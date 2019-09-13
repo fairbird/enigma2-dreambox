@@ -293,6 +293,7 @@
 	</setup>
 	<setup key="osd" title="OSD settings">
 		<item text="Alpha">config.osd.alpha</item>
+		<item text="Teletext alpha">config.osd.alpha_teletext</item>
 		<item text="Brightness">config.osd.bright</item>
 		<item text="Contrast">config.osd.contrast</item>
 	</setup>
