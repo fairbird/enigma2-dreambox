@@ -1,7 +1,7 @@
 import errno
 import xml.etree.ElementTree
 
-from enigma import addFont, eLabel, ePixmap, ePoint, eRect, eSize, eWindow, eWindowStyleManager, eWindowStyleSkinned, getDesktop, gFont, getFontFaces, gRGB, BT_ALPHATEST, BT_ALPHABLEND
+from enigma import addFont, eLabel, ePixmap, ePoint, eRect, eSize, eWindow, eWindowStyleManager, eWindowStyleSkinned, getDesktop, gFont, getFontFaces, gMainDC, gRGB, BT_ALPHATEST, BT_ALPHABLEND
 from os.path import basename, dirname, isfile
 
 from Components.config import ConfigSubsection, ConfigText, config
@@ -41,6 +41,7 @@ parameters = {}  # Dictionary of skin parameters used to modify code behavior.
 setups = {}  # Dictionary of images associated with setup menus.
 switchPixmap = {}  # Dictionary of switch images.
 windowStyles = {}  # Dictionary of window styles for each screen ID.
+skinResolutions = {}  # Dictionary of screen resolutions for each screen ID.
 
 config.skin = ConfigSubsection()
 skin = resolveFilename(SCOPE_SKIN, DEFAULT_SKIN)
@@ -70,7 +71,7 @@ runCallbacks = False
 
 
 def InitSkins():
-	global currentPrimarySkin, currentDisplaySkin
+	global currentPrimarySkin, currentDisplaySkin, skinResolutions
 	runCallbacks = False
 	# Add the emergency skin.  This skin should provide enough functionality
 	# to enable basic GUI functions to work.
@@ -108,6 +109,10 @@ def InitSkins():
 			result = loadSkin(name, scope=SCOPE_CURRENT_SKIN, desktop=getDesktop(GUI_SKIN_ID), screenID=GUI_SKIN_ID)
 	if result is None:
 		loadSkin(USER_SKIN, scope=SCOPE_CURRENT_SKIN, desktop=getDesktop(GUI_SKIN_ID), screenID=GUI_SKIN_ID)
+	resolution = skinResolutions.get(GUI_SKIN_ID, (0, 0, 0))
+	if resolution[0] and resolution[1]:
+		gMainDC.getInstance().setResolution(resolution[0], resolution[1])
+		getDesktop(GUI_SKIN_ID).resize(eSize(resolution[0], resolution[1]))
 	runCallbacks = True
 
 # Temporary entry point for older versions of StartEnigma.py.
@@ -122,7 +127,7 @@ def loadSkinData(desktop):
 
 
 def loadSkin(filename, scope=SCOPE_SKIN, desktop=getDesktop(GUI_SKIN_ID), screenID=GUI_SKIN_ID):
-	global windowStyles
+	global windowStyles, skinResolutions
 	filename = resolveFilename(scope, filename)
 	print("[Skin] Loading skin file '%s'." % filename)
 	try:
@@ -706,7 +711,7 @@ def reloadWindowStyles():
 def loadSingleSkinData(desktop, screenID, domSkin, pathSkin, scope=SCOPE_CURRENT_SKIN):
 	"""Loads skin data like colors, windowstyle etc."""
 	assert domSkin.tag == "skin", "root element in skin must be 'skin'!"
-	global colors, fonts, menus, parameters, setups, switchPixmap
+	global colors, fonts, menus, parameters, setups, switchPixmap, skinResolutions
 	for tag in domSkin.findall("output"):
 		scrnID = int(tag.attrib.get("id", GUI_SKIN_ID))
 		if scrnID == GUI_SKIN_ID:
@@ -717,10 +722,11 @@ def loadSingleSkinData(desktop, screenID, domSkin, pathSkin, scope=SCOPE_CURRENT
 				yres = int(yres) if yres else 576
 				bpp = res.attrib.get("bpp")
 				bpp = int(bpp) if bpp else 32
-				# print("[Skin] DEBUG: Resolution xres=%d, yres=%d, bpp=%d." % (xres, yres, bpp))
-				from enigma import gMainDC
-				gMainDC.getInstance().setResolution(xres, yres)
-				desktop.resize(eSize(xres, yres))
+				print("[Skin] Skin resolution is %dx%d colour depth is %d bits." % (xres, yres, bpp))
+				skinResolutions[scrnID] = (xres, yres, bpp)
+				# from enigma import gMainDC
+				# gMainDC.getInstance().setResolution(xres, yres)
+				# desktop.resize(eSize(xres, yres))
 				if bpp != 32:
 					pass  # Load palette (Not yet implemented!)
 
