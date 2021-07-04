@@ -554,6 +554,12 @@ def InitUsageConfig():
 			("mute", _("Black screen")), ("hold", _("Hold screen")), ("mutetilllock", _("Black screen till locked")), ("holdtilllock", _("Hold till locked"))])
 		config.misc.zapmode.addNotifier(setZapmode, immediate_feedback=False)
 
+	if not SystemInfo["ZapMode"] and exists("/proc/stb/info/model"):
+		def setZapmodeDM(el):
+			print('[UsageConfig] >>> zapmodeDM')
+		config.misc.zapmodeDM = ConfigSelection(default="black", choices=[("black", _("Black screen")), ("hold", _("Hold screen"))])
+		config.misc.zapmodeDM.addNotifier(setZapmodeDM, immediate_feedback = False)
+
 	if SystemInfo["VFD_scroll_repeats"]:
 		def scroll_repeats(el):
 			open(SystemInfo["VFD_scroll_repeats"], "w").write(el.value)
