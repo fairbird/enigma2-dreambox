@@ -537,6 +537,9 @@ def InitUsageConfig():
 		("3", _("Everywhere"))])
 	config.misc.erase_flags.addNotifier(updateEraseFlags, immediate_feedback=False)
 
+	config.misc.zapkey_delay = ConfigSelectionNumber(default=5, stepwidth=1, min=0, max=20, wraparound=True)
+	config.misc.numzap_picon = ConfigYesNo(default=False)
+
 	if SystemInfo["ZapMode"]:
 		def setZapmode(el):
 			open(SystemInfo["ZapMode"], "w").write(el.value)
