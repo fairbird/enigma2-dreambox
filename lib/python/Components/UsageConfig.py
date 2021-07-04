@@ -21,6 +21,13 @@ def InitUsageConfig():
 
 	showrotorpositionChoicesUpdate()
 
+	config.usage.maxchannelnumlen = ConfigSelection(default="4", choices=[
+		("3", _("3")),
+		("4", _("4")),
+		("5", _("5")),
+		("6", _("6"))
+	])
+
 	config.usage.alternative_number_mode = ConfigYesNo(default=False)
 
 	def alternativeNumberModeChange(configElement):
