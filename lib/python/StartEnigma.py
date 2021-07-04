@@ -587,6 +587,18 @@ profile("LCD")
 import Components.Lcd
 Components.Lcd.InitLcd()
 
+if boxtype in ('dm7080', 'dm820', 'dm900', 'dm920', 'dreamone', 'dreamtwo'):
+	print("[StartEnigma] Read /proc/stb/hdmi-rx/0/hdmi_rx_monitor")
+	check = open("/proc/stb/hdmi-rx/0/hdmi_rx_monitor", "r").read()
+	if check.startswith("on"):
+		print("[StartEnigma] Write to /proc/stb/hdmi-rx/0/hdmi_rx_monitor")
+		open("/proc/stb/hdmi-rx/0/hdmi_rx_monitor", "w").write("off")
+	print("[StartEnigma] Read /proc/stb/audio/hdmi_rx_monitor")
+	checkaudio = open("/proc/stb/audio/hdmi_rx_monitor", "r").read()
+	if checkaudio.startswith("on"):
+		print("[StartEnigma] Write to /proc/stb/audio/hdmi_rx_monitor")
+		open("/proc/stb/audio/hdmi_rx_monitor", "w").write("off")
+
 profile("RFMod")
 import Components.RFmod
 Components.RFmod.InitRFmod()
