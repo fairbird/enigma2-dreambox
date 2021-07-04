@@ -3005,6 +3005,148 @@ class InfoBarRedButton:
 			for x in self.onRedButtonActivation:
 				x()
 
+class InfoBarAspectSelection:
+	STATE_HIDDEN = 0
+	STATE_ASPECT = 1
+	STATE_RESOLUTION = 2
+
+	def __init__(self):
+		self["AspectSelectionAction"] = HelpableActionMap(self, ["InfobarAspectSelectionActions"], {
+			"aspectSelection": (self.ExGreen_toggleGreen, _("Aspect ratio list")),
+		}, prio=0, description=_("Aspect Ratio Actions"))
+
+		self.__ExGreen_state = self.STATE_HIDDEN
+
+	def ExGreen_doAspect(self):
+		print("do self.STATE_ASPECT")
+		self.__ExGreen_state = self.STATE_ASPECT
+		self.aspectSelection()
+
+	def ExGreen_doResolution(self):
+		print("do self.STATE_RESOLUTION")
+		self.__ExGreen_state = self.STATE_RESOLUTION
+		self.resolutionSelection()
+
+	def ExGreen_doHide(self):
+		print("do self.STATE_HIDDEN")
+		self.__ExGreen_state = self.STATE_HIDDEN
+
+	def ExGreen_toggleGreen(self, arg=""):
+		print(self.__ExGreen_state)
+		if self.__ExGreen_state == self.STATE_HIDDEN:
+			print("self.STATE_HIDDEN")
+			self.ExGreen_doAspect()
+		elif self.__ExGreen_state == self.STATE_ASPECT:
+			print("self.STATE_ASPECT")
+			self.ExGreen_doResolution()
+		elif self.__ExGreen_state == self.STATE_RESOLUTION:
+			print("self.STATE_RESOLUTION")
+			self.ExGreen_doHide()
+
+	def aspectSelection(self):
+		selection = 0
+		tlist = [(_("Resolution"), "resolution"), ("--", ""), (_("4:3 letterbox"), "0"), (_("4:3 panscan"), "1"), (_("16:9"), "2"), (_("16:9 always"), "3"), (_("16:10 letterbox"), "4"), (_("16:10 panscan"), "5"), (_("16:9 letterbox"), "6")]
+		for x in range(len(tlist)):
+			selection = x
+		keys = ["green", "", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
+		self.session.openWithCallback(self.aspectSelected, ChoiceBox, title=_("Please select an aspect ratio..."), list=tlist, selection=selection, keys=keys)
+
+	def aspectSelected(self, aspect):
+		if not aspect is None:
+			if isinstance(aspect[1], str):
+				if aspect[1] == "":
+					self.ExGreen_doHide()
+				elif aspect[1] == "resolution":
+					self.ExGreen_toggleGreen()
+				else:
+					from Components.AVSwitch import AVSwitch
+					iAVSwitch = AVSwitch()
+					iAVSwitch.setAspectRatio(int(aspect[1]))
+					self.ExGreen_doHide()
+		else:
+			self.ExGreen_doHide()
+		return
+
+class InfoBarResolutionSelection:
+	def __init__(self):
+		return
+
+	def resolutionSelection(self):
+		try:
+			print("[InfoBarGenerics] Read /proc/stb/vmpeg/0/xres")
+			xresString = open("/proc/stb/vmpeg/0/xres", "r").read()
+		except:
+			print("[InfoBarGenerics] Error open /proc/stb/vmpeg/0/xres!")
+		try:
+			print("[InfoBarGenerics] Read /proc/stb/vmpeg/0/yres")
+			yresString = open("/proc/stb/vmpeg/0/yres", "r").read()
+		except:
+			print("[InfoBarGenerics] Error open /proc/stb/vmpeg/0/yres!")
+		if brand == "azbox":
+			print("[InfoBarGenerics] Set fpsString to 50000 for azbox to avoid further problems!")
+			fpsString = '50000'
+		else:
+			try:
+				print("[InfoBarGenerics] Read /proc/stb/vmpeg/0/framerate")
+				fpsString = open("/proc/stb/vmpeg/0/framerate", "r").read()
+			except:
+				print("[InfoBarGenerics] Error open /proc/stb/vmpeg/0/framerate!")
+				print("[InfoBarGenerics] Set fpsString to 50000 like azbox to avoid further problems!")
+				fpsString = '50000'
+
+		xres = int(xresString, 16)
+		yres = int(yresString, 16)
+		fps = int(fpsString)
+		fpsFloat = float(fps)
+		fpsFloat = fpsFloat / 1000
+
+		# do we need a new sorting with this way here or should we disable some choices?
+		choices = []
+		if os.path.exists("/proc/stb/video/videomode_choices"):
+			print("[InfoBarGenerics] Read /proc/stb/video/videomode_choices")
+			f = open("/proc/stb/video/videomode_choices")
+			values = f.readline().replace("\n", "").replace("pal ", "").replace("ntsc ", "").split(" ", -1)
+			for x in values:
+				entry = x.replace('i50', 'i@50hz').replace('i60', 'i@60hz').replace('p23', 'p@23.976hz').replace('p24', 'p@24hz').replace('p25', 'p@25hz').replace('p29', 'p@29hz').replace('p30', 'p@30hz').replace('p50', 'p@50hz'), x
+				choices.append(entry)
+			f.close()
+
+		selection = 0
+		tlist = []
+		tlist.append((_("Exit"), "exit"))
+		tlist.append((_("Auto (not available)"), "auto"))
+		tlist.append((_("Video: ") + str(xres) + "x" + str(yres) + "@" + str(fpsFloat) + "hz", ""))
+		tlist.append(("--", ""))
+		if choices != []:
+			for x in choices:
+				tlist.append(x)
+
+		keys = ["green", "yellow", "blue", "", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
+
+		if os.path.exists("/proc/stb/video/videomode"):
+			print("[InfoBarGenerics] Read /proc/stb/video/videomode")
+			mode = open("/proc/stb/video/videomode").read()[:-1]
+		print(mode)
+		for x in range(len(tlist)):
+			if tlist[x][1] == mode:
+				selection = x
+
+		self.session.openWithCallback(self.ResolutionSelected, ChoiceBox, title=_("Please select a resolution..."), list=tlist, selection=selection, keys=keys)
+
+	def ResolutionSelected(self, Resolution):
+		if not Resolution is None:
+			if isinstance(Resolution[1], str):
+				if Resolution[1] == "exit" or Resolution[1] == "" or Resolution[1] == "auto":
+					self.ExGreen_toggleGreen()
+				if Resolution[1] != "auto":
+					print("[InfoBarGenerics] Write to /proc/stb/video/videomode")
+					open("/proc/stb/video/videomode", "w").write(Resolution[1])
+					#from enigma import gMainDC
+					#gMainDC.getInstance().setResolution(-1, -1)
+					self.ExGreen_doHide()
+		else:
+			self.ExGreen_doHide()
+		return
 
 class InfoBarTimerButton:
 	def __init__(self):
