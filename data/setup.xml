@@ -7,6 +7,7 @@
 		<!-- this is just a placeholder, the Videomode plugin implements this submenu -->
 	</setup>
 	<setup key="usage" title="Customize">
+		<item level="0" text="Show Main Menu as" description="Choose style of main menus" >config.usage.menutype</item>
 		<item level="1" text="Sort order for menu entries" description="This option allows you to hide and sort menu entries. When selecting user you can change order and hide menu items via the blue button. With the user defined hidden the blue button is not shown in the menus">config.usage.menu_sort_mode</item>
 		<item level="1" text="Sort order for setup entries" description="This option allows you to alphabetically sort setup menu entries.">config.usage.sort_settings</item>
 		<item level="1" text="Show screen path" description="This option allows you to show the full screen path leading to the current screen.">config.usage.showScreenPath</item>

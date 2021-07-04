@@ -896,6 +896,12 @@ def preferredTunerChoicesUpdate(update=False):
 			atsc_nims.append((str(slot.slot), slot.getSlotName()))
 		nims.append((str(slot.slot), slot.getSlotName()))
 
+	config.usage.menutype = ConfigSelection(default="standard", choices=[
+		("horzanim", _("Horizontal menu")),
+		("horzicon", _("Horizontal icons")),
+		("standard", _("Standard menu"))
+	])
+
 	if not update:
 		config.usage.frontend_priority = ConfigSelection(default="-1", choices=list(nims))
 	else:
