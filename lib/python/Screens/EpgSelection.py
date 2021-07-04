@@ -5,7 +5,7 @@ from Components.config import config, ConfigClock
 from Components.Pixmap import Pixmap
 from Components.Label import Label
 from Components.EpgList import EPGList, EPG_TYPE_SINGLE, EPG_TYPE_SIMILAR, EPG_TYPE_MULTI
-from Components.ActionMap import ActionMap
+from Components.ActionMap import ActionMap, HelpableActionMap
 from Components.UsageConfig import preferredTimerPath
 from Components.Sources.ServiceEvent import ServiceEvent
 from Components.Sources.StaticText import StaticText
@@ -23,6 +23,9 @@ from Components.PluginComponent import plugins
 from Plugins.Plugin import PluginDescriptor
 from Tools.BoundFunction import boundFunction
 from Tools.FallbackTimer import FallbackTimerList
+from Components.Button import Button
+from Screens.MessageBox import MessageBox
+from Components.Console import Console
 
 mepg_config_initialized = False
 
@@ -45,6 +48,7 @@ class EPGSelection(Screen):
 		self["Service"] = ServiceEvent()
 		self["Event"] = Event()
 		self.session = session
+		self.Console = Console()
 		if isinstance(service, str) and eventid is not None:
 			self.type = EPG_TYPE_SIMILAR
 			self.setTitle(_("Similar EPG"))
@@ -67,8 +71,12 @@ class EPGSelection(Screen):
 			self.setTitle(_("Multi EPG"))
 			self.skinName = "EPGSelectionMulti"
 			self.type = EPG_TYPE_MULTI
-			self["key_yellow"] = StaticText(pgettext("button label, 'previous screen'", "Prev"))
-			self["key_blue"] = StaticText(pgettext("button label, 'next screen'", "Next"))
+			if self.bouquetChangeCB == StaticText:
+				self["key_yellow"] = StaticText(pgettext("button label, 'previous screen'", "Prev"))
+				self["key_blue"] = StaticText(pgettext("button label, 'next screen'", "Next"))
+			else:
+				self["key_yellow"] = Button(pgettext("button label, 'previous screen'", "Prev"))
+				self["key_blue"] = Button(pgettext("button label, 'next screen'", "Next"))
 			self["now_button"] = Pixmap()
 			self["next_button"] = Pixmap()
 			self["more_button"] = Pixmap()
@@ -82,7 +90,10 @@ class EPGSelection(Screen):
 			self.services = service
 			self.zapFunc = zapFunc
 		self.parent = parent
-		self["key_green"] = StaticText(_("Add timer"))
+		if self.bouquetChangeCB == StaticText:
+			self["key_green"] = StaticText(_("Add timer"))
+		else:
+			self["key_green"] = Button(_("Add timer"))
 		self.key_green_choice = self.ADD_TIMER
 		self.key_red_choice = self.EMPTY
 		self["list"] = EPGList(type=self.type, selChangedCB=self.onSelectionChanged, timer=session.nav.RecordTimer)
@@ -95,7 +106,6 @@ class EPGSelection(Screen):
 				"yellow": self.yellowButtonPressed,
 				"blue": self.blueButtonPressed,
 				"info": self.infoKeyPressed,
-				"red": self.zapTo,
 				"menu": self.furtherOptions,
 				"nextBouquet": self.nextBouquet, # just used in multi epg yet
 				"prevBouquet": self.prevBouquet, # just used in multi epg yet
@@ -103,12 +113,88 @@ class EPGSelection(Screen):
 				"prevService": self.prevService, # just used in single epg yet
 				"preview": self.eventPreview,
 			})
+
+		self['colouractions'] = HelpableActionMap(self, ["ColorActions"],
+			{
+				"red": (self.GoToTmbd, _("Search event in TMBD"))
+			})
+
+		self.isTMBD = isPluginInstalled("TMBD")
+		if self.isTMBD:
+			self["key_red"] = Button(_("Search TMBD"))
+			self.select = True
+		if not self.isTMBD:
+			self["key_red"] = Button(_("TMBD Not Installed"))
+			self.select = False
+		try:
+			from Plugins.Extensions.YTTrailer.plugin import baseEPGSelection__init__
+			description = _("Search yt-trailer for event")
+		except ImportError as ie:
+			pass
+		else:
+			if baseEPGSelection__init__ is not None:
+				self["trailerActions"] = ActionMap(["InfobarActions", "InfobarTeletextActions"],
+				{
+					"showTv": self.showTrailer,
+					"showRadio": self.showTrailerList,
+					"startTeletext": self.showConfig
+				})
 		self["actions"].csel = self
 		if parent and hasattr(parent, "fallbackTimer"):
 			self.fallbackTimer = parent.fallbackTimer
 			self.onLayoutFinish.append(self.onCreate)
 		else:
 			self.fallbackTimer = FallbackTimerList(self, self.onCreate)
+
+	def GoToTmbd(self):
+		if isPluginInstalled("TMBD"):
+			self.runTMBD()
+		else:
+			self.session.openWithCallback(self.doInstall, MessageBox, _('The TMBD plugin is not installed!\nDo you want to install it?'), MessageBox.TYPE_YESNO)
+
+	def runTMBD(self):
+		if isPluginInstalled("TMBD"):
+			from Plugins.Extensions.TMBD.plugin import TMBD
+			description = _("TMBD Details")
+			description = _("TMBD details for event")
+			description = _("Query details from the Internet Movie Database")
+			cur = self["list"].getCurrent()
+			if cur[0] is not None:
+				name2 = cur[0].getEventName() or ''
+				name3 = name2.split("(")[0].strip()
+				eventname = name3.replace('"', '').replace('', '').replace('.', '')
+				eventname = eventname.replace('', '')
+				try:
+					tmbdsearch = config.plugins.tmbd.profile.value
+				except:
+					tmbdsearch = None
+				if tmbdsearch is not None:
+					if config.plugins.tmbd.profile.value == "0":
+						self.session.open(TMBD, eventname, False)
+					else:
+						try:
+							from Plugins.Extensions.TMBD.plugin import KinoRu
+							self.session.open(KinoRu, eventname, False)
+						except:
+							pass
+				else:
+					self.session.open(TMBD, eventname, False)
+
+	def doInstall(self, val):
+		if val:
+			self.message = self.session.open(MessageBox, _("Please wait..."), MessageBox.TYPE_INFO, enable_input=False)
+			self.message.setTitle(_('Installing TMBD'))
+			self.Console.ePopen('opkg update && opkg install enigma2-plugin-extensions-tmbd', self.installComplete)
+		else:
+			self.close()
+
+	def installComplete(self, str, retval, extra_args):
+		if 'Collected errors' in str:
+			self.session.openWithCallback(self.close, MessageBox, _("Seems internet connection down, Or TMBD Plugin not on feed."), type=MessageBox.TYPE_INFO, timeout=10, close_on_any_key=True)
+			self.message.close()
+		else:
+			self.message.close()
+			self.close()
 
 	def nextBouquet(self):
 		if self.type == EPG_TYPE_SINGLE:
@@ -534,9 +620,6 @@ class EPGSelection(Screen):
 			if self.key_green_choice != self.EMPTY:
 				self["key_green"].setText("")
 				self.key_green_choice = self.EMPTY
-			if self.key_red_choice != self.EMPTY:
-				self["key_red"].setText("")
-				self.key_red_choice = self.EMPTY
 			return
 		event = cur[0]
 		self["Event"].newEvent(event)
@@ -558,9 +641,9 @@ class EPGSelection(Screen):
 				nowTime = localtime(now)
 				begTime = localtime(beg)
 				if nowTime[2] != begTime[2]:
-					datestr = '%s %d.%d.' % (days[begTime[6]], begTime[2], begTime[1])
+					datestr = strftime(config.usage.date.dayshort.value, begTime)
 				else:
-					datestr = '%s %d.%d.' % (_("Today"), begTime[2], begTime[1])
+					datestr = '%s' % _('Today')
 			self["date"].setText(datestr)
 			if cur[1] is None:
 				self["Service"].newService(None)
@@ -570,13 +653,7 @@ class EPGSelection(Screen):
 			if self.key_green_choice != self.EMPTY:
 				self["key_green"].setText("")
 				self.key_green_choice = self.EMPTY
-			if self.key_red_choice != self.EMPTY:
-				self["key_red"].setText("")
-				self.key_red_choice = self.EMPTY
 			return
-		elif self.key_red_choice != self.ZAP and self.zapFunc is not None:
-				self["key_red"].setText(_("Zap"))
-				self.key_red_choice = self.ZAP
 
 		if event is None:
 			if self.key_green_choice != self.EMPTY:
