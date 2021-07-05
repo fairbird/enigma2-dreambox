@@ -10,7 +10,7 @@ import os
 # selected mode. No other strict checking is done.
 
 config.av.edid_override = ConfigYesNo(default=True)
-
+chipsetstring = about.getChipSetString()
 
 class VideoHardware:
 	rates = {} # high-level, use selectable modes.
@@ -55,8 +55,12 @@ class VideoHardware:
 
 	rates["2160p"] = {"50Hz": {50: "2160p50"},
 								"60Hz": {60: "2160p60"},
-								"multi": {50: "2160p50", 60: "2160p60"},
+								"multi": {50: "2160p50", 60: "2160p60"}, 
 								"auto": {50: "2160p50", 60: "2160p60", 24: "2160p24"}}
+	if HardwareInfo().get_device_name() in ("dm900", "dm920", "dreamone", "dreamtwo"):
+		rates["2160p"] = {"50Hz": {50: "2160p50"}, "60Hz": {60: "2160p60"}, "multi": {50: "2160p50", 60: "2160p60"}, "auto": {50: "2160p50", 60: "2160p60", 24: "2160p24"}}
+	else:
+		rates["2160p"] = {"50Hz": {50: "2160p50"}, "60Hz": {60: "2160p"}, "multi": {50: "2160p50", 60: "2160p"}, "auto": {50: "2160p50", 60: "2160p", 24: "2160p24"}}
 
 	rates["PC"] = {
 		"1024x768": {60: "1024x768"}, # not possible on DM7025
@@ -85,6 +89,10 @@ class VideoHardware:
 	else:
 		modes["DVI"] = ["720p", "1080p", "2160p", "2160p30", "1080i", "576p", "480p", "576i", "480i"]
 	modes["DVI-PC"] = ["PC"]
+
+	if HardwareInfo().get_device_name() in ("dreamone", "dreamtwo"):
+		modes['HDMI'] = ['720p', '1080p', '2160p', '1080i', '576p', '576i', '480p', '480i']
+		widescreen_modes = {'720p', '1080p', '1080i', '2160p'}
 
 	def getOutputAspect(self):
 		ret = (16, 9)
@@ -156,12 +164,19 @@ class VideoHardware:
 
 	def readPreferredModes(self):
 		if config.av.edid_override.value == False:
-			try:
-				modes = open("/proc/stb/video/videomode_preferred").read()[:-1]
-				self.modes_preferred = modes.split(' ')
-			except IOError:
-				print "[VideoHardware] reading preferred modes failed, using all video modes"
-				self.modes_preferred = self.modes_available
+			if HardwareInfo().get_device_name() in ("dreamone", "dreamtwo"):
+				f = open('/sys/class//amhdmitx/amhdmitx0/disp_cap')
+				modes = f.read()[:-1]
+				f.close()
+				self.modes_preferred = modes.splitlines()
+				print '[AVSwitch] reading edid modes: ', self.modes_preferred
+			else:
+				try:
+					modes = open("/proc/stb/video/videomode_preferred").read()[:-1]
+					self.modes_preferred = modes.split(' ')
+				except IOError:
+					print "[VideoHardware] reading preferred modes failed, using all video modes"
+					self.modes_preferred = self.modes_available
 
 			if len(self.modes_preferred) <= 1:
 				self.modes_preferred = self.modes_available
@@ -207,6 +222,16 @@ class VideoHardware:
 			if force == 50:
 				mode_24 = mode_50
 
+		if HardwareInfo().get_device_name() in ("dreamone", "dreamtwo"):
+			f = open('/sys/class/display/mode', 'w')
+			f.write('576i50hz')
+			f.close()
+			amlmode = mode + rate.lower()
+			f = open('/sys/class/display/mode', 'w')
+			f.write(amlmode)
+			f.close()
+			print '##########################[AVSwitch] setting videomode to::::', amlmode
+
 		try:
 			open("/proc/stb/video/videomode_50hz", "w").write(mode_50)
 			open("/proc/stb/video/videomode_60hz", "w").write(mode_60)
@@ -223,10 +248,13 @@ class VideoHardware:
 			print "[VideoHardware] writing initial videomode to /etc/videomode failed."
 
 		if SystemInfo["Has24hz"]:
-			try:
-				open("/proc/stb/video/videomode_24hz", "w").write(mode_24)
-			except IOError:
-				print "[VideoHardware] cannot open /proc/stb/video/videomode_24hz"
+			if HardwareInfo().get_device_name() in ("dreamone", "dreamtwo"):
+				self.has24pAvailable = False
+			else:
+				try:
+					open("/proc/stb/video/videomode_24hz", "w").write(mode_24)
+				except IOError:
+					print "[VideoHardware] cannot open /proc/stb/video/videomode_24hz"
 
 		self.updateAspect(None)
 
@@ -257,7 +285,9 @@ class VideoHardware:
 
 	# get a list with all modes, with all rates, for a given port.
 	def getModeList(self, port):
-		print "[VideoHardware] getModeList for port", port
+		if HardwareInfo().get_device_name() in ("dreamone", "dreamtwo"):
+			res = [('720p', ['50Hz', '60Hz']), ('1080p', ['50Hz', '60Hz', '30hz', '24hz', '25hz']), ('1080i', ['50Hz', '60Hz']), ('2160p', ['50Hz', '60hz', '30hz', '24hz', '25hz']), ('576p', ['50Hz']), ('576i', ['50Hz']), ('480p', ['60Hz']), ('480i', ['60Hz'])]
+			return res
 		res = []
 		for mode in self.modes[port]:
 			# list all rates which are completely valid
@@ -308,11 +338,12 @@ class VideoHardware:
 
 		mode = config.av.videomode[port].value
 
-		if mode not in config.av.videorate:
-			print "[VideoHardware] current mode not available, not setting videomode"
-			return
-
-		rate = config.av.videorate[mode].value
+		if HardwareInfo().get_device_name() in ("dreamone", "dreamtwo") and (mode.find("0p30") != -1 or mode.find("0p24") != -1 or mode.find("0p25") != -1):
+			match = re.search(r"(\d*?[ip])(\d*?)$", mode)
+			mode = match.group(1)
+			rate = match.group(2) + "Hz"
+		else:
+			rate = config.av.videorate[mode].value
 		self.setMode(port, mode, rate)
 
 	def updateAspect(self, cfgelement):
@@ -373,6 +404,33 @@ class VideoHardware:
 			wss = "auto"
 
 		print "[VideoHardware] -> setting aspect, policy, policy2, wss", aspect, policy, policy2, wss
+		if chipsetstring.startswith("meson-6") and if HardwareInfo().get_device_name() in ("dreamone", "dreamtwo"):
+			arw = "0"
+			if config.av.policy_43.value == "bestfit":
+				arw = "10"
+			if config.av.policy_43.value == "panscan":
+				arw = "11"
+			if config.av.policy_43.value == "letterbox":
+				arw = "12"
+			try:
+				print("[Videomode] Write to /sys/class/video/screen_mode")
+				open("/sys/class/video/screen_mode", "w").write(arw)
+			except IOError:
+				print("[Videomode] Write to /sys/class/video/screen_mode failed.")
+		elif HardwareInfo().get_device_name() in ("dreamone", "dreamtwo"):
+			arw = "0"
+			if config.av.policy_43.value == "bestfit":
+				arw = "10"
+			if config.av.policy_43.value == "panscan":
+				arw = "12"
+			if config.av.policy_43.value == "letterbox":
+				arw = "11"
+			try:
+				print("[Videomode] Write to /sys/class/video/screen_mode")
+				open("/sys/class/video/screen_mode", "w").write(arw)
+			except IOError:
+				print("[Videomode] Write to /sys/class/video/screen_mode failed.")
+
 		open("/proc/stb/video/aspect", "w").write(aspect)
 		open("/proc/stb/video/policy", "w").write(policy)
 		try:
