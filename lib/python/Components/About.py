@@ -4,6 +4,9 @@ import time
 import re
 from Tools.HardwareInfo import HardwareInfo
 from sys import maxsize, modules, version_info
+from Tools.Directories import fileReadLine
+
+MODULE_NAME = __name__.split(".")[-1]
 
 
 def getVersionString():
