@@ -563,7 +563,7 @@ def InitUsageConfig():
 			("mute", _("Black screen")), ("hold", _("Hold screen")), ("mutetilllock", _("Black screen till locked")), ("holdtilllock", _("Hold till locked"))])
 		config.misc.zapmode.addNotifier(setZapmode, immediate_feedback=False)
 
-	if not SystemInfo["ZapMode"] and exists("/proc/stb/info/model"):
+	if not SystemInfo["ZapMode"] and os.path.exists("/proc/stb/info/model"):
 		def setZapmodeDM(el):
 			print('[UsageConfig] >>> zapmodeDM')
 		config.misc.zapmodeDM = ConfigSelection(default="black", choices=[("black", _("Black screen")), ("hold", _("Hold screen"))])

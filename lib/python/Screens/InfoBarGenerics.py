@@ -3841,7 +3841,7 @@ class InfoBarHdmi2:
 		self.hdmi_enabled_full = False
 		self.hdmi_enabled_pip = False
 
-		if BoxInfo.getItem("HasHDMIin"):
+		if SystemInfo["HasHDMIin"]:
 			if not self.hdmi_enabled_full:
 				self.addExtension((self.getHDMIInFullScreen, self.HDMIInFull, lambda: True), "blue")
 			if not self.hdmi_enabled_pip:
