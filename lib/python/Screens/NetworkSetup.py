@@ -248,10 +248,21 @@ class NameserverSetup(Screen, ConfigListScreen, HelpableScreen):
 
 	def createConfig(self):
 		self.nameservers = iNetwork.getNameserverList()
-		self.nameserverEntries = [NoSave(ConfigIP(default=nameserver)) for nameserver in self.nameservers]
+		if config.usage.dns.value == 'google':
+			self.nameserverEntries = [NoSave(ConfigIP(default=[8, 8, 8, 8])), NoSave(ConfigIP(default=[8, 8, 4, 4]))]
+		elif config.usage.dns.value == 'cloudflare':
+			self.nameserverEntries = [NoSave(ConfigIP(default=[1, 1, 1, 1])), NoSave(ConfigIP(default=[1, 0, 0, 1]))]
+		elif config.usage.dns.value == 'opendns-familyshield':
+			self.nameserverEntries = [NoSave(ConfigIP(default=[208, 67, 222, 123])), NoSave(ConfigIP(default=[208, 67, 220, 123]))]
+		elif config.usage.dns.value == 'opendns-home':
+			self.nameserverEntries = [NoSave(ConfigIP(default=[208, 67, 222, 222])), NoSave(ConfigIP(default=[208, 67, 220, 220]))]
+		elif config.usage.dns.value == 'custom' or config.usage.dns.value == 'dhcp-router':
+			self.nameserverEntries = [NoSave(ConfigIP(default=nameserver)) for nameserver in self.nameservers]
 
 	def createSetup(self):
 		self.list = []
+		self.DNSEntry = getConfigListEntry(_("Nameserver configuration"), config.usage.dns)
+		self.list.append(self.DNSEntry)
 
 		i = 1
 		for x in self.nameserverEntries:
@@ -262,20 +273,18 @@ class NameserverSetup(Screen, ConfigListScreen, HelpableScreen):
 		self["config"].l.setList(self.list)
 
 	def ok(self):
+		self.RefreshNameServerUsed()
 		iNetwork.clearNameservers()
 		for nameserver in self.nameserverEntries:
 			iNetwork.addNameserver(nameserver.value)
 		iNetwork.writeNameserverConfig()
+		config.usage.dns.save()
 		self.close()
 
 	def run(self):
 		self.ok()
 
 	def cancel(self):
-		iNetwork.clearNameservers()
-		print "backup-list:", self.backupNameserverList
-		for nameserver in self.backupNameserverList:
-			iNetwork.addNameserver(nameserver)
 		self.close()
 
 	def add(self):
@@ -291,12 +300,19 @@ class NameserverSetup(Screen, ConfigListScreen, HelpableScreen):
 			self.createConfig()
 			self.createSetup()
 
+	def RefreshNameServerUsed(self):
+		print("[NetworkSetup] currentIndex:", self["config"].getCurrentIndex())
+		index = self["config"].getCurrentIndex()
+		if index < len(self.nameservers):
+			self.createConfig()
+			self.createSetup()
+
 
 class AdapterSetup(Screen, ConfigListScreen, HelpableScreen):
 	def __init__(self, session, networkinfo, essid=None):
 		Screen.__init__(self, session)
 		HelpableScreen.__init__(self)
-		self.setTitle(_("Network setup"))
+		self.setTitle(_("Network Setup"))
 		self.session = session
 		if isinstance(networkinfo, (list, tuple)):
 			self.iface = networkinfo[0]
@@ -916,7 +932,6 @@ class AdapterSetupConfiguration(Screen, HelpableScreen):
 
 	def restartfinishedCB(self, data):
 		if data is True:
-			self.updateStatusbar()
 			self.session.open(MessageBox, _("Finished restarting your network"), type=MessageBox.TYPE_INFO, timeout=10, default=False)
 
 	def dataAvail(self, data):
