@@ -1,4 +1,5 @@
 from Screens.Screen import Screen
+from xml.etree.cElementTree import parse
 from Screens.MessageBox import MessageBox
 from Screens.ParentalControlSetup import ProtectedScreen
 from Components.Sources.List import List
