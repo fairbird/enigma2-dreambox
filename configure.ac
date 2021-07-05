@@ -280,6 +280,9 @@ data/skin_default/buttons/Makefile
 data/skin_default/epg/Makefile
 data/skin_default/spinner/Makefile
 data/skin_default/LCDIcons/Makefile
+data/VirtualKeyBoard_Icons/Makefile
+data/VirtualKeyBoard_Icons/buttonsHD/Makefile
+data/VirtualKeyBoard_Icons/buttonsFHD/Makefile
 include/Makefile
 lib/Makefile
 lib/base/eenv.cpp
