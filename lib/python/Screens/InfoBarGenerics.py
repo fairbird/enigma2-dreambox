@@ -5,6 +5,7 @@ from Components.ActionMap import NumberActionMap
 from Components.Harddisk import harddiskmanager
 from Components.Input import Input
 from Components.Label import Label
+from Components.Pixmap import MultiPixmap
 from Components.MovieList import AUDIO_EXTENSIONS, MOVIE_EXTENSIONS, DVD_EXTENSIONS
 from Components.PluginComponent import plugins
 from Components.ServiceEventTracker import ServiceEventTracker
@@ -1804,6 +1805,11 @@ from Screens.PVRState import PVRState, TimeshiftState
 
 class InfoBarPVRState:
 	def __init__(self, screen=PVRState, force_show=False):
+		self.seekstate = self.SEEK_STATE_PLAY
+		self["statespeed"] = Label(text="")
+		self["state"] = Label(text="")
+		self["stateicon"] = MultiPixmap()
+		self["stateicon"].hide()
 		self.onPlayStateChanged.append(self.__playStateChanged)
 		self.pvrStateDialog = self.session.instantiateDialog(screen)
 		self.onShow.append(self._mayShow)
@@ -1811,7 +1817,8 @@ class InfoBarPVRState:
 		self.force_show = force_show
 
 	def _mayShow(self):
-		if self.shown and self.seekstate != self.SEEK_STATE_PLAY:
+		if self.shown:
+			self.__playStateChanged(self.seekstate)
 			self.pvrStateDialog.show()
 		if config.usage.fadeout.value is True:
 			if self.shown and self.seekstate != self.SEEK_STATE_EOF:
@@ -1820,15 +1827,43 @@ class InfoBarPVRState:
 				self.pvrStateDialog.show()
 				self.startHideTimer()
 
+
 	def __playStateChanged(self, state):
 		playstateString = state[3]
 		self.pvrStateDialog["state"].setText(playstateString)
+		self["state"].setText(playstateString)
 
-		# if we return into "PLAY" state, ensure that the dialog gets hidden if there will be no infobar displayed
-		if not config.usage.show_infobar_on_skip.value and self.seekstate == self.SEEK_STATE_PLAY and not self.force_show:
-			self.pvrStateDialog.hide()
+		if state[1] > 1:
+			self.pvrStateDialog["statespeed"].setText("x%d" % state[1])
+			self["statespeed"].setText("x%d" % state[1])
+		elif state[1] < 0:
+			self.pvrStateDialog["statespeed"].setText("x%d" % -state[1])
+			self["statespeed"].setText("x%d" % -state[1])
+		elif state[1] == 0 and state[2] > 1:
+			self.pvrStateDialog["statespeed"].setText("x%d" % state[2])
+			self["statespeed"].setText("x%d" % state[2])
 		else:
-			self._mayShow()
+			self.pvrStateDialog["statespeed"].setText("")
+			self["statespeed"].setText("")
+
+		if state != self.SEEK_STATE_EOF:	
+			if state[1] > 1:
+				self.pvrStateDialog["stateicon"].setPixmapNum(0) #stateFF
+				self["stateicon"].setPixmapNum(0) #stateFF
+			elif state[1] < 0:
+				self.pvrStateDialog["stateicon"].setPixmapNum(1) #stateRew
+				self["stateicon"].setPixmapNum(1) #stateRew
+			elif state == self.SEEK_STATE_PLAY:
+				self.pvrStateDialog["stateicon"].setPixmapNum(2) #statePlay
+				self["stateicon"].setPixmapNum(2) #statePlay
+			elif state == self.SEEK_STATE_PAUSE:
+				self.pvrStateDialog["stateicon"].setPixmapNum(3) #statePause
+				self["stateicon"].setPixmapNum(3) #statePause
+			self.pvrStateDialog["stateicon"].show()
+			self["stateicon"].show()
+		else:
+			self.pvrStateDialog["stateicon"].hide()
+			self["stateicon"].hide()
 
 
 class TimeshiftLive(Screen):
@@ -4016,4 +4051,3 @@ class InfoBarHandleBsod:
 			resetBsodCounter()
 		self.infoBsodIsShown = False
 		self.lastestBsodWarning = False
-#########################################################################################
