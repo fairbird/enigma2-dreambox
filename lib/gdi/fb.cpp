@@ -13,10 +13,11 @@
 #define FBIO_WAITFORVSYNC _IOW('F', 0x20, uint32_t)
 #endif
 
-#ifndef FBIO_BLIT
-#define FBIO_SET_MANUAL_BLIT _IOW('F', 0x21, __u8)
-#define FBIO_BLIT 0x22
-#endif
+#include <lib/gdi/accel.h>
+#include <interfaces/ion.h>
+#define ION_HEAP_TYPE_BMEM      (ION_HEAP_TYPE_CUSTOM + 1)
+#define ION_HEAP_ID_MASK        (1 << ION_HEAP_TYPE_BMEM)
+#define ACCEL_MEM_SIZE          (32*1024*1024)
 
 fbClass *fbClass::instance;
 
@@ -38,6 +39,8 @@ fbClass::fbClass(const char *fb)
 	cmap.green=green;
 	cmap.blue=blue;
 	cmap.transp=trans;
+
+	int ion;
 
 	fbFd=open(fb, O_RDWR);
 	if (fbFd<0)
@@ -64,10 +67,81 @@ fbClass::fbClass(const char *fb)
 	m_phys_mem = fix.smem_start;
 	eDebug("[fb] %s: %dk video mem", fb, available/1024);
 	lfb=(unsigned char*)mmap(0, available, PROT_WRITE|PROT_READ, MAP_SHARED, fbFd, 0);
-	if (!lfb)
+
+	/* allocate accel memory here... its independent from the framebuffer */
+	ion = open("/dev/ion", O_RDWR | O_CLOEXEC);
+	if (ion >= 0)
 	{
-		eDebug("[fb] mmap: %m");
-		goto nolfb;
+		struct ion_allocation_data alloc_data;
+		struct ion_fd_data share_data;
+		struct ion_handle_data free_data;
+		struct ion_phys_data phys_data;
+		int ret;
+		unsigned char *lion;
+
+		eDebug("Using ION allocator");
+
+		memset(&alloc_data, 0, sizeof(alloc_data));
+		alloc_data.len = ACCEL_MEM_SIZE;
+		alloc_data.align = 4096; // 4k aligned
+		alloc_data.heap_id_mask = ION_HEAP_ID_MASK;
+		ret = ioctl(ion, ION_IOC_ALLOC, &alloc_data);
+		if (ret < 0)
+		{
+			perror("ION_IOC_ALLOC failed");
+			eFatal("failed to allocate accel memory!!!");
+			return;
+		}
+
+		memset(&phys_data, 0, sizeof(phys_data));
+		phys_data.handle = alloc_data.handle;
+		ret = ioctl(ion, ION_IOC_PHYS, &phys_data);
+		if (ret < 0)
+		{
+			perror("ION_IOC_PHYS failed");
+			goto err_ioc_free;
+		}
+
+		memset(&share_data, 0, sizeof(share_data));
+		share_data.handle = alloc_data.handle;
+		ret = ioctl(ion, ION_IOC_SHARE, &share_data);
+		if (ret < 0)
+		{
+			perror("ION_IOC_SHARE failed");
+			goto err_ioc_free;
+		}
+
+		memset(&free_data, 0, sizeof(free_data));
+		free_data.handle = alloc_data.handle;
+		if (ioctl(ion, ION_IOC_FREE, &free_data) < 0)
+			perror("ION_IOC_FREE failed");
+
+		m_accel_fd = share_data.fd;
+		lion=(unsigned char*)mmap(0, ACCEL_MEM_SIZE, PROT_WRITE|PROT_READ, MAP_SHARED, share_data.fd, 0);
+
+		if (lion)
+		{
+			eDebug("%dkB available for acceleration surfaces (via ION).", ACCEL_MEM_SIZE / 1024);
+			gAccel::getInstance()->setAccelMemorySpace(lion, phys_data.addr, ACCEL_MEM_SIZE);
+		}
+		else
+		{
+			close(m_accel_fd);
+			eDebug("mmap lion failed");
+			err_ioc_free:
+			eFatal("failed to allocate accel memory via ION!!!");
+			m_accel_fd = -1;
+			memset(&free_data, 0, sizeof(free_data));
+			free_data.handle = alloc_data.handle;
+			if (ioctl(ion, ION_IOC_FREE, &free_data) < 0)
+				perror("ION_IOC_FREE");
+		}
+		close(ion);
+	}
+	else
+	{
+		eFatal("failed to open ION device node! no allocate accel memory available !!");
+		m_accel_fd = -1;
 	}
 
 	showConsole(0);
@@ -100,6 +174,11 @@ int fbClass::showConsole(int state)
 
 int fbClass::SetMode(int nxRes, int nyRes, int nbpp)
 {
+
+	/* unmap old framebuffer with old size */
+	if (lfb)
+		munmap(lfb, stride * screeninfo.yres_virtual);
+
 	if (fbFd < 0) return -1;
 	screeninfo.xres_virtual=screeninfo.xres=nxRes;
 	screeninfo.yres_virtual=(screeninfo.yres=nyRes)*2;
@@ -148,6 +227,7 @@ int fbClass::SetMode(int nxRes, int nyRes, int nbpp)
 		eDebug("[fb] double buffering available!");
 
 	m_number_of_pages = screeninfo.yres_virtual / nyRes;
+	eDebug("[fb] %d page(s) available!", m_number_of_pages);
 
 	ioctl(fbFd, FBIOGET_VSCREENINFO, &screeninfo);
 
@@ -167,6 +247,12 @@ int fbClass::SetMode(int nxRes, int nyRes, int nbpp)
 		eDebug("[fb] FBIOGET_FSCREENINFO: %m");
 	}
 	stride=fix.line_length;
+	
+	m_phys_mem = fix.smem_start;
+	available = fix.smem_len;
+	/* map new framebuffer */
+	lfb=(unsigned char*)mmap(0, stride * screeninfo.yres_virtual, PROT_WRITE|PROT_READ, MAP_SHARED, fbFd, 0);
+	
 	memset(lfb, 0, stride*yRes);
 	blit();
 	return 0;
@@ -196,11 +282,6 @@ int fbClass::waitVSync()
 
 void fbClass::blit()
 {
-	if (fbFd < 0) return;
-	if (m_manual_blit == 1) {
-		if (ioctl(fbFd, FBIO_BLIT) < 0)
-			eDebug("[fb] FBIO_BLIT: %m");
-	}
 }
 
 fbClass::~fbClass()
@@ -252,21 +333,9 @@ void fbClass::unlock()
 
 void fbClass::enableManualBlit()
 {
-	unsigned char tmp = 1;
-	if (fbFd < 0) return;
-	if (ioctl(fbFd,FBIO_SET_MANUAL_BLIT, &tmp)<0)
-		eDebug("[fb] enable FBIO_SET_MANUAL_BLIT: %m");
-	else
-		m_manual_blit = 1;
 }
 
 void fbClass::disableManualBlit()
 {
-	unsigned char tmp = 0;
-	if (fbFd < 0) return;
-	if (ioctl(fbFd,FBIO_SET_MANUAL_BLIT, &tmp)<0)
-		eDebug("[fb] disable FBIO_SET_MANUAL_BLIT: %m");
-	else
-		m_manual_blit = 0;
 }
 
