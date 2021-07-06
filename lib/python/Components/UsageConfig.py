@@ -246,6 +246,35 @@ def InitUsageConfig():
 		("5", "DVB-T/-S/-C"),
 		("127", _("No priority"))])
 
+	config.usage.frontled_color = ConfigSelection(default="2", choices=[
+		("0", _("Off")),
+		("1", _("Blue")),
+		("2", _("Red")),
+		("3", _("Blinking blue")),
+		("4", _("Blinking red"))
+	])
+	config.usage.frontledrec_color = ConfigSelection(default="3", choices=[
+		("0", _("Off")),
+		("1", _("Blue")),
+		("2", _("Red")),
+		("3", _("Blinking blue")),
+		("4", _("Blinking red"))
+	])
+	config.usage.frontledstdby_color = ConfigSelection(default="0", choices=[
+		("0", _("Off")),
+		("1", _("Blue")),
+		("2", _("Red")),
+		("3", _("Blinking blue")),
+		("4", _("Blinking red"))
+	])
+	config.usage.frontledrecstdby_color = ConfigSelection(default="3", choices=[
+		("0", _("Off")),
+		("1", _("Blue")),
+		("2", _("Red")),
+		("3", _("Blinking blue")),
+		("4", _("Blinking red"))
+	])
+
 	def remote_fallback_changed(configElement):
 		if configElement.value:
 			configElement.value = "%s%s" % (not configElement.value.startswith("http://") and "http://" or "", configElement.value)

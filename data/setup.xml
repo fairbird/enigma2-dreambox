@@ -246,6 +246,10 @@
 		<item level="0" text="Brightness" description="Configure the brightness level of the front panel display.">config.lcd.bright</item>
 		<item level="0" text="Contrast" description="Configure the contrast level of the front panel display.">config.lcd.contrast</item>
 		<item level="0" text="Standby" description="Configure the brightness level of the front panel display during standby.">config.lcd.standby</item>
+		<item level="0" text="LED color during normal operations" description="Configure front LED color during normal operations (this requires an enigma2 restart).">config.usage.frontled_color</item>
+		<item level="0" text="LED color during recording" description="Configure front LED color during recording (this requires an enigma2 restart).">config.usage.frontledrec_color</item>
+		<item level="0" text="LED color during standby" description="Configure front LED color during standby (this requires an enigma2 restart).">config.usage.frontledstdby_color</item>
+		<item level="0" text="LED color during recording in standby" description="Configure front LED color during recording in standby (this requires an enigma2 restart).">config.usage.frontledrecstdby_color</item>
 		<item level="0" text="Power LED" description="Turn on the power LED." requires="PowerLED">config.usage.powerLED</item>
 		<item level="0" text="Standby LED" description="Turn on the power LED during standby." requires="StandbyLED">config.usage.standbyLED</item>
 		<item level="0" text="Deep Standby LED" description="Turn on the power LED during deep standby." requires="SuspendLED">config.usage.suspendLED</item>
