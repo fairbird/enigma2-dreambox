@@ -29,6 +29,7 @@ public:
 #else
 public:
 	unsigned char *lfb;
+	int m_accel_fd;
 	void enableManualBlit();
 	void disableManualBlit();
 	int showConsole(int state);
