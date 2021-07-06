@@ -268,6 +268,9 @@ void eDBoxLCD::update()
 			write(lcdfd, raw, _stride * height);
 		}
 		else
+#if !defined(DREAMBOX_MOVE_LCD)
+			write(lcdfd, _buffer, _stride * res.height());
+#else
 		{
 			unsigned char gb_buffer[_stride * res.height()];
 			for (int offset = 0; offset < ((_stride * res.height())>>2); offset ++)
@@ -280,6 +283,7 @@ void eDBoxLCD::update()
 			}
 			write(lcdfd, gb_buffer, _stride * res.height());
 		}
+#endif
 	}
 	else /* lcd_type == 1 */
 	{
