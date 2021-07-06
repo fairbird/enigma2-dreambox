@@ -117,6 +117,13 @@ except ImportError:
 
 profile("LOAD:Plugin")
 
+from twisted.python import log
+config.misc.enabletwistedlog = ConfigYesNo(default=False)
+if config.misc.enabletwistedlog.value == True:
+	log.startLogging(open('/tmp/twisted.log', 'w'))
+else:
+	log.startLogging(sys.stdout)
+
 # initialize autorun plugins and plugin menu entries
 from Components.PluginComponent import plugins
 
@@ -304,8 +311,9 @@ class Session:
 
 	def openWithCallback(self, callback, screen, *arguments, **kwargs):
 		dlg = self.open(screen, *arguments, **kwargs)
-		dlg.callback = callback
-		return dlg
+		if dlg != 'config.crash.bsodpython.value=True':
+			dlg.callback = callback
+			return dlg
 
 	def open(self, screen, *arguments, **kwargs):
 		if self.dialog_stack and not self.in_exec:
@@ -313,7 +321,15 @@ class Session:
 			# ...unless it's the very first screen.
 
 		self.pushCurrent()
-		dlg = self.current_dialog = self.instantiateDialog(screen, *arguments, **kwargs)
+		if config.crash.bsodpython.value:
+			try:
+				dlg = self.current_dialog = self.instantiateDialog(screen, *arguments, **kwargs)
+			except:
+				self.popCurrent()
+				raise
+				return 'config.crash.bsodpython.value=True'
+		else:
+			dlg = self.current_dialog = self.instantiateDialog(screen, *arguments, **kwargs)
 		dlg.isTmp = True
 		dlg.callback = None
 		self.execBegin()
@@ -573,6 +589,10 @@ Components.RecordingConfig.InitRecordingConfig()
 profile("UsageConfig")
 import Components.UsageConfig
 Components.UsageConfig.InitUsageConfig()
+
+profile("Init:DebugLogCheck")
+import Screens.LogManager
+Screens.LogManager.AutoLogManager()
 
 profile("Timezones")
 import Components.Timezones
