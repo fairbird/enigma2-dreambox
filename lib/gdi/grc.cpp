@@ -44,6 +44,7 @@ gRC::gRC(): rp(0), wp(0)
 	m_spinneronoff = 1;
 }
 
+#ifdef CONFIG_ION
 void gRC::lock()
 {
 #ifndef SYNC_PAINT
@@ -56,6 +57,7 @@ void gRC::unlock()
 	pthread_mutex_unlock(&mutex);
 #endif
 }
+#endif
 
 DEFINE_REF(gRC);
 
