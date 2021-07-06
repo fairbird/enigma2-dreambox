@@ -86,6 +86,8 @@ class eDVBCISlot: public iObject, public sigc::trackable
 	int setClockRate(int);
 	void determineCIVersion();
 	static std::string getTunerLetter(int tuner_no) { return std::string(1, char(65 + tuner_no)); }
+	static std::string getTunerLetterDM(int);
+	static char* readInputCI(int);
 public:
 	enum {stateRemoved, stateInserted, stateInvalid, stateResetted};
 	enum {versionUnknown = -1, versionCI = 0, versionCIPlus1 = 1, versionCIPlus2 = 2};
