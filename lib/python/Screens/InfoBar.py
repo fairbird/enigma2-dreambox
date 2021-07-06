@@ -13,7 +13,7 @@ import enigma
 profile("LOAD:InfoBarGenerics")
 from Screens.InfoBarGenerics import InfoBarShowHide, \
 	InfoBarNumberZap, InfoBarChannelSelection, InfoBarMenu, InfoBarRdsDecoder, InfoBarResolutionSelection, InfoBarAspectSelection, \
-	InfoBarEPG, InfoBarSeek, InfoBarInstantRecord, InfoBarRedButton, InfoBarTimerButton, InfoBarVmodeButton, \
+	InfoBarEPG, InfoBarSeek, InfoBarInstantRecord, InfoBarRedButton, InfoBarTimerButton, InfoBarVmodeButton, InfoBarHandleBsod, \
 	InfoBarAudioSelection, InfoBarAdditionalInfo, InfoBarNotifications, InfoBarDish, InfoBarUnhandledKey, \
 	InfoBarSubserviceSelection, InfoBarShowMovies, InfoBarTimeshift,  \
 	InfoBarServiceNotifications, InfoBarPVRState, InfoBarCueSheetSupport, InfoBarBuffer, \
@@ -38,7 +38,7 @@ class InfoBar(InfoBarBase, InfoBarShowHide,
 	InfoBarSubserviceSelection, InfoBarTimeshift, InfoBarSeek, InfoBarCueSheetSupport, InfoBarBuffer,
 	InfoBarSummarySupport, InfoBarTimeshiftState, InfoBarTeletextPlugin, InfoBarExtensions,
 	InfoBarPiP, InfoBarPlugins, InfoBarSubtitleSupport, InfoBarServiceErrorPopupSupport, InfoBarJobman, InfoBarPowersaver,
-	InfoBarHDMI, InfoBarHdmi2, InfoBarHotkey, Screen):
+	InfoBarHDMI, InfoBarHdmi2, InfoBarHotkey, InfoBarHandleBsod, Screen):
 
 	ALLOW_SUSPEND = True
 	instance = None

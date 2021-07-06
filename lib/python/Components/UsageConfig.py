@@ -1,12 +1,13 @@
 from Components.Harddisk import harddiskmanager
 from Components.Console import Console
-from config import ConfigSubsection, ConfigYesNo, config, ConfigSelection, ConfigText, ConfigNumber, ConfigSet, ConfigLocations, ConfigSelectionNumber, ConfigClock, ConfigSlider, ConfigEnableDisable, ConfigSubDict, ConfigDictionarySet, ConfigInteger, ConfigPassword
+from config import ConfigSubsection, ConfigYesNo, config, ConfigSelection, ConfigText, ConfigNumber, ConfigSet, ConfigLocations, ConfigSelectionNumber, ConfigClock, ConfigSlider, ConfigEnableDisable, ConfigSubDict, ConfigDictionarySet, ConfigInteger, ConfigPassword, NoSave
 from Tools.Directories import defaultRecordingLocation, fileHas
 from enigma import setTunerTypePriorityOrder, setPreferredTuner, setSpinnerOnOff, setEnableTtCachingOnOff, eEnv, eDVBDB, Misc_Options, eBackgroundFileEraser, eServiceEvent, eDVBLocalTimeHandler, eEPGCache
 from Components.About import GetIPsFromNetworkInterfaces
 from Components.NimManager import nimmanager
 from Components.ServiceList import refreshServiceList
 from SystemInfo import SystemInfo
+from os.path import exists, islink, join as pathjoin, normpath
 import os
 import time
 
@@ -503,6 +504,49 @@ def InitUsageConfig():
 	config.usage.keytrans = ConfigText(default=eEnv.resolve("${datadir}/enigma2/keytranslation.xml"))
 	config.usage.alternative_imagefeed = ConfigText(default="", fixed_size=False)
 
+	#// handle python crashes
+	config.crash = ConfigSubsection()
+	config.crash.bsodpython = ConfigYesNo(default=True)
+	config.crash.bsodpython_ready = NoSave(ConfigYesNo(default=False))
+	choicelist = [("0", _("never")), ("1", "1") , ("2", "2"), ("3", "3"), ("4", "4"), ("5", "5"), ("6", "6"), ("7", "7"), ("8", "8"), ("9", "9"), ("10", "10")]
+	config.crash.bsodhide = ConfigSelection(default="0", choices=choicelist)
+	config.crash.bsodmax = ConfigSelection(default="3", choices=choicelist)
+	#//
+
+	config.crash.enabledebug = ConfigYesNo(default=False)
+	config.crash.debugloglimit = ConfigSelectionNumber(min=1, max=10, stepwidth=1, default=4, wraparound=True)
+	config.crash.daysloglimit = ConfigSelectionNumber(min=1, max=30, stepwidth=1, default=8, wraparound=True)
+	config.crash.sizeloglimit = ConfigSelectionNumber(min=1, max=20, stepwidth=1, default=10, wraparound=True)
+	config.crash.lastfulljobtrashtime = ConfigInteger(default=-1)
+
+	debugpath = [('/home/root/logs/', '/home/root/')]
+	for p in harddiskmanager.getMountedPartitions():
+		if exists(p.mountpoint):
+			d = normpath(p.mountpoint)
+			if p.mountpoint != '/':
+				debugpath.append((pathjoin(p.mountpoint, 'logs', ''), d))
+	config.crash.debugPath = ConfigSelection(default='/home/root/logs/', choices=debugpath)
+	if not exists("/home"):
+		os.mkdir("/home",0755)
+	if not exists("/home/root"):
+		os.mkdir("/home/root",0755)
+
+	def updatedebugPath(configElement):
+		if not exists(config.crash.debugPath.value):
+			try:
+				mkdir(config.crash.debugPath.value, 493)
+			except:
+				print("Failed to create log path: %s" % config.crash.debugPath.value)
+	config.crash.debugPath.addNotifier(updatedebugPath, immediate_feedback=False)
+
+	crashlogheader = _("We are really sorry. Your receiver encountered " \
+					 "a software problem, and needs to be restarted.\n" \
+					 "Please send the logfile %senigma2_crash_xxxxxx.log to rrrr53@hotmail.com.\n" \
+					 "Your receiver restarts in 10 seconds!\n" \
+					 "Component: enigma2") % config.crash.debugPath.value
+	config.crash.debug_text = ConfigText(default=crashlogheader, fixed_size=False)
+	config.crash.skin_error_crash = ConfigYesNo(default=True)
+
 	config.seek = ConfigSubsection()
 	config.seek.selfdefined_13 = ConfigNumber(default=15)
 	config.seek.selfdefined_46 = ConfigNumber(default=60)
@@ -844,6 +888,15 @@ def InitUsageConfig():
 
 	config.misc.softcam_setup = ConfigSubsection()
 	config.misc.softcam_setup.extension_menu = ConfigYesNo(default=True)
+
+	config.logmanager = ConfigSubsection()
+	config.logmanager.showinextensions = ConfigYesNo(default=False)
+	config.logmanager.user = ConfigText(default='', fixed_size=False)
+	config.logmanager.useremail = ConfigText(default='', fixed_size=False)
+	config.logmanager.usersendcopy = ConfigYesNo(default=True)
+	config.logmanager.path = ConfigText(default="/")
+	config.logmanager.additionalinfo = NoSave(ConfigText(default=""))
+	config.logmanager.sentfiles = ConfigLocations(default='')
 
 	config.ntp = ConfigSubsection()
 
