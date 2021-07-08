@@ -9,13 +9,6 @@ if [ -d /home/root ]; then
 	cd
 fi
 
-# any debuglevel passed?
-if [ -z $ENIGMA_DEBUG_LVL ]; then
-	DEBUG_LVL=3
-else
-	DEBUG_LVL=$ENIGMA_DEBUG_LVL
-fi
-
 LIBS=@libdir@/libopen.so.0.0.0
 
 # enigma main loop
@@ -39,7 +32,6 @@ while : ; do
 	# start enigma
 	sync
 	if [ "$(grep config.crash.enabledebug /etc/enigma2/settings)" == "config.crash.enabledebug=true" ]; then
-		DEBUG_LVL='4'
 		RANDOMIZE1970=''
 		time=`date +%Y` ;
 		if [ "$time" = 1970 ]; then
@@ -50,9 +42,9 @@ while : ; do
 		if [ "$(grep config.crash.debugPath= /etc/enigma2/settings | sed 's/config.crash.debugPath=//g')" != "" -a -d "$(grep config.crash.debugPath= /etc/enigma2/settings | sed 's/config.crash.debugPath=//g')" ]; then
 			LOGFOLDER=$(grep config.crash.debugPath= /etc/enigma2/settings | sed 's/config.crash.debugPath=//g')
 		fi
-		LD_PRELOAD=$LIBS ENIGMA_DEBUG_LVL=$DEBUG_LVL @bindir@/enigma2 &> ${LOGFOLDER}Enigma2-debug-$(date +%Y%m%d_%H-%M-%S)${RANDOMIZE1970}.log
+		LD_PRELOAD=$LIBS @bindir@/enigma2 --debug-no-color $VERBOSE &> ${LOGFOLDER}Enigma2-debug-$(date +%Y%m%d_%H-%M-%S)${RANDOMIZE1970}.log
 	else
-		LD_PRELOAD=$LIBS ENIGMA_DEBUG_LVL=$DEBUG_LVL @bindir@/enigma2
+		LD_PRELOAD=$LIBS @bindir@/enigma2 $VERBOSE
 	fi
 
 
@@ -79,7 +71,7 @@ while : ; do
 			/sbin/reboot
 			;;
 		3)
-			DEBUG_LVL=3
+			ENIGMA_DEBUG_LVL=3
 			;;
 		4)
 			/sbin/rmmod lcd
@@ -95,7 +87,7 @@ while : ; do
 			fi
 			;;
 		6)
-			DEBUG_LVL=4
+			ENIGMA_DEBUG_LVL="4"
 			;;
 		7)
 			rm -R /etc/enigma2

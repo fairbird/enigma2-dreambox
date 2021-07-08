@@ -532,12 +532,12 @@ def InitUsageConfig():
 	config.usage.keytrans = ConfigText(default=eEnv.resolve("${datadir}/enigma2/keytranslation.xml"))
 	config.usage.alternative_imagefeed = ConfigText(default="", fixed_size=False)
 
-	#// handle python crashes
 	config.crash = ConfigSubsection()
+	#// handle python crashes
 	config.crash.bsodpython = ConfigYesNo(default=True)
 	config.crash.bsodpython_ready = NoSave(ConfigYesNo(default=False))
-	choicelist = [("0", _("never")), ("1", "1") , ("2", "2"), ("3", "3"), ("4", "4"), ("5", "5"), ("6", "6"), ("7", "7"), ("8", "8"), ("9", "9"), ("10", "10")]
-	config.crash.bsodhide = ConfigSelection(default="0", choices=choicelist)
+	choicelist = [("0", _("never")), ("1", "1"), ("2", "2"), ("3", "3"), ("4", "4"), ("5", "5"), ("6", "6"), ("7", "7"), ("8", "8"), ("9", "9"), ("10", "10")]
+	config.crash.bsodhide = ConfigSelection(default="1", choices=choicelist)
 	config.crash.bsodmax = ConfigSelection(default="3", choices=choicelist)
 	#//
 
@@ -547,33 +547,46 @@ def InitUsageConfig():
 	config.crash.sizeloglimit = ConfigSelectionNumber(min=1, max=20, stepwidth=1, default=10, wraparound=True)
 	config.crash.lastfulljobtrashtime = ConfigInteger(default=-1)
 
-	debugpath = [('/home/root/logs/', '/home/root/')]
+	debugPath = [('/home/root/logs/', '/home/root/')]
 	for p in harddiskmanager.getMountedPartitions():
-		if exists(p.mountpoint):
-			d = normpath(p.mountpoint)
+		if os.path.exists(p.mountpoint):
+			d = os.path.normpath(p.mountpoint)
 			if p.mountpoint != '/':
-				debugpath.append((pathjoin(p.mountpoint, 'logs', ''), d))
-	config.crash.debugPath = ConfigSelection(default='/home/root/logs/', choices=debugpath)
-	if not exists("/home"):
-		os.mkdir("/home",0755)
-	if not exists("/home/root"):
-		os.mkdir("/home/root",0755)
+				debugPath.append((p.mountpoint + '/logs/', d))
+	config.crash.debugPath = ConfigSelection(default="/home/root/logs/", choices=debugPath)
+	if not os.path.exists("/home"):
+		os.mkdir("/home", 0755)
+	if not os.path.exists("/home/root"):
+		os.mkdir("/home/root", 0755)
 
 	def updatedebugPath(configElement):
-		if not exists(config.crash.debugPath.value):
+		if not os.path.exists(config.crash.debugPath.value):
 			try:
-				mkdir(config.crash.debugPath.value, 493)
+				os.mkdir(config.crash.debugPath.value, 0755)
 			except:
-				print("Failed to create log path: %s" % config.crash.debugPath.value)
+				print "Failed to create log path: %s" % config.crash.debugPath.value
 	config.crash.debugPath.addNotifier(updatedebugPath, immediate_feedback=False)
 
-	crashlogheader = _("We are really sorry. Your receiver encountered " \
-					 "a software problem, and needs to be restarted.\n" \
-					 "Please send the logfile %senigma2_crash_xxxxxx.log to rrrr53@hotmail.com.\n" \
-					 "Your receiver restarts in 10 seconds!\n" \
+	crashlogheader = _("We are really sorry. Your receiver encountered "
+					 "a software problem, and needs to be restarted.\n"
+					 "Please send the logfile %senigma2_crash_xxxxxx.log to https://github.com/Hains/enigma2.\n"
+					 "Your receiver restarts in 10 seconds!\n"
 					 "Component: enigma2") % config.crash.debugPath.value
 	config.crash.debug_text = ConfigText(default=crashlogheader, fixed_size=False)
 	config.crash.skin_error_crash = ConfigYesNo(default=True)
+
+	def updateStackTracePrinter(configElement):
+		from Components.StackTrace import StackTracePrinter
+		if configElement.value:
+			if (os.path.isfile("/tmp/doPythonStackTrace")):
+				os.remove("/tmp/doPythonStackTrace")
+			from threading import current_thread
+			StackTracePrinter.getInstance().activate(current_thread().ident)
+		else:
+			StackTracePrinter.getInstance().deactivate()
+
+	config.crash.pystackonspinner = ConfigYesNo(default=True)
+	config.crash.pystackonspinner.addNotifier(updateStackTracePrinter, immediate_feedback=False, initial_call=True)
 
 	config.seek = ConfigSubsection()
 	config.seek.selfdefined_13 = ConfigNumber(default=15)
