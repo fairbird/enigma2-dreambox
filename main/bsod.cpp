@@ -115,7 +115,7 @@ bool bsodRestart()
 
 void bsodFatal(const char *component)
 {
-	//handle python crashes	
+	//handle python crashes
 	bool bsodpython = (eConfigManager::getConfigBoolValue("config.crash.bsodpython", false) && eConfigManager::getConfigBoolValue("config.crash.bsodpython_ready", false));
 	//hide bs after x bs counts and no more write crash log	-> setting values 0-10 (always write the first crashlog)
 	int bsodhide = eConfigManager::getConfigIntValue("config.crash.bsodhide", 5);
@@ -128,10 +128,10 @@ void bsodFatal(const char *component)
 	if ((bsodmax && bsodcnt > bsodmax) || component || bsodcnt > bsodmaxmax)
 		bsodpython = false;
 	if (bsodpython && bsodcnt-1 && bsodcnt > bsodhide && (!bsodmax || bsodcnt < bsodmax) && bsodcnt < bsodmaxmax)
-	{	
+	{
 		sleep(1);
 		return;
-	}	
+	}
 	bsodrestart = true;
 
 	/* show no more than one bsod while shutting down/crashing */
@@ -259,20 +259,20 @@ void bsodFatal(const char *component)
 	os_text.clear();
 
 	if (!bsodpython)
-	{	
+	{
 		os_text << "We are really sorry. Your receiver encountered "
 			"a software problem, and needs to be restarted.\n"
 			"Please send the logfile " << crashlog_name << " to " << crash_emailaddr << ".\n"
 			"Your receiver restarts in 10 seconds!\n"
 			"Component: " << component;
-	
+
 		os << getConfigString("config.crash.debug_text", os_text.str());
 	}
 	else
-	{	
+	{
 		std::string txt;
 		if (!bsodmax && bsodcnt < bsodmaxmax)
-			txt = "not (max " + std::to_string(bsodmaxmax) + " times)";	
+			txt = "not (max " + std::to_string(bsodmaxmax) + " times)";
 		else if (bsodmax - bsodcnt > 0)
 			txt = "if it happens "+ std::to_string(bsodmax - bsodcnt) + " more times";
 		else
@@ -351,7 +351,7 @@ void bsodFatal(const char *component)
 	 */
 
 	if (bsodpython)
-	{	
+	{
 		bsodrestart = false;
 		bsodhandled = false;
 		p.setBackgroundColor(gRGB(0,0,0,0xFF));
