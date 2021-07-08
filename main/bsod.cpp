@@ -133,9 +133,15 @@ void bsodFatal(const char *component)
 		return;
 	}
 	bsodrestart = true;
+
 	/* show no more than one bsod while shutting down/crashing */
-	if (bsodhandled)
+	if (bsodhandled) {
+		if (component) {
+			sleep(1);
+			raise(SIGKILL);
+		}
 		return;
+	}
 	bsodhandled = true;
 
 	if (!component)
@@ -220,7 +226,6 @@ void bsodFatal(const char *component)
 
 		/* dump the kernel log */
 		getKlog(f);
-
 		fsync(fileno(f));
 		fclose(f);
 	}
@@ -232,6 +237,7 @@ void bsodFatal(const char *component)
 		sleep(1);
 		return;
 	}
+
 	ePtr<gMainDC> my_dc;
 	gMainDC::getInstance(my_dc);
 
@@ -240,11 +246,11 @@ void bsodFatal(const char *component)
 	p.resetClip(eRect(ePoint(0, 0), my_dc->size()));
 	p.setBackgroundColor(gRGB(0x008000));
 	p.setForegroundColor(gRGB(0xFFFFFF));
+	p.clear();
 
 	int hd =  my_dc->size().width() == 1920;
 	ePtr<gFont> font = new gFont("Regular", hd ? 30 : 20);
 	p.setFont(font);
-	p.clear();
 
 	eRect usable_area = eRect(hd ? 30 : 100, hd ? 30 : 70, my_dc->size().width() - (hd ? 60 : 150), hd ? 150 : 100);
 
@@ -257,10 +263,9 @@ void bsodFatal(const char *component)
 		os_text << "We are really sorry. Your receiver encountered "
 			"a software problem, and needs to be restarted.\n"
 			"Please send the logfile " << crashlog_name << " to " << crash_emailaddr << ".\n"
-			"Better to enable Twisted log after and send us the twisted.log also.\n"
 			"Your receiver restarts in 10 seconds!\n"
 			"Component: " << component;
-
+	
 		os << getConfigString("config.crash.debug_text", os_text.str());
 	}
 	else
