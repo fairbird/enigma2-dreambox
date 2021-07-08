@@ -369,17 +369,14 @@ def queryKeyBinding(context, action):
 
 
 def getKeyDescription(key):
-	if rc_model.rcIsDefault():
-		idx = config.misc.rcused.value
+	rcType = config.plugins.remotecontroltype.rctype.value
+	# rcType = config.misc.inputdevices.rcType.value
+	if rcType == 14:  # XP1000
+		idx = 3
+	elif rcType == 18:  # F1
+		idx = 4
 	else:
-		rcType = config.plugins.remotecontroltype.rctype.value
-		# rcType = config.misc.inputdevices.rcType.value
-		if rcType == 14:  # XP1000
-			idx = 3
-		elif rcType == 18:  # F1
-			idx = 4
-		else:
-			idx = 2
+		idx = 2
 	return keyDescriptions[idx].get(key)
 
 
