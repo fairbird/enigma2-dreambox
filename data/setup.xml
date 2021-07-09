@@ -1,8 +1,4 @@
 <setupxml>
-	<setup key="timezone" title="Timezone">
-		<item level="0" text="Time zone area" description="Select your time zone area or region.">config.timezone.area</item>
-		<item level="0" text="Time zone" description="Select the time zone within the area or region.">config.timezone.val</item>
-	</setup>
 	<setup key="avsetup">
 		<!-- this is just a placeholder, the Videomode plugin implements this submenu -->
 	</setup>
@@ -183,6 +179,12 @@
 		<item level="2" text="Seekbar sensibility" description="Set the jump-size of the seekbar.">config.seek.sensibility</item>
 		<item level="2" text="Quit Movie Player with EXIT button" description="When enabled, it is possible to leave the Movie Player with exit.">config.usage.leave_movieplayer_onExit</item>
 		-->
+	</setup>
+	<setup key="Time" title="Time Setup">
+		<item level="0" text="Time zone area" description="Select your time zone area or region.">config.timezone.area</item>
+		<item level="0" text="Time zone" description="Select the time zone within the area or region.">config.timezone.val</item>
+		<item level="1" text="Time synchronization method" description="Select how you want your receiver to keep the correct time, either from the DVB transponder, or from the internet using NTP. Or use Auto, which will favour using NTP, but will fall back to transponder time when no internet connection is available.">config.ntp.timesync</item>
+		<item level="1" text="NTP Hostname" conditional="config.ntp.timesync.value != 'dvb'" description="The hostname or the IP address of the NTP server to synchronise the time with.">config.ntp.server</item>
 	</setup>
 	<setup key="Recording" title="Recording Setup">
 		<item level="0" text="Default movie location" description="Set the default location for your recordings. Press OK to add new locations, LEFT/RIGHT to select from any existing locations.">config.usage.default_path</item>

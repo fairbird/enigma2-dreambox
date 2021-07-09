@@ -1002,14 +1002,18 @@ def InitUsageConfig():
 		if configElement.value == "dvb" or not GetIPsFromNetworkInterfaces():
 			eDVBLocalTimeHandler.getInstance().setUseDVBTime(True)
 			eEPGCache.getInstance().timeUpdated()
-			if configElement.value == "dvb" and os.path.islink('/etc/network/if-up.d/ntpdate-sync'):
+			if configElement.value == "dvb" and islink("/etc/network/if-up.d/ntpdate-sync"):
 				Console().ePopen("sed -i '/ntpdate-sync/d' /etc/cron/crontabs/root;unlink /etc/network/if-up.d/ntpdate-sync")
 		else:
 			eDVBLocalTimeHandler.getInstance().setUseDVBTime(False)
 			eEPGCache.getInstance().timeUpdated()
-			if not os.path.islink('/etc/network/if-up.d/ntpdate-sync'):
-				Console().ePopen("echo '30 * * * *    /usr/bin/ntpdate-sync silent' >>/etc/cron/crontabs/root;ln -s /usr/bin/ntpdate-sync /etc/network/if-up.d/ntpdate-sync")
-	config.ntp.timesync = ConfigSelection(default="auto", choices=[("auto", _("auto")), ("dvb", _("Transponder Time")), ("ntp", _("Internet (ntp)"))])
+			if not islink("/etc/network/if-up.d/ntpdate-sync"):
+				Console().ePopen("echo '30 * * * * /usr/bin/ntpdate-sync silent' >>/etc/cron/crontabs/root;ln -s /usr/bin/ntpdate-sync /etc/network/if-up.d/ntpdate-sync")
+	config.ntp.timesync = ConfigSelection(default="ntp", choices=[
+		("auto", _("Auto")),
+		("dvb", _("Transponder time")),
+		("ntp", _("Internet time (NTP)"))
+	])
 	config.ntp.timesync.addNotifier(timesyncChanged)
 	config.ntp.server = ConfigText("pool.ntp.org", fixed_size=False)
 

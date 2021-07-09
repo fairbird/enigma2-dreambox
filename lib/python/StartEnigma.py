@@ -23,10 +23,6 @@ profile("SetupDevices")
 import Components.SetupDevices
 Components.SetupDevices.InitSetupDevices()
 
-profile("Geolocation")
-import Tools.Geolocation
-Tools.Geolocation.InitGeolocation()
-
 profile("SimpleSummary")
 from Screens import InfoBar
 from Screens.SimpleSummary import SimpleSummary

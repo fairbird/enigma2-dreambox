@@ -44,7 +44,8 @@
 				<menu level="0" text="GUI Settings" entryID="gui_settings">
 					<id val="gui"/>
 					<item level="0" text="Language" entryID="language_setup"><screen module="LanguageSelection"/></item>
-					<item level="0" entryID="timezone_setup" text="Time" ><setup id="timezone"/></item>
+					<!-- Menu / Setup / Time -->
+					<item entryID="time_setup" level="0" text="Time" weight="50"><screen module="Time" screen="Time" /></item>
 					<item level="0" entryID="user_interface" text="User Interface" ><setup id="userinterface"/></item>
 					<item level="0" entryID="usage_setup"><setup id="usage"/></item>
 					<item level="0" text="Skin" entryID="primary_skin_selector"><screen module="SkinSelector" screen="SkinSelector"/></item>

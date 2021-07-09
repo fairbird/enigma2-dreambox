@@ -103,7 +103,8 @@ class Setup(ConfigListScreen, Screen):
 
 		ConfigListScreen.__init__(self, self.list, session=session, on_change=self.changedEntry)
 		self.createSetupList()
-		self["config"].onSelectionChanged.append(self.__onSelectionChanged)
+		if self.selectionChanged not in self["config"].onSelectionChanged:
+			self["config"].onSelectionChanged.append(self.selectionChanged)
 
 		self.setTitle(_(self.setup_title))
 
@@ -157,14 +158,11 @@ class Setup(ConfigListScreen, Screen):
 		if isinstance(self["config"].getCurrent()[1], ConfigBoolean) or isinstance(self["config"].getCurrent()[1], ConfigSelection):
 			self.createSetupList()
 
-	def __onSelectionChanged(self):
-		if self.force_update_list:
-			self["config"].onSelectionChanged.remove(self.__onSelectionChanged)
-			self.createSetupList()
-			self["config"].onSelectionChanged.append(self.__onSelectionChanged)
-			self.force_update_list = False
-		if not (isinstance(self["config"].getCurrent()[1], ConfigBoolean) or isinstance(self["config"].getCurrent()[1], ConfigSelection)):
-			self.force_update_list = True
+	def selectionChanged(self):
+		if self["config"]:
+			self["description"].text = self.getCurrentDescription()
+		else:
+			self["description"].text = _("There are no items currently available for this screen.")
 
 	def run(self):
 		self.keySave()
