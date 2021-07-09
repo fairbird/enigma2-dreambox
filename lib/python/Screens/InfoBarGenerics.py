@@ -796,14 +796,20 @@ class InfoBarChannelSelection:
 
 	def historyBackCheckTimeshiftCallback(self, answer):
 		if answer:
-			self.servicelist.historyBack()
+			if config.usage.historymode.getValue() == '0':
+				self.servicelist.historyBack()
+			else:
+				self.servicelist.historyZap(-1)
 
 	def historyNext(self):
 		self.checkTimeshiftRunning(self.historyNextCheckTimeshiftCallback)
 
 	def historyNextCheckTimeshiftCallback(self, answer):
 		if answer:
-			self.servicelist.historyNext()
+			if config.usage.historymode.getValue() == '0':
+				self.servicelist.historyNext()
+			else:
+				self.servicelist.historyZap(+1)
 
 	def keyUpCheck(self):
 		if config.usage.oldstyle_zap_controls.value:
