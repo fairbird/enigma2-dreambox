@@ -2259,7 +2259,17 @@ class InfoBarExtensions:
 		self["InstantExtensionsActions"] = HelpableActionMap(self, ["InfobarExtensions"],
 			{
 				"extensions": (self.showExtensionSelection, _("Show extensions...")),
-			}, 1) # lower priority
+			},prio=1, description=_("Extension Actions"))  # Lower priority.
+			self.addExtension(extension=self.getOScamInfo, type=InfoBarExtensions.EXTENSION_LIST)
+
+	def getOSname(self):
+		return _("OScam/Ncam Info")
+
+	def getOScamInfo(self):
+		if SystemInfo["OScamInstalled"] or SystemInfo["NCamInstalled"]:
+			return [((boundFunction(self.getOSname), boundFunction(self.openOScamInfo), lambda: True), None)] or []
+		else:
+			return []
 
 	def openSoftcamSetup(self):
 		from Screens.SoftcamSetup import SoftcamSetup
@@ -2321,6 +2331,9 @@ class InfoBarExtensions:
 		if answer is not None:
 			answer[1][1]()
 
+	def openOScamInfo(self):
+		from Screens.OScamInfo import OscamInfoMenu
+		self.session.open(OscamInfoMenu)
 
 from Tools.BoundFunction import boundFunction
 import inspect
