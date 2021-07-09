@@ -26,6 +26,7 @@ dist_install_DATA = \
 	celserviceeventprogressbar.png \
 	div-h.png \
 	div-v.png \
+	div-h-fhd.png \
 	epg_more.png \
 	epg_next.png \
 	epg_now.png \

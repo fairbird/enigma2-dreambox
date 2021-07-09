@@ -956,6 +956,19 @@ def InitUsageConfig():
 	config.autolanguage.subtitle_defaultdvb = ConfigYesNo(default=False)
 	config.autolanguage.subtitle_usecache = ConfigYesNo(default=True)
 
+	config.oscaminfo = ConfigSubsection()
+	if SystemInfo["OScamInstalled"] or SystemInfo["NCamInstalled"]:
+		config.oscaminfo.showInExtensions = ConfigYesNo(default=True)
+	else:
+		config.oscaminfo.showInExtensions = ConfigYesNo(default=False)
+	config.oscaminfo.userdatafromconf = ConfigYesNo(default=True)
+	config.oscaminfo.autoupdate = ConfigYesNo(default=False)
+	config.oscaminfo.username = ConfigText(default="username", fixed_size=False, visible_width=12)
+	config.oscaminfo.password = ConfigPassword(default="password", fixed_size=False)
+	config.oscaminfo.ip = ConfigIP(default=[127, 0, 0, 1], auto_jump=True)
+	config.oscaminfo.port = ConfigInteger(default=16002, limits=(0, 65536))
+	config.oscaminfo.intervall = ConfigSelectionNumber(min=1, max=600, stepwidth=1, default=10, wraparound=True)
+
 	config.streaming = ConfigSubsection()
 	config.streaming.stream_ecm = ConfigYesNo(default=False)
 	config.streaming.descramble = ConfigYesNo(default=True)

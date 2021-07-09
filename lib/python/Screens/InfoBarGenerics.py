@@ -2290,10 +2290,19 @@ class InfoBarExtensions:
 		self.list = []
 		self.addExtension((lambda: _("Softcam Setup"), self.openSoftcamSetup, lambda: config.misc.softcam_setup.extension_menu.value and SystemInfo["HasSoftcamInstalled"]), "1")
 		self.addExtension((lambda: _("Manually import from fallback tuner"), self.importChannels, lambda: config.usage.remote_fallback_extension_menu.value and config.usage.remote_fallback_import.value))
-		self["InstantExtensionsActions"] = HelpableActionMap(self, "InfobarExtensions",
-			{
+		self["InstantExtensionsActions"] = HelpableActionMap(self, "InfobarExtensions", {
 				"extensions": (self.showExtensionSelection, _("Show extensions...")),
-			}, 1) # lower priority
+		},prio=1, description=_("Extension Actions"))  # Lower priority.
+		self.addExtension(extension=self.getOScamInfo, type=InfoBarExtensions.EXTENSION_LIST)
+
+	def getOSname(self):
+		return _("OScam/Ncam Info")
+
+	def getOScamInfo(self):
+		if SystemInfo["OScamInstalled"] or SystemInfo["NCamInstalled"]:
+			return [((boundFunction(self.getOSname), boundFunction(self.openOScamInfo), lambda: True), None)] or []
+		else:
+			return []
 
 	def openSoftcamSetup(self):
 		from Screens.SoftcamSetup import SoftcamSetup
@@ -2355,6 +2364,9 @@ class InfoBarExtensions:
 		if answer is not None:
 			answer[1][1]()
 
+	def openOScamInfo(self):
+		from Screens.OScamInfo import OscamInfoMenu
+		self.session.open(OscamInfoMenu)
 
 from Tools.BoundFunction import boundFunction
 import inspect

@@ -113,6 +113,9 @@ class SoftcamSetup(Screen, ConfigListScreen):
 		if "oscam" in self.softcams.value.lower() and os.path.isfile(resolveFilename(SCOPE_PLUGINS, 'Extensions/OscamStatus/plugin.pyo')):
 			from Plugins.Extensions.OscamStatus.plugin import OscamStatus
 			self.session.open(OscamStatus)
+		elif "oscam" or "ncam" in self.softcams.value.lower() and os.path.isfile('/usr/lib/enigma2/python/Screens/OScamInfo.pyo'):
+			from Screens.OScamInfo import OscamInfoMenu
+			self.session.open(OscamInfoMenu)
 		elif "cccam" in self.softcams.value.lower() and os.path.isfile(resolveFilename(SCOPE_PLUGINS, 'Extensions/CCcamInfo/plugin.pyo')):
 			from Plugins.Extensions.CCcamInfo.plugin import CCcamInfoMain
 			self.session.open(CCcamInfoMain)
