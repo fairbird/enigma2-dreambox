@@ -2,6 +2,7 @@
 import errno
 import inspect
 import os
+from os import F_OK, R_OK, W_OK, access, chmod, listdir, makedirs, mkdir, readlink, rename, rmdir, sep, stat, statvfs, symlink, utime, walk
 
 from enigma import eEnv, getDesktop, eGetEnigmaDebugLvl
 from errno import ENOENT, EXDEV
@@ -313,10 +314,34 @@ def fileExists(f, mode="r"):
 		acc_mode = os.F_OK
 	return os.access(f, acc_mode)
 
+def fileAccess(file, mode="r"):
+	accMode = F_OK
+	if "r" in mode:
+		accMode |= R_OK
+	if "w" in mode:
+		accMode |= W_OK
+	result = False
+	try:
+		result = access(file, accMode)
+	except (IOError, OSError) as err:
+		print("[Directories] Error %d: Couldn't determine file '%s' access mode! (%s)" % (err.errno, file, err.strerror))
+	return result
 
 def fileCheck(f, mode="r"):
 	return fileExists(f, mode) and f
 
+def fileExists(file, mode="r"):
+	return fileAccess(file, mode) and file
+
+def fileContains(file, content, mode="r"):
+	result = False
+	if fileExists(file, mode):
+		fd = open(file, mode)
+		text = fd.read()
+		fd.close()
+		if content in text:
+			result = True
+	return result
 
 def fileHas(f, content, mode="r"):
 	result = False
