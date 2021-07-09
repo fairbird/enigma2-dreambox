@@ -1,4 +1,4 @@
-name: Enigma2 CI
+name: Enigma2 Build
 
 on:
   push:
@@ -8,10 +8,10 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     strategy:
       matrix:
-        gcc: [8, 10]
+        gcc: [8, 9, 10, 11]
     steps:
     - uses: actions/checkout@v2
     - name: install gcc ${{ matrix.gcc }}
