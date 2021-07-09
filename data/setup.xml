@@ -89,6 +89,7 @@
 		<item level="0" text="Show second infobar" description="Configure whether (and for how long) a second infobar will be shown when OK is pressed twice. The second infobar contains additional information about the current channel.">config.usage.show_second_infobar</item>
 		<item level="1" text="Show screensaver" description="Configure the duration in minutes for the screensaver.">config.usage.screen_saver</item>
 		<item level="2" text="Hide zap errors" description="When enabled, error messages related to zapping will not be shown.">config.usage.hide_zap_errors</item>
+		<item level="2" text="Hide CI messages" description="When enabled, error messages related to the Common Interface module will not be shown.">config.usage.hide_ci_messages</item>
 		<item level="2" text="Show crypto info in infobar" description="When enabled, encryption info will be shown in the infobar (when supported by the skin).">config.usage.show_cryptoinfo</item>
 		<item level="2" text="Show picons in display" description="Configure if service picons will be shown in display (when supported by the skin)." requires="HasFrontDisplayPicon">config.usage.show_picon_in_display</item>
 		<item level="2" text="Infobar frontend data source" description="Configure the source of the frontend data as shown on the infobars. 'Settings' is as stored on the settings. 'Tuner' is as reported by the tuner.">config.usage.infobar_frontend_source</item>
@@ -185,8 +186,6 @@
 	<setup key="Time" title="Time Setup">
 		<item level="0" text="Time zone area" description="Select your time zone area or region.">config.timezone.area</item>
 		<item level="0" text="Time zone" description="Select the time zone within the area or region.">config.timezone.val</item>
-		<item level="1" text="Time synchronization method" description="Select how you want your receiver to keep the correct time, either from the DVB transponder, or from the internet using NTP. Or use Auto, which will favour using NTP, but will fall back to transponder time when no internet connection is available.">config.ntp.timesync</item>
-		<item level="1" text="NTP Hostname" conditional="config.ntp.timesync.value != 'dvb'" description="The hostname or the IP address of the NTP server to synchronise the time with.">config.ntp.server</item>
 	</setup>
 	<setup key="Recording" title="Recording Setup">
 		<item level="0" text="Default movie location" description="Set the default location for your recordings. Press OK to add new locations, LEFT/RIGHT to select from any existing locations.">config.usage.default_path</item>
