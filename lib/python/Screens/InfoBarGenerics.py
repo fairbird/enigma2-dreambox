@@ -41,7 +41,7 @@ from ServiceReference import ServiceReference, isPlayableForCur
 from Tools import Notifications, ASCIItranslit
 from Tools.Directories import fileExists, getRecordingFilename, moveFiles
 
-from enigma import eTimer, eServiceCenter, eDVBServicePMTHandler, iServiceInformation, iPlayableService, eServiceReference, eEPGCache, eActionMap, getDesktop, eDVBDB
+from enigma import eTimer, eServiceCenter, eDVBServicePMTHandler, iServiceInformation, iPlayableService, eServiceReference, eEPGCache, eActionMap, getDesktop, eDVBDB, getBoxType
 
 from time import time, localtime, strftime
 import os
@@ -50,9 +50,9 @@ from sys import maxint
 import itertools
 import datetime
 
-from boxbranding import getMachineBuild
-
 from RecordTimer import RecordTimerEntry, RecordTimer, findSafeRecordPath
+
+boxtype = getBoxType()
 
 # hack alert!
 from Menu import MainMenu, mdom
@@ -3900,15 +3900,16 @@ class InfoBarHdmi2:
 		self.hdmi_enabled_full = False
 		self.hdmi_enabled_pip = False
 
-		if SystemInfo["HasHDMIin"]:
+		if SystemInfo["HDMIin"]:
 			if not self.hdmi_enabled_full:
 				self.addExtension((self.getHDMIInFullScreen, self.HDMIInFull, lambda: True), "blue")
 			if not self.hdmi_enabled_pip:
 				self.addExtension((self.getHDMIInPiPScreen, self.HDMIInPiP, lambda: True), "green")
-		self["HDMIActions"] = HelpableActionMap(self, ["InfobarHDMIActions"], {
-			"HDMIin": (self.HDMIIn, _("Switch to HDMI-IN mode")),
-			"HDMIinLong": (self.HDMIInLong, _("Switch to HDMI-IN mode")),
-		}, prio=2, description=_("HDMI-IN Actions"))
+		self["HDMIActions"] = HelpableActionMap(self, "InfobarHDMIActions",
+			{
+				"HDMIin": (self.HDMIIn, _("Switch to HDMI in mode")),
+				"HDMIinLong": (self.HDMIInLong, _("Switch to HDMI in mode")),
+			}, prio=2)
 
 	def HDMIInLong(self):
 		if self.LongButtonPressed:
@@ -3949,19 +3950,24 @@ class InfoBarHdmi2:
 			return _("Turn off HDMI-IN PiP mode")
 
 	def HDMIInPiP(self):
-		if getMachineBuild() in ('dm7080', 'dm820', 'dm900', 'dm920', 'dreamone', 'dreamtwo'):
-			print("[InfoBarGenerics] Read /proc/stb/hdmi-rx/0/hdmi_rx_monitor")
-			check = open("/proc/stb/hdmi-rx/0/hdmi_rx_monitor", "r").read()
+		if boxtype in ('dm7080', 'dm820', 'dm900', 'dm920', 'dreamone', 'dreamtwo'):
+			f = open("/proc/stb/hdmi-rx/0/hdmi_rx_monitor", "r")
+			check = f.read()
+			f.close()
 			if check.startswith("off"):
-				print("[InfoBarGenerics] Write to /proc/stb/audio/hdmi_rx_monitor")
-				open("/proc/stb/audio/hdmi_rx_monitor", "w").write("on")
-				print("[InfoBarGenerics] Write to /proc/stb/hdmi-rx/0/hdmi_rx_monitor")
-				open("/proc/stb/hdmi-rx/0/hdmi_rx_monitor", "w").write("on")
+				f = open("/proc/stb/audio/hdmi_rx_monitor", "w")
+				f.write("on")
+				f.close()
+				f = open("/proc/stb/hdmi-rx/0/hdmi_rx_monitor", "w")
+				f.write("on")
+				f.close()
 			else:
-				print("[InfoBarGenerics] Write to /proc/stb/audio/hdmi_rx_monitor")
-				open("/proc/stb/audio/hdmi_rx_monitor", "w").write("off")
-				print("[InfoBarGenerics] Write to /proc/stb/hdmi-rx/0/hdmi_rx_monitor")
-				open("/proc/stb/hdmi-rx/0/hdmi_rx_monitor", "w").write("off")
+				f = open("/proc/stb/audio/hdmi_rx_monitor", "w")
+				f.write("off")
+				f.close()
+				f = open("/proc/stb/hdmi-rx/0/hdmi_rx_monitor", "w")
+				f.write("off")
+				f.close()
 		else:
 			if not hasattr(self.session, 'pip') and not self.session.pipshown:
 				self.hdmi_enabled_pip = True
@@ -3982,37 +3988,48 @@ class InfoBarHdmi2:
 					del self.session.pip
 
 	def HDMIInFull(self):
-		if getMachineBuild() in ('dm7080', 'dm820', 'dm900', 'dm920', 'dreamone', 'dreamtwo'):
-			print("[InfoBarGenerics] Read /proc/stb/hdmi-rx/0/hdmi_rx_monitor")
-			check = open("/proc/stb/hdmi-rx/0/hdmi_rx_monitor", "r").read()
+		if boxtype in ('dm7080', 'dm820', 'dm900', 'dm920', 'dreamone', 'dreamtwo'):
+			f = open("/proc/stb/hdmi-rx/0/hdmi_rx_monitor", "r")
+			check = f.read()
+			f.close()
 			if check.startswith("off"):
-				print("[InfoBarGenerics] Read /proc/stb/video/videomode")
-				self.oldvideomode = open("/proc/stb/video/videomode", "r").read()
-				print("[InfoBarGenerics] Read /proc/stb/video/videomode_50hz")
-				self.oldvideomode_50hz = open("/proc/stb/video/videomode_50hz", "r").read()
-				print("[InfoBarGenerics] Read /proc/stb/video/videomode_60hz")
-				self.oldvideomode_60hz = open("/proc/stb/video/videomode_60hz", "r").read()
-				if getMachineBuild() in ('dm900', 'dm920', 'dreamone', 'dreamtwo'):
-					print("[InfoBarGenerics] Write to /proc/stb/video/videomode")
-					open("/proc/stb/video/videomode", "w").write("1080p")
+				f = open("/proc/stb/video/videomode", "r")
+				self.oldvideomode = f.read()
+				f.close()
+				f = open("/proc/stb/video/videomode_50hz", "r")
+				self.oldvideomode_50hz = f.read()
+				f.close()
+				f = open("/proc/stb/video/videomode_60hz", "r")
+				self.oldvideomode_60hz = f.read()
+				f.close()
+				f = open("/proc/stb/video/videomode", "w")
+				if boxtype in ('dm900', 'dm920', 'dreamone', 'dreamtwo'):
+					f.write("1080p")
 				else:
-					print("[InfoBarGenerics] Write to /proc/stb/video/videomode")
-					open("/proc/stb/video/videomode", "w").write("720p")
-				print("[InfoBarGenerics] Write to /proc/stb/audio/hdmi_rx_monitor")
-				open("/proc/stb/audio/hdmi_rx_monitor", "w").write("on")
-				print("[InfoBarGenerics] Write to /proc/stb/hdmi-rx/0/hdmi_rx_monitor")
-				open("/proc/stb/hdmi-rx/0/hdmi_rx_monitor", "w").write("on")
+					f.write("720p")
+				f.close()
+				f = open("/proc/stb/audio/hdmi_rx_monitor", "w")
+				f.write("on")
+				f.close()
+				f = open("/proc/stb/hdmi-rx/0/hdmi_rx_monitor", "w")
+				f.write("on")
+				f.close()
 			else:
-				print("[InfoBarGenerics] Write to /proc/stb/audio/hdmi_rx_monitor")
-				open("/proc/stb/audio/hdmi_rx_monitor", "w").write("off")
-				print("[InfoBarGenerics] Write to /proc/stb/hdmi-rx/0/hdmi_rx_monitor")
-				open("/proc/stb/hdmi-rx/0/hdmi_rx_monitor", "w").write("off")
-				print("[InfoBarGenerics] Write to /proc/stb/video/videomode")
-				open("/proc/stb/video/videomode", "w").write(self.oldvideomode)
-				print("[InfoBarGenerics] Write to /proc/stb/video/videomode_50hz")
-				open("/proc/stb/video/videomode_50hz", "w").write(self.oldvideomode_50hz)
-				print("[InfoBarGenerics] Write to /proc/stb/video/videomode_60hz")
-				open("/proc/stb/video/videomode_60hz", "w").write(self.oldvideomode_60hz)
+				f = open("/proc/stb/audio/hdmi_rx_monitor", "w")
+				f.write("off")
+				f.close()
+				f = open("/proc/stb/hdmi-rx/0/hdmi_rx_monitor", "w")
+				f.write("off")
+				f.close()
+				f = open("/proc/stb/video/videomode", "w")
+				f.write(self.oldvideomode)
+				f.close()
+				f = open("/proc/stb/video/videomode_50hz", "w")
+				f.write(self.oldvideomode_50hz)
+				f.close()
+				f = open("/proc/stb/video/videomode_60hz", "w")
+				f.write(self.oldvideomode_60hz)
+				f.close()
 		else:
 			slist = self.servicelist
 			curref = self.session.nav.getCurrentlyPlayingServiceOrGroup()
