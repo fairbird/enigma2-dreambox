@@ -3,7 +3,7 @@ import errno
 import inspect
 import os
 from os import F_OK, R_OK, W_OK, access, chmod, listdir, makedirs, mkdir, readlink, rename, rmdir, sep, stat, statvfs, symlink, utime, walk
-
+from os.path import isdir, isfile, join as pathjoin
 from enigma import eEnv, getDesktop, eGetEnigmaDebugLvl
 from errno import ENOENT, EXDEV
 from re import compile
@@ -627,3 +627,13 @@ def mediafilesInUse(session):
 
 def shellquote(s):
 	return "'%s'" % s.replace("'", "'\\''")
+
+def isPluginInstalled(pluginName, pluginFile="plugin", pluginType=None):
+	path, flags = defaultPaths.get(SCOPE_PLUGINS)
+	for type in [x for x in listdir(path) if isdir(pathjoin(path, x))]:
+		for extension in ["o", "c", ""]:
+			if isfile(pathjoin(path, type, pluginName, "%s.py%s" % (pluginFile, extension))):
+				if pluginType and type != pluginType:
+					continue
+				return True
+	return False
