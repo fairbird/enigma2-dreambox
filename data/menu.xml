@@ -54,13 +54,13 @@
 						<item level="0" requires="FrontpanelDisplay" text="Front panel display" entryID="display_skin_selector"><screen module="SkinSelector" screen="LcdSkinSelector"/></item>
 						<item entryID="lcd_setup" requires="Display" text="LCD setup"><setup level="1" id="lcd"/></item>
 					</menu>
-					<menu entryID="usage_setup" level="0" text="Log Manager" weight="2">
-						<id val="logs_menu" />
-						<item entryID="logs_setup" level="2" text="Settings"><setup id="Logs" /></item>
-						<item entryID="logs_man" level="2" text="View Log Manager"><screen module="LogManager" screen="LogManager" /></item>
-					</menu>
 				</menu>
-				<menu level="0" text="EPG" entryID="epg_menu">
+				<menu entryID="usage_setup" level="0" text="Log Manager" weight="2">
+					<id val="logs_menu" />
+					<item entryID="logs_setup" level="2" text="Settings"><setup id="Logs" /></item>
+					<item entryID="logs_man" level="2" text="View Log Manager"><screen module="LogManager" screen="LogManager" /></item>
+				</menu>
+				<menu level="0" text="EPG" entryID="epg_menu" weight="0">
 					<id val="epg"/>
 					<item level="0" entryID="epg_setup"><setup id="epgsettings"/></item>
 				</menu>
@@ -97,7 +97,7 @@
 			<item weight="15" level="0" text="Parental control" entryID="parental_setup"><screen module="ParentalControlSetup" screen="ParentalControlSetup"/></item>
 			<item weight="15" level="0" text="Factory reset" entryID="factory_reset"><screen module="FactoryReset" screen="FactoryReset"/></item>
 			<item weight="15" level="0" text="Flash image" entryID="flash_image" requires="canFlashWithOfgwrite" ><screen module="FlashImage" screen="SelectImage"/></item>
-			<item weight="15" level="0" text="Software update" entryID="software_update"><screen module="SoftwareUpdate" screen="UpdatePlugin"/></item>
+			<!--item weight="15" level="0" text="Software update" entryID="software_update"><screen module="SoftwareUpdate" screen="UpdatePlugin"/></item-->
 		</menu>
 
 		<menu text="Standby / restart" entryID="standby_restart_list">
