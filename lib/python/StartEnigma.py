@@ -1,5 +1,6 @@
 import sys
 import os
+from Tools.HardwareInfo import HardwareInfo
 from Tools.Profile import profile, profile_final
 profile("PYTHON_START")
 
@@ -12,10 +13,6 @@ import eBaseImpl
 enigma.eTimer = eBaseImpl.eTimer
 enigma.eSocketNotifier = eBaseImpl.eSocketNotifier
 enigma.eConsoleAppContainer = eConsoleImpl.eConsoleAppContainer
-
-from boxbranding import getBoxType
-
-boxtype = getBoxType()
 
 from traceback import print_exc
 
@@ -611,7 +608,7 @@ profile("LCD")
 import Components.Lcd
 Components.Lcd.InitLcd()
 
-if boxtype in ('dm7080', 'dm820', 'dm900', 'dm920', 'dreamone', 'dreamtwo'):
+if HardwareInfo().get_device_model() in ('dm7080', 'dm820', 'dm900', 'dm920', 'dreamone', 'dreamtwo'):
 	print("[StartEnigma] Read /proc/stb/hdmi-rx/0/hdmi_rx_monitor")
 	check = open("/proc/stb/hdmi-rx/0/hdmi_rx_monitor", "r").read()
 	if check.startswith("on"):
