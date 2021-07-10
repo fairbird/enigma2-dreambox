@@ -9,6 +9,7 @@ from Components.Pixmap import MultiPixmap
 from Components.MovieList import AUDIO_EXTENSIONS, MOVIE_EXTENSIONS, DVD_EXTENSIONS
 from Components.PluginComponent import plugins
 from Components.ServiceEventTracker import ServiceEventTracker
+from Components.Sources.ServiceEvent import ServiceEvent
 from Components.ServiceList import refreshServiceList
 from Components.Sources.Boolean import Boolean
 from Components.config import config, ConfigBoolean, ConfigClock
@@ -594,6 +595,7 @@ class NumberZap(Screen):
 		if self.searchNumber:
 			self.service, self.bouquet = self.searchNumber(int(self["number"].getText()))
 			self["servicename"].text = self["servicename_summary"].text = ServiceReference(self.service).getServiceName()
+			self["Service"].newService(self.service)
 			if not self.startBouquet:
 				self.startBouquet = self.bouquet
 
@@ -606,6 +608,7 @@ class NumberZap(Screen):
 			else:
 				self.service, self.bouquet = self.searchNumber(int(self["number"].getText()))
 			self["servicename"].text = self["servicename_summary"].text = ServiceReference(self.service).getServiceName()
+			self["Service"].newService(self.service)
 
 	def keyNumberGlobal(self, number):
 		if int(config.misc.zapkey_delay.value) > 0:
@@ -630,6 +633,7 @@ class NumberZap(Screen):
 		self["channel_summary"] = StaticText(_("Channel:"))
 		self["number_summary"] = StaticText(self.numberString)
 		self["servicename_summary"] = StaticText()
+		self["Service"] = ServiceEvent()
 
 		self.onLayoutFinish.append(self.handleServiceName)
 		if config.misc.numzap_picon.value:
