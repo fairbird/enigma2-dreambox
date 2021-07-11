@@ -134,7 +134,7 @@ def InitUsageConfig():
 
 	if not exists(resolveFilename(SCOPE_HDD)):
 		try:
-			mkdir(resolveFilename(SCOPE_HDD), 0755)
+			os.mkdir(resolveFilename(SCOPE_HDD), 0755)
 		except (IOError, OSError):
 			pass
 	defaultValue = resolveFilename(SCOPE_HDD)
@@ -165,7 +165,7 @@ def InitUsageConfig():
 	config.usage.instantrec_path.save()
 	if not exists(resolveFilename(SCOPE_TIMESHIFT)):
 		try:
-			mkdir(resolveFilename(SCOPE_TIMESHIFT), 0755)
+			os.mkdir(resolveFilename(SCOPE_TIMESHIFT), 0755)
 		except:
 			pass
 	defaultValue = resolveFilename(SCOPE_TIMESHIFT)
