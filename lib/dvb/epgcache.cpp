@@ -618,7 +618,7 @@ void eEPGCache::sectionRead(const uint8_t *data, int source, eEPGChannelData *ch
 
 			if (event_id == 0) {
 				// hack for some polsat services on 13.0E..... but this also replaces other valid event_ids with value 0..
-				// but we dont care about it...
+				// but we do not care about it...
 				event_id = event_hash;
 				eit_event->event_id_hi = event_hash >> 8;
 				eit_event->event_id_lo = event_hash & 0xFF;
@@ -2029,11 +2029,6 @@ void eEPGCache::submitEventData(const std::vector<int>& sids, const std::vector<
 		packet->setOriginalNetworkId(chids[i].original_network_id.get());
 		sectionRead(data, source, 0);
 	}
-}
-
-void eEPGCache::setEpgmaxdays(unsigned int epgmaxdays)
-{
-	maxdays = epgmaxdays;
 }
 
 void eEPGCache::setEpgHistorySeconds(time_t seconds)
