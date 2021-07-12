@@ -60,6 +60,51 @@
 					<item entryID="logs_setup" level="2" text="Settings"><setup id="Logs" /></item>
 					<item entryID="logs_man" level="2" text="View Log Manager"><screen module="LogManager" screen="LogManager" /></item>
 				</menu>
+				<!-- Menu / Setup / EPG -->
+				<menu entryID="epg_menu" level="0" text="EPG" weight="15">
+					<id val="epg" />
+					<item entryID="epg_setup" level="0" text="EPG Setup" weight="5"><setup id="EPG" /></item>
+					<menu entryID="epgloadsave_menu" level="2" text="Save, Load &amp; Delete EPG Cache" weight="10">
+						<id val="epgloadsave_menu" />
+						<item entryID="saveepgcache" level="0" text="Save EPG Cache">
+							<code>
+from Components.EpgLoadSave import EpgSaveMsg
+def msgClosed(ret):
+	if ret:
+		from enigma import eEPGCache
+		epgcache = eEPGCache.getInstance()
+		epgcache.save()
+self.session.openWithCallback(msgClosed, EpgSaveMsg)
+							</code>
+						</item>
+						<item entryID="loadepgcache" level="0" text="Load EPG Cache">
+							<code>
+from Components.EpgLoadSave import EpgLoadMsg
+def msgClosed(ret):
+	if ret:
+		from enigma import eEPGCache
+		epgcache = eEPGCache.getInstance()
+		epgcache.load()
+self.session.openWithCallback(msgClosed, EpgLoadMsg)
+							</code>
+						</item>
+						<item entryID="deleteepgcache" level="0" text="Delete EPG Cache">
+							<code>
+from Components.EpgLoadSave import EpgDeleteMsg
+def msgClosed(ret):
+	if ret:
+		import os
+		from Components.config import config
+		if os.path.exists(config.misc.epgcache_filename.value):
+			os.remove(config.misc.epgcache_filename.value)
+		from enigma import eEPGCache
+		epgcache = eEPGCache.getInstance()
+		epgcache.flushEPG()
+self.session.openWithCallback(msgClosed, EpgDeleteMsg)
+							</code>
+						</item>
+					</menu>
+				</menu>
 				<menu level="0" text="EPG" entryID="epg_menu" weight="0">
 					<id val="epg"/>
 					<item level="0" entryID="epg_setup"><setup id="epgsettings"/></item>
