@@ -105,10 +105,6 @@ self.session.openWithCallback(msgClosed, EpgDeleteMsg)
 						</item>
 					</menu>
 				</menu>
-				<menu level="0" text="EPG" entryID="epg_menu" weight="0">
-					<id val="epg"/>
-					<item level="0" entryID="epg_setup"><setup id="epgsettings"/></item>
-				</menu>
 				<item level="1" entryID="rfmod_setup" requires="RfModulator"><setup id="RFmod"/></item>
 				<menu level="0" text="Expert settings" entryID="expert_selection">
 				<id val="expert"/>
