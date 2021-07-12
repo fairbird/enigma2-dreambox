@@ -2032,6 +2032,11 @@ void eEPGCache::submitEventData(const std::vector<int>& sids, const std::vector<
 	}
 }
 
+void eEPGCache::setEpgmaxdays(unsigned int epgmaxdays)
+{
+	maxdays = epgmaxdays;
+}
+
 void eEPGCache::setEpgHistorySeconds(time_t seconds)
 {
 	historySeconds = seconds;
