@@ -631,6 +631,11 @@ Screens.Ci.InitCiConfig()
 profile("RcModel")
 import Components.RcModel
 
+profile("EpgCacheSched")
+import Components.EpgLoadSave
+Components.EpgLoadSave.EpgCacheSaveCheck()
+Components.EpgLoadSave.EpgCacheLoadCheck()
+
 #from enigma import dump_malloc_stats
 #t = eTimer()
 #t.callback.append(dump_malloc_stats)
