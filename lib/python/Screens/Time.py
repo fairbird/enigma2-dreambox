@@ -1,6 +1,7 @@
 from Components.ActionMap import HelpableActionMap
 from Components.config import config
 from Components.Sources.StaticText import StaticText
+from Screens.MessageBox import MessageBox
 from Screens.Setup import Setup
 from Tools.Geolocation import geolocation
 
@@ -26,11 +27,11 @@ class Time(Setup):
 	def useGeolocation(self):
 		geolocationData = geolocation.getGeolocationData(fields="status,message,timezone,proxy")
 		if geolocationData.get("proxy", True):
-			self.setFootnote(_("Geolocation is not available."))
+			self.session.open(MessageBox, 'Geolocation is not available.', MessageBox.TYPE_INFO, timeout=3)
 			return
 		tz = geolocationData.get("timezone", None)
 		if tz is None:
-			self.setFootnote(_("Geolocation does not contain time zone information."))
+			self.session.open(MessageBox, 'Geolocation does not contain time zone information.', MessageBox.TYPE_INFO, timeout=3)
 		else:
 			areaItem = None
 			valItem = None
@@ -48,7 +49,7 @@ class Time(Setup):
 			if valItem is not None:
 				valItem[1].changed()
 			self["config"].invalidate(valItem)
-			self.setFootnote(_("Geolocation has been used to set the time zone."))
+			self.session.open(MessageBox, 'Geolocation has been used to set the time zone.', MessageBox.TYPE_INFO, timeout=3)
 
 	def yellow(self):  # Invoked from the Wizard.
 		self.useGeolocation()
