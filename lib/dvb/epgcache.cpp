@@ -581,7 +581,7 @@ void eEPGCache::sectionRead(const uint8_t *data, int source, eEPGChannelData *ch
 	int duration;
 
 	time_t TM = parseDVBtime((const uint8_t*)eit_event + 2);
-	time_t now = ::time(0);
+	time_t(&now) = ::time(0);
 
 	if ( TM != 3599 && TM > -1 && channel)
 		channel->haveData |= source;
