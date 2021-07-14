@@ -2,7 +2,7 @@
 import errno
 import os
 from os import F_OK, R_OK, W_OK, access, chmod, listdir, makedirs, mkdir, readlink, rename, rmdir, sep, stat, statvfs, symlink, utime, walk
-from os.path import isdir, isfile, join as pathjoin
+from os.path import isdir, isfile
 from enigma import eEnv, getDesktop, eGetEnigmaDebugLvl
 from errno import ENOENT, EXDEV
 from re import compile, split
@@ -388,6 +388,41 @@ def fileWriteLines(filename, lines, source=DEFAULT_MODULE_NAME, debug=False):
 	return result
 
 
+def fileReadXML(filename, default=None, source=DEFAULT_MODULE_NAME, debug=False):
+	dom = None
+	try:
+		with open(filename, "r") as fd:  # This open gets around a possible file handle leak in Python's XML parser.
+			try:
+				dom = parse(fd).getroot()
+				msg = "Read"
+			except ParseError as err:
+				fd.seek(0)
+				content = fd.readlines()
+				line, column = err.position
+				print("[%s] XML Parse Error: '%s' in '%s'!" % (source, err, filename))
+				data = content[line - 1].replace("\t", " ").rstrip()
+				print("[%s] XML Parse Error: '%s'" % (source, data))
+				print("[%s] XML Parse Error: '%s^%s'" % (source, "-" * column, " " * (len(data) - column - 1)))
+			except Exception as err:
+				print("[%s] Error: Unable to parse data in '%s' - '%s'!" % (source, filename, err))
+	except (IOError, OSError) as err:
+		if err.errno == ENOENT:  # ENOENT - No such file or directory.
+			print("[%s] Warning: File '%s' does not exist!" % (source, filename))
+		else:
+			print("[%s] Error %d: Opening file '%s'! (%s)" % (source, err.errno, filename, err.strerror))
+	except Exception as err:
+		print("[%s] Error: Unexpected error opening file '%s'! (%s)" % (source, filename, err))
+	if dom is None:
+		if default:
+			dom = fromstring(default)
+			msg = "Default"
+		else:
+			msg = "Failed to read"
+	if debug or forceDebug:
+		print("[%s] Line %d: %s from XML file '%s'." % (source, stack()[1][0].f_lineno, msg, filename))
+	return dom
+
+
 def getRecordingFilename(basename, dirname=None):
 	# Filter out non-allowed characters.
 	non_allowed_characters = "/.\\:*?<>|\""
@@ -598,9 +633,9 @@ def shellquote(s):
 
 def isPluginInstalled(pluginName, pluginFile="plugin", pluginType=None):
 	path, flags = defaultPaths.get(SCOPE_PLUGINS)
-	for type in [x for x in listdir(path) if isdir(pathjoin(path, x))]:
+	for type in [x for x in listdir(path) if isdir(os.path.join(path, x))]:
 		for extension in ["o", "c", ""]:
-			if isfile(pathjoin(path, type, pluginName, "%s.py%s" % (pluginFile, extension))):
+			if isfile(os.path.join(path, type, pluginName, "%s.py%s" % (pluginFile, extension))):
 				if pluginType and type != pluginType:
 					continue
 				return True
