@@ -184,8 +184,10 @@ def resolveFilename(scope, base="", path_prefix=None):
 			os.path.join(defaultPaths[SCOPE_CONFIG][0], skin)
 		]
 		if display:
-			resolveList.append(os.path.join(defaultPaths[SCOPE_CONFIG][0], "display", display))
-		resolveList.append(os.path.join(defaultPaths[SCOPE_CONFIG][0], "skin_common"))
+			resolveList.append(pathjoin(defaultPaths[SCOPE_CONFIG][0], "display", display, "fonts"))
+			resolveList.append(pathjoin(defaultPaths[SCOPE_CONFIG][0], "display", display))
+		resolveList.append(pathjoin(defaultPaths[SCOPE_CONFIG][0], "skin_common", "fonts"))
+		resolveList.append(pathjoin(defaultPaths[SCOPE_CONFIG][0], "skin_common"))
 		resolveList.append(defaultPaths[SCOPE_CONFIG][0])
 		resolveList.append(os.path.join(defaultPaths[SCOPE_SKIN][0], skin, "fonts"))
 		resolveList.append(os.path.join(defaultPaths[SCOPE_SKIN][0], skin))
@@ -418,6 +420,41 @@ def fileWriteLines(filename, lines, source=DEFAULT_MODULE_NAME, debug=False):
 	if debug or forceDebug:
 		print("[%s] Line %d: %s %d lines to file '%s'." % (source, stack()[1][0].f_lineno, msg, len(lines), filename))
 	return result
+
+
+def fileReadXML(filename, default=None, source=DEFAULT_MODULE_NAME, debug=False):
+	dom = None
+	try:
+		with open(filename, "r") as fd:  # This open gets around a possible file handle leak in Python's XML parser.
+			try:
+				dom = parse(fd).getroot()
+				msg = "Read"
+			except ParseError as err:
+				fd.seek(0)
+				content = fd.readlines()
+				line, column = err.position
+				print("[%s] XML Parse Error: '%s' in '%s'!" % (source, err, filename))
+				data = content[line - 1].replace("\t", " ").rstrip()
+				print("[%s] XML Parse Error: '%s'" % (source, data))
+				print("[%s] XML Parse Error: '%s^%s'" % (source, "-" * column, " " * (len(data) - column - 1)))
+			except Exception as err:
+				print("[%s] Error: Unable to parse data in '%s' - '%s'!" % (source, filename, err))
+	except (IOError, OSError) as err:
+		if err.errno == ENOENT:  # ENOENT - No such file or directory.
+			print("[%s] Warning: File '%s' does not exist!" % (source, filename))
+		else:
+			print("[%s] Error %d: Opening file '%s'! (%s)" % (source, err.errno, filename, err.strerror))
+	except Exception as err:
+		print("[%s] Error: Unexpected error opening file '%s'! (%s)" % (source, filename, err))
+	if dom is None:
+		if default:
+			dom = fromstring(default)
+			msg = "Default"
+		else:
+			msg = "Failed to read"
+	if debug or forceDebug:
+		print("[%s] Line %d: %s from XML file '%s'." % (source, stack()[1][0].f_lineno, msg, filename))
+	return dom
 
 
 def getRecordingFilename(basename, dirname=None):
