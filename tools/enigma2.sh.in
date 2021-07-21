@@ -92,6 +92,10 @@ while : ; do
 		7)
 			rm -R /etc/enigma2
 			;;
+		16)
+		        echo "rescue" > /proc/stb/fp/boot_mode
+			/sbin/reboot
+			;;
 		42)
 			df -P | grep -v "tmpfs " | awk '{print $6}' | tail -n +3 > /tmp/upgrade_mountpoints.txt
 			while read line; do

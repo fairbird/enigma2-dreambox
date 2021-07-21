@@ -154,5 +154,6 @@ self.session.openWithCallback(msgClosed, EpgDeleteMsg)
 			<item text="Multiboot image selector" entryID="multiboot" requires="canMultiBoot"><screen module="FlashImage" screen="MultibootSelection">1</screen></item>
 			<item text="Deep standby" requires="DeepstandbySupport" entryID="deep_standby"><screen module="Standby" screen="TryQuitMainloop">1</screen></item>
 			<item text="Shutdown" requires="!DeepstandbySupport" entryID="deep_standby"><screen module="Standby" screen="TryQuitMainloop">1</screen></item>
+			<item entryID="maintenance_mode" level="0" text="Recovery Mode" weight="55" requires="RecoveryMode"><screen module="Standby" screen="TryQuitMainloop">16</screen></item>
 		</menu>
 </menu>
