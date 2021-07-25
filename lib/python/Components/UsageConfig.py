@@ -648,7 +648,7 @@ def InitUsageConfig():
 
 	crashlogheader = _("We are really sorry. Your receiver encountered "
 					 "a software problem, and needs to be restarted.\n"
-					 "Please send the logfile %senigma2_crash_xxxxxx.log to https://github.com/Hains/enigma2.\n"
+					 "Please send the logfile %senigma2_crash_xxxxxx.log to https://github.com/fairbird/enigma2.\n"
 					 "Your receiver restarts in 10 seconds!\n"
 					 "Component: enigma2") % config.crash.debugPath.value
 	config.crash.debug_text = ConfigText(default=crashlogheader, fixed_size=False)
