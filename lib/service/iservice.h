@@ -1041,6 +1041,10 @@ public:
 	virtual SWIG_VOID(RESULT) stream(ePtr<iStreamableService> &SWIG_OUTPUT)=0;
 	virtual SWIG_VOID(RESULT) subServices(ePtr<iSubserviceList> &SWIG_OUTPUT)=0;
 	virtual SWIG_VOID(RESULT) getFilenameExtension(std::string &SWIG_OUTPUT)=0;
+	virtual PyObject *getCutList()
+	{
+		return PyList_New(0);
+	}
 };
 SWIG_TEMPLATE_TYPEDEF(ePtr<iRecordableService>, iRecordableServicePtr);
 
