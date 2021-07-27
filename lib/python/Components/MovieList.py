@@ -6,6 +6,7 @@ from Components.config import config
 import os
 import struct
 import random
+from time import localtime, strftime
 from Tools.LoadPixmap import LoadPixmap
 from Tools.Directories import SCOPE_CURRENT_SKIN, resolveFilename
 from Screens.LocationBox import defaultInhibitDirs
@@ -484,7 +485,10 @@ class MovieList(GUIComponent):
 
 		begin_string = ""
 		if begin > 0:
-			begin_string = ', '.join(FuzzyTime(begin, inPast=True))
+			if config.movielist.use_fuzzy_dates.value:
+				begin_string = ', '.join(FuzzyTime(begin, inPast = True))
+			else:
+				begin_string = strftime("%s, %s" % (config.usage.date.daylong.value, config.usage.time.short.value), localtime(begin))
 
 		ih = self.itemHeight
 		if self.list_type == MovieList.LISTTYPE_ORIGINAL:
