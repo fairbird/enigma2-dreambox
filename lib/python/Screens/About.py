@@ -18,6 +18,8 @@ from enigma import eTimer, eLabel, eConsoleAppContainer, getDesktop, eGetEnigmaD
 from Components.GUIComponent import GUIComponent
 from skin import applySkinFactor, parameters, parseScale
 
+from time import strftime
+
 import os
 
 

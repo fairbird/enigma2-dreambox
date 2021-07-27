@@ -39,6 +39,7 @@ import time
 import cPickle as pickle
 
 config.movielist = ConfigSubsection()
+config.movielist.use_fuzzy_dates = ConfigYesNo(default=True)
 config.movielist.moviesort = ConfigInteger(default=MovieList.SORT_GROUPWISE)
 config.movielist.listtype = ConfigInteger(default=MovieList.LISTTYPE_MINIMAL)
 config.movielist.description = ConfigInteger(default=MovieList.SHOW_DESCRIPTION)
@@ -271,6 +272,7 @@ class MovieBrowserConfiguration(ConfigListScreen, Screen):
 		cfg.listtype = ConfigSelection(default=str(config.movielist.listtype.value), choices=l_listtype)
 		cfg.description = ConfigYesNo(default=(config.movielist.description.value != MovieList.HIDE_DESCRIPTION))
 		configList = [
+			getConfigListEntry(_("Use adaptive date display"), config.movielist.use_fuzzy_dates, _("Adaptive date display allows recent dates to be displayed as 'Today' or 'Yesterday'.  It hides the year for recordings made this year.  It hides the day of the week for recordings made in previous years.")),
 			getConfigListEntry(_("Sort"), cfg.moviesort, _("You can set sorting type for items in movielist.")),
 			getConfigListEntry(_("Show extended description"), cfg.description, _("You can enable if will be displayed extended EPG description for item.")),
 			getConfigListEntry(_("Type"), cfg.listtype, _("Set movielist type.")),

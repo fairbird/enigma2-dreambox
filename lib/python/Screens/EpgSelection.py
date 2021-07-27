@@ -18,7 +18,7 @@ from enigma import eServiceReference
 from RecordTimer import RecordTimerEntry, parseEvent, AFTEREVENT, createRecordTimerEntry
 from TimerEntry import TimerEntry
 from ServiceReference import ServiceReference
-from time import localtime, time
+from time import localtime, time, strftime
 from Components.PluginComponent import plugins
 from Plugins.Plugin import PluginDescriptor
 from Tools.BoundFunction import boundFunction

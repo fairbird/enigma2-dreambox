@@ -49,10 +49,11 @@
 					<item level="0" entryID="user_interface" text="User Interface" ><setup id="userinterface"/></item>
 					<item level="0" entryID="usage_setup"><setup id="usage"/></item>
 					<item level="0" text="Skin" entryID="primary_skin_selector"><screen module="SkinSelector" screen="SkinSelector"/></item>
-					<menu level="0" text="Front Panel &amp; LCD Setup" entryID="gui_settings">
-						<id val="gui"/>
-						<item level="0" requires="FrontpanelDisplay" text="Front panel display" entryID="display_skin_selector"><screen module="SkinSelector" screen="LcdSkinSelector"/></item>
-						<item entryID="lcd_setup" requires="Display" text="LCD setup"><setup level="1" id="lcd"/></item>
+					<menu entryID="display_selection" level="0" text="Front Panel Display" requires="Display">
+						<id val="lcd" />
+						<item entryID="display_skin_selector" level="0" text="Skin Setup" weight="5"><screen module="SkinSelector" screen="LcdSkinSelector" /></item>
+						<item entryID="lcd_setup" level="1" text="LCD Setup" weight="10"><setup id="FrontDisplay" /></item>
+						<item entryID="led_setup" level="1" text="LED Setup" weight="15"><setup id="LedDisplay" /></item>
 					</menu>
 				</menu>
 				<menu entryID="usage_setup" level="0" text="Log Manager" weight="2">

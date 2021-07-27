@@ -85,6 +85,10 @@
 		<item level="0" text="Show second infobar" description="Configure whether (and for how long) a second infobar will be shown when OK is pressed twice. The second infobar contains additional information about the current channel.">config.usage.show_second_infobar</item>
 		<item level="1" text="Show background in radio mode" description="When enabled, a radio background image will be visible while listening to a radio channel.">config.misc.showradiopic</item>
 		<item level="1" text="Show screensaver" description="Configure the duration in minutes for the screensaver.">config.usage.screen_saver</item>
+		<item level="0" text="Show time remaining/elapsed" description="This option allows you choose how to display remaining time, or elapsed time, or both.">config.usage.swap_time_remaining_on_osd</item>
+		<item level="0" text="Show time elapsed as positive" description="This option allows you choose how to display elapsed time as + or -">config.usage.elapsed_time_positive_osd</item>
+		<item level="0" text="Show transponder remaining/elapsed as" description="This option allows you to choose how to display the remaining/elapsed time for live TV.">config.usage.swap_time_display_on_osd</item>
+		<item level="0" text="Media playback Remaining/Elapsed as" description="This option allows you to choose how to display the remaining/elapsed time for media playback.">config.usage.swap_media_time_display_on_osd</item>
 		<item level="2" text="Hide zap errors" description="When enabled, error messages related to zapping will not be shown.">config.usage.hide_zap_errors</item>
 		<item level="2" text="Show crypto info in infobar" description="When enabled, encryption info will be shown in the infobar (when supported by the skin).">config.usage.show_cryptoinfo</item>
 		<item level="2" text="Show picons in display" description="Configure if service picons will be shown in display (when supported by the skin)." requires="HasFrontDisplayPicon">config.usage.show_picon_in_display</item>
@@ -192,6 +196,9 @@
 		<item level="0" text="Time zone" description="Select the time zone within the area or region.">config.timezone.val</item>
 		<item level="1" text="Time synchronization method" description="Select how you want your receiver to keep the correct time, either from the DVB transponder, or from the internet using NTP. Or use Auto, which will favour using NTP, but will fall back to transponder time when no internet connection is available.">config.ntp.timesync</item>
 		<item level="1" text="NTP Hostname" conditional="config.ntp.timesync.value != 'dvb'" description="The hostname or the IP address of the NTP server to synchronise the time with.">config.ntp.server</item>
+		<item level="0" text="Sync NTP every (minutes)" description="Setup network time synchronization interval." conditional="config.ntp.timesync.value != 'dvb'" >config.ntp.useNTPminutes</item>
+		<item level="0" text="Date style" description="Choose the display formatting style for dates. 'D' / 'DD' is the date and 'M' / 'MM' is the month in digits.  ('DD' and 'MM' have leading zeros for single digit values.) The screen display will be based on your choice but can be influenced by the skin." requires="config.usage.date.enabled">config.usage.date.dayfull</item>
+		<item level="0" text="Time style" description="Choose the display formatting style for times. 'H' / 'HH' is the hour for a 24 hour clock, 'h' / 'hh' is the hour for a 12 hour clock, 'mm' is the minutes and 'ss' is the seconds.  ('HH' and 'hh' have leading zeros for single digit values.) The screen display will be based on your choice but can be influenced by the skin." requires="config.usage.time.enabled">config.usage.time.long</item>
 	</setup>
 	<setup key="Recording" title="Recording Setup">
 		<item level="0" text="Default movie location" description="Set the default location for your recordings. Press OK to add new locations, LEFT/RIGHT to select from any existing locations.">config.usage.default_path</item>
@@ -276,33 +283,63 @@
 		<item text="Brightness">config.osd.bright</item>
 		<item text="Contrast">config.osd.contrast</item>
 	</setup>
-	<setup key="lcd" title="Display setup" requires="FrontpanelDisplay">
+	<setup key="FrontDisplay" title="Display Setup" requires="FrontpanelDisplay">
+		<item level="0" text="Use separate picon pack for front panel display" description="Use piconlcd directory for picons on color LCD">config.lcd.picon_pack</item>
+		<item level="0" text="Date style" description="Choose the front panel display formatting style for dates. 'D' / 'DD' is the date and 'M' / 'MM' is the month in digits.  ('DD' and 'MM' have leading zeros for single digit values.) The screen display will be based on your choice but can be influenced by the skin." requires="config.usage.date.enabled_display">config.usage.date.display</item>
+		<item level="0" text="Time style" description="Choose the front panel display formatting style for times. 'H' / 'HH' is the hour for a 24 hour clock, 'h' / 'hh' is the hour for a 12 hour clock, 'mm' is the minutes.  ('HH' and 'hh' have leading zeros for single digit values.) The front panel display will be based on your choice but can be influenced any applicable skin." requires="config.usage.time.enabled_display">config.usage.time.display</item>
+		<item level="1" requires="ConfigDisplay" text="Show Time Remaining/Elapsed" description="This option allows you choose how to display remaining time, or elapsed time, or both.">config.usage.swap_time_remaining_on_vfd</item>
+		<item level="1" requires="ConfigDisplay" text="Show Transponder Remaining/Elapsed as" description="This option allows you choose how to display the remaining/elapsed time for live TV.">config.usage.swap_time_display_on_vfd</item>
+		<item level="1" requires="ConfigDisplay" text="Show Media playback Remaining/Elapsed as" description="This option allows you to choose how to display the remaining/elapsed time for Media playback.">config.usage.swap_media_time_display_on_vfd</item>
+		<item level="0" requires="ConfigDisplay" text="Show time elapsed as positive" description="This option allows you to choose how to display elapsed time. As + or -">config.usage.elapsed_time_positive_vfd</item>
 		<item level="0" text="Clone TV screen to LCD" description="Shows live tv or informations on LCD." requires="LcdLiveTV">config.lcd.showTv</item>
-		<item level="0" text="Clone TV screen to LCD mode" description="Selects the mode how live tv should be shown on the LCD." requires="LcdLiveTVMode">config.usage.LcdLiveTVMode</item>
-		<item level="2" text="Live decoder" description="Selects video source displayed on the LCD." requires="LcdLiveDecoder">config.usage.LcdLiveDecoder</item>
 		<item level="0" text="Brightness" description="Configure the brightness level of the front panel display.">config.lcd.bright</item>
+		<item level="0" text="Brightness (Dimmed)" description="Configure the brightness level of the front panel display for dimmed operation.">config.lcd.dimbright</item>
+		<item level="0" text="Dim delay" description="Dim the LCD after specified time.">config.lcd.dimdelay</item>
 		<item level="0" text="Contrast" description="Configure the contrast level of the front panel display.">config.lcd.contrast</item>
 		<item level="0" text="Standby" description="Configure the brightness level of the front panel display during standby.">config.lcd.standby</item>
-		<item level="0" text="LED color during normal operations" description="Configure front LED color during normal operations (this requires an enigma2 restart).">config.usage.frontled_color</item>
-		<item level="0" text="LED color during recording" description="Configure front LED color during recording (this requires an enigma2 restart).">config.usage.frontledrec_color</item>
-		<item level="0" text="LED color during standby" description="Configure front LED color during standby (this requires an enigma2 restart).">config.usage.frontledstdby_color</item>
-		<item level="0" text="LED color during recording in standby" description="Configure front LED color during recording in standby (this requires an enigma2 restart).">config.usage.frontledrecstdby_color</item>
-		<item level="0" text="Power LED" description="Turn on the power LED." requires="PowerLED">config.usage.powerLED</item>
-		<item level="0" text="Standby LED" description="Turn on the power LED during standby." requires="StandbyLED">config.usage.standbyLED</item>
-		<item level="0" text="Deep Standby LED" description="Turn on the power LED during deep standby." requires="SuspendLED">config.usage.suspendLED</item>
-		<item level="0" requires="LedPowerColor" text="Operating LED status while running." description="With this option you can switch the LED color or deactivate the LED.">config.lcd.ledpowercolor</item>
-		<item level="0" requires="LedStandbyColor" text="Operating LED status in standby mode" description="With this option you can switch the LED color or deactivate the LED.">config.lcd.ledstandbycolor</item>
-		<item level="0" requires="LedSuspendColor" text="Operating LED status in deep standby mode" description="With this option you can switch the LED color or deactivate the LED.">config.lcd.ledsuspendcolor</item>
-		<item level="0" requires="Power4x7On" text="Switch on the display during operation." description="With this option you can switch on the display during operation.">config.lcd.power4x7on</item>
-		<item level="0" requires="Power4x7Standby" text="Switch on the display during Standby Mode" description="With this option you can switch on the display in Standby Mode.">config.lcd.power4x7standby</item>
-		<item level="0" requires="Power4x7Suspend" text="Switch on the display during Suspend Mode" description="With this option you can switch on the display in Deep Standby Mode.">config.lcd.power4x7suspend</item>
 		<item level="0" text="Scroll repeats" description="Number of repeating text on display." requires="VFD_scroll_repeats">config.usage.vfd_scroll_repeats</item>
 		<item level="2" text="Scroll delay" description="Delay in miliseconds between scrolling characters on display." requires="VFD_scroll_delay">config.usage.vfd_scroll_delay</item>
 		<item level="2" text="Initial scroll delay" description="Delay in miliseconds before start of scrolling text on display." requires="VFD_initial_scroll_delay">config.usage.vfd_initial_scroll_delay</item>
 		<item level="2" text="Final scroll delay" description="Delay in miliseconds after finish scrolling text on display." requires="VFD_final_scroll_delay">config.usage.vfd_final_scroll_delay</item>
-		<item level="0" text="Power on display" description="This option allows you to power off the display." requires="PowerOffDisplay">config.usage.powerOffDisplay</item>
-		<item level="2" text="Show symbols on display" description="This option allows you to show all symbols on the display." requires="LCDshow_symbols">config.usage.lcd_show_symbols</item>
-		<item level="2" text="Use 12 characters display mode" description="If enabled, display shows 12 chars instead 8, but in latin-1/translit only." requires="hasXcoreVFD">config.usage.toggle12to8characterVFD</item>
+		<item level="0" requires="ConfigDisplay" text="Power On Display" description="This option allows you to Power Off the display.">config.lcd.power</item>
+		<item level="2" text="Use 12 characters display mode" description="If enabled, display shows 12 chars instead 8, but in latin-1/translit only." requires="hasXcoreVFD">config.usage.vfd_xcorevfd</item>
+		<item level="1" text="Show Display Icons" description="Allows you to enable/disable displaying icons on the frontpanel.">config.lcd.mode</item>
+		<item level="1" requires="LCDMiniTV" text="Show MiniTV in the front panel display" description="You can display MiniTV with or without OSD menu">config.lcd.modeminitv</item>
+		<item level="1" requires="LCDMiniTV" text="Show PIP in the front panel display" description="You can display PIP with or without OSD menu">config.lcd.modepip</item>
+		<item level="1" requires="LCDMiniTV" text="Set framerate for MiniTV" description="Lower framerate save CPU time">config.lcd.fpsminitv</item>
+		<item level="2" requires="LCDMiniTV" text="Screenshot of LCD in /tmp" description="Enable screenshot of LCD in /tmp">config.lcd.screenshot</item>
+		<item level="1" text="REC symbol in use" description="Enable blinking REC symbol on the LCD display">config.usage.blinking_rec_symbol_during_recording</item>
+		<item level="1" text="REC symbol in Standby" description="In the Standby record on the LCD display">config.usage.blinking_display_clock_during_recording</item>
+		<item level="1" requires="ConfigDisplay" text="Scrolling speed (software renderer)" description="Set the scrolling speed of text on the front panel display, this is used by software renderer in some skins.">config.lcd.scroll_speed</item>
+		<item level="1" requires="ConfigDisplay" text="Scrolling delay (software renderer)" description="Set the delay time between repeated loops, this is used by software renderer in some skins.">config.lcd.scroll_delay</item>
+		<item level="0" requires="ConfigDisplay" text="Power On Display" description="This option allows you to Power Off the display.">config.lcd.power</item>
+		<item level="0" requires="ConfigDisplay" text="Show HDD progress" description="Disable the HDD Process on VFD">config.lcd.hdd</item>
+		<item level="0" requires="LcdLiveTV" text="Clone TV screen to LCD" description="Shows live tv or informations on LCD.">config.lcd.fblcddisplay</item>
+		<item level="0" requires="ConfigDisplay" text="Show HDMI-Output Res" description="Show HDMI Output Resulution">config.lcd.showoutputresolution</item>
+	</setup>
+	<setup key="LedDisplay" title="LED Setup">
+		<item level="0" text="LED color during normal operations" description="Configure front LED color during normal operations (this needs an enigma2 restart).">config.usage.frontled_color</item>
+		<item level="0" text="LED color during recording" description="Configure front LED color during recording (this needs an enigma2 restart).">config.usage.frontledrec_color</item>
+		<item level="0" text="LED color during standby" description="Configure front LED color during standby (this needs an enigma2 restart).">config.usage.frontledstdby_color</item>
+		<item level="0" text="LED color during recording in standby" description="Configure front LED color during recording in standby (this needs an enigma2 restart).">config.usage.frontledrecstdby_color</item>
+		<item level="0" text="LED Normal" description="LED brightness during normal operations.">config.lcd.ledbrightness</item>
+		<item level="0" text="LED Standby" description="LED brightness during standby.">config.lcd.ledbrightnessstandby</item>
+		<item level="0" text="LED Deep Standby" description="LED brightness during deep standby.">config.lcd.ledbrightnessdeepstandby</item>
+		<item level="0" requires="PowerLed" text="Turn on the power LED." description="Power LED can be turned on or off here.">config.usage.lcd_powerled</item>
+		<item level="0" requires="PowerLed2" text="Turn on the control LED." description="Control LED can be turned on or off here.">config.usage.lcd_powerled2</item>
+		<item level="0" requires="StandbyLED" text="Power LED state in Standby" description="Power LED state during standby.">config.usage.lcd_standbypowerled</item>
+		<item level="0" requires="SuspendLED" text="Power LED state in Deep-Standby" description="Power LED state during deep-standby.">config.usage.lcd_deepstandbypowerled</item>
+		<item level="0" requires="LedPowerColor" text="Operating LED status while running." description="With this option you can switch the LED color or deactivate the LED.">config.lcd.ledpowercolor</item>
+		<item level="0" requires="LedStandbyColor" text="Operating LED status in standby mode" description="With this option you can switch the LED color or deactivate the LED.">config.lcd.ledstandbycolor</item>
+		<item level="0" requires="LedSuspendColor" text="Operating LED status in deep standby mode" description="With this option you can switch the LED color or deactivate the LED.">config.lcd.ledsuspendcolor</item>
+		<item level="0" requires="FrontpanelLEDBlinkControl" text="Operating LED color while blinking." description="With this option you can switch the LED color while blinking.">config.lcd.ledblinkcontrolcolor</item>
+		<item level="0" requires="FrontpanelLEDBrightnessControl" text="Operating LED brightness." description="With this option you can switch the LED brightness.">config.lcd.ledbrightnesscontrol</item>
+		<item level="0" requires="FrontpanelLEDColorControl" text="Operating LED color." description="With this option you can switch the LED color.">config.lcd.ledcolorcontrolcolor</item>
+		<item level="0" requires="FrontpanelLEDFadeControl" text="Operating LED fade." description="With this option you can switch the LED fade.">config.lcd.ledfadecontrolcolor</item>
+		<item level="0" requires="Power4x7On" text="Switch on the display during operation." description="With this option you can switch on the display during operation.">config.lcd.power4x7on</item>
+		<item level="0" requires="Power4x7Standby" text="Switch on the display during Standby Mode" description="With this option you can switch on the display in Standby Mode.">config.lcd.power4x7standby</item>
+		<item level="0" requires="Power4x7Suspend" text="Switch on the display during Suspend Mode" description="With this option you can switch on the display in Deep Standby Mode.">config.lcd.power4x7suspend</item>
+		<item level="0" requires="7segment" text="Show in Standby" description="This option allows you choose how to display the time or nothing in Standby">config.usage.show_in_standby</item>
 	</setup>
 	<setup key="satconfig" title="Satellite dish setup">
 		<item text="Tuner slot" description="Choose which tuner to configure.">config.sat.tunerslot</item>
