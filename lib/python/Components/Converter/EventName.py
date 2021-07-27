@@ -3,6 +3,7 @@ from Components.Element import cached
 from Components.Converter.genre import getGenreStringSub
 from Components.config import config
 from Components.UsageConfig import dropEPGNewLines, replaceEPGSeparator
+from time import localtime, mktime, strftime
 
 
 class EventName(Converter):
@@ -131,10 +132,11 @@ class EventName(Converter):
 		elif self.type in (self.PDCTIME, self.PDCTIMESHORT):
 			pil = event.getPdcPil()
 			if pil:
+				begin = localtime(event.getBeginTime())
+				start = localtime(mktime([begin.tm_year, (pil & 0x7800) >> 11, (pil & 0xF8000) >> 15, (pil & 0x7C0) >> 6, (pil & 0x3F), 0, begin.tm_wday, begin.tm_yday, begin.tm_isdst]))
 				if self.type == self.PDCTIMESHORT:
-					return _("%02d:%02d") % ((pil & 0x7C0) >> 6, (pil & 0x3F))
-				return _("%d.%02d. %02d:%02d") % ((pil & 0xF8000) >> 15, (pil & 0x7800) >> 11, (pil & 0x7C0) >> 6, (pil & 0x3F))
-			return ""
+					return strftime(config.usage.time.short.value, start)
+				return strftime(config.usage.date.short.value + " " + config.usage.time.short.value, start)
 		elif self.type == self.ISRUNNINGSTATUS:
 			if event.getPdcPil():
 				running_status = event.getRunningStatus()

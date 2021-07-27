@@ -1,11 +1,11 @@
-from time import localtime, time
+from Components.config import config
+from time import localtime, time, strftime
 
 
 def FuzzyTime(t, inPast=False):
 	d = localtime(t)
 	nt = time()
-	n = localtime()
-	dayOfWeek = (_("Mon"), _("Tue"), _("Wed"), _("Thu"), _("Fri"), _("Sat"), _("Sun"))
+	n = localtime(nt)
 
 	if d[:3] == n[:3]:
 		# same day
@@ -15,20 +15,20 @@ def FuzzyTime(t, inPast=False):
 		date = _("Yesterday")
 	elif ((t - nt) < 7 * 86400) and (nt < t) and not inPast:
 		# same week (must be future)
-		date = dayOfWeek[d[6]]
+		date = strftime("%a", d)
 	elif d[0] == n[0]:
 		# same year
 		if inPast:
 			# I want the day in the movielist
-			date = _("%s %d.%d") % (dayOfWeek[d[6]], d[2], d[1])
+			date = strftime(config.usage.date.dayshort.value, d)
 		else:
-			date = _("%d.%d") % (d[2], d[1])
+			date = strftime(config.usage.date.short.value, d)
 	else:
-		date = _("%d.%d.%d") % (d[2], d[1], d[0])
+		date = strftime(config.usage.date.long.value, d)
 
-	timeres = _("%d:%02d") % (d[3], d[4])
+	timeres = strftime(config.usage.time.short.value, d)
 
-	return (date, timeres)
+	return date, timeres
 
 
 if __name__ == "__main__":
