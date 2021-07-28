@@ -135,6 +135,7 @@ private:
 	static eEPGCache *instance;
 
 	unsigned int historySeconds;
+	unsigned int maxdays;
 
 	std::vector<int> onid_blacklist;
 	eventCache eventDB;
@@ -172,9 +173,12 @@ private:
 public:
 	static eEPGCache *getInstance() { return instance; }
 
+	void crossepgImportEPGv21(std::string dbroot);
+	void clear();
 	void save();
 	void load();
 	void timeUpdated();
+	void flushEPG(int sid, int onid, int tsid);
 	void flushEPG(const uniqueEPGKey & s=uniqueEPGKey(), bool lock = true);
 #ifndef SWIG
 	eEPGCache();
@@ -194,9 +198,6 @@ private:
 	RESULT lookupEventTime(const eServiceReference &service, time_t, const eventData *&, int direction=0);
 
 public:
-	/* Only used by servicedvbrecord.cpp to write the EIT file */
-	RESULT saveEventToFile(const char* filename, const eServiceReference &service, int eit_event_id, time_t begTime, time_t endTime);
-
 	// Events are parsed epg events.. it's safe to use them after cache unlock
 	// after use the Event pointer must be released using "delete".
 	RESULT lookupEventId(const eServiceReference &service, int event_id, Event* &);
@@ -218,6 +219,9 @@ public:
 	};
 	PyObject *lookupEvent(SWIG_PYOBJECT(ePyObject) list, SWIG_PYOBJECT(ePyObject) convertFunc=(PyObject*)0);
 	PyObject *search(SWIG_PYOBJECT(ePyObject));
+
+	/* Used by servicedvbrecord.cpp, timeshift, etc. to write the EIT file */
+	RESULT saveEventToFile(const char* filename, const eServiceReference &service, int eit_event_id, time_t begTime, time_t endTime);
 
 	// eServiceEvent are parsed epg events.. it's safe to use them after cache unlock
 	// for use from python ( members: m_start_time, m_duration, m_short_description, m_extended_description )
@@ -251,9 +255,11 @@ public:
 #endif
 	,EPG_IMPORT=0x80000000
 	};
+	void setEpgmaxdays(unsigned int epgmaxdays);
 	void setEpgHistorySeconds(time_t seconds);
 	void setEpgSources(unsigned int mask);
 	unsigned int getEpgSources();
+	unsigned int getEpgmaxdays();
 
 	void submitEventData(const std::vector<eServiceReferenceDVB>& serviceRefs, long start, long duration, const char* title, const char* short_summary, const char* long_description, char event_type);
 

@@ -842,6 +842,23 @@ def InitUsageConfig():
 	config.epg.opentv = ConfigYesNo(default=False)
 	config.epg.saveepg = ConfigYesNo(default=True)
 
+	config.epg.maxdays = ConfigSelectionNumber(min=1, max=365, stepwidth=1, default=7, wraparound=True)
+
+	def EpgmaxdaysChanged(configElement):
+		eEPGCache.getInstance().setEpgmaxdays(config.epg.maxdays.getValue())
+	config.epg.maxdays.addNotifier(EpgmaxdaysChanged)
+
+	config.misc.epgratingcountry = ConfigSelection(default="", choices=[
+		("", _("Auto detect")),
+		("ETSI", _("Generic")),
+		("AUS", _("Australia"))
+	])
+	config.misc.epggenrecountry = ConfigSelection(default="", choices=[
+		("", _("Auto detect")),
+		("ETSI", _("Generic")),
+		("AUS", _("Australia"))
+	])
+
 	def EpgSettingsChanged(configElement):
 		mask = 0xffffffff
 		if not config.epg.eit.value:
