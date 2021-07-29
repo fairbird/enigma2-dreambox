@@ -5,11 +5,12 @@ from twisted.internet import threads
 from usb import busses
 
 from enigma import eActionMap, eDBoxLCD, eTimer
+
 from Components.config import ConfigNothing, ConfigSelection, ConfigSlider, ConfigSubsection, ConfigYesNo, config
 from Components.SystemInfo import SystemInfo
+from Tools.HardwareInfo import HardwareInfo
 from Screens.InfoBar import InfoBar
 from Screens.Screen import Screen
-from Tools.HardwareInfo import HardwareInfo
 from Screens.Standby import inTryQuitMainloop
 from Tools.Directories import fileReadLine, fileWriteLine
 
@@ -23,6 +24,7 @@ class dummyScreen(Screen):
 	def __init__(self, session, args=None):
 		Screen.__init__(self, session)
 		self.close()
+
 
 def IconCheck(session=None, **kwargs):
 	if exists("/proc/stb/lcd/symbol_network") or exists("/proc/stb/lcd/symbol_usb"):
@@ -178,7 +180,7 @@ class LCD:
 		eDBoxLCD.getInstance().setFlipped(value)
 
 	def setScreenShot(self, value):
-		eDBoxLCD.getInstance().setDump(value)
+ 		eDBoxLCD.getInstance().setDump(value)
 
 	def isOled(self):
 		return eDBoxLCD.getInstance().isOled()
@@ -529,11 +531,17 @@ def InitLcd():
 			("on", _("On"))
 		], default="on")
 		config.lcd.power4x7suspend.addNotifier(setPower4x7Suspend)
-
+		
 		if HardwareInfo().get_device_model() in ('dm900', 'dm920'):
 			standby_default = 4
 		else:
 			standby_default = 1
+
+		if not ilcd.isOled():
+			config.lcd.contrast = ConfigSlider(default=5, limits=(0, 20))
+			config.lcd.contrast.addNotifier(setLCDcontrast)
+		else:
+			config.lcd.contrast = ConfigNothing()
 
 		config.lcd.standby = ConfigSlider(default=standby_default, limits=(0, 10))
 		config.lcd.dimbright = ConfigSlider(default=standby_default, limits=(0, 10))
@@ -565,10 +573,8 @@ def InitLcd():
 
 		config.lcd.picon_pack = ConfigYesNo(default=False)
 		config.lcd.picon_pack.addNotifier(PiconPackChanged)
-
 		config.lcd.flip = ConfigYesNo(default=False)
 		config.lcd.flip.addNotifier(setLCDflipped)
-
 		if SystemInfo["LcdLiveTV"]:
 			def lcdLiveTvChanged(configElement):
 				if "live_enable" in SystemInfo["LcdLiveTV"]:
@@ -734,5 +740,4 @@ def InitLcd():
 		config.lcd.ledbrightnessdeepstandby.apply = lambda: doNothing()
 		config.lcd.ledblinkingtime = ConfigNothing()
 		config.lcd.picon_pack = ConfigNothing()
-
 	config.misc.standbyCounter.addNotifier(standbyCounterChanged, initial_call=False)
