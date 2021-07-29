@@ -25,6 +25,8 @@ from datetime import datetime
 
 
 class TimerEntry(Screen, ConfigListScreen):
+	EMPTY = 0
+
 	def __init__(self, session, timer):
 		Screen.__init__(self, session)
 		self.timer = timer
@@ -37,6 +39,7 @@ class TimerEntry(Screen, ConfigListScreen):
 
 		self.entryDate = None
 		self.entryService = None
+		self.key_red_choice = self.EMPTY
 
 		if self.key_red_choice != Pixmap:
 			self["key_red"] = StaticText(_("Cancel"))
