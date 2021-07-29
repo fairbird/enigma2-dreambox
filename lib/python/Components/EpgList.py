@@ -240,6 +240,7 @@ class EPGList(GUIComponent):
                 r1 = self.weekday_rect
                 r2 = self.datetime_rect
                 r3 = self.descr_rect
+                split = int(r2.w * 0.55)
                 t = localtime(beginTime)
                 et = localtime(beginTime + duration)
                 res = [
