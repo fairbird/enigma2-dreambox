@@ -698,6 +698,9 @@ def InitLcd():
 		else:
 			config.lcd.showoutputresolution = ConfigNothing()
 
+			def doNothing():
+				pass
+
 			config.lcd.ledbrightness = ConfigNothing()
 			config.lcd.ledbrightness.apply = lambda: doNothing()
 			config.lcd.ledbrightnessstandby = ConfigNothing()
