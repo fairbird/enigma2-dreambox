@@ -1562,8 +1562,8 @@ self.instance.move(ePoint(orgpos.x() + (orgwidth - newwidth)/2, orgpos.y() + (or
 		<widget name="timerlist" position="0,45" size="560,350" scrollbarMode="showOnDemand"/>
 	</screen>
 	<!-- CronTimers -->
-	<screen name="CronTimers" position="center,center" size="590,460" title="Cron Manager">
-		<eLabel backgroundColor="background" position="0,0" size="560,460" zPosition="-1" />
+	<screen name="CronTimers" position="center,center" size="570,460" title="Cron Manager">
+		<eLabel backgroundColor="background" position="0,0" size="570,460" zPosition="-1" />
 		<widget source="title" render="Label" position="10,5" size="280,35" valign="center" font="Enigma;30" halign="center" />
 		<eLabel backgroundColor="darkgrey" position="0,430" size="560,2" zPosition="1"/>
 		<widget source="global.CurrentTime" render="Label" position="500,435" size="55,22" font="Enigma;18" halign="right" transparent="1" valign="center" zPosition="3">
@@ -1571,23 +1571,30 @@ self.instance.move(ePoint(orgpos.x() + (orgwidth - newwidth)/2, orgpos.y() + (or
 		</widget>
 		<ePixmap pixmap="skin_default/logos/logo.png" position="2,435" size="210,25" alphatest="on" />
 		<ePixmap pixmap="skin_default/buttons/red.png" position="0,0" size="140,40" alphatest="on" />
-		<widget name="key_red" font="Regular;20" halign="center" position="-2,1" size="140,40" transparent="1" valign="center" zPosition="10" />
+		<widget source="key_red" render="Label" font="Regular;20" halign="center" position="-2,1" size="140,40" transparent="1" valign="center" zPosition="10" />
 		<ePixmap pixmap="skin_default/buttons/green.png" position="140,0" size="140,40" alphatest="on" />
-		<widget name="key_green" font="Regular;20" halign="center" position="140,0" size="140,40" transparent="1" valign="center" zPosition="10" />
+		<widget source="key_green" render="Label" font="Regular;20" halign="center" position="140,0" size="140,40" transparent="1" valign="center" zPosition="10" />
 		<ePixmap pixmap="skin_default/buttons/yellow.png" position="280,0" size="140,40" alphatest="on" />
-		<widget name="key_yellow" font="Regular;20" halign="center" position="280,1" size="140,40" transparent="1" valign="center" zPosition="10" />
+		<widget source="key_yellow" render="Label" font="Regular;20" halign="center" position="280,1" size="140,40" transparent="1" valign="center" zPosition="10" />
 		<ePixmap pixmap="skin_default/buttons/blue.png" position="420,0" size="140,40" alphatest="on" />
-		<widget name="blue" font="Regular;20" halign="center" position="420,0" size="140,40" transparent="1" valign="center" zPosition="10" />
+		<widget source="key_blue" render="Label" font="Regular;20" halign="center" position="420,0" size="140,40" transparent="1" valign="center" zPosition="10" />
 		<widget name="lab1" position="10,100" size="100,24" font="Regular;20" valign="center" transparent="0" />
 		<widget name="labdisabled" position="110,100" size="100,24" font="Regular;20" valign="center" halign="center" backgroundColor="red" zPosition="1" />
 		<widget name="labactive" position="110,100" size="100,24" font="Regular;20" valign="center" halign="center" backgroundColor="green" zPosition="2" />
 		<widget name="lab2" position="290,100" size="150,24" font="Regular;20" valign="center" transparent="0" />
 		<widget name="labstop" position="440,100" size="100,24" font="Regular;20" valign="center" halign="center" backgroundColor="red" zPosition="1" />
 		<widget name="labrun" position="440,100" size="100,24" font="Regular;20" valign="center" halign="center" backgroundColor="green" zPosition="2"/>
-		<widget source="list" render="Listbox" position="10,115" size="540,325" scrollbarMode="showOnDemand" >
-			<convert type="StringList" />
+		<widget source="list" render="Listbox" position="10,140" size="540,280" scrollbarSliderBorderWidth="1" scrollbarWidth="10" transparent="1" >
+			<convert type="TemplatedMultiContent">
+				{"template": [
+						MultiContentEntryText(pos = (5, 2), size = (695, 28), font=0, flags = RT_HALIGN_LEFT | RT_VALIGN_CENTER, text = 0), # index 0 is the name
+					],
+				"fonts": [gFont("Regular", 20)],
+				"itemHeight": 30
+				}
+			</convert>
 		</widget>
-		<widget name="key" position="520,182" size="755,25" font="Regular;20" halign="center" transparent="1" valign="center" backgroundColor="background" />
+		<widget name="key" position="5,56" size="544,25" font="Regular;20" halign="center" transparent="1" valign="center" backgroundColor="background" />
 	</screen>
 	<!-- Timeshift state -->
 	<screen name="TimeshiftState" position="70,70" zPosition="2" size="150,60" backgroundColor="transpBlack" flags="wfNoBorder">
