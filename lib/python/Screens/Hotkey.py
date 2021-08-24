@@ -261,7 +261,6 @@ class HotkeySetup(Screen):
 
 	def __init__(self, session, args=None):
 		Screen.__init__(self, session)
-		self.session = session
 		self.setTitle(_("Hotkey Setup"))
 		self["key_red"] = StaticText(_("Exit"))
 		self["description"] = Label()
@@ -355,7 +354,6 @@ class HotkeySetup(Screen):
 class HotkeySetupSelect(Screen):
 	def __init__(self, session, key, args=None):
 		Screen.__init__(self, session)
-		self.session = session
 		self.key = key
 		getHotkeyFunctions()
 		self.setTitle(_("Hotkey Setup") + " " + key[0][0])

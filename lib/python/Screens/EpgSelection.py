@@ -48,7 +48,6 @@ class EPGSelection(Screen):
 		self.saved_title = None
 		self["Service"] = ServiceEvent()
 		self["Event"] = Event()
-		self.session = session
 		self.Console = Console()
 		if isinstance(service, str) and eventid is not None:
 			self.type = EPG_TYPE_SIMILAR
