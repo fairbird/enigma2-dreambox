@@ -6,7 +6,7 @@ from time import localtime, strftime, time
 from Components.config import config
 
 
-class ServicePosition(Poll, Converter, object):
+class ServicePosition(Poll, Converter):
 	TYPE_LENGTH = 0
 	TYPE_POSITION = 1
 	TYPE_REMAINING = 2

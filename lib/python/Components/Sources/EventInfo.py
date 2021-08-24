@@ -4,7 +4,7 @@ from enigma import iPlayableService, iServiceInformation, eServiceReference, eEP
 from Source import Source
 
 
-class EventInfo(PerServiceBase, Source, object):
+class EventInfo(PerServiceBase, Source):
 	NOW = 0
 	NEXT = 1
 
