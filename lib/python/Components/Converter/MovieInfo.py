@@ -2,6 +2,8 @@ from Components.Converter.Converter import Converter
 from Components.Element import cached, ElementError
 from enigma import iServiceInformation, eServiceReference
 from ServiceReference import ServiceReference
+from Components.UsageConfig import dropEPGNewLines, replaceEPGSeparator
+from Components.config import config
 
 
 class MovieInfo(Converter):
@@ -34,10 +36,10 @@ class MovieInfo(Converter):
 					# Short description for Directory is the full path
 					return service.getPath()
 				return (info.getInfoString(service, iServiceInformation.sDescription)
-					or (event and event.getShortDescription())
+					or (event and dropEPGNewLines(event.getShortDescription()))
 					or service.getPath())
 			elif self.type == self.MOVIE_META_DESCRIPTION:
-				return ((event and (event.getExtendedDescription() or event.getShortDescription()))
+				return ((event and (event.getExtendedDescription() or edropEPGNewLines(event.getShortDescription())))
 					or info.getInfoString(service, iServiceInformation.sDescription)
 					or service.getPath())
 			elif self.type == self.MOVIE_REC_SERVICE_NAME:
