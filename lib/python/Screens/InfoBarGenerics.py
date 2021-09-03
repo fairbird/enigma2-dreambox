@@ -2555,7 +2555,7 @@ class InfoBarInstantRecord:
 	def __init__(self):
 		self["InstantRecordActions"] = HelpableActionMap(self, "InfobarInstantRecord",
 			{
-				"instantRecord": (self.instantRecord, _("Instant recording...")),
+				"instantRecord": (self.instantRecord, _("Instant recording")),
 			})
 		self.SelectedInstantServiceRef = None
 		if isStandardInfoBar(self):

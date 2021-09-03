@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: OpenPLi enigma2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-08-27 05:57+0200\n"
+"POT-Creation-Date: 2021-09-02 01:12+0300\n"
 "PO-Revision-Date: \n"
 "Last-Translator: ims <ims21@users.sourceforge.net>\n"
 "Language-Team: PLi <ims@openpli.org>\n"
@@ -21,13 +21,6 @@ msgid ""
 msgstr ""
 "\n"
 "Po stisknutí OK čekejte, prosím!"
-
-msgid ""
-"\n"
-"Conflict detection disabled!"
-msgstr ""
-"\n"
-"Detekce konfliktů zakázána!"
 
 #
 msgid ""
@@ -407,10 +400,6 @@ msgstr[2] " %s dostupných aktualizací"
 msgid "%s%d min"
 msgstr "%s%d min"
 
-#, python-format
-msgid "%s/%s: %s"
-msgstr "%s/%s: %s"
-
 msgid "(VU+ type)"
 msgstr "(VU+ typ)"
 
@@ -483,23 +472,13 @@ msgstr "10 MB/s"
 msgid "100 MB/s"
 msgstr "100 MB/s"
 
-msgid "10bit"
-msgstr "10bit"
-
 #
 msgid "12V output"
 msgstr "12V výstup"
 
-msgid "12bit"
-msgstr "12bit"
-
 #
 msgid "13 V"
 msgstr "13 V"
-
-#
-msgid "16:10"
-msgstr "16:10"
 
 #
 msgid "16:10 Letterbox"
@@ -508,10 +487,6 @@ msgstr "16:10 Letterbox"
 #
 msgid "16:10 PanScan"
 msgstr "16:10 PanScan"
-
-#
-msgid "16:9"
-msgstr "16:9"
 
 #
 msgid "16:9 Letterbox"
@@ -531,6 +506,10 @@ msgstr "18 V"
 #
 msgid "2"
 msgstr "2"
+
+#
+msgid "2 new lines"
+msgstr "dvě odřádkování"
 
 msgid "20 MB/s"
 msgstr "20 MB/s"
@@ -571,19 +550,6 @@ msgstr "3D mód"
 msgid "4"
 msgstr "4"
 
-msgid "420"
-msgstr "420"
-
-msgid "422"
-msgstr "422"
-
-msgid "444"
-msgstr "444"
-
-#
-msgid "4:3"
-msgstr "4:3"
-
 #
 msgid "4:3 Letterbox"
 msgstr "4:3 Letterbox"
@@ -618,9 +584,6 @@ msgstr "8"
 #
 msgid "8K"
 msgstr "8K"
-
-msgid "8bit"
-msgstr "8bit"
 
 #
 msgid "9"
@@ -783,9 +746,6 @@ msgstr "ACQUIRING TSID/ONID"
 
 msgid "AGC:"
 msgstr "AGC:"
-
-msgid "ASS File"
-msgstr "ASS soubor"
 
 msgid "ASS file"
 msgstr "ASS soubor"
@@ -1446,10 +1406,6 @@ msgstr "Automatická Instalace dokončena"
 msgid "Autoinstalling please wait for packages being updated"
 msgstr "Automatická instalace - prosím, čekejte na dokončení aktualizace balíčků"
 
-#
-msgid "Automatic"
-msgstr "Automatické"
-
 msgid "Automatic Scan"
 msgstr "Automatické prohledávání"
 
@@ -1492,15 +1448,6 @@ msgstr "BER"
 #
 msgid "BER:"
 msgstr "BER:"
-
-msgid "BT 2020 CL"
-msgstr "BT 2020 CL"
-
-msgid "BT 2020 NCL"
-msgstr "BT 2020 NCL"
-
-msgid "BT 709"
-msgstr "BT 709"
 
 #
 msgid "Back"
@@ -1770,10 +1717,6 @@ msgstr "CI slot: "
 
 msgid "CPU: "
 msgstr "CPU: "
-
-#
-msgid "CVBS"
-msgstr "CVBS"
 
 #
 msgid "Cable"
@@ -2319,6 +2262,9 @@ msgstr "Nastavuje, na kterých zařízeních může být nastaveno mazání na p
 msgid "Configure remote control type"
 msgstr "Nastavit typ dálkového ovládání"
 
+msgid "Configure separator type used in full description for separate short and extended descriptions."
+msgstr "Nastavuje oddělovač používaný v EPG pro oddělení krátkého a rozšířeného popisu."
+
 msgid "Configure the DiSEqC mode for this LNB."
 msgstr "Nastavuje DiSEqC mód pro tento LNB."
 
@@ -2590,6 +2536,9 @@ msgstr "Nastavuje, který konektor video výstupu bude použit."
 msgid "Configuring"
 msgstr "Nastavuji"
 
+msgid "Conflict detection disabled!"
+msgstr "Detekce konfliktů zakázána!"
+
 msgid "Conflict not resolved!"
 msgstr "Konflikt nevyřešen!"
 
@@ -2834,9 +2783,6 @@ msgstr "Česká republika"
 #
 msgid "D"
 msgstr "D"
-
-msgid "DAC"
-msgstr "DAC"
 
 #
 msgid "DHCP"
@@ -3467,9 +3413,6 @@ msgstr "Zaktualizovat přijímač na %s?"
 msgid "Do you want to update your receiver?"
 msgstr "Chcete zaktualizovat Váš přijímač?"
 
-msgid "Dolby"
-msgstr "Dolby"
-
 msgid "Dominica"
 msgstr "Dominika"
 
@@ -3650,9 +3593,6 @@ msgstr "Salvador"
 #
 msgid "Electronic Program Guide"
 msgstr "EPG"
-
-msgid "Embedded"
-msgstr "Vestavěný"
 
 msgid "Emergency"
 msgstr "Nouzový"
@@ -4491,6 +4431,9 @@ msgstr "Z:"
 msgid "Frontprocessor version: %s"
 msgstr "Frontprocesor: %s"
 
+msgid "Full description separator"
+msgstr "Oddělovač pro EPG"
+
 #. TRANSLATORS: (aspect ratio policy: display as fullscreen, even if the content aspect ratio does not match the screen ratio)
 msgid "Full screen"
 msgstr "Celá obrazovka"
@@ -4726,9 +4669,6 @@ msgstr "HD2400"
 msgid "HD60/Multibox/Multibox SE"
 msgstr "HD60/Multibox/Multibox SE"
 
-msgid "HDMI"
-msgstr "HDMI"
-
 msgid "HDMI Colordepth"
 msgstr "Barevná hloubka HDMI"
 
@@ -4752,9 +4692,6 @@ msgstr "HDMI-CEC Source Inactive"
 msgid "HDMI-CEC setup"
 msgstr "Nastavení HDMI-CEC"
 
-msgid "HDR10"
-msgstr "HDR10"
-
 msgid "HDR10 support"
 msgstr "Podpora HDR10"
 
@@ -4763,9 +4700,6 @@ msgstr "Gold"
 
 msgid "HELP"
 msgstr ""
-
-msgid "HLG"
-msgstr "HLG"
 
 msgid "HLG support"
 msgstr "Podpora HLG"
@@ -5226,16 +5160,13 @@ msgstr "Instaluji"
 msgid "Installing software..."
 msgstr "Instalace software..."
 
-msgid "Instant record"
+#
+msgid "Instant recording"
 msgstr "Okamžité nahrávání"
 
 #
 msgid "Instant recording location"
 msgstr "Okamžité nahrávání"
-
-#
-msgid "Instant recording..."
-msgstr "Okamžité nahrávání..."
 
 #
 msgid "Interface: "
@@ -6709,17 +6640,11 @@ msgstr "Přepsat konfigurační soubory?"
 msgid "PAL"
 msgstr "PAL"
 
-msgid "PCM"
-msgstr "PCM"
-
 msgid "PCR PID"
 msgstr "PCR PID"
 
 msgid "PDC"
 msgstr "PDC"
-
-msgid "PGS File"
-msgstr "PGS soubor"
 
 msgid "PGS file"
 msgstr "PGS soubor"
@@ -6747,8 +6672,8 @@ msgstr "PMT PID"
 msgid "PPanel"
 msgstr "PPanel"
 
-msgid "PULSe 4K"
-msgstr "PULSe 4K"
+msgid "PULSe 4K(mini)"
+msgstr "PULSe 4K(mini)"
 
 #
 msgid "Package list update"
@@ -7621,10 +7546,6 @@ msgid "RF output"
 msgstr "RF výstup"
 
 #
-msgid "RGB"
-msgstr "RGB"
-
-#
 msgid "Radio"
 msgstr "Rádio"
 
@@ -7944,6 +7865,9 @@ msgstr "Opakování"
 msgid "Replace `- ` in dialogs with colored text per speaker (like teletext subtitles for the hearing impaired)"
 msgstr "Nahradí `- ` v dialozích, které mají obarvený text jednotlivých mluvčích (jako teletextové titulky pro sluchově postižené)."
 
+msgid "Replace newlines in EPG"
+msgstr "Nahrazovat odřádkování v EPG"
+
 msgid "Request for physical address report"
 msgstr "Požadavek na ohlášení fyzické adresy"
 
@@ -8166,10 +8090,6 @@ msgstr "Rusko"
 msgid "Rwanda"
 msgstr "Rwanda"
 
-#
-msgid "S-Video"
-msgstr "S-Video"
-
 msgid "SCPC optimized search range"
 msgstr "SCPC optimalizovaný rozsah vyhledávání"
 
@@ -8183,10 +8103,6 @@ msgid "SCR Unicable"
 msgstr "SCR Unicable"
 
 #
-msgid "SDR"
-msgstr "SDR"
-
-#
 msgid "SINGLE LAYER DVD"
 msgstr "JEDNOVRSTVÉ DVD"
 
@@ -8198,17 +8114,8 @@ msgstr "SNR"
 msgid "SNR:"
 msgstr "SNR:"
 
-msgid "SPDIF"
-msgstr "SPDIF"
-
-msgid "SRT File"
-msgstr "SRT soubor"
-
 msgid "SRT file"
 msgstr "SRT soubor"
-
-msgid "SSA File"
-msgstr "SSA soubor"
 
 msgid "SSA file"
 msgstr "SSA soubor"
@@ -8637,6 +8544,9 @@ msgstr "Vybrat kanál"
 #
 msgid "Select channel to record from"
 msgstr "Vyberte kanál z kterého chcete nahrávat"
+
+msgid "Select char for replacing newlines in epg."
+msgstr "Vyberte znak, kterým bude nahrazováno odřádkování v EPG."
 
 #
 msgid "Select copy destination for:"
@@ -10252,7 +10162,7 @@ msgstr ""
 "Pro případné korekce můžete kontaktovat autora\n"
 "na výše uvedené adrese.\n"
 "\n"
-"®24. 8. 2021"
+"®2. 9. 2021"
 
 #
 msgid "TS file is too large for ISO9660 level 1!"
@@ -10509,8 +10419,8 @@ msgstr "Existuje nejméně "
 
 #
 #, python-format
-msgid "There are at least %s updates available."
-msgstr "K dispozici je nejméně %s aktualizací."
+msgid "There are at least %d updates available."
+msgstr "K dispozici je nejméně %d aktualizací."
 
 #
 msgid "There are currently no outstanding actions."
@@ -11323,12 +11233,12 @@ msgstr "Aktualizace skončila. Chcete restartovat přijímač?"
 msgid "Update failed. Your receiver does not have a working internet connection."
 msgstr "Aktualizace se nezdařila. Přijímač nemá funkční připojení k internetu."
 
+#
+msgid "Update feed not available."
+msgstr "Zdroj aktualizací není k dispozici."
+
 msgid "Update has completed."
 msgstr "Aktualizace je dokončena."
-
-#
-msgid "Updatefeed not available."
-msgstr "Zdroj aktualizací není k dispozici."
 
 #
 msgid "Updating"
@@ -11526,9 +11436,6 @@ msgstr "VLAN připojení"
 #
 msgid "VMGM (intro trailer)"
 msgstr "VMGM (úvodní upoutávka)"
-
-msgid "VOB File"
-msgstr "VOB soubor"
 
 msgid "VOB file"
 msgstr "VOB soubor"
@@ -12198,21 +12105,8 @@ msgstr "Zápis selhal!"
 msgid "Write to /tmp/positionersetup.log"
 msgstr "Zapsat do /tmp/positionersetup.log"
 
-msgid "YCbCr420"
-msgstr "YCbCr420"
-
-msgid "YCbCr422"
-msgstr "YCbCr422"
-
-msgid "YCbCr444"
-msgstr "YCbCr444"
-
 msgid "YES"
 msgstr "ANO"
-
-#
-msgid "YPbPr"
-msgstr "YPbPr"
 
 #
 msgid "Year"
@@ -12374,10 +12268,9 @@ msgstr ""
 msgid "You didn't select a channel to record from."
 msgstr "Nezvolili jste kanál pro nahrávání."
 
-#
 #, python-format
-msgid "You have to wait %s!"
-msgstr "Musíte počkat %s!"
+msgid "You have to wait %(min)d minutes, %(sec)d seconds!"
+msgstr "Musíte počkat %(min)d minut, %(sec)d vteřin!"
 
 #, python-format
 msgid "You must switch to the service %s (%s - '%s')!\n"
@@ -13133,10 +13026,6 @@ msgid "mins"
 msgstr "minut"
 
 #
-msgid "minutes"
-msgstr "minut"
-
-#
 msgid "month"
 msgstr "měsíc"
 
@@ -13169,10 +13058,6 @@ msgstr "film/drama (obecně)"
 msgid "multi"
 msgstr "Multi"
 
-#
-msgid "multinorm"
-msgstr "multinorma"
-
 msgid "music/ballet/dance (general)"
 msgstr "hudba/balet/tanec (obecně)"
 
@@ -13185,6 +13070,10 @@ msgstr "příroda/zvířata/životní prostředí"
 #
 msgid "never"
 msgstr "Nikdy"
+
+#
+msgid "new line"
+msgstr "odřádkování"
 
 msgid "new media"
 msgstr "new media"
@@ -13258,6 +13147,10 @@ msgid "not_tested"
 msgstr "netestováno"
 
 #
+msgid "nothing"
+msgstr "nic"
+
+#
 msgid "nothing connected"
 msgstr "Nepřipojeno"
 
@@ -13278,6 +13171,9 @@ msgstr "vyp nebo wpa2 zap"
 
 msgid "offset is"
 msgstr "posun je"
+
+msgid "omit"
+msgstr "vynechat"
 
 #
 msgid "on"
@@ -13381,9 +13277,6 @@ msgstr "Podle data v opačném pořadí"
 msgid "rewind to the previous chapter"
 msgstr "zpět na předchozí kapitolu"
 
-msgid "rgb"
-msgstr "RGB"
-
 #
 msgid "right"
 msgstr "Vpravo"
@@ -13412,10 +13305,6 @@ msgstr "stav prohledávání"
 
 msgid "science fiction/fantasy/horror"
 msgstr "scifi/fantastický/horor"
-
-#
-msgid "seconds"
-msgstr "sekund"
 
 #
 msgid "select CAId's"
@@ -13524,6 +13413,9 @@ msgstr "společensko politické problémy/ekonomie (obecně)"
 
 msgid "social/spiritual science"
 msgstr "sociální/duchovní vědy"
+
+msgid "space"
+msgstr "mezera"
 
 msgid "special events"
 msgstr "zvláštní události"

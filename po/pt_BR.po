@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: enigma2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-08-27 05:57+0200\n"
+"POT-Creation-Date: 2021-09-02 01:12+0300\n"
 "PO-Revision-Date: 2013-10-20 19:13-0300\n"
 "Last-Translator: Diogo <pingflood@gmail.com>\n"
 "Language-Team: Traduzido por Frank Viana <franksrviana@gmail.com>\n"
@@ -23,11 +23,6 @@ msgid ""
 msgstr ""
 "\n"
 "Após pressionar OK, aguarde..."
-
-msgid ""
-"\n"
-"Conflict detection disabled!"
-msgstr ""
 
 msgid ""
 "\n"
@@ -367,10 +362,6 @@ msgstr[1] "%s atualizações disponíveis"
 msgid "%s%d min"
 msgstr ""
 
-#, python-format
-msgid "%s/%s: %s"
-msgstr ""
-
 msgid "(VU+ type)"
 msgstr ""
 
@@ -434,19 +425,10 @@ msgstr ""
 msgid "100 MB/s"
 msgstr ""
 
-msgid "10bit"
-msgstr ""
-
 msgid "12V output"
 msgstr "Saída 12V"
 
-msgid "12bit"
-msgstr ""
-
 msgid "13 V"
-msgstr ""
-
-msgid "16:10"
 msgstr ""
 
 msgid "16:10 Letterbox"
@@ -454,9 +436,6 @@ msgstr ""
 
 msgid "16:10 PanScan"
 msgstr "16:10 PanScan"
-
-msgid "16:9"
-msgstr ""
 
 msgid "16:9 Letterbox"
 msgstr "16:9 Letterbox"
@@ -472,6 +451,10 @@ msgstr ""
 
 msgid "2"
 msgstr ""
+
+#, fuzzy
+msgid "2 new lines"
+msgstr "Exibir linha de informações"
 
 msgid "20 MB/s"
 msgstr ""
@@ -509,18 +492,6 @@ msgstr "Modo 3D"
 msgid "4"
 msgstr ""
 
-msgid "420"
-msgstr ""
-
-msgid "422"
-msgstr ""
-
-msgid "444"
-msgstr ""
-
-msgid "4:3"
-msgstr ""
-
 msgid "4:3 Letterbox"
 msgstr ""
 
@@ -546,9 +517,6 @@ msgid "8"
 msgstr ""
 
 msgid "8K"
-msgstr ""
-
-msgid "8bit"
 msgstr ""
 
 msgid "9"
@@ -693,9 +661,6 @@ msgid "ACQUIRING TSID/ONID"
 msgstr ""
 
 msgid "AGC:"
-msgstr ""
-
-msgid "ASS File"
 msgstr ""
 
 msgid "ASS file"
@@ -1264,9 +1229,6 @@ msgstr "Instalação concluída."
 msgid "Autoinstalling please wait for packages being updated"
 msgstr ""
 
-msgid "Automatic"
-msgstr "Automático"
-
 msgid "Automatic Scan"
 msgstr ""
 
@@ -1303,15 +1265,6 @@ msgid "BER"
 msgstr ""
 
 msgid "BER:"
-msgstr ""
-
-msgid "BT 2020 CL"
-msgstr ""
-
-msgid "BT 2020 NCL"
-msgstr ""
-
-msgid "BT 709"
 msgstr ""
 
 msgid "Back"
@@ -1555,9 +1508,6 @@ msgid "CI slot: "
 msgstr ""
 
 msgid "CPU: "
-msgstr ""
-
-msgid "CVBS"
 msgstr ""
 
 msgid "Cable"
@@ -2036,6 +1986,9 @@ msgstr "Configurar em quais dispositivos a opção de remoção em segundo plano
 msgid "Configure remote control type"
 msgstr "Configurar o tipo de controle remoto"
 
+msgid "Configure separator type used in full description for separate short and extended descriptions."
+msgstr ""
+
 msgid "Configure the DiSEqC mode for this LNB."
 msgstr "Configurar o modo de DiSEqC para este LNB."
 
@@ -2291,6 +2244,9 @@ msgstr "Configurar qual conector de saída de vídeo será usado."
 msgid "Configuring"
 msgstr "Configurando"
 
+msgid "Conflict detection disabled!"
+msgstr ""
+
 msgid "Conflict not resolved!"
 msgstr ""
 
@@ -2501,9 +2457,6 @@ msgid "Czechia"
 msgstr "Checo"
 
 msgid "D"
-msgstr ""
-
-msgid "DAC"
 msgstr ""
 
 msgid "DHCP"
@@ -3050,9 +3003,6 @@ msgstr "Atualizar o receptor para %s?"
 msgid "Do you want to update your receiver?"
 msgstr "Deseja atualizar o receptor?"
 
-msgid "Dolby"
-msgstr ""
-
 msgid "Dominica"
 msgstr ""
 
@@ -3208,9 +3158,6 @@ msgid "El Salvador"
 msgstr ""
 
 msgid "Electronic Program Guide"
-msgstr ""
-
-msgid "Embedded"
 msgstr ""
 
 msgid "Emergency"
@@ -3948,6 +3895,9 @@ msgstr "De:"
 msgid "Frontprocessor version: %s"
 msgstr ""
 
+msgid "Full description separator"
+msgstr ""
+
 #. TRANSLATORS: (aspect ratio policy: display as fullscreen, even if the content aspect ratio does not match the screen ratio)
 #, fuzzy
 msgid "Full screen"
@@ -4165,9 +4115,6 @@ msgstr ""
 msgid "HD60/Multibox/Multibox SE"
 msgstr ""
 
-msgid "HDMI"
-msgstr ""
-
 msgid "HDMI Colordepth"
 msgstr ""
 
@@ -4189,9 +4136,6 @@ msgstr ""
 msgid "HDMI-CEC setup"
 msgstr ""
 
-msgid "HDR10"
-msgstr ""
-
 #, fuzzy
 msgid "HDR10 support"
 msgstr "Não suportado"
@@ -4200,9 +4144,6 @@ msgid "HDx1/HD1xxx/HD5x0C/VS1x00/et7x00/et8500/et7000mini"
 msgstr ""
 
 msgid "HELP"
-msgstr ""
-
-msgid "HLG"
 msgstr ""
 
 #, fuzzy
@@ -4617,14 +4558,11 @@ msgstr "Instalando..."
 msgid "Installing software..."
 msgstr "Instalando o software..."
 
-msgid "Instant record"
-msgstr ""
+msgid "Instant recording"
+msgstr "Gravação instantânea"
 
 msgid "Instant recording location"
 msgstr "Diretório das gravações instantâneas"
-
-msgid "Instant recording..."
-msgstr "Gravação instantânea"
 
 msgid "Interface: "
 msgstr "Interface de uso"
@@ -5920,16 +5858,10 @@ msgstr "Substituir os arquivos de configuração?"
 msgid "PAL"
 msgstr ""
 
-msgid "PCM"
-msgstr ""
-
 msgid "PCR PID"
 msgstr ""
 
 msgid "PDC"
-msgstr ""
-
-msgid "PGS File"
 msgstr ""
 
 msgid "PGS file"
@@ -5957,7 +5889,7 @@ msgstr ""
 msgid "PPanel"
 msgstr ""
 
-msgid "PULSe 4K"
+msgid "PULSe 4K(mini)"
 msgstr ""
 
 msgid "Package list update"
@@ -6706,9 +6638,6 @@ msgstr ""
 msgid "RF output"
 msgstr "Conexão RF"
 
-msgid "RGB"
-msgstr ""
-
 msgid "Radio"
 msgstr "Rádio"
 
@@ -6979,6 +6908,9 @@ msgstr "Frequência"
 msgid "Replace `- ` in dialogs with colored text per speaker (like teletext subtitles for the hearing impaired)"
 msgstr ""
 
+msgid "Replace newlines in EPG"
+msgstr ""
+
 #, fuzzy
 msgid "Request for physical address report"
 msgstr "Relatório de endereço físico da TV"
@@ -7174,9 +7106,6 @@ msgstr ""
 msgid "Rwanda"
 msgstr ""
 
-msgid "S-Video"
-msgstr ""
-
 msgid "SCPC optimized search range"
 msgstr ""
 
@@ -7189,9 +7118,6 @@ msgstr ""
 msgid "SCR Unicable"
 msgstr ""
 
-msgid "SDR"
-msgstr ""
-
 msgid "SINGLE LAYER DVD"
 msgstr "DVD Camada Simples"
 
@@ -7201,16 +7127,7 @@ msgstr ""
 msgid "SNR:"
 msgstr ""
 
-msgid "SPDIF"
-msgstr ""
-
-msgid "SRT File"
-msgstr ""
-
 msgid "SRT file"
-msgstr ""
-
-msgid "SSA File"
 msgstr ""
 
 msgid "SSA file"
@@ -7589,6 +7506,9 @@ msgstr ""
 
 msgid "Select channel to record from"
 msgstr "Selecione o canal a ser gravado"
+
+msgid "Select char for replacing newlines in epg."
+msgstr ""
 
 msgid "Select copy destination for:"
 msgstr "Selecione o destino para copiar:"
@@ -9264,8 +9184,8 @@ msgid "There are at least "
 msgstr "Existem ao menos"
 
 #, python-format
-msgid "There are at least %s updates available."
-msgstr "Existem ao menos %s atualizações disponíveis."
+msgid "There are at least %d updates available."
+msgstr "Existem ao menos %d atualizações disponíveis."
 
 msgid "There are currently no outstanding actions."
 msgstr "Atualmente não existem ações pendentes."
@@ -9999,11 +9919,11 @@ msgstr "Atualização concluída. Reiniciar o receptor?"
 msgid "Update failed. Your receiver does not have a working internet connection."
 msgstr "Falha na atualização. O receptor não está conectado à internet."
 
+msgid "Update feed not available."
+msgstr "Servidor de atualizações não disponível."
+
 msgid "Update has completed."
 msgstr "Atualização concluída."
-
-msgid "Updatefeed not available."
-msgstr "Servidor de atualizações não disponível."
 
 msgid "Updating"
 msgstr "Atualizando..."
@@ -10182,9 +10102,6 @@ msgid "VLAN connection"
 msgstr "Conexão LAN"
 
 msgid "VMGM (intro trailer)"
-msgstr ""
-
-msgid "VOB File"
 msgstr ""
 
 msgid "VOB file"
@@ -10806,19 +10723,7 @@ msgstr "A gravação falhou!"
 msgid "Write to /tmp/positionersetup.log"
 msgstr ""
 
-msgid "YCbCr420"
-msgstr ""
-
-msgid "YCbCr422"
-msgstr ""
-
-msgid "YCbCr444"
-msgstr ""
-
 msgid "YES"
-msgstr ""
-
-msgid "YPbPr"
 msgstr ""
 
 msgid "Year"
@@ -10954,8 +10859,8 @@ msgid "You didn't select a channel to record from."
 msgstr "Nenhum canal foi selecionado."
 
 #, python-format
-msgid "You have to wait %s!"
-msgstr "Aguarde %s!"
+msgid "You have to wait %(min)d minutes, %(sec)d seconds!"
+msgstr ""
 
 #, python-format
 msgid "You must switch to the service %s (%s - '%s')!\n"
@@ -11627,9 +11532,6 @@ msgstr "Menu"
 msgid "mins"
 msgstr "mins"
 
-msgid "minutes"
-msgstr "minutos"
-
 msgid "month"
 msgstr "mês"
 
@@ -11657,9 +11559,6 @@ msgstr "Filme/Drama (geral)"
 msgid "multi"
 msgstr ""
 
-msgid "multinorm"
-msgstr "Multinorma"
-
 msgid "music/ballet/dance (general)"
 msgstr "Música/Balé/Dança (geral)"
 
@@ -11671,6 +11570,10 @@ msgstr "Natureza/Animais/Ambiente"
 
 msgid "never"
 msgstr "Nunca"
+
+#, fuzzy
+msgid "new line"
+msgstr "Exibir linha de informações"
 
 msgid "new media"
 msgstr "Nova mídia"
@@ -11734,6 +11637,10 @@ msgstr "Tipo inválido"
 msgid "not_tested"
 msgstr ""
 
+#, fuzzy
+msgid "nothing"
+msgstr "Não fazer nada"
+
 msgid "nothing connected"
 msgstr "Desconectado"
 
@@ -11751,6 +11658,9 @@ msgstr ""
 
 msgid "offset is"
 msgstr "o desvio é"
+
+msgid "omit"
+msgstr ""
 
 msgid "on"
 msgstr "Ligado"
@@ -11836,9 +11746,6 @@ msgstr "Invertido por data"
 msgid "rewind to the previous chapter"
 msgstr "Voltar ao capítulo anterior"
 
-msgid "rgb"
-msgstr ""
-
 msgid "right"
 msgstr "Direita"
 
@@ -11868,9 +11775,6 @@ msgstr "Estado da busca"
 
 msgid "science fiction/fantasy/horror"
 msgstr "Ficção científica/Fantasia/Terror"
-
-msgid "seconds"
-msgstr "Segundos"
 
 msgid "select CAId's"
 msgstr "Selecionar CAID's"
@@ -11969,6 +11873,9 @@ msgstr "Questões sociais/Políticas/Economia (geral)"
 
 msgid "social/spiritual science"
 msgstr "Ciência social/espiritual"
+
+msgid "space"
+msgstr ""
 
 msgid "special events"
 msgstr "Eventos especiais"
