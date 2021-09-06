@@ -19,6 +19,16 @@
 #define I2C_SLAVE_FORCE	0x0706
 #endif
 
+#ifdef HAVE_OLDE2_API
+#ifndef NO_STREAM_ID_FILTER
+#define NO_STREAM_ID_FILTER    (~0U)
+#endif
+
+#ifndef DTV_STREAM_ID
+#define DTV_STREAM_ID DTV_ISDBS_TS_ID
+#endif
+#endif
+
 #define eDebugNoSimulate(x...) \
 	do { \
 		if (!m_simulate) \
@@ -671,11 +681,16 @@ int eDVBFrontend::openFrontend()
 					}
 					case FE_QAM:
 					{
+#ifdef HAVE_OLDE2_API
+						/* no need for a m_dvbversion check, SYS_DVBC_ANNEX_A replaced SYS_DVBC_ANNEX_AC (same value) */
+						m_delsys[SYS_DVBC_ANNEX_A] = true;
+#else
 #if DVB_API_VERSION > 5 || DVB_API_VERSION == 5 && DVB_API_VERSION_MINOR >= 6
 						/* no need for a m_dvbversion check, SYS_DVBC_ANNEX_A replaced SYS_DVBC_ANNEX_AC (same value) */
 						m_delsys[SYS_DVBC_ANNEX_A] = true;
 #else
 						m_delsys[SYS_DVBC_ANNEX_AC] = true;
+#endif
 #endif
 						break;
 					}
@@ -2192,6 +2207,23 @@ void eDVBFrontend::setFrontend(bool recvEvents)
 			oparm.getDVBC(parm);
 
 			p[cmdseq.num].cmd = DTV_DELIVERY_SYSTEM;
+#ifdef HAVE_OLDE2_API
+			if (m_dvbversion >= DVB_VERSION(5, 6))
+			{
+				switch (parm.system)
+				{
+					default:
+					case eDVBFrontendParametersCable::System_DVB_C_ANNEX_A: p[cmdseq.num].u.data = SYS_DVBC_ANNEX_A; break;
+#if DVB_API_VERSION > 5 || DVB_API_VERSION == 5 && DVB_API_VERSION_MINOR >= 6
+					case eDVBFrontendParametersCable::System_DVB_C_ANNEX_C: p[cmdseq.num].u.data = SYS_DVBC_ANNEX_C; break;
+#endif
+				}
+			}
+			else
+			{
+				p[cmdseq.num].u.data = SYS_DVBC_ANNEX_A; /* old value for SYS_DVBC_ANNEX_AC */
+			}
+#else
 #if DVB_API_VERSION > 5 || DVB_API_VERSION == 5 && DVB_API_VERSION_MINOR >= 6
 			if (m_dvbversion >= DVB_VERSION(5, 6))
 			{
@@ -2208,6 +2240,7 @@ void eDVBFrontend::setFrontend(bool recvEvents)
 			}
 #else
 			p[cmdseq.num].u.data = SYS_DVBC_ANNEX_AC;
+#endif
 #endif
 			cmdseq.num++;
 
@@ -2898,6 +2931,19 @@ int eDVBFrontend::isCompatibleWith(ePtr<iDVBFrontendParameters> &feparm, bool is
 		{
 			return 0;
 		}
+#ifdef HAVE_OLDE2_API
+		if (m_dvbversion >= DVB_VERSION(5, 6))
+		{
+			can_handle_dvbc_annex_a = supportsDeliverySystem(SYS_DVBC_ANNEX_A, true);
+#if DVB_API_VERSION > 5 || DVB_API_VERSION == 5 && DVB_API_VERSION_MINOR >= 6
+			can_handle_dvbc_annex_c = supportsDeliverySystem(SYS_DVBC_ANNEX_C, true);
+#endif
+		}
+		else
+		{
+			can_handle_dvbc_annex_a = can_handle_dvbc_annex_c = supportsDeliverySystem(SYS_DVBC_ANNEX_A, true); /* new value for SYS_DVB_ANNEX_AC */
+		}
+#else
 #if DVB_API_VERSION > 5 || DVB_API_VERSION == 5 && DVB_API_VERSION_MINOR >= 6
 		if (m_dvbversion >= DVB_VERSION(5, 6))
 		{
@@ -2910,6 +2956,7 @@ int eDVBFrontend::isCompatibleWith(ePtr<iDVBFrontendParameters> &feparm, bool is
 		}
 #else
 		can_handle_dvbc_annex_a = can_handle_dvbc_annex_c = supportsDeliverySystem(SYS_DVBC_ANNEX_AC, true);
+#endif
 #endif
 		if (parm.system == eDVBFrontendParametersCable::System_DVB_C_ANNEX_A && !can_handle_dvbc_annex_a)
 		{
@@ -2960,10 +3007,12 @@ int eDVBFrontend::isCompatibleWith(ePtr<iDVBFrontendParameters> &feparm, bool is
 		{
 			return 0;
 		}
+#ifndef HAVE_OLDE2_API
 		if (!can_handle_atsc && !can_handle_dvbc_annex_b)
 		{
 			return 0;
 		}
+#endif
 		if (parm.system == eDVBFrontendParametersATSC::System_DVB_C_ANNEX_B && !can_handle_dvbc_annex_b)
 		{
 			return 0;
@@ -3108,7 +3157,15 @@ bool eDVBFrontend::setSlotInfo(int id, const char *descr, bool enabled, bool isD
 
 bool eDVBFrontend::is_multistream()
 {
+#ifdef HAVE_OLDE2_API
+#if defined FE_CAN_MULTISTREAM
 	return fe_info.caps & FE_CAN_MULTISTREAM;
+#else
+	return false;
+#endif
+#else
+	return fe_info.caps & FE_CAN_MULTISTREAM;
+#endif
 }
 
 std::string eDVBFrontend::getCapabilities()
@@ -3157,7 +3214,13 @@ std::string eDVBFrontend::getCapabilities()
 	if (fe_info.caps &  FE_CAN_8VSB)			ss << " FE_CAN_8VSB";
 	if (fe_info.caps &  FE_CAN_16VSB)			ss << " FE_CAN_16VSB";
 	if (fe_info.caps &  FE_HAS_EXTENDED_CAPS)		ss << " FE_HAS_EXTENDED_CAPS";
+#ifdef HAVE_OLDE2_API
+#if defined FE_CAN_MULTISTREAM
 	if (fe_info.caps &  FE_CAN_MULTISTREAM)			ss << " FE_CAN_MULTISTREAM";
+#endif
+#else
+	if (fe_info.caps &  FE_CAN_MULTISTREAM)			ss << " FE_CAN_MULTISTREAM";
+#endif
 	if (fe_info.caps &  FE_CAN_TURBO_FEC)			ss << " FE_CAN_TURBO_FEC";
 	if (fe_info.caps &  FE_CAN_2G_MODULATION)		ss << " FE_CAN_2G_MODULATION";
 	if (fe_info.caps &  FE_NEEDS_BENDING)			ss << " FE_NEEDS_BENDING";
@@ -3188,10 +3251,20 @@ std::string eDVBFrontend::getCapabilities()
 		case SYS_ISDBT:		ss << " ISDBT"; break;
 		case SYS_UNDEFINED:	ss << " UNDEFINED"; break;
 		case SYS_DVBC_ANNEX_A:	ss << " DVBC_ANNEX_A"; break;
+#ifdef HAVE_OLDE2_API
+#if DVB_API_VERSION > 5 || DVB_API_VERSION == 5 && DVB_API_VERSION_MINOR >= 6
 		case SYS_DVBC_ANNEX_C:	ss << " DVBC_ANNEX_C"; break;
-		case SYS_DVBT2:		ss << " DVBT2"; break;
 		case SYS_TURBO:		ss << " TURBO"; break;
 		case SYS_DTMB:		ss << " DTMB"; break;
+#else
+		case SYS_DMBTH:		ss << " DMBTH"; break;
+#endif
+#else
+		case SYS_DVBC_ANNEX_C:	ss << " DVBC_ANNEX_C"; break;
+		case SYS_TURBO:		ss << " TURBO"; break;
+		case SYS_DTMB:		ss << " DTMB"; break;
+#endif
+		case SYS_DVBT2:		ss << " DVBT2"; break;
 		}
 	}
 
