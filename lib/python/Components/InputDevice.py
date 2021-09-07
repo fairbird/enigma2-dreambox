@@ -4,19 +4,24 @@ from fcntl import ioctl
 import os
 import struct
 import platform
+from platform import machine
 
-# include/uapi/asm-generic/ioctl.h
-IOC_NRBITS = 8
-IOC_TYPEBITS = 8
-IOC_SIZEBITS = 13 if "mips" in platform.machine() else 14
-IOC_DIRBITS = 3 if "mips" in platform.machine() else 2
 
-IOC_NRSHIFT = 0
-IOC_TYPESHIFT = IOC_NRSHIFT + IOC_NRBITS
-IOC_SIZESHIFT = IOC_TYPESHIFT + IOC_TYPEBITS
-IOC_DIRSHIFT = IOC_SIZESHIFT + IOC_SIZEBITS
-
-IOC_READ = 2
+def EVIOCGNAME(self, length):
+	# From include/uapi/asm-generic/ioctl.h and asm-generic/ioctl.h for HAVE_OLDE2_API
+	IOC_NRBITS = 8
+	IOC_TYPEBITS = 8
+	if SystemInfo["OLDE2API"]:
+		IOC_SIZEBITS = 13
+		IOC_DIRBITS = 3
+	else:
+		IOC_SIZEBITS = 13 if "mips" in machine() else 14
+		IOC_DIRBITS = 3 if "mips" in platform.machine() else 2
+	IOC_NRSHIFT = 0
+	IOC_TYPESHIFT = IOC_NRSHIFT + IOC_NRBITS
+	IOC_SIZESHIFT = IOC_TYPESHIFT + IOC_TYPEBITS
+	IOC_DIRSHIFT = IOC_SIZESHIFT + IOC_SIZEBITS
+	IOC_READ = 2
 
 
 def EVIOCGNAME(length):

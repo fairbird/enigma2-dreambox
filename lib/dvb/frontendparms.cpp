@@ -9,6 +9,15 @@
 #include <fcntl.h>
 #include <sys/ioctl.h>
 
+#ifdef HAVE_OLDE2_API
+#ifndef NO_STREAM_ID_FILTER
+#define NO_STREAM_ID_FILTER    (~0U)
+#endif
+
+#ifndef DTV_STREAM_ID
+#define DTV_STREAM_ID DTV_ISDBS_TS_ID
+#endif
+#endif
 
 DEFINE_REF(eDVBFrontendStatus);
 

@@ -11,6 +11,12 @@
 #define PNG_SKIP_SETJMP_CHECK
 #include <png.h>
 
+#ifdef HAVE_OLDE2_API
+#ifndef FBIO_WAITFORVSYNC
+#define FBIO_WAITFORVSYNC _IOW('F', 0x20, uint32_t)
+#endif
+#endif
+
 #ifndef FBIO_BLIT
 #define FBIO_SET_MANUAL_BLIT _IOW('F', 0x21, __u8)
 #define FBIO_BLIT 0x22
