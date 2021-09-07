@@ -7,7 +7,7 @@ import platform
 from platform import machine
 
 
-def EVIOCGNAME(self, length):
+def EVIOCGNAME(length):
 	# From include/uapi/asm-generic/ioctl.h and asm-generic/ioctl.h for HAVE_OLDE2_API
 	IOC_NRBITS = 8
 	IOC_TYPEBITS = 8
