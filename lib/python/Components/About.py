@@ -4,6 +4,7 @@ import os
 import time
 import re
 from Tools.HardwareInfo import HardwareInfo
+from SystemInfo import SystemInfo
 from Tools.Directories import fileReadLine
 
 MODULE_NAME = __name__.split(".")[-1]
@@ -153,6 +154,9 @@ def getChipSetString():
 	if chipset is None:
 		return _("Undefined")
 	return chipset.lower()
+
+def getDVBAPI():
+	return _("Old") if SystemInfo["OLDE2API"]: else _("New")
 
 
 def getDriverInstalledDate():
