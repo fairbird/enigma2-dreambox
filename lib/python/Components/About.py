@@ -3,6 +3,7 @@ import os
 import time
 import re
 from Tools.HardwareInfo import HardwareInfo
+from SystemInfo import SystemInfo
 from sys import maxsize, modules, version_info
 from Tools.Directories import fileReadLine
 
@@ -154,6 +155,9 @@ def getChipSetString():
 	if chipset is None:
 		return _("Undefined")
 	return chipset.lower()
+
+def getDVBAPI():
+	return _("Old") if SystemInfo["OLDE2API"]: else _("New")
 
 
 def getDriverInstalledDate():

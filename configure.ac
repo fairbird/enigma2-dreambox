@@ -240,6 +240,13 @@ if test x"$with_accelerationaccumulation" = xyes ; then
 	AC_DEFINE(SUPPORT_ACCUMULATED_ACCELERATION_OPERATIONS, 1,[Accumulate blit/fill acceleration operations])
 fi
 
+AC_ARG_WITH(olde2api,
+	AS_HELP_STRING([--with-olde2api],[use olde2api, yes or no]),
+	[with_olde2api=$withval],[with_olde2api=no])
+if test x"$with_olde2api" != xno ; then
+	AC_DEFINE(HAVE_OLDE2_API, 1,[define add old api of enigma2])
+fi
+
 AC_CHECK_HEADERS([sys/klog.h])
 AC_CHECK_FUNCS([klogctl])
 
