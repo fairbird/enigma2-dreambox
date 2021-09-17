@@ -53,10 +53,10 @@
 					<item level="0" entryID="user_interface" text="User Interface" ><setup id="userinterface"/></item>
 					<item level="0" entryID="usage_setup"><setup id="usage"/></item>
 					<item level="0" text="Skin" entryID="primary_skin_selector"><screen module="SkinSelector" screen="SkinSelector"/></item>
-					<menu entryID="display_selection" level="0" text="Front Panel Display" requires="Display">
+					<menu entryID="display_selection" level="0" text="Front Panel Display">
 						<id val="lcd" />
-						<item entryID="display_skin_selector" level="0" text="Skin Setup" weight="5"><screen module="SkinSelector" screen="LcdSkinSelector" /></item>
-						<item entryID="lcd_setup" level="1" text="LCD Setup" weight="10"><setup id="FrontDisplay" /></item>
+						<item entryID="display_skin_selector" level="0" text="Skin Setup" weight="5" requires="Display"><screen module="SkinSelector" screen="LcdSkinSelector" /></item>
+						<item entryID="lcd_setup" level="1" text="LCD Setup" weight="10" requires="Display"><setup id="FrontDisplay" /></item>
 						<item entryID="led_setup" level="1" text="LED Setup" weight="15"><setup id="LedDisplay" /></item>
 					</menu>
 				</menu>
