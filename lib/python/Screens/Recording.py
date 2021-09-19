@@ -39,13 +39,13 @@ class RecordingSettings(Setup):
 			self.pathStatus(self.getCurrentValue())
 		Setup.changedEntry(self)
 
-	def keySelect(self):
+	def keyOK(self):
 		item = self.getCurrentItem()
 		if item in (config.usage.default_path, config.usage.timer_path, config.usage.instantrec_path):
 			# print("[Recordings] DEBUG: '%s', '%s', '%s'." % (self.getCurrentEntry(), item.value, preferredPath(item.value)))
 			self.session.openWithCallback(self.pathSelect, MovieLocationBox, self.getCurrentEntry(), preferredPath(item.value))
 		else:
-			Setup.keySelect(self)
+			Setup.keyOK(self)
 
 	def keySave(self):
 		if self.errorItem == -1:
