@@ -35,11 +35,11 @@ class TimeshiftSettings(Setup):
 			self.pathStatus(self.getCurrentValue())
 		Setup.changedEntry(self)
 
-	def keySelect(self):
+	def keyOK(self):
 		if self.getCurrentItem() is config.usage.timeshift_path:
 			self.session.openWithCallback(self.pathSelect, TimeshiftLocationBox)
 		else:
-			Setup.keySelect(self)
+			Setup.keyOK(self)
 
 	def keySave(self):
 		if self.errorItem == -1:
