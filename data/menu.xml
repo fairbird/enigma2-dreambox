@@ -41,7 +41,7 @@
 				<id val="system"/>
 				<menu level="0" text="Audio &amp; Video" entryID="video_selection">
 					<id val="video"/>
-					<item level="0" entryID="av_setup"><setup id="avsetup"/></item>					
+					<item level="0" entryID="av_setup"><setup id="avsetup"/></item>
 					<item entryID="subtitle_setup" level="2" text="Subtitle Setup" weight="20"><setup id="subtitlesetup" /></item>
 					<item level="0" entryID="autolanguage_setup" text="Auto Language Setup"><setup id="autolanguagesetup"/></item>
 				</menu>
