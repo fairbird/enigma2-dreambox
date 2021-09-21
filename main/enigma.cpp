@@ -356,7 +356,12 @@ void dump_malloc_stats(void)
 {
 #ifdef __GLIBC__
 	struct mallinfo2 mi = mallinfo2();
+#if HAVE_AMLOGIC
+	eDebug("MALLOC: %ld total", mi.uordblks);
+
+#else
 	eDebug("MALLOC: %d total", mi.uordblks);
+#endif
 #else
 	eDebug("MALLOC: info not exposed");
 #endif
