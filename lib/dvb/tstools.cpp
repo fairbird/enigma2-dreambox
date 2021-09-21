@@ -170,7 +170,7 @@ int eDVBTSTools::getPTS(off_t &offset, pts_t &pts, int fixed)
 			const unsigned char* match = (const unsigned char*)memchr(packet+1, 0x47, 188-1);
 			if (match != NULL)
 			{
-				eDebug("[eDVBTSTools] getPTS resync %d", match - packet);
+				eDebug("[eDVBTSTools] getPTS resync %ld", match - packet);
 				offset += (match - packet) - 188;
 			}
 			else
@@ -413,7 +413,7 @@ int eDVBTSTools::getOffset(off_t &offset, pts_t &pts, int marg)
 					continue;
 				}
 
-				eDebug("[eDVBTSTools] getOffset using: %lld:%lld -> %lld:%lld", l->first, u->first, l->second, u->second);
+				eDebug("[eDVBTSTools] getOffset using: %lld:%lld -> %ld:%ld", l->first, u->first, l->second, u->second);
 
 				int bitrate;
 
@@ -691,7 +691,7 @@ int eDVBTSTools::takeSample(off_t off, pts_t &p)
 			{
 				if ((l->second > off) || (u->second < off))
 				{
-					eDebug("[eDVBTSTools] takeSample ignoring sample %lld %jd %lld (%llu %llu %llu)",
+					eDebug("[eDVBTSTools] takeSample ignoring sample %ld %jd %ld (%llu %llu %llu)",
 						l->second, (intmax_t)off, u->second, l->first, p, u->first);
 					return 1;
 				}
