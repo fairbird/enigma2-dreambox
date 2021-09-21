@@ -72,6 +72,10 @@ if test "$BOXTYPE" == "dm900" -o "$BOXTYPE" == "dm920"; then
 	AC_DEFINE(DREAMBOX_MOVE_LCD, 1,[define when we need to move lcd text a bit to the right])
 fi
 
+if test "$BOXTYPE" == "dreamone" -o "$BOXTYPE" == "dreamtwo"; then
+	AC_DEFINE(HAVE_AMLOGIC, 1,[define when we need to use amlogic])
+fi
+
 AC_ARG_WITH(textlcd,
 	AC_HELP_STRING([--with-textlcd], [use ascii based lcd, yes or no]),
 	[[withtextlcd=$withval]],
