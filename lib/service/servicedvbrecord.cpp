@@ -591,9 +591,9 @@ void eDVBServiceRecord::fixupCuts(std::list<pts_t> &offsets)
 			continue;
 		}
 #if HAVE_AMLOGIC
-			eDebug("[eDVBServiceRecord] fixed up %llx to %llx (offset %lx)", i->second, p, offset);
+		eDebug("[eDVBServiceRecord] fixed up %llx to %llx (offset %lx)", i->second, p, offset);
 #else
-			eDebug("[eDVBServiceRecord] fixed up %llx to %llx (offset %llx)", i->second, p, offset);
+		eDebug("[eDVBServiceRecord] fixed up %llx to %llx (offset %llx)", i->second, p, offset);
 #endif
 		offsets.push_back(p);
 	}
