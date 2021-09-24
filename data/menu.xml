@@ -120,6 +120,7 @@ self.session.openWithCallback(msgClosed, EpgDeleteMsg)
 					<item entryID="playback_setup" level="0" text="Playback Setup" weight="5"><setup id="Playback" /></item>
 					<item entryID="recording_setup" level="0" text="Recording Setup" weight="10"><screen module="Recording" screen="RecordingSettings" /></item>
 					<item entryID="timeshift_setup" level="0" text="Timeshift Setup" weight="15"><screen module="Timeshift" screen="TimeshiftSettings" /></item>
+					<item entryID="hdmirecord_setup" level="0" text="HDMI-IN Recording settings" weight="15" requires="HDMIin"><setup id="HDMIRecord"/></item>
 				</menu>
 				<menu level="0" text="Harddisk" entryID="hardisk_selection" requires="Harddisk">
 					<id val="harddisk"/>
