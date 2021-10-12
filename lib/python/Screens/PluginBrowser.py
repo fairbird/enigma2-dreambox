@@ -739,7 +739,7 @@ class PluginBrowserNew(Screen):
 		skincontent = ""
 		skin = """
 			<screen name="PluginBrowserNew" position="%d,%d" size="%d,%d" flags="wfNoBorder" backgroundColor="%s">
-				<eLabel text="Black Hole Green Panel" position="%d,%d" size="%d,%d" font="Regular;%d" backgroundColor="#44000000" transparent="1" zPosition="2" />
+				<eLabel text="Plugin Browser" position="%d,%d" size="%d,%d" font="Regular;%d" backgroundColor="#44000000" transparent="1" zPosition="2" />
 				<widget name="plugin_description" position="%d,%d" size="%d,%d" font="Regular;%d" foregroundColor="#000080ff" backgroundColor="#44000000" transparent="1" zPosition="2" />
 				<widget source="global.CurrentTime" render="Label" position="%d,%d" size="%d,%d" font="Regular;%d" halign="right" backgroundColor="#44000000" transparent="1" foregroundColor="#00ffffff">
 					<convert type="ClockToText">
