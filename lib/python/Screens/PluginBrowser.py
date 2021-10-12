@@ -550,13 +550,13 @@ class PluginBrowserNew(Screen):
 			self.primaryColor = "#282828"
 			self.primaryColorLabel = "#DCE1E3"
 			self.secondaryColor = "#4e4e4e"
-			self.secondaryColorLabel = "#212121"
+			self.secondaryColorLabel = "#00000000"
 		elif config.misc.plugin_style.value == "newstyle2":
 			self.backgroundColor = "#21292A"
 			self.primaryColor = "#191F22"
 			self.primaryColorLabel = "#DCE1E3"
 			self.secondaryColor = "#39474F"
-			self.secondaryColorLabel = "#212121"
+			self.secondaryColorLabel = "#00000000"
 		elif config.misc.plugin_style.value == "newstyle3":
 			self.backgroundColor = "#44000000"
 			self.primaryColor = "#16000000"
@@ -739,7 +739,7 @@ class PluginBrowserNew(Screen):
 		skincontent = ""
 		skin = """
 			<screen name="PluginBrowserNew" position="%d,%d" size="%d,%d" flags="wfNoBorder" backgroundColor="%s">
-				<eLabel text="Plugin Browser" position="%d,%d" size="%d,%d" font="Regular;%d" backgroundColor="#44000000" transparent="1" zPosition="2" />
+				<eLabel text="Plugin Browser" position="%d,%d" size="%d,%d" font="Regular;%d" foregroundColor="#00ffffff" backgroundColor="#44000000" transparent="1" zPosition="2" />
 				<widget name="plugin_description" position="%d,%d" size="%d,%d" font="Regular;%d" foregroundColor="#000080ff" backgroundColor="#44000000" transparent="1" zPosition="2" />
 				<widget source="global.CurrentTime" render="Label" position="%d,%d" size="%d,%d" font="Regular;%d" halign="right" backgroundColor="#44000000" transparent="1" foregroundColor="#00ffffff">
 					<convert type="ClockToText">
@@ -753,7 +753,7 @@ class PluginBrowserNew(Screen):
 				<eLabel position="%d,%d" size="%d,%d" backgroundColor="#00389416" foregroundColor="#00389416" zPosition="4"/>
 				<widget name="key_red" position="%d,%d" size="%d,%d" font="Regular;%d" zPosition="1" halign="center" valign="center" foregroundColor="#00ffffff" backgroundColor="#16000000" transparent="1"/>
 				<widget name="key_green" position="%d,%d" size="%d,%d" font="Regular;%d" zPosition="1" halign="center" valign="center" foregroundColor="#00ffffff" backgroundColor="#16000000" transparent="1"/>
-			""" % (positionx, positiony, sizex, sizey, positionx1, positiony1, sizex1, sizey1, font1, positionx2, positiony2, sizex2, sizey2, font2, positionx3, positiony3, sizex3, sizey3, font3, positionx4, positiony4, sizex4, sizey4, font4, positionx5, positiony5, sizex5, sizey5, font5, eLabelx1, eLabely1, eLabel1ysizex, eLabel1ysizey, eLabelx2, eLabely2, eLabel1ysizex, eLabel1ysizey, positionxkey1, positionykey, sizekeysx, sizekeysy, fontkey, positionxkey2, positionykey, sizekeysx, sizekeysy, fontkey)
+			""" % (positionx, positiony, sizex, sizey, backgroundColor, positionx1, positiony1, sizex1, sizey1, font1, positionx2, positiony2, sizex2, sizey2, font2, positionx3, positiony3, sizex3, sizey3, font3, positionx4, positiony4, sizex4, sizey4, font4, positionx5, positiony5, sizex5, sizey5, font5, eLabelx1, eLabely1, eLabel1ysizex, eLabel1ysizey, eLabelx2, eLabely2, eLabel1ysizex, eLabel1ysizey, positionxkey1, positionykey, sizekeysx, sizekeysy, fontkey, positionxkey2, positionykey, sizekeysx, sizekeysy, fontkey)
 		count = 0
 		for x, p in enumerate(plugins.getPlugins(PluginDescriptor.WHERE_PLUGINMENU)):
 			x += 1
