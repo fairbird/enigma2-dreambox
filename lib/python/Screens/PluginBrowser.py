@@ -563,6 +563,12 @@ class PluginBrowserNew(Screen):
 			self.primaryColorLabel = "#00ffffff"
 			self.secondaryColor = "#696969"
 			self.secondaryColorLabel = "#00000000"
+		else:
+			self.backgroundColor = "#44000000"
+			self.primaryColor = "#282828"
+			self.primaryColorLabel = "#DCE1E3"
+			self.secondaryColor = "#4e4e4e"
+			self.secondaryColorLabel = "#00000000"
 		self.skin = self.buildSkin()
 		self.firsttime = True
 		self.list = []
