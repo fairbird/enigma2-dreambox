@@ -1,9 +1,10 @@
+# -*- coding: UTF-8 -*-
 from Screen import Screen
 from Screens.ParentalControlSetup import ProtectedScreen
-from enigma import eConsoleAppContainer, eDVBDB, eTimer
+from enigma import eConsoleAppContainer, eDVBDB, eTimer, eSize, ePoint, getDesktop
 
 from Components.ActionMap import ActionMap, NumberActionMap
-from Components.config import config, ConfigSubsection, ConfigText
+from Components.config import config, ConfigSubsection, ConfigSelection, ConfigText
 from Components.PluginComponent import plugins
 from Components.PluginList import *
 from Components.Label import Label
@@ -19,15 +20,26 @@ from Screens.Console import Console
 from Plugins.Plugin import PluginDescriptor
 from Tools.Directories import resolveFilename, SCOPE_PLUGINS, SCOPE_CURRENT_SKIN
 from Tools.LoadPixmap import LoadPixmap
+from Components.Pixmap import Pixmap
 
+from skin import parseColor
 from time import time
-import os
+import os, math
 
 language.addCallback(plugins.reloadPlugins)
 
 config.misc.pluginbrowser = ConfigSubsection()
 config.misc.pluginbrowser.plugin_order = ConfigText(default="")
 
+
+def getDesktopSize():
+    s = getDesktop(0).size()
+    return (s.width(), s.height())
+
+
+def isFullHD():
+    desktopSize = getDesktopSize()
+    return desktopSize[0] == 1920
 
 class PluginBrowserSummary(Screen):
 	def __init__(self, session, parent):
@@ -523,3 +535,413 @@ class PluginDownloadBrowser(Screen):
 				list.append(PluginCategoryComponent(x, expandableIcon, self.listWidth))
 		self.list = list
 		self["list"].l.setList(list)
+
+class PluginBrowserNew(Screen):
+
+	def __init__(self, session):
+		Screen.__init__(self, session)
+		self.mainlist = []
+		self.plugins_pos = []
+		self.plugins = []
+		self.current = 0
+		self.current_page = 0
+		if config.misc.plugin_style.value == "newstyle1":
+			self.backgroundColor = "#44000000"
+			self.primaryColor = "#282828"
+			self.primaryColorLabel = "#DCE1E3"
+			self.secondaryColor = "#4e4e4e"
+			self.secondaryColorLabel = "#212121"
+		elif config.misc.plugin_style.value == "newstyle2":
+			self.backgroundColor = "#21292A"
+			self.primaryColor = "#191F22"
+			self.primaryColorLabel = "#DCE1E3"
+			self.secondaryColor = "#39474F"
+			self.secondaryColorLabel = "#212121"
+		elif config.misc.plugin_style.value == "newstyle3":
+			self.backgroundColor = "#44000000"
+			self.primaryColor = "#16000000"
+			self.primaryColorLabel = "#00ffffff"
+			self.secondaryColor = "#696969"
+			self.secondaryColorLabel = "#00000000"
+		self.skin = self.buildSkin()
+		self.firsttime = True
+		self.list = []
+		self["list"] = PluginList(self.list)
+		self['pages'] = Label()
+		self['plugin_description'] = Label()
+		self["key_red"] = self["red"] = Label(_("Remove plugins"))
+		self["key_green"] = self["green"] = Label(_("Download plugins"))
+
+		self["PluginDownloadActions"] = ActionMap(["ColorActions", "SetupActions", "DirectionActions"],
+		{
+			"red": self.delete,
+			"green": self.download,
+			"cancel": self.exit,
+			"right": self.keyRight,
+			"left": self.keyLeft,
+			"up": self.keyUp,
+			"down": self.keyDown,
+			"ok": self.ok,
+		}, -1)
+		self.onFirstExecBegin.append(self.checkWarnings)
+		self.onLayoutFinish.append(self.setIcons)
+		self.onLayoutFinish.append(self.activeBox)
+		self.onLayoutFinish.append(self.saveListsize)
+		self.setTitle(_('Plugin browser'))
+
+	def exit(self):
+		self.close()
+
+	def saveListsize(self):
+		listsize = self['list'].instance.size()
+		self.listWidth = listsize.width()
+		self.listHeight = listsize.height()
+
+	def isProtected(self):
+		return config.ParentalControl.setuppinactive.value and (not config.ParentalControl.config_sections.main_menu.value or hasattr(self.session, 'infobar') and self.session.infobar is None) and config.ParentalControl.config_sections.plugin_browser.value
+
+	def buildSkin(self):
+		if isFullHD():
+			# panel backgroundColor
+			backgroundColor = self.backgroundColor
+			# panel position
+			posxstart = 50
+			posystart = 190
+			# panel size
+			posxplus = 260
+			posyplus = 260
+			# plugins icon size
+			iconsize = "250,250"
+			# screen
+			positionx=0
+			positiony=0
+			sizex=1920
+			sizey=1080
+			# Title
+			positionx1=50
+			positiony1=12
+			sizex1=900
+			sizey1=100
+			font1=75
+			# plugin_description
+			positionx2=50
+			positiony2=105
+			sizex2=900
+			sizey2=100
+			font2=40
+			# Time
+			positionx3=1617
+			positiony3=12
+			sizex3=273
+			sizey3=100
+			font3=80
+			# Date
+			positionx4=1128
+			positiony4=105
+			sizex4=762
+			sizey4=50
+			font4=40
+			# pages
+			positionx5=1683
+			positiony5=975
+			sizex5=220
+			sizey5=85
+			font5=40
+			# keys eLabel
+			eLabelx1=67
+			eLabely1=1065
+			eLabelx2=393
+			eLabely2=1065
+			eLabelx3=719
+			eLabely3=1065
+			eLabelx4=1045
+			eLabely4=1065
+			eLabel1ysizex=300
+			eLabel1ysizey=8
+			# keys function
+			positionxkey1=67
+			positionxkey2=393
+			positionxkey3=719
+			positionxkey4=1045
+			positionykey=1013
+			sizekeysx=300
+			sizekeysy=50
+			fontkey=32
+		else:
+			# panel backgroundColor
+			backgroundColor = self.backgroundColor
+			# panel position
+			posxstart = 10
+			posystart = 110
+			# panel size
+			posxplus = 180
+			posyplus = 190
+			# plugins icon size
+			iconsize = "150,150"
+			# screen
+			positionx=0
+			positiony=0
+			sizex=1280
+			sizey=720
+			# Title
+			positionx1=20
+			positiony1=12
+			sizex1=563
+			sizey1=45
+			font1=40
+			# plugin_description
+			positionx2=20
+			positiony2=60
+			sizex2=567
+			sizey2=32
+			font2=28
+			# Time
+			positionx3=1000
+			positiony3=12
+			sizex3=273
+			sizey3=100
+			font3=50
+			# Date
+			positionx4=813
+			positiony4=60
+			sizex4=462
+			sizey4=32
+			font4=28
+			# pages
+			positionx5=1130
+			positiony5=655
+			sizex5=160
+			sizey5=50
+			font5=27
+			# keys eLabel
+			eLabelx1=67
+			eLabely1=712
+			eLabelx2=293
+			eLabely2=712
+			eLabelx3=519
+			eLabely3=712
+			eLabelx4=750
+			eLabely4=712
+			eLabel1ysizex=200
+			eLabel1ysizey=5
+			# keys function
+			positionxkey1=67
+			positionxkey2=293
+			positionxkey3=519
+			positionxkey4=750
+			positionykey=677
+			sizekeysx=200
+			sizekeysy=35
+			fontkey=28
+		posx = posxstart
+		posy = posystart
+		list_dummy = []
+		skincontent = ""
+		skin = """
+			<screen name="PluginBrowserNew" position="%d,%d" size="%d,%d" flags="wfNoBorder" backgroundColor="%s">
+				<eLabel text="Black Hole Green Panel" position="%d,%d" size="%d,%d" font="Regular;%d" backgroundColor="#44000000" transparent="1" zPosition="2" />
+				<widget name="plugin_description" position="%d,%d" size="%d,%d" font="Regular;%d" foregroundColor="#000080ff" backgroundColor="#44000000" transparent="1" zPosition="2" />
+				<widget source="global.CurrentTime" render="Label" position="%d,%d" size="%d,%d" font="Regular;%d" halign="right" backgroundColor="#44000000" transparent="1" foregroundColor="#00ffffff">
+					<convert type="ClockToText">
+				</convert>
+				</widget>
+				<widget backgroundColor="#44000000" position="%d,%d" size="%d,%d" font="Regular;%d" foregroundColor="#000080ff" halign="right" render="Label"  source="global.CurrentTime" transparent="1">
+				<convert type="ClockToText">FullDate</convert>
+				</widget>
+				<widget name="pages" foregroundColor="#000080ff" position="%d,%d" size="%d,%d" font="Regular;%d" zPosition="2" halign="center" valign="center" transparent="1" />
+				<eLabel position="%d,%d" size="%d,%d" backgroundColor="#00ff2525" foregroundColor="#00ff2525" zPosition="4"/>
+				<eLabel position="%d,%d" size="%d,%d" backgroundColor="#00389416" foregroundColor="#00389416" zPosition="4"/>
+				<widget name="key_red" position="%d,%d" size="%d,%d" font="Regular;%d" zPosition="1" halign="center" valign="center" foregroundColor="#00ffffff" backgroundColor="#16000000" transparent="1"/>
+				<widget name="key_green" position="%d,%d" size="%d,%d" font="Regular;%d" zPosition="1" halign="center" valign="center" foregroundColor="#00ffffff" backgroundColor="#16000000" transparent="1"/>
+			""" % (positionx, positiony, sizex, sizey, positionx1, positiony1, sizex1, sizey1, font1, positionx2, positiony2, sizex2, sizey2, font2, positionx3, positiony3, sizex3, sizey3, font3, positionx4, positiony4, sizex4, sizey4, font4, positionx5, positiony5, sizex5, sizey5, font5, eLabelx1, eLabely1, eLabel1ysizex, eLabel1ysizey, eLabelx2, eLabely2, eLabel1ysizex, eLabel1ysizey, positionxkey1, positionykey, sizekeysx, sizekeysy, fontkey, positionxkey2, positionykey, sizekeysx, sizekeysy, fontkey)
+		count = 0
+		for x, p in enumerate(plugins.getPlugins(PluginDescriptor.WHERE_PLUGINMENU)):
+			x += 1
+			count += 1
+			if isFullHD():
+				skincontent += '<widget backgroundColor="'+self.primaryColor+'" name="plugin_' + str(x) + '" position="' + str(posx) + ',' + str(posy) + '" size="' + iconsize + '" />'
+				skincontent += '<widget foregroundColor="'+self.primaryColorLabel+'" name="label_'+str(x)+'" position="'+str(posx+10)+','+str(posy+139)+'" size="220,84" zPosition="3" font="Regular;32" halign="center" valign="center" transparent="1" />'
+				skincontent += '<widget  name="icon_'+str(x)+'" position="'+str(posx+30)+','+str(posy+40)+'" size="180,80" zPosition="3" alphatest="on" transparent="1" />'
+			else:
+				skincontent += '<widget backgroundColor="'+self.primaryColor+'" name="plugin_' + str(x) + '" position="' + str(posx) + ',' + str(posy) + '" size="' + iconsize + '" />'
+				skincontent += '<widget foregroundColor="'+self.primaryColorLabel+'" name="label_'+str(x)+'" position="'+str(posx)+','+str(posy+20)+'" size="150,65" zPosition="3" font="Regular;22" halign="center" valign="center" transparent="1" />'
+				skincontent += '<widget  name="icon_'+str(x)+'" position="'+str(posx+10)+','+str(posy+20)+'" size="150,50" zPosition="3" alphatest="on" transparent="1" />'
+			self.plugins_pos.append((posx, posy))
+			self.plugins.append((p.name, p.description, p, p.icon))
+			self["plugin_"+str(x)] = Label()
+			self["label_"+str(x)] = Label()
+			self["icon_"+str(x)] = Pixmap()
+			self["label_"+str(x)].setText(p.name)
+			posx += posxplus
+			list_dummy.append(x)
+			if len(list_dummy)==7:
+				list_dummy[:] = []
+				posx = posxstart
+				posy += posyplus
+			if count == 21:
+				posx = posxstart
+				posy = posystart
+				count = 0
+
+		skin += skincontent
+		skin += '</screen>'
+		self.total_pages = int(math.ceil(float(len(self.plugins))/21))
+		count = 1
+		counting = 1
+		list_dummy = []
+		for x in range(1, len(self.plugins)+1):
+			if count == 21:
+				count += 1
+				counting += 1
+				list_dummy.append(x)
+				self.mainlist.append(list_dummy)
+				count = 1
+				list_dummy = []
+			else:
+				count += 1
+				counting += 1
+				list_dummy.append(x)
+				if int(counting) == len(self.plugins)+1:
+					self.mainlist.append(list_dummy)
+		return skin
+
+	def checkWarnings(self):
+		if len(plugins.warnings):
+			text = _("Some plugins are not available:\n")
+			for (pluginname, error) in plugins.warnings:
+				text += "%s (%s)\n" % (pluginname, error)
+			plugins.resetWarnings()
+			self.session.open(MessageBox, text=text, type=MessageBox.TYPE_WARNING)
+
+	def setIcons(self):
+		for x,elem in enumerate(self.plugins):
+			x += 1
+			icon = elem[3] or LoadPixmap(resolveFilename(SCOPE_CURRENT_SKIN, "icons/plugin.png"))
+			self['icon_'+str(x)].instance.setScale(1)
+			self['icon_'+str(x)].instance.setPixmap(icon)
+
+	def activeBox(self):
+		for index, plugin in enumerate(self.plugins):
+			index += 1
+			if index == self.current+1:
+				self["plugin_description"].setText(plugin[1])
+				pos = self.plugins_pos[self.current]
+				if isFullHD():
+					self["plugin_"+str(index)].instance.resize(eSize(270, 270))
+					self["plugin_" +str(index)].instance.move(ePoint(pos[0]-10, pos[1]-10))
+					self["label_" +str(index)].instance.move(ePoint(pos[0]+10, pos[1]+155))
+				else:
+					self["plugin_"+str(index)].instance.resize(eSize(190, 190))
+					self["plugin_" +str(index)].instance.move(ePoint(pos[0]-10, pos[1]-10))
+					self["label_" +str(index)].instance.move(ePoint(pos[0]+5, pos[1]+110))
+				self["plugin_" + str(index)].instance.setBackgroundColor(parseColor(self.secondaryColor))
+				self["plugin_"+str(index)].instance.invalidate()
+				self["label_" + str(index)].instance.setBackgroundColor(parseColor(self.secondaryColor))
+				self["label_"+str(index)].instance.setForegroundColor(parseColor(self.secondaryColorLabel))
+			else:
+				pos = self.plugins_pos[index-1]
+				if isFullHD():
+					self["plugin_"+str(index)].instance.resize(eSize(250, 250))
+					self["plugin_"+str(index)].instance.move(ePoint(pos[0], pos[1]))
+					self["label_" +str(index)].instance.move(ePoint(pos[0]+10, pos[1]+139))
+				else:
+					self["plugin_"+str(index)].instance.resize(eSize(170, 170))
+					self["plugin_"+str(index)].instance.move(ePoint(pos[0], pos[1]))
+					self["label_" +str(index)].instance.move(ePoint(pos[0]+10, pos[1]+90))
+				self["plugin_" + str(index)].instance.setBackgroundColor(parseColor(self.primaryColor))
+				self["plugin_"+str(index)].instance.invalidate()
+				self["label_" + str(index)].instance.setBackgroundColor(parseColor(self.primaryColor))
+				self["label_" + str(index)].instance.setForegroundColor(parseColor(self.primaryColorLabel))
+		self.paint_hide()
+		self.currentPage()
+
+	def ok(self):
+		plugin = self.plugins[self.current][2]
+		plugin(session=self.session)
+        
+	def currentPage(self):
+		self['pages'].setText("Page {}/{}".format(self.current_page+1, self.total_pages))
+
+	def keyRight(self):
+		self.move(1, 'forward')
+
+	def keyLeft(self):
+		self.move(1, 'backwards')
+
+	def keyDown(self):
+		self.move(7, 'forward')
+
+	def keyUp(self):
+		self.move(7, 'backwards')
+
+	def move(self, step, direction):
+		ls = [elem for elem in range(1, len(self.plugins_pos)+1)]
+		if direction == 'backwards':
+			self.current -= step
+		else:
+			self.current += step
+		if self.current > (len(ls)-1):
+			self.current = 0
+		if self.current < 0:
+			self.current = len(ls)-1
+		for i in range(self.total_pages):
+			if ls[self.current] in self.mainlist[i]:
+				self.current_page = i
+		self.activeBox()
+
+	def paint_hide(self):
+		for i in range(self.total_pages):
+			if i != self.current_page:
+				for x in self.mainlist[i]:
+					self["plugin_"+str(x)].hide()
+					self["label_"+str(x)].hide()
+					self['icon_'+str(x)].hide()
+			else:
+				for x in self.mainlist[i]:
+					self["plugin_"+str(x)].show()
+					self["label_"+str(x)].show()
+					self["icon_"+str(x)].show()
+
+	def updateList(self, showHelp=False):
+		self.list = []
+		pluginlist = plugins.getPlugins(PluginDescriptor.WHERE_PLUGINMENU)[:]
+		for x in config.misc.pluginbrowser.plugin_order.value.split(","):
+			plugin = list(plugin for plugin in pluginlist if plugin.path[24:] == x)
+			if plugin:
+				self.list.append(PluginEntryComponent(plugin[0], self.listWidth))
+				pluginlist.remove(plugin[0])
+		self.list = self.list + [PluginEntryComponent(plugin, self.listWidth) for plugin in pluginlist]
+		if config.usage.menu_show_numbers.value in ("menu&plugins", "plugins") or showHelp:
+			for x in enumerate(self.list):
+				tmp = list(x[1][1])
+				tmp[7] = "%s %s" % (x[0] + 1, tmp[7])
+				x[1][1] = tuple(tmp)
+		self["list"].l.setList(self.list)
+
+	def showHelp(self):
+		if config.usage.menu_show_numbers.value not in ("menu&plugins", "plugins"):
+			self.help = not self.help
+			self.updateList(self.help)
+
+	def delete(self):
+		self.session.openWithCallback(self.PluginDownloadBrowserClosed, PluginDownloadBrowser, PluginDownloadBrowser.REMOVE)
+
+	def download(self):
+		self.session.openWithCallback(self.PluginDownloadBrowserClosed, PluginDownloadBrowser, PluginDownloadBrowser.DOWNLOAD, self.firsttime)
+		self.firsttime = False
+
+	def PluginDownloadBrowserClosed(self):
+		self.updateList()
+		self.checkWarnings()
+
+	def openExtensionmanager(self):
+		if fileExists(resolveFilename(SCOPE_PLUGINS, "SystemPlugins/SoftwareManager/plugin.py")):
+			try:
+				from Plugins.SystemPlugins.SoftwareManager.plugin import PluginManager
+			except ImportError:
+				self.session.open(MessageBox, _("The software management extension is not installed!\nPlease install it."), type=MessageBox.TYPE_INFO, timeout=10)
+			else:
+				self.session.openWithCallback(self.PluginDownloadBrowserClosed, PluginManager)
+
+if config.misc.plugin_style.value == "newstyle1" or config.misc.plugin_style.value == "newstyle2" or config.misc.plugin_style.value == "newstyle3":
+	PluginBrowser = PluginBrowserNew
