@@ -13,8 +13,16 @@ import eBaseImpl
 enigma.eTimer = eBaseImpl.eTimer
 enigma.eSocketNotifier = eBaseImpl.eSocketNotifier
 enigma.eConsoleAppContainer = eConsoleImpl.eConsoleAppContainer
+from Components.config import config, configfile, ConfigText, ConfigYesNo, ConfigInteger, ConfigSelection, NoSave
 
 from traceback import print_exc
+
+# New Plugin Style
+config.misc.plugin_style = ConfigSelection(default='normallstyle', choices=[
+	('normallstyle', _('Normall Style')),
+	('newstyle1', _('New Style 1')),
+	('newstyle2', _('New Style 2')),
+	('newstyle3', _('New Style 3'))])
 
 profile("SimpleSummary")
 from Screens import InfoBar
@@ -23,7 +31,6 @@ from Screens.SimpleSummary import SimpleSummary
 from sys import stdout
 
 profile("Bouquets")
-from Components.config import config, configfile, ConfigText, ConfigYesNo, ConfigInteger, ConfigSelection, NoSave
 config.misc.load_unlinked_userbouquets = ConfigYesNo(default=True)
 
 
