@@ -31,3 +31,7 @@ driver_libenigma_driver_a_SOURCES += \
 	driver/rcsdl.cpp \
 	driver/rcsdl.h
 endif
+
+if DMAMLOGIC
+driverinclude_HEADERS += driver/alsa.h
+endif
