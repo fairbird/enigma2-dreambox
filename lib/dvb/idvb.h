@@ -2,7 +2,9 @@
 #define __dvb_idvb_h
 
 #ifndef SWIG
-
+#if defined(DMAMLOGIC)
+#include <lib/base/sigc.h>
+#endif
 #include <linux/dvb/frontend.h>
 #include <linux/dvb/video.h>
 #include <lib/base/object.h>
@@ -760,7 +762,13 @@ public:
 			eventSizeChanged = VIDEO_EVENT_SIZE_CHANGED,
 			eventFrameRateChanged = VIDEO_EVENT_FRAME_RATE_CHANGED,
 			eventProgressiveChanged = 16,
+#if defined(DMAMLOGIC)
+			eventGammaChanged = 17,
+			eventPtsValid = 32,
+			eventVideoDiscontDetected = 64
+#else
 			eventGammaChanged = 17
+#endif
 		} type;
 		unsigned char aspect;
 		unsigned short height;

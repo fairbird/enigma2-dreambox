@@ -63,11 +63,18 @@ class eDVBSectionReader: public iDVBSectionReader, public sigc::trackable
 	int checkcrc;
 	void data(int);
 	ePtr<eSocketNotifier> notifier;
+#if defined(DMAMLOGIC)
+	Slot0<__u8*> m_buffer_func;
+	bool m_have_external_buffer_func;
+#endif
 public:
 	eDVBSectionReader(eDVBDemux *demux, eMainloop *context, RESULT &res);
 	virtual ~eDVBSectionReader();
 	RESULT setBufferSize(int size);
 	RESULT start(const eDVBSectionFilterMask &mask);
+#if defined(DMAMLOGIC)
+	RESULT startWithExternalBufferFunc(const eDVBSectionFilterMask &mask, const Slot0<__u8*> &buffer_func);
+#endif
 	RESULT stop();
 	RESULT connectRead(const sigc::slot1<void,const uint8_t*> &read, ePtr<eConnection> &conn);
 };
