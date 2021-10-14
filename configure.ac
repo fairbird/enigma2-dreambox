@@ -64,7 +64,7 @@ if test `echo "$BOXTYPE" | cut -b 1-2` == "dm"; then
 fi
 
 if test "$BOXTYPE" == "dm520" -o "$BOXTYPE" == "dm820" -o "$BOXTYPE" == "dm7080" -o "$BOXTYPE" == "dm900" -o "$BOXTYPE" == "dm920" -o "$BOXTYPE" == "dreamone" -o "$BOXTYPE" == "dreamtwo"; then
-	AC_DEFINE(DREAMBOX_DUAL_TUNER, 1,[define BOXTYPE DM7080])
+	AC_DEFINE(DREAMBOX_DUAL_TUNER, 1,[define dreambox dual tuner])
 	AC_DEFINE(CONFIG_ION, 1,[define when we need to use ION allocator])
 fi
 
