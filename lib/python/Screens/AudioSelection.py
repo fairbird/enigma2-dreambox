@@ -272,7 +272,7 @@ class AudioSelection(Screen, ConfigListScreen):
 				if SystemInfo["HasMultichannelPCM"]:
 					config.av.multichannel_pcm.setValue(False)
 			else:
-				config.av.downmix_ac3.setValue(False)gbg
+				config.av.downmix_ac3.setValue(False)
 		config.av.downmix_ac3.save()
 		if SystemInfo["HasMultichannelPCM"]:
 			config.av.multichannel_pcm.save()
