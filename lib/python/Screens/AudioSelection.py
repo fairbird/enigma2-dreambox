@@ -90,9 +90,13 @@ class AudioSelection(Screen, ConfigListScreen):
 			self.audioTracks = audio = service and service.audioTracks()
 			n = audio and audio.getNumberOfTracks() or 0
 			if SystemInfo["CanDownmixAC3"]:
-				self.settings.downmix = ConfigOnOff(default=config.av.downmix_ac3.value)
-				self.settings.downmix.addNotifier(self.changeAC3Downmix, initial_call=False)
-				conflist.append(getConfigListEntry(_("Multi channel downmix"), self.settings.downmix))
+				if SystemInfo["DreamBoxAudio"]:
+					choice_list = [("downmix", _("Downmix")), ("passthrough", _("Passthrough")), ("multichannel", _("convert to multi-channel PCM")), ("hdmi_best", _("use best / controlled by HDMI"))]
+					self.settings.downmix_ac3 = ConfigSelection(choices=choice_list, default=config.av.downmix_ac3.value)
+				else:
+					self.settings.downmix_ac3 = ConfigOnOff(default=config.av.downmix_ac3.value)
+				self.settings.downmix_ac3.addNotifier(self.changeAC3Downmix, initial_call=False)
+				conflist.append(getConfigListEntry(_("AC3 downmix"), self.settings.downmix_ac3, None))
 				self["key_red"].setBoolean(True)
 
 			if n > 0:
@@ -243,15 +247,46 @@ class AudioSelection(Screen, ConfigListScreen):
 			subtitlelist.append(self.selectedSubtitle)
 		return subtitlelist
 
+	def changeBTAudio(self, btaudio):
+		if btaudio.value:
+			config.av.btaudio.value = btaudio.value
+		config.av.btaudio.save()
+
+	def changePCMMultichannel(self, multichan):
+		if SystemInfo["DreamBoxAudio"]:
+			config.av.multichannel_pcm.setValue(multichan.value)
+		else:
+			if multichan.value:
+				config.av.multichannel_pcm.setValue(True)
+			else:
+				config.av.multichannel_pcm.setValue(False)
+		config.av.multichannel_pcm.save()
+		self.fillList()
+
 	def changeAC3Downmix(self, downmix):
-		config.av.downmix_ac3.value = downmix.getValue() == True
+		if SystemInfo["DreamBoxAudio"]:
+			config.av.downmix_ac3.setValue(downmix.value)
+		else:
+			if downmix.value:
+				config.av.downmix_ac3.setValue(True)
+				if SystemInfo["HasMultichannelPCM"]:
+					config.av.multichannel_pcm.setValue(False)
+			else:
+				config.av.downmix_ac3.setValue(False)gbg
 		config.av.downmix_ac3.save()
-		if SystemInfo["CanDownmixDTS"]:
-			config.av.downmix_dts.value = config.av.downmix_ac3.value
-			config.av.downmix_dts.save()
-		if SystemInfo["CanDownmixAAC"]:
-			config.av.downmix_aac.value = config.av.downmix_ac3.value
-			config.av.downmix_aac.save()
+		if SystemInfo["HasMultichannelPCM"]:
+			config.av.multichannel_pcm.save()
+		self.fillList()
+
+	def changeAACDownmix(self, downmix):
+		if SystemInfo["DreamBoxAudio"]:
+			config.av.downmix_aac.setValue(downmix.value)
+		else:
+			if downmix.value:
+				config.av.downmix_aac.setValue(True)
+			else:
+				config.av.downmix_aac.setValue(False)
+		config.av.downmix_aac.save()
 
 	def changeMode(self, mode):
 		if mode is not None and self.audioChannel:

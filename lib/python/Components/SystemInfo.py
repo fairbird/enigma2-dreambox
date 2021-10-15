@@ -121,6 +121,7 @@ SystemInfo["HasYPbPr"] = model in ("dm8000", "et5000", "et6000", "et6500", "et90
 SystemInfo["HasScart"] = model in ("dm8000", "et4000", "et6500", "et8000", "et9000", "et9200", "et9500", "et10000", "formuler1", "hd1100", "hd1200", "hd1265", "hd2400", "vusolo", "vusolo2", "vuduo", "vuduo2", "vuultimo", "vuuno", "xp1000")
 SystemInfo["HasSVideo"] = model in ("dm8000")
 SystemInfo["RecoveryMode"] = fileCheck("/proc/stb/fp/boot_mode")
+SystemInfo["CanAC3plusTranscode"] = fileAccess("/proc/stb/audio/ac3plus_choices")
 SystemInfo["HasComposite"] = model not in ("i55", "gbquad4k", "gbue4k", "hd1500", "osnino", "osninoplus", "purehd", "purehdse", "revo4k", "vusolo4k", "vuzero4k", "vuduo4k", "vuduo4kse", "vuuno4k", "vuuno4kse", "vuultimo4k")
 SystemInfo["HasAutoVolume"] = fileExists("/proc/stb/audio/avl_choices") and fileCheck("/proc/stb/audio/avl")
 SystemInfo["HasAutoVolumeLevel"] = fileExists("/proc/stb/audio/autovolumelevel_choices") and fileCheck("/proc/stb/audio/autovolumelevel")
