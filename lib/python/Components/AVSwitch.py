@@ -177,8 +177,16 @@ def InitAVSwitch():
 
 	if SystemInfo["CanDownmixAC3"]:
 		def setAC3Downmix(configElement):
-			open("/proc/stb/audio/ac3", "w").write(configElement.value and "downmix" or "passthrough")
-		config.av.downmix_ac3 = ConfigYesNo(default=True)
+			print("[AVSwitch] Write to /proc/stb/audio/ac3")
+			if SystemInfo["DreamBoxAudio"]:
+				open("/proc/stb/audio/ac3", "w").write(configElement.value)
+			else:
+				open("/proc/stb/audio/ac3", "w").write(configElement.value and "downmix" or "passthrough")
+		if SystemInfo["DreamBoxAudio"]:
+			choice_list = [("downmix", _("Downmix")), ("passthrough", _("Passthrough")), ("multichannel", _("convert to multi-channel PCM")), ("hdmi_best", _("use best / controlled by HDMI"))]
+			config.av.downmix_ac3 = ConfigSelection(choices=choice_list, default="downmix")
+		else:
+			config.av.downmix_ac3 = ConfigYesNo(default=True)
 		config.av.downmix_ac3.addNotifier(setAC3Downmix)
 
 	if SystemInfo["CanAC3plusTranscode"]:
@@ -187,9 +195,6 @@ def InitAVSwitch():
 			open("/proc/stb/audio/ac3plus", "w").write(configElement.value)
 		if SystemInfo["DreamBoxAudio"]:
 			choice_list = [("use_hdmi_caps", _("controlled by HDMI")), ("force_ac3", _("convert to AC3")), ("multichannel", _("convert to multi-channel PCM")), ("hdmi_best", _("use best / controlled by HDMI")), ("force_ddp", _("force AC3plus"))]
-			config.av.transcodeac3plus = ConfigSelection(choices=choice_list, default="force_ac3")
-		elif platform in ("gb7252", "gb72604"):
-			choice_list = [("downmix", _("Downmix")), ("passthrough", _("Passthrough")), ("force_ac3", _("convert to AC3")), ("multichannel", _("convert to multi-channel PCM")), ("force_dts", _("convert to DTS"))]
 			config.av.transcodeac3plus = ConfigSelection(choices=choice_list, default="force_ac3")
 		else:
 			choice_list = [("use_hdmi_caps", _("controlled by HDMI")), ("force_ac3", _("convert to AC3"))]
@@ -223,8 +228,16 @@ def InitAVSwitch():
 
 	if SystemInfo["CanDownmixAAC"]:
 		def setAACDownmix(configElement):
-			open("/proc/stb/audio/aac", "w").write(configElement.value and "downmix" or "passthrough")
-		config.av.downmix_aac = ConfigYesNo(default=True)
+			print("[AVSwitch] Write to /proc/stb/audio/aac")
+			if SystemInfo["DreamBoxAudio"]:
+				open("/proc/stb/audio/aac", "w").write(configElement.value)
+			else:
+				open("/proc/stb/audio/aac", "w").write(configElement.value and "downmix" or "passthrough")
+		if SystemInfo["DreamBoxAudio"]:
+			choice_list = [("downmix", _("Downmix")), ("passthrough", _("Passthrough")), ("multichannel", _("convert to multi-channel PCM")), ("hdmi_best", _("use best / controlled by HDMI"))]
+			config.av.downmix_aac = ConfigSelection(choices=choice_list, default="downmix")
+		else:
+			config.av.downmix_aac = ConfigYesNo(default=True)
 		config.av.downmix_aac.addNotifier(setAACDownmix)
 
 	if SystemInfo["CanDownmixAACPlus"]:
