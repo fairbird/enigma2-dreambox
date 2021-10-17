@@ -38,7 +38,7 @@ if screenwidth and screenwidth == 1920:
 elif screenwidth and screenwidth > 1920:
 	f = 3
 	HDSKIN = True
-	sizeH = screenwidth - 300
+	sizeH = screenwidth - 150
 elif screenwidth and screenwidth > 1024:
 	sizeH = screenwidth - 100
 	HDSKIN = True
@@ -658,7 +658,10 @@ class oscInfo(Screen, OscamInfo):
 		self.scrolling = False
 		self.webif_data = self.readXML(typ=self.what)
 		ypos = 10
-		ysize = 350
+		if f == 1.5 or f == 3:
+			ysize = 800
+		else:
+			ysize = 350
 		self.rows = 12
 		self.itemheight = 25
 		self.sizeLH = sizeH
@@ -667,7 +670,7 @@ class oscInfo(Screen, OscamInfo):
 		for k, v in enumerate(["red", "green", "yellow", "blue"]):
 			xpos = k * button_width
 			self.skin += """<ePixmap name="%s" position="%d,%d" size="40,40" pixmap="buttons/key_%s.png" zPosition="1" transparent="1" alphatest="blend" />""" % (v, xpos, ypos, v)
-			self.skin += """<widget source="key_%s" render="Label" position="%d,%d" size="%d,%d" font="Regular;22" zPosition="1" valign="center" transparent="1" />""" % (v, xpos + 50, ypos, button_width, 27)
+			self.skin += """<widget source="key_%s" render="Label" position="%d,%d" size="%d,%d" font="Regular;26" zPosition="1" valign="center" transparent="1" />""" % (v, xpos + 50, ypos, button_width, 27)
 		if f == 1.5:
 		    self.skin += """<ePixmap name="divh" position="10,55" size="%d,2" pixmap="div-h-fhd.png" transparent="1" alphatest="blend" />""" % sizeH
 		else:
