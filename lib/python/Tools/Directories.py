@@ -8,6 +8,7 @@ from enigma import eEnv, getDesktop, eGetEnigmaDebugLvl
 from errno import ENOENT, EXDEV
 from re import compile
 from stat import S_IMODE
+from xml.etree.cElementTree import Element, ParseError, fromstring, parse
 
 pathExists = os.path.exists
 isMount = os.path.ismount  # Only used in OpenATV /lib/python/Plugins/SystemPlugins/NFIFlash/downloader.py.
@@ -443,13 +444,17 @@ def fileReadXML(filename, default=None, source=DEFAULT_MODULE_NAME, debug=False)
 		if err.errno == ENOENT:  # ENOENT - No such file or directory.
 			print("[%s] Warning: File '%s' does not exist!" % (source, filename))
 		else:
-			print("[%s] Error %d: Opening file '%s'! (%s)" % (source, err.errno, filename, err.strerror))
+			print("[%s] Error %d: Opening file '%s'!  (%s)" % (source, err.errno, filename, err.strerror))
 	except Exception as err:
-		print("[%s] Error: Unexpected error opening file '%s'! (%s)" % (source, filename, err))
+		print("[%s] Error: Unexpected error opening/parsing file '%s'!  (%s)" % (source, filename, err))
+		print_exc()
 	if dom is None:
-		if default:
+		if default and isinstance(default, str):
 			dom = fromstring(default)
-			msg = "Default"
+			msg = "Default (XML)"
+		elif default and isinstance(default, Element):
+			dom = default
+			msg = "Default (DOM)"
 		else:
 			msg = "Failed to read"
 	if debug or forceDebug:
