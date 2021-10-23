@@ -452,7 +452,7 @@ def fileReadXML(filename, default=None, source=DEFAULT_MODULE_NAME, debug=False)
 		if default and isinstance(default, str):
 			dom = fromstring(default)
 			msg = "Default (XML)"
-		elif default and isinstance(default, Element):
+		elif default and isinstance(default, type(Element(None))):  # This handles a bug in Python 2 where the Element object is *not* a class type in cElementTree!!!
 			dom = default
 			msg = "Default (DOM)"
 		else:
