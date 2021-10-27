@@ -524,7 +524,7 @@ self.autoResize()
 		<widget name="wait" position="20,10" size="500,25" font="Regular;23"/>
 	</screen>
 	<!-- Help menu -->
-	<screen name="HelpMenu" position="fill" title="Menu" flags="wfNoBorder">
+	<!--screen name="HelpMenu" position="fill" title="Menu" flags="wfNoBorder">
 		<eLabel text="help..." position="280,40" size="220,60" font="Regular;40" halign="right"/>
 		<widget name="list" position="50,100" size="450,380" scrollbarMode="showOnDemand"/>
 		<widget name="rc" pixmaps="rc.png,rcold.png" position="540,10" zPosition="10" size="154,500" alphatest="on"/>
@@ -533,6 +533,169 @@ self.autoResize()
 		<widget name="arrowup" pixmap="arrowup.png" position="-100,-100" zPosition="11" size="37,70" alphatest="on"/>
 		<widget name="arrowup2" pixmap="arrowup.png" position="-100,-100" zPosition="11" size="37,70" alphatest="on"/>
 		<widget name="long_key" position="320,520" size="350,50" font="Regular;25" halign="right" foregroundColor="yellow"/>
+	</screen-->
+	<screen name="HelpMenu" position="0,0" size="1280,720" flags="wfNoBorder">
+		<panel name="HelpMenuOld" conditional="arrowdown"/>
+		<panel name="HelpMenuNew" conditional="indicatorU0"/>
+	</screen>
+	<screen name="HelpMenuOld" position="0,0" size="1280,720" flags="wfNoBorder">
+		<widget name="list" position="60,150" size="503,456" transparent="0" scrollbarMode="showOnDemand"/>
+		<panel name="RcPanel"/>
+		<widget name="long_key" position="760,600" size="180,40" font="Regular;20" halign="right" foregroundColor="yellow" transparent="0"/>
+	</screen>
+	<screen name="HelpMenuNew" position="0,0" size="1280,720" flags="wfNoBorder">
+		<widget name="description" position="660,150" size="280,44" font="Regular;20" halign="center" valign="center" transparent="1"/>
+		<widget source="list" render="Listbox" position="60,150" size="503,456" transparent="0" scrollbarMode="showOnDemand">
+			<convert type="TemplatedMultiContent">
+				{
+				  "templates": {
+				    # Simple help with no headings ("flat")
+				    # data[1:] = [helpText]
+				    "default": [
+				      38,  # itemHeight
+				      [
+					MultiContentEntryText(pos=(0, 0), size=(503, 38), font=1, text=1),
+				      ]
+				    ],
+				    # Simple help with headings
+				    # data[1:] = [heading, None]  # For heading entries
+				    # data[1:] = [None, helpText]  # For help entries
+				    "default+headings": [  # data[1:] = [helpText]
+				      38,  # itemHeight
+				      [
+					MultiContentEntryText(pos=(0, 0), size=(503, 38), font=0, text=1),
+					MultiContentEntryText(pos=(20, 0), size=(483, 38), font=1, text=2),
+				      ]
+				    ],
+				    # Extended help with no headings
+				    # data[1:] = [helpText, extendedHelpText]
+				    "extended": [
+				      57,  # itemHeight
+				      [
+					MultiContentEntryText(pos=(0, 0), size=(503, 30), font=2, text=1),
+					MultiContentEntryText(pos=(0, 40), size=(503, 27), color=0x009e9fa4, font=3, text=2),
+				      ],
+				    ],
+				    # Extended help with headings
+				    # data[1:] = [heading, None, None]  # For heading entries
+				    # data[1:] = [None, helpText, extendedHelpText]  # For help entries
+				    "extended+headings": [
+				      57,  # itemHeight
+				      [
+					MultiContentEntryText(pos=(0, 9), size=(503, 32), font=0, text=1),
+					MultiContentEntryText(pos=(20, 0), size=(483, 30), font=2, text=2),
+					MultiContentEntryText(pos=(20, 30), size=(483, 27), color=0x009e9fa4, font=3, text=3),
+				      ],
+				    ],
+				  },
+				  "fonts": [gFont("Regular", 26), gFont("Regular", 24), gFont("Regular", 25), gFont("Regular", 21)],
+				  "itemHeight": 38
+				}
+			</convert>
+		</widget>
+		<panel name="RcPanel"/>
+		<widget name="longshift_key0" position="660,600" size="280,25" font="Regular;20" halign="right" foregroundColor="yellow" transparent="0"/>
+		<widget name="longshift_key1" position="660,625" size="280,25" font="Regular;20" halign="right" foregroundColor="yellow" transparent="0"/>
+	</screen>
+	<screen name="HelpMenuBeyonwiz" position="0,0" size="1280,720" flags="wfNoBorder">
+		<widget name="description" position="660,150" size="280,44" font="Regular;20" halign="center" valign="center" transparent="1"/>
+		<widget source="list" render="Listbox" position="60,150" size="503,456" transparent="0" scrollbarMode="showOnDemand">
+			<convert type="TemplatedMultiContent">
+				{
+				  "templates": {
+				    # Simple help with no headings ("flat")
+				    # data[1:] = [helpText]
+				    "default": [
+				      38,  # itemHeight
+				      [
+					MultiContentEntryText(pos=(0, 0), size=(503, 38), font=1, text=1),
+				      ]
+				    ],
+				    # Simple help with headings
+				    # data[1:] = [heading, None]  # For heading entries
+				    # data[1:] = [None, helpText]  # For help entries
+				    "default+headings": [  # data[1:] = [helpText]
+				      38,  # itemHeight
+				      [
+					MultiContentEntryText(pos=(0, 0), size=(503, 38), font=0, text=1),
+					MultiContentEntryText(pos=(20, 0), size=(483, 38), font=1, text=2),
+				      ]
+				    ],
+				    # Extended help with no headings
+				    # data[1:] = [helpText, extendedHelpText]
+				    "extended": [
+				      57,  # itemHeight
+				      [
+					MultiContentEntryText(pos=(0, 0), size=(503, 30), font=2, text=1),
+					MultiContentEntryText(pos=(0, 40), size=(503, 27), color=0x009e9fa4, font=3, text=2),
+				      ],
+				    ],
+				    # Extended help with headings
+				    # data[1:] = [heading, None, None]  # For heading entries
+				    # data[1:] = [None, helpText, extendedHelpText]  # For help entries
+				    "extended+headings": [
+				      57,  # itemHeight
+				      [
+					MultiContentEntryText(pos=(0, 9), size=(503, 32), font=0, text=1),
+					MultiContentEntryText(pos=(20, 0), size=(483, 30), font=2, text=2),
+					MultiContentEntryText(pos=(20, 30), size=(483, 27), color=0x009e9fa4, font=3, text=3),
+				      ],
+				    ],
+				  },
+				  "fonts": [gFont("Regular", 26), gFont("Regular", 24), gFont("Regular", 25), gFont("Regular", 21)],
+				  "itemHeight": 38
+				}
+			</convert>
+		</widget>
+		<panel name="RcPanel"/>
+		<widget name="longshift_key0" position="660,600" size="280,25" font="Regular;20" halign="right" foregroundColor="yellow" transparent="0"/>
+		<widget name="longshift_key1" position="660,625" size="280,25" font="Regular;20" halign="right" foregroundColor="yellow" transparent="0"/>
+	</screen>
+	<screen name="RcPanel" position="fill" flags="wfNoBorder">
+		<panel name="RcPanelOld" conditional="arrowdown"/>
+		<panel name="RcPanelNew" conditional="indicatorU0" />
+	</screen>
+	<screen name="RcPanelOld" position="fill" flags="wfNoBorder">
+		<widget name="rc" pixmaps="rc.png,rcold.png" position="950,140" zPosition="10" size="154,500" alphatest="blend" transparent="0"/>
+		<widget name="arrowdown" pixmap="arrowdown.png" position="-100,-100" zPosition="11" size="37,70" alphatest="blend"/>
+		<widget name="arrowdown2" pixmap="arrowdown.png" position="-100,-100" zPosition="11" size="37,70" alphatest="blend"/>
+		<widget name="arrowup" pixmap="arrowup.png" position="-100,-100" zPosition="11" size="37,70" alphatest="blend"/>
+		<widget name="arrowup2" pixmap="arrowup.png" position="-100,-100" zPosition="11" size="37,70" alphatest="blend"/>
+	</screen>
+	<screen name="RcPanelNew" position="fill" flags="wfNoBorder">
+		<widget name="rc" pixmaps="rc.png,rcold.png" position="950,140" zPosition="10" size="154,500" alphatest="blend" transparent="0" />
+		<widget alphatest="blend" name="indicatorU0" pixmap="skin_default/yellow_circle23x23.png" position="950,140" offset="11,11" size="23,23" zPosition="11"/>
+		<widget alphatest="blend" name="indicatorU1" pixmap="skin_default/yellow_circle23x23.png" position="950,140" offset="11,11" size="23,23" zPosition="11"/>
+		<widget alphatest="blend" name="indicatorU2" pixmap="skin_default/yellow_circle23x23.png" position="950,140" offset="11,11" size="23,23" zPosition="11"/>
+		<widget alphatest="blend" name="indicatorU3" pixmap="skin_default/yellow_circle23x23.png" position="950,140" offset="11,11" size="23,23" zPosition="11"/>
+		<widget alphatest="blend" name="indicatorU4" pixmap="skin_default/yellow_circle23x23.png" position="950,140" offset="11,11" size="23,23" zPosition="11"/>
+		<widget alphatest="blend" name="indicatorU5" pixmap="skin_default/yellow_circle23x23.png" position="950,140" offset="11,11" size="23,23" zPosition="11"/>
+		<widget alphatest="blend" name="indicatorU6" pixmap="skin_default/yellow_circle23x23.png" position="950,140" offset="11,11" size="23,23" zPosition="11"/>
+		<widget alphatest="blend" name="indicatorU7" pixmap="skin_default/yellow_circle23x23.png" position="950,140" offset="11,11" size="23,23" zPosition="11"/>
+		<widget alphatest="blend" name="indicatorU8" pixmap="skin_default/yellow_circle23x23.png" position="950,140" offset="11,11" size="23,23" zPosition="11"/>
+		<widget alphatest="blend" name="indicatorU9" pixmap="skin_default/yellow_circle23x23.png" position="950,140" offset="11,11" size="23,23" zPosition="11"/>
+		<widget alphatest="blend" name="indicatorU10" pixmap="skin_default/yellow_circle23x23.png" position="950,140" offset="11,11" size="23,23" zPosition="11"/>
+		<widget alphatest="blend" name="indicatorU11" pixmap="skin_default/yellow_circle23x23.png" position="950,140" offset="11,11" size="23,23" zPosition="11"/>
+		<widget alphatest="blend" name="indicatorU12" pixmap="skin_default/yellow_circle23x23.png" position="950,140" offset="11,11" size="23,23" zPosition="11"/>
+		<widget alphatest="blend" name="indicatorU13" pixmap="skin_default/yellow_circle23x23.png" position="950,140" offset="11,11" size="23,23" zPosition="11"/>
+		<widget alphatest="blend" name="indicatorU14" pixmap="skin_default/yellow_circle23x23.png" position="950,140" offset="11,11" size="23,23" zPosition="11"/>
+		<widget alphatest="blend" name="indicatorU15" pixmap="skin_default/yellow_circle23x23.png" position="950,140" offset="11,11" size="23,23" zPosition="11"/>
+		<widget alphatest="blend" name="indicatorL0" pixmap="skin_default/yellow_circle23x23.png" position="950,140" offset="11,11" size="23,23" zPosition="11"/>
+		<widget alphatest="blend" name="indicatorL1" pixmap="skin_default/yellow_circle23x23.png" position="950,140" offset="11,11" size="23,23" zPosition="11"/>
+		<widget alphatest="blend" name="indicatorL2" pixmap="skin_default/yellow_circle23x23.png" position="950,140" offset="11,11" size="23,23" zPosition="11"/>
+		<widget alphatest="blend" name="indicatorL3" pixmap="skin_default/yellow_circle23x23.png" position="950,140" offset="11,11" size="23,23" zPosition="11"/>
+		<widget alphatest="blend" name="indicatorL4" pixmap="skin_default/yellow_circle23x23.png" position="950,140" offset="11,11" size="23,23" zPosition="11"/>
+		<widget alphatest="blend" name="indicatorL5" pixmap="skin_default/yellow_circle23x23.png" position="950,140" offset="11,11" size="23,23" zPosition="11"/>
+		<widget alphatest="blend" name="indicatorL6" pixmap="skin_default/yellow_circle23x23.png" position="950,140" offset="11,11" size="23,23" zPosition="11"/>
+		<widget alphatest="blend" name="indicatorL7" pixmap="skin_default/yellow_circle23x23.png" position="950,140" offset="11,11" size="23,23" zPosition="11"/>
+		<widget alphatest="blend" name="indicatorL8" pixmap="skin_default/yellow_circle23x23.png" position="950,140" offset="11,11" size="23,23" zPosition="11"/>
+		<widget alphatest="blend" name="indicatorL9" pixmap="skin_default/yellow_circle23x23.png" position="950,140" offset="11,11" size="23,23" zPosition="11"/>
+		<widget alphatest="blend" name="indicatorL10" pixmap="skin_default/yellow_circle23x23.png" position="950,140" offset="11,11" size="23,23" zPosition="11"/>
+		<widget alphatest="blend" name="indicatorL11" pixmap="skin_default/yellow_circle23x23.png" position="950,140" offset="11,11" size="23,23" zPosition="11"/>
+		<widget alphatest="blend" name="indicatorL12" pixmap="skin_default/yellow_circle23x23.png" position="950,140" offset="11,11" size="23,23" zPosition="11"/>
+		<widget alphatest="blend" name="indicatorL13" pixmap="skin_default/yellow_circle23x23.png" position="950,140" offset="11,11" size="23,23" zPosition="11"/>
+		<widget alphatest="blend" name="indicatorL14" pixmap="skin_default/yellow_circle23x23.png" position="950,140" offset="11,11" size="23,23" zPosition="11"/>
+		<widget alphatest="blend" name="indicatorL15" pixmap="skin_default/yellow_circle23x23.png" position="950,140" offset="11,11" size="23,23" zPosition="11"/>
 	</screen>
 	<!-- Main infobar -->
 	<screen name="InfoBar" flags="wfNoBorder" position="0,380" size="720,160" title="Info bar" backgroundColor="transparent">

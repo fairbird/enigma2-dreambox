@@ -116,9 +116,10 @@ else:
 from Components.PluginComponent import plugins
 
 profile("LOAD:Wizard")
+config.misc.rcused = ConfigInteger(default=1)
 from Screens.Wizard import wizardManager
 from Screens.StartWizard import *
-import Screens.Rc
+#import Screens.Rc
 from Tools.BoundFunction import boundFunction
 from Plugins.Plugin import PluginDescriptor
 

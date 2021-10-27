@@ -1,19 +1,167 @@
-import re
+from hashlib import md5
+from os.path import exists as fileAccess, isdir, isfile, join as pathjoin
+from re import findall
 
 from enigma import Misc_Options, eDVBCIInterfaces, eDVBResourceManager, eGetEnigmaDebugLvl
-from Tools.Directories import SCOPE_PLUGINS, fileCheck, fileExists, fileHas, pathExists, resolveFilename
+from Tools.Directories import SCOPE_PLUGINS, SCOPE_LIBDIR, SCOPE_SKIN, fileCheck, fileReadLine, fileReadLines, resolveFilename, fileExists, fileHas, fileReadLine, pathExists
 from Tools.HardwareInfo import HardwareInfo
 
+MODULE_NAME = __name__.split(".")[-1]
 
 SystemInfo = {}
+
+class BoxInformation:  # To maintain data integrity class variables should not be accessed from outside of this class!
+	def __init__(self):
+		self.immutableList = []
+		self.procList = []
+		self.boxInfo = {}
+		self.enigmaList = []
+		self.enigmaInfo = {}
+		lines = fileReadLines(pathjoin(resolveFilename(SCOPE_LIBDIR), "enigma.info"), source=MODULE_NAME)
+		if lines:
+			modified = self.checkChecksum(lines)
+			if modified:
+				print("[SystemInfo] WARNING: Enigma information file checksum is incorrect!  File appears to have been modified.")
+				self.boxInfo["checksumerror"] = True
+			else:
+				print("[SystemInfo] Enigma information file checksum is correct.")
+				self.boxInfo["checksumerror"] = False
+			for line in lines:
+				if line.startswith("#") or line.strip() == "":
+					continue
+				if "=" in line:
+					item, value = [x.strip() for x in line.split("=", 1)]
+					if item:
+						self.immutableList.append(item)
+						self.procList.append(item)
+						self.boxInfo[item] = self.processValue(value)
+			self.procList = sorted(self.procList)
+			print("[SystemInfo] Enigma information file data loaded into BoxInfo.")
+		else:
+			print("[SystemInfo] ERROR: Enigma information file is not available!  The system is unlikely to boot or operate correctly.")
+		lines = fileReadLines(pathjoin(resolveFilename(SCOPE_LIBDIR), "enigma.conf"), source=MODULE_NAME)
+		if lines:
+			print("[SystemInfo] Enigma config override file available and data loaded into BoxInfo.")
+			self.boxInfo["overrideactive"] = True
+			for line in lines:
+				if line.startswith("#") or line.strip() == "":
+					continue
+				if "=" in line:
+					item, value = [x.strip() for x in line.split("=", 1)]
+					if item:
+						self.enigmaList.append(item)
+						self.enigmaInfo[item] = self.processValue(value)
+						if item in self.boxInfo:
+							print("[SystemInfo] Note: Enigma information value '%s' with value '%s' being overridden to '%s'." % (item, self.boxInfo[item], value))
+			self.enigmaList = sorted(self.enigmaList)
+		else:
+			self.boxInfo["overrideactive"] = False
+
+	def checkChecksum(self, lines):
+		value = "Undefined!"
+		data = []
+		for line in lines:
+			if line.startswith("checksum"):
+				item, value = [x.strip() for x in line.split("=", 1)]
+			else:
+				data.append(line)
+		data.append("")
+		result = md5(bytearray("\n".join(data), "UTF-8", errors="ignore")).hexdigest()
+		return value != result
+
+	def processValue(self, value):
+		valueTest = value.upper() if value else ""
+		if value is None:
+			pass
+		elif value.startswith("\"") or value.startswith("'") and value.endswith(value[0]):
+			value = value[1:-1]
+		elif value.startswith("(") and value.endswith(")"):
+			data = []
+			for item in [x.strip() for x in value[1:-1].split(",")]:
+				data.append(self.processValue(item))
+			value = tuple(data)
+		elif value.startswith("[") and value.endswith("]"):
+			data = []
+			for item in [x.strip() for x in value[1:-1].split(",")]:
+				data.append(self.processValue(item))
+			value = list(data)
+		elif valueTest == "NONE":
+			value = None
+		elif valueTest in ("FALSE", "NO", "OFF", "DISABLED"):
+			value = False
+		elif valueTest in ("TRUE", "YES", "ON", "ENABLED"):
+			value = True
+		elif value.isdigit() or (value[0:1] == "-" and value[1:].isdigit()):
+			value = int(value)
+		elif valueTest.startswith("0X"):
+			try:
+				value = int(value, 16)
+			except ValueError:
+				pass
+		elif valueTest.startswith("0O"):
+			try:
+				value = int(value, 8)
+			except ValueError:
+				pass
+		elif valueTest.startswith("0B"):
+			try:
+				value = int(value, 2)
+			except ValueError:
+				pass
+		else:
+			try:
+				value = float(value)
+			except ValueError:
+				pass
+		return value
+
+	def getProcList(self):
+		return self.procList
+
+	def getEnigmaList(self):
+		return self.enigmaList
+
+	def getItemsList(self):
+		return sorted(list(self.boxInfo.keys()))
+
+	def getItem(self, item, default=None):
+		if item in self.enigmaList:
+			value = self.enigmaInfo[item]
+		elif item in self.boxInfo:
+			value = self.boxInfo[item]
+		elif item in SystemInfo:
+			value = SystemInfo[item]
+		else:
+			value = default
+		return value
+
+	def setItem(self, item, value, immutable=False):
+		if item in self.immutableList or item in self.procList:
+			print("[BoxInfo] Error: Item '%s' is immutable and can not be %s!" % (item, "changed" if item in self.boxInfo else "added"))
+			return False
+		if immutable:
+			self.immutableList.append(item)
+		self.boxInfo[item] = value
+		SystemInfo[item] = value
+		return True
+
+	def deleteItem(self, item):
+		if item in self.immutableListor or item in self.procList:
+			print("[BoxInfo] Error: Item '%s' is immutable and can not be deleted!" % item)
+		elif item in self.boxInfo:
+			del self.boxInfo[item]
+			return True
+		return False
+
+
+BoxInfo = BoxInformation()
 
 from Tools.Multiboot import getMultibootStartupDevice, getMultibootslots  # This import needs to be here to avoid a SystemInfo load loop!
 
 # Parse the boot commandline.
 #
-with open("/proc/cmdline", "r") as fd:
-	cmdline = fd.read()
-cmdline = {k: v.strip('"') for k, v in re.findall(r'(\S+)=(".*?"|\S+)', cmdline)}
+cmdline = fileReadLine("/proc/cmdline", source=MODULE_NAME)
+cmdline = {k: v.strip('"') for k, v in findall(r'(\S+)=(".*?"|\S+)', cmdline)}
 
 
 def getNumVideoDecoders():
@@ -41,8 +189,17 @@ def getBootdevice():
 		dev = dev[:-1]
 	return dev
 
+def getRCFile(ext):
+	filename = resolveFilename(SCOPE_SKIN, pathjoin("rc_models", "%s.%s" % (BoxInfo.getItem("rcname"), ext)))
+	if not isfile(filename):
+		filename = resolveFilename(SCOPE_SKIN, pathjoin("rc_models", "dmm.%s" % ext))
+	return filename
+
 
 model = HardwareInfo().get_device_model()
+
+BoxInfo.setItem("RCImage", getRCFile("png"))
+BoxInfo.setItem("RCMapping", getRCFile("xml"))
 SystemInfo["InDebugMode"] = eGetEnigmaDebugLvl() >= 4
 SystemInfo["CommonInterface"] = eDVBCIInterfaces.getInstance().getNumOfSlots()
 SystemInfo["CommonInterfaceCIDelay"] = fileCheck("/proc/stb/tsmux/rmx_delay")
