@@ -10,7 +10,7 @@ from enigma import eTimer
 import enigma
 
 
-class NetworkWizard(WizardLanguage, ShowRemoteControl):
+class NetworkWizard(WizardLanguage, Rc):
 	skin = """
 		<screen position="0,0" size="720,576" title="Welcome..." flags="wfNoBorder" >
 			<widget name="text" position="153,40" size="340,300" font="Regular;22" />
@@ -35,7 +35,7 @@ class NetworkWizard(WizardLanguage, ShowRemoteControl):
 	def __init__(self, session, interface=None):
 		self.xmlfile = resolveFilename(SCOPE_PLUGINS, "SystemPlugins/NetworkWizard/networkwizard.xml")
 		WizardLanguage.__init__(self, session, showSteps=False, showStepSlider=False)
-		ShowRemoteControl.__init__(self)
+		Rc.__init__(self)
 		self.session = session
 		self["wizard"] = Pixmap()
 		self["HelpWindow"] = Pixmap()
