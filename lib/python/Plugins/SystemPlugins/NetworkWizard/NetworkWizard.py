@@ -1,5 +1,5 @@
 from Screens.WizardLanguage import WizardLanguage
-from Screens.Rc import Rc
+from Screens.HelpMenu import Rc
 from Screens.MessageBox import MessageBox
 from Components.Pixmap import Pixmap
 from Components.Sources.Boolean import Boolean
@@ -10,7 +10,7 @@ from enigma import eTimer
 import enigma
 
 
-class NetworkWizard(WizardLanguage, Rc):
+class NetworkWizard(WizardLanguage, ShowRemoteControl):
 	skin = """
 		<screen position="0,0" size="720,576" title="Welcome..." flags="wfNoBorder" >
 			<widget name="text" position="153,40" size="340,300" font="Regular;22" />
@@ -35,7 +35,7 @@ class NetworkWizard(WizardLanguage, Rc):
 	def __init__(self, session, interface=None):
 		self.xmlfile = resolveFilename(SCOPE_PLUGINS, "SystemPlugins/NetworkWizard/networkwizard.xml")
 		WizardLanguage.__init__(self, session, showSteps=False, showStepSlider=False)
-		Rc.__init__(self)
+		ShowRemoteControl.__init__(self)
 		self.session = session
 		self["wizard"] = Pixmap()
 		self["HelpWindow"] = Pixmap()
