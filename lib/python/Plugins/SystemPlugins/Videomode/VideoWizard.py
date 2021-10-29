@@ -1,6 +1,6 @@
 from Screens.Wizard import WizardSummary
 from Screens.WizardLanguage import WizardLanguage
-from Screens.Rc import Rc
+from Screens.HelpMenu import Rc
 from Plugins.SystemPlugins.Videomode.VideoHardware import video_hw
 
 from Components.Pixmap import Pixmap
