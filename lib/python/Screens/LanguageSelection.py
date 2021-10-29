@@ -6,7 +6,7 @@ from Components.Sources.List import List
 from Components.Label import Label
 from Components.Pixmap import Pixmap
 from Screens.InfoBar import InfoBar
-from Screens.Rc import Rc
+from Screens.HelpMenu import Rc
 from Screens.MessageBox import MessageBox
 from Screens.Standby import TryQuitMainloop
 from Tools.Directories import resolveFilename, SCOPE_CURRENT_SKIN

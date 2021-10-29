@@ -1,5 +1,5 @@
 from Screens.WizardLanguage import WizardLanguage
-from Screens.Rc import Rc
+from Screens.HelpMenu import Rc
 from Screens.MessageBox import MessageBox
 from Components.Pixmap import Pixmap
 from Components.Sources.Boolean import Boolean
