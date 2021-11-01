@@ -9,12 +9,11 @@ from re import compile
 from stat import S_IMODE
 from xml.etree.cElementTree import Element, ParseError, fromstring, parse
 
-pathExists = exists
-isMount = ismount  # Only used in OpenATV /lib/python/Plugins/SystemPlugins/NFIFlash/downloader.py.
+DEFAULT_MODULE_NAME = __name__.split(".")[-1]
 
 forceDebug = eGetEnigmaDebugLvl() > 4
-
-DEFAULT_MODULE_NAME = __name__.split(".")[-1]
+pathExists = exists
+isMount = os.path.ismount  # Only used in OpenATV /lib/python/Plugins/SystemPlugins/NFIFlash/downloader.py.
 
 SCOPE_TRANSPONDERDATA = 0
 SCOPE_SYSETC = 1
