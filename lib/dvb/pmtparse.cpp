@@ -123,7 +123,7 @@ int eDVBPMTParser::getProgramInfo(program &program)
 						isvideo = 1;
 					}
 					[[fallthrough]];
-				case 0xD2: // CAVS2
+				case 0xD2: // AVS2
 					if (!isvideo)
 					{
 						video.type = videoStream::vtAVS2;
