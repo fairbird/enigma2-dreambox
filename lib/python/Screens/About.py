@@ -65,6 +65,8 @@ class About(Screen):
 		else:
 			AboutText += GStreamerVersion + "\n"
 
+		AboutText += _("OpenSSL version: ") + about.getOpenSSLVersion() + "\n"
+
 		AboutText += _("Python version: ") + about.getPythonVersionString() + "\n"
 
 		AboutText += _("Enigma (re)starts: %d\n") % config.misc.startCounter.value
