@@ -7,7 +7,6 @@ DISPLAYTYPE = display
 endif
 
 dist_install_DATA = skin_display.xml progress_oled.png lcd_video_900uhd.png
-datainstalldir = $(pkgdatadir)/display
 
 # Use box-specific XML if it exists, otherwise get the default
 # TEXTSKIN is either "default" or "7segment"
