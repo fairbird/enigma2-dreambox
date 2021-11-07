@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: enigma2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-15 22:30+0300\n"
+"POT-Creation-Date: 2021-11-07 10:36+0100\n"
 "PO-Revision-Date: 2021-09-18 15:17+0300\n"
 "Last-Translator: RAED - Fairbirb <rrrr53@hotmail.com>\n"
 "Language-Team: \n"
@@ -12,6 +12,12 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 3.0\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#, fuzzy
+msgid ""
+"\n"
+" Do you want to switch to Android ?"
+msgstr "هل تريد الإنتقال إلى نظام الاندرويد ؟"
 
 msgid ""
 "\n"
@@ -4094,6 +4100,10 @@ msgstr "ضبط تكوين التحكم بكيبل عالي الوضوح"
 msgid "HDMI-CEC Source Inactive"
 msgstr "المصدر غير نشط لكيبل عالي الوضوح"
 
+#, fuzzy
+msgid "HDMI-CEC address"
+msgstr "عنوان الأيبي"
+
 msgid "HDMI-CEC setup"
 msgstr "ضبط تكوين التحكم بكيبل عالي الوضوح"
 
@@ -6471,6 +6481,9 @@ msgstr ".اضغط أو حدد الزر ثم اضغط على 'موافق' لوظ�
 msgid "Press or select button and then press 'OK' for attach next function or edit attached."
 msgstr ".اضغط أو حدد الزر ثم اضغط على 'موافق' لإرفاق الوظيفة التالية أو التعديل المرفق"
 
+msgid "Press yellow button to set CEC address again"
+msgstr "مرة اخرى CEC أضغط الزر الأصفر لوضع عنوان"
+
 msgid "Press yellow to set this interface as default interface."
 msgstr "أضغط الزر الأصفر لتجعل هذه الواجهه هى الواجهة الإفتراضية."
 
@@ -8578,6 +8591,10 @@ msgstr "خطوه ناحية الغرب"
 msgid "Stepped east"
 msgstr "خطوه ناحية الشرق"
 
+#, fuzzy
+msgid "Steps"
+msgstr "خطوات"
+
 msgid "Stepped west"
 msgstr "خطوه ناحية الغرب"
 
@@ -8828,6 +8845,10 @@ msgstr "قم بتشغيل العرض أثناء وضع الإيقاف المرح
 #, fuzzy
 msgid "Switch on the display during operation."
 msgstr "قم بتشغيل العرض أثناء التشغيل."
+
+#, fuzzy
+msgid "Switch to Android"
+msgstr "التبديل إلى وضع الاندرويد"
 
 msgid "Switch to TV mode"
 msgstr "التبديل إلى وضع التلفزيون"
@@ -10239,6 +10260,9 @@ msgstr ":نص لوحة المفاتيح الافتراضية"
 msgid "Virtual keyboard"
 msgstr "لوحة مفاتيح الحروف بالترتيب"
 
+msgid "Visually impaired commentary"
+msgstr "تعليق ضعاف البصر"
+
 msgid "Voltage mode"
 msgstr "وضع الفولت"
 
@@ -11610,6 +11634,10 @@ msgstr "غير مغلقه"
 #, fuzzy
 msgid "not running"
 msgstr "لا يعمل"
+
+#, fuzzy
+msgid "not set"
+msgstr "غير مضبوط"
 
 msgid "not supported"
 msgstr "غير معتمد"
