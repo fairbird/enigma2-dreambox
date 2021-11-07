@@ -13,3 +13,5 @@ dist_install_DATA = skin_display.xml
 # TODO: Missing dependency on optional "skin_$(DISPLAYTYPE)_$(BOXTYPE).xml"
 skin_display.xml:
 	cp $(srcdir)/skin_$(DISPLAYTYPE)_$(BOXTYPE).xml $@ 2>/dev/null || cp $(srcdir)/skin_$(DISPLAYTYPE)_$(TEXTSKIN).xml $@
+	cp $(srcdir)/progress_oled.png $@
+	cp $(srcdir)/lcd_video_900uhd.png $@ 
