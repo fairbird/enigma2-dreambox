@@ -13,6 +13,4 @@ datainstalldir = $(pkgdatadir)/display
 # TEXTSKIN is either "default" or "7segment"
 # TODO: Missing dependency on optional "skin_$(DISPLAYTYPE)_$(BOXTYPE).xml"
 skin_display.xml:
-	cp $(srcdir)/skin_$(DISPLAYTYPE)_$(BOXTYPE).xml $@ 2>/dev/null || cp $(srcdir)/skin_$(DISPLAYTYPE)_$(TEXTSKIN).xml $@
-
-dist_datainstall_DATA = *.png
+	cp $(srcdir)/skin_$(DISPLAYTYPE)_$(BOXTYPE).xml $@ 2>/dev/null || cp $(srcdir)/skin_$(DISPLAYTYPE)_$(TEXTSKIN).xml $@ && cp $(srcdir)/*.png
