@@ -13,6 +13,9 @@ from boxbranding import getDisplayType
 
 displaytype = getDisplayType()
 
+originalAudioTracks = "orj dos ory org esl qaa und mis mul ORY ORJ Audio_ORJ oth"
+visuallyImpairedCommentary = "NAR qad"
+
 
 def InitUsageConfig():
 	config.usage = ConfigSubsection()
@@ -1225,7 +1228,7 @@ def InitUsageConfig():
 	config.autolanguage = ConfigSubsection()
 	audio_language_choices = [
 		("", _("None")),
-		("orj dos ory org esl qaa und mis mul ORY ORJ Audio_ORJ oth", _("Original")),
+		(originalAudioTracks, _("Original")),
 		("ara", _("Arabic")),
 		("eus baq", _("Basque")),
 		("bul", _("Bulgarian")),
@@ -1262,7 +1265,7 @@ def InitUsageConfig():
 		("tha", _("Thai")),
 		("tur Audio_TUR", _("Turkish")),
 		("ukr Ukr", _("Ukrainian")),
-		("NAR qad", _("Visual impaired commentary"))]
+		(visuallyImpairedCommentary, _("Audio description for the visually impaired"))]
 
 	epg_language_choices = audio_language_choices[:1] + audio_language_choices[2:]
 
