@@ -1228,6 +1228,9 @@ msgstr "Audio PID, kodek & jazyk"
 msgid "Audio auto volume level"
 msgstr "Automatická úroveň hlasitosti"
 
+msgid "Audio description for the visually impaired"
+msgstr "Zvukový popis pro zrakově postižené"
+
 #
 msgid "Audio language selection 1"
 msgstr "Volba jazyka zvuku 1"
@@ -11532,9 +11535,6 @@ msgstr "Virtuální klávesnice"
 
 msgid "Visually impaired commentary"
 msgstr "komentář pro zrakově postižené"
-
-msgid "Visually impaired commentary"
-msgstr "Komentář pro zrakově postižené"
 
 #
 msgid "Voltage mode"
