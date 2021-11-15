@@ -1273,7 +1273,6 @@ void eDVBCISlot::data(int what)
 	if(state != stateInserted) {
 		eDebug("[CI] ci inserted in slot %d", getSlotID());
 		state = stateInserted;
-		determineCIVersion();
 		/* emit */ eDVBCI_UI::getInstance()->m_messagepump.send(eDVBCIInterfaces::Message(eDVBCIInterfaces::Message::slotStateChanged, getSlotID(), 1));
 		notifier->setRequested(eSocketNotifier::Read|eSocketNotifier::Priority);
 		/* enable PRI to detect removal or errors */
