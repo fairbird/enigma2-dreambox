@@ -264,10 +264,13 @@ class NameserverSetup(Screen, ConfigListScreen, HelpableScreen):
 		self.DNSEntry = getConfigListEntry(_("Nameserver configuration"), config.usage.dns)
 		self.list.append(self.DNSEntry)
 
-		i = 1
-		for x in self.nameserverEntries:
-			self.list.append(getConfigListEntry(_("Nameserver %d") % (i), x))
-			i += 1
+		try:
+			i = 1
+			for x in self.nameserverEntries:
+				self.list.append(getConfigListEntry(_("Nameserver %d") % (i), x))
+				i += 1
+		except:
+			pass
 
 		self["config"].list = self.list
 		self["config"].l.setList(self.list)
