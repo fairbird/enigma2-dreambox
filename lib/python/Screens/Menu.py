@@ -18,6 +18,7 @@ from Tools.LoadPixmap import LoadPixmap
 from Components.Pixmap import Pixmap
 from enigma import eTimer
 from skin import findSkinScreen
+from os.path import exists
 
 import xml.etree.ElementTree
 
@@ -30,12 +31,16 @@ file.close()
 
 lastMenuID = None
 
+nomainmenupath = False if exists(resolveFilename(SCOPE_CURRENT_SKIN, "mainmenu")) else True
+
 def default_skin():
 	for line in open("/etc/enigma2/settings"):
 		if not "config.skin.primary_skin" in line:
 			return default_skin
 
 def MenuEntryPixmap(entryID, png_cache, lastMenuID):
+	if nomainmenupath:
+		return None
 	png = png_cache.get(entryID, None)
 	if png is None:
 		pngPath = resolveFilename(SCOPE_CURRENT_SKIN, "mainmenu/" + entryID + ".png")
