@@ -12,4 +12,4 @@ install_PYTHON = \
 	ExtendedServiceInfo.py ExtremeInfo.py HbbtvApplicationInfo.py LayoutInfo.py MovieBarInfo.py MovieReference.py \
 	ProgressDiskSpaceInfo.py RefString.py RouteInfo.py ServiceInfo2.py ServiceInfoEX.py ServiceName2.py \
 	TextAddAfter.py TextAddBefore.py Textreplace.py TextToUpper.py VAudioInfo.py VExtraNumText.py \
-	VNetSpeedInfo.py VtiTempFan.py VWeather.py YWeather.py
+	VNetSpeedInfo.py VtiTempFan.py VWeather.py YWeather.py HddState.py
