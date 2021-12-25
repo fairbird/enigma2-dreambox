@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: enigma2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-12-08 15:28+0100\n"
+"POT-Creation-Date: 2021-12-22 15:03+0100\n"
 "PO-Revision-Date: 2021-03-11 01:18+0200\n"
 "Last-Translator: \n"
 "Language-Team: kvinto\n"
@@ -1079,7 +1079,7 @@ msgid "Audio auto volume level"
 msgstr "Рівень для автоматичної гучності звуку"
 
 msgid "Audio description for the visually impaired"
-msgstr ""
+msgstr "Аудіо опис для людей з вадами зору"
 
 msgid "Audio language selection 1"
 msgstr "Вибір мови Аудіо 1"
@@ -1704,10 +1704,10 @@ msgid "Choose bouquet"
 msgstr "Виберіть фаворитний список"
 
 msgid "Choose whether to scan a single transponder, one satellite or multiple satellites."
-msgstr ""
+msgstr "Виберіть, чи потрібно сканувати один транспондер, один супутник чи декілька супутників."
 
 msgid "Choose whether to scan for free services only or whether to include paid/encrypted services too."
-msgstr ""
+msgstr "Виберіть, чи потрібно сканувати лише відкриті канали, чи включати також платні/кодовані канали."
 
 msgid "Choose which tuner to configure."
 msgstr "Виберіть тюнер для налаштування."
@@ -2720,6 +2720,10 @@ msgstr "Вимкнуто"
 msgid "Disk space to reserve for recordings (in GB)"
 msgstr "Зарезервувати дисковий простір для записів (у ГБ)"
 
+#, fuzzy
+msgid "Disk state: "
+msgstr "стан пошуку"
+
 msgid "Display 16:9 content as"
 msgstr "Показувати 16:9 контент як"
 
@@ -3539,13 +3543,6 @@ msgid ""
 msgstr ""
 "FBC автоматичний\n"
 "неактивний"
-
-#, python-format
-msgid "FBC socket %s"
-msgstr "FBC роз’єм %s"
-
-msgid "FBC virtual"
-msgstr "Віртуальний FBC"
 
 msgid "FEC"
 msgstr "ФЕК"
@@ -6705,7 +6702,7 @@ msgid "Remove terrestrial services"
 msgstr "Видалити наземні канали"
 
 msgid "Remove the services on scanned transponders before re-adding services?"
-msgstr ""
+msgstr "Видалити існуючі канали перед повторним скануванням транспондерів?"
 
 msgid "Remove this logfile"
 msgstr "Видалити даний файл логу"
@@ -7136,7 +7133,7 @@ msgid "Scan state"
 msgstr "Стан пошуку"
 
 msgid "Scan using transponders on NIT table? 'No' will use transponders in xml file."
-msgstr ""
+msgstr "Сканувати за допомогою транспондерів по сітці NIT? 'Ні' використовуватиме транспондери з xml файла."
 
 msgid "Scan wireless networks"
 msgstr "Пошук Wі-Fі мереж"
@@ -8151,6 +8148,14 @@ msgstr "Інтервал слайд-шоу (сек.)"
 msgid "Slot %d"
 msgstr "Слот %d"
 
+#, python-format
+msgid "Slot %s / FBC in %s"
+msgstr ""
+
+#, fuzzy, python-format
+msgid "Slot %s / FBC virtual %s"
+msgstr "Віртуальний FBC"
+
 msgid "Slovak"
 msgstr "Словацька"
 
@@ -8356,7 +8361,8 @@ msgstr "Шрі Ланка"
 msgid "Standard"
 msgstr "Стандарт"
 
-msgid "Standart list"
+#, fuzzy
+msgid "Standard list"
 msgstr "Стандартний список"
 
 msgid "Standby"
@@ -8764,7 +8770,7 @@ msgstr "ТЕКСТ"
 #. TRANSLATORS: Add here whatever should be shown in the "translator" about screen, up to 6 lines (use \n for newline)
 msgid "TRANSLATOR_INFO"
 msgstr ""
-"Переклад:  kvinto - 11.12.2021\n"
+"Переклад:  kvinto - 14.12.2021\n"
 "Сторінка:    https://gisclub.tv\n"
 "                  kvinto@rambler.ru"
 
@@ -10836,6 +10842,10 @@ msgstr "активувати налаштування мережевого ад�
 msgid "active"
 msgstr "активний"
 
+#, fuzzy
+msgid "active "
+msgstr "активний"
+
 msgid "actual time only"
 msgstr "лише фактичний час"
 
@@ -11662,6 +11672,10 @@ msgstr "спортивний журнал"
 
 msgid "standard"
 msgstr "стандартний"
+
+#, fuzzy
+msgid "standby "
+msgstr "Режим очікування"
 
 msgid "start cut here"
 msgstr "початок вирізання тут"
