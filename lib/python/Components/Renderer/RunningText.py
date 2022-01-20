@@ -1,8 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-from enigma import eWidget, eLabel, eTimer, ePoint, eSize, gFont, RT_HALIGN_LEFT, RT_HALIGN_CENTER, RT_HALIGN_RIGHT, RT_HALIGN_BLOCK, RT_VALIGN_TOP, RT_VALIGN_CENTER, RT_VALIGN_BOTTOM, RT_WRAP
 from Components.Renderer.Renderer import Renderer
 from skin import parseColor, parseFont
+from enigma import eWidget, eLabel, eTimer, ePoint, eSize, gFont, RT_HALIGN_LEFT, RT_HALIGN_CENTER, RT_HALIGN_RIGHT, RT_HALIGN_BLOCK, RT_VALIGN_TOP, RT_VALIGN_CENTER, RT_VALIGN_BOTTOM, RT_WRAP, eCanvas, eRect, gRGB
 
 
 # scroll type:
@@ -202,8 +202,8 @@ class RunningText(Renderer):
 
 	def calcMoving(self):
 		self.X = self.Y = 0
-		if not (self.txtflags & RT_WRAP):
-			self.txtext = self.txtext.replace("\xe0\x8a", " ").replace(chr(0x8A), " ").replace("\n", " ").replace("\r", " ")
+		#if not (self.txtflags & RT_WRAP): ## This option if enable break Arabic language
+		#	self.txtext = self.txtext.replace("\xe0\x8a", " ").replace(chr(0x8A), " ").replace("\n", " ").replace("\r", " ")
 
 		self.scroll_label.setText(self.txtext)
 
