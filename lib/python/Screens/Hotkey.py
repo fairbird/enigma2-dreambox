@@ -11,10 +11,18 @@ from Plugins.Plugin import PluginDescriptor
 from Tools.BoundFunction import boundFunction
 from Tools.Directories import resolveFilename, SCOPE_PLUGINS
 from ServiceReference import ServiceReference
-from enigma import eServiceReference
+from enigma import eServiceReference, getDesktop
 from Components.Pixmap import Pixmap
 from Components.Label import Label
 import os
+
+def getDesktopSize():
+	s = getDesktop(0).size()
+	return (s.width(), s.height())
+
+def isHD():
+	desktopSize = getDesktopSize()
+	return desktopSize[0] == 1280
 
 
 class hotkey:
@@ -258,6 +266,30 @@ for x in hotkey.hotkeys:
 
 class HotkeySetup(Screen):
 	ALLOW_SUSPEND = False
+	if isHD():
+		skin = '''
+			<screen name="HotkeySetup" position="center,center" size="560,437" title="Input">
+				<ePixmap pixmap="buttons/red.png" position="0,0" size="140,40" alphatest="on" zPosition="1"/>
+				<widget name="key_red" position="0,0" zPosition="2" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#9f1313" transparent="1"/>
+				<widget name="list" position="0,45" size="280,350" scrollbarMode="showOnDemand"/>
+				<widget name="choosen" position="280,45" size="280,350" scrollbarMode="showOnDemand"/>
+				<widget name="description" position="5,405" size="550,32" zPosition="1" font="Regular;16" valign="bottom"/>
+			</screen>
+		'''
+	else:
+		skin = '''
+			<screen name="HotkeySetup" position="center,center" size="800,870" title="Input">
+				<ePixmap pixmap="buttons/red.png" position="0,0" size="200,40" alphatest="on" zPosition="1" />				
+				<widget objectTypes="key_red,StaticText" source="key_red" render="Pixmap" pixmap="buttons/red.png" position="0,0" size="200,40" zPosition="1" alphatest="blend">
+					<convert type="ConditionalShowHide"/>
+				</widget>
+				<widget objectTypes="key_red,Label,Button" name="key_red" position="0,0" size="200,40" backgroundColor="#9f1313" zPosition="1" transparent="1" font="Regular;34" halign="left"/>
+				<widget objectTypes="key_red,StaticText" source="key_red" render="Label" position="0,0" size="200,40" backgroundColor="#9f1313" zPosition="2" transparent="1" font="Regular;28" halign="left"/>
+				<widget name="list" font="Regular;28" itemHeight="40" position="0,70" size="370,733" scrollbarMode="showOnDemand"/>
+				<widget name="choosen" font="Regular;28" itemHeight="40" position="375,70" size="420,733" scrollbarMode="showOnDemand"/>
+				<widget name="description" position="5,805" size="793,65" zPosition="1" font="Regular;25" valign="bottom"/>
+			</screen>
+		'''
 
 	def __init__(self, session, args=None):
 		Screen.__init__(self, session)
@@ -352,6 +384,50 @@ class HotkeySetup(Screen):
 
 
 class HotkeySetupSelect(Screen):
+	if isHD():
+		skin = '''
+			<screen name="HotkeySetupSelect" position="center,center" size="560,437" title="Input">
+				<ePixmap pixmap="buttons/red.png" position="0,0" size="140,40" alphatest="on"/>
+				<ePixmap pixmap="buttons/green.png" position="140,0" size="140,40" alphatest="on"/>
+				<widget name="h_yellow" pixmap="buttons/yellow.png" position="280,0" size="140,40" alphatest="on"/>
+				<widget name="key_red" position="0,0" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#9f1313" transparent="1"/>
+				<widget name="key_green" position="140,0" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#1f771f" transparent="1"/>
+				<widget name="key_yellow" position="280,0" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#1f771f" transparent="1"/>
+				<widget name="h_prev" pixmap="buttons/key_prev.png" zPosition="1" alphatest="blend" position="430,8" size="35,25"/>
+				<widget name="h_next" pixmap="buttons/key_next.png" zPosition="1" alphatest="blend" position="460,8" size="35,25"/>
+				<widget name="list" position="0,45" size="280,350" scrollbarMode="showOnDemand"/>
+				<widget name="choosen" position="280,45" size="280,350" scrollbarMode="showOnDemand"/>
+				<widget name="description" position="5,405" size="550,32" zPosition="1" font="Regular;16" valign="bottom"/>
+			</screen>
+		'''
+	else:
+		skin = '''
+			<screen name="HotkeySetupSelect" position="center,center" size="800,870" title="Input">
+				<ePixmap pixmap="buttons/red.png" position="0,0" size="200,40" alphatest="on" zPosition="1" />				
+				<widget objectTypes="key_red,StaticText" source="key_red" render="Pixmap" pixmap="buttons/red.png" position="0,0" size="200,40" zPosition="1" alphatest="blend">
+					<convert type="ConditionalShowHide"/>
+				</widget>
+				<widget objectTypes="key_red,Label,Button" name="key_red" position="0,0" size="200,40" backgroundColor="#9f1313" zPosition="1" transparent="1" font="Regular;34" halign="left"/>
+				<widget objectTypes="key_red,StaticText" source="key_red" render="Label" position="0,0" size="200,40" backgroundColor="#9f1313" zPosition="2" transparent="1" font="Regular;28" halign="left"/>
+				<ePixmap pixmap="buttons/green.png" position="200,0" size="200,40" alphatest="on"/>
+				<widget objectTypes="key_green,StaticText" source="key_green" render="Pixmap" pixmap="buttons/green.png" position="200,0" size="200,40" zPosition="1" alphatest="blend">
+					<convert type="ConditionalShowHide"/>
+				</widget>
+				<widget objectTypes="key_green,Label,Button" name="key_green" position="200,0" size="200,40" backgroundColor="#9f1313" zPosition="1" transparent="1" font="Regular;34" halign="left"/>
+				<widget objectTypes="key_green,StaticText" source="key_green" render="Label" position="200,0" size="200,40" backgroundColor="#9f1313" zPosition="2" transparent="1" font="Regular;28" halign="left"/>
+				<widget objectTypes="key_yellow,StaticText" source="key_yellow" render="Pixmap" pixmap="buttons/yellow.png" position="400,0" size="200,40" zPosition="1" alphatest="blend">
+					<convert type="ConditionalShowHide"/>
+				</widget>
+				<widget objectTypes="key_yellow,Label,Button" name="key_yellow" position="400,0" size="200,40" backgroundColor="#9f1313" zPosition="1" transparent="1" font="Regular;34" halign="left"/>
+				<widget objectTypes="key_yellow,StaticText" source="key_yellow" render="Label" position="400,0" size="200,40" backgroundColor="#9f1313" zPosition="2" transparent="1" font="Regular;28" halign="left"/>
+				<widget name="h_prev" pixmap="buttons/key_prev.png" zPosition="1" alphatest="blend" position="710,8" size="35,25"/>
+				<widget name="h_next" pixmap="buttons/key_next.png" zPosition="1" alphatest="blend" position="750,8" size="35,25"/>
+				<widget name="list" font="Regular;28" itemHeight="40" position="0,70" size="370,733" scrollbarMode="showOnDemand"/>
+				<widget name="choosen" font="Regular;28" itemHeight="40" position="375,70" size="420,733" scrollbarMode="showOnDemand"/>
+				<widget name="description" position="5,805" size="793,65" zPosition="1" font="Regular;25" valign="bottom"/>
+			</screen>
+		'''
+
 	def __init__(self, session, key, args=None):
 		Screen.__init__(self, session)
 		self.key = key
