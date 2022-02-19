@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: enigma2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-15 22:30+0300\n"
+"POT-Creation-Date: 2022-02-07 15:38+0100\n"
 "PO-Revision-Date: 2021-11-26 14:55+0300\n"
 "Last-Translator: RAED - Fairbirb <rrrr53@hotmail.com>\n"
 "Language-Team: \n"
@@ -965,8 +965,8 @@ msgstr "أرمينيا"
 msgid "Artist"
 msgstr "الفنان"
 
-msgid "Arts/Culture"
-msgstr "الفنون/الثقافة"
+msgid "Arts/Culture (without music)"
+msgstr "الفنون/الثقافة (بدون موسيقي ، عام)"
 
 msgid "Aruba"
 msgstr "أروبا"
@@ -1389,6 +1389,10 @@ msgstr "كيبل"
 msgid "Cable Scan"
 msgstr "بحث عن قنوات الكيبل"
 
+#, python-format
+msgid "Cable scan executable utility not found '%s'!"
+msgstr "! '%s' لم يتم العثور على الأداة المساعدة القابلة للتنفيذ لفحص الكبل"
+
 msgid "Cabo Verde"
 msgstr "كابو فيردي"
 
@@ -1618,8 +1622,8 @@ msgid "Checking tuner %s\n"
 msgstr "التحقق من المؤالف %s\n"
 "منفذ الدايزك %s إلى %s"
 
-msgid "Children/Youth"
-msgstr "الأطفال/الشباب"
+msgid "Children/Youth/Education/Science"
+msgstr "التعليم/العلوم/الوقائع"
 
 msgid "Chile"
 msgstr "تشيلي"
@@ -2859,6 +2863,9 @@ msgstr "تحميل الإضافة"
 msgid "Downloadable plugins"
 msgstr "تحميل الإضافة"
 
+msgid "Downloaded Images"
+msgstr "جاري التحميل"
+
 msgid "Downloading"
 msgstr "جاري التحميل"
 
@@ -2867,6 +2874,9 @@ msgstr "جاري التحميل"
 
 msgid "Downloading plugin information. Please wait..."
 msgstr "جاري تحميل معلومات عن الإضافة. رجاء الانتظار.."
+
+msgid "Drama and Films"
+msgstr "دراما و أفلام"
 
 msgid "Drop unconfigured satellites"
 msgstr "الأقمار الصناعية المتصلة"
@@ -2959,9 +2969,6 @@ msgstr "تعديل العنوان"
 
 msgid "Edit update source url"
 msgstr "تحرير عنوان مصدر الترقيه."
-
-msgid "Education/Science/..."
-msgstr "التعليم/العلوم/الوقائع"
 
 msgid "Egypt"
 msgstr "مصر"
@@ -3709,6 +3716,9 @@ msgstr "شفافية كاملة"
 
 msgid "Full view resolution"
 msgstr "جميع أنواع الدقة"
+
+msgid "Fullbackup Images"
+msgstr "ضبط مؤالف التراجع"
 
 msgid "Function of OK button"
 msgstr "وظيفة زر موافق"
@@ -4578,9 +4588,6 @@ msgstr "يسار"
 msgid "Left from servicename"
 msgstr "أسم القناة في اليسار"
 
-msgid "Leisure hobbies"
-msgstr "هوايات الترفيه"
-
 msgid "Lesotho"
 msgstr "ليسوتو"
 
@@ -5050,9 +5057,6 @@ msgstr "مكان الفيلم"
 msgid "Movie selection"
 msgstr "أختيار الأفلام"
 
-msgid "Movie/Drama"
-msgstr "فيلم/دراما"
-
 msgid "Movielist menu"
 msgstr "ضبط قائمة الأفلام"
 
@@ -5229,8 +5233,8 @@ msgstr "كاليدونيا الجديدة"
 msgid "New Zealand"
 msgstr "نيوزلندا"
 
-msgid "News Current Affairs"
-msgstr "الاخبار/الشئون الحالية"
+msgid "News/Current Affairs/Social"
+msgstr "الأخبار/الشؤون الجارية/الاجتماعية"
 
 msgctxt "button label, 'next screen'"
 msgid "Next"
@@ -7653,9 +7657,6 @@ msgstr "عرض دليل البرامج الإلكتروني للقناة الح�
 msgid "Show EPG..."
 msgstr "عرض دليل البرامج الإلكترونية..."
 
-msgid "Show Games show"
-msgstr "عرض/الألعاب عرض"
-
 msgid "Show InfoBar"
 msgstr "عرض المعلومات"
 
@@ -7884,6 +7885,9 @@ msgstr "'إظهار التحذير قبل تعيين 'تجاهل التعارض"
 msgid "Show warning when timeshift is stopped"
 msgstr "عرض تنبيه عندما يتم إيقاف خاصية التايم شفت"
 
+msgid "Show/Game Show/Leisure hobbies"
+msgstr "هوايات الترفيه"
+
 msgid "Show/hide window"
 msgstr "عرض المعلومات"
 
@@ -8035,9 +8039,6 @@ msgstr "كلمة المرور للبطاقة الذكية"
 
 msgid "Smooth"
 msgstr "ناعم"
-
-msgid "Social/Political/Economics"
-msgstr "اجتماعي/سياسي/اقتصادي"
 
 msgid "SocketMMI"
 msgstr "SocketMMI"
@@ -10178,8 +10179,8 @@ msgstr "عند التمكين سيتم عرض الترجمة النصية للق
 msgid "When enabled, the VCR scart option will be shown on the main menu"
 msgstr "عند التمكين، سيتم عرض خيار مدخل سكارت في القائمة الرئيسية"
 
-msgid "When enabled, the channel selection list will be hidden while listening to a radio channel"
-msgstr "عند التمكين ، سيتم إخفاء قائمة اختيار القنوات أثناء الاستماع إلى قناة راديو"
+msgid "When enabled, the channel selection list will be hidden while listening to a radio channel. When disabled, the option 'Auto play last service in radio mode' is available."
+msgstr "عند التمكين ، سيتم إخفاء قائمة اختيار القنوات أثناء الاستماع إلى قناة راديو. عند التعطيل ، يتوفر خيار التشغيل التلقائي لآخر خدمة في وضع الراديو"
 
 msgid "When enabled, the infobar will be displayed when a new event starts."
 msgstr "وإذا تم تعيين إلى 'نعم' على شريط المعلومات للظهور عندما يبدأ الحدث الجديد."
@@ -10589,8 +10590,8 @@ msgstr "!%s تم الانتقال إلى قناة المؤقت"
 msgid "Zgemma H.S/H.2S/H.2H/H5/H7(old model)"
 msgstr "Zgemma H.S/H.2S/H.2H/H5/H7(old model)"
 
-msgid "Zgemma H9(old model)/I55Plus"
-msgstr "Zgemma H9(old model)/I55Plus"
+msgid "Zgemma H9(old model)/I55Plus/H8"
+msgstr "Zgemma H9(old model)/I55Plus/H8"
 
 msgid "Zgemma Star S/2S/H1/H2"
 msgstr "Zgemma Star S/2S/H1/H2"
@@ -10634,8 +10635,8 @@ msgstr "الوقت الفعلي فقط"
 msgid "additional cable of rotor"
 msgstr "كابل إضافي للدوار"
 
-msgid "adult movie/drama"
-msgstr "فيلم الكبار/الدراما"
+msgid "adult movie"
+msgstr "فيلم للكبار"
 
 msgid "advanced"
 msgstr "متقدم"
@@ -10725,9 +10726,6 @@ msgstr "أفضل"
 msgid "black"
 msgstr "أسود"
 
-msgid "black & white"
-msgstr "أسود و أبيض"
-
 msgid "blacklist"
 msgstr "القائمه السوداء"
 
@@ -10758,8 +10756,8 @@ msgstr "في المنتصف, مغطى"
 msgid "chapters"
 msgstr "الفصول"
 
-msgid "childrens's/youth program (general)"
-msgstr "برنامج الأطفال/الشباب (عام)"
+msgid "childrens's youth program (general)"
+msgstr "برنامج الأطفال الشباب (عام)"
 
 msgid "circular left"
 msgstr "دائرى يسار"
@@ -10772,9 +10770,6 @@ msgstr "مقطع أعلى بحث / حدود الحواف"
 
 msgid "comedy"
 msgstr "كوميدي"
-
-msgid "config menu"
-msgstr "تم التأكيد"
 
 msgid "confirmed"
 msgstr "تم التأكيد"
@@ -10839,8 +10834,8 @@ msgstr "شرق"
 msgid "economics/social advisory"
 msgstr "الاقتصاد/الاستشارات الاجتماعية"
 
-msgid "education/science/factual topics (general)"
-msgstr "التعليم/العلوم/المواضيع الواقعية (عام)"
+msgid "educational/science/factual topics (general)"
+msgstr "مواضيع تعليمية/علمية/واقعية (عامة)"
 
 msgid "embedded"
 msgstr "مدمج"
@@ -10929,7 +10924,7 @@ msgstr "فيلم/سينما"
 msgid "fine arts"
 msgstr "الفنون الجميلة"
 
-msgid "fitness & health"
+msgid "fitness and health"
 msgstr "اللياقة البدنية والصحة"
 
 msgid "flat alphabetic"
@@ -10967,9 +10962,6 @@ msgstr "مزيد من التعليم"
 
 msgid "game show/quiz/contest"
 msgstr "عرض اللعبة/أختبار/مسابقة"
-
-msgid "gardening"
-msgstr "الحدائق"
 
 msgid "go to deep standby"
 msgstr "الذهاب الى وضع الاستعداد العميق"
@@ -11073,8 +11065,8 @@ msgstr "المحاذاة للأحداث"
 msgid "literature"
 msgstr "الادب"
 
-msgid "live broadcast"
-msgstr "بث مباشر"
+msgid "local sports"
+msgstr "فريق الرياضة"
 
 msgid "locked"
 msgstr "مغلق"
@@ -11121,7 +11113,7 @@ msgstr "تحرك للأعلى إلى المدخل الأول"
 msgid "move up to previous entry"
 msgstr "تحرك للأعلى المدخل السابق"
 
-msgid "movie/drama (general)"
+msgid "movie (general)"
 msgstr "فيلم/دراما (عام)"
 
 msgid "music/ballet/dance (general)"
@@ -11247,9 +11239,6 @@ msgstr "فتح تكوين أسم الخادم"
 msgid "original"
 msgstr "الأصلي"
 
-msgid "original language"
-msgstr "اللغة الاصلية"
-
 msgid "pass"
 msgstr "مرور"
 
@@ -11270,6 +11259,9 @@ msgstr "الثقافة الشعبية/الفنون التقليدية"
 
 msgid "pre-school children's program"
 msgstr "برنامج الأطفال قبل المدرسة"
+
+msgid "preserve bookmarks in cuts"
+msgstr "الحفاظ على الإشارات المرجعية في القطع"
 
 msgid "receiver software because updates are available."
 msgstr ".برنامج المتلقي لأن التحديثات متوفرة"
@@ -11294,6 +11286,9 @@ msgstr "حذف بعد هذا المكان"
 
 msgid "remove before this position"
 msgstr "حذف قبل هذا المكان"
+
+msgid "remove bookmarks in cuts"
+msgstr "إزالة العلامة المرجعية"
 
 msgid "remove this mark"
 msgstr "حذف هذه العلامة"
@@ -11346,7 +11341,7 @@ msgstr "أختار القائمة المدخلة"
 msgid "serious music/classic music"
 msgstr "موسيقى هادئه/موسيقى كلاسيكية"
 
-msgid "serious/classical/religious/historical movie/drama"
+msgid "serious/classical/religious/historical drama"
 msgstr "هادئه/الكلاسيكية/الدينية/التاريخية الفيلم/الدراما"
 
 msgid "service off-air"
@@ -11425,13 +11420,13 @@ msgstr "(الصورة الحالية) مع نسخة إحتياطية %s - %sفت
 msgid "slot%s - %s, without backup"
 msgstr "(الصورة الحالية) مع بدون نسخة إحتياطية %s - %sفتحة"
 
-msgid "soap/melodram/folkloric"
+msgid "soap/melodrama/folkloric"
 msgstr "ميلودراما/الفولكلوري"
 
 msgid "social/political issues/economics (general)"
 msgstr "القضايا الاجتماعية/السياسية/الاقتصاد (عام)"
 
-msgid "social/spiritual science"
+msgid "social/spiritual sciences"
 msgstr "العلوم الاجتماعية/الروحية"
 
 msgid "space"
@@ -11479,10 +11474,10 @@ msgstr "الانتقال إلى لغة الترجمة التالية"
 msgid "talk show"
 msgstr "برنامج حواري"
 
-msgid "team sports"
-msgstr "فريق الرياضة"
+msgid "team sports/excluding football"
+msgstr "الرياضات الجماعية/باستثناء كرة القدم"
 
-msgid "technology/natural science"
+msgid "technology/natural sciences"
 msgstr "التكنولوجيا/العلوم الطبيعية"
 
 msgid "template file"
@@ -11529,9 +11524,6 @@ msgstr "قناة مجهولة"
 
 msgid "unknown service"
 msgstr "قناة مجهولة"
-
-msgid "unpublished"
-msgstr "غير منشورة"
 
 msgid "untestable"
 msgstr "تفعيل"
@@ -12105,4 +12097,3 @@ msgstr "متعدد"
 
 msgid "®"
 msgstr ""
-
