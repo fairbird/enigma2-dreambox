@@ -1,3 +1,4 @@
+from enigma import getDesktop
 from Screen import Screen
 from Screens.HelpMenu import HelpableScreen
 from Screens.MessageBox import MessageBox
@@ -10,33 +11,68 @@ from Components.ActionMap import ActionMap, HelpableActionMap
 from Tools.Directories import resolveFilename, SCOPE_CURRENT_SKIN
 from Tools.LoadPixmap import LoadPixmap
 
+def getDesktopSize():
+	s = getDesktop(0).size()
+	return (s.width(), s.height())
+
+def isHD():
+	desktopSize = getDesktopSize()
+	return desktopSize[0] == 1280
+
 
 class InputDeviceSelection(HelpableScreen, Screen):
-	skin = """
-	<screen name="InputDeviceSelection" position="center,center" size="560,400">
-		<ePixmap pixmap="buttons/red.png" position="0,0" size="140,40" alphatest="on"/>
-		<ePixmap pixmap="buttons/green.png" position="140,0" size="140,40" alphatest="on"/>
-		<ePixmap pixmap="buttons/yellow.png" position="280,0" size="140,40" alphatest="on"/>
-		<ePixmap pixmap="buttons/blue.png" position="420,0" size="140,40" alphatest="on"/>
-		<widget source="key_red" render="Label" position="0,0" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#9f1313" transparent="1"/>
-		<widget source="key_green" render="Label" position="140,0" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#1f771f" transparent="1"/>
-		<widget source="key_yellow" render="Label" position="280,0" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#a08500" transparent="1"/>
-		<widget source="key_blue" render="Label" position="420,0" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#18188b" transparent="1"/>
-		<widget source="list" render="Listbox" position="5,50" size="550,280" zPosition="10" scrollbarMode="showOnDemand">
-			<convert type="TemplatedMultiContent">
-			<!--  device, description, devicepng, divpng  -->
-							{"template": [
-									MultiContentEntryPixmapAlphaBlend(pos = (2, 8), size = (54, 54), png = 2), # index 3 is the interface pixmap
-									MultiContentEntryText(pos = (65, 6), size = (450, 54), font=0, flags = RT_HALIGN_LEFT|RT_VALIGN_CENTER|RT_WRAP, text = 1), # index 1 is the interfacename
-								],
-							"fonts": [gFont("Regular", 28),gFont("Regular", 20)],
-							"itemHeight": 70
-							}
-			</convert>
-		</widget>
-		<ePixmap pixmap="div-h.png" position="0,340" zPosition="1" size="560,2"/>
-		<widget source="introduction" render="Label" position="0,350" size="560,50" zPosition="10" font="Regular;21" halign="center" valign="center" backgroundColor="#25062748" transparent="1"/>
-	</screen>"""
+	if isHD():
+		skin = """
+		<screen name="InputDeviceSelection" position="center,center" size="560,400">
+			<ePixmap pixmap="buttons/red.png" position="0,0" size="140,40" alphatest="on"/>
+			<ePixmap pixmap="buttons/green.png" position="140,0" size="140,40" alphatest="on"/>
+			<ePixmap pixmap="buttons/yellow.png" position="280,0" size="140,40" alphatest="on"/>
+			<ePixmap pixmap="buttons/blue.png" position="420,0" size="140,40" alphatest="on"/>
+			<widget source="key_red" render="Label" position="0,0" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#9f1313" transparent="1"/>
+			<widget source="key_green" render="Label" position="140,0" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#1f771f" transparent="1"/>
+			<widget source="key_yellow" render="Label" position="280,0" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#a08500" transparent="1"/>
+			<widget source="key_blue" render="Label" position="420,0" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#18188b" transparent="1"/>
+			<widget source="list" render="Listbox" position="5,50" size="550,280" zPosition="10" scrollbarMode="showOnDemand">
+				<convert type="TemplatedMultiContent">
+				<!--  device, description, devicepng, divpng  -->
+								{"template": [
+										MultiContentEntryPixmapAlphaBlend(pos = (2, 8), size = (54, 54), png = 2), # index 3 is the interface pixmap
+										MultiContentEntryText(pos = (65, 6), size = (450, 54), font=0, flags = RT_HALIGN_LEFT|RT_VALIGN_CENTER|RT_WRAP, text = 1), # index 1 is the interfacename
+									],
+								"fonts": [gFont("Regular", 28),gFont("Regular", 20)],
+								"itemHeight": 70
+								}
+				</convert>
+			</widget>
+			<ePixmap pixmap="div-h.png" position="0,340" zPosition="1" size="560,2"/>
+			<widget source="introduction" render="Label" position="0,350" size="560,50" zPosition="10" font="Regular;21" halign="center" valign="center" backgroundColor="#25062748" transparent="1"/>
+		</screen>"""
+	else:
+		skin = """
+		<screen name="InputDeviceSelection" position="center,center" size="902,740">
+			<ePixmap pixmap="buttons/red.png" position="85,0" size="140,40" alphatest="on"/>
+			<ePixmap pixmap="buttons/green.png" position="275,0" size="140,40" alphatest="on"/>
+			<ePixmap pixmap="buttons/yellow.png" position="465,0" size="140,40" alphatest="on"/>
+			<ePixmap pixmap="buttons/blue.png" position="665,0" size="140,40" alphatest="on"/>
+			<widget source="key_red" render="Label" position="85,0" zPosition="1" size="140,40" font="Regular;28" halign="center" valign="center" backgroundColor="#9f1313" transparent="1"/>
+			<widget source="key_green" render="Label" position="275,0" zPosition="1" size="140,40" font="Regular;28" halign="center" valign="center" backgroundColor="#1f771f" transparent="1"/>
+			<widget source="key_yellow" render="Label" position="465,0" zPosition="1" size="140,40" font="Regular;28" halign="center" valign="center" backgroundColor="#a08500" transparent="1"/>
+			<widget source="key_blue" render="Label" position="665,0" zPosition="1" size="140,40" font="Regular;28" halign="center" valign="center" backgroundColor="#18188b" transparent="1"/>
+			<widget source="list" render="Listbox" position="5,50" size="891,618" zPosition="10" scrollbarMode="showOnDemand">
+				<convert type="TemplatedMultiContent">
+				<!--  device, description, devicepng, divpng  -->
+								{"template": [
+										MultiContentEntryPixmapAlphaBlend(pos = (2, 14), size = (54, 54), png = 2), # index 3 is the interface pixmap
+										MultiContentEntryText(pos = (65, 2), size = (450, 80), font=0, flags = RT_HALIGN_LEFT|RT_VALIGN_CENTER|RT_WRAP, text = 1), # index 1 is the interfacename
+									],
+								"fonts": [gFont("Regular", 30),gFont("Regular", 25)],
+								"itemHeight": 80
+								}
+				</convert>
+			</widget>
+			<ePixmap pixmap="div-h.png" position="0,675" zPosition="1" size="900,2"/>
+			<widget source="introduction" render="Label" position="0,680" size="900,60" zPosition="10" font="Regular;28" halign="center" valign="center" backgroundColor="#25062748" transparent="1"/>
+		</screen>"""
 
 	def __init__(self, session):
 		Screen.__init__(self, session)
@@ -133,20 +169,35 @@ class InputDeviceSelection(HelpableScreen, Screen):
 
 
 class InputDeviceSetup(ConfigListScreen, Screen):
-
-	skin = """
-		<screen name="InputDeviceSetup" position="center,center" size="560,440">
-			<ePixmap pixmap="buttons/red.png" position="0,0" size="140,40" alphatest="on" />
-			<ePixmap pixmap="buttons/green.png" position="140,0" size="140,40" alphatest="on" />
-			<ePixmap pixmap="buttons/yellow.png" position="280,0" size="140,40" alphatest="on" />
-			<ePixmap pixmap="buttons/blue.png" position="420,0" size="140,40" alphatest="on" />
-			<widget source="key_red" render="Label" position="0,0" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#9f1313" transparent="1" />
-			<widget source="key_green" render="Label" position="140,0" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#1f771f" transparent="1" />
-			<widget source="key_yellow" render="Label" position="280,0" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#a08500" transparent="1" />
-			<widget source="key_blue" render="Label" position="420,0" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#18188b" transparent="1" />
-			<widget name="config" position="5,50" size="550,350" scrollbarMode="showOnDemand" />
-			<ePixmap pixmap="div-h.png" position="0,400" zPosition="1" size="560,2" />
-			<widget source="introduction" render="Label" position="5,410" size="550,30" zPosition="10" font="Regular;21" halign="center" valign="center" backgroundColor="#25062748" transparent="1" />
+	if isHD():
+		skin = """
+			<screen name="InputDeviceSetup" position="center,center" size="560,440">
+				<ePixmap pixmap="buttons/red.png" position="0,0" size="140,40" alphatest="on" />
+				<ePixmap pixmap="buttons/green.png" position="140,0" size="140,40" alphatest="on" />
+				<ePixmap pixmap="buttons/yellow.png" position="280,0" size="140,40" alphatest="on" />
+				<ePixmap pixmap="buttons/blue.png" position="420,0" size="140,40" alphatest="on" />
+				<widget source="key_red" render="Label" position="0,0" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#9f1313" transparent="1" />
+				<widget source="key_green" render="Label" position="140,0" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#1f771f" transparent="1" />
+				<widget source="key_yellow" render="Label" position="280,0" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#a08500" transparent="1" />
+				<widget source="key_blue" render="Label" position="420,0" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#18188b" transparent="1" />
+				<widget name="config" position="5,50" size="550,350" scrollbarMode="showOnDemand" />
+				<ePixmap pixmap="div-h.png" position="0,400" zPosition="1" size="560,2" />
+				<widget source="introduction" render="Label" position="5,410" size="550,30" zPosition="10" font="Regular;21" halign="center" valign="center" backgroundColor="#25062748" transparent="1" />
+			</screen>"""
+	else:
+		skin = """
+			<screen name="InputDeviceSelection" position="center,center" size="902,740">
+				<ePixmap pixmap="buttons/red.png" position="85,0" size="140,40" alphatest="on"/>
+				<ePixmap pixmap="buttons/green.png" position="275,0" size="140,40" alphatest="on"/>
+				<ePixmap pixmap="buttons/yellow.png" position="465,0" size="140,40" alphatest="on"/>
+				<ePixmap pixmap="buttons/blue.png" position="665,0" size="140,40" alphatest="on"/>
+				<widget source="key_red" render="Label" position="85,0" zPosition="1" size="140,40" font="Regular;28" halign="center" valign="center" backgroundColor="#9f1313" transparent="1"/>
+				<widget source="key_green" render="Label" position="275,0" zPosition="1" size="140,40" font="Regular;28" halign="center" valign="center" backgroundColor="#1f771f" transparent="1"/>
+				<widget source="key_yellow" render="Label" position="465,0" zPosition="1" size="140,40" font="Regular;28" halign="center" valign="center" backgroundColor="#a08500" transparent="1"/>
+				<widget source="key_blue" render="Label" position="665,0" zPosition="1" size="140,40" font="Regular;28" halign="center" valign="center" backgroundColor="#18188b" transparent="1"/>
+				<widget name="config" font="Regular;28" itemHeight="40" position="5,50" size="891,618" scrollbarMode="showOnDemand" />
+				<ePixmap pixmap="div-h.png" position="0,675" zPosition="1" size="900,2"/>
+				<widget source="introduction" render="Label" position="0,680" size="900,60" zPosition="10" font="Regular;28" halign="center" valign="center" backgroundColor="#25062748" transparent="1"/>
 		</screen>"""
 
 	def __init__(self, session, device):
