@@ -319,3 +319,4 @@ SystemInfo["CanWMAPRO"] = fileExists("/proc/stb/audio/wmapro")
 SystemInfo["CanDownmixAACPlus"] = fileExists("/proc/stb/audio/aacplus_choices")
 SystemInfo["CanAACTranscode"] = fileExists("/proc/stb/audio/aac_transcode_choices")
 SystemInfo["CanSyncMode"] = fileExists("/proc/stb/video/sync_mode_choices")
+SystemInfo["FCCactive"] = False
