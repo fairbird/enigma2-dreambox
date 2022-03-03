@@ -989,7 +989,7 @@ def InitUsageConfig():
 			try:
 				os.mkdir(config.crash.debugPath.value, 0755)
 			except:
-				print "Failed to create log path: %s" % config.crash.debugPath.value
+				print("Failed to create log path: %s" % config.crash.debugPath.value)
 	config.crash.debugPath.addNotifier(updatedebugPath, immediate_feedback=False)
 
 	crashlogheader = _("We are really sorry. Your receiver encountered "
