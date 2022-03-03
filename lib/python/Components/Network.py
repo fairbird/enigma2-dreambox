@@ -133,7 +133,7 @@ class Network:
 				fp.close()
 			#self.restartNetwork()
 		except:
-			print "[Network] resolv.conf or nameserversdns.conf - writing failed"
+			print("[Network] resolv.conf or nameserversdns.conf - writing failed")
 
 	def loadNetworkConfig(self, iface, callback=None):
 		interfaces = []
@@ -217,7 +217,7 @@ class Network:
 			fp.close()
 			self.nameservers = []
 		except:
-			print "[Network] resolv.conf or nameserversdns.conf - opening failed"
+			print("[Network] resolv.conf or nameserversdns.conf - opening failed")
 
 		for line in resolv:
 			if self.regExpMatch(nameserverPattern, line) is not None:
