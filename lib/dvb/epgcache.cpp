@@ -2206,22 +2206,10 @@ void eEPGCache::importEvents(ePyObject serviceReferences, ePyObject list)
 		refstr = PyUnicode_AsUTF8(serviceReferences);
 		if (!refstr)
 		{
-			eDebug("[eEPGCache:import] serviceReferences string is 0, aborting");
+			eDebug("[eEPGCache:import] serviceReference string is 0, aborting");
 			return;
 		}
 		refs.push_back(eServiceReferenceDVB(refstr));
-	}
-	else if (PyTuple_Check(serviceReferences))
-	{
-		if (PyTuple_Size(serviceReferences) != 3)
-		{
-			eDebug("[eEPGCache:import] serviceReferences tuple must contain 3 numbers (onid, tsid, sid), aborting");
-			return;
-		}
-		int onid = PyLong_AsLong(PyTuple_GET_ITEM(serviceReferences, 0));
-		int tsid = PyLong_AsLong(PyTuple_GET_ITEM(serviceReferences, 1));
-		int sid = PyLong_AsLong(PyTuple_GET_ITEM(serviceReferences, 2));
-		refs.push_back(eServiceReferenceDVB(0, tsid, onid, sid, 0));
 	}
 	else if (PyList_Check(serviceReferences))
 	{
@@ -2229,33 +2217,14 @@ void eEPGCache::importEvents(ePyObject serviceReferences, ePyObject list)
 		for (int i = 0; i < nRefs; ++i)
 		{
 			PyObject* item = PyList_GET_ITEM(serviceReferences, i);
-			if (PyString_Check(item))
+			refstr = PyUnicode_AsUTF8(item);
+			if (!refstr)
 			{
-				char *refstr;
-				refstr = PyUnicode_AsUTF8(item);
-				if (!refstr)
-				{
-					eDebug("[eEPGCache:import] serviceReferences[%d] is not a string", i);
-				}
-				else
-				{
-					refs.push_back(eServiceReferenceDVB(refstr));
-				}
-			}
-			else if (PyTuple_Check(item))
-			{
-				if (PyTuple_Size(item) != 3)
-				{
-					eDebug("[eEPGCache:import] serviceReferences[%d] tuple must contain 3 numbers (onid, tsid, sid)", i);
-				}
-				int onid = PyLong_AsLong(PyTuple_GET_ITEM(item, 0));
-				int tsid = PyLong_AsLong(PyTuple_GET_ITEM(item, 1));
-				int sid = PyLong_AsLong(PyTuple_GET_ITEM(item, 2));
-				refs.push_back(eServiceReferenceDVB(0, tsid, onid, sid, 0));
+				eDebug("[eEPGCache:import] a serviceref item is not a string");
 			}
 			else
 			{
-				eDebug("[eEPGCache:import] serviceReferences[%d] is not a string or a tuple", i);
+				refs.push_back(eServiceReferenceDVB(refstr));
 			}
 		}
 	}
