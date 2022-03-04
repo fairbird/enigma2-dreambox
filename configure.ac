@@ -278,7 +278,7 @@ CXXFLAGS="$CXXFLAGS -Wall -Wextra -Werror \
 	-Wimplicit-fallthrough=5 -Wduplicated-branches -Wtrampolines \
 	-Wdangling-else -Wshift-overflow=2 -Wswitch \
 	-Wunused-but-set-parameter -Wunused-const-variable=1 -Wuninitialized \
-	-Wstringop-overflow=3 -Woverlength-strings \
+	-Wstringop-overflow=3 -Woverlength-strings -Wno-error=deprecated-declarations\
 	-Wunsafe-loop-optimizations -Wpointer-arith \
 	-Wfloat-equal -Wlogical-op \
 	-Wno-error=cast-align=strict -Wno-error=ignored-qualifiers \
