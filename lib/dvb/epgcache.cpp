@@ -2200,7 +2200,7 @@ void eEPGCache::importEvents(ePyObject serviceReferences, ePyObject list)
 {
 	std::vector<eServiceReferenceDVB> refs;
 
-	if (PyString_Check(serviceReferences))
+	if (PyMapping_Check(serviceReferences))
 	{
 		const char *refstr;
 		refstr = PyBytes_AS_STRING(serviceReferences);
