@@ -81,7 +81,7 @@ def getType(file):
 			return "video/x-vcd"
 
 		if ext == "ipk":
-		return "application/x-debian-package"
+			return "application/x-debian-package"
 
 	return type
 
