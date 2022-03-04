@@ -2199,11 +2199,11 @@ void eEPGCache::importEvent(ePyObject serviceReference, ePyObject list)
 void eEPGCache::importEvents(ePyObject serviceReferences, ePyObject list)
 {
 	std::vector<eServiceReferenceDVB> refs;
+	const char *refstr;
 
 	if (PyMapping_Check(serviceReferences))
 	{
-		const char *refstr;
-		refstr = PyBytes_AS_STRING(serviceReferences);
+		refstr = PyUnicode_AsUTF8(serviceReferences);
 	        if (!refstr)
 	        {
 			eDebug("[eEPGCache:import] serviceReferences string is 0, aborting");
@@ -2231,8 +2231,7 @@ void eEPGCache::importEvents(ePyObject serviceReferences, ePyObject list)
 			PyObject* item = PyList_GET_ITEM(serviceReferences, i);
 			if (PyMapping_Check(item))
 			{
-				const char *refstr;
-				refstr = PyBytes_AS_STRING(item);
+				refstr = PyUnicode_AsUTF8(item);
 				if (!refstr)
 				{
 					eDebug("[eEPGCache:import] serviceReferences[%d] is not a string", i);
@@ -2410,7 +2409,7 @@ PyObject *eEPGCache::search(ePyObject arg)
 				ePyObject obj = PyTuple_GET_ITEM(arg, 3);
 				if (PyUnicode_Check(obj))
 				{
-					const char *refstr = PyBytes_AS_STRING(obj);
+					refstr = PyUnicode_AsUTF8(obj);
 					eServiceReferenceDVB ref(refstr);
 					if (ref.valid())
 					{
