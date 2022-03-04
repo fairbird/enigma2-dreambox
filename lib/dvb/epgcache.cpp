@@ -2229,7 +2229,7 @@ void eEPGCache::importEvents(ePyObject serviceReferences, ePyObject list)
 		for (int i = 0; i < nRefs; ++i)
 		{
 			PyObject* item = PyList_GET_ITEM(serviceReferences, i);
-			if (PyString_Check(item))
+			if (PyMapping_Check(item))
 			{
 				const char *refstr;
 				refstr = PyBytes_AS_STRING(item);
