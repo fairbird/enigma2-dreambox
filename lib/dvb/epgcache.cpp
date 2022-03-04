@@ -2218,9 +2218,9 @@ void eEPGCache::importEvents(ePyObject serviceReferences, ePyObject list)
 			eDebug("[eEPGCache:import] serviceReferences tuple must contain 3 numbers (onid, tsid, sid), aborting");
 			return;
 		}
-		int onid = PyInt_AsLong(PyTuple_GET_ITEM(serviceReferences, 0));
-		int tsid = PyInt_AsLong(PyTuple_GET_ITEM(serviceReferences, 1));
-		int sid = PyInt_AsLong(PyTuple_GET_ITEM(serviceReferences, 2));
+		int onid = PyLong_AsLong(PyTuple_GET_ITEM(serviceReferences, 0));
+		int tsid = PyLong_AsLong(PyTuple_GET_ITEM(serviceReferences, 1));
+		int sid = PyLong_AsLong(PyTuple_GET_ITEM(serviceReferences, 2));
 		refs.push_back(eServiceReferenceDVB(0, tsid, onid, sid, 0));
 	}
 	else if (PyList_Check(serviceReferences))
@@ -2248,9 +2248,9 @@ void eEPGCache::importEvents(ePyObject serviceReferences, ePyObject list)
 				{
 					eDebug("[eEPGCache:import] serviceReferences[%d] tuple must contain 3 numbers (onid, tsid, sid)", i);
 				}
-				int onid = PyInt_AsLong(PyTuple_GET_ITEM(item, 0));
-				int tsid = PyInt_AsLong(PyTuple_GET_ITEM(item, 1));
-				int sid = PyInt_AsLong(PyTuple_GET_ITEM(item, 2));
+				int onid = PyLong_AsLong(PyTuple_GET_ITEM(item, 0));
+				int tsid = PyLong_AsLong(PyTuple_GET_ITEM(item, 1));
+				int sid = PyLong_AsLong(PyTuple_GET_ITEM(item, 2));
 				refs.push_back(eServiceReferenceDVB(0, tsid, onid, sid, 0));
 			}
 			else
