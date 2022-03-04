@@ -2232,7 +2232,7 @@ void eEPGCache::importEvents(ePyObject serviceReferences, ePyObject list)
 			if (PyString_Check(item))
 			{
 				char *refstr;
-				refstr = PyString_AS_STRING(item);
+				refstr = PyUnicode_AsUTF8(item);
 				if (!refstr)
 				{
 					eDebug("[eEPGCache:import] serviceReferences[%d] is not a string", i);
