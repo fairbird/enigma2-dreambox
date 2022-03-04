@@ -1,24 +1,18 @@
-name: Enigma2 CI
-
+name: coverity-scan
 on:
-  push:
-    branches: [ python3 ]
-  pull_request:
-    branches: [ python3 ]
+#  schedule:
+#    - cron: '0 18 * * *' # Daily at 18:00 UTC
+  workflow_dispatch:
 
 jobs:
-  build:
-    name: Build enigma2
+  latest:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        gcc: [8, 9, 10, 11]
     steps:
-      - name: Install prerequisites
+      - name: Install libraries
         run: |
           sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
           sudo apt-get -q update
-          sudo apt-get install g++-${{ matrix.gcc }}
+          sudo apt-get install g++-10
           sudo apt-get install linux-libc-dev
           sudo apt-get install git
           sudo apt-get install build-essential
@@ -41,14 +35,28 @@ jobs:
       - uses: actions/checkout@v2
         with:
           ref: 'python3'
+
+      - name: Download Coverity Build Tool
+        run: |
+          wget -q https://scan.coverity.com/download/cxx/linux64 --post-data "token=$TOKEN&project=fairbird/enigma2-dreambox" -O cov-analysis-linux64.tar.gz
+          mkdir cov-analysis-linux64
+          tar xzf cov-analysis-linux64.tar.gz --strip 1 -C cov-analysis-linux64
+        env:
+          TOKEN: ${{ secrets.COVERITY_SCAN_TOKEN }}
+
+      - name: Fixed world writable dirs
+        run: |
+          chmod go-w $HOME
+          sudo chmod -R go-w /usr/share
+
       - uses: actions/setup-python@v2
         with:
           python-version: '3.9'
-
-    - name: Build enigma2 dependencies, gcc-${{ matrix.gcc }}
+          
+      - name: Build enigma2 dependencies
         env:
-          CC: "gcc-${{ matrix.gcc }}"
-          CXX: "g++-${{ matrix.gcc }}"
+          CC: "gcc-10"
+          CXX: "g++-10"
         run: |
           echo "installing libdvbsi++"
           pushd .
@@ -76,15 +84,39 @@ jobs:
           sudo make install
           popd
 
-      - name: Build enigma2
+      - name: configure enigma2
         env:
-          CC: "gcc-${{ matrix.gcc }}"
-          CXX: "g++-${{ matrix.gcc }}"
+          CC: "gcc-10"
+          CXX: "g++-10"
         run: |
-          pip3 install six
-          echo "compiling enigma2"
+          sed -i 's/include lib main data po tools/include lib main tools/g' Makefile.am
           autoreconf -i
           ./configure --with-libsdl=no --with-boxtype=nobox --enable-dependency-tracking ac_cv_prog_c_openmp=-fopenmp --with-gstversion=1.0 --with-textlcd
-          make
-          python -m compileall .
-          echo done!
+          
+      - name: Build with cov-build
+        env:
+          CC: "gcc-10"
+          CXX: "g++-10"
+        run: |
+          pip3 install six
+          export PATH=`pwd`/cov-analysis-linux64/bin:$PATH
+          cov-configure --template --compiler gcc-10 --comptype gcc
+          cov-build --dir cov-int make
+
+      - name: print cov-build
+        run: |
+          cat ./cov-int/build-log.txt
+
+      - name: Submit the result to Coverity Scan
+        run: |
+          tar czvf enigma2.tgz cov-int
+          curl \
+            --form project=fairbird/enigma2-dreambox \
+            --form token=$TOKEN \
+            --form email=rrrr53@mail.com \
+            --form file=@enigma2.tgz \
+            --form version=python3 \
+            --form description="`git rev-parse --abbrev-ref HEAD` `git rev-parse --short HEAD`" \
+            https://scan.coverity.com/builds?project=fairbird/enigma2-dreambox
+        env:
+          TOKEN: ${{ secrets.COVERITY_SCAN_TOKEN }}
