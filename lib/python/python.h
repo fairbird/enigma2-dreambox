@@ -10,6 +10,18 @@
 
 #if !defined(SKIP_PART1) && !defined(SWIG)
 
+#define PyStringObject PyUnicodeObject
+#define PyString_FromStringAndSize PyUnicode_FromStringAndSize
+#define PyString_AS_STRING PyUnicode_AsUTF8
+#define PyString_AsString PyUnicode_AsUTF8
+#define PyString_Check PyUnicode_Check
+
+#define PyInt_AsLong PyLong_AsLong
+#define PyInt_Check PyLong_Check
+#define PyInt_AsUnsignedLongMask PyLong_AsUnsignedLongMask
+
+#define PyExc_StandardError PyExc_Exception
+
 class ePyObject
 {
 	PyObject *m_ob;
@@ -318,6 +330,11 @@ inline ePyObject Impl_PyList_New(int elements=0)
 inline ePyObject Impl_PyDict_New()
 {
 	return PyDict_New();
+}
+
+inline ePyObject Impl_PyString_FromString(const char *str)
+{
+	return PyUnicode_FromString(str);
 }
 
 inline ePyObject Impl_PyString_FromFormat(const char *fmt, ...)

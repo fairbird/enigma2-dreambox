@@ -2202,11 +2202,7 @@ void eEPGCache::importEvents(ePyObject serviceReferences, ePyObject list)
 
 	if (PyString_Check(serviceReferences))
 	{
-#if PY_MAJOR_VERSION < 3
-		char *refstr;
-#else
 		const char *refstr;
-#endif
 		refstr = PyString_AS_STRING(serviceReferences);
 	        if (!refstr)
 	        {
@@ -2235,11 +2231,7 @@ void eEPGCache::importEvents(ePyObject serviceReferences, ePyObject list)
 			PyObject* item = PyList_GET_ITEM(serviceReferences, i);
 			if (PyString_Check(item))
 			{
-#if PY_MAJOR_VERSION < 3
-				char *refstr;
-#else
 				const char *refstr;
-#endif
 				refstr = PyString_AS_STRING(item);
 				if (!refstr)
 				{
@@ -2418,7 +2410,7 @@ PyObject *eEPGCache::search(ePyObject arg)
 				ePyObject obj = PyTuple_GET_ITEM(arg, 3);
 				if (PyUnicode_Check(obj))
 				{
-					refstr = PyUnicode_AsUTF8(obj);
+					const char *refstr = PyString_AS_STRING(obj);
 					eServiceReferenceDVB ref(refstr);
 					if (ref.valid())
 					{
@@ -2504,7 +2496,7 @@ PyObject *eEPGCache::search(ePyObject arg)
 							it != eventData::descriptors.end(); ++it)
 						{
 							uint8_t *data = it->second.data;
-							int textlen = 0;
+							ssize_t textlen = 0;
 							const char *textptr = NULL;
 							if ( data[0] == SHORT_EVENT_DESCRIPTOR && querytype > 0 && querytype < 5 )
 							{
