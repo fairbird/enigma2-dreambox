@@ -2203,7 +2203,7 @@ void eEPGCache::importEvents(ePyObject serviceReferences, ePyObject list)
 	if (PyString_Check(serviceReferences))
 	{
 		const char *refstr;
-		refstr = PyString_AS_STRING(serviceReferences);
+		refstr = PyBytes_AS_STRING(serviceReferences);
 	        if (!refstr)
 	        {
 			eDebug("[eEPGCache:import] serviceReferences string is 0, aborting");
@@ -2232,7 +2232,7 @@ void eEPGCache::importEvents(ePyObject serviceReferences, ePyObject list)
 			if (PyString_Check(item))
 			{
 				const char *refstr;
-				refstr = PyString_AS_STRING(item);
+				refstr = PyBytes_AS_STRING(item);
 				if (!refstr)
 				{
 					eDebug("[eEPGCache:import] serviceReferences[%d] is not a string", i);
