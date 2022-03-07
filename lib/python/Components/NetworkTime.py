@@ -1,5 +1,5 @@
 from Components.Console import Console
-from config import config
+from Components.config import config
 from enigma import eTimer, eDVBLocalTimeHandler, eEPGCache
 from Tools.StbHardware import setRTCtime
 from time import time

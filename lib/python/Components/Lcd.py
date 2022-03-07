@@ -2,7 +2,7 @@ from os import sys
 from os.path import exists
 from sys import maxsize
 from twisted.internet import threads
-from usb import busses
+from six import PY2
 
 from enigma import eActionMap, eDBoxLCD, eTimer
 
@@ -69,15 +69,17 @@ class IconCheckPoller:
 			fileWriteLine("/proc/stb/lcd/symbol_network", linkState)
 		elif exists("/proc/stb/lcd/symbol_network") and config.lcd.mode.value == "0":
 			fileWriteLine("/proc/stb/lcd/symbol_network", "0")
-		USBState = 0
-		for bus in busses():
-			devices = bus.devices
-			for dev in devices:
-				if dev.deviceClass != 9 and dev.deviceClass != 2 and dev.idVendor != 3034 and dev.idVendor > 0:
-					USBState = 1
-		if exists("/proc/stb/lcd/symbol_usb"):
-			fileWriteLine("/proc/stb/lcd/symbol_usb", USBState)
-		self.timer.startLongTimer(30)
+		if PY2:
+			from usb import busses
+			USBState = 0
+			for bus in busses():
+				devices = bus.devices
+				for dev in devices:
+					if dev.deviceClass != 9 and dev.deviceClass != 2 and dev.idVendor != 3034 and dev.idVendor > 0:
+						USBState = 1
+			if exists("/proc/stb/lcd/symbol_usb"):
+				fileWriteLine("/proc/stb/lcd/symbol_usb", USBState)
+			self.timer.startLongTimer(30)
 
 
 class LCD:
@@ -142,7 +144,7 @@ class LCD:
 
 	def setStandbyBright(self, value):
 		value *= 255
-		value /= 10
+		value //= 10
 		if value > 255:
 			value = 255
 		self.autoDimDownLCDTimer.stop()

@@ -2265,11 +2265,10 @@ class InfoBarExtensions:
 		self.list = []
 		self.addExtension((lambda: _("Softcam Setup"), self.openSoftcamSetup, lambda: config.misc.softcam_setup.extension_menu.value and SystemInfo["HasSoftcamInstalled"]), "1")
 		self.addExtension((lambda: _("Manually import from fallback tuner"), self.importChannels, lambda: config.usage.remote_fallback_extension_menu.value and config.usage.remote_fallback_import.value))
-		self["InstantExtensionsActions"] = HelpableActionMap(self, ["InfobarExtensions"],
-			{
+		self["InstantExtensionsActions"] = HelpableActionMap(self, ["InfobarExtensions"], {
 				"extensions": (self.showExtensionSelection, _("Show extensions...")),
-			},prio=1, description=_("Extension Actions"))  # Lower priority.
-			self.addExtension(extension=self.getOScamInfo, type=InfoBarExtensions.EXTENSION_LIST)
+		},prio=1, description=_("Extension Actions"))  # Lower priority.
+		self.addExtension(extension=self.getOScamInfo, type=InfoBarExtensions.EXTENSION_LIST)
 
 	def getOSname(self):
 		return _("OScam/Ncam Info")
@@ -4050,8 +4049,8 @@ class InfoBarHandleBsod:
 			try:
 				self.session.openWithCallback(self.infoBsodCallback, MessageBox, txt, type=MessageBox.TYPE_ERROR, default=False, close_on_any_key=not self.lastestBsodWarning, showYESNO=self.lastestBsodWarning)
 				self.infoBsodIsShown = True
-			except Exception, e:
-				#print "[InfoBarHandleBsod] Exception:", e
+			except Exception as ex:
+				#print("[InfoBarHandleBsod] Exception:", ex)
 				self.checkBsodTimer.stop()
 				self.checkBsodTimer.start(5000, True)
 				self.infoBsodCallback(False)

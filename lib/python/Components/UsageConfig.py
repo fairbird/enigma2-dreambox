@@ -154,7 +154,7 @@ def InitUsageConfig():
 
 	if not exists(resolveFilename(SCOPE_HDD)):
 		try:
-			os.mkdir(resolveFilename(SCOPE_HDD), 0755)
+			os.mkdir(resolveFilename(SCOPE_HDD), 0o755)
 		except (IOError, OSError):
 			pass
 	defaultValue = resolveFilename(SCOPE_HDD)
@@ -185,7 +185,7 @@ def InitUsageConfig():
 	config.usage.instantrec_path.save()
 	if not exists(resolveFilename(SCOPE_TIMESHIFT)):
 		try:
-			os.mkdir(resolveFilename(SCOPE_TIMESHIFT), 0755)
+			os.mkdir(resolveFilename(SCOPE_TIMESHIFT), 0o755)
 		except:
 			pass
 	defaultValue = resolveFilename(SCOPE_TIMESHIFT)
@@ -898,12 +898,14 @@ def InitUsageConfig():
 
 	config.epg.cacheloadsched = ConfigYesNo(default = False)
 	config.epg.cachesavesched = ConfigYesNo(default = False)
+
 	def EpgCacheLoadSchedChanged(configElement):
-		import EpgLoadSave
-		EpgLoadSave.EpgCacheLoadCheck()
+		import Components.EpgLoadSave
+		Components.EpgLoadSave.EpgCacheLoadCheck()
+
 	def EpgCacheSaveSchedChanged(configElement):
-		import EpgLoadSave
-		EpgLoadSave.EpgCacheSaveCheck()
+		import Components.EpgLoadSave
+		Components.EpgLoadSave.EpgCacheSaveCheck()
 	config.epg.cacheloadsched.addNotifier(EpgCacheLoadSchedChanged, immediate_feedback = False)
 	config.epg.cachesavesched.addNotifier(EpgCacheSaveSchedChanged, immediate_feedback = False)
 	config.epg.cacheloadtimer = ConfigSelectionNumber(default = 24, stepwidth = 1, min = 1, max = 24, wraparound = True)
@@ -980,14 +982,14 @@ def InitUsageConfig():
 				debugPath.append((p.mountpoint + '/logs/', d))
 	config.crash.debugPath = ConfigSelection(default="/home/root/logs/", choices=debugPath)
 	if not os.path.exists("/home"):
-		os.mkdir("/home", 0755)
+		os.mkdir("/home", 0o755)
 	if not os.path.exists("/home/root"):
-		os.mkdir("/home/root", 0755)
+		os.mkdir("/home/root", 0o755)
 
 	def updatedebugPath(configElement):
 		if not os.path.exists(config.crash.debugPath.value):
 			try:
-				os.mkdir(config.crash.debugPath.value, 0755)
+				os.mkdir(config.crash.debugPath.value, 0o755)
 			except:
 				print("Failed to create log path: %s" % config.crash.debugPath.value)
 	config.crash.debugPath.addNotifier(updatedebugPath, immediate_feedback=False)
