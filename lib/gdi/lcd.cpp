@@ -93,7 +93,7 @@ eDBoxLCD::eDBoxLCD()
 		lcd_type = 1;
 
 	if (lcdfd < 0)
-		eDebug("[eDboxLCD] No oled0 or lcd0 device found!");
+		eDebug("[eLCD] No oled0 or lcd0 device found!");
 	else
 	{
 
@@ -129,7 +129,7 @@ eDBoxLCD::eDBoxLCD()
 			}
 			lcd_type = 3;
 		}
-		eDebug("[eDboxLCD] xres=%d, yres=%d, bpp=%d lcd_type=%d", xres, yres, bpp, lcd_type);
+		eDebug("[eLCD] xres=%d, yres=%d, bpp=%d lcd_type=%d", xres, yres, bpp, lcd_type);
 
 		instance = this;
 		setSize(xres, yres, bpp);
@@ -165,17 +165,17 @@ int eDBoxLCD::setLCDContrast(int contrast)
 #define LCDSET                  0x1000
 #define	LCD_IOCTL_SRV			(10|LCDSET)
 #endif
-	eDebug("[eDboxLCD] setLCDContrast %d", contrast);
+	eDebug("[eLCD] setLCDContrast %d", contrast);
 
 	int fp;
 	if((fp = open("/dev/dbox/fp0", O_RDWR)) < 0)
 	{
-		eDebug("[eDboxLCD] can't open /dev/dbox/fp0: %m");
+		eDebug("[eLCD] can't open /dev/dbox/fp0: %m");
 		return(-1);
 	}
 
 	if(ioctl(lcdfd, LCD_IOCTL_SRV, &contrast) < 0)
-		eDebug("[eDboxLCD] can't set lcd contrast: %m");
+		eDebug("[eLCD] can't set lcd contrast: %m");
 	close(fp);
 #endif
 	return(0);
@@ -187,14 +187,14 @@ int eDBoxLCD::setLCDBrightness(int brightness)
 	if (lcdfd < 0)
 		return(0);
 
-	eDebug("[eDboxLCD] setLCDBrightness %d", brightness);
+	eDebug("[eLCD] setLCDBrightness %d", brightness);
 	FILE *f = fopen("/proc/stb/lcd/oled_brightness", "w");
 	if (!f)
 		f = fopen("/proc/stb/fp/oled_brightness", "w");
 	if (f)
 	{
 		if (fprintf(f, "%d", brightness) == 0)
-			eDebug("[eDboxLCD] write /proc/stb/lcd|fp/oled_brightness failed: %m");
+			eDebug("[eLCD] write /proc/stb/lcd|fp/oled_brightness failed: %m");
 		fclose(f);
 	}
 	else
@@ -202,14 +202,14 @@ int eDBoxLCD::setLCDBrightness(int brightness)
 		int fp;
 		if ((fp = open("/dev/dbox/fp0", O_RDWR)) < 0)
 		{
-			eDebug("[eDboxLCD] can't open /dev/dbox/fp0: %m");
+			eDebug("[eLCD] can't open /dev/dbox/fp0: %m");
 			return(-1);
 		}
 #ifndef FP_IOCTL_LCD_DIMM
 #define FP_IOCTL_LCD_DIMM       3
 #endif
 		if (ioctl(fp, FP_IOCTL_LCD_DIMM, &brightness) < 0)
-			eDebug("[eDboxLCD] can't set lcd brightness: %m");
+			eDebug("[eLCD] can't set lcd brightness: %m");
 		close(fp);
 	}
 #endif
