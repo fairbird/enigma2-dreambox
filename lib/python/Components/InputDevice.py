@@ -3,13 +3,12 @@ from os import listdir, open as osopen, close as osclose, write as oswrite, O_RD
 from os.path import isdir, isfile
 from platform import machine
 from struct import pack
-from SystemInfo import SystemInfo
 
 from enigma import eRCInput
 
 from keyids import KEYIDS, KEYIDNAMES
 from Components.config import ConfigSubsection, ConfigInteger, ConfigSelection, ConfigYesNo, ConfigText, ConfigSlider, config
-from Components.SystemInfo import BoxInfo
+from Components.SystemInfo import BoxInfo, SystemInfo
 from Tools.Directories import SCOPE_KEYMAPS, SCOPE_SKIN, fileReadLine, fileWriteLine, fileReadLines, fileReadXML, resolveFilename, pathExists
 
 MODULE_NAME = __name__.split(".")[-1]
@@ -26,16 +25,16 @@ class InputDevices:
 	def __init__(self):
 		self.Devices = {}
 		self.currentDevice = ""
-		devices = listdir("/dev/input/")
 
-		for device in devices:
+		for device in sorted(listdir("/dev/input/")):
 			if isdir("/dev/input/%s" % device):
 				continue
 			try:
 				_buffer = "\0" * 512
 				self.fd = osopen("/dev/input/%s" % device, O_RDWR | O_NONBLOCK)
 				self.name = ioctl(self.fd, self.EVIOCGNAME(256), _buffer)
-				self.name = self.name[:self.name.find(b"\0")]
+				osclose(self.fd)
+				self.name = str(self.name[:self.name.find(b"\0")])
 				if str(self.name).find("Keyboard") != -1:
 					self.name = 'keyboard'
 				osclose(self.fd)

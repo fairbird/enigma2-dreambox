@@ -25,7 +25,7 @@ import smtplib, base64
 # Here are the email package modules we'll need
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-from email.Utils import formatdate
+from email.utils import formatdate
 
 _session = None
 

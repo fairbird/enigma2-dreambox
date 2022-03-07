@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from GUIComponent import GUIComponent
+from Components.GUIComponent import GUIComponent
 
 from enigma import eEPGCache, eListbox, eListboxPythonMultiContent, gFont, RT_HALIGN_LEFT, RT_HALIGN_RIGHT, RT_HALIGN_CENTER, RT_VALIGN_CENTER
 

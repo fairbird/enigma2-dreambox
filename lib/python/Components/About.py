@@ -3,7 +3,7 @@ import os
 import time
 import re
 from Tools.HardwareInfo import HardwareInfo
-from SystemInfo import SystemInfo
+from Components.SystemInfo import SystemInfo
 from sys import maxsize, modules, version_info
 from Tools.Directories import fileReadLine
 from subprocess import PIPE, Popen
