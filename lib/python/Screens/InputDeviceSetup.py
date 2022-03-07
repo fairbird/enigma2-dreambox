@@ -2,6 +2,7 @@ from enigma import getDesktop
 from Screens.Screen import Screen
 from Screens.HelpMenu import HelpableScreen
 from Screens.MessageBox import MessageBox
+from Screens.Setup import Setup
 from Components.InputDevice import iInputDevices, iRcTypeControl
 from Components.Sources.StaticText import StaticText
 from Components.Sources.List import List
