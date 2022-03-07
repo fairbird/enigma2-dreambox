@@ -38,7 +38,7 @@ def getSkinFactor(refresh = False):
 			if not skinfactor in [1, 1.5, 3]:
 				print('[SKIN] getSkinFactor unknown result (%s) -> set skinfactor to 1' %skinfactor)
 				skinfactor = 1
-		except Exception, err:
+		except Exception as err:
 			skinfactor = 1
 			print('[SKIN] getSkinFactor failed: ', err)
 	return skinfactor
@@ -173,7 +173,7 @@ class LogManagerPoller:
 							else:
 								candidates.append((st.st_mtime, fn, st.st_size))
 								size += st.st_size
-						except Exception, e:
+						except Exception as e:
 							print("[LogManager] Failed to stat %s:"% name, e)
 					# Remove empty directories if possible
 					for name in dirs:
@@ -488,7 +488,7 @@ class LogManager(Screen):
 					s.sendmail(fromlogman, tocrashlogs, msg.as_string())
 					s.quit()
 					self.session.open(MessageBox, sentfiles + ' ' + _('has been sent to the SVN team team.\nplease quote') + ' ' + str(ref) + ' ' + _('when asking question about this log'), MessageBox.TYPE_INFO)
-			except Exception,e:
+			except Exception as e:
 				self.session.open(MessageBox, _("Error:\n%s" % e), MessageBox.TYPE_INFO, timeout = 10)
 		else:
 			self.session.open(MessageBox, _('You have not setup your user info in the setup screen\nPress MENU, and enter your info, then try again'), MessageBox.TYPE_INFO, timeout = 10)
