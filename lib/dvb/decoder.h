@@ -131,7 +131,7 @@ private:
 	void video_event(struct videoEvent);
 	sigc::signal<void(struct videoEvent)> m_video_event;
 #if defined(DMAMLOGIC)
-	sigc::signal1<void, int> m_state_event;
+	sigc::signal<void(int)> m_state_event;
 #endif
 	int m_video_clip_fd;
 	ePtr<eTimer> m_showSinglePicTimer;
@@ -184,7 +184,7 @@ public:
 	RESULT getPTS(int what, pts_t &pts);
 	RESULT connectVideoEvent(const sigc::slot<void(struct videoEvent)> &event, ePtr<eConnection> &connection);
 #if defined(DMAMLOGIC)
-	RESULT connectStateEvent(const sigc::slot1<void, int> &event, ePtr<eConnection> &connection);
+	RESULT connectStateEvent(const sigc::slot<void(int)> &event, ePtr<eConnection> &connection);
 	int getVideoDecoderId();
 #endif
 	int getVideoWidth();
