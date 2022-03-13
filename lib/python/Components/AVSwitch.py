@@ -71,31 +71,31 @@ class AVSwitch:
 def InitAVSwitch():
 	config.av = ConfigSubsection()
 	config.av.yuvenabled = ConfigBoolean(default=True)
-	colorformat_choices = {"cvbs": "CVBS"}
+	colorformat_choices = {"cvbs": _("CVBS")}
 
 	# when YUV, Scart or S-Video is not support by HW, don't let the user select it
 	if SystemInfo["HasYPbPr"]:
-		colorformat_choices["yuv"] = "YPbPr"
+		colorformat_choices["yuv"] = _("YPbPr")
 	if SystemInfo["HasScart"]:
-		colorformat_choices["rgb"] = "RGB"
+		colorformat_choices["rgb"] = _("RGB")
 	if SystemInfo["HasSVideo"]:
-		colorformat_choices["svideo"] = "S-Video"
+		colorformat_choices["svideo"] = _("S-Video")
 
 	config.av.colorformat = ConfigSelection(choices=colorformat_choices, default="cvbs")
 	config.av.aspectratio = ConfigSelection(choices={
 			"4_3_letterbox": _("4:3 Letterbox"),
 			"4_3_panscan": _("4:3 PanScan"),
-			"16_9": "16:9",
+			"16_9": _("16:9"),
 			"16_9_always": _("16:9 always"),
 			"16_10_letterbox": _("16:10 Letterbox"),
 			"16_10_panscan": _("16:10 PanScan"),
 			"16_9_letterbox": _("16:9 Letterbox")},
 			default="16_9")
 	config.av.aspect = ConfigSelection(choices={
-			"4_3": "4:3",
-			"16_9": "16:9",
-			"16_10": "16:10",
-			"auto": _("automatic")},
+			"4_3": _("4:3"),
+			"16_9": _("16:9"),
+			"16_10": _("16:10"),
+			"auto": _("Automatic")},
 			default="auto")
 	policy2_choices = {
 	# TRANSLATORS: (aspect ratio policy: black bars on top/bottom) in doubt, keep english term.
@@ -143,7 +143,7 @@ def InitAVSwitch():
 	except:
 		pass
 	config.av.policy_43 = ConfigSelection(choices=policy_choices, default="pillarbox")
-	config.av.tvsystem = ConfigSelection(choices={"pal": "PAL", "ntsc": "NTSC", "multinorm": "multinorm"}, default="pal")
+	config.av.tvsystem = ConfigSelection(choices={"pal": _("PAL"), "ntsc": _("NTSC"), "multinorm": _("multinorm")}, default="pal")
 	config.av.wss = ConfigEnableDisable(default=True)
 	config.av.generalAC3delay = ConfigSelectionNumber(-1000, 1000, 5, default=0)
 	config.av.generalPCMdelay = ConfigSelectionNumber(-1000, 1000, 5, default=0)
@@ -196,9 +196,6 @@ def InitAVSwitch():
 		if SystemInfo["DreamBoxAudio"]:
 			choice_list = [("use_hdmi_caps", _("controlled by HDMI")), ("force_ac3", _("convert to AC3")), ("multichannel", _("convert to multi-channel PCM")), ("hdmi_best", _("use best / controlled by HDMI")), ("force_ddp", _("force AC3plus"))]
 			config.av.transcodeac3plus = ConfigSelection(choices=choice_list, default="force_ac3")
-		elif platform in ("gb7252", "gb72604"):
-			choice_list = [("downmix", _("Downmix")), ("passthrough", _("Passthrough")), ("force_ac3", _("convert to AC3")), ("multichannel", _("convert to multi-channel PCM")), ("force_dts", _("convert to DTS"))]
-			config.av.transcodeac3plus = ConfigSelection(choices=choice_list, default="force_ac3")
 		else:
 			choice_list = [("use_hdmi_caps", _("controlled by HDMI")), ("force_ac3", _("convert to AC3"))]
 			config.av.transcodeac3plus = ConfigSelection(choices=choice_list, default="force_ac3")
@@ -229,6 +226,20 @@ def InitAVSwitch():
 		config.av.wmapro = ConfigSelection(choices = choice_list, default = "downmix")
 		config.av.wmapro.addNotifier(setWMAPRO)
 
+	if SystemInfo["CanDownmixAAC"]:
+		def setAACDownmix(configElement):
+			print("[AVSwitch] Write to /proc/stb/audio/aac")
+			if SystemInfo["DreamBoxAudio"]:
+				open("/proc/stb/audio/aac", "w").write(configElement.value)
+			else:
+				open("/proc/stb/audio/aac", "w").write(configElement.value and "downmix" or "passthrough")
+		if SystemInfo["DreamBoxAudio"]:
+			choice_list = [("downmix", _("Downmix")), ("passthrough", _("Passthrough")), ("multichannel", _("convert to multi-channel PCM")), ("hdmi_best", _("use best / controlled by HDMI"))]
+			config.av.downmix_aac = ConfigSelection(choices=choice_list, default="downmix")
+		else:
+			config.av.downmix_aac = ConfigYesNo(default=True)
+		config.av.downmix_aac.addNotifier(setAACDownmix)
+
 	if SystemInfo["CanDownmixAACPlus"]:
 		def setAACDownmixPlus(configElement):
 			open("/proc/stb/audio/aacplus", "w").write(configElement.value)
@@ -244,20 +255,6 @@ def InitAVSwitch():
 		config.av.transcodeaac.addNotifier(setAACTranscode)
 	else:
 		config.av.transcodeaac = ConfigNothing()
-
-	if SystemInfo["CanDownmixAAC"]:
-		def setAACDownmix(configElement):
-			print("[AVSwitch] Write to /proc/stb/audio/aac")
-			if SystemInfo["DreamBoxAudio"]:
-				open("/proc/stb/audio/aac", "w").write(configElement.value)
-			else:
-				open("/proc/stb/audio/aac", "w").write(configElement.value and "downmix" or "passthrough")
-		if SystemInfo["DreamBoxAudio"]:
-			choice_list = [("downmix", _("Downmix")), ("passthrough", _("Passthrough")), ("multichannel", _("convert to multi-channel PCM")), ("hdmi_best", _("use best / controlled by HDMI"))]
-			config.av.downmix_aac = ConfigSelection(choices=choice_list, default="downmix")
-		else:
-			config.av.downmix_aac = ConfigYesNo(default=True)
-		config.av.downmix_aac.addNotifier(setAACDownmix)
 
 	try:
 		SystemInfo["CanChangeOsdAlpha"] = open("/proc/stb/video/alpha", "r") and True or False
@@ -294,7 +291,7 @@ def InitAVSwitch():
 	if SystemInfo["HasAutoVolume"]:
 		def setAutoVolume(configElement):
 			open(SystemInfo["HasAutoVolume"], "w").write(configElement.value)
-		config.av.autovolume = ConfigSelection(default="none", choices=[("none", _("off")), ("hdmi", "HDMI"), ("spdif", "SPDIF"), ("dac", "DAC")])
+		config.av.autovolume = ConfigSelection(default="none", choices=[("none", _("off")), ("hdmi", _("HDMI")), ("spdif", _("SPDIF")), ("dac", _("DAC"))])
 		config.av.autovolume.addNotifier(setAutoVolume)
 
 	if SystemInfo["HasAutoVolumeLevel"]:
@@ -306,7 +303,7 @@ def InitAVSwitch():
 	if SystemInfo["Has3DSurround"]:
 		def set3DSurround(configElement):
 			open(SystemInfo["Has3DSurround"], "w").write(configElement.value)
-		config.av.surround_3d = ConfigSelection(default="none", choices=[("none", _("off")), ("hdmi", "HDMI"), ("spdif", "SPDIF"), ("dac", "DAC")])
+		config.av.surround_3d = ConfigSelection(default="none", choices=[("none", _("off")), ("hdmi", _("HDMI")), ("spdif", _("SPDIF")), ("dac", _("DAC"))])
 		config.av.surround_3d.addNotifier(set3DSurround)
 
 	if SystemInfo["Has3DSpeaker"]:
@@ -330,7 +327,7 @@ def InitAVSwitch():
 	if SystemInfo["HDMIAudioSource"]:
 		def setHDMIAudioSource(configElement):
 			open(SystemInfo["HDMIAudioSource"], "w").write(configElement.value)
-		config.av.hdmi_audio_source = ConfigSelection(default="pcm", choices=[("pcm", "PCM"), ("spdif", "SPDIF")])
+		config.av.hdmi_audio_source = ConfigSelection(default="pcm", choices=[("pcm", _("PCM")), ("spdif", _("SPDIF"))])
 		config.av.hdmi_audio_source.addNotifier(setHDMIAudioSource)
 
 	if SystemInfo["CanBTAudio"]:
