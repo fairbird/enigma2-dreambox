@@ -342,7 +342,6 @@ void eventData::load(FILE *f)
 	uint8_t header[2];
 	size_t ret; /* dummy value to store fread return values */
 	ret = fread(&size, sizeof(int), 1, f);
-	descriptors.clear();
 	descriptors.rehash(size);
 	while(size)
 	{
@@ -2495,7 +2494,7 @@ PyObject *eEPGCache::search(ePyObject arg)
 							it != eventData::descriptors.end(); ++it)
 						{
 							uint8_t *data = it->second.data;
-							ssize_t textlen = 0;
+							int textlen = 0;
 							const char *textptr = NULL;
 							if ( data[0] == SHORT_EVENT_DESCRIPTOR && querytype > 0 && querytype < 5 )
 							{
