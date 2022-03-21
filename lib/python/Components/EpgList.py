@@ -343,11 +343,11 @@ class EPGList(GUIComponent):
 					self.list[cnt] = (changecount, x[0], x[1], x[2], x[3], x[4], x[5], x[6])
 			cnt += 1
 		self.l.setList(self.list)
-		#print time() - t
+		#print(time() - t)
 		self.selectionChanged()
 
 	def fillSingleEPG(self, service):
-		t = time()
+		t = int(time())
 		epg_time = t - config.epg.histminutes.getValue() * 60
 		test = ['RIBDT', (service.ref.toString(), 0, epg_time, -1)]
 		self.list = self.queryEPG(test)
@@ -430,7 +430,7 @@ class EPGList(GUIComponent):
 			self.tw = parseScale(value)
 
 		def setColWidths(value):
-			self.col = map(int, value.split(','))
+			self.col = list(map(int, value.split(',')))
 			if len(self.col) == 2:
 				self.skinColumns = True
 			else:
