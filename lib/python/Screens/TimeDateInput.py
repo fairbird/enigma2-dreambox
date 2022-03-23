@@ -1,5 +1,5 @@
 from Screens.Screen import Screen
-from Components.config import config, ConfigClock, ConfigDateTime, getConfigListEntry
+from Components.config import ConfigClock, ConfigDateTime, getConfigListEntry
 from Components.ActionMap import NumberActionMap
 from Components.ConfigList import ConfigListScreen
 from Components.Sources.StaticText import StaticText
@@ -7,7 +7,7 @@ import time
 import datetime
 
 
-class TimeDateInput(Screen, ConfigListScreen):
+class TimeDateInput(ConfigListScreen, Screen):
 	def __init__(self, session, config_time=None, config_date=None):
 		Screen.__init__(self, session)
 		self.setTitle(_("Date/time input"))
@@ -38,7 +38,7 @@ class TimeDateInput(Screen, ConfigListScreen):
 		if conf_date:
 			self.save_mask |= 2
 		else:
-			conf_date = ConfigDateTime(default=time.time(), formatstring=config.usage.date.full.value, increment=86400)
+			conf_date = ConfigDateTime(default=time.time(), formatstring=_("%d.%B %Y"), increment=86400)
 		self.timeinput_date = conf_date
 		self.timeinput_time = conf_time
 

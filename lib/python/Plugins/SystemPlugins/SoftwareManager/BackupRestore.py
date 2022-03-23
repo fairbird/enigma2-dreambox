@@ -16,7 +16,7 @@ from datetime import date
 
 config.plugins.configurationbackup = ConfigSubsection()
 config.plugins.configurationbackup.backuplocation = ConfigText(default='/media/hdd/', visible_width=50, fixed_size=False)
-config.plugins.configurationbackup.backupdirs = ConfigLocations(default=[eEnv.resolve('${sysconfdir}/enigma2/'), '/etc/network/interfaces', '/etc/wpa_supplicant.conf', '/etc/wpa_supplicant.ath0.conf', '/etc/wpa_supplicant.wlan0.conf', '/etc/resolv.conf', '/etc/enigma2/nameserversdns.conf', '/etc/default_gw', '/etc/hostname'])
+config.plugins.configurationbackup.backupdirs = ConfigLocations(default=[eEnv.resolve('${sysconfdir}/enigma2/'), '/etc/network/interfaces', '/etc/wpa_supplicant.conf', '/etc/wpa_supplicant.ath0.conf', '/etc/wpa_supplicant.wlan0.conf', '/etc/resolv.conf', '/etc/default_gw', '/etc/hostname'])
 
 
 def getBackupPath():
@@ -31,7 +31,7 @@ def getBackupFilename():
 	return "enigma2settingsbackup.tar.gz"
 
 
-class BackupScreen(Screen, ConfigListScreen):
+class BackupScreen(ConfigListScreen, Screen):
 	skin = """
 		<screen position="135,144" size="350,310" title="Backup is running" >
 		<widget name="config" position="10,10" size="330,250" transparent="1" scrollbarMode="showOnDemand" />

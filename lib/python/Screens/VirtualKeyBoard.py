@@ -1,14 +1,14 @@
 from copy import copy, deepcopy
 
-from enigma import BT_SCALE, RT_HALIGN_CENTER, RT_HALIGN_LEFT, RT_HALIGN_RIGHT, RT_VALIGN_BOTTOM, RT_VALIGN_CENTER, RT_VALIGN_TOP, eListboxPythonMultiContent, getPrevAsciiCode, gFont, getDesktop
+from enigma import BT_SCALE, RT_HALIGN_CENTER, RT_HALIGN_LEFT, RT_HALIGN_RIGHT, RT_VALIGN_BOTTOM, RT_VALIGN_CENTER, RT_VALIGN_TOP, eListboxPythonMultiContent, getPrevAsciiCode, gFont
 
-from skin import applySkinFactor, fonts, parameters, loadSkin
+from skin import applySkinFactor, fonts, parameters
 from Components.ActionMap import HelpableNumberActionMap
 from Components.Input import Input
 from Components.Label import Label
 from Components.Language import language
 from Components.MenuList import MenuList
-from Components.MultiContent import MultiContentEntryText, MultiContentEntryPixmapAlphaTest
+from Components.MultiContent import MultiContentEntryText, MultiContentEntryPixmapAlphaBlend
 from Components.Sources.StaticText import StaticText
 from Screens.ChoiceBox import ChoiceBox
 from Screens.HelpMenu import HelpableScreen
@@ -16,17 +16,6 @@ from Screens.Screen import Screen
 from Tools.Directories import SCOPE_CURRENT_SKIN, resolveFilename
 from Tools.LoadPixmap import LoadPixmap
 from Tools.NumericalTextInput import NumericalTextInput
-from Components.config import config
-
-loadSkin('/usr/share/enigma2/VirtualKeyBoard_Icons/vkskin.xml')
-
-def getDesktopSize():
-    s = getDesktop(0).size()
-    return (s.width(), s.height())
-
-def isHD():
-    desktopSize = getDesktopSize()
-    return desktopSize[0] == 1280
 
 
 VKB_DONE_ICON = 0
@@ -77,120 +66,42 @@ class VirtualKeyBoard(Screen, HelpableScreen):
 			VKB_SAVE_TEXT: ("Save", _("Save")),
 			VKB_SEARCH_TEXT: ("Search", _("Search"))
 		}.get(style, ("Enter", "ENTERICON"))
-		if config.usage.virtualkeyBoard_style.value == "new":
-			if isHD():
-				self.skinName = 'vkeyboard_hdskin'
-				self.bg = LoadPixmap('/usr/share/enigma2/VirtualKeyBoard_Icons/buttonsHD/vkey_bg.png')
-				self.bg_l = LoadPixmap('/usr/share/enigma2/VirtualKeyBoard_Icons/buttonsHD/vkey_bg_l.png')
-				self.bg_m = LoadPixmap('/usr/share/enigma2/VirtualKeyBoard_Icons/buttonsHD/vkey_bg_m.png')
-				self.bg_r = LoadPixmap('/usr/share/enigma2/VirtualKeyBoard_Icons/buttonsHD/vkey_bg_r.png')
-				self.sel_l = LoadPixmap('/usr/share/enigma2/VirtualKeyBoard_Icons/buttonsHD/vkey_sel_l.png')
-				self.sel_m = LoadPixmap('/usr/share/enigma2/VirtualKeyBoard_Icons/buttonsHD/vkey_sel_m.png')
-				self.sel_r = LoadPixmap('/usr/share/enigma2/VirtualKeyBoard_Icons/buttonsHD/vkey_sel_r.png')
-				key_red_l = LoadPixmap('/usr/share/enigma2/VirtualKeyBoard_Icons/buttonsHD/vkey_red_l.png')
-				key_red_m = LoadPixmap('/usr/share/enigma2/VirtualKeyBoard_Icons/buttonsHD/vkey_red_m.png')
-				key_red_r = LoadPixmap('/usr/share/enigma2/VirtualKeyBoard_Icons/buttonsHD/vkey_red_r.png')
-				key_green_l = LoadPixmap('/usr/share/enigma2/VirtualKeyBoard_Icons/buttonsHD/vkey_green_l.png')
-				key_green_m = LoadPixmap('/usr/share/enigma2/VirtualKeyBoard_Icons/buttonsHD/vkey_green_m.png')
-				key_green_r = LoadPixmap('/usr/share/enigma2/VirtualKeyBoard_Icons/buttonsHD/vkey_green_r.png')
-				key_yellow_l = LoadPixmap('/usr/share/enigma2/VirtualKeyBoard_Icons/buttonsHD/vkey_yellow_l.png')
-				key_yellow_m = LoadPixmap('/usr/share/enigma2/VirtualKeyBoard_Icons/buttonsHD/vkey_yellow_m.png')
-				key_yellow_r = LoadPixmap('/usr/share/enigma2/VirtualKeyBoard_Icons/buttonsHD/vkey_yellow_r.png')
-				key_blue_l = LoadPixmap('/usr/share/enigma2/VirtualKeyBoard_Icons/buttonsHD/vkey_blue_l.png')
-				key_blue_m = LoadPixmap('/usr/share/enigma2/VirtualKeyBoard_Icons/buttonsHD/vkey_blue_m.png')
-				key_blue_r = LoadPixmap('/usr/share/enigma2/VirtualKeyBoard_Icons/buttonsHD/vkey_blue_r.png')
-				key_backspace = LoadPixmap('/usr/share/enigma2/VirtualKeyBoard_Icons/buttonsHD/vkey_backspace.png')
-				key_clear = LoadPixmap('/usr/share/enigma2/VirtualKeyBoard_Icons/buttonsHD/vkey_clear.png')
-				key_delete = LoadPixmap('/usr/share/enigma2/VirtualKeyBoard_Icons/buttonsHD/vkey_delete.png')
-				key_enter = LoadPixmap('/usr/share/enigma2/VirtualKeyBoard_Icons/buttonsHD/vkey_enter.png')
-				key_exit = LoadPixmap('/usr/share/enigma2/VirtualKeyBoard_Icons/buttonsHD/vkey_exit.png')
-				key_first = LoadPixmap('/usr/share/enigma2/VirtualKeyBoard_Icons/buttonsHD/vkey_first.png')
-				key_last = LoadPixmap('/usr/share/enigma2/VirtualKeyBoard_Icons/buttonsHD/vkey_last.png')
-				key_left = LoadPixmap('/usr/share/enigma2/VirtualKeyBoard_Icons/buttonsHD/vkey_left.png')
-				key_locale = LoadPixmap('/usr/share/enigma2/VirtualKeyBoard_Icons/buttonsHD/vkey_locale.png')
-				key_right = LoadPixmap('/usr/share/enigma2/VirtualKeyBoard_Icons/buttonsHD/vkey_right.png')
-				key_shift = LoadPixmap('/usr/share/enigma2/VirtualKeyBoard_Icons/buttonsHD/vkey_shift.png')
-				key_shift0 = LoadPixmap('/usr/share/enigma2/VirtualKeyBoard_Icons/buttonsHD/vkey_shift0.png')
-				key_shift1 = LoadPixmap('/usr/share/enigma2/VirtualKeyBoard_Icons/buttonsHD/vkey_shift1.png')
-				key_shift2 = LoadPixmap('/usr/share/enigma2/VirtualKeyBoard_Icons/buttonsHD/vkey_shift2.png')
-				key_shift3 = LoadPixmap('/usr/share/enigma2/VirtualKeyBoard_Icons/buttonsHD/vkey_shift3.png')
-				key_space = LoadPixmap('/usr/share/enigma2/VirtualKeyBoard_Icons/buttonsHD/vkey_space.png')
-				key_space_alt = LoadPixmap('/usr/share/enigma2/VirtualKeyBoard_Icons/buttonsHD/vkey_space_alt.png')
-			else:
-				self.skinName = 'vkeyboard_fhdskin'
-				self.bg = LoadPixmap('/usr/share/enigma2/VirtualKeyBoard_Icons/buttonsFHD/vkey_bg.png')
-				self.bg_l = LoadPixmap('/usr/share/enigma2/VirtualKeyBoard_Icons/buttonsFHD/vkey_bg_l.png')
-				self.bg_m = LoadPixmap('/usr/share/enigma2/VirtualKeyBoard_Icons/buttonsFHD/vkey_bg_m.png')
-				self.bg_r = LoadPixmap('/usr/share/enigma2/VirtualKeyBoard_Icons/buttonsFHD/vkey_bg_r.png')
-				self.sel_l = LoadPixmap('/usr/share/enigma2/VirtualKeyBoard_Icons/buttonsFHD/vkey_sel_l.png')
-				self.sel_m = LoadPixmap('/usr/share/enigma2/VirtualKeyBoard_Icons/buttonsFHD/vkey_sel_m.png')
-				self.sel_r = LoadPixmap('/usr/share/enigma2/VirtualKeyBoard_Icons/buttonsFHD/vkey_sel_r.png')
-				key_red_l = LoadPixmap('/usr/share/enigma2/VirtualKeyBoard_Icons/buttonsFHD/vkey_red_l.png')
-				key_red_m = LoadPixmap('/usr/share/enigma2/VirtualKeyBoard_Icons/buttonsFHD/vkey_red_m.png')
-				key_red_r = LoadPixmap('/usr/share/enigma2/VirtualKeyBoard_Icons/buttonsFHD/vkey_red_r.png')
-				key_green_l = LoadPixmap('/usr/share/enigma2/VirtualKeyBoard_Icons/buttonsFHD/vkey_green_l.png')
-				key_green_m = LoadPixmap('/usr/share/enigma2/VirtualKeyBoard_Icons/buttonsFHD/vkey_green_m.png')
-				key_green_r = LoadPixmap('/usr/share/enigma2/VirtualKeyBoard_Icons/buttonsFHD/vkey_green_r.png')
-				key_yellow_l = LoadPixmap('/usr/share/enigma2/VirtualKeyBoard_Icons/buttonsFHD/vkey_yellow_l.png')
-				key_yellow_m = LoadPixmap('/usr/share/enigma2/VirtualKeyBoard_Icons/buttonsFHD/vkey_yellow_m.png')
-				key_yellow_r = LoadPixmap('/usr/share/enigma2/VirtualKeyBoard_Icons/buttonsFHD/vkey_yellow_r.png')
-				key_blue_l = LoadPixmap('/usr/share/enigma2/VirtualKeyBoard_Icons/buttonsFHD/vkey_blue_l.png')
-				key_blue_m = LoadPixmap('/usr/share/enigma2/VirtualKeyBoard_Icons/buttonsFHD/vkey_blue_m.png')
-				key_blue_r = LoadPixmap('/usr/share/enigma2/VirtualKeyBoard_Icons/buttonsFHD/vkey_blue_r.png')
-				key_backspace = LoadPixmap('/usr/share/enigma2/VirtualKeyBoard_Icons/buttonsFHD/vkey_backspace.png')
-				key_clear = LoadPixmap('/usr/share/enigma2/VirtualKeyBoard_Icons/buttonsFHD/vkey_clear.png')
-				key_delete = LoadPixmap('/usr/share/enigma2/VirtualKeyBoard_Icons/buttonsFHD/vkey_delete.png')
-				key_enter = LoadPixmap('/usr/share/enigma2/VirtualKeyBoard_Icons/buttonsFHD/vkey_enter.png')
-				key_exit = LoadPixmap('/usr/share/enigma2/VirtualKeyBoard_Icons/buttonsFHD/vkey_exit.png')
-				key_first = LoadPixmap('/usr/share/enigma2/VirtualKeyBoard_Icons/buttonsFHD/vkey_first.png')
-				key_last = LoadPixmap('/usr/share/enigma2/VirtualKeyBoard_Icons/buttonsFHD/vkey_last.png')
-				key_left = LoadPixmap('/usr/share/enigma2/VirtualKeyBoard_Icons/buttonsFHD/vkey_left.png')
-				key_locale = LoadPixmap('/usr/share/enigma2/VirtualKeyBoard_Icons/buttonsFHD/vkey_locale.png')
-				key_right = LoadPixmap('/usr/share/enigma2/VirtualKeyBoard_Icons/buttonsFHD/vkey_right.png')
-				key_shift = LoadPixmap('/usr/share/enigma2/VirtualKeyBoard_Icons/buttonsFHD/vkey_shift.png')
-				key_shift0 = LoadPixmap('/usr/share/enigma2/VirtualKeyBoard_Icons/buttonsFHD/vkey_shift0.png')
-				key_shift1 = LoadPixmap('/usr/share/enigma2/VirtualKeyBoard_Icons/buttonsFHD/vkey_shift1.png')
-				key_shift2 = LoadPixmap('/usr/share/enigma2/VirtualKeyBoard_Icons/buttonsFHD/vkey_shift2.png')
-				key_shift3 = LoadPixmap('/usr/share/enigma2/VirtualKeyBoard_Icons/buttonsFHD/vkey_shift3.png')
-				key_space = LoadPixmap('/usr/share/enigma2/VirtualKeyBoard_Icons/buttonsFHD/vkey_space.png')
-				key_space_alt = LoadPixmap('/usr/share/enigma2/VirtualKeyBoard_Icons/buttonsFHD/vkey_space_alt.png')
-		else:
-			self.bg = LoadPixmap(path=resolveFilename(SCOPE_CURRENT_SKIN, "buttons/vkey_bg.png"))  # Legacy support only!
-			self.bg_l = LoadPixmap(path=resolveFilename(SCOPE_CURRENT_SKIN, "buttons/vkey_bg_l.png"))
-			self.bg_m = LoadPixmap(path=resolveFilename(SCOPE_CURRENT_SKIN, "buttons/vkey_bg_m.png"))
-			self.bg_r = LoadPixmap(path=resolveFilename(SCOPE_CURRENT_SKIN, "buttons/vkey_bg_r.png"))
-			self.sel_l = LoadPixmap(path=resolveFilename(SCOPE_CURRENT_SKIN, "buttons/vkey_sel_l.png"))
-			self.sel_m = LoadPixmap(path=resolveFilename(SCOPE_CURRENT_SKIN, "buttons/vkey_sel_m.png"))
-			self.sel_r = LoadPixmap(path=resolveFilename(SCOPE_CURRENT_SKIN, "buttons/vkey_sel_r.png"))
-			key_red_l = LoadPixmap(path=resolveFilename(SCOPE_CURRENT_SKIN, "buttons/vkey_red_l.png"))
-			key_red_m = LoadPixmap(path=resolveFilename(SCOPE_CURRENT_SKIN, "buttons/vkey_red_m.png"))
-			key_red_r = LoadPixmap(path=resolveFilename(SCOPE_CURRENT_SKIN, "buttons/vkey_red_r.png"))
-			key_green_l = LoadPixmap(path=resolveFilename(SCOPE_CURRENT_SKIN, "buttons/vkey_green_l.png"))
-			key_green_m = LoadPixmap(path=resolveFilename(SCOPE_CURRENT_SKIN, "buttons/vkey_green_m.png"))
-			key_green_r = LoadPixmap(path=resolveFilename(SCOPE_CURRENT_SKIN, "buttons/vkey_green_r.png"))
-			key_yellow_l = LoadPixmap(path=resolveFilename(SCOPE_CURRENT_SKIN, "buttons/vkey_yellow_l.png"))
-			key_yellow_m = LoadPixmap(path=resolveFilename(SCOPE_CURRENT_SKIN, "buttons/vkey_yellow_m.png"))
-			key_yellow_r = LoadPixmap(path=resolveFilename(SCOPE_CURRENT_SKIN, "buttons/vkey_yellow_r.png"))
-			key_blue_l = LoadPixmap(path=resolveFilename(SCOPE_CURRENT_SKIN, "buttons/vkey_blue_l.png"))
-			key_blue_m = LoadPixmap(path=resolveFilename(SCOPE_CURRENT_SKIN, "buttons/vkey_blue_m.png"))
-			key_blue_r = LoadPixmap(path=resolveFilename(SCOPE_CURRENT_SKIN, "buttons/vkey_blue_r.png"))
-			key_backspace = LoadPixmap(path=resolveFilename(SCOPE_CURRENT_SKIN, "buttons/vkey_backspace.png"))
-			key_clear = LoadPixmap(path=resolveFilename(SCOPE_CURRENT_SKIN, "buttons/vkey_clear.png"))
-			key_delete = LoadPixmap(path=resolveFilename(SCOPE_CURRENT_SKIN, "buttons/vkey_delete.png"))
-			key_enter = LoadPixmap(path=resolveFilename(SCOPE_CURRENT_SKIN, "buttons/vkey_enter.png"))
-			key_exit = LoadPixmap(path=resolveFilename(SCOPE_CURRENT_SKIN, "buttons/vkey_exit.png"))
-			key_first = LoadPixmap(path=resolveFilename(SCOPE_CURRENT_SKIN, "buttons/vkey_first.png"))
-			key_last = LoadPixmap(path=resolveFilename(SCOPE_CURRENT_SKIN, "buttons/vkey_last.png"))
-			key_left = LoadPixmap(path=resolveFilename(SCOPE_CURRENT_SKIN, "buttons/vkey_left.png"))
-			key_locale = LoadPixmap(path=resolveFilename(SCOPE_CURRENT_SKIN, "buttons/vkey_locale.png"))
-			key_right = LoadPixmap(path=resolveFilename(SCOPE_CURRENT_SKIN, "buttons/vkey_right.png"))
-			key_shift = LoadPixmap(path=resolveFilename(SCOPE_CURRENT_SKIN, "buttons/vkey_shift.png"))
-			key_shift0 = LoadPixmap(path=resolveFilename(SCOPE_CURRENT_SKIN, "buttons/vkey_shift0.png"))
-			key_shift1 = LoadPixmap(path=resolveFilename(SCOPE_CURRENT_SKIN, "buttons/vkey_shift1.png"))
-			key_shift2 = LoadPixmap(path=resolveFilename(SCOPE_CURRENT_SKIN, "buttons/vkey_shift2.png"))
-			key_shift3 = LoadPixmap(path=resolveFilename(SCOPE_CURRENT_SKIN, "buttons/vkey_shift3.png"))
-			key_space = LoadPixmap(path=resolveFilename(SCOPE_CURRENT_SKIN, "buttons/vkey_space.png"))
-			key_space_alt = LoadPixmap(path=resolveFilename(SCOPE_CURRENT_SKIN, "buttons/vkey_space_alt.png"))
+		self.bg = LoadPixmap(path=resolveFilename(SCOPE_CURRENT_SKIN, "buttons/vkey_bg.png"))  # Legacy support only!
+		self.bg_l = LoadPixmap(path=resolveFilename(SCOPE_CURRENT_SKIN, "buttons/vkey_bg_l.png"))
+		self.bg_m = LoadPixmap(path=resolveFilename(SCOPE_CURRENT_SKIN, "buttons/vkey_bg_m.png"))
+		self.bg_r = LoadPixmap(path=resolveFilename(SCOPE_CURRENT_SKIN, "buttons/vkey_bg_r.png"))
+		self.sel_l = LoadPixmap(path=resolveFilename(SCOPE_CURRENT_SKIN, "buttons/vkey_sel_l.png"))
+		self.sel_m = LoadPixmap(path=resolveFilename(SCOPE_CURRENT_SKIN, "buttons/vkey_sel_m.png"))
+		self.sel_r = LoadPixmap(path=resolveFilename(SCOPE_CURRENT_SKIN, "buttons/vkey_sel_r.png"))
+		key_red_l = LoadPixmap(path=resolveFilename(SCOPE_CURRENT_SKIN, "buttons/vkey_red_l.png"))
+		key_red_m = LoadPixmap(path=resolveFilename(SCOPE_CURRENT_SKIN, "buttons/vkey_red_m.png"))
+		key_red_r = LoadPixmap(path=resolveFilename(SCOPE_CURRENT_SKIN, "buttons/vkey_red_r.png"))
+		key_green_l = LoadPixmap(path=resolveFilename(SCOPE_CURRENT_SKIN, "buttons/vkey_green_l.png"))
+		key_green_m = LoadPixmap(path=resolveFilename(SCOPE_CURRENT_SKIN, "buttons/vkey_green_m.png"))
+		key_green_r = LoadPixmap(path=resolveFilename(SCOPE_CURRENT_SKIN, "buttons/vkey_green_r.png"))
+		key_yellow_l = LoadPixmap(path=resolveFilename(SCOPE_CURRENT_SKIN, "buttons/vkey_yellow_l.png"))
+		key_yellow_m = LoadPixmap(path=resolveFilename(SCOPE_CURRENT_SKIN, "buttons/vkey_yellow_m.png"))
+		key_yellow_r = LoadPixmap(path=resolveFilename(SCOPE_CURRENT_SKIN, "buttons/vkey_yellow_r.png"))
+		key_blue_l = LoadPixmap(path=resolveFilename(SCOPE_CURRENT_SKIN, "buttons/vkey_blue_l.png"))
+		key_blue_m = LoadPixmap(path=resolveFilename(SCOPE_CURRENT_SKIN, "buttons/vkey_blue_m.png"))
+		key_blue_r = LoadPixmap(path=resolveFilename(SCOPE_CURRENT_SKIN, "buttons/vkey_blue_r.png"))
+		key_backspace = LoadPixmap(path=resolveFilename(SCOPE_CURRENT_SKIN, "buttons/vkey_backspace.png"))
+		key_clear = LoadPixmap(path=resolveFilename(SCOPE_CURRENT_SKIN, "buttons/vkey_clear.png"))
+		key_delete = LoadPixmap(path=resolveFilename(SCOPE_CURRENT_SKIN, "buttons/vkey_delete.png"))
+		key_enter = LoadPixmap(path=resolveFilename(SCOPE_CURRENT_SKIN, "buttons/vkey_enter.png"))
+		key_exit = LoadPixmap(path=resolveFilename(SCOPE_CURRENT_SKIN, "buttons/vkey_exit.png"))
+		key_first = LoadPixmap(path=resolveFilename(SCOPE_CURRENT_SKIN, "buttons/vkey_first.png"))
+		key_last = LoadPixmap(path=resolveFilename(SCOPE_CURRENT_SKIN, "buttons/vkey_last.png"))
+		key_left = LoadPixmap(path=resolveFilename(SCOPE_CURRENT_SKIN, "buttons/vkey_left.png"))
+		key_locale = LoadPixmap(path=resolveFilename(SCOPE_CURRENT_SKIN, "buttons/vkey_locale.png"))
+		key_right = LoadPixmap(path=resolveFilename(SCOPE_CURRENT_SKIN, "buttons/vkey_right.png"))
+		key_shift = LoadPixmap(path=resolveFilename(SCOPE_CURRENT_SKIN, "buttons/vkey_shift.png"))
+		key_shift0 = LoadPixmap(path=resolveFilename(SCOPE_CURRENT_SKIN, "buttons/vkey_shift0.png"))
+		key_shift1 = LoadPixmap(path=resolveFilename(SCOPE_CURRENT_SKIN, "buttons/vkey_shift1.png"))
+		key_shift2 = LoadPixmap(path=resolveFilename(SCOPE_CURRENT_SKIN, "buttons/vkey_shift2.png"))
+		key_shift3 = LoadPixmap(path=resolveFilename(SCOPE_CURRENT_SKIN, "buttons/vkey_shift3.png"))
+		key_space = LoadPixmap(path=resolveFilename(SCOPE_CURRENT_SKIN, "buttons/vkey_space.png"))
+		key_space_alt = LoadPixmap(path=resolveFilename(SCOPE_CURRENT_SKIN, "buttons/vkey_space_alt.png"))
 		self.keyHighlights = {  # This is a table of cell highlight components (left, middle and right)
 			"EXIT": (key_red_l, key_red_m, key_red_r),
 			"EXITICON": (key_red_l, key_red_m, key_red_r),
@@ -1008,26 +919,26 @@ class VirtualKeyBoard(Screen, HelpableScreen):
 					x += self.width * width
 				else:
 					w = self.bg_l.size().width()
-					res.append(MultiContentEntryPixmapAlphaTest(pos=(x, 0), size=(w, self.height), png=self.bg_l))
+					res.append(MultiContentEntryPixmapAlphaBlend(pos=(x, 0), size=(w, self.height), png=self.bg_l))
 					x += w
 					w = self.bg_m.size().width() + (self.width * (width - 1))
-					res.append(MultiContentEntryPixmapAlphaTest(pos=(x, 0), size=(w, self.height), png=self.bg_m, flags=BT_SCALE))
+					res.append(MultiContentEntryPixmapAlphaBlend(pos=(x, 0), size=(w, self.height), png=self.bg_m, flags=BT_SCALE))
 					x += w
 					w = self.bg_r.size().width()
-					res.append(MultiContentEntryPixmapAlphaTest(pos=(x, 0), size=(w, self.height), png=self.bg_r))
+					res.append(MultiContentEntryPixmapAlphaBlend(pos=(x, 0), size=(w, self.height), png=self.bg_r))
 					x += w
 				highlight = self.keyHighlights.get(key.upper(), (None, None, None))  # Check if the cell needs to be highlighted.
 				if highlight[0] is None or highlight[1] is None or highlight[2] is None:  # If available display the cell highlight.
 					xHighlight += self.width * width
 				else:
 					w = highlight[0].size().width()
-					res.append(MultiContentEntryPixmapAlphaTest(pos=(xHighlight, 0), size=(w, self.height), png=highlight[0]))
+					res.append(MultiContentEntryPixmapAlphaBlend(pos=(xHighlight, 0), size=(w, self.height), png=highlight[0]))
 					xHighlight += w
 					w = highlight[1].size().width() + (self.width * (width - 1))
-					res.append(MultiContentEntryPixmapAlphaTest(pos=(xHighlight, 0), size=(w, self.height), png=highlight[1], flags=BT_SCALE))
+					res.append(MultiContentEntryPixmapAlphaBlend(pos=(xHighlight, 0), size=(w, self.height), png=highlight[1], flags=BT_SCALE))
 					xHighlight += w
 					w = highlight[2].size().width()
-					res.append(MultiContentEntryPixmapAlphaTest(pos=(xHighlight, 0), size=(w, self.height), png=highlight[2]))
+					res.append(MultiContentEntryPixmapAlphaBlend(pos=(xHighlight, 0), size=(w, self.height), png=highlight[2]))
 					xHighlight += w
 				if self.alignment[0] == 1:  # Determine the cell alignment.
 					alignH = RT_HALIGN_LEFT
@@ -1064,7 +975,7 @@ class VirtualKeyBoard(Screen, HelpableScreen):
 						top += (h - hImage) // 2
 					elif alignV == RT_VALIGN_BOTTOM:
 						top += h - hImage
-					res.append(MultiContentEntryPixmapAlphaTest(pos=(left, top), size=(wImage, hImage), png=image))
+					res.append(MultiContentEntryPixmapAlphaBlend(pos=(left, top), size=(wImage, hImage), png=image))
 					# print("[VirtualKeyBoard] DEBUG: Left=%d, Top=%d, Width=%d, Height=%d, Image Width=%d, Image Height=%d" % (left, top, w, h, wImage, hImage))
 				else:  # Display the cell text.
 					if len(key) > 1:  # NOTE: UTF8 / Unicode glyphs only count as one character here.
@@ -1085,13 +996,13 @@ class VirtualKeyBoard(Screen, HelpableScreen):
 		start, width = self.findStartAndWidth(self.selectedKey)
 		x = start * self.width
 		w = self.sel_l.size().width()
-		self.list[self.selectedKey // self.keyboardWidth].append(MultiContentEntryPixmapAlphaTest(pos=(x, 0), size=(w, self.height), png=self.sel_l))
+		self.list[self.selectedKey // self.keyboardWidth].append(MultiContentEntryPixmapAlphaBlend(pos=(x, 0), size=(w, self.height), png=self.sel_l))
 		x += w
 		w = self.sel_m.size().width() + (self.width * (width - 1))
-		self.list[self.selectedKey // self.keyboardWidth].append(MultiContentEntryPixmapAlphaTest(pos=(x, 0), size=(w, self.height), png=self.sel_m, flags=BT_SCALE))
+		self.list[self.selectedKey // self.keyboardWidth].append(MultiContentEntryPixmapAlphaBlend(pos=(x, 0), size=(w, self.height), png=self.sel_m, flags=BT_SCALE))
 		x += w
 		w = self.sel_r.size().width()
-		self.list[self.selectedKey // self.keyboardWidth].append(MultiContentEntryPixmapAlphaTest(pos=(x, 0), size=(w, self.height), png=self.sel_r))
+		self.list[self.selectedKey // self.keyboardWidth].append(MultiContentEntryPixmapAlphaBlend(pos=(x, 0), size=(w, self.height), png=self.sel_r))
 		self.previousSelectedKey = self.selectedKey
 		self["list"].setList(self.list)
 

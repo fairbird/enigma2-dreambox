@@ -9,6 +9,13 @@ if [ -d /home/root ]; then
 	cd
 fi
 
+# any debuglevel passed?
+if [ -z $ENIGMA_DEBUG_LVL ]; then
+	DEBUG_LVL=3
+else
+	DEBUG_LVL=$ENIGMA_DEBUG_LVL
+fi
+
 # LC_ALL available?
 if [ -z $LC_ALL ]; then
 	export LC_ALL=en_GB.utf8
@@ -36,20 +43,15 @@ while : ; do
 
 	# start enigma
 	sync
-	if [ "$(grep config.crash.enabledebug /etc/enigma2/settings)" == "config.crash.enabledebug=true" ]; then
-		RANDOMIZE1970=''
-		time=`date +%Y` ;
-		if [ "$time" = 1970 ]; then
-			RANDOMIZE1970="$(strings /dev/urandom | grep -o '[[:alnum:]]' | head -n 5 | tr -d '\n')"
-		fi
-		LOGFOLDER="/home/root/logs/"
-		if [ ! -d $LOGFOLDER ] ; then mkdir -p $LOGFOLDER; fi
-		if [ "$(grep config.crash.debugPath= /etc/enigma2/settings | sed 's/config.crash.debugPath=//g')" != "" -a -d "$(grep config.crash.debugPath= /etc/enigma2/settings | sed 's/config.crash.debugPath=//g')" ]; then
-			LOGFOLDER=$(grep config.crash.debugPath= /etc/enigma2/settings | sed 's/config.crash.debugPath=//g')
-		fi
-		LD_PRELOAD=$LIBS @bindir@/enigma2 --debug-no-color $VERBOSE &> ${LOGFOLDER}Enigma2-debug-$(date +%Y%m%d_%H-%M-%S)${RANDOMIZE1970}.log
+	if [ $DEBUG_LVL -lt 4 ]; then
+		LD_PRELOAD=$LIBS ENIGMA_DEBUG_LVL=$DEBUG_LVL @bindir@/enigma2
 	else
-		LD_PRELOAD=$LIBS @bindir@/enigma2 $VERBOSE
+		# remove old logfiles
+		keep=5;
+		for file in `ls -t /home/root/enigma.*.debuglog`; do let "keep--"; if [ "$keep" -lt "0" ]; then rm $file; fi; done
+		# todays log file
+		file="/home/root/enigma.$(date +%Y%m%d).debuglog"
+		LD_PRELOAD=$LIBS ENIGMA_DEBUG_LVL=$DEBUG_LVL @bindir@/enigma2 >> $file 2>&1
 	fi
 
 
@@ -76,7 +78,7 @@ while : ; do
 			/sbin/reboot
 			;;
 		3)
-			ENIGMA_DEBUG_LVL=3
+			DEBUG_LVL=3
 			;;
 		4)
 			/sbin/rmmod lcd
@@ -92,14 +94,10 @@ while : ; do
 			fi
 			;;
 		6)
-			ENIGMA_DEBUG_LVL="4"
+			DEBUG_LVL=4
 			;;
 		7)
 			rm -R /etc/enigma2
-			;;
-		16)
-		        echo "rescue" > /proc/stb/fp/boot_mode
-			/sbin/reboot
 			;;
 		42)
 			df -P | grep -v "tmpfs " | awk '{print $6}' | tail -n +3 > /tmp/upgrade_mountpoints.txt

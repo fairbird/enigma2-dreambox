@@ -1,4 +1,3 @@
-from Components.config import config
 from Components.VariableText import VariableText
 from Components.Renderer.Renderer import Renderer
 from enigma import eLabel, eEPGCache, eServiceReference
@@ -39,7 +38,7 @@ class NextEpgInfo(Renderer, VariableText):
 					for x in range(self.numberOfItems):
 						event = self.epgcache.getNextTimeEntry()
 						if event:
-							self.text += "%s%s%s%s%s\n" % (self.timecolor, strftime(config.usage.time.short.value, localtime(event.getBeginTime())), spaces, self.foregroundColor, event.getEventName())
+							self.text += "%s%s%s%s%s\n" % (self.timecolor, strftime("%H:%M", localtime(event.getBeginTime())), spaces, self.foregroundColor, event.getEventName())
 					if not self.hideLabel:
 						self.text = self.text and "%s%s\n%s" % (self.labelcolor, pgettext("now/next: 'next' event label", "Next"), self.text) or ""
 

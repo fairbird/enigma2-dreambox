@@ -183,6 +183,18 @@
 		<widget source="Statustext" render="Label" position="10,375" size="115,21" zPosition="10" font="Regular;20" halign="left" backgroundColor="#25062748" transparent="1"/>
 		<widget name="statuspic" pixmaps="buttons/button_green.png,buttons/button_green_off.png" position="130,380" zPosition="10" size="15,16" transparent="1" alphatest="on"/>
 	</screen>
+	<!-- Streaming Clients Info screen -->
+	<screen name="StreamingClientsInfo" position="center,center" size="540,490" title="Streaming clients info">
+		<widget name="menu" font="Regular;20" position="10,60" size="530,320" zPosition="1" />
+		<widget name="info" position="10,60" size="530,22" font="Regular;20" halign="center" transparent="1" zPosition="2"/>
+		<ePixmap pixmap="buttons/red.png" position="0,0" size="140,40" alphatest="on"/>
+		<ePixmap pixmap="buttons/green.png" position="135,0" size="140,40" alphatest="on"/>
+		<ePixmap pixmap="buttons/yellow.png" position="270,0" size="140,40" alphatest="on"/>
+		<ePixmap pixmap="buttons/blue.png" position="405,0" size="140,40" alphatest="on"/>
+		<widget name="key_red" position="0,0" zPosition="1" size="135,40" font="Regular;18" halign="center" valign="center" backgroundColor="#9f1313" transparent="1"/>
+		<widget name="key_green" position="135,0" zPosition="1" size="135,40" font="Regular;18" halign="center" valign="center" backgroundColor="#1f771f" transparent="1"/>
+		<widget name="key_yellow" position="270,0" zPosition="1" size="135,40" font="Regular;18" halign="center" valign="center" backgroundColor="#18188b" transparent="1"/>
+	</screen>
 	<!-- Audio selection -->
 	<screen name="AudioSelection" position="center,center" size="485,330" title="Audio">
 		<widget name="config" position="50,10" size="425,110" scrollbarMode="showOnDemand"/>
@@ -290,6 +302,27 @@
 		<applet type="onLayoutFinish">
 self.autoResize()
 		</applet>
+	</screen>
+	<!-- Hotkey -->
+	<screen name="HotkeySetup" position="center,center" size="560,437" title="Input">
+		<ePixmap pixmap="buttons/red.png" position="0,0" size="140,40" alphatest="on"/>
+		<widget name="key_red" position="0,0" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#9f1313" transparent="1"/>
+		<widget name="list" position="0,45" size="280,350" scrollbarMode="showOnDemand"/>
+		<widget name="choosen" position="280,45" size="280,350" scrollbarMode="showOnDemand"/>
+		<widget name="description" position="5,405" size="550,32" zPosition="1" font="Regular;16" valign="bottom"/>
+	</screen>
+	<screen name="HotkeySetupSelect" position="center,center" size="560,437" title="Input">
+		<ePixmap pixmap="buttons/red.png" position="0,0" size="140,40" alphatest="on"/>
+		<ePixmap pixmap="buttons/green.png" position="140,0" size="140,40" alphatest="on"/>
+		<widget name="h_yellow" pixmap="buttons/yellow.png" position="280,0" size="140,40" alphatest="on"/>
+		<widget name="key_red" position="0,0" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#9f1313" transparent="1"/>
+		<widget name="key_green" position="140,0" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#1f771f" transparent="1"/>
+		<widget name="key_yellow" position="280,0" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#1f771f" transparent="1"/>
+		<widget name="h_prev" pixmap="buttons/key_prev.png" zPosition="1" alphatest="blend" position="430,8" size="35,25"/>
+		<widget name="h_next" pixmap="buttons/key_next.png" zPosition="1" alphatest="blend" position="460,8" size="35,25"/>
+		<widget name="list" position="0,45" size="280,350" scrollbarMode="showOnDemand"/>
+		<widget name="choosen" position="280,45" size="280,350" scrollbarMode="showOnDemand"/>
+		<widget name="description" position="5,405" size="550,32" zPosition="1" font="Regular;16" valign="bottom"/>
 	</screen>
 	<!-- Common interface -->
 	<screen name="MMIDialog" position="center,center" size="450,270">
@@ -481,7 +514,7 @@ self.autoResize()
 		<widget name="wait" position="20,10" size="500,25" font="Regular;23"/>
 	</screen>
 	<!-- Help menu -->
-	<!--screen name="HelpMenu" position="fill" title="Menu" flags="wfNoBorder">
+	<screen name="HelpMenu" position="fill" title="Menu" flags="wfNoBorder">
 		<eLabel text="help..." position="280,40" size="220,60" font="Regular;40" halign="right"/>
 		<widget name="list" position="50,100" size="450,380" scrollbarMode="showOnDemand"/>
 		<widget name="rc" pixmaps="rc.png,rcold.png" position="540,10" zPosition="10" size="154,500" alphatest="on"/>
@@ -490,169 +523,6 @@ self.autoResize()
 		<widget name="arrowup" pixmap="arrowup.png" position="-100,-100" zPosition="11" size="37,70" alphatest="on"/>
 		<widget name="arrowup2" pixmap="arrowup.png" position="-100,-100" zPosition="11" size="37,70" alphatest="on"/>
 		<widget name="long_key" position="320,520" size="350,50" font="Regular;25" halign="right" foregroundColor="yellow"/>
-	</screen-->
-	<screen name="HelpMenu" position="0,0" size="1280,720" flags="wfNoBorder">
-		<panel name="HelpMenuOld" conditional="arrowdown"/>
-		<panel name="HelpMenuNew" conditional="indicatorU0"/>
-	</screen>
-	<screen name="HelpMenuOld" position="0,0" size="1280,720" flags="wfNoBorder">
-		<widget name="list" position="60,150" size="503,456" transparent="0" scrollbarMode="showOnDemand"/>
-		<panel name="RcPanel"/>
-		<widget name="long_key" position="760,600" size="180,40" font="Regular;20" halign="right" foregroundColor="yellow" transparent="0"/>
-	</screen>
-	<screen name="HelpMenuNew" position="0,0" size="1280,720" flags="wfNoBorder">
-		<widget name="description" position="660,150" size="280,44" font="Regular;20" halign="center" valign="center" transparent="1"/>
-		<widget source="list" render="Listbox" position="60,150" size="503,456" transparent="0" scrollbarMode="showOnDemand">
-			<convert type="TemplatedMultiContent">
-				{
-				  "templates": {
-				    # Simple help with no headings ("flat")
-				    # data[1:] = [helpText]
-				    "default": [
-				      38,  # itemHeight
-				      [
-					MultiContentEntryText(pos=(0, 0), size=(503, 38), font=1, text=1),
-				      ]
-				    ],
-				    # Simple help with headings
-				    # data[1:] = [heading, None]  # For heading entries
-				    # data[1:] = [None, helpText]  # For help entries
-				    "default+headings": [  # data[1:] = [helpText]
-				      38,  # itemHeight
-				      [
-					MultiContentEntryText(pos=(0, 0), size=(503, 38), font=0, text=1),
-					MultiContentEntryText(pos=(20, 0), size=(483, 38), font=1, text=2),
-				      ]
-				    ],
-				    # Extended help with no headings
-				    # data[1:] = [helpText, extendedHelpText]
-				    "extended": [
-				      57,  # itemHeight
-				      [
-					MultiContentEntryText(pos=(0, 0), size=(503, 30), font=2, text=1),
-					MultiContentEntryText(pos=(0, 40), size=(503, 27), color=0x009e9fa4, font=3, text=2),
-				      ],
-				    ],
-				    # Extended help with headings
-				    # data[1:] = [heading, None, None]  # For heading entries
-				    # data[1:] = [None, helpText, extendedHelpText]  # For help entries
-				    "extended+headings": [
-				      57,  # itemHeight
-				      [
-					MultiContentEntryText(pos=(0, 9), size=(503, 32), font=0, text=1),
-					MultiContentEntryText(pos=(20, 0), size=(483, 30), font=2, text=2),
-					MultiContentEntryText(pos=(20, 30), size=(483, 27), color=0x009e9fa4, font=3, text=3),
-				      ],
-				    ],
-				  },
-				  "fonts": [gFont("Regular", 26), gFont("Regular", 24), gFont("Regular", 25), gFont("Regular", 21)],
-				  "itemHeight": 38
-				}
-			</convert>
-		</widget>
-		<panel name="RcPanel"/>
-		<widget name="longshift_key0" position="660,600" size="280,25" font="Regular;20" halign="right" foregroundColor="yellow" transparent="0"/>
-		<widget name="longshift_key1" position="660,625" size="280,25" font="Regular;20" halign="right" foregroundColor="yellow" transparent="0"/>
-	</screen>
-	<screen name="HelpMenuBeyonwiz" position="0,0" size="1280,720" flags="wfNoBorder">
-		<widget name="description" position="660,150" size="280,44" font="Regular;20" halign="center" valign="center" transparent="1"/>
-		<widget source="list" render="Listbox" position="60,150" size="503,456" transparent="0" scrollbarMode="showOnDemand">
-			<convert type="TemplatedMultiContent">
-				{
-				  "templates": {
-				    # Simple help with no headings ("flat")
-				    # data[1:] = [helpText]
-				    "default": [
-				      38,  # itemHeight
-				      [
-					MultiContentEntryText(pos=(0, 0), size=(503, 38), font=1, text=1),
-				      ]
-				    ],
-				    # Simple help with headings
-				    # data[1:] = [heading, None]  # For heading entries
-				    # data[1:] = [None, helpText]  # For help entries
-				    "default+headings": [  # data[1:] = [helpText]
-				      38,  # itemHeight
-				      [
-					MultiContentEntryText(pos=(0, 0), size=(503, 38), font=0, text=1),
-					MultiContentEntryText(pos=(20, 0), size=(483, 38), font=1, text=2),
-				      ]
-				    ],
-				    # Extended help with no headings
-				    # data[1:] = [helpText, extendedHelpText]
-				    "extended": [
-				      57,  # itemHeight
-				      [
-					MultiContentEntryText(pos=(0, 0), size=(503, 30), font=2, text=1),
-					MultiContentEntryText(pos=(0, 40), size=(503, 27), color=0x009e9fa4, font=3, text=2),
-				      ],
-				    ],
-				    # Extended help with headings
-				    # data[1:] = [heading, None, None]  # For heading entries
-				    # data[1:] = [None, helpText, extendedHelpText]  # For help entries
-				    "extended+headings": [
-				      57,  # itemHeight
-				      [
-					MultiContentEntryText(pos=(0, 9), size=(503, 32), font=0, text=1),
-					MultiContentEntryText(pos=(20, 0), size=(483, 30), font=2, text=2),
-					MultiContentEntryText(pos=(20, 30), size=(483, 27), color=0x009e9fa4, font=3, text=3),
-				      ],
-				    ],
-				  },
-				  "fonts": [gFont("Regular", 26), gFont("Regular", 24), gFont("Regular", 25), gFont("Regular", 21)],
-				  "itemHeight": 38
-				}
-			</convert>
-		</widget>
-		<panel name="RcPanel"/>
-		<widget name="longshift_key0" position="660,600" size="280,25" font="Regular;20" halign="right" foregroundColor="yellow" transparent="0"/>
-		<widget name="longshift_key1" position="660,625" size="280,25" font="Regular;20" halign="right" foregroundColor="yellow" transparent="0"/>
-	</screen>
-	<screen name="RcPanel" position="fill" flags="wfNoBorder">
-		<panel name="RcPanelOld" conditional="arrowdown"/>
-		<panel name="RcPanelNew" conditional="indicatorU0" />
-	</screen>
-	<screen name="RcPanelOld" position="fill" flags="wfNoBorder">
-		<widget name="rc" pixmaps="rc.png,rcold.png" position="950,140" zPosition="10" size="154,500" alphatest="blend" transparent="0"/>
-		<widget name="arrowdown" pixmap="arrowdown.png" position="-100,-100" zPosition="11" size="37,70" alphatest="blend"/>
-		<widget name="arrowdown2" pixmap="arrowdown.png" position="-100,-100" zPosition="11" size="37,70" alphatest="blend"/>
-		<widget name="arrowup" pixmap="arrowup.png" position="-100,-100" zPosition="11" size="37,70" alphatest="blend"/>
-		<widget name="arrowup2" pixmap="arrowup.png" position="-100,-100" zPosition="11" size="37,70" alphatest="blend"/>
-	</screen>
-	<screen name="RcPanelNew" position="fill" flags="wfNoBorder">
-		<widget name="rc" pixmaps="rc.png,rcold.png" position="950,140" zPosition="10" size="154,500" alphatest="blend" transparent="0" />
-		<widget alphatest="blend" name="indicatorU0" pixmap="skin_default/yellow_circle23x23.png" position="950,140" offset="11,11" size="23,23" zPosition="11"/>
-		<widget alphatest="blend" name="indicatorU1" pixmap="skin_default/yellow_circle23x23.png" position="950,140" offset="11,11" size="23,23" zPosition="11"/>
-		<widget alphatest="blend" name="indicatorU2" pixmap="skin_default/yellow_circle23x23.png" position="950,140" offset="11,11" size="23,23" zPosition="11"/>
-		<widget alphatest="blend" name="indicatorU3" pixmap="skin_default/yellow_circle23x23.png" position="950,140" offset="11,11" size="23,23" zPosition="11"/>
-		<widget alphatest="blend" name="indicatorU4" pixmap="skin_default/yellow_circle23x23.png" position="950,140" offset="11,11" size="23,23" zPosition="11"/>
-		<widget alphatest="blend" name="indicatorU5" pixmap="skin_default/yellow_circle23x23.png" position="950,140" offset="11,11" size="23,23" zPosition="11"/>
-		<widget alphatest="blend" name="indicatorU6" pixmap="skin_default/yellow_circle23x23.png" position="950,140" offset="11,11" size="23,23" zPosition="11"/>
-		<widget alphatest="blend" name="indicatorU7" pixmap="skin_default/yellow_circle23x23.png" position="950,140" offset="11,11" size="23,23" zPosition="11"/>
-		<widget alphatest="blend" name="indicatorU8" pixmap="skin_default/yellow_circle23x23.png" position="950,140" offset="11,11" size="23,23" zPosition="11"/>
-		<widget alphatest="blend" name="indicatorU9" pixmap="skin_default/yellow_circle23x23.png" position="950,140" offset="11,11" size="23,23" zPosition="11"/>
-		<widget alphatest="blend" name="indicatorU10" pixmap="skin_default/yellow_circle23x23.png" position="950,140" offset="11,11" size="23,23" zPosition="11"/>
-		<widget alphatest="blend" name="indicatorU11" pixmap="skin_default/yellow_circle23x23.png" position="950,140" offset="11,11" size="23,23" zPosition="11"/>
-		<widget alphatest="blend" name="indicatorU12" pixmap="skin_default/yellow_circle23x23.png" position="950,140" offset="11,11" size="23,23" zPosition="11"/>
-		<widget alphatest="blend" name="indicatorU13" pixmap="skin_default/yellow_circle23x23.png" position="950,140" offset="11,11" size="23,23" zPosition="11"/>
-		<widget alphatest="blend" name="indicatorU14" pixmap="skin_default/yellow_circle23x23.png" position="950,140" offset="11,11" size="23,23" zPosition="11"/>
-		<widget alphatest="blend" name="indicatorU15" pixmap="skin_default/yellow_circle23x23.png" position="950,140" offset="11,11" size="23,23" zPosition="11"/>
-		<widget alphatest="blend" name="indicatorL0" pixmap="skin_default/yellow_circle23x23.png" position="950,140" offset="11,11" size="23,23" zPosition="11"/>
-		<widget alphatest="blend" name="indicatorL1" pixmap="skin_default/yellow_circle23x23.png" position="950,140" offset="11,11" size="23,23" zPosition="11"/>
-		<widget alphatest="blend" name="indicatorL2" pixmap="skin_default/yellow_circle23x23.png" position="950,140" offset="11,11" size="23,23" zPosition="11"/>
-		<widget alphatest="blend" name="indicatorL3" pixmap="skin_default/yellow_circle23x23.png" position="950,140" offset="11,11" size="23,23" zPosition="11"/>
-		<widget alphatest="blend" name="indicatorL4" pixmap="skin_default/yellow_circle23x23.png" position="950,140" offset="11,11" size="23,23" zPosition="11"/>
-		<widget alphatest="blend" name="indicatorL5" pixmap="skin_default/yellow_circle23x23.png" position="950,140" offset="11,11" size="23,23" zPosition="11"/>
-		<widget alphatest="blend" name="indicatorL6" pixmap="skin_default/yellow_circle23x23.png" position="950,140" offset="11,11" size="23,23" zPosition="11"/>
-		<widget alphatest="blend" name="indicatorL7" pixmap="skin_default/yellow_circle23x23.png" position="950,140" offset="11,11" size="23,23" zPosition="11"/>
-		<widget alphatest="blend" name="indicatorL8" pixmap="skin_default/yellow_circle23x23.png" position="950,140" offset="11,11" size="23,23" zPosition="11"/>
-		<widget alphatest="blend" name="indicatorL9" pixmap="skin_default/yellow_circle23x23.png" position="950,140" offset="11,11" size="23,23" zPosition="11"/>
-		<widget alphatest="blend" name="indicatorL10" pixmap="skin_default/yellow_circle23x23.png" position="950,140" offset="11,11" size="23,23" zPosition="11"/>
-		<widget alphatest="blend" name="indicatorL11" pixmap="skin_default/yellow_circle23x23.png" position="950,140" offset="11,11" size="23,23" zPosition="11"/>
-		<widget alphatest="blend" name="indicatorL12" pixmap="skin_default/yellow_circle23x23.png" position="950,140" offset="11,11" size="23,23" zPosition="11"/>
-		<widget alphatest="blend" name="indicatorL13" pixmap="skin_default/yellow_circle23x23.png" position="950,140" offset="11,11" size="23,23" zPosition="11"/>
-		<widget alphatest="blend" name="indicatorL14" pixmap="skin_default/yellow_circle23x23.png" position="950,140" offset="11,11" size="23,23" zPosition="11"/>
-		<widget alphatest="blend" name="indicatorL15" pixmap="skin_default/yellow_circle23x23.png" position="950,140" offset="11,11" size="23,23" zPosition="11"/>
 	</screen>
 	<!-- Main infobar -->
 	<screen name="InfoBar" flags="wfNoBorder" position="0,380" size="720,160" title="Info bar" backgroundColor="transparent">
@@ -1008,10 +878,10 @@ self.autoResize()
 		<ePixmap pixmap="buttons/green.png" position="140,0" size="140,40" alphatest="on"/>
 		<ePixmap pixmap="buttons/yellow.png" position="280,0" size="140,40" alphatest="on"/>
 		<ePixmap pixmap="buttons/blue.png" position="420,0" size="140,40" alphatest="on"/>
-		<widget objectTypes="key_red,StaticText" source="key_red" render="Label" font="Regular; 20" backgroundColor="#9f1313" position="0,0" size="140,40" transparent="1" zPosition="1" halign="center" valign="center" />
-		<widget objectTypes="key_green,StaticText" source="key_green" render="Label" font="Regular; 20" backgroundColor="#9f1313" position="140,0" size="140,40" transparent="1" zPosition="1" halign="center" valign="center" />
-		<widget objectTypes="key_yellow,StaticText" source="key_yellow" render="Label" font="Regular; 20" backgroundColor="#9f1313" position="280,0" size="140,40" transparent="1" zPosition="1" halign="center" valign="center" />
-		<widget objectTypes="key_blue,StaticText" source="key_blue" render="Label" font="Regular; 20" backgroundColor="#9f1313" position="420,0" size="140,40" transparent="1" zPosition="1" halign="center" valign="center" />
+		<widget name="key_red" position="0,0" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#9f1313" transparent="1"/>
+		<widget name="key_green" position="140,0" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#1f771f" transparent="1"/>
+		<widget name="key_yellow" position="280,0" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#a08500" transparent="1"/>
+		<widget name="key_blue" position="420,0" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#18188b" transparent="1"/>
 		<widget source="title" render="Label" position="10,45" size="540,35" font="Regular;23"/>
 		<widget source="menu" render="Listbox" position="10,80" size="360,225" scrollbarMode="showOnDemand">
 			<convert type="StringList"/>
@@ -1019,7 +889,7 @@ self.autoResize()
 	</screen>
 	<!-- Messagebox -->
 	<screen name="MessageBoxTemplate">
-		<widget name="text" position="65,8" size="520,0" font="Regular;22" transparent="1"/>
+		<widget name="text" position="65,8" size="520,0" font="Regular;22"/>
 		<widget name="ErrorPixmap" pixmap="icons/input_error.png" position="5,5" size="53,53" alphatest="on"/>
 		<widget name="QuestionPixmap" pixmap="icons/input_question.png" position="5,5" size="53,53" alphatest="on"/>
 		<widget name="InfoPixmap" pixmap="icons/input_info.png" position="5,5" size="53,53" alphatest="on"/>
@@ -1231,14 +1101,6 @@ self.instance.move(ePoint(orgpos.x() + (orgwidth - newwidth)/2, orgpos.y() + (or
 	<screen name="NumberZap" position="center,center" size="250,60" title="Channel">
 		<widget name="channel" position="35,15" size="110,25" font="Regular;23"/>
 		<widget name="number" position="145,15" size="80,25" halign="right" font="Regular;23"/>
-	</screen>
-	<!-- NumberZapPicon -->
-	<screen name="NumberZapPicon" position="center,center" size="465,116" title="NumberZapPicon">
-  		<widget name="number" position="143,4" size="315,55" halign="center" valign="center" font="Regular;50"/>
-  		<widget source="Service" render="Picon" position="5,16" size="130,85" zPosition="5" alphatest="blend">
-    		<convert type="ServiceName2">Reference</convert>
-  		</widget>
-  		<widget name="servicename" position="143,60" size="315,55" font="Regular;25" halign="center" valign="center"/>
 	</screen>
 	<!-- BufferIndicator -->
 	<screen name="BufferIndicator" title="Channel" position="c-100,45" size="200,35" backgroundColor="transparent" flags="wfNoBorder" zPosition="100">
@@ -1719,32 +1581,6 @@ self.instance.move(ePoint(orgpos.x() + (orgwidth - newwidth)/2, orgpos.y() + (or
 		<widget source="job_status" render="Label" position="20,212" size="520,26" font="Regular;23"/>
 		<widget name="config" position="20,254" size="520,20"/>
 	</screen>
-	<!-- LogManager -->
-	<screen name="LogManager" position="center,center" size="560,400" title="Log Manager">
-		<ePixmap pixmap="buttons/red.png" position="0,0" size="140,40" alphatest="on"/>
-		<widget name="key_red" position="0,0" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#9f1313" transparent="1"/>
-		<ePixmap pixmap="buttons/green.png" position="140,0" size="140,40" alphatest="on"/>
-		<widget name="key_green" position="140,0" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#1f771f" transparent="1"/>
-		<ePixmap pixmap="buttons/yellow.png" position="280,0" size="140,40" alphatest="on"/>
-		<widget name="key_yellow" position="280,0" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#a08500" transparent="1"/>
-		<ePixmap pixmap="buttons/blue.png" position="420,0" size="140,40" alphatest="on"/>
-		<widget name="key_blue" position="420,0" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#141484" transparent="1"/>
-		<widget name="list" position="0,70" size="560,325" transparent="0" scrollbarMode="showOnDemand"/>
-		<applet type="onLayoutFinish">
-			self["list"].instance.setItemHeight(25)
-		</applet>
-		<widget name="LogsSize" position="0,400" size="560,25" font="Regular;20" foregroundColor="#ffffff" transparent="0" halign="center" />
-	</screen>
-	<screen name="LogManagerViewLog" position="center,center" size="700,400" title="Log Manager">
-		<widget name="list" position="5,10" size="690,450" font="Console;14" />
-	</screen>
-	<screen name="LogManagerFb" position="center,center" size="265,430" flags="wfNoBorder" title="">
-		<widget name="list" position="0,0" size="265,430" scrollbarMode="showOnDemand" />
-		<eLabel backgroundColor="transpBlack" position="0,430" size="560,2" zPosition="1"/>
-		<widget source="global.CurrentTime" render="Label" position="500,435" size="55,22" font="Enigma;18" halign="right" transparent="1" valign="center" zPosition="3">
-			<convert type="ClockToText">Default</convert>
-		</widget>
-	</screen>
 	<!-- VideoMode -->
 	<screen name="VideoMode" position="center,center" size="250,60" title="VideoMode">
 		<widget name="videomode" position="10,10" size="230,40" font="Regular;23" halign="left"/>
@@ -1766,25 +1602,5 @@ self.instance.move(ePoint(orgpos.x() + (orgwidth - newwidth)/2, orgpos.y() + (or
 		<widget source="key_red" render="Label" position="0,0" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#9f1313" transparent="1"/>
 		<widget source="key_green" render="Label" position="140,0" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#1f771f" transparent="1"/>
 		<widget name="filelist" position="5,50" size="510,370" scrollbarMode="showOnDemand"/>
-	</screen>
-	<!-- History Zap Selector -->
-	<screen name="HistoryZapSelector" position="25,center" size="550,490" flags="wfNoBorder">
-		<eLabel text="History Zap..." position="center,0" size="550,50" halign="center" font="Regular; 35" backgroundColor="background" foregroundColor="foreground" transparent="1" />
-		<eLabel position="30,50" zPosition="0" size="490,1" backgroundColor="background" />
-		<eLabel position="9,0" zPosition="-2" size="532,490" backgroundColor="transpBlack" />
-		<widget source="menu" render="Listbox" position="0,60" size="550,420" scrollbarMode="showNever" backgroundColor="background" foregroundColor="foreground" foregroundColorSelected="yellow" transparent="1">
-			<convert type="TemplatedMultiContent">
-				{"template": [
-						MultiContentEntryText(pos = (128, 22), size = (10, 22), font = 1, flags = RT_HALIGN_CENTER | RT_VALIGN_CENTER, text = 1), # Current Service
-						MultiContentEntryText(pos = (150, 2), size = (370, 25), font = 1, flags = RT_HALIGN_LEFT | RT_VALIGN_TOP, text = 2), # Servicename
-						MultiContentEntryText(pos = (150, 24), size = (370, 22), font = 2, flags = RT_HALIGN_LEFT | RT_VALIGN_CENTER | RT_WRAP, text = 3), # Eventname
-						MultiContentEntryText(pos = (150, 46), size = (370, 21), font = 3, flags = RT_HALIGN_LEFT, text = 5), # Eventtime
-						MultiContentEntryPixmapAlphaBlend(pos=(30, 9), size=(85, 51), png=6, flags = BT_SCALE) # picon
-					],
-				 "fonts": [gFont("Regular",22), gFont("Regular",22), gFont("Regular",20), gFont("Regular",18)],
-				 "itemHeight": 70
-				}
-			</convert>
-		</widget>
 	</screen>
 </skin>

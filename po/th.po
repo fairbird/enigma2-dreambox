@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tuxbox-enigma 0.0.1-En-Th\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-12-22 15:03+0100\n"
+"POT-Creation-Date: 2022-02-26 15:37+0100\n"
 "PO-Revision-Date: 2010-04-08 18:13+0700\n"
 "Last-Translator: Tony - Thaidreambox\n"
 "Language-Team: Tony @ Thai Dreambox <tonyboyth@gmail.com>\n"
@@ -1036,7 +1036,7 @@ msgstr ""
 msgid "Artist"
 msgstr "ศิลปิน"
 
-msgid "Arts/Culture"
+msgid "Arts/Culture (without music)"
 msgstr ""
 
 msgid "Aruba"
@@ -1216,6 +1216,9 @@ msgstr "รูปแบบที่ใช้งานได้"
 #, fuzzy
 msgid "Available locales are:"
 msgstr "รูปแบบที่ใช้งานได้"
+
+msgid "Axas E4HD Ultra"
+msgstr ""
 
 msgid "Azerbaijan"
 msgstr ""
@@ -1481,6 +1484,10 @@ msgstr "เคเบิ้ล"
 msgid "Cable Scan"
 msgstr ""
 
+#, python-format
+msgid "Cable scan executable utility not found '%s'!"
+msgstr ""
+
 msgid "Cabo Verde"
 msgstr ""
 
@@ -1710,7 +1717,7 @@ msgid ""
 "DiSEqC port %s for %s"
 msgstr ""
 
-msgid "Children/Youth"
+msgid "Children/Youth/Education/Science"
 msgstr ""
 
 msgid "Chile"
@@ -3039,6 +3046,10 @@ msgstr "Plugin ใหม่ที่ดาวน์โหลดได้"
 msgid "Downloadable plugins"
 msgstr "Plugin ที่ดาวน์โหลดได้"
 
+#, fuzzy
+msgid "Downloaded Images"
+msgstr "กำลังดาวน์โหลด"
+
 msgid "Downloading"
 msgstr "กำลังดาวน์โหลด"
 
@@ -3051,6 +3062,9 @@ msgstr "กำลังดาวน์โหลดข้อมูลติดต
 
 msgid "Downloading plugin information. Please wait..."
 msgstr "กำลังดาวน์โหลดข้อมูล Plugin กรุณารอสักครู่..."
+
+msgid "Drama and Films"
+msgstr ""
 
 #, fuzzy
 msgid "Drop unconfigured satellites"
@@ -3149,9 +3163,6 @@ msgstr "แก้ไขชื่อเรื่อง"
 
 msgid "Edit update source url"
 msgstr "แก้ไข URL ของเซอร์พเวอร์เพื่อปรับปรุง"
-
-msgid "Education/Science/..."
-msgstr ""
 
 msgid "Egypt"
 msgstr ""
@@ -3912,6 +3923,10 @@ msgstr ""
 msgid "Full view resolution"
 msgstr ""
 
+#, fuzzy
+msgid "Fullbackup Images"
+msgstr "แฟรช"
+
 msgid "Function of OK button"
 msgstr ""
 
@@ -4125,7 +4140,7 @@ msgstr ""
 msgid "HD2400"
 msgstr ""
 
-msgid "HD60/Multibox/Multibox SE"
+msgid "HD60/HD66SE/Multibox/Multibox SE"
 msgstr ""
 
 msgid "HDMI Colordepth"
@@ -4836,9 +4851,6 @@ msgstr "ซ้าย"
 msgid "Left from servicename"
 msgstr ""
 
-msgid "Leisure hobbies"
-msgstr ""
-
 msgid "Lesotho"
 msgstr ""
 
@@ -5343,9 +5355,6 @@ msgstr ""
 msgid "Movie selection"
 msgstr "เลือกการตั้งเวลา"
 
-msgid "Movie/Drama"
-msgstr ""
-
 msgid "Movielist menu"
 msgstr "เมนูรายการภาพยนต์"
 
@@ -5529,7 +5538,7 @@ msgstr ""
 msgid "New Zealand"
 msgstr ""
 
-msgid "News Current Affairs"
+msgid "News/Current Affairs/Social"
 msgstr ""
 
 msgctxt "button label, 'next screen'"
@@ -7990,6 +7999,10 @@ msgstr ""
 msgid "Set blocktimes by weekday"
 msgstr ""
 
+#, fuzzy
+msgid "Set cursor on service from channel history"
+msgstr "รายการก่อนหน้าที่จำไว้"
+
 msgid "Set default"
 msgstr ""
 
@@ -8121,9 +8134,6 @@ msgstr "แสดงแถบรายการเมื่อมีการเ
 #, fuzzy
 msgid "Show EPG..."
 msgstr "แสดงผังรายการ (EPG)"
-
-msgid "Show Games show"
-msgstr ""
 
 msgid "Show InfoBar"
 msgstr ""
@@ -8364,6 +8374,9 @@ msgstr ""
 msgid "Show warning when timeshift is stopped"
 msgstr ""
 
+msgid "Show/Game Show/Leisure hobbies"
+msgstr ""
+
 msgid "Show/hide window"
 msgstr ""
 
@@ -8537,9 +8550,6 @@ msgid "Smartcard PIN"
 msgstr ""
 
 msgid "Smooth"
-msgstr ""
-
-msgid "Social/Political/Economics"
 msgstr ""
 
 msgid "SocketMMI"
@@ -10788,7 +10798,7 @@ msgstr ""
 msgid "When enabled, the VCR scart option will be shown on the main menu"
 msgstr ""
 
-msgid "When enabled, the channel selection list will be hidden while listening to a radio channel"
+msgid "When enabled, the channel selection list will be hidden while listening to a radio channel. When disabled, the option 'Auto play last service in radio mode' is available."
 msgstr ""
 
 msgid "When enabled, the infobar will be displayed when a new event starts."
@@ -10816,6 +10826,9 @@ msgid "When enabled, the receiver will select an AC3 track (when available)."
 msgstr ""
 
 msgid "When enabled, the receiver will select an AC3+ track (when available)."
+msgstr ""
+
+msgid "When enabled, then when changing bouquets, set the cursor on the service from the channel history in the channel selection list."
 msgstr ""
 
 msgid "When enabled, this setting has more weight than 'Preferred tuner for recordings'."
@@ -11194,7 +11207,7 @@ msgstr "ย้ายไปบนสุด"
 msgid "Zgemma H.S/H.2S/H.2H/H5/H7(old model)"
 msgstr ""
 
-msgid "Zgemma H9(old model)/I55Plus"
+msgid "Zgemma H9(old model)/I55Plus/H8"
 msgstr ""
 
 msgid "Zgemma Star S/2S/H1/H2"
@@ -11242,8 +11255,9 @@ msgstr ""
 msgid "additional cable of rotor"
 msgstr ""
 
-msgid "adult movie/drama"
-msgstr ""
+#, fuzzy
+msgid "adult movie"
+msgstr "เลือกภาพยนต์"
 
 msgid "advanced"
 msgstr "ขั้นสูง"
@@ -11335,9 +11349,6 @@ msgstr "ดีขึ้น"
 msgid "black"
 msgstr "ดำ"
 
-msgid "black & white"
-msgstr ""
-
 msgid "blacklist"
 msgstr "รายการต้องห้าม"
 
@@ -11369,7 +11380,7 @@ msgstr ""
 msgid "chapters"
 msgstr "บทที่"
 
-msgid "childrens's/youth program (general)"
+msgid "childrens's youth program (general)"
 msgstr ""
 
 msgid "circular left"
@@ -11383,9 +11394,6 @@ msgstr ""
 
 msgid "comedy"
 msgstr ""
-
-msgid "config menu"
-msgstr "เมนูตั้งค่า"
 
 msgid "confirmed"
 msgstr "ยืนยันแล้ว"
@@ -11451,7 +11459,7 @@ msgstr ""
 msgid "economics/social advisory"
 msgstr ""
 
-msgid "education/science/factual topics (general)"
+msgid "educational/science/factual topics (general)"
 msgstr ""
 
 msgid "embedded"
@@ -11541,7 +11549,7 @@ msgstr ""
 msgid "fine arts"
 msgstr ""
 
-msgid "fitness & health"
+msgid "fitness and health"
 msgstr ""
 
 #, fuzzy
@@ -11582,9 +11590,6 @@ msgid "further education"
 msgstr ""
 
 msgid "game show/quiz/contest"
-msgstr ""
-
-msgid "gardening"
 msgstr ""
 
 msgid "go to deep standby"
@@ -11693,7 +11698,7 @@ msgstr ""
 msgid "literature"
 msgstr ""
 
-msgid "live broadcast"
+msgid "local sports"
 msgstr ""
 
 msgid "locked"
@@ -11741,7 +11746,7 @@ msgstr "ย้ายไปบนสุด"
 msgid "move up to previous entry"
 msgstr "ย้ายไปก่อนหน้านี้"
 
-msgid "movie/drama (general)"
+msgid "movie (general)"
 msgstr ""
 
 msgid "multi"
@@ -11874,9 +11879,6 @@ msgstr "ตั้งค่า Nameserver"
 msgid "original"
 msgstr ""
 
-msgid "original language"
-msgstr ""
-
 msgid "pass"
 msgstr "ผ่าน"
 
@@ -11896,6 +11898,9 @@ msgid "popular culture/traditional arts"
 msgstr ""
 
 msgid "pre-school children's program"
+msgstr ""
+
+msgid "preserve bookmarks in cuts"
 msgstr ""
 
 msgid "receiver software because updates are available."
@@ -11921,6 +11926,10 @@ msgstr "ลบหลังจากตำแหน่งนี้ออก"
 
 msgid "remove before this position"
 msgstr "ลบก่อนหน้าตำแหน่งนี้ออก"
+
+#, fuzzy
+msgid "remove bookmarks in cuts"
+msgstr "ลบบุ๊คมาร์ค"
 
 msgid "remove this mark"
 msgstr "ลบรายการนี้ออก"
@@ -11974,7 +11983,7 @@ msgstr "เลือกเมนูจากรายการ"
 msgid "serious music/classic music"
 msgstr ""
 
-msgid "serious/classical/religious/historical movie/drama"
+msgid "serious/classical/religious/historical drama"
 msgstr ""
 
 #, fuzzy
@@ -12054,13 +12063,13 @@ msgstr ""
 msgid "slot%s - %s, without backup"
 msgstr ""
 
-msgid "soap/melodram/folkloric"
+msgid "soap/melodrama/folkloric"
 msgstr ""
 
 msgid "social/political issues/economics (general)"
 msgstr ""
 
-msgid "social/spiritual science"
+msgid "social/spiritual sciences"
 msgstr ""
 
 msgid "space"
@@ -12112,10 +12121,10 @@ msgstr "เลือกซับไตเติ้ลต่อไป"
 msgid "talk show"
 msgstr ""
 
-msgid "team sports"
+msgid "team sports/excluding football"
 msgstr ""
 
-msgid "technology/natural science"
+msgid "technology/natural sciences"
 msgstr ""
 
 msgid "template file"
@@ -12163,9 +12172,6 @@ msgstr ""
 
 msgid "unknown service"
 msgstr "ไม่ทราบชนิดบริการ"
-
-msgid "unpublished"
-msgstr ""
 
 msgid "untestable"
 msgstr ""

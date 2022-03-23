@@ -3,12 +3,7 @@ import os
 import time
 import re
 from Tools.HardwareInfo import HardwareInfo
-from Components.SystemInfo import SystemInfo
 from sys import maxsize, modules, version_info
-from Tools.Directories import fileReadLine
-from subprocess import PIPE, Popen
-
-MODULE_NAME = __name__.split(".")[-1]
 
 
 def getVersionString():
@@ -75,7 +70,7 @@ def getffmpegVersionString():
 	try:
 		from glob import glob
 		ffmpeg = [x.split("Version: ") for x in open(glob("/var/lib/opkg/info/ffmpeg.control")[0], "r") if x.startswith("Version:")][0]
-		return "%s" % ffmpeg[1].split("+")[0].replace("\n", "")
+		return "%s" % ffmpeg[1].split("-")[0].replace("\n", "")
 	except:
 		return _("Not Installed")
 
@@ -151,27 +146,11 @@ def getCPUInfoString():
 		return _("undefined")
 
 
-def getChipSetString():
-	chipset = fileReadLine("/proc/stb/info/chipset", source=MODULE_NAME)
-	if chipset is None:
-		return _("Undefined")
-	return chipset.lower()
-
-def getDVBAPI():
-	if SystemInfo["OLDE2API"]:
-		return _("Old") 
-	else:
-		return _("New")
-
-
 def getDriverInstalledDate():
 	try:
 		from glob import glob
 		try:
-			if HardwareInfo().get_device_name() =="dm8000":
-				driver = [x.split("-")[-2:-1][0][-9:] for x in open(glob("/var/lib/opkg/info/*-dvb-modules-*.control")[0], "r") if x.startswith("Version:")][0]
-			else:
-				driver = [x.split("-")[-2:-1][0][-8:] for x in open(glob("/var/lib/opkg/info/*-dvb-modules-*.control")[0], "r") if x.startswith("Version:")][0]
+			driver = [x.split("-")[-2:-1][0][-8:] for x in open(glob("/var/lib/opkg/info/*-dvb-modules-*.control")[0], "r") if x.startswith("Version:")][0]
 			return "%s-%s-%s" % (driver[:4], driver[4:6], driver[6:])
 		except:
 			try:
@@ -186,6 +165,7 @@ def getDriverInstalledDate():
 
 def getPythonVersionString():
 	return "%s.%s.%s" % (version_info.major, version_info.minor, version_info.micro)
+
 
 def GetIPsFromNetworkInterfaces():
 	import socket
@@ -237,17 +217,6 @@ def getBoxUptime():
 		return "%s" % time
 	except:
 		return '-'
-
-
-def getOpenSSLVersion():
-	process = Popen(("/usr/bin/openssl", "version"), stdout=PIPE, stderr=PIPE, universal_newlines=True)
-	stdout, stderr = process.communicate()
-	if process.returncode == 0:
-		data = stdout.strip().split()
-		if len(data) > 1 and data[0] == "OpenSSL":
-			return data[1]
-	print("[About] Get OpenSSL version failed.")
-	return _("Unknown")
 
 
 # For modules that do "from About import about"

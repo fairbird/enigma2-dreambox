@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: enigma2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-12-22 15:03+0100\n"
+"POT-Creation-Date: 2022-02-26 15:37+0100\n"
 "PO-Revision-Date: 2008-12-29 16:22+0100\n"
 "Last-Translator: gerrit <gerrit@nedlinux.nl>\n"
 "Language-Team: gerrit <fy@li.org>\n"
@@ -1145,7 +1145,7 @@ msgstr ""
 msgid "Artist"
 msgstr "Artyst"
 
-msgid "Arts/Culture"
+msgid "Arts/Culture (without music)"
 msgstr ""
 
 msgid "Aruba"
@@ -1343,6 +1343,9 @@ msgstr "Beskikbere variabele formaten"
 #, fuzzy
 msgid "Available locales are:"
 msgstr "Beskikbere variabele formaten"
+
+msgid "Axas E4HD Ultra"
+msgstr ""
 
 msgid "Azerbaijan"
 msgstr ""
@@ -1643,6 +1646,10 @@ msgstr "Kabel"
 msgid "Cable Scan"
 msgstr ""
 
+#, python-format
+msgid "Cable scan executable utility not found '%s'!"
+msgstr ""
+
 msgid "Cabo Verde"
 msgstr ""
 
@@ -1898,7 +1905,7 @@ msgid ""
 "DiSEqC port %s for %s"
 msgstr ""
 
-msgid "Children/Youth"
+msgid "Children/Youth/Education/Science"
 msgstr ""
 
 msgid "Chile"
@@ -3378,6 +3385,11 @@ msgid "Downloadable plugins"
 msgstr "Binnen te heljen ynstekkers"
 
 #
+#, fuzzy
+msgid "Downloaded Images"
+msgstr "Binnenheljen fan"
+
+#
 msgid "Downloading"
 msgstr "Binnenheljen fan"
 
@@ -3393,6 +3405,9 @@ msgstr ""
 #
 msgid "Downloading plugin information. Please wait..."
 msgstr "Binnenheljen fan ynstekker ynformaasje..."
+
+msgid "Drama and Films"
+msgstr ""
 
 #
 #, fuzzy
@@ -3507,9 +3522,6 @@ msgstr "Bewukje titel"
 
 #
 msgid "Edit update source url"
-msgstr ""
-
-msgid "Education/Science/..."
 msgstr ""
 
 msgid "Egypt"
@@ -4355,6 +4367,11 @@ msgstr ""
 msgid "Full view resolution"
 msgstr ""
 
+#
+#, fuzzy
+msgid "Fullbackup Images"
+msgstr "Flash"
+
 msgid "Function of OK button"
 msgstr ""
 
@@ -4588,7 +4605,7 @@ msgstr ""
 msgid "HD2400"
 msgstr ""
 
-msgid "HD60/Multibox/Multibox SE"
+msgid "HD60/HD66SE/Multibox/Multibox SE"
 msgstr ""
 
 msgid "HDMI Colordepth"
@@ -5369,9 +5386,6 @@ msgstr "Links"
 msgid "Left from servicename"
 msgstr ""
 
-msgid "Leisure hobbies"
-msgstr ""
-
 msgid "Lesotho"
 msgstr ""
 
@@ -5946,9 +5960,6 @@ msgstr ""
 msgid "Movie selection"
 msgstr "Tiidsbarren seleksje"
 
-msgid "Movie/Drama"
-msgstr ""
-
 #
 msgid "Movielist menu"
 msgstr "Filmlyst menu"
@@ -6162,7 +6173,7 @@ msgstr ""
 msgid "New Zealand"
 msgstr ""
 
-msgid "News Current Affairs"
+msgid "News/Current Affairs/Social"
 msgstr ""
 
 msgctxt "button label, 'next screen'"
@@ -8947,6 +8958,11 @@ msgstr ""
 msgid "Set blocktimes by weekday"
 msgstr ""
 
+#
+#, fuzzy
+msgid "Set cursor on service from channel history"
+msgstr "set foarich kanaal yn skiednis"
+
 msgid "Set default"
 msgstr ""
 
@@ -9091,9 +9107,6 @@ msgstr "Ynfobalke sjen litte by barren wiksel"
 #, fuzzy
 msgid "Show EPG..."
 msgstr "EPG sjen litte..."
-
-msgid "Show Games show"
-msgstr ""
 
 msgid "Show InfoBar"
 msgstr ""
@@ -9350,6 +9363,9 @@ msgstr ""
 msgid "Show warning when timeshift is stopped"
 msgstr ""
 
+msgid "Show/Game Show/Leisure hobbies"
+msgstr ""
+
 msgid "Show/hide window"
 msgstr ""
 
@@ -9546,9 +9562,6 @@ msgid "Smartcard PIN"
 msgstr ""
 
 msgid "Smooth"
-msgstr ""
-
-msgid "Social/Political/Economics"
 msgstr ""
 
 msgid "SocketMMI"
@@ -12041,7 +12054,7 @@ msgstr ""
 msgid "When enabled, the VCR scart option will be shown on the main menu"
 msgstr ""
 
-msgid "When enabled, the channel selection list will be hidden while listening to a radio channel"
+msgid "When enabled, the channel selection list will be hidden while listening to a radio channel. When disabled, the option 'Auto play last service in radio mode' is available."
 msgstr ""
 
 msgid "When enabled, the infobar will be displayed when a new event starts."
@@ -12069,6 +12082,9 @@ msgid "When enabled, the receiver will select an AC3 track (when available)."
 msgstr ""
 
 msgid "When enabled, the receiver will select an AC3+ track (when available)."
+msgstr ""
+
+msgid "When enabled, then when changing bouquets, set the cursor on the service from the channel history in the channel selection list."
 msgstr ""
 
 msgid "When enabled, this setting has more weight than 'Preferred tuner for recordings'."
@@ -12466,7 +12482,7 @@ msgstr "Neit it earste menu item gean"
 msgid "Zgemma H.S/H.2S/H.2H/H5/H7(old model)"
 msgstr ""
 
-msgid "Zgemma H9(old model)/I55Plus"
+msgid "Zgemma H9(old model)/I55Plus/H8"
 msgstr ""
 
 msgid "Zgemma Star S/2S/H1/H2"
@@ -12522,8 +12538,10 @@ msgstr ""
 msgid "additional cable of rotor"
 msgstr ""
 
-msgid "adult movie/drama"
-msgstr ""
+#
+#, fuzzy
+msgid "adult movie"
+msgstr "Kies in film"
 
 #
 msgid "advanced"
@@ -12624,9 +12642,6 @@ msgstr "better"
 msgid "black"
 msgstr "swart"
 
-msgid "black & white"
-msgstr ""
-
 #
 msgid "blacklist"
 msgstr "swarte lyst"
@@ -12662,7 +12677,7 @@ msgstr ""
 msgid "chapters"
 msgstr "Haadstikken"
 
-msgid "childrens's/youth program (general)"
+msgid "childrens's youth program (general)"
 msgstr ""
 
 #
@@ -12678,10 +12693,6 @@ msgstr ""
 
 msgid "comedy"
 msgstr ""
-
-#
-msgid "config menu"
-msgstr "konfiguraasje menu"
 
 #
 msgid "confirmed"
@@ -12756,7 +12767,7 @@ msgstr ""
 msgid "economics/social advisory"
 msgstr ""
 
-msgid "education/science/factual topics (general)"
+msgid "educational/science/factual topics (general)"
 msgstr ""
 
 msgid "embedded"
@@ -12855,7 +12866,7 @@ msgstr ""
 msgid "fine arts"
 msgstr ""
 
-msgid "fitness & health"
+msgid "fitness and health"
 msgstr ""
 
 #
@@ -12902,9 +12913,6 @@ msgid "further education"
 msgstr ""
 
 msgid "game show/quiz/contest"
-msgstr ""
-
-msgid "gardening"
 msgstr ""
 
 #
@@ -13033,7 +13041,7 @@ msgstr ""
 msgid "literature"
 msgstr ""
 
-msgid "live broadcast"
+msgid "local sports"
 msgstr ""
 
 #
@@ -13090,7 +13098,7 @@ msgstr "Neit it earste menu item gean"
 msgid "move up to previous entry"
 msgstr "Nei it foarige menu item "
 
-msgid "movie/drama (general)"
+msgid "movie (general)"
 msgstr ""
 
 msgid "multi"
@@ -13241,9 +13249,6 @@ msgstr "Iepenje nammeserver konfiguraasje"
 msgid "original"
 msgstr ""
 
-msgid "original language"
-msgstr ""
-
 #
 msgid "pass"
 msgstr "trochgean"
@@ -13266,6 +13271,9 @@ msgid "popular culture/traditional arts"
 msgstr ""
 
 msgid "pre-school children's program"
+msgstr ""
+
+msgid "preserve bookmarks in cuts"
 msgstr ""
 
 msgid "receiver software because updates are available."
@@ -13296,6 +13304,11 @@ msgstr "nei dizze posysje alles ferwiderje"
 #
 msgid "remove before this position"
 msgstr "foar dizze posysje alles ferwiderje"
+
+#
+#, fuzzy
+msgid "remove bookmarks in cuts"
+msgstr "boekmerk ferwiderje"
 
 #
 msgid "remove this mark"
@@ -13357,7 +13370,7 @@ msgstr "Kies menu item"
 msgid "serious music/classic music"
 msgstr ""
 
-msgid "serious/classical/religious/historical movie/drama"
+msgid "serious/classical/religious/historical drama"
 msgstr ""
 
 #
@@ -13444,13 +13457,13 @@ msgstr ""
 msgid "slot%s - %s, without backup"
 msgstr ""
 
-msgid "soap/melodram/folkloric"
+msgid "soap/melodrama/folkloric"
 msgstr ""
 
 msgid "social/political issues/economics (general)"
 msgstr ""
 
-msgid "social/spiritual science"
+msgid "social/spiritual sciences"
 msgstr ""
 
 msgid "space"
@@ -13509,10 +13522,10 @@ msgstr "skeakelje nei de folgende undertiteling taal"
 msgid "talk show"
 msgstr ""
 
-msgid "team sports"
+msgid "team sports/excluding football"
 msgstr ""
 
-msgid "technology/natural science"
+msgid "technology/natural sciences"
 msgstr ""
 
 #
@@ -13568,9 +13581,6 @@ msgstr ""
 #
 msgid "unknown service"
 msgstr "unbeneame kanaal"
-
-msgid "unpublished"
-msgstr ""
 
 msgid "untestable"
 msgstr ""

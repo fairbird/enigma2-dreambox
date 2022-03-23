@@ -1,5 +1,4 @@
 #include <lib/gdi/lcd.h>
-#include <lib/gdi/epng.h>
 
 #include <unistd.h>
 #include <fcntl.h>
@@ -77,7 +76,6 @@ eDBoxLCD::eDBoxLCD()
 {
 	int xres = 132, yres = 64, bpp = 8;
 	flipped = false;
-	dump = false;
 	inverted = 0;
 	lcd_type = 0;
 #ifndef NO_LCD
@@ -93,7 +91,7 @@ eDBoxLCD::eDBoxLCD()
 		lcd_type = 1;
 
 	if (lcdfd < 0)
-		eDebug("[eLCD] No oled0 or lcd0 device found!");
+		eDebug("[eDboxLCD] No oled0 or lcd0 device found!");
 	else
 	{
 
@@ -129,7 +127,7 @@ eDBoxLCD::eDBoxLCD()
 			}
 			lcd_type = 3;
 		}
-		eDebug("[eLCD] xres=%d, yres=%d, bpp=%d lcd_type=%d", xres, yres, bpp, lcd_type);
+		eDebug("[eDboxLCD] xres=%d, yres=%d, bpp=%d lcd_type=%d", xres, yres, bpp, lcd_type);
 
 		instance = this;
 		setSize(xres, yres, bpp);
@@ -149,12 +147,6 @@ void eDBoxLCD::setFlipped(bool onoff)
 	update();
 }
 
-void eDBoxLCD::setDump(bool onoff)
-{
- 	dump = onoff;
- 	dumpLCD2PNG();
-}
-
 int eDBoxLCD::setLCDContrast(int contrast)
 {
 #ifndef NO_LCD
@@ -165,17 +157,17 @@ int eDBoxLCD::setLCDContrast(int contrast)
 #define LCDSET                  0x1000
 #define	LCD_IOCTL_SRV			(10|LCDSET)
 #endif
-	eDebug("[eLCD] setLCDContrast %d", contrast);
+	eDebug("[eDboxLCD] setLCDContrast %d", contrast);
 
 	int fp;
 	if((fp = open("/dev/dbox/fp0", O_RDWR)) < 0)
 	{
-		eDebug("[eLCD] can't open /dev/dbox/fp0: %m");
+		eDebug("[eDboxLCD] can't open /dev/dbox/fp0: %m");
 		return(-1);
 	}
 
 	if(ioctl(lcdfd, LCD_IOCTL_SRV, &contrast) < 0)
-		eDebug("[eLCD] can't set lcd contrast: %m");
+		eDebug("[eDboxLCD] can't set lcd contrast: %m");
 	close(fp);
 #endif
 	return(0);
@@ -187,14 +179,14 @@ int eDBoxLCD::setLCDBrightness(int brightness)
 	if (lcdfd < 0)
 		return(0);
 
-	eDebug("[eLCD] setLCDBrightness %d", brightness);
+	eDebug("[eDboxLCD] setLCDBrightness %d", brightness);
 	FILE *f = fopen("/proc/stb/lcd/oled_brightness", "w");
 	if (!f)
 		f = fopen("/proc/stb/fp/oled_brightness", "w");
 	if (f)
 	{
 		if (fprintf(f, "%d", brightness) == 0)
-			eDebug("[eLCD] write /proc/stb/lcd|fp/oled_brightness failed: %m");
+			eDebug("[eDboxLCD] write /proc/stb/lcd|fp/oled_brightness failed: %m");
 		fclose(f);
 	}
 	else
@@ -202,14 +194,14 @@ int eDBoxLCD::setLCDBrightness(int brightness)
 		int fp;
 		if ((fp = open("/dev/dbox/fp0", O_RDWR)) < 0)
 		{
-			eDebug("[eLCD] can't open /dev/dbox/fp0: %m");
+			eDebug("[eDboxLCD] can't open /dev/dbox/fp0: %m");
 			return(-1);
 		}
 #ifndef FP_IOCTL_LCD_DIMM
 #define FP_IOCTL_LCD_DIMM       3
 #endif
 		if (ioctl(fp, FP_IOCTL_LCD_DIMM, &brightness) < 0)
-			eDebug("[eLCD] can't set lcd brightness: %m");
+			eDebug("[eDboxLCD] can't set lcd brightness: %m");
 		close(fp);
 	}
 #endif
@@ -222,61 +214,6 @@ eDBoxLCD::~eDBoxLCD()
 	{
 		close(lcdfd);
 		lcdfd = -1;
-	}
-}
-
-void eDBoxLCD::dumpLCD2PNG(void)
-{
-	if (dump)
-	{
-		int bpp =( _stride *8)/res.width();
-		int lcd_width = res.width();
-		int lcd_hight = res.height();
-		ePtr<gPixmap> pixmap32;
-		pixmap32 = new gPixmap(eSize(lcd_width, lcd_hight), 32, gPixmap::accelAuto);
-		const uint8_t *srcptr = (uint8_t*)_buffer;
-		uint8_t *dstptr=(uint8_t*)pixmap32->surface->data;
-
-		switch(bpp)
-		{
-			case 8:
-				eDebug("[eLCD] 8 bit not supportet yet");
-				break;
-			case 16:
-				{
-
-					for (int y = lcd_hight; y != 0; --y)
-					{
-						gRGB pixel32;
-						uint16_t pixel16;
-						int x = lcd_width;
-						gRGB *dst = (gRGB *)dstptr;
-						const uint16_t *src = (const uint16_t *)srcptr;
-						while (x--)
-						{
-#if BYTE_ORDER == LITTLE_ENDIAN
-							pixel16 = bswap_16(*src++);
-#else
-							pixel16 = *src++;;
-#endif
-							pixel32.a = 0xFF;
-							pixel32.r = (pixel16 << 3) & 0xF8;
-							pixel32.g = (pixel16 >> 3) & 0xFC;
-							pixel32.b = (pixel16 >> 8) & 0xF8;
-							*dst++ = pixel32;
-						}
-						srcptr += _stride;
-						dstptr += pixmap32->surface->stride;
-					}
-					savePNG("/tmp/lcd.png", pixmap32);
-				}
-				break;
-			case 32:
-				eDebug("[eLCD]  32 bit not supportet yet");
-				break;
-			default:
-				eDebug("[eLCD] %d bit not supportet yet",bpp);
-		}
 	}
 }
 
@@ -331,22 +268,7 @@ void eDBoxLCD::update()
 			write(lcdfd, raw, _stride * height);
 		}
 		else
-#if !defined(DREAMBOX_MOVE_LCD)
 			write(lcdfd, _buffer, _stride * res.height());
-#else
-		{
-			unsigned char gb_buffer[_stride * res.height()];
-			for (int offset = 0; offset < ((_stride * res.height())>>2); offset ++)
-			{
-				unsigned int src = 0;
-				if (offset%(_stride>>2) >= 4) // 4 is offset for dm9x0
-					src = ((unsigned int*)_buffer)[offset - 4];  
-			//                                             blue                         red                  green low                     green high
-			((unsigned int*)gb_buffer)[offset] = ((src >> 3) & 0x001F001F) | ((src << 3) & 0xF800F800) | ((src >> 8) & 0x00E000E0) | ((src << 8) & 0x07000700);
-			}
-			write(lcdfd, gb_buffer, _stride * res.height());
-		}
-#endif
 	}
 	else /* lcd_type == 1 */
 	{
@@ -375,7 +297,6 @@ void eDBoxLCD::update()
 		}
 		write(lcdfd, raw, 64 * 64);
 	}
-	dumpLCD2PNG();
 #endif
 }
 

@@ -8,7 +8,7 @@ from Components.config import ConfigSubsection, ConfigText, config
 from Components.RcModel import rc_model
 from Components.Sources.Source import ObsoleteSource
 from Components.SystemInfo import SystemInfo
-from Tools.Directories import SCOPE_CONFIG, SCOPE_CURRENT_LCDSKIN, SCOPE_CURRENT_SKIN, SCOPE_FONTS, SCOPE_SKIN, SCOPE_SKIN_IMAGE, resolveFilename, fileExists
+from Tools.Directories import SCOPE_CONFIG, SCOPE_CURRENT_LCDSKIN, SCOPE_CURRENT_SKIN, SCOPE_FONTS, SCOPE_SKIN, SCOPE_SKIN_IMAGE, resolveFilename
 from Tools.Import import my_import
 from Tools.LoadPixmap import LoadPixmap
 
@@ -391,7 +391,7 @@ def loadPixmap(path, desktop, width=0, height=0):
 	option = path.find("#")
 	if option != -1:
 		path = path[:option]
-	if basename(path) in ("rc.png", "rc0.png", "rc1.png", "rc2.png", "oldrc.png"):
+	if not rc_model.rcIsDefault() and basename(path) in ("rc.png", "rc0.png", "rc1.png", "rc2.png", "oldrc.png"):
 		path = rc_model.getRcImg()
 	pixmap = LoadPixmap(path, desktop, None, width, height)
 	if pixmap is None:
@@ -815,10 +815,6 @@ def loadSingleSkinData(desktop, screenID, domSkin, pathSkin, scope=SCOPE_CURRENT
 			else:
 				render = 0
 			filename = resolveFilename(SCOPE_FONTS, filename, path_prefix=pathSkin)
-			if not fileExists(filename): #when font is not available look at current skin path
-				filename = resolveFilename(SCOPE_CURRENT_SKIN, filename)
-				if not fileExists(filename) and fileExists(resolveFilename(SCOPE_CURRENT_LCDSKIN, filename)):
-					filename = resolveFilename(SCOPE_CURRENT_LCDSKIN, filename)
 			if isfile(filename):
 				addFont(filename, name, scale, isReplacement, render)
 				# Log provided by C++ addFont code.

@@ -38,7 +38,6 @@ public:
 	virtual void setInverted( unsigned char )=0;
 	virtual void setFlipped(bool)=0;
 	virtual void dumpLCD(bool png=true)=0;
-	virtual void setDump(bool)=0;
 	virtual int waitVSync()=0;
 	virtual bool isOled() const=0;
 	int getLcdType() { return lcd_type; };
@@ -60,7 +59,6 @@ class eDBoxLCD: public eLCD
 {
 	unsigned char inverted;
 	bool flipped;
-	bool dump;
 #ifdef SWIG
 	eDBoxLCD();
 	~eDBoxLCD();
@@ -75,12 +73,10 @@ public:
 	void setInverted( unsigned char );
 	void setFlipped(bool);
 	void dumpLCD(bool);
-	void setDump(bool);
 	bool isOled() const { return !!lcd_type; };
 	void setPalette(gUnmanagedSurface) {};
 	void update();
 	int waitVSync() { return 0; };
-	void dumpLCD2PNG(void);
 };
 
 #endif

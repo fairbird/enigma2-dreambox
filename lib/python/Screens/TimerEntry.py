@@ -6,8 +6,6 @@ from Components.ActionMap import NumberActionMap
 from Components.ConfigList import ConfigListScreen
 from Components.MenuList import MenuList
 from Components.Sources.StaticText import StaticText
-from Components.Button import Button
-from Components.Pixmap import Pixmap
 from Components.Label import Label
 from Components.NimManager import nimmanager
 from Components.SystemInfo import SystemInfo
@@ -24,9 +22,7 @@ from time import localtime, mktime, time, strftime
 from datetime import datetime
 
 
-class TimerEntry(Screen, ConfigListScreen):
-	EMPTY = 0
-
+class TimerEntry(ConfigListScreen, Screen):
 	def __init__(self, session, timer):
 		Screen.__init__(self, session)
 		self.timer = timer
@@ -39,18 +35,11 @@ class TimerEntry(Screen, ConfigListScreen):
 
 		self.entryDate = None
 		self.entryService = None
-		self.key_red_choice = self.EMPTY
 
-		if self.key_red_choice != Pixmap:
-			self["key_red"] = StaticText(_("Cancel"))
-			self["key_green"] = StaticText(_("Save"))
-			self["key_yellow"] = StaticText(_("Timer type"))
-			self["key_blue"] = StaticText("")
-		if self.key_red_choice != StaticText:
-			self["oktext"] = Label(_("OK"))
-			self["canceltext"] = Label(_("Cancel"))
-			self["ok"] = Pixmap()
-			self["cancel"] = Pixmap()
+		self["key_red"] = StaticText(_("Cancel"))
+		self["key_green"] = StaticText(_("Save"))
+		self["key_yellow"] = StaticText(_("Timer type"))
+		self["key_blue"] = StaticText("")
 
 		self["actions"] = NumberActionMap(["SetupActions", "GlobalActions", "PiPSetupActions", "ColorActions"],
 		{
@@ -139,7 +128,7 @@ class TimerEntry(Screen, ConfigListScreen):
 		self.timerentry_pipzap = ConfigYesNo(default=pipzap)
 		self.timerentry_conflictdetection = ConfigYesNo(default=conflict_detection)
 
-		self.timerentry_date = ConfigDateTime(default = self.timer.begin, formatstring = config.usage.date.full.value, increment = 86400)
+		self.timerentry_date = ConfigDateTime(default=self.timer.begin, formatstring=_("%d.%B %Y"), increment=86400)
 		self.timerentry_starttime = ConfigClock(default=self.timer.begin)
 		self.timerentry_endtime = ConfigClock(default=self.timer.end)
 		self.timerentry_showendtime = ConfigSelection(default=((self.timer.end - self.timer.begin) > 4), choices=[(True, _("yes")), (False, _("no"))])
@@ -155,7 +144,7 @@ class TimerEntry(Screen, ConfigListScreen):
 			locations.append(default)
 		self.timerentry_fallbackdirname = ConfigSelection(default=default, choices=locations)
 
-		self.timerentry_repeatedbegindate = ConfigDateTime(default = self.timer.repeatedbegindate, formatstring = config.usage.date.full.value, increment = 86400)
+		self.timerentry_repeatedbegindate = ConfigDateTime(default=self.timer.repeatedbegindate, formatstring=_("%d.%B %Y"), increment=86400)
 
 		self.timerentry_weekday = ConfigSelection(default=weekday_table[weekday], choices=[("mon", _("Monday")), ("tue", _("Tuesday")), ("wed", _("Wednesday")), ("thu", _("Thursday")), ("fri", _("Friday")), ("sat", _("Saturday")), ("sun", _("Sunday"))])
 
@@ -253,7 +242,6 @@ class TimerEntry(Screen, ConfigListScreen):
 			self.list.append(getConfigListEntry(_("Recording type"), self.timerentry_recordingtype))
 
 		self[widget].list = self.list
-		self[widget].l.setList(self.list)
 
 	def newConfig(self):
 		print("[TimerEdit] newConfig", self["config"].getCurrent())
@@ -603,7 +591,7 @@ class TimerLog(Screen):
 		self.updateText()
 
 	def fillLogList(self):
-		self.list = [(str(strftime(config.usage.date.daylong.value + " " + config.usage.time.short.value, localtime(x[0])) + " - " + x[2]), x) for x in self.log_entries]
+		self.list = [(str(strftime("%Y-%m-%d %H-%M", localtime(x[0])) + " - " + x[2]), x) for x in self.log_entries]
 
 	def clearLog(self):
 		self.log_entries = []

@@ -1,6 +1,5 @@
 import sys
 import os
-from time import time
 from Tools.Profile import profile, profile_final
 profile("PYTHON_START")
 
@@ -13,16 +12,16 @@ import eBaseImpl
 enigma.eTimer = eBaseImpl.eTimer
 enigma.eSocketNotifier = eBaseImpl.eSocketNotifier
 enigma.eConsoleAppContainer = eConsoleImpl.eConsoleAppContainer
-from Components.config import config, configfile, ConfigText, ConfigYesNo, ConfigInteger, ConfigSelection, NoSave
 
 from traceback import print_exc
 
-# New Plugin Style
-config.misc.plugin_style = ConfigSelection(default='normallstyle', choices=[
-	('normallstyle', _('Normall Style')),
-	('newstyle1', _('New Style 1')),
-	('newstyle2', _('New Style 2')),
-	('newstyle3', _('New Style 3'))])
+profile("SetupDevices")
+import Components.SetupDevices
+Components.SetupDevices.InitSetupDevices()
+
+profile("Geolocation")
+import Tools.Geolocation
+Tools.Geolocation.InitGeolocation()
 
 profile("SimpleSummary")
 from Screens import InfoBar
@@ -31,6 +30,7 @@ from Screens.SimpleSummary import SimpleSummary
 from sys import stdout
 
 profile("Bouquets")
+from Components.config import config, configfile, ConfigText, ConfigYesNo, ConfigInteger, NoSave
 config.misc.load_unlinked_userbouquets = ConfigYesNo(default=True)
 
 
@@ -58,6 +58,7 @@ InitFallbackFiles()
 profile("config.misc")
 config.misc.radiopic = ConfigText(default=resolveFilename(SCOPE_CURRENT_SKIN, "radio.mvi"))
 config.misc.blackradiopic = ConfigText(default=resolveFilename(SCOPE_CURRENT_SKIN, "black.mvi"))
+config.misc.useTransponderTime = ConfigYesNo(default=True)
 config.misc.startCounter = ConfigInteger(default=0) # number of e2 starts...
 config.misc.standbyCounter = NoSave(ConfigInteger(default=0)) # number of standby
 config.misc.DeepStandby = NoSave(ConfigYesNo(default=False)) # detect deepstandby
@@ -86,6 +87,13 @@ def setEPGCachePath(configElement):
 #config.misc.standbyCounter.addNotifier(standbyCountChanged, initial_call = False)
 ####################################################
 
+
+def useTransponderTimeChanged(configElement):
+	enigma.eDVBLocalTimeHandler.getInstance().setUseDVBTime(configElement.value)
+
+
+config.misc.useTransponderTime.addNotifier(useTransponderTimeChanged)
+
 profile("Twisted")
 try:
 	import twisted.python.runtime
@@ -105,21 +113,13 @@ except ImportError:
 
 profile("LOAD:Plugin")
 
-from twisted.python import log
-config.misc.enabletwistedlog = ConfigYesNo(default=False)
-if config.misc.enabletwistedlog.value == True:
-	log.startLogging(open('/tmp/twisted.log', 'w'))
-else:
-	log.startLogging(sys.stdout)
-
 # initialize autorun plugins and plugin menu entries
 from Components.PluginComponent import plugins
 
 profile("LOAD:Wizard")
-config.misc.rcused = ConfigInteger(default=1)
 from Screens.Wizard import wizardManager
 from Screens.StartWizard import *
-#import Screens.Rc
+import Screens.Rc
 from Tools.BoundFunction import boundFunction
 from Plugins.Plugin import PluginDescriptor
 
@@ -300,9 +300,8 @@ class Session:
 
 	def openWithCallback(self, callback, screen, *arguments, **kwargs):
 		dlg = self.open(screen, *arguments, **kwargs)
-		if dlg != 'config.crash.bsodpython.value=True':
-			dlg.callback = callback
-			return dlg
+		dlg.callback = callback
+		return dlg
 
 	def open(self, screen, *arguments, **kwargs):
 		if self.dialog_stack and not self.in_exec:
@@ -310,15 +309,7 @@ class Session:
 			# ...unless it's the very first screen.
 
 		self.pushCurrent()
-		if config.crash.bsodpython.value:
-			try:
-				dlg = self.current_dialog = self.instantiateDialog(screen, *arguments, **kwargs)
-			except:
-				self.popCurrent()
-				raise
-				return 'config.crash.bsodpython.value=True'
-		else:
-			dlg = self.current_dialog = self.instantiateDialog(screen, *arguments, **kwargs)
+		dlg = self.current_dialog = self.instantiateDialog(screen, *arguments, **kwargs)
 		dlg.isTmp = True
 		dlg.callback = None
 		self.execBegin()
@@ -452,10 +443,6 @@ from Screens.Ci import CiHandler
 profile("Load:VolumeControl")
 from Components.VolumeControl import VolumeControl
 
-profile("Load:StackTracePrinter")
-from Components.StackTrace import StackTracePrinter
-StackTracePrinterInst = StackTracePrinter()
-
 
 def runScreenTest():
 	config.misc.startCounter.value += 1
@@ -571,17 +558,9 @@ import Components.InputDevice
 Components.InputDevice.InitInputDevices()
 import Components.InputHotplug
 
-profile("SetupDevices")
-import Components.SetupDevices
-Components.SetupDevices.InitSetupDevices()
-
 profile("AVSwitch")
 import Components.AVSwitch
 Components.AVSwitch.InitAVSwitch()
-
-profile("HdmiRecord")
-import Components.HdmiRecord
-Components.HdmiRecord.InitHdmiRecord()
 
 profile("RecordingConfig")
 import Components.RecordingConfig
@@ -594,14 +573,6 @@ Components.UsageConfig.InitUsageConfig()
 profile("Timezones")
 import Components.Timezones
 Components.Timezones.InitTimeZones()
-
-profile("Init:NTPSync")
-import Components.NetworkTime
-Components.NetworkTime.AutoNTPSync()
-
-profile("Init:DebugLogCheck")
-import Screens.LogManager
-Screens.LogManager.AutoLogManager()
 
 profile("keymapparser")
 import keymapparser
@@ -616,19 +587,6 @@ profile("LCD")
 import Components.Lcd
 Components.Lcd.InitLcd()
 
-from Tools.HardwareInfo import HardwareInfo
-if HardwareInfo().get_device_model() in ('dm7080', 'dm820', 'dm900', 'dm920', 'dreamone', 'dreamtwo'):
-	print("[StartEnigma] Read /proc/stb/hdmi-rx/0/hdmi_rx_monitor")
-	check = open("/proc/stb/hdmi-rx/0/hdmi_rx_monitor", "r").read()
-	if check.startswith("on"):
-		print("[StartEnigma] Write to /proc/stb/hdmi-rx/0/hdmi_rx_monitor")
-		open("/proc/stb/hdmi-rx/0/hdmi_rx_monitor", "w").write("off")
-	print("[StartEnigma] Read /proc/stb/audio/hdmi_rx_monitor")
-	checkaudio = open("/proc/stb/audio/hdmi_rx_monitor", "r").read()
-	if checkaudio.startswith("on"):
-		print("[StartEnigma] Write to /proc/stb/audio/hdmi_rx_monitor")
-		open("/proc/stb/audio/hdmi_rx_monitor", "w").write("off")
-
 profile("RFMod")
 import Components.RFmod
 Components.RFmod.InitRFmod()
@@ -639,11 +597,6 @@ Screens.Ci.InitCiConfig()
 
 profile("RcModel")
 import Components.RcModel
-
-profile("EpgCacheSched")
-import Components.EpgLoadSave
-Components.EpgLoadSave.EpgCacheSaveCheck()
-Components.EpgLoadSave.EpgCacheLoadCheck()
 
 #from enigma import dump_malloc_stats
 #t = eTimer()

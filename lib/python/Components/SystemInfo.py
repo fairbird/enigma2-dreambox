@@ -1,167 +1,18 @@
-from hashlib import md5
-from os.path import exists as fileAccess, isdir, isfile, join as pathjoin
-from re import findall
+import re
 
 from enigma import Misc_Options, eDVBCIInterfaces, eDVBResourceManager, eGetEnigmaDebugLvl
-from Tools.Directories import SCOPE_PLUGINS, SCOPE_LIBDIR, SCOPE_SKIN, fileCheck, fileReadLine, fileReadLines, resolveFilename, fileExists, fileHas, fileReadLine, pathExists
+from Tools.Directories import SCOPE_PLUGINS, fileCheck, fileExists, fileHas, pathExists, resolveFilename
 from Tools.HardwareInfo import HardwareInfo
 
-MODULE_NAME = __name__.split(".")[-1]
-
 SystemInfo = {}
-
-class BoxInformation:  # To maintain data integrity class variables should not be accessed from outside of this class!
-	def __init__(self):
-		self.immutableList = []
-		self.procList = []
-		self.boxInfo = {}
-		self.enigmaList = []
-		self.enigmaInfo = {}
-		lines = fileReadLines(pathjoin(resolveFilename(SCOPE_LIBDIR), "enigma.info"), source=MODULE_NAME)
-		if lines:
-			modified = self.checkChecksum(lines)
-			if modified:
-				print("[SystemInfo] WARNING: Enigma information file checksum is incorrect!  File appears to have been modified.")
-				self.boxInfo["checksumerror"] = True
-			else:
-				print("[SystemInfo] Enigma information file checksum is correct.")
-				self.boxInfo["checksumerror"] = False
-			for line in lines:
-				if line.startswith("#") or line.strip() == "":
-					continue
-				if "=" in line:
-					item, value = [x.strip() for x in line.split("=", 1)]
-					if item:
-						self.immutableList.append(item)
-						self.procList.append(item)
-						self.boxInfo[item] = self.processValue(value)
-			self.procList = sorted(self.procList)
-			print("[SystemInfo] Enigma information file data loaded into BoxInfo.")
-		else:
-			print("[SystemInfo] ERROR: Enigma information file is not available!  The system is unlikely to boot or operate correctly.")
-		lines = fileReadLines(pathjoin(resolveFilename(SCOPE_LIBDIR), "enigma.conf"), source=MODULE_NAME)
-		if lines:
-			print("[SystemInfo] Enigma config override file available and data loaded into BoxInfo.")
-			self.boxInfo["overrideactive"] = True
-			for line in lines:
-				if line.startswith("#") or line.strip() == "":
-					continue
-				if "=" in line:
-					item, value = [x.strip() for x in line.split("=", 1)]
-					if item:
-						self.enigmaList.append(item)
-						self.enigmaInfo[item] = self.processValue(value)
-						if item in self.boxInfo:
-							print("[SystemInfo] Note: Enigma information value '%s' with value '%s' being overridden to '%s'." % (item, self.boxInfo[item], value))
-			self.enigmaList = sorted(self.enigmaList)
-		else:
-			self.boxInfo["overrideactive"] = False
-
-	def checkChecksum(self, lines):
-		value = "Undefined!"
-		data = []
-		for line in lines:
-			if line.startswith("checksum"):
-				item, value = [x.strip() for x in line.split("=", 1)]
-			else:
-				data.append(line)
-		data.append("")
-		result = md5(bytearray("\n".join(data), "UTF-8", errors="ignore")).hexdigest()
-		return value != result
-
-	def processValue(self, value):
-		valueTest = value.upper() if value else ""
-		if value is None:
-			pass
-		elif value.startswith("\"") or value.startswith("'") and value.endswith(value[0]):
-			value = value[1:-1]
-		elif value.startswith("(") and value.endswith(")"):
-			data = []
-			for item in [x.strip() for x in value[1:-1].split(",")]:
-				data.append(self.processValue(item))
-			value = tuple(data)
-		elif value.startswith("[") and value.endswith("]"):
-			data = []
-			for item in [x.strip() for x in value[1:-1].split(",")]:
-				data.append(self.processValue(item))
-			value = list(data)
-		elif valueTest == "NONE":
-			value = None
-		elif valueTest in ("FALSE", "NO", "OFF", "DISABLED"):
-			value = False
-		elif valueTest in ("TRUE", "YES", "ON", "ENABLED"):
-			value = True
-		elif value.isdigit() or (value[0:1] == "-" and value[1:].isdigit()):
-			value = int(value)
-		elif valueTest.startswith("0X"):
-			try:
-				value = int(value, 16)
-			except ValueError:
-				pass
-		elif valueTest.startswith("0O"):
-			try:
-				value = int(value, 8)
-			except ValueError:
-				pass
-		elif valueTest.startswith("0B"):
-			try:
-				value = int(value, 2)
-			except ValueError:
-				pass
-		else:
-			try:
-				value = float(value)
-			except ValueError:
-				pass
-		return value
-
-	def getProcList(self):
-		return self.procList
-
-	def getEnigmaList(self):
-		return self.enigmaList
-
-	def getItemsList(self):
-		return sorted(list(self.boxInfo.keys()))
-
-	def getItem(self, item, default=None):
-		if item in self.enigmaList:
-			value = self.enigmaInfo[item]
-		elif item in self.boxInfo:
-			value = self.boxInfo[item]
-		elif item in SystemInfo:
-			value = SystemInfo[item]
-		else:
-			value = default
-		return value
-
-	def setItem(self, item, value, immutable=False):
-		if item in self.immutableList or item in self.procList:
-			print("[BoxInfo] Error: Item '%s' is immutable and can not be %s!" % (item, "changed" if item in self.boxInfo else "added"))
-			return False
-		if immutable:
-			self.immutableList.append(item)
-		self.boxInfo[item] = value
-		SystemInfo[item] = value
-		return True
-
-	def deleteItem(self, item):
-		if item in self.immutableListor or item in self.procList:
-			print("[BoxInfo] Error: Item '%s' is immutable and can not be deleted!" % item)
-		elif item in self.boxInfo:
-			del self.boxInfo[item]
-			return True
-		return False
-
-
-BoxInfo = BoxInformation()
 
 from Tools.Multiboot import getMultibootStartupDevice, getMultibootslots  # This import needs to be here to avoid a SystemInfo load loop!
 
 # Parse the boot commandline.
 #
-cmdline = fileReadLine("/proc/cmdline", source=MODULE_NAME)
-cmdline = {k: v.strip('"') for k, v in findall(r'(\S+)=(".*?"|\S+)', cmdline)}
+with open("/proc/cmdline", "r") as fd:
+	cmdline = fd.read()
+cmdline = {k: v.strip('"') for k, v in re.findall(r'(\S+)=(".*?"|\S+)', cmdline)}
 
 
 def getNumVideoDecoders():
@@ -189,17 +40,8 @@ def getBootdevice():
 		dev = dev[:-1]
 	return dev
 
-def getRCFile(ext):
-	filename = resolveFilename(SCOPE_SKIN, pathjoin("rc_models", "%s.%s" % (BoxInfo.getItem("rcname"), ext)))
-	if not isfile(filename):
-		filename = resolveFilename(SCOPE_SKIN, pathjoin("rc_models", "dmm.%s" % ext))
-	return filename
-
 
 model = HardwareInfo().get_device_model()
-
-BoxInfo.setItem("RCImage", getRCFile("png"))
-BoxInfo.setItem("RCMapping", getRCFile("xml"))
 SystemInfo["InDebugMode"] = eGetEnigmaDebugLvl() >= 4
 SystemInfo["CommonInterface"] = model in ("h9combo", "h9combose", "h10","pulse4kmini") and 1 or eDVBCIInterfaces.getInstance().getNumOfSlots()
 SystemInfo["CommonInterfaceCIDelay"] = fileCheck("/proc/stb/tsmux/rmx_delay")
@@ -245,10 +87,6 @@ SystemInfo["VFD_final_scroll_delay"] = not model.startswith("et8500") and fileCh
 SystemInfo["LcdLiveTV"] = fileCheck("/proc/stb/fb/sd_detach") or fileCheck("/proc/stb/lcd/live_enable")
 SystemInfo["LcdLiveTVMode"] = fileCheck("/proc/stb/lcd/mode")
 SystemInfo["LcdLiveDecoder"] = fileCheck("/proc/stb/lcd/live_decoder")
-SystemInfo["LCDMiniTV"] = fileExists("/proc/stb/lcd/mode")
-SystemInfo["ConfigDisplay"] = SystemInfo["FrontpanelDisplay"]
-SystemInfo["DreamBoxAudio"] = model in ("dm7080", "dm800", 'dm900', 'dm920', 'dreamone', 'dreamtwo')
-SystemInfo["DefaultDisplayBrightness"] = model in ('dm900', 'dm920', 'dreamone', 'dreamtwo') and 8 or 5
 SystemInfo["FastChannelChange"] = False
 SystemInfo["3DMode"] = fileCheck("/proc/stb/fb/3dmode") or fileCheck("/proc/stb/fb/primary/3d")
 SystemInfo["3DZNorm"] = fileCheck("/proc/stb/fb/znorm") or fileCheck("/proc/stb/fb/primary/zoffset")
@@ -270,14 +108,11 @@ SystemInfo["Has2160p"] = fileHas("/proc/stb/video/videomode_preferred", "2160p50
 SystemInfo["HasHDMIpreemphasis"] = fileCheck("/proc/stb/hdmi/preemphasis")
 SystemInfo["HasColorimetry"] = fileCheck("/proc/stb/video/hdmi_colorimetry")
 SystemInfo["HasHdrType"] = fileCheck("/proc/stb/video/hdmi_hdrtype")
-SystemInfo["HasHDMIin"] = model in ('dm7080', 'dm820')
-SystemInfo["HasHDMIinFHD"] = model in ('dm900', 'dm920', 'dreamone', 'dreamtwo')
-SystemInfo["HDMIin"] = SystemInfo["HasHDMIin"] or SystemInfo["HasHDMIinFHD"]
+SystemInfo["HasHDMIin"] = model in ("vuduo4k", "vuduo4kse", "vuultimo4k", "vuuno4kse", "gbquad4k", "hd2400", "et10000")
 SystemInfo["HasHDMI-CEC"] = HardwareInfo().has_hdmi() and fileExists(resolveFilename(SCOPE_PLUGINS, "SystemPlugins/HdmiCEC/plugin.pyo")) and (fileExists("/dev/cec0") or fileExists("/dev/hdmi_cec") or fileExists("/dev/misc/hdmi_cec0"))
 SystemInfo["HasYPbPr"] = model in ("dm8000", "et5000", "et6000", "et6500", "et9000", "et9200", "et9500", "et10000", "formuler1", "mbtwinplus", "spycat", "vusolo", "vuduo", "vuduo2", "vuultimo")
 SystemInfo["HasScart"] = model in ("dm8000", "et4000", "et6500", "et8000", "et9000", "et9200", "et9500", "et10000", "formuler1", "hd1100", "hd1200", "hd1265", "hd2400", "vusolo", "vusolo2", "vuduo", "vuduo2", "vuultimo", "vuuno", "xp1000")
 SystemInfo["HasSVideo"] = model in ("dm8000")
-SystemInfo["RecoveryMode"] = fileCheck("/proc/stb/fp/boot_mode")
 SystemInfo["HasComposite"] = model not in ("i55", "gbquad4k", "gbue4k", "hd1500", "osnino", "osninoplus", "purehd", "purehdse", "revo4k", "vusolo4k", "vuzero4k", "vuduo4k", "vuduo4kse", "vuuno4k", "vuuno4kse", "vuultimo4k")
 SystemInfo["HasAutoVolume"] = fileExists("/proc/stb/audio/avl_choices") and fileCheck("/proc/stb/audio/avl")
 SystemInfo["HasAutoVolumeLevel"] = fileExists("/proc/stb/audio/autovolumelevel_choices") and fileCheck("/proc/stb/audio/autovolumelevel")
@@ -302,20 +137,3 @@ SystemInfo["FbcTunerPowerAlwaysOn"] = model in ("vusolo4k", "vuduo4k", "vuduo4ks
 SystemInfo["HasPhysicalLoopthrough"] = ["Vuplus DVB-S NIM(AVL2108)", "GIGA DVB-S2 NIM (Internal)"]
 SystemInfo["HasFBCtuner"] = ["Vuplus DVB-C NIM(BCM3158)", "Vuplus DVB-C NIM(BCM3148)", "Vuplus DVB-S NIM(7376 FBC)", "Vuplus DVB-S NIM(45308X FBC)", "Vuplus DVB-S NIM(45208 FBC)", "DVB-S NIM(45208 FBC)", "DVB-S2X NIM(45308X FBC)", "DVB-S2 NIM(45308 FBC)", "DVB-C NIM(3128 FBC)", "BCM45208", "BCM45308X", "BCM3158"]
 SystemInfo["HasHiSi"] = pathExists("/proc/hisi")
-SystemInfo["OScamInstalled"] = fileExists("/usr/bin/oscam") or fileExists("/usr/bin/oscam-emu") or fileExists("/usr/bin/oscam-smod")
-SystemInfo["OScamIsActive"] = SystemInfo["OScamInstalled"] and fileExists("/tmp/.oscam/oscam.version")
-SystemInfo["NCamInstalled"] = fileExists("/usr/bin/ncam")
-SystemInfo["NCamIsActive"] = SystemInfo["NCamInstalled"] and fileExists("/tmp/.ncam/ncam.version")
-SystemInfo["FrontpanelLEDBlinkControl"] = fileExists("/proc/stb/fp/led_blink")
-SystemInfo["FrontpanelLEDBrightnessControl"] = fileExists("/proc/stb/fp/led_brightness")
-SystemInfo["FrontpanelLEDColorControl"] = fileExists("/proc/stb/fp/led_color")
-SystemInfo["FrontpanelLEDFadeControl"] = fileExists("/proc/stb/fp/led_fade")
-SystemInfo["OLDE2API"] = model in ("dm800")
-SystemInfo["CanBTAudio"] = fileCheck("/proc/stb/audio/btaudio")
-SystemInfo["CanBTAudioDelay"] = fileCheck("/proc/stb/audio/btaudio_delay")
-SystemInfo["CanAC3plusTranscode"] = fileExists("/proc/stb/audio/ac3plus_choices")
-SystemInfo["CanDTSHD"] = fileExists("/proc/stb/audio/dtshd_choices")
-SystemInfo["CanWMAPRO"] = fileExists("/proc/stb/audio/wmapro")
-SystemInfo["CanDownmixAACPlus"] = fileExists("/proc/stb/audio/aacplus_choices")
-SystemInfo["CanAACTranscode"] = fileExists("/proc/stb/audio/aac_transcode_choices")
-SystemInfo["CanSyncMode"] = fileExists("/proc/stb/video/sync_mode_choices")

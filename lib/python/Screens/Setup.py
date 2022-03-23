@@ -42,7 +42,7 @@ class SetupSummary(Screen):
 
 	def __init__(self, session, parent):
 		Screen.__init__(self, session, parent=parent)
-		self["SetupTitle"] = StaticText(parent.getTitle())
+		self["SetupTitle"] = StaticText(parent.title)
 		self["SetupEntry"] = StaticText("")
 		self["SetupValue"] = StaticText("")
 		self.onShow.append(self.addWatcher)
@@ -81,7 +81,6 @@ class Setup(ConfigListScreen, Screen):
 				self.setup = x
 				break
 
-		self.setup_title = self.setup.get("title", "")
 		self.seperation = int(self.setup.get('separation', '0'))
 
 		#check for list.entries > 0 else self.close
@@ -101,7 +100,7 @@ class Setup(ConfigListScreen, Screen):
 
 		ConfigListScreen.__init__(self, self.list, session=session, on_change=self.changedEntry)
 		self.createSetupList()
-		self.title = _(self.setup_title)
+		self.title = _(self.setup.get("title", "").encode("UTF-8"))
 
 	def createSetupList(self):
 		currentItem = self["config"].getCurrent()
@@ -117,28 +116,10 @@ class Setup(ConfigListScreen, Screen):
 
 				requires = x.get("requires")
 				if requires:
-					meets = True
-					for requires in requires.split(';'):
-						negate = requires.startswith('!')
-						if negate:
-							requires = requires[1:]
-						if requires.startswith('config.'):
-							try:
-								item = eval(requires)
-								SystemInfo[requires] = True if item.value and item.value not in ("0", "False", "false", "off") else False
-							except AttributeError:
-								print('[Setup] unknown "requires" config element:', requires)
-
-						if requires:
-							if not SystemInfo.get(requires, False):
-								if not negate:
-									meets = False
-									break
-							else:
-								if negate:
-									meets = False
-									break
-					if not meets:
+					if requires.startswith('!'):
+						if SystemInfo.get(requires[1:], False):
+							continue
+					elif not SystemInfo.get(requires, False):
 						continue
 				conditional = x.get("conditional")
 				if conditional and not eval(conditional):
@@ -171,11 +152,14 @@ class Setup(ConfigListScreen, Screen):
 		if isinstance(self["config"].getCurrent()[1], ConfigBoolean) or isinstance(self["config"].getCurrent()[1], ConfigSelection):
 			self.createSetupList()
 
-	def selectionChanged(self):
-		if self["config"]:
-			self["description"].text = self.getCurrentDescription()
-		else:
-			self["description"].text = _("There are no items currently available for this screen.")
+	def __onSelectionChanged(self):
+		if self.force_update_list:
+			self["config"].onSelectionChanged.remove(self.__onSelectionChanged)
+			self.createSetupList()
+			self["config"].onSelectionChanged.append(self.__onSelectionChanged)
+			self.force_update_list = False
+		if not (isinstance(self["config"].getCurrent()[1], ConfigBoolean) or isinstance(self["config"].getCurrent()[1], ConfigSelection)):
+			self.force_update_list = True
 
 	def run(self):
 		self.keySave()

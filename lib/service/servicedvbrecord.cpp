@@ -416,6 +416,12 @@ int eDVBServiceRecord::doRecord()
 					if (i != program.audioStreams.begin())
 						eDebugNoNewLine(", ");
 					eDebugNoNewLine("%04x", i->pid);
+
+					if (i->rdsPid != -1)
+					{
+						pids_to_record.insert(i->rdsPid);
+						eDebugNoNewLine(", (RDS %04x)", i->rdsPid);
+					}
 				}
 				eDebugNoNewLine(")");
 			}
@@ -570,77 +576,36 @@ void eDVBServiceRecord::gotNewEvent(int /*error*/)
 	m_event((iRecordableService*)this, evNewEventInfo);
 }
 
-void eDVBServiceRecord::fixupCuts(std::list<pts_t> &offsets)
+void eDVBServiceRecord::saveCutlist()
 {
+			/* XXX: dupe of eDVBServicePlay::saveCuesheet, refactor plz */
+	std::string filename = m_filename + ".cuts";
+
 	eDVBTSTools tstools;
-	offsets.clear();
 
 	if (tstools.openFile(m_filename.c_str()))
 	{
-		eDebug("[eDVBServiceRecord] fetching cutlist failed because tstools failed");
+		eDebug("[eDVBServiceRecord] saving cutlist failed because tstools failed");
 		return;
 	}
-
-	for (std::map<int,pts_t>::iterator i(m_event_timestamps.begin()); i != m_event_timestamps.end(); ++i)
-	{
-		pts_t p = i->second;
-		off_t offset = 0; // fixme, we need to note down both
-		if (tstools.fixupPTS(offset, p))
-		{
-			eDebug("[eDVBServiceRecord] fixing up PTS failed, not saving");
-			continue;
-		}
-#if HAVE_AMLOGIC
-		eDebug("[eDVBServiceRecord] fixed up %llx to %llx (offset %lx)", i->second, p, offset);
-#else
-		eDebug("[eDVBServiceRecord] fixed up %llx to %llx (offset %llx)", i->second, p, offset);
-#endif
-		offsets.push_back(p);
-	}
-}
-
-PyObject *eDVBServiceRecord::getCutList()
-{
-        ePyObject list = PyList_New(0);
-	std::list<pts_t> offsets;
-	fixupCuts(offsets);
-
-	for (std::list<pts_t>::iterator i(offsets.begin()); i != offsets.end(); ++i)
-	{
-		pts_t p = *i;
-		eDebug("[eDVBServiceRecord] getCutList %llx", p);
-		ePyObject tuple = PyTuple_New(2);
-		PyTuple_SET_ITEM(tuple, 0, PyLong_FromLongLong(p));
-		PyTuple_SET_ITEM(tuple, 1, PyLong_FromLong(2)); /* mark */
-		PyList_Append(list, tuple);
-		Py_DECREF(tuple);
-	}
-
-	return list;
-}
-
-void eDVBServiceRecord::saveCutlist()
-{
-	// Save cuts only when main file is accessible.
-	if (::access(m_filename.c_str(), R_OK) < 0)
-		return;
-
-	std::string filename = m_filename + ".cuts";
 
 	// If a cuts file exists, append to it (who cares about sorting it)
 	FILE *f = fopen(filename.c_str(), "a+b");
 	if (f)
 	{
-		std::list<pts_t> offsets;
-		fixupCuts(offsets);
+		unsigned long long where;
+		int what;
 
-		for (std::list<pts_t>::iterator i(offsets.begin()); i != offsets.end(); ++i)
+		for (std::map<int,pts_t>::iterator i(m_event_timestamps.begin()); i != m_event_timestamps.end(); ++i)
 		{
-			unsigned long long where;
-			int what;
-			pts_t p = *i;
-
-			eDebug("[eDVBServiceRecord] saveCutlist %llx", p);
+			pts_t p = i->second;
+			off_t offset = 0; // fixme, we need to note down both
+			if (tstools.fixupPTS(offset, p))
+			{
+				eDebug("[eDVBServiceRecord] fixing up PTS failed, not saving");
+				continue;
+			}
+			eDebug("[eDVBServiceRecord] fixed up %llx to %llx (offset %jx)", i->second, p, (intmax_t)offset);
 			where = htobe64(p);
 			what = htonl(2); /* mark */
 			fwrite(&where, sizeof(where), 1, f);

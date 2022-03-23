@@ -1,22 +1,17 @@
 from os import path
 from fcntl import ioctl
 from struct import pack, unpack
-from time import localtime, time, timezone
-from Tools.HardwareInfo import HardwareInfo
+from time import time, localtime, gmtime
 
 
 def getFPVersion():
 	ret = None
 	try:
-		if  HardwareInfo().get_device_model() in ('dm7080','dm820','dm520','dm525','dm900','dm920','dreamone','dreamtwo'):
-			ret = open("/proc/stb/fp/version", "r").read()
-		else:
-			ret = long(open("/proc/stb/fp/version", "r").read())
+		ret = open("/proc/stb/fp/version", "r").read()
 	except IOError:
 		try:
 			fp = open("/dev/dbox/fp0")
 			ret = ioctl(fp.fileno(), 0)
-			fp.close()
 		except IOError:
 			try:
 				ret = open("/sys/firmware/devicetree/base/bolt/tag", "r").read().rstrip("\0")
@@ -32,15 +27,13 @@ def setFPWakeuptime(wutime):
 		try:
 			fp = open("/dev/dbox/fp0")
 			ioctl(fp.fileno(), 6, pack('L', wutime)) # set wake up
-			fp.close()
 		except IOError:
 			print("setFPWakeupTime failed!")
 
 
 def setRTCoffset(forsleep=None):
-	forsleep = 7200 + timezone if localtime().tm_isdst == 0 else 3600 - timezone
-	# t_local = localtime(int(time()))  # This line does nothing!
-	# Set RTC OFFSET (diff. between UTC and Local Time)
+	if forsleep is None:
+		forsleep = (localtime(time()).tm_hour - gmtime(time()).tm_hour) * 3600
 	try:
 		open("/proc/stb/fp/rtc_offset", "w").write(str(forsleep))
 		print("[RTC] set RTC offset to %s sec." % (forsleep))
@@ -57,7 +50,6 @@ def setRTCtime(wutime):
 		try:
 			fp = open("/dev/dbox/fp0")
 			ioctl(fp.fileno(), 0x101, pack('L', wutime)) # set wake up
-			fp.close()
 		except IOError:
 			print("setRTCtime failed!")
 
@@ -70,7 +62,6 @@ def getFPWakeuptime():
 		try:
 			fp = open("/dev/dbox/fp0")
 			ret = unpack('L', ioctl(fp.fileno(), 5, '    '))[0] # get wakeuptime
-			fp.close()
 		except IOError:
 			print("getFPWakeupTime failed!")
 	return ret
@@ -90,7 +81,6 @@ def getFPWasTimerWakeup():
 		try:
 			fp = open("/dev/dbox/fp0")
 			wasTimerWakeup = unpack('B', ioctl(fp.fileno(), 9, ' '))[0] and True or False
-			fp.close()
 		except IOError:
 			print("wasTimerWakeup failed!")
 	if wasTimerWakeup:
@@ -106,6 +96,5 @@ def clearFPWasTimerWakeup():
 		try:
 			fp = open("/dev/dbox/fp0")
 			ioctl(fp.fileno(), 10)
-			fp.close()
 		except IOError:
 			print("clearFPWasTimerWakeup failed!")

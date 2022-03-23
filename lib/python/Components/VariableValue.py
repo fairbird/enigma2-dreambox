@@ -7,17 +7,14 @@ class VariableValue:
 	def setValue(self, value):
 		self.__value = int(value)
 		if self.instance:
-			try:
-				self.instance.setValue(self.__value)
-			except TypeError:
-				self.instance.setValue(0)
+			self.instance.setValue(self.__value)
+
 
 	def getValue(self):
 		return self.__value
 
 	def postWidgetCreate(self, instance):
-		print(self)
-		print(self.GUI_WIDGET)
-		self.instance.setValue(self.__value)
+		if self.instance:
+			self.instance.setValue(self.__value)
 
 	value = property(getValue, setValue)

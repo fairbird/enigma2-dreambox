@@ -28,7 +28,6 @@ public:
 	RESULT frontendInfo(ePtr<iFrontendInformation> &ptr);
 	RESULT subServices(ePtr<iSubserviceList> &ptr);
 	RESULT getFilenameExtension(std::string &ext) { ext = ".ts"; return 0; };
-	PyObject *getCutList();
 
 		// iStreamableService
 	ePtr<iStreamData> getStreamingData();
@@ -75,7 +74,6 @@ private:
 	void recordEvent(int event);
 
 			/* eit updates */
-	void fixupCuts(std::list<pts_t>&);
 	void gotNewEvent(int error);
 	void saveCutlist();
 };

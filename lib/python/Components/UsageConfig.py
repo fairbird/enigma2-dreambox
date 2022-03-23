@@ -1,18 +1,15 @@
 from Components.Harddisk import harddiskmanager
 from Components.Console import Console
-from Components.config import ConfigSubsection, ConfigYesNo, config, ConfigSelection, ConfigText, ConfigNumber, ConfigSet, ConfigLocations, ConfigSelectionNumber, ConfigClock, ConfigSlider, ConfigEnableDisable, ConfigSubDict, ConfigDictionarySet, ConfigInteger, ConfigIP, ConfigPassword, NoSave, ConfigBoolean
-from Tools.Directories import SCOPE_HDD, SCOPE_TIMESHIFT, defaultRecordingLocation, fileContains, resolveFilename, fileHas
+from Components.config import ConfigSubsection, ConfigYesNo, config, ConfigSelection, ConfigText, ConfigNumber, ConfigSet, ConfigLocations, ConfigSelectionNumber, ConfigClock, ConfigSlider, ConfigEnableDisable, ConfigSubDict, ConfigDictionarySet, ConfigInteger, ConfigPassword
+from Tools.Directories import defaultRecordingLocation
 from enigma import setTunerTypePriorityOrder, setPreferredTuner, setSpinnerOnOff, setEnableTtCachingOnOff, eEnv, eDVBDB, Misc_Options, eBackgroundFileEraser, eServiceEvent, eDVBLocalTimeHandler, eEPGCache
 from Components.About import GetIPsFromNetworkInterfaces
 from Components.NimManager import nimmanager
 from Components.Renderer.FrontpanelLed import ledPatterns, PATTERN_ON, PATTERN_OFF, PATTERN_BLINK
 from Components.ServiceList import refreshServiceList
 from Components.SystemInfo import SystemInfo
-from os.path import exists, islink, join as pathjoin, normpath
-import os, time, locale, skin
-from boxbranding import getDisplayType
-
-displaytype = getDisplayType()
+import os
+import time
 
 
 originalAudioTracks = "orj dos ory org esl qaa und mis mul ORY ORJ Audio_ORJ oth"
@@ -21,23 +18,6 @@ visuallyImpairedCommentary = "NAR qad"
 
 def InitUsageConfig():
 	config.usage = ConfigSubsection()
-	if fileContains("/etc/network/interfaces", "iface eth0 inet static") and not fileContains("/etc/network/interfaces", "iface wlan0 inet dhcp") or fileContains("/etc/network/interfaces", "iface wlan0 inet static") and fileContains("/run/ifstate", "wlan0=wlan0"):
-		config.usage.dns = ConfigSelection(default="custom", choices=[
-			("custom", _("Static IP or Custom")),
-			("google", _("Google DNS")),
-			("cloudflare", _("Cloudflare")),
-			("opendns-familyshield", _("OpenDNS FamilyShield")),
-			("opendns-home", _("OpenDNS Home"))
-		])
-	else:
-		config.usage.dns = ConfigSelection(default="dhcp-router", choices=[
-			("dhcp-router", _("DHCP Router")),
-			("custom", _("Static IP or Custom")),
-			("google", _("Google DNS")),
-			("cloudflare", _("Cloudflare")),
-			("opendns-familyshield", _("OpenDNS FamilyShield")),
-			("opendns-home", _("OpenDNS Home"))
-		])
 	config.usage.subnetwork = ConfigYesNo(default=True)
 	config.usage.subnetwork_cable = ConfigYesNo(default=True)
 	config.usage.subnetwork_terrestrial = ConfigYesNo(default=True)
@@ -45,13 +25,6 @@ def InitUsageConfig():
 	config.usage.multibouquet = ConfigYesNo(default=True)
 
 	showrotorpositionChoicesUpdate()
-
-	config.usage.maxchannelnumlen = ConfigSelection(default="4", choices=[
-		("3", _("3")),
-		("4", _("4")),
-		("5", _("5")),
-		("6", _("6"))
-	])
 
 	config.usage.alternative_number_mode = ConfigYesNo(default=False)
 
@@ -72,11 +45,6 @@ def InitUsageConfig():
 	config.usage.crypto_icon_mode.addNotifier(refreshServiceList)
 	config.usage.record_indicator_mode = ConfigSelection(default="0", choices=[("0", _("None")), ("1", _("Left from servicename")), ("2", _("Right from servicename")), ("3", _("Red colored"))])
 	config.usage.record_indicator_mode.addNotifier(refreshServiceList)
-
-	config.usage.virtualkeyBoard_style = ConfigSelection(default="new", choices=[
-		("new", _("New style")),
-		("e2", _("Enigma2 default"))
-	])
 
 	choicelist = [("-1", _("Disable"))]
 	for i in range(0, 1300, 100):
@@ -107,8 +75,6 @@ def InitUsageConfig():
 	for i in range(1, 12):
 		choicelist.append((str(i), ngettext("%d second", "%d seconds", i) % i))
 	config.usage.infobar_timeout = ConfigSelection(default="5", choices=choicelist)
-	config.usage.show_infobar_do_dimming = ConfigYesNo(default = True)
-	config.usage.show_infobar_dimming_speed = ConfigSelectionNumber(min = 1, max = 40, stepwidth = 1, default = 40, wraparound = True)
 	config.usage.show_infobar_on_zap = ConfigYesNo(default=True)
 	config.usage.show_infobar_on_skip = ConfigYesNo(default=True)
 	config.usage.show_infobar_on_event_change = ConfigYesNo(default=False)
@@ -119,6 +85,7 @@ def InitUsageConfig():
 	config.usage.oldstyle_channel_select_controls = ConfigYesNo(default=False)
 	config.usage.zap_with_ch_buttons = ConfigYesNo(default=False)
 	config.usage.ok_is_channelselection = ConfigYesNo(default=False)
+	config.usage.changebouquet_set_history = ConfigYesNo(default=False)
 	config.usage.volume_instead_of_channelselection = ConfigYesNo(default=False)
 	config.usage.channelselection_preview = ConfigYesNo(default=False)
 	config.usage.show_spinner = ConfigYesNo(default=True)
@@ -152,52 +119,11 @@ def InitUsageConfig():
 		choicelist.append((str(i), ngettext("%d minute", "%d minutes", m) % m))
 	config.usage.pip_last_service_timeout = ConfigSelection(default="0", choices=choicelist)
 
-	if not exists(resolveFilename(SCOPE_HDD)):
-		try:
-			os.mkdir(resolveFilename(SCOPE_HDD), 0o755)
-		except (IOError, OSError):
-			pass
-	defaultValue = resolveFilename(SCOPE_HDD)
-	config.usage.default_path = ConfigSelection(default=defaultValue, choices=[(defaultValue, defaultValue)])
-	config.usage.default_path.load()
-	if config.usage.default_path.saved_value:
-		savedValue = pathjoin(config.usage.default_path.saved_value, "")
-		if savedValue and savedValue != defaultValue:
-			config.usage.default_path.setChoices([(defaultValue, defaultValue), (savedValue, savedValue)], default=defaultValue)
-			config.usage.default_path.value = savedValue
-	config.usage.default_path.save()
-	choiceList = [("<default>", "<default>"), ("<current>", "<current>"), ("<timer>", "<timer>")]
-	config.usage.timer_path = ConfigSelection(default="<default>", choices=choiceList)
-	config.usage.timer_path.load()
-	if config.usage.timer_path.saved_value:
-		savedValue = config.usage.timer_path.saved_value if config.usage.timer_path.saved_value.startswith("<") else pathjoin(config.usage.timer_path.saved_value, "")
-		if savedValue and savedValue not in choiceList:
-			config.usage.timer_path.setChoices(choiceList + [(savedValue, savedValue)], default="<default>")
-			config.usage.timer_path.value = savedValue
-	config.usage.timer_path.save()
-	config.usage.instantrec_path = ConfigSelection(default="<default>", choices=choiceList)
-	config.usage.instantrec_path.load()
-	if config.usage.instantrec_path.saved_value:
-		savedValue = config.usage.instantrec_path.saved_value if config.usage.instantrec_path.saved_value.startswith("<") else pathjoin(config.usage.instantrec_path.saved_value, "")
-		if savedValue and savedValue not in choiceList:
-			config.usage.instantrec_path.setChoices(choiceList + [(savedValue, savedValue)], default="<default>")
-			config.usage.instantrec_path.value = savedValue
-	config.usage.instantrec_path.save()
-	if not exists(resolveFilename(SCOPE_TIMESHIFT)):
-		try:
-			os.mkdir(resolveFilename(SCOPE_TIMESHIFT), 0o755)
-		except:
-			pass
-	defaultValue = resolveFilename(SCOPE_TIMESHIFT)
-	config.usage.timeshift_path = ConfigSelection(default=defaultValue, choices=[(defaultValue, defaultValue)])
-	config.usage.timeshift_path.load()
-	if config.usage.timeshift_path.saved_value:
-		savedValue = pathjoin(config.usage.timeshift_path.saved_value, "")
-		if savedValue and savedValue != defaultValue:
-			config.usage.timeshift_path.setChoices([(defaultValue, defaultValue), (savedValue, savedValue)], default=defaultValue)
-			config.usage.timeshift_path.value = savedValue
-	config.usage.timeshift_path.save()
-	config.usage.allowed_timeshift_paths = ConfigLocations(default=[resolveFilename(SCOPE_TIMESHIFT)])
+	config.usage.default_path = ConfigText(default="")
+	config.usage.timer_path = ConfigText(default="<default>")
+	config.usage.instantrec_path = ConfigText(default="<default>")
+	config.usage.timeshift_path = ConfigText(default="/media/hdd/")
+	config.usage.allowed_timeshift_paths = ConfigLocations(default=["/media/hdd/"])
 
 	config.usage.movielist_trashcan = ConfigYesNo(default=True)
 	config.usage.movielist_trashcan_days = ConfigNumber(default=8)
@@ -217,25 +143,10 @@ def InitUsageConfig():
 	config.usage.leave_movieplayer_onExit = ConfigSelection(default="popup", choices=[
 		("no", _("no")), ("popup", _("With popup")), ("without popup", _("Without popup")), ("movielist", _("Return to movie list"))])
 
-	config.usage.setup_level = ConfigSelection(default="expert", choices=[
+	config.usage.setup_level = ConfigSelection(default="simple", choices=[
 		("simple", _("Normal")),
 		("intermediate", _("Advanced")),
 		("expert", _("Expert"))])
-
-	config.usage.helpSortOrder = ConfigSelection(default="headings+alphabetic", choices=[
-		("headings+alphabetic", _("Alphabetical under headings")),
-		("flat+alphabetic", _("Flat alphabetical")),
-		("flat+remotepos", _("Flat by position on remote")),
-		("flat+remotegroups", _("Flat by key group on remote"))
-	])
-
-	config.usage.helpAnimationSpeed = ConfigSelection(default="10", choices=[
-		("1", _("Very fast")),
-		("5", _("Fast")),
-		("10", _("Default")),
-		("20", _("Slow")),
-		("50", _("Very slow"))
-	])
 
 	config.usage.startup_to_standby = ConfigSelection(default="no", choices=[
 		("no", _("no")),
@@ -321,35 +232,6 @@ def InitUsageConfig():
 		("5", "DVB-T/-S/-C"),
 		("127", _("No priority"))])
 
-	config.usage.frontled_color = ConfigSelection(default="2", choices=[
-		("0", _("Off")),
-		("1", _("Blue")),
-		("2", _("Red")),
-		("3", _("Blinking blue")),
-		("4", _("Blinking red"))
-	])
-	config.usage.frontledrec_color = ConfigSelection(default="3", choices=[
-		("0", _("Off")),
-		("1", _("Blue")),
-		("2", _("Red")),
-		("3", _("Blinking blue")),
-		("4", _("Blinking red"))
-	])
-	config.usage.frontledstdby_color = ConfigSelection(default="0", choices=[
-		("0", _("Off")),
-		("1", _("Blue")),
-		("2", _("Red")),
-		("3", _("Blinking blue")),
-		("4", _("Blinking red"))
-	])
-	config.usage.frontledrecstdby_color = ConfigSelection(default="3", choices=[
-		("0", _("Off")),
-		("1", _("Blue")),
-		("2", _("Red")),
-		("3", _("Blinking blue")),
-		("4", _("Blinking red"))
-	])
-
 	def remote_fallback_changed(configElement):
 		if configElement.value:
 			configElement.value = "%s%s" % (not configElement.value.startswith("http://") and "http://" or "", configElement.value)
@@ -397,14 +279,6 @@ def InitUsageConfig():
 
 	config.usage.blinking_display_clock_during_recording = ConfigYesNo(default=False)
 
-	if displaytype == "textlcd" or "text" in displaytype:
-		config.usage.blinking_rec_symbol_during_recording = ConfigSelection(default="Channel", choices=[
-			("Rec", _("REC symbol")),
-			("RecBlink", _("Blinking REC symbol")),
-			("Channel", _("Channel name"))
-		])
-	config.usage.blinking_rec_symbol_during_recording = ConfigYesNo(default=True)
-
 	config.usage.show_message_when_recording_starts = ConfigYesNo(default=True)
 
 	config.usage.load_length_of_movies_in_moviellist = ConfigYesNo(default=True)
@@ -417,14 +291,6 @@ def InitUsageConfig():
 	config.usage.movielist_unseen = ConfigYesNo(default=False)
 
 	config.usage.swap_snr_on_osd = ConfigYesNo(default=False)
-	config.usage.swap_time_display_on_osd = ConfigSelection(default = "0", choices = [("0", _("Skin Setting")), ("1", _("Mins")), ("2", _("Mins Secs")), ("3", _("Hours Mins")), ("4", _("Hours Mins Secs")), ("5", _("Percentage"))])
-	config.usage.swap_media_time_display_on_osd = ConfigSelection(default = "0", choices = [("0", _("Skin Setting")), ("1", _("Mins")), ("2", _("Mins Secs")), ("3", _("Hours Mins")), ("4", _("Hours Mins Secs")), ("5", _("Percentage"))])
-	config.usage.swap_time_remaining_on_osd = ConfigSelection(default = "0", choices = [("0", _("Remaining")), ("1", _("Elapsed")), ("2", _("Elapsed & Remaining")), ("3", _("Remaining & Elapsed"))])
-	config.usage.elapsed_time_positive_osd = ConfigYesNo(default = False)
-	config.usage.swap_time_display_on_vfd = ConfigSelection(default = "0", choices = [("0", _("Skin Setting")), ("1", _("Mins")), ("2", _("Mins Secs")), ("3", _("Hours Mins")), ("4", _("Hours Mins Secs")), ("5", _("Percentage"))])
-	config.usage.swap_media_time_display_on_vfd = ConfigSelection(default = "0", choices = [("0", _("Skin Setting")), ("1", _("Mins")), ("2", _("Mins Secs")), ("3", _("Hours Mins")), ("4", _("Hours Mins Secs")), ("5", _("Percentage"))])
-	config.usage.swap_time_remaining_on_vfd = ConfigSelection(default = "0", choices = [("0", _("Remaining")), ("1", _("Elapsed")), ("2", _("Elapsed & Remaining")), ("3", _("Remaining & Elapsed"))])
-	config.usage.elapsed_time_positive_vfd = ConfigYesNo(default = False)
 
 	def SpinnerOnOffChanged(configElement):
 		setSpinnerOnOff(int(configElement.value))
@@ -450,307 +316,9 @@ def InitUsageConfig():
 	config.usage.show_update_disclaimer = ConfigYesNo(default=True)
 	config.usage.pic_resolution = ConfigSelection(default=None, choices=[(None, _("Same resolution as skin")), ("(720, 576)", "720x576"), ("(1280, 720)", "1280x720"), ("(1920, 1080)", "1920x1080")][:SystemInfo["HasFullHDSkinSupport"] and 4 or 3])
 
-	config.usage.date = ConfigSubsection()
-	config.usage.date.enabled = NoSave(ConfigBoolean(default=False))
-	config.usage.date.enabled_display = NoSave(ConfigBoolean(default=False))
-	config.usage.time = ConfigSubsection()
-	config.usage.time.enabled = NoSave(ConfigBoolean(default=False))
-	config.usage.time.disabled = NoSave(ConfigBoolean(default=True))
-	config.usage.time.enabled_display = NoSave(ConfigBoolean(default=False))
-	config.usage.time.wide = NoSave(ConfigBoolean(default=False))
-	config.usage.time.wide_display = NoSave(ConfigBoolean(default=False))
-
-	# TRANSLATORS: full date representation dayname daynum monthname year in strftime() format! See 'man strftime'
-	config.usage.date.dayfull = ConfigSelection(default=_("%A %-d %B %Y"), choices=[
-		(_("%A %d %B %Y"), _("Dayname DD Month Year")),
-		(_("%A %-d %B %Y"), _("Dayname D Month Year")),
-		(_("%A %d-%B-%Y"), _("Dayname DD-Month-Year")),
-		(_("%A %-d-%B-%Y"), _("Dayname D-Month-Year")),
-		(_("%A %d/%m/%Y"), _("Dayname DD/MM/Year")),
-		(_("%A %-d/%m/%Y"), _("Dayname D/MM/Year")),
-		(_("%A %d/%-m/%Y"), _("Dayname DD/M/Year")),
-		(_("%A %-d/%-m/%Y"), _("Dayname D/M/Year")),
-		(_("%A %B %d %Y"), _("Dayname Month DD Year")),
-		(_("%A %B %-d %Y"), _("Dayname Month D Year")),
-		(_("%A %B-%d-%Y"), _("Dayname Month-DD-Year")),
-		(_("%A %B-%-d-%Y"), _("Dayname Month-D-Year")),
-		(_("%A %m/%d/%Y"), _("Dayname MM/DD/Year")),
-		(_("%A %-m/%d/%Y"), _("Dayname M/DD/Year")),
-		(_("%A %m/%-d/%Y"), _("Dayname MM/D/Year")),
-		(_("%A %-m/%-d/%Y"), _("Dayname M/D/Year")),
-		(_("%A %Y %B %d"), _("Dayname Year Month DD")),
-		(_("%A %Y %B %-d"), _("Dayname Year Month D")),
-		(_("%A %Y-%B-%d"), _("Dayname Year-Month-DD")),
-		(_("%A %Y-%B-%-d"), _("Dayname Year-Month-D")),
-		(_("%A %Y/%m/%d"), _("Dayname Year/MM/DD")),
-		(_("%A %Y/%m/%-d"), _("Dayname Year/MM/D")),
-		(_("%A %Y/%-m/%d"), _("Dayname Year/M/DD")),
-		(_("%A %Y/%-m/%-d"), _("Dayname Year/M/D"))
-	])
-
-	# TRANSLATORS: long date representation short dayname daynum monthname year in strftime() format! See 'man strftime'
-	config.usage.date.shortdayfull = ConfigText(default=_("%a %-d %B %Y"))
-
-	# TRANSLATORS: long date representation short dayname daynum short monthname year in strftime() format! See 'man strftime'
-	config.usage.date.daylong = ConfigText(default=_("%a %-d %b %Y"))
-
-	# TRANSLATORS: short date representation dayname daynum short monthname in strftime() format! See 'man strftime'
-	config.usage.date.dayshortfull = ConfigText(default=_("%A %-d %B"))
-
-	# TRANSLATORS: short date representation short dayname daynum short monthname in strftime() format! See 'man strftime'
-	config.usage.date.dayshort = ConfigText(default=_("%a %-d %b"))
-
-	# TRANSLATORS: small date representation short dayname daynum in strftime() format! See 'man strftime'
-	config.usage.date.daysmall = ConfigText(default=_("%a %-d"))
-
-	# TRANSLATORS: full date representation daynum monthname year in strftime() format! See 'man strftime'
-	config.usage.date.full = ConfigText(default=_("%-d %B %Y"))
-
-	# TRANSLATORS: long date representation daynum short monthname year in strftime() format! See 'man strftime'
-	config.usage.date.long = ConfigText(default=_("%-d %b %Y"))
-
-	# TRANSLATORS: small date representation daynum short monthname in strftime() format! See 'man strftime'
-	config.usage.date.short = ConfigText(default=_("%-d %b"))
-
-	def setDateStyles(configElement):
-		dateStyles = {
-			# dayfull            shortdayfull      daylong           dayshortfull   dayshort       daysmall    full           long           short
-			_("%A %d %B %Y"): (_("%a %d %B %Y"), _("%a %d %b %Y"), _("%A %d %B"), _("%a %d %b"), _("%a %d"), _("%d %B %Y"), _("%d %b %Y"), _("%d %b")),
-			_("%A %-d %B %Y"): (_("%a %-d %B %Y"), _("%a %-d %b %Y"), _("%A %-d %B"), _("%a %-d %b"), _("%a %-d"), _("%-d %B %Y"), _("%-d %b %Y"), _("%-d %b")),
-			_("%A %d-%B-%Y"): (_("%a %d-%B-%Y"), _("%a %d-%b-%Y"), _("%A %d-%B"), _("%a %d-%b"), _("%a %d"), _("%d-%B-%Y"), _("%d-%b-%Y"), _("%d-%b")),
-			_("%A %-d-%B-%Y"): (_("%a %-d-%B-%Y"), _("%a %-d-%b-%Y"), _("%A %-d-%B"), _("%a %-d-%b"), _("%a %-d"), _("%-d-%B-%Y"), _("%-d-%b-%Y"), _("%-d-%b")),
-			_("%A %d/%m/%Y"): (_("%a %d/%m/%Y"), _("%a %d/%m/%Y"), _("%A %d/%m"), _("%a %d/%m"), _("%a %d"), _("%d/%m/%Y"), _("%d/%m/%Y"), _("%d/%m")),
-			_("%A %-d/%m/%Y"): (_("%a %-d/%m/%Y"), _("%a %-d/%m/%Y"), _("%A %-d/%m"), _("%a %-d/%m"), _("%a %-d"), _("%-d/%m/%Y"), _("%-d/%m/%Y"), _("%-d/%m")),
-			_("%A %d/%-m/%Y"): (_("%a %d/%-m/%Y"), _("%a %d/%-m/%Y"), _("%A %d/%-m"), _("%a %d/%-m"), _("%a %d"), _("%d/%-m/%Y"), _("%d/%-m/%Y"), _("%d/%-m")),
-			_("%A %-d/%-m/%Y"): (_("%a %-d/%-m/%Y"), _("%a %-d/%-m/%Y"), _("%A %-d/%-m"), _("%a %-d/%-m"), _("%a %-d"), _("%-d/%-m/%Y"), _("%-d/%-m/%Y"), _("%-d/%-m")),
-			_("%A %B %d %Y"): (_("%a %B %d %Y"), _("%a %b %d %Y"), _("%A %B %d"), _("%a %b %d"), _("%a %d"), _("%B %d %Y"), _("%b %d %Y"), _("%b %d")),
-			_("%A %B %-d %Y"): (_("%a %B %-d %Y"), _("%a %b %-d %Y"), _("%A %B %-d"), _("%a %b %-d"), _("%a %-d"), _("%B %-d %Y"), _("%b %-d %Y"), _("%b %-d")),
-			_("%A %B-%d-%Y"): (_("%a %B-%d-%Y"), _("%a %b-%d-%Y"), _("%A %B-%d"), _("%a %b-%d"), _("%a %d"), _("%B-%d-%Y"), _("%b-%d-%Y"), _("%b-%d")),
-			_("%A %B-%-d-%Y"): (_("%a %B-%-d-%Y"), _("%a %b-%-d-%Y"), _("%A %B-%-d"), _("%a %b-%-d"), _("%a %-d"), _("%B-%-d-%Y"), _("%b-%-d-%Y"), _("%b-%-d")),
-			_("%A %m/%d/%Y"): (_("%a %m/%d/%Y"), _("%a %m/%d/%Y"), _("%A %m/%d"), _("%a %m/%d"), _("%a %d"), _("%m/%d/%Y"), _("%m/%d/%Y"), _("%m/%d")),
-			_("%A %-m/%d/%Y"): (_("%a %-m/%d/%Y"), _("%a %-m/%d/%Y"), _("%A %-m/%d"), _("%a %-m/%d"), _("%a %d"), _("%-m/%d/%Y"), _("%-m/%d/%Y"), _("%-m/%d")),
-			_("%A %m/%-d/%Y"): (_("%a %m/%-d/%Y"), _("%a %m/%-d/%Y"), _("%A %m/%-d"), _("%a %m/%-d"), _("%a %-d"), _("%m/%-d/%Y"), _("%m/%-d/%Y"), _("%m/%-d")),
-			_("%A %-m/%-d/%Y"): (_("%a %-m/%-d/%Y"), _("%a %-m/%-d/%Y"), _("%A %-m/%-d"), _("%a %-m/%-d"), _("%a %-d"), _("%-m/%-d/%Y"), _("%-m/%-d/%Y"), _("%-m/%-d")),
-			_("%A %Y %B %d"): (_("%a %Y %B %d"), _("%a %Y %b %d"), _("%A %B %d"), _("%a %b %d"), _("%a %d"), _("%Y %B %d"), _("%Y %b %d"), _("%b %d")),
-			_("%A %Y %B %-d"): (_("%a %Y %B %-d"), _("%a %Y %b %-d"), _("%A %B %-d"), _("%a %b %-d"), _("%a %-d"), _("%Y %B %-d"), _("%Y %b %-d"), _("%b %-d")),
-			_("%A %Y-%B-%d"): (_("%a %Y-%B-%d"), _("%a %Y-%b-%d"), _("%A %B-%d"), _("%a %b-%d"), _("%a %d"), _("%Y-%B-%d"), _("%Y-%b-%d"), _("%b-%d")),
-			_("%A %Y-%B-%-d"): (_("%a %Y-%B-%-d"), _("%a %Y-%b-%-d"), _("%A %B-%-d"), _("%a %b-%-d"), _("%a %-d"), _("%Y-%B-%-d"), _("%Y-%b-%-d"), _("%b-%-d")),
-			_("%A %Y/%m/%d"): (_("%a %Y/%m/%d"), _("%a %Y/%m/%d"), _("%A %m/%d"), _("%a %m/%d"), _("%a %d"), _("%Y/%m/%d"), _("%Y/%m/%d"), _("%m/%d")),
-			_("%A %Y/%m/%-d"): (_("%a %Y/%m/%-d"), _("%a %Y/%m/%-d"), _("%A %m/%-d"), _("%a %m/%-d"), _("%a %-d"), _("%Y/%m/%-d"), _("%Y/%m/%-d"), _("%m/%-d")),
-			_("%A %Y/%-m/%d"): (_("%a %Y/%-m/%d"), _("%a %Y/%-m/%d"), _("%A %-m/%d"), _("%a %-m/%d"), _("%a %d"), _("%Y/%-m/%d"), _("%Y/%-m/%d"), _("%-m/%d")),
-			_("%A %Y/%-m/%-d"): (_("%a %Y/%-m/%-d"), _("%a %Y/%-m/%-d"), _("%A %-m/%-d"), _("%a %-m/%-d"), _("%a %-d"), _("%Y/%-m/%-d"), _("%Y/%-m/%-d"), _("%-m/%-d"))
-		}
-		style = dateStyles.get(configElement.value, ((_("Invalid")) * 8))
-		config.usage.date.shortdayfull.value = style[0]
-		config.usage.date.shortdayfull.save()
-		config.usage.date.daylong.value = style[1]
-		config.usage.date.daylong.save()
-		config.usage.date.dayshortfull.value = style[2]
-		config.usage.date.dayshortfull.save()
-		config.usage.date.dayshort.value = style[3]
-		config.usage.date.dayshort.save()
-		config.usage.date.daysmall.value = style[4]
-		config.usage.date.daysmall.save()
-		config.usage.date.full.value = style[5]
-		config.usage.date.full.save()
-		config.usage.date.long.value = style[6]
-		config.usage.date.long.save()
-		config.usage.date.short.value = style[7]
-		config.usage.date.short.save()
-
-	config.usage.date.dayfull.addNotifier(setDateStyles)
-
-	# TRANSLATORS: full time representation hour:minute:seconds
-	if locale.nl_langinfo(locale.AM_STR) and locale.nl_langinfo(locale.PM_STR):
-		config.usage.time.long = ConfigSelection(default=_("%T"), choices=[
-			(_("%T"), _("HH:mm:ss")),
-			(_("%-H:%M:%S"), _("H:mm:ss")),
-			(_("%I:%M:%S%^p"), _("hh:mm:ssAM/PM")),
-			(_("%-I:%M:%S%^p"), _("h:mm:ssAM/PM")),
-			(_("%I:%M:%S%P"), _("hh:mm:ssam/pm")),
-			(_("%-I:%M:%S%P"), _("h:mm:ssam/pm")),
-			(_("%I:%M:%S"), _("hh:mm:ss")),
-			(_("%-I:%M:%S"), _("h:mm:ss"))
-		])
-	else:
-		config.usage.time.long = ConfigSelection(default=_("%T"), choices=[
-			(_("%T"), _("HH:mm:ss")),
-			(_("%-H:%M:%S"), _("H:mm:ss")),
-			(_("%I:%M:%S"), _("hh:mm:ss")),
-			(_("%-I:%M:%S"), _("h:mm:ss"))
-		])
-
-	# TRANSLATORS: time representation hour:minute:seconds for 24 hour clock or 12 hour clock without AM/PM and hour:minute for 12 hour clocks with AM/PM
-	config.usage.time.mixed = ConfigText(default=_("%T"))
-
-	# TRANSLATORS: short time representation hour:minute (Same as "Default")
-	config.usage.time.short = ConfigText(default=_("%R"))
-
-	def setTimeStyles(configElement):
-		timeStyles = {
-			# long      mixed    short
-			_("%T"): (_("%T"), _("%R")),
-			_("%-H:%M:%S"): (_("%-H:%M:%S"), _("%-H:%M")),
-			_("%I:%M:%S%^p"): (_("%I:%M%^p"), _("%I:%M%^p")),
-			_("%-I:%M:%S%^p"): (_("%-I:%M%^p"), _("%-I:%M%^p")),
-			_("%I:%M:%S%P"): (_("%I:%M%P"), _("%I:%M%P")),
-			_("%-I:%M:%S%P"): (_("%-I:%M%P"), _("%-I:%M%P")),
-			_("%I:%M:%S"): (_("%I:%M:%S"), _("%I:%M")),
-			_("%-I:%M:%S"): (_("%-I:%M:%S"), _("%-I:%M"))
-		}
-		style = timeStyles.get(configElement.value, ((_("Invalid")) * 2))
-		config.usage.time.mixed.value = style[0]
-		config.usage.time.mixed.save()
-		config.usage.time.short.value = style[1]
-		config.usage.time.short.save()
-		config.usage.time.wide.value = style[1].endswith(("P", "p"))
-
-	config.usage.time.long.addNotifier(setTimeStyles)
-
-	try:
-		dateEnabled, timeEnabled = skin.parameters.get("AllowUserDatesAndTimes", (0, 0))
-	except Exception as error:
-		print("[UsageConfig] Error loading 'AllowUserDatesAndTimes' skin parameter! (%s)" % error)
-		dateEnabled, timeEnabled = (0, 0)
-	if dateEnabled:
-		config.usage.date.enabled.value = True
-	else:
-		config.usage.date.enabled.value = False
-		config.usage.date.dayfull.value = config.usage.date.dayfull.default
-	if timeEnabled:
-		config.usage.time.enabled.value = True
-		config.usage.time.disabled.value = not config.usage.time.enabled.value
-	else:
-		config.usage.time.enabled.value = False
-		config.usage.time.disabled.value = not config.usage.time.enabled.value
-		config.usage.time.long.value = config.usage.time.long.default
-
-	# TRANSLATORS: compact date representation (for VFD) daynum short monthname in strftime() format! See 'man strftime'
-	config.usage.date.display = ConfigSelection(default=_("%-d %b"), choices=[
-		("", _("Hidden / Blank")),
-		(_("%d %b"), _("Day DD Mon")),
-		(_("%-d %b"), _("Day D Mon")),
-		(_("%d-%b"), _("Day DD-Mon")),
-		(_("%-d-%b"), _("Day D-Mon")),
-		(_("%d/%m"), _("Day DD/MM")),
-		(_("%-d/%m"), _("Day D/MM")),
-		(_("%d/%-m"), _("Day DD/M")),
-		(_("%-d/%-m"), _("Day D/M")),
-		(_("%b %d"), _("Day Mon DD")),
-		(_("%b %-d"), _("Day Mon D")),
-		(_("%b-%d"), _("Day Mon-DD")),
-		(_("%b-%-d"), _("Day Mon-D")),
-		(_("%m/%d"), _("Day MM/DD")),
-		(_("%m/%-d"), _("Day MM/D")),
-		(_("%-m/%d"), _("Day M/DD")),
-		(_("%-m/%-d"), _("Day M/D"))
-	])
-
-	config.usage.date.displayday = ConfigText(default=_("%a %-d+%b_"))
-	config.usage.date.display_template = ConfigText(default=_("%-d+%b_"))
-	config.usage.date.compact = ConfigText(default=_("%-d+%b_"))
-	config.usage.date.compressed = ConfigText(default=_("%-d+%b_"))
-
-	timeDisplayValue = [_("%R")]
-
-	def adjustDisplayDates():
-		if timeDisplayValue[0] == "":
-			if config.usage.date.display.value == "":  # If the date and time are both hidden output a space to blank the VFD display.
-				config.usage.date.compact.value = " "
-				config.usage.date.compressed.value = " "
-			else:
-				config.usage.date.compact.value = config.usage.date.displayday.value
-				config.usage.date.compressed.value = config.usage.date.displayday.value
-		else:
-			if config.usage.time.wide_display.value:
-				config.usage.date.compact.value = config.usage.date.display_template.value.replace("_", "").replace("=", "").replace("+", "")
-				config.usage.date.compressed.value = config.usage.date.display_template.value.replace("_", "").replace("=", "").replace("+", "")
-			else:
-				config.usage.date.compact.value = config.usage.date.display_template.value.replace("_", " ").replace("=", "-").replace("+", " ")
-				config.usage.date.compressed.value = config.usage.date.display_template.value.replace("_", " ").replace("=", "").replace("+", "")
-		config.usage.date.compact.save()
-		config.usage.date.compressed.save()
-
-	def setDateDisplayStyles(configElement):
-		dateDisplayStyles = {
-			# display      displayday     template
-			"": ("", ""),
-			_("%d %b"): (_("%a %d %b"), _("%d+%b_")),
-			_("%-d %b"): (_("%a %-d %b"), _("%-d+%b_")),
-			_("%d-%b"): (_("%a %d-%b"), _("%d=%b_")),
-			_("%-d-%b"): (_("%a %-d-%b"), _("%-d=%b_")),
-			_("%d/%m"): (_("%a %d/%m"), _("%d/%m ")),
-			_("%-d/%m"): (_("%a %-d/%m"), _("%-d/%m ")),
-			_("%d/%-m"): (_("%a %d/%-m"), _("%d/%-m ")),
-			_("%-d/%-m"): (_("%a %-d/%-m"), _("%-d/%-m ")),
-			_("%b %d"): (_("%a %b %d"), _("%b+%d ")),
-			_("%b %-d"): (_("%a %b %-d"), _("%b+%-d ")),
-			_("%b-%d"): (_("%a %b-%d"), _("%b=%d ")),
-			_("%b-%-d"): (_("%a %b-%-d"), _("%b=%-d ")),
-			_("%m/%d"): (_("%a %m/%d"), _("%m/%d ")),
-			_("%m/%-d"): (_("%a %m/%-d"), _("%m/%-d ")),
-			_("%-m/%d"): (_("%a %-m/%d"), _("%-m/%d ")),
-			_("%-m/%-d"): (_("%a %-m/%-d"), _("%-m/%-d "))
-		}
-		style = dateDisplayStyles.get(configElement.value, ((_("Invalid")) * 2))
-		config.usage.date.displayday.value = style[0]
-		config.usage.date.displayday.save()
-		config.usage.date.display_template.value = style[1]
-		config.usage.date.display_template.save()
-		adjustDisplayDates()
-
-	config.usage.date.display.addNotifier(setDateDisplayStyles)
-
-	# TRANSLATORS: short time representation hour:minute (Same as "Default")
-	if locale.nl_langinfo(locale.AM_STR) and locale.nl_langinfo(locale.PM_STR):
-		config.usage.time.display = ConfigSelection(default=_("%R"), choices=[
-			("", _("Hidden / Blank")),
-			(_("%R"), _("HH:mm")),
-			(_("%-H:%M"), _("H:mm")),
-			(_("%I:%M%^p"), _("hh:mmAM/PM")),
-			(_("%-I:%M%^p"), _("h:mmAM/PM")),
-			(_("%I:%M%P"), _("hh:mmam/pm")),
-			(_("%-I:%M%P"), _("h:mmam/pm")),
-			(_("%I:%M"), _("hh:mm")),
-			(_("%-I:%M"), _("h:mm"))
-		])
-	else:
-		config.usage.time.display = ConfigSelection(default=_("%R"), choices=[
-			("", _("Hidden / Blank")),
-			(_("%R"), _("HH:mm")),
-			(_("%-H:%M"), _("H:mm")),
-			(_("%I:%M"), _("hh:mm")),
-			(_("%-I:%M"), _("h:mm"))
-		])
-
-	def setTimeDisplayStyles(configElement):
-		timeDisplayValue[0] = config.usage.time.display.value
-		config.usage.time.wide_display.value = configElement.value.endswith(("P", "p"))
-		adjustDisplayDates()
-
-	config.usage.time.display.addNotifier(setTimeDisplayStyles)
-
-	try:
-		dateDisplayEnabled, timeDisplayEnabled = skin.parameters.get("AllowUserDatesAndTimesDisplay", (0, 0))
-	except Exception as error:
-		print("[UsageConfig] Error loading 'AllowUserDatesAndTimesDisplay' display skin parameter! (%s)" % error)
-		dateDisplayEnabled, timeDisplayEnabled = (0, 0)
-	if dateDisplayEnabled:
-		config.usage.date.enabled_display.value = True
-	else:
-		config.usage.date.enabled_display.value = False
-		config.usage.date.display.value = config.usage.date.display.default
-	if timeDisplayEnabled:
-		config.usage.time.enabled_display.value = True
-	else:
-		config.usage.time.enabled_display.value = False
-		config.usage.time.display.value = config.usage.time.display.default
-
-	config.usage.boolean_graphic = ConfigYesNo(default=False)
-
 	if SystemInfo["Fan"]:
 		choicelist = [('off', _("Off")), ('on', _("On")), ('auto', _("Auto"))]
-		if exists("/proc/stb/fp/fan_choices"):
+		if os.path.exists("/proc/stb/fp/fan_choices"):
 			choicelist = [x for x in choicelist if x[0] in open("/proc/stb/fp/fan_choices", "r").read().strip().split(" ")]
 		config.usage.fan = ConfigSelection(choicelist)
 
@@ -835,8 +403,6 @@ def InitUsageConfig():
 
 	config.usage.boolean_graphic = ConfigSelection(default="true", choices={"false": _("no"), "true": _("yes"), "only_bool": _("yes, but not in multi selections")})
 
-	config.osd.alpha_teletext = ConfigSelectionNumber(default=255, stepwidth=1, min=0, max=255, wraparound=False)
-
 	config.epg = ConfigSubsection()
 	config.epg.eit = ConfigYesNo(default=True)
 	config.epg.mhw = ConfigYesNo(default=False)
@@ -845,26 +411,10 @@ def InitUsageConfig():
 	config.epg.netmed = ConfigYesNo(default=True)
 	config.epg.virgin = ConfigYesNo(default=False)
 	config.epg.opentv = ConfigYesNo(default=False)
-	config.epg.saveepg = ConfigYesNo(default=True)
-
-	config.epg.maxdays = ConfigSelectionNumber(min=1, max=365, stepwidth=1, default=7, wraparound=True)
-
-	def EpgmaxdaysChanged(configElement):
-		eEPGCache.getInstance().setEpgmaxdays(config.epg.maxdays.getValue())
-	config.epg.maxdays.addNotifier(EpgmaxdaysChanged)
-
-	config.misc.epgratingcountry = ConfigSelection(default="", choices=[
-		("", _("Auto detect")),
-		("ETSI", _("Generic")),
-		("AUS", _("Australia"))
-	])
-	config.misc.epggenrecountry = ConfigSelection(default="", choices=[
-		("", _("Auto detect")),
-		("ETSI", _("Generic")),
-		("AUS", _("Australia"))
-	])
+	config.misc.showradiopic = ConfigYesNo(default=True)
 
 	def EpgSettingsChanged(configElement):
+		from enigma import eEPGCache
 		mask = 0xffffffff
 		if not config.epg.eit.value:
 			mask &= ~(eEPGCache.NOWNEXT | eEPGCache.SCHEDULE | eEPGCache.SCHEDULE_OTHER)
@@ -896,47 +446,6 @@ def InitUsageConfig():
 		eEPGCache.getInstance().setEpgHistorySeconds(config.epg.histminutes.getValue() * 60)
 	config.epg.histminutes.addNotifier(EpgHistorySecondsChanged)
 
-	config.epg.cacheloadsched = ConfigYesNo(default = False)
-	config.epg.cachesavesched = ConfigYesNo(default = False)
-
-	def EpgCacheLoadSchedChanged(configElement):
-		import Components.EpgLoadSave
-		Components.EpgLoadSave.EpgCacheLoadCheck()
-
-	def EpgCacheSaveSchedChanged(configElement):
-		import Components.EpgLoadSave
-		Components.EpgLoadSave.EpgCacheSaveCheck()
-	config.epg.cacheloadsched.addNotifier(EpgCacheLoadSchedChanged, immediate_feedback = False)
-	config.epg.cachesavesched.addNotifier(EpgCacheSaveSchedChanged, immediate_feedback = False)
-	config.epg.cacheloadtimer = ConfigSelectionNumber(default = 24, stepwidth = 1, min = 1, max = 24, wraparound = True)
-	config.epg.cachesavetimer = ConfigSelectionNumber(default = 24, stepwidth = 1, min = 1, max = 24, wraparound = True)
-
-	hddchoises = [('/etc/enigma2/', 'Internal Flash')]
-	for p in harddiskmanager.getMountedPartitions():
-		if exists(p.mountpoint):
-			d = normpath(p.mountpoint)
-			if p.mountpoint != '/':
-				hddchoises.append((p.mountpoint, d))
-	config.misc.epgcachepath = ConfigSelection(default = '/etc/enigma2/', choices = hddchoises)
-	config.misc.epgcachefilename = ConfigText(default='epg', fixed_size=False)
-	config.misc.epgcache_filename = ConfigText(default = (config.misc.epgcachepath.value + config.misc.epgcachefilename.value.replace('.dat','') + '.dat'))
-	def EpgCacheChanged(configElement):
-		config.misc.epgcache_filename.setValue(pathjoin(config.misc.epgcachepath.value, config.misc.epgcachefilename.value.replace('.dat','') + '.dat'))
-		config.misc.epgcache_filename.save()
-		eEPGCache.getInstance().setCacheFile(config.misc.epgcache_filename.value)
-		epgcache = eEPGCache.getInstance()
-		epgcache.save()
-		if not config.misc.epgcache_filename.value.startswith("/etc/enigma2/"):
-			if exists('/etc/enigma2/' + config.misc.epgcachefilename.value.replace('.dat','') + '.dat'):
-				os.remove('/etc/enigma2/' + config.misc.epgcachefilename.value.replace('.dat','') + '.dat')
-	config.misc.epgcachepath.addNotifier(EpgCacheChanged, immediate_feedback = False)
-	config.misc.epgcachefilename.addNotifier(EpgCacheChanged, immediate_feedback = False)
-
-	config.misc.epgratingcountry = ConfigSelection(default="", choices=[("", _("Auto Detect")), ("ETSI", _("Generic")), ("AUS", _("Australia"))])
-	config.misc.epggenrecountry = ConfigSelection(default="", choices=[("", _("Auto Detect")), ("ETSI", _("Generic")), ("AUS", _("Australia"))])
-
-	config.misc.showradiopic = ConfigYesNo(default = True)
-
 	choicelist = [("newline", _("new line")), ("2newlines", _("2 new lines")), ("space", _("space")), ("dot", " . "), ("dash", " - "), ("asterisk", " * "), ("nothing", _("nothing"))]
 	config.epg.fulldescription_separator = ConfigSelection(default="2newlines", choices=choicelist)
 	choicelist = [("no", _("no")), ("nothing", _("omit")), ("space", _("space")), ("dot", ". "), ("dash", " - "), ("asterisk", " * "), ("hashtag", " # ")]
@@ -954,66 +463,10 @@ def InitUsageConfig():
 
 	config.usage.keymap = ConfigText(default=eEnv.resolve("${datadir}/enigma2/keymap.xml"))
 	keytranslation = eEnv.resolve("${sysconfdir}/enigma2/keytranslation.xml")
-	if not exists(keytranslation):
+	if not os.path.exists(keytranslation):
 		keytranslation = eEnv.resolve("${datadir}/enigma2/keytranslation.xml")
 	config.usage.keytrans = ConfigText(default=keytranslation)
 	config.usage.alternative_imagefeed = ConfigText(default="", fixed_size=False)
-
-	config.crash = ConfigSubsection()
-	#// handle python crashes
-	config.crash.bsodpython = ConfigYesNo(default=True)
-	config.crash.bsodpython_ready = NoSave(ConfigYesNo(default=False))
-	choicelist = [("0", _("never")), ("1", "1"), ("2", "2"), ("3", "3"), ("4", "4"), ("5", "5"), ("6", "6"), ("7", "7"), ("8", "8"), ("9", "9"), ("10", "10")]
-	config.crash.bsodhide = ConfigSelection(default="0", choices=choicelist)
-	config.crash.bsodmax = ConfigSelection(default="3", choices=choicelist)
-	#//
-
-	config.crash.enabledebug = ConfigYesNo(default=False)
-	config.crash.debugloglimit = ConfigSelectionNumber(min=1, max=10, stepwidth=1, default=4, wraparound=True)
-	config.crash.daysloglimit = ConfigSelectionNumber(min=1, max=30, stepwidth=1, default=8, wraparound=True)
-	config.crash.sizeloglimit = ConfigSelectionNumber(min=1, max=20, stepwidth=1, default=10, wraparound=True)
-	config.crash.lastfulljobtrashtime = ConfigInteger(default=-1)
-
-	debugPath = [('/home/root/logs/', '/home/root/')]
-	for p in harddiskmanager.getMountedPartitions():
-		if exists(p.mountpoint):
-			d = normpath(p.mountpoint)
-			if p.mountpoint != '/':
-				debugPath.append((p.mountpoint + '/logs/', d))
-	config.crash.debugPath = ConfigSelection(default="/home/root/logs/", choices=debugPath)
-	if not exists("/home"):
-		os.mkdir("/home", 0o755)
-	if not exists("/home/root"):
-		os.mkdir("/home/root", 0o755)
-
-	def updatedebugPath(configElement):
-		if not exists(config.crash.debugPath.value):
-			try:
-				os.mkdir(config.crash.debugPath.value, 0o755)
-			except:
-				print("Failed to create log path: %s" % config.crash.debugPath.value)
-	config.crash.debugPath.addNotifier(updatedebugPath, immediate_feedback=False)
-
-	crashlogheader = _("We are really sorry. Your receiver encountered "
-					 "a software problem, and needs to be restarted.\n"
-					 "Please send the logfile %senigma2_crash_xxxxxx.log to https://github.com/fairbird/enigma2.\n"
-					 "Your receiver restarts in 10 seconds!\n"
-					 "Component: enigma2") % config.crash.debugPath.value
-	config.crash.debug_text = ConfigText(default=crashlogheader, fixed_size=False)
-	config.crash.skin_error_crash = ConfigYesNo(default=True)
-
-	def updateStackTracePrinter(configElement):
-		from Components.StackTrace import StackTracePrinter
-		if configElement.value:
-			if (os.path.isfile("/tmp/doPythonStackTrace")):
-				os.remove("/tmp/doPythonStackTrace")
-			from threading import current_thread
-			StackTracePrinter.getInstance().activate(current_thread().ident)
-		else:
-			StackTracePrinter.getInstance().deactivate()
-
-	config.crash.pystackonspinner = ConfigYesNo(default=True)
-	config.crash.pystackonspinner.addNotifier(updateStackTracePrinter, immediate_feedback=False, initial_call=True)
 
 	config.seek = ConfigSubsection()
 	config.seek.selfdefined_13 = ConfigNumber(default=15)
@@ -1065,23 +518,12 @@ def InitUsageConfig():
 		("3", _("Everywhere"))])
 	config.misc.erase_flags.addNotifier(updateEraseFlags, immediate_feedback=False)
 
-	config.misc.zapkey_delay = ConfigSelectionNumber(default=5, stepwidth=1, min=0, max=20, wraparound=True)
-	config.misc.numzap_picon = ConfigYesNo(default=False)
-
 	if SystemInfo["ZapMode"]:
 		def setZapmode(el):
 			open(SystemInfo["ZapMode"], "w").write(el.value)
 		config.misc.zapmode = ConfigSelection(default="mute", choices=[
 			("mute", _("Black screen")), ("hold", _("Hold screen")), ("mutetilllock", _("Black screen till locked")), ("holdtilllock", _("Hold till locked"))])
 		config.misc.zapmode.addNotifier(setZapmode, immediate_feedback=False)
-
-	config.usage.historymode = ConfigSelection(default='1', choices=[('0', _('Just zap')), ('1', _('Show menu'))])
-
-	if not SystemInfo["ZapMode"] and exists("/proc/stb/info/model"):
-		def setZapmodeDM(el):
-			print('[UsageConfig] >>> zapmodeDM')
-		config.misc.zapmodeDM = ConfigSelection(default="black", choices=[("black", _("Black screen")), ("hold", _("Hold screen"))])
-		config.misc.zapmodeDM.addNotifier(setZapmodeDM, immediate_feedback = False)
 
 	if SystemInfo["VFD_scroll_repeats"]:
 		def scroll_repeats(el):
@@ -1180,17 +622,6 @@ def InitUsageConfig():
 			open("/proc/stb/video/disable_10bit", "w").write("on" if configElement.value else "off")
 		config.av.allow_10bit = ConfigYesNo(default=False)
 		config.av.allow_10bit.addNotifier(setDisable10Bit)
-
-	if SystemInfo["CanSyncMode"]:
-		def setSyncMode(configElement):
-			print("[UsageConfig] Read /proc/stb/video/sync_mode")
-			open("/proc/stb/video/sync_mode", "w").write(configElement.value)
-		config.av.sync_mode = ConfigSelection(default="slow", choices={
-			"slow": _("Slow motion"),
-			"hold": _("Hold first frame"),
-			"black": _("Black screen")
-		})
-		config.av.sync_mode.addNotifier(setSyncMode)
 
 	config.subtitles = ConfigSubsection()
 	config.subtitles.show = ConfigYesNo(default=True)
@@ -1356,19 +787,6 @@ def InitUsageConfig():
 	config.autolanguage.subtitle_defaultdvb = ConfigYesNo(default=False)
 	config.autolanguage.subtitle_usecache = ConfigYesNo(default=True)
 
-	config.oscaminfo = ConfigSubsection()
-	if SystemInfo["OScamInstalled"] or SystemInfo["NCamInstalled"]:
-		config.oscaminfo.showInExtensions = ConfigYesNo(default=True)
-	else:
-		config.oscaminfo.showInExtensions = ConfigYesNo(default=False)
-	config.oscaminfo.userdatafromconf = ConfigYesNo(default=True)
-	config.oscaminfo.autoupdate = ConfigYesNo(default=False)
-	config.oscaminfo.username = ConfigText(default="username", fixed_size=False, visible_width=12)
-	config.oscaminfo.password = ConfigPassword(default="password", fixed_size=False)
-	config.oscaminfo.ip = ConfigIP(default=[127, 0, 0, 1], auto_jump=True)
-	config.oscaminfo.port = ConfigInteger(default=16002, limits=(0, 65536))
-	config.oscaminfo.intervall = ConfigSelectionNumber(min=1, max=600, stepwidth=1, default=10, wraparound=True)
-
 	config.streaming = ConfigSubsection()
 	config.streaming.stream_ecm = ConfigYesNo(default=False)
 	config.streaming.descramble = ConfigYesNo(default=True)
@@ -1384,36 +802,22 @@ def InitUsageConfig():
 	config.misc.softcam_setup = ConfigSubsection()
 	config.misc.softcam_setup.extension_menu = ConfigYesNo(default=True)
 
-	config.logmanager = ConfigSubsection()
-	config.logmanager.showinextensions = ConfigYesNo(default=False)
-	config.logmanager.user = ConfigText(default='', fixed_size=False)
-	config.logmanager.useremail = ConfigText(default='', fixed_size=False)
-	config.logmanager.usersendcopy = ConfigYesNo(default=True)
-	config.logmanager.path = ConfigText(default="/")
-	config.logmanager.additionalinfo = NoSave(ConfigText(default=""))
-	config.logmanager.sentfiles = ConfigLocations(default='')
-
 	config.ntp = ConfigSubsection()
 
 	def timesyncChanged(configElement):
 		if configElement.value == "dvb" or not GetIPsFromNetworkInterfaces():
 			eDVBLocalTimeHandler.getInstance().setUseDVBTime(True)
 			eEPGCache.getInstance().timeUpdated()
-			if configElement.value == "dvb" and islink("/etc/network/if-up.d/ntpdate-sync"):
+			if configElement.value == "dvb" and os.path.islink('/etc/network/if-up.d/ntpdate-sync'):
 				Console().ePopen("sed -i '/ntpdate-sync/d' /etc/cron/crontabs/root;unlink /etc/network/if-up.d/ntpdate-sync")
 		else:
 			eDVBLocalTimeHandler.getInstance().setUseDVBTime(False)
 			eEPGCache.getInstance().timeUpdated()
-			if not islink("/etc/network/if-up.d/ntpdate-sync"):
-				Console().ePopen("echo '30 * * * * /usr/bin/ntpdate-sync silent' >>/etc/cron/crontabs/root;ln -s /usr/bin/ntpdate-sync /etc/network/if-up.d/ntpdate-sync")
-	config.ntp.timesync = ConfigSelection(default="ntp", choices=[
-		("auto", _("Auto")),
-		("dvb", _("Transponder time")),
-		("ntp", _("Internet time (NTP)"))
-	])
+			if not os.path.islink('/etc/network/if-up.d/ntpdate-sync'):
+				Console().ePopen("echo '30 * * * *    /usr/bin/ntpdate-sync silent' >>/etc/cron/crontabs/root;ln -s /usr/bin/ntpdate-sync /etc/network/if-up.d/ntpdate-sync")
+	config.ntp.timesync = ConfigSelection(default="auto", choices=[("auto", _("auto")), ("dvb", _("Transponder Time")), ("ntp", _("Internet (ntp)"))])
 	config.ntp.timesync.addNotifier(timesyncChanged)
 	config.ntp.server = ConfigText("pool.ntp.org", fixed_size=False)
-	config.ntp.useNTPminutes = ConfigSelection(default = "30", choices = [("30", "30" + " " +_("minutes")), ("60", _("Hour")), ("1440", _("Once per day"))])
 
 
 def updateChoices(sel, choices):
@@ -1488,12 +892,6 @@ def preferredTunerChoicesUpdate(update=False):
 		elif slot.isCompatible("ATSC"):
 			atsc_nims.append((str(slot.slot), slot.getSlotName()))
 		nims.append((str(slot.slot), slot.getSlotName()))
-
-	config.usage.menutype = ConfigSelection(default="standard", choices=[
-		("horzanim", _("Horizontal menu")),
-		("horzicon", _("Horizontal icons")),
-		("standard", _("Standard menu"))
-	])
 
 	if not update:
 		config.usage.frontend_priority = ConfigSelection(default="-1", choices=list(nims))

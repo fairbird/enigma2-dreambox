@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: enigma2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-12-22 15:03+0100\n"
+"POT-Creation-Date: 2022-02-26 15:37+0100\n"
 "PO-Revision-Date: 2021-03-06\n"
 "Last-Translator: LinuxSTV\n"
 "Language-Team: \n"
@@ -1033,8 +1033,9 @@ msgstr "Armenia"
 msgid "Artist"
 msgstr "Artis"
 
-msgid "Arts/Culture"
-msgstr "Seni/Budaya"
+#, fuzzy
+msgid "Arts/Culture (without music)"
+msgstr "seni/budaya (tanpa musik, umum)"
 
 msgid "Aruba"
 msgstr "Aruba"
@@ -1210,6 +1211,9 @@ msgstr "Variabel format tersedia"
 #, fuzzy
 msgid "Available locales are:"
 msgstr "Locale yang tersedia:"
+
+msgid "Axas E4HD Ultra"
+msgstr ""
 
 msgid "Azerbaijan"
 msgstr "Azerbaijan"
@@ -1473,6 +1477,10 @@ msgstr "Kabel"
 msgid "Cable Scan"
 msgstr "Pelacakan Kabel"
 
+#, python-format
+msgid "Cable scan executable utility not found '%s'!"
+msgstr ""
+
 msgid "Cabo Verde"
 msgstr "Cabo Verde"
 
@@ -1713,8 +1721,9 @@ msgstr ""
 "Memeriksa penala %s\n"
 "DiSEqC port %s untuk %s"
 
-msgid "Children/Youth"
-msgstr "Anak-anak/Pemuda"
+#, fuzzy
+msgid "Children/Youth/Education/Science"
+msgstr "Edukasi/Sains/..."
 
 msgid "Chile"
 msgstr "Chili"
@@ -3016,6 +3025,10 @@ msgstr "Plugin baru yang bisa diunduh"
 msgid "Downloadable plugins"
 msgstr "Plugin yang bisa diunduh"
 
+#, fuzzy
+msgid "Downloaded Images"
+msgstr "Mengunduh Image"
+
 msgid "Downloading"
 msgstr "Mengunduh"
 
@@ -3028,6 +3041,9 @@ msgstr "Mencoba unduh daftar paket yg baru. Mohon tunggu..."
 
 msgid "Downloading plugin information. Please wait..."
 msgstr "Mengunduh informasi plugin. Mohon menunggu..."
+
+msgid "Drama and Films"
+msgstr ""
 
 #, fuzzy
 msgid "Drop unconfigured satellites"
@@ -3124,9 +3140,6 @@ msgstr "Ubah judul"
 
 msgid "Edit update source url"
 msgstr "Ubah url sumber update"
-
-msgid "Education/Science/..."
-msgstr "Edukasi/Sains/..."
 
 msgid "Egypt"
 msgstr "Mesir"
@@ -3918,6 +3931,10 @@ msgstr "Transparan sepenuhnya"
 msgid "Full view resolution"
 msgstr "Resolusi tinjauan penuh"
 
+#, fuzzy
+msgid "Fullbackup Images"
+msgstr "Pewaktu Mundur"
+
 msgid "Function of OK button"
 msgstr "Fungsi tombol OK"
 
@@ -4125,7 +4142,7 @@ msgstr "daftar HD"
 msgid "HD2400"
 msgstr "HD2400"
 
-msgid "HD60/Multibox/Multibox SE"
+msgid "HD60/HD66SE/Multibox/Multibox SE"
 msgstr ""
 
 msgid "HDMI Colordepth"
@@ -4821,9 +4838,6 @@ msgstr "Kiri"
 msgid "Left from servicename"
 msgstr "Di kiri nama layanan"
 
-msgid "Leisure hobbies"
-msgstr "Hobi santai"
-
 msgid "Lesotho"
 msgstr ""
 
@@ -5319,9 +5333,6 @@ msgstr "Lokasi film"
 msgid "Movie selection"
 msgstr "Pemilihan film"
 
-msgid "Movie/Drama"
-msgstr "Film/Drama"
-
 msgid "Movielist menu"
 msgstr "Menu Dafarfilm"
 
@@ -5501,7 +5512,8 @@ msgstr "Keledonia Baru"
 msgid "New Zealand"
 msgstr "Selandia Baru"
 
-msgid "News Current Affairs"
+#, fuzzy
+msgid "News/Current Affairs/Social"
 msgstr "News Current Affairs"
 
 msgctxt "button label, 'next screen'"
@@ -7912,6 +7924,10 @@ msgstr "Atur sbg layanan saat mulai"
 msgid "Set blocktimes by weekday"
 msgstr "Atur waktu blokir berdasarkan hari kerja"
 
+#, fuzzy
+msgid "Set cursor on service from channel history"
+msgstr "Beralih ke kanal sebelumnya di riwayat"
+
 msgid "Set default"
 msgstr "Atur bawaan"
 
@@ -8037,9 +8053,6 @@ msgstr "Tampilkan EPG pada kanal sekarang..."
 
 msgid "Show EPG..."
 msgstr "Tampilkan EPG..."
-
-msgid "Show Games show"
-msgstr "Tampilkan permainan"
 
 msgid "Show InfoBar"
 msgstr "Tampilkan Bilah info"
@@ -8274,6 +8287,10 @@ msgstr "Tampilkan peringatan sebelum atur 'Abaikan konflik'"
 msgid "Show warning when timeshift is stopped"
 msgstr "Tampilkan peringatan ketika timeshift berhenti"
 
+#, fuzzy
+msgid "Show/Game Show/Leisure hobbies"
+msgstr "Hobi santai"
+
 msgid "Show/hide window"
 msgstr "Tampilkan/sembunyikan jendela"
 
@@ -8439,9 +8456,6 @@ msgstr "PIN kartu pintar"
 
 msgid "Smooth"
 msgstr "Lembut"
-
-msgid "Social/Political/Economics"
-msgstr "Sosial/Politik/Ekonomi"
 
 msgid "SocketMMI"
 msgstr ""
@@ -10695,7 +10709,8 @@ msgstr "Ketika diaktifkan, terjemahan teleteks akan ditampilkan pada posisi asli
 msgid "When enabled, the VCR scart option will be shown on the main menu"
 msgstr "Ketika diaktifkan, pilihan scart VCR akan ditampilkan pada menu utama."
 
-msgid "When enabled, the channel selection list will be hidden while listening to a radio channel"
+#, fuzzy
+msgid "When enabled, the channel selection list will be hidden while listening to a radio channel. When disabled, the option 'Auto play last service in radio mode' is available."
 msgstr "Ketika diaktifkan, daftar pemilihan kanal akan disembunyikan saat sedang mendengarkan kanal radio"
 
 msgid "When enabled, the infobar will be displayed when a new event starts."
@@ -10724,6 +10739,10 @@ msgstr "Ketika diaktifkan, rx akan memilih jalur AC3 (saat tersedia)."
 
 msgid "When enabled, the receiver will select an AC3+ track (when available)."
 msgstr "Ketika diaktifkan, rx akan memilih jalur AC3+ (saat tersedia)."
+
+#, fuzzy
+msgid "When enabled, then when changing bouquets, set the cursor on the service from the channel history in the channel selection list."
+msgstr "Ketika diaktifkan, anda bisa mengatur volume suara dengan tombol panah daripada membuka daftar pemilihan kanal."
 
 msgid "When enabled, this setting has more weight than 'Preferred tuner for recordings'."
 msgstr "Ketika diaktifkan, setelan ini punya bobot lebih daripada 'Penala pilihan untuk merekam'."
@@ -11134,7 +11153,8 @@ msgstr "Zap ke layanan pewaktu %s!"
 msgid "Zgemma H.S/H.2S/H.2H/H5/H7(old model)"
 msgstr "Zgemma H.S/H.2S/H.2H/H5/H7(model lama)"
 
-msgid "Zgemma H9(old model)/I55Plus"
+#, fuzzy
+msgid "Zgemma H9(old model)/I55Plus/H8"
 msgstr "Zgemma H9(model lama)/I55Plus"
 
 msgid "Zgemma Star S/2S/H1/H2"
@@ -11184,7 +11204,8 @@ msgstr "waktu aktual saja"
 msgid "additional cable of rotor"
 msgstr "kabel tambahan pada rotor"
 
-msgid "adult movie/drama"
+#, fuzzy
+msgid "adult movie"
 msgstr "film dewasa/drama"
 
 msgid "advanced"
@@ -11277,9 +11298,6 @@ msgstr "bagus"
 msgid "black"
 msgstr "hitam"
 
-msgid "black & white"
-msgstr "hitam & putih"
-
 msgid "blacklist"
 msgstr "daftar hitam"
 
@@ -11310,7 +11328,8 @@ msgstr "ke tengah, dibungkus"
 msgid "chapters"
 msgstr "bab"
 
-msgid "childrens's/youth program (general)"
+#, fuzzy
+msgid "childrens's youth program (general)"
 msgstr "acara anak-anak/pemuda (umum)"
 
 msgid "circular left"
@@ -11324,9 +11343,6 @@ msgstr "overscan klip / batas kotaksurat"
 
 msgid "comedy"
 msgstr "lawak"
-
-msgid "config menu"
-msgstr "menu setelan"
 
 msgid "confirmed"
 msgstr "dikonfirmasi"
@@ -11391,7 +11407,8 @@ msgstr "timur"
 msgid "economics/social advisory"
 msgstr "ekonomi/nasihat sosial"
 
-msgid "education/science/factual topics (general)"
+#, fuzzy
+msgid "educational/science/factual topics (general)"
 msgstr "edukasi/sains/topik faktual (umum)"
 
 msgid "embedded"
@@ -11481,7 +11498,8 @@ msgstr "film/sinema"
 msgid "fine arts"
 msgstr "seni rupa"
 
-msgid "fitness & health"
+#, fuzzy
+msgid "fitness and health"
 msgstr "kebugaran & kesehatan"
 
 msgid "flat alphabetic"
@@ -11521,9 +11539,6 @@ msgstr "edukasi lanjut"
 
 msgid "game show/quiz/contest"
 msgstr "game show/quiz/contest"
-
-msgid "gardening"
-msgstr "berkebun"
 
 msgid "go to deep standby"
 msgstr "menuju deep standby"
@@ -11632,8 +11647,9 @@ msgstr "Perataan acara"
 msgid "literature"
 msgstr "literatur"
 
-msgid "live broadcast"
-msgstr "siaran langsung"
+#, fuzzy
+msgid "local sports"
+msgstr "team sports"
 
 msgid "locked"
 msgstr "terkunci"
@@ -11680,7 +11696,8 @@ msgstr "gerak ke atas menuju entri pertama"
 msgid "move up to previous entry"
 msgstr "gerak ke atas menuju entri sebelumnya"
 
-msgid "movie/drama (general)"
+#, fuzzy
+msgid "movie (general)"
 msgstr "film/drama (umum)"
 
 msgid "multi"
@@ -11814,9 +11831,6 @@ msgstr "buka setelan namaserver"
 msgid "original"
 msgstr "asli"
 
-msgid "original language"
-msgstr "bahasa aslinya"
-
 msgid "pass"
 msgstr "lewatkan"
 
@@ -11837,6 +11851,9 @@ msgstr "budaya populer/seni tradisional"
 
 msgid "pre-school children's program"
 msgstr "acara anak prasekolah"
+
+msgid "preserve bookmarks in cuts"
+msgstr ""
 
 msgid "receiver software because updates are available."
 msgstr "perangkat lunak rx karena update tersedia."
@@ -11861,6 +11878,10 @@ msgstr "hapus setelah posisi ini"
 
 msgid "remove before this position"
 msgstr "hapus sebelum posisi ini"
+
+#, fuzzy
+msgid "remove bookmarks in cuts"
+msgstr "Hapus penandabuku"
 
 msgid "remove this mark"
 msgstr "hapus penanda ini"
@@ -11916,7 +11937,8 @@ msgstr "pilih entri menu"
 msgid "serious music/classic music"
 msgstr "serious music/classic music"
 
-msgid "serious/classical/religious/historical movie/drama"
+#, fuzzy
+msgid "serious/classical/religious/historical drama"
 msgstr "serious/classical/religious/historical movie/drama"
 
 #, fuzzy
@@ -11996,13 +12018,15 @@ msgstr "slot%s - %s, dgn cadangan"
 msgid "slot%s - %s, without backup"
 msgstr "slot%s - %s, tanpa cadangan"
 
-msgid "soap/melodram/folkloric"
+#, fuzzy
+msgid "soap/melodrama/folkloric"
 msgstr "soap/melodram/folkloric"
 
 msgid "social/political issues/economics (general)"
 msgstr "social/political issues/economics (general)"
 
-msgid "social/spiritual science"
+#, fuzzy
+msgid "social/spiritual sciences"
 msgstr "social/spiritual science"
 
 msgid "space"
@@ -12055,10 +12079,11 @@ msgstr "tukar ke bahasa terjemahan berikutnya"
 msgid "talk show"
 msgstr "talk show"
 
-msgid "team sports"
-msgstr "team sports"
+msgid "team sports/excluding football"
+msgstr ""
 
-msgid "technology/natural science"
+#, fuzzy
+msgid "technology/natural sciences"
 msgstr "technology/natural science"
 
 msgid "template file"
@@ -12106,9 +12131,6 @@ msgstr "kesalahan takdikenal"
 
 msgid "unknown service"
 msgstr "layanan tak dikenal"
-
-msgid "unpublished"
-msgstr "takdipulikasikan"
 
 msgid "untestable"
 msgstr "takbisa dites"

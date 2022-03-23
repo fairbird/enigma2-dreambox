@@ -6,7 +6,6 @@ from Components.Sources.ServiceEvent import ServiceEvent
 from Components.TimerList import TimerList
 from Components.TimerSanityCheck import TimerSanityCheck
 from Components.UsageConfig import preferredTimerPath, dropEPGNewLines, replaceEPGSeparator
-from Components.Button import Button
 from RecordTimer import RecordTimerEntry, parseEvent, AFTEREVENT, createRecordTimerEntry
 from Screens.Screen import Screen
 from Screens.ChoiceBox import ChoiceBox
@@ -43,18 +42,11 @@ class TimerEditList(Screen):
 		self.key_yellow_choice = self.EMPTY
 		self.key_blue_choice = self.EMPTY
 
-		if self.key_red_choice == StaticText:
-			self["key_red"] = StaticText("")
-			self["key_green"] = StaticText(_("Add"))
-			self["key_yellow"] = StaticText("")
-			self["key_blue"] = StaticText("")
-			self["key_info"] = StaticText("")
-		else:
-			self["key_red"] = Button("")
-			self["key_green"] = Button(_("Add"))
-			self["key_yellow"] = Button("")
-			self["key_blue"] = Button("")
-			self["key_info"] = Button("")
+		self["key_red"] = StaticText("")
+		self["key_green"] = StaticText(_("Add"))
+		self["key_yellow"] = StaticText("")
+		self["key_blue"] = StaticText("")
+		self["key_info"] = StaticText("")
 
 		self["description"] = Label("")
 

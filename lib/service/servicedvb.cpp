@@ -335,6 +335,17 @@ eStaticServiceDVBPVRInformation::eStaticServiceDVBPVRInformation(const eServiceR
 	m_parser.parseFile(ref.path);
 }
 
+static bool looksLikeRecording(const std::string& n)
+{
+	return
+		(n.size() > 19) &&
+		(n[8] == ' ') &&
+		(n[13] == ' ') &&
+		(n[14] == '-') &&
+		(n[15] == ' ') &&
+		(isdigit(n[0]));
+}
+
 RESULT eStaticServiceDVBPVRInformation::getName(const eServiceReference &ref, std::string &name)
 {
 	ASSERT(ref == m_ref);
@@ -348,60 +359,24 @@ RESULT eStaticServiceDVBPVRInformation::getName(const eServiceReference &ref, st
 		size_t n = name.rfind('/');
 		if (n != std::string::npos)
 			name = name.substr(n + 1);
-		if (name.size() >= 3 && name.substr(name.size()-3, 3) == ".ts") {
-			enum { is_unknown, is_short, is_standard, is_long, is_event } name_type = is_unknown;
-
-			std::size_t dash1 = name.find(" - ");
-			std::size_t dash2 = dash1 == std::string::npos
-						? std::string::npos
-						: name.find(" - ", dash1+1);
-			std::size_t dash3 = dash2 == std::string::npos
-						? std::string::npos
-						: name.find(" - ", dash2+1);
-			std::size_t dashlast = name.rfind(" - ");
-
-			struct tm stm = {0};
-			std::string descr = "";
-
-			name.erase(name.size()-3);
-
-			if (dash1 == 8 && strptime(name.substr(0, dash1).c_str(), "%Y%m%d", &stm) != NULL)
+		if (looksLikeRecording(name))
+		{
+			// Parse recording names in 'YYYYMMDD HHMM - ... - name.ts' into name
+			std::size_t dash2 = name.find(" - ", 16, 3);
+			if (dash2 != std::string::npos)
 			{
-				name_type = is_short;
-				name = name.substr(dash1+3);
-			} else if (dash1 == 13 && strptime(name.substr(0, dash1).c_str(), "%Y%m%d %H%M", &stm) != NULL)
-			{
-				if (dash3 == std::string::npos)
+				struct tm stm{};
+				if (strptime(name.c_str(), "%Y%m%d %H%M", &stm) != NULL)
 				{
-					name_type = is_standard;
-					name = name.substr(dash2+3);
-				}
-				else
-				{
-					name_type = is_long;
-					size_t name_pos = dash2+3;
-					if (name.size() > name_pos)
-						m_parser.m_description = name.substr(dash3+3);
-					name = name.substr(name_pos, dash3-name_pos);
-				}
-			} else if (dashlast != std::string::npos && strptime(name.substr(dashlast+3, dashlast+17).c_str(), "%Y%m%d %H%M_", &stm))
-			{
-				name_type = is_event;
-				name = name.substr(0, dashlast);
-			}
-
-			if(name_type != is_unknown) {
-				if(name_type != is_short || m_parser.m_time_create == 0)
-				{
-					// Force mktime to look up zoneinfo for DST
-					stm.tm_isdst = -1;
 					m_parser.m_time_create = mktime(&stm);
 				}
+				name.erase(0,dash2+3);
 			}
-			else
-				name += ".ts";
+			if (name[name.size()-3] == '.')
+			{
+				name.erase(name.size()-3);
+			}
 		}
-
 		m_parser.m_name = name;
 	}
 	return 0;
@@ -446,11 +421,6 @@ int eStaticServiceDVBPVRInformation::getLength(const eServiceReference &ref)
 
 int eStaticServiceDVBPVRInformation::getInfo(const eServiceReference &ref, int w)
 {
-	if (m_parser.m_name.empty())
-	{
-		std::string name;
-		getName(ref, name); // This also updates m_parser.m_time_create
-	}
 	switch (w)
 	{
 	case iServiceInformation::sDescription:
@@ -473,11 +443,6 @@ int eStaticServiceDVBPVRInformation::getInfo(const eServiceReference &ref, int w
 
 std::string eStaticServiceDVBPVRInformation::getInfoString(const eServiceReference &ref,int w)
 {
-	if (m_parser.m_name.empty())
-	{
-		std::string name;
-		getName(ref, name); // This also updates m_parser.m_description
-	}
 	switch (w)
 	{
 	case iServiceInformation::sDescription:
@@ -1470,13 +1435,6 @@ RESULT eDVBServicePlay::stop()
 
 	m_nownext_timer->stop();
 	m_event((iPlayableService*)this, evStopped);
-
-	// In case the event callout changes the cue sheet
-	if ((m_is_pvr || m_timeshift_enabled) && m_cuesheet_changed)
-	{
-		saveCuesheet();
-	}
-
 	return 0;
 }
 
@@ -1559,17 +1517,7 @@ RESULT eDVBServicePlay::setFastForward_internal(int ratio, bool final_seek)
 	{
 		eDebug("[eDVBServicePlay] setFastForward setting cue skipmode to %d", skipmode);
 		if (m_cue)
-		{
-			long long _skipmode = skipmode;
-			if (!m_timeshift_active && (m_current_video_pid_type == eDVBServicePMTHandler::videoStream::vtH265_HEVC))
-			{
-				if (ratio < 0)
-					_skipmode = skipmode * 3;
-				else
-					_skipmode = skipmode * 4;
-			}
-			m_cue->setSkipmode(_skipmode * 90000); /* convert to 90000 per second */
-		}
+			m_cue->setSkipmode(skipmode * 90000); /* convert to 90000 per second */
 	}
 
 	m_skipmode = skipmode;
@@ -2251,8 +2199,8 @@ int eDVBServicePlay::selectAudioStream(int i)
 
 	int rdsPid = apid;
 
-		/* if we are not in PVR mode, timeshift is not active and we are not in pip mode, check if we need to enable the rds reader */
-	if (!(m_is_pvr || m_timeshift_active || m_decoder_index || m_have_video_pid))
+		/* if timeshift is not active and we are not in pip mode, check if we need to enable the rds reader */
+	if (!(m_timeshift_active || m_decoder_index || m_have_video_pid))
 	{
 		int different_pid = program.videoStreams.empty() && program.audioStreams.size() == 1 && program.audioStreams[stream].rdsPid != -1;
 		if (different_pid)
@@ -2263,7 +2211,7 @@ int eDVBServicePlay::selectAudioStream(int i)
 			ePtr<iDVBDemux> data_demux;
 			if (!h.getDataDemux(data_demux))
 			{
-				m_rds_decoder = new eDVBRdsDecoder(data_demux, different_pid);
+				m_rds_decoder = new eDVBRdsDecoder(data_demux, different_pid, apidtype);
 				m_rds_decoder->connectEvent(sigc::mem_fun(*this, &eDVBServicePlay::rdsDecoderEvent), m_rds_decoder_event_connection);
 				m_rds_decoder->start(rdsPid);
 				eDebug("[eDVBServicePlay] Using rds pid %d", rdsPid);
@@ -3072,7 +3020,6 @@ void eDVBServicePlay::updateDecoder(bool sendSeekableStateChanged)
 		}
 
 		m_decoder->setVideoPID(vpid, vpidtype);
-		m_current_video_pid_type = vpidtype;
 		m_have_video_pid = (vpid > 0 && vpid < 0x2000);
 
 		if (!m_noaudio)

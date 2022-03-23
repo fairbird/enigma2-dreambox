@@ -48,7 +48,6 @@ public:
 	void unlock();
 	int islocked() { return locked; }
 	void dumpLCD(bool);
-	void setDump(bool) {}
 };
 
 #endif

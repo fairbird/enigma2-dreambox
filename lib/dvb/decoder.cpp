@@ -1,7 +1,6 @@
 #include <lib/base/cfile.h>
 #include <lib/base/ebase.h>
 #include <lib/base/eerror.h>
-#include <lib/base/nconfig.h> // access to python config
 #include <lib/base/wrappers.h>
 #include <lib/dvb/decoder.h>
 #include <lib/components/tuxtxtapp.h>
@@ -283,14 +282,12 @@ eDVBVideo::eDVBVideo(eDVBDemux *demux, int dev)
 		m_fd_demux = -1;
 	}
 
-std::string zapmodeDM = eConfigManager::getConfigValue("config.misc.zapmodeDM");
-if (zapmodeDM == "hold")
-{
+#ifndef DREAMBOX
 	if (m_fd >= 0)
 	{
 		::ioctl(m_fd, VIDEO_SELECT_SOURCE, demux ? VIDEO_SOURCE_DEMUX : VIDEO_SOURCE_HDMI);
 	}
-}
+#endif
 	if (m_close_invalidates_attributes < 0)
 	{
 		/*
@@ -319,11 +316,7 @@ if (zapmodeDM == "hold")
 #define VIDEO_STREAMTYPE_MPEG4_Part2 4
 #define VIDEO_STREAMTYPE_VC1_SM 5
 #define VIDEO_STREAMTYPE_MPEG1 6
-#ifdef DREAMBOX
-#define VIDEO_STREAMTYPE_H265_HEVC 22
-#else
 #define VIDEO_STREAMTYPE_H265_HEVC 7
-#endif
 #define VIDEO_STREAMTYPE_AVS 16
 #define VIDEO_STREAMTYPE_AVS2 40
 

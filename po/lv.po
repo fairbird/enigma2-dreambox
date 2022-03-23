@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: enigma2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-12-22 15:03+0100\n"
+"POT-Creation-Date: 2022-02-26 15:37+0100\n"
 "PO-Revision-Date: 2014-11-12 00:49+0200\n"
 "Last-Translator: Taapat <taapat@gmail.com>\n"
 "Language-Team: Taapat <taapat@gmail.com>\n"
@@ -1024,8 +1024,8 @@ msgstr "Armēnija"
 msgid "Artist"
 msgstr "Izpildītājs"
 
-msgid "Arts/Culture"
-msgstr "Māksla/Kultūra"
+msgid "Arts/Culture (without music)"
+msgstr "māksla, kultūra"
 
 msgid "Aruba"
 msgstr "Aruba"
@@ -1194,6 +1194,9 @@ msgstr "Pieejamie mainīgo formāti"
 
 msgid "Available locales are:"
 msgstr "Pieejamās valodas:"
+
+msgid "Axas E4HD Ultra"
+msgstr "Axas E4HD Ultra"
 
 msgid "Azerbaijan"
 msgstr "Azerbaidžāna"
@@ -1451,6 +1454,10 @@ msgstr "Kabeļu"
 msgid "Cable Scan"
 msgstr "Kabeļu meklēšana"
 
+#, python-format
+msgid "Cable scan executable utility not found '%s'!"
+msgstr "Kabeļu skenēšanas aplikācija nav atrasta '%s'!"
+
 msgid "Cabo Verde"
 msgstr "Kaboverde"
 
@@ -1684,8 +1691,8 @@ msgstr ""
 "Pārbauda uztvērēju %s\n"
 "DiSEqC ieeja %s no %s"
 
-msgid "Children/Youth"
-msgstr "Bērni/Jaunieši"
+msgid "Children/Youth/Education/Science"
+msgstr "Bērnu, jauniešu, izglītība, zinātne"
 
 msgid "Chile"
 msgstr "Čīle"
@@ -2722,9 +2729,8 @@ msgstr "Izslēgts"
 msgid "Disk space to reserve for recordings (in GB)"
 msgstr "Rezerve ierakstiem diskā (GB)"
 
-#, fuzzy
 msgid "Disk state: "
-msgstr "meklēšanas statuss"
+msgstr "Diska statuss: "
 
 msgid "Display 16:9 content as"
 msgstr "Attēlot 16:9 saturu"
@@ -2944,6 +2950,9 @@ msgstr "Lejuplādējamie jaunie spraudņi"
 msgid "Downloadable plugins"
 msgstr "Lejuplādējamie spraudņi"
 
+msgid "Downloaded Images"
+msgstr "Lejupielādētie attēli"
+
 msgid "Downloading"
 msgstr "Lejuplādē"
 
@@ -2955,6 +2964,9 @@ msgstr "Mēģina lejuplādēt jaunu pakotņu sarakstu. Lūdzu gaidiet..."
 
 msgid "Downloading plugin information. Please wait..."
 msgstr "Lejuplādē spraudņu informāciju. Lūdzu uzgaidiet..."
+
+msgid "Drama and Films"
+msgstr "Drāma un filmas"
 
 msgid "Drop unconfigured satellites"
 msgstr "Izlaist nekonfigurētos pavadoņus"
@@ -3047,9 +3059,6 @@ msgstr "Rediģēt nosaukumu"
 
 msgid "Edit update source url"
 msgstr "Rediģēt atjaunināšanas avota adresi"
-
-msgid "Education/Science/..."
-msgstr "Izglītība/Zinātne/..."
 
 msgid "Egypt"
 msgstr "Ēģipte"
@@ -3805,6 +3814,9 @@ msgstr "Pilnīgi caurspīdīgs"
 msgid "Full view resolution"
 msgstr "Pilnekrāna izšķirtspēja"
 
+msgid "Fullbackup Images"
+msgstr "Imidži no dublējumkopijas"
+
 msgid "Function of OK button"
 msgstr "Taustiņa Labi funkcija"
 
@@ -4004,8 +4016,8 @@ msgstr "HD saraksts"
 msgid "HD2400"
 msgstr "HD2400"
 
-msgid "HD60/Multibox/Multibox SE"
-msgstr "HD60/Multibox/Multibox SE"
+msgid "HD60/HD66SE/Multibox/Multibox SE"
+msgstr "HD60/HD66SE/Multibox/Multibox SE"
 
 msgid "HDMI Colordepth"
 msgstr "HDMI krāsu dziļums"
@@ -4675,9 +4687,6 @@ msgstr "Kreisais"
 msgid "Left from servicename"
 msgstr "Pa kreisi no kanāla nosaukuma"
 
-msgid "Leisure hobbies"
-msgstr "Brīvā laika hobiji"
-
 msgid "Lesotho"
 msgstr "Lesoto"
 
@@ -5150,9 +5159,6 @@ msgstr "Mediju atrašanās vieta"
 msgid "Movie selection"
 msgstr "Mediju faili"
 
-msgid "Movie/Drama"
-msgstr "Filma/Drāma"
-
 msgid "Movielist menu"
 msgstr "Mediju saraksta izvēlne"
 
@@ -5329,8 +5335,8 @@ msgstr "Jaunkaledonija"
 msgid "New Zealand"
 msgstr "Jaunzēlande"
 
-msgid "News Current Affairs"
-msgstr "Jaunumi Aktualitātes"
+msgid "News/Current Affairs/Social"
+msgstr "Ziņas, aktuālitātes, sociālie"
 
 msgctxt "button label, 'next screen'"
 msgid "Next"
@@ -7672,6 +7678,10 @@ msgstr "Iestatīt kā starta kanālu"
 msgid "Set blocktimes by weekday"
 msgstr "Iestatīt bloķēšanas laikus pa dienām"
 
+#, fuzzy
+msgid "Set cursor on service from channel history"
+msgstr "Pārslēgt uz iepriekšējo kanālu vēsturē"
+
 msgid "Set default"
 msgstr "Pēc noklusējuma"
 
@@ -7794,9 +7804,6 @@ msgstr "Rādīt EPG pašreizējam kanālam..."
 
 msgid "Show EPG..."
 msgstr "Rādīt EPG..."
-
-msgid "Show Games show"
-msgstr "Rādīt Games show"
 
 msgid "Show InfoBar"
 msgstr "Rādīt infojoslu"
@@ -8026,6 +8033,9 @@ msgstr "Rādīt brīdinājumu pirms iestatīt 'Ignorēt konfliktus'"
 msgid "Show warning when timeshift is stopped"
 msgstr "Rādīt brīdinājumu kad laika aizture apturēta"
 
+msgid "Show/Game Show/Leisure hobbies"
+msgstr "Šovi, spēļu šovi, atpūta, vaļasprieki"
+
 msgid "Show/hide window"
 msgstr "Rādīt/slēpt logu"
 
@@ -8150,11 +8160,11 @@ msgstr "Karšu lasītājs %d"
 
 #, python-format
 msgid "Slot %s / FBC in %s"
-msgstr ""
+msgstr "Slots %s / FBC %s"
 
-#, fuzzy, python-format
+#, python-format
 msgid "Slot %s / FBC virtual %s"
-msgstr "Virtuālais FBC"
+msgstr "Slots %s / virtuālais FBC %s"
 
 msgid "Slovak"
 msgstr "Slovāku"
@@ -8185,9 +8195,6 @@ msgstr "Kartes PIN"
 
 msgid "Smooth"
 msgstr "Izlīdzināt"
-
-msgid "Social/Political/Economics"
-msgstr "Sociālie/Politika/Ekonomika"
 
 msgid "SocketMMI"
 msgstr "SocketMMI"
@@ -8361,7 +8368,6 @@ msgstr "Šrilanka"
 msgid "Standard"
 msgstr "Standarta"
 
-#, fuzzy
 msgid "Standard list"
 msgstr "Standarta saraksts"
 
@@ -10371,7 +10377,7 @@ msgstr "Ja ieslēgts, teleteksta subtitri tiks attēloti to oriģinālajā pozī
 msgid "When enabled, the VCR scart option will be shown on the main menu"
 msgstr "Ja ieslēgts, VCR scart tiks rādīts galvenajā izvēlnē"
 
-msgid "When enabled, the channel selection list will be hidden while listening to a radio channel"
+msgid "When enabled, the channel selection list will be hidden while listening to a radio channel. When disabled, the option 'Auto play last service in radio mode' is available."
 msgstr "Ja ieslēgts, klausoties radio kanālu pārslēgšanas saraksts netiks rādīts."
 
 msgid "When enabled, the infobar will be displayed when a new event starts."
@@ -10400,6 +10406,10 @@ msgstr "Ja ieslēgts, uztvērējs izvēlēsies AC3 celiņu (ja pieejams)."
 
 msgid "When enabled, the receiver will select an AC3+ track (when available)."
 msgstr "Ja ieslēgts, uztvērējs izvēlēsies AC3+ celiņu (ja pieejams)."
+
+#, fuzzy
+msgid "When enabled, then when changing bouquets, set the cursor on the service from the channel history in the channel selection list."
+msgstr "Ja ieslēgts, ar virziena pogām ap OK jūs varat regulēt skaļumu, nevis atvērt kanālu sarakstu"
 
 msgid "When enabled, this setting has more weight than 'Preferred tuner for recordings'."
 msgstr "Ja ieslēgts, šis iestatījums tiks lietots 'Ieteicamais uztvērējs ierakstam' vietā."
@@ -10798,8 +10808,8 @@ msgstr "Pārslēdz uz taimera kanālu %s!"
 msgid "Zgemma H.S/H.2S/H.2H/H5/H7(old model)"
 msgstr "Zgemma H.S/H.2S/H.2H/H5/H7(vecais modelis)"
 
-msgid "Zgemma H9(old model)/I55Plus"
-msgstr "Zgemma H9(vecais modelis)/I55Plus"
+msgid "Zgemma H9(old model)/I55Plus/H8"
+msgstr "Zgemma H9(vecais modelis)/I55Plus/H8"
 
 msgid "Zgemma Star S/2S/H1/H2"
 msgstr "Zgemma Star S/2S/H1/H2"
@@ -10826,7 +10836,7 @@ msgid "a gui to assign services/providers to common interface modules"
 msgstr "interfeiss lai piešķirtu kanālus/operatorus moduļiem"
 
 msgid "a gui to assign services/providers/caids to common interface modules"
-msgstr "interfeiss lai piešķirtu kanālus/operatorus/caids moduļiem"
+msgstr "interfeiss lai piešķirtu kanālus, operatorus vai caids moduļiem"
 
 msgid "about to start"
 msgstr "gatavojas sākt"
@@ -10837,9 +10847,8 @@ msgstr "aktivizēt tīkla adaptera konfigurāciju"
 msgid "active"
 msgstr "aktīvs"
 
-#, fuzzy
 msgid "active "
-msgstr "aktīvs"
+msgstr "aktīvs "
 
 msgid "actual time only"
 msgstr "tikai aktuālajam laikam"
@@ -10847,17 +10856,17 @@ msgstr "tikai aktuālajam laikam"
 msgid "additional cable of rotor"
 msgstr "rotora papildus kabelis"
 
-msgid "adult movie/drama"
-msgstr "pieaugušo filma/drāma"
+msgid "adult movie"
+msgstr "pieaugušo"
 
 msgid "advanced"
 msgstr "paplašināts"
 
 msgid "adventure/western/war"
-msgstr "piedzīvojumi/vesterns/kara"
+msgstr "piedzīvojumi, vesterns, kara"
 
 msgid "advertisement/shopping"
-msgstr "reklāma/iepirkšanās"
+msgstr "reklāma, iepirkšanās"
 
 msgid "after "
 msgstr "pēc"
@@ -10899,10 +10908,10 @@ msgid "are you sure to cancel all changes"
 msgstr "vai tiešām vēlaties atcelt visas izmaiņas"
 
 msgid "arts/culture (without music, general)"
-msgstr "māksla/kultūra (bez mūzikas, kopējā)"
+msgstr "māksla, kultūra"
 
 msgid "arts/culture magazine"
-msgstr "māksla/kultūra žurnāli"
+msgstr "māksla, kultūra, žurnāli"
 
 msgid "athletics"
 msgstr "atlētika"
@@ -10938,9 +10947,6 @@ msgstr "labāks"
 msgid "black"
 msgstr "melns"
 
-msgid "black & white"
-msgstr "melns un balts"
-
 msgid "blacklist"
 msgstr "melnais saraksts"
 
@@ -10951,13 +10957,13 @@ msgid "bottom"
 msgstr "apakšā"
 
 msgid "broadcasting/press"
-msgstr "apraide/prese"
+msgstr "apraide, prese"
 
 msgid "by date"
 msgstr "pēc datuma"
 
 msgid "cartoon/puppets"
-msgstr "multfilmas/leļļu"
+msgstr "multfilmas, leļļu"
 
 msgid "center"
 msgstr "centrs"
@@ -10971,8 +10977,8 @@ msgstr "centrēti, saspiesti"
 msgid "chapters"
 msgstr "nodaļas"
 
-msgid "childrens's/youth program (general)"
-msgstr "bērnu/jauniešu programmas (vispārīgi)"
+msgid "childrens's youth program (general)"
+msgstr "bērnu, jauniešu programmas"
 
 msgid "circular left"
 msgstr "cirkulārā kreisā"
@@ -10985,9 +10991,6 @@ msgstr "apgriež attēla malas"
 
 msgid "comedy"
 msgstr "komēdija"
-
-msgid "config menu"
-msgstr "konfigurācijas izvēlne"
 
 msgid "confirmed"
 msgstr "apstiprināts"
@@ -11017,7 +11020,7 @@ msgid "descramble and record ecm"
 msgstr "dekodēt un ierakstīt ecm"
 
 msgid "detective/thriller"
-msgstr "detektīvs/trilleris"
+msgstr "detektīvs, trilleris"
 
 msgid "disable"
 msgstr "izslēgt"
@@ -11032,7 +11035,7 @@ msgid "disconnected"
 msgstr "atvienots"
 
 msgid "discussion/interview/debate"
-msgstr "diskusijas/intervijas/debates"
+msgstr "diskusijas, intervijas, debates"
 
 msgid "do nothing"
 msgstr "neko nedarīt"
@@ -11050,10 +11053,10 @@ msgid "east"
 msgstr "austrumi"
 
 msgid "economics/social advisory"
-msgstr "ekonomika/sociālā konsultatīvā"
+msgstr "ekonomika, sociālā konsultatīvā"
 
-msgid "education/science/factual topics (general)"
-msgstr "izglītība/zinātne/faktiskās tēmas (vispārīgi)"
+msgid "educational/science/factual topics (general)"
+msgstr "izglītība, zinātne, faktiska"
 
 msgid "embedded"
 msgstr "iekšējais"
@@ -11142,7 +11145,7 @@ msgstr "filmas/kino"
 msgid "fine arts"
 msgstr "tēlotājmāksla"
 
-msgid "fitness & health"
+msgid "fitness and health"
 msgstr "fitness un veselība"
 
 msgid "flat alphabetic"
@@ -11180,9 +11183,6 @@ msgstr "tālākizglītība"
 
 msgid "game show/quiz/contest"
 msgstr "spēļu šovi/viktorīna/konkurss"
-
-msgid "gardening"
-msgstr "dārzkopība"
 
 msgid "go to deep standby"
 msgstr "iet uz dziļo gaidstāvi"
@@ -11260,7 +11260,7 @@ msgid "left, wrapped"
 msgstr "pa kreisi, saspiesti"
 
 msgid "leisure hobbies (general)"
-msgstr "atpūtas hobiji (vispārīgi)"
+msgstr "atpūta, hobiji"
 
 msgid "length"
 msgstr "garums"
@@ -11286,8 +11286,8 @@ msgstr "Pārvalda hotplug darbības"
 msgid "literature"
 msgstr "literatūra"
 
-msgid "live broadcast"
-msgstr "dzīvais raidījums"
+msgid "local sports"
+msgstr "sports"
 
 msgid "locked"
 msgstr "noenkurojies"
@@ -11296,7 +11296,7 @@ msgid "long"
 msgstr "ilgi"
 
 msgid "magazines/reports/documentary"
-msgstr "avīzes/atskaites/dokumentālais"
+msgstr "avīzes, atskaites, dokumentālais"
 
 msgid "manual"
 msgstr "manuāls"
@@ -11305,7 +11305,7 @@ msgid "martial sports"
 msgstr "cīņas sports"
 
 msgid "medicine/physiology/psychology"
-msgstr "medicīna/fizioloģija/psiholoģija"
+msgstr "medicīna, fizioloģija, psiholoģija"
 
 msgid "menu"
 msgstr "izvēlne"
@@ -11334,20 +11334,20 @@ msgstr "pārvietot augšup uz pirmo ierakstu"
 msgid "move up to previous entry"
 msgstr "pārvietot augšup uz iepriekšējo ierakstu"
 
-msgid "movie/drama (general)"
-msgstr "filmas/drāma (vispārīgi)"
+msgid "movie (general)"
+msgstr "filmas, drāma"
 
 msgid "multi"
 msgstr "multi"
 
 msgid "music/ballet/dance (general)"
-msgstr "mūzika/balets/dejas (vispārīgi)"
+msgstr "mūzika, balets, dejas"
 
 msgid "musical/opera"
-msgstr "mūzika/opera"
+msgstr "mūzika, opera"
 
 msgid "nature/animals/environment"
-msgstr "daba/dzīvnieki/vide"
+msgstr "daba, dzīvnieki, vide"
 
 msgid "never"
 msgstr "nekad"
@@ -11362,10 +11362,10 @@ msgid "news magazine"
 msgstr "ziņas žurnāli"
 
 msgid "news/current affairs (general)"
-msgstr "jaunumi/aktualitātes (vispārīgi)"
+msgstr "jaunumi, aktualitātes"
 
 msgid "news/weather report"
-msgstr "jaunumi/laika ziņas"
+msgstr "jaunumi, laika ziņas"
 
 msgid "no"
 msgstr "nē"
@@ -11463,9 +11463,6 @@ msgstr "atvērt DNS konfigurāciju"
 msgid "original"
 msgstr "oriģināls"
 
-msgid "original language"
-msgstr "oriģinālā valoda"
-
 msgid "pass"
 msgstr "šobrīd"
 
@@ -11486,6 +11483,9 @@ msgstr "tautas kultūra/tradicionālā māksla"
 
 msgid "pre-school children's program"
 msgstr "pirmsskolas bērnu programma"
+
+msgid "preserve bookmarks in cuts"
+msgstr "saglabāt grāmatzīmes izgriestajos"
 
 msgid "receiver software because updates are available."
 msgstr "uztvērēja programmatūru jo atjauninājumi pieejami."
@@ -11511,6 +11511,9 @@ msgstr "dzēst pēc šīs pozīcijas"
 msgid "remove before this position"
 msgstr "dzēst pirms šīs pozīcijas"
 
+msgid "remove bookmarks in cuts"
+msgstr "dzēst grāmatzīmes izgriestajos"
+
 msgid "remove this mark"
 msgstr "dzēst iezīmi"
 
@@ -11533,7 +11536,7 @@ msgid "right, wrapped"
 msgstr "pa labi, saspiesti"
 
 msgid "rock/pop"
-msgstr "roks/pops"
+msgstr "roks, pops"
 
 msgid "romance"
 msgstr "romance"
@@ -11551,7 +11554,7 @@ msgid "scan state"
 msgstr "meklēšanas statuss"
 
 msgid "science fiction/fantasy/horror"
-msgstr "zinātniskā fantastika/fantāzijas/šausmu"
+msgstr "zinātniskā fantastika, fantāzijas, šausmu"
 
 msgid "select CAId's"
 msgstr "izvēlēties"
@@ -11560,10 +11563,10 @@ msgid "select menu entry"
 msgstr "norādīt izvēlnes ierakstu"
 
 msgid "serious music/classic music"
-msgstr "nopietnā mūzika/klasiskā mūzika"
+msgstr "nopietnā mūzika, klasiskā mūzika"
 
-msgid "serious/classical/religious/historical movie/drama"
-msgstr "nopietnā/klasiskā/reliģiskā/vēsturiskā filma/drāma"
+msgid "serious/classical/religious/historical drama"
+msgstr "nopietnā, klasiskā, reliģiskā, vēsturiskā drāma"
 
 msgid "service off-air"
 msgstr "kanāls nedarbojas"
@@ -11584,7 +11587,7 @@ msgid "show softwaremanager on blue button"
 msgstr "parādīt programmatūras pārvaldnieku ar zilo pogu"
 
 msgid "show/game show (general)"
-msgstr "šovi/spēļu šovi (vispārīgi)"
+msgstr "šovi, spēļu šovi"
 
 msgid "shuffle"
 msgstr "jaukts"
@@ -11641,14 +11644,14 @@ msgstr "slots%s - %s, ar dublējumkopiju"
 msgid "slot%s - %s, without backup"
 msgstr "slots%s - %s, bez dublējumkopijas"
 
-msgid "soap/melodram/folkloric"
-msgstr "ziepju opera/melodrāma/folklora"
+msgid "soap/melodrama/folkloric"
+msgstr "ziepju opera, melodrāma, folklora"
 
 msgid "social/political issues/economics (general)"
-msgstr "sociālie/politiskie jautājumi/ekonomika (vispārīgi)"
+msgstr "sociālie, politiskie jautājumi, ekonomika"
 
-msgid "social/spiritual science"
-msgstr "sociālie/garīgā zinātne"
+msgid "social/spiritual sciences"
+msgstr "sociālie, garīgie"
 
 msgid "space"
 msgstr "tukšums"
@@ -11660,7 +11663,7 @@ msgid "special format data DVD (HDTV compatible)"
 msgstr "īpaša formāta datu DVD (HDTV)"
 
 msgid "sports (general)"
-msgstr "sports (vispārīgi)"
+msgstr "sports"
 
 msgid "sports magazine"
 msgstr "sporta žurnāls"
@@ -11668,9 +11671,8 @@ msgstr "sporta žurnāls"
 msgid "standard"
 msgstr "standarta"
 
-#, fuzzy
 msgid "standby "
-msgstr "Gaidstāve"
+msgstr "gaidstāve "
 
 msgid "start cut here"
 msgstr "sākt griešanu šeit"
@@ -11699,11 +11701,11 @@ msgstr "pārslēgt uz nākamo subtitru valodu"
 msgid "talk show"
 msgstr "runu šovi"
 
-msgid "team sports"
-msgstr "komandu sports"
+msgid "team sports/excluding football"
+msgstr "komandu sporta veidi"
 
-msgid "technology/natural science"
-msgstr "tehnoloģijas/dabaszinātnes"
+msgid "technology/natural sciences"
+msgstr "tehnoloģijas, dabaszinātnes"
 
 msgid "template file"
 msgstr "šablona fails"
@@ -11749,9 +11751,6 @@ msgstr "nezināma kļūda"
 
 msgid "unknown service"
 msgstr "nezināms kanāls"
-
-msgid "unpublished"
-msgstr "nepublicēts"
 
 msgid "untestable"
 msgstr "netestēts"

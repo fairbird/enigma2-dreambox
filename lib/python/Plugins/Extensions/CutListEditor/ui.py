@@ -1,102 +1,97 @@
-import bisect
-from time import sleep
-from struct import unpack, Struct
-from ctypes import CDLL, c_longlong
-from enigma import getDesktop, iPlayableService
 from Screens.Screen import Screen
 from Screens.MessageBox import MessageBox
-from Screens.ChoiceBox import ChoiceBox
 from Components.ServicePosition import ServicePositionGauge
 from Components.ActionMap import HelpableActionMap
+from Components.MultiContent import MultiContentEntryText
 from Components.ServiceEventTracker import ServiceEventTracker, InfoBarBase
 from Components.VideoWindow import VideoWindow
 from Components.Label import Label
+from Components.config import config, ConfigSubsection, ConfigYesNo
 from Screens.InfoBarGenerics import InfoBarSeek, InfoBarCueSheetSupport
+from enigma import getDesktop, gFont, iPlayableService, RT_HALIGN_RIGHT
 from Screens.FixedMenu import FixedMenu
 from Screens.HelpMenu import HelpableScreen
+from ServiceReference import ServiceReference
 from Components.Sources.List import List
-from Components.config import config, ConfigYesNo
-from Screens.MovieSelection import MovieSelection
+from Components.Console import Console
+from Screens.ChoiceBox import ChoiceBox
+from time import gmtime, strftime
 
-apscParser = Struct(">qq")    # big-endian, 64-bit offset and 64-bit PTS/data
+import bisect
 
-config.usage.cutlisteditor_tutorial_seen = ConfigYesNo(default=False)
+try:
+	from Plugins.Extensions.MovieCut.plugin import main as MovieCut
+except:
+	MovieCut = None
+
+config.plugins.CutListEditor = ConfigSubsection()
+config.plugins.CutListEditor.showIntro = ConfigYesNo(default=True)
+config.plugins.CutListEditor.keep_bookmarks = ConfigYesNo(default=False)
 
 
-def SecToMSS(sec):
-	return "%d:%02d" % (sec / 60, sec % 60)
-
-
-def CutListEntry(where, what, where_next=None):
+def CutListEntry(where, what):
 	w = where / 90
 	ms = w % 1000
 	s = (w / 1000) % 60
 	m = (w / 60000) % 60
 	h = w / 3600000
-	type, type_col = (
-		("IN", 0x004000),
-		("OUT", 0x400000),
-		("MARK", 0x000040),
-		("LAST", 0x000000),
-		("START", 0x000000),
-		("END", 0x000000),
-		("", 0x000000)
-	)[what if what < 6 else 6]
-
-	d = SecToMSS((where_next / 90 - w) / 1000) if where_next else ""
-
-	return (where, what), "%dh:%02dm:%02ds:%03d" % (h, m, s, ms), type, d, type_col
+	if what == 0:
+		type = "IN"
+		type_col = 0x004000
+	elif what == 1:
+		type = "OUT"
+		type_col = 0x400000
+	elif what == 2:
+		type = "MARK"
+		type_col = 0x000040
+	elif what == 3:
+		type = "LAST"
+		type_col = 0x000000
+	return ((where, what), "%dh:%02dm:%02ds:%03d" % (h, m, s, ms), type, type_col)
 
 
 class CutListContextMenu(FixedMenu):
 	RET_STARTCUT = 0
 	RET_ENDCUT = 1
 	RET_DELETECUT = 2
-	RET_MARKIN = 12
 	RET_MARK = 3
 	RET_DELETEMARK = 4
 	RET_REMOVEBEFORE = 5
 	RET_REMOVEAFTER = 6
-	RET_ENABLECUTS = 7
-	RET_DISABLECUTS = 8
-	RET_EXECUTECUTS = 9
-	RET_QUICKEXECUTE = 10
-	RET_GRABFRAME = 11
+	RET_GRABFRAME = 7
+	RET_TOGGLEINTRO = 8
+	RET_MOVIECUT = 9
+	RET_KEEPBOOKMARKS = 10
 
 	SHOW_STARTCUT = 0
 	SHOW_ENDCUT = 1
 	SHOW_DELETECUT = 2
 
-	def __init__(self, session, state, nearmark, cut_state):
+	def __init__(self, session, state, nearmark):
 		menu = [(_("back"), self.close)] #, (None, )]
 
 		if state == self.SHOW_STARTCUT:
-			menu.append((_("start cut here (reset)"), self.startCut))
-		else:
 			menu.append((_("start cut here"), self.startCut))
+		else:
+			menu.append((_("start cut here"), ))
 
 		if state == self.SHOW_ENDCUT:
-			menu.append((_("end cut here (reset)"), self.endCut))
-		else:
 			menu.append((_("end cut here"), self.endCut))
+		else:
+			menu.append((_("end cut here"), ))
 
 		if state == self.SHOW_DELETECUT:
 			menu.append((_("delete cut"), self.deleteCut))
 		else:
-			menu.append((_("delete cut (disabled)"), ))
+			menu.append((_("delete cut"), ))
 
 		menu.append((_("remove before this position"), self.removeBefore))
 		menu.append((_("remove after this position"), self.removeAfter))
 
-		if cut_state == 2:
-			menu.append((_("enable cuts (preview)"), self.enableCuts))
+		if config.plugins.CutListEditor.keep_bookmarks.value:
+			menu.append((_("remove bookmarks in cuts"), self.keepBookmarks))
 		else:
-			menu.append((_("disable cuts (edit)"), self.disableCuts))
-
-		menu.append((_("execute cuts and exit"), self.executeCuts))
-		menu.append((_("quick execute"), self.quickExecute))
-
-		menu.append((_("insert mark after each in"), self.markIn))
+			menu.append((_("preserve bookmarks in cuts"), self.keepBookmarks))
 
 		if not nearmark:
 			menu.append((_("insert mark here"), self.insertMark))
@@ -104,8 +99,17 @@ class CutListContextMenu(FixedMenu):
 			menu.append((_("remove this mark"), self.removeMark))
 
 		menu.append((_("grab this frame as bitmap"), self.grabFrame))
+
+		if config.plugins.CutListEditor.showIntro.value:
+			menu.append((_("disable intro screen"), self.toggleIntro))
+		else:
+			menu.append((_("enable intro screen"), self.toggleIntro))
+
+		if MovieCut:
+			menu.append((_("execute cuts (requires MovieCut plugin)"), self.callMovieCut))
+
 		FixedMenu.__init__(self, session, _("Cut"), menu)
-		self.skinName = "CutListMenu"
+		self.skinName = "Menu"
 
 	def startCut(self):
 		self.close(self.RET_STARTCUT)
@@ -116,8 +120,8 @@ class CutListContextMenu(FixedMenu):
 	def deleteCut(self):
 		self.close(self.RET_DELETECUT)
 
-	def markIn(self):
-		self.close(self.RET_MARKIN)
+	def keepBookmarks(self):
+		self.close(self.RET_KEEPBOOKMARKS)
 
 	def insertMark(self):
 		self.close(self.RET_MARK)
@@ -131,102 +135,79 @@ class CutListContextMenu(FixedMenu):
 	def removeAfter(self):
 		self.close(self.RET_REMOVEAFTER)
 
-	def enableCuts(self):
-		self.close(self.RET_ENABLECUTS)
-
-	def disableCuts(self):
-		self.close(self.RET_DISABLECUTS)
-
-	def executeCuts(self):
-		self.close(self.RET_EXECUTECUTS)
-
-	def quickExecute(self):
-		self.close(self.RET_QUICKEXECUTE)
-
 	def grabFrame(self):
 		self.close(self.RET_GRABFRAME)
+
+	def toggleIntro(self):
+		self.close(self.RET_TOGGLEINTRO)
+
+	def callMovieCut(self):
+		self.close(self.RET_MOVIECUT)
 
 
 class CutListEditor(Screen, InfoBarBase, InfoBarSeek, InfoBarCueSheetSupport, HelpableScreen):
 	skin = """
-	<screen name="CutListEditor" position="fill" flags="wfNoBorder">
-		<panel name="BasicTemplate"/>
-		<eLabel text="Cutlist editor" position="30,7" size="1830,75" backgroundColor="secondBG" transparent="1" zPosition="1" font="Regular;36" valign="center" halign="left"/>
-		<widget source="cutlist" render="Listbox" position="30,100" size="570,912" backgroundColor="black" zPosition="3" transparent="1" scrollbarMode="showOnDemand">
+	<screen position="0,0" size="720,576" title="Cutlist editor" flags="wfNoBorder">
+		<eLabel text="Cutlist editor" position="65,60" size="300,25" font="Regular;20" />
+		<widget source="global.CurrentTime" render="Label" position="268,60" size="394,20" font="Regular;20" halign="right">
+			<convert type="ClockToText">Format:%A %B %d, %H:%M</convert>
+		</widget>
+		<eLabel position="268,98" size="394,304" backgroundColor="#505555" />
+		<widget name="Video" position="270,100" zPosition="1" size="390,300" backgroundColor="transparent" />
+		<widget source="session.CurrentService" render="Label" position="135,405" size="450,50" font="Regular;22" halign="center" valign="center">
+			<convert type="ServiceName">Name</convert>
+		</widget>
+		<widget source="session.CurrentService" render="Label" position="320,450" zPosition="1" size="420,25" font="Regular;20" halign="left" valign="center">
+			<convert type="ServicePosition">Position,Detailed</convert>
+		</widget>
+		<widget name="SeekState" position="210,450" zPosition="1" size="100,25" halign="right" font="Regular;20" valign="center" />
+		<eLabel position="48,98" size="204,274" backgroundColor="#505555" />
+		<eLabel position="50,100" size="200,270" backgroundColor="#000000" />
+		<widget source="cutlist" position="50,100" zPosition="1" size="200,270" scrollbarMode="showOnDemand" transparent="1" render="Listbox" >
 			<convert type="TemplatedMultiContent">
-				{"template": [
-						MultiContentEntryText(pos=(15,3),size=(255,30),text = 1,backcolor = MultiContentTemplateColor(4)),
-						MultiContentEntryText(pos=(285,3),size=(120,30),text = 2,flags = RT_HALIGN_CENTER,backcolor = MultiContentTemplateColor(4))
+				{
+					"template": [
+						MultiContentEntryText(size=(125, 20), text = 1, backcolor = MultiContentTemplateColor(3)),
+						MultiContentEntryText(pos=(125,0), size=(50, 20), text = 2, flags = RT_HALIGN_RIGHT, backcolor = MultiContentTemplateColor(3))
 					],
-				 "fonts": [gFont("Regular",28)],
-				 "itemHeight": 38
+					"fonts": [gFont("Regular", 18)],
+					"itemHeight": 20
 				}
 			</convert>
 		</widget>
-		<widget name="Video" position="630,105" backgroundColor="transparent" size="1260,709" zPosition="1"/>
-		<widget source="session.CurrentService" render="Label" position="630,825" size="1260,45" font="Regular;37" backgroundColor="black" zPosition="1" transparent="1" valign="center" halign="center">
-			<convert type="ServiceName">Name</convert>
-		</widget>
-		<widget source="session.CurrentService" render="Label" position="630,900" size="1260,45" font="Regular;37" backgroundColor="black" zPosition="1" transparent="1" valign="center" halign="center">
-			<convert type="ServicePosition">Position,Detailed</convert>
-		</widget>
-		<widget name="SeekState" position="532,949" zPosition="1" size="150,37" halign="right" font="Regular;30" valign="center"/>
-		<widget name="Timeline" position="690,952" size="1140,30" backgroundColor="#505555" pointer="position_arrow.png:4,11" foregroundColor="black"/>
-		<ePixmap pixmap="buttons/key_ok.png" position="80,950" size="52,38" alphatest="blend"/>
-		<eLabel text="Menu" position="150,950" size="370,38" backgroundColor="secondBG" font="Regular;34" halign="left" transparent="1" zPosition="1"/>
-		<ePixmap pixmap="buttons/key_0.png" position="280,950" size="52,38" alphatest="blend"/>
-		<eLabel text="Mark" position="350,950" size="370,38" backgroundColor="secondBG" font="Regular;34" halign="left" transparent="1" zPosition="1"/>
+		<widget name="Timeline" position="50,485" size="615,20" backgroundColor="#505555" pointer="position_arrow.png:3,5" foregroundColor="black" />
+		<ePixmap pixmap="icons/mp_buttons.png" position="305,515" size="109,13" alphatest="on" />
 	</screen>"""
 
-	BACK_BACK = 0
-	BACK_RESTORE = 1
-	BACK_RESTOREEXIT = 2
-	BACK_REMOVEMARKS = 3
-	BACK_REMOVECUTS = 4
-	BACK_REMOVEALL = 5
+	tutorial_seen = False
 
 	def __init__(self, session, service):
 		self.skin = CutListEditor.skin
 		Screen.__init__(self, session)
-		Screen.setTitle(self, _("Cutlist editor"))
-		InfoBarSeek.__init__(self, actionmap=["CutlistSeekActions"])
+		self.setTitle(_("Cutlist editor"))
+		InfoBarSeek.__init__(self, actionmap="CutlistSeekActions")
 		InfoBarCueSheetSupport.__init__(self)
 		InfoBarBase.__init__(self, steal_current_service=True)
 		HelpableScreen.__init__(self)
-		self.old_service = session.nav.getCurrentlyPlayingServiceReference()
-		self.service = service
-		session.nav.playService(service)
-		self.pauseService()
+		self.old_service = session.nav.getCurrentlyPlayingServiceOrGroup()
+		self.cut_service = service
+		session.nav.playService(service, adjust=False)
 
-		# disable cutlists. we want to freely browse around in the movie
-		# However, downloading and uploading the cue sheet restores the
-		# default state, so we need to keep disabling it.
-		self.cut_state = 2
+		service = session.nav.getCurrentService()
+		cue = service and service.cueSheet()
+		if cue is not None:
+			# disable cutlists. we want to freely browse around in the movie
+			print("[CutListEditor] cut lists disabled!")
+			cue.setCutListEnable(0)
 
-		self.getCuesheet()
+		self.downloadCuesheet()
 
-		# preserve the original cuts to possibly restore them later
-		self.prev_cuts = self.cut_list[:]
-		self.last_mark = [x for x in self.prev_cuts if x[1] == self.CUT_TYPE_LAST]
-		self.edited = False
-		self.MovieSelection = isinstance(self.session.current_dialog, MovieSelection) and self.session.current_dialog
-
-		self["InLen"] = Label()
-		self["OutLen"] = Label()
 		self["Timeline"] = ServicePositionGauge(self.session.nav)
 		self["cutlist"] = List(self.getCutlist())
 		self["cutlist"].onSelectionChanged.append(self.selectionChanged)
 		self["SeekState"] = Label()
 		self.onPlayStateChanged.append(self.updateStateLabel)
 		self.updateStateLabel(self.seekstate)
-
-		self["key_red"] = Label(_("Start cut"))
-		self["key_green"] = Label(_("End cut"))
-		self["key_yellow"] = Label(_("Step back"))
-		self["key_blue"] = Label(_("Step forward"))
-
-		self["SeekActions"].actions.update({"stepFwd": self.stepFwd})
-		self.helpList.append((self["SeekActions"], "CutlistSeekActions", [("stepFwd", _("Step forward"))]))
 
 		desktopSize = getDesktop(0).size()
 		self["Video"] = VideoWindow(decoder=0, fb_width=desktopSize.width(), fb_height=desktopSize.height())
@@ -235,16 +216,11 @@ class CutListEditor(Screen, InfoBarBase, InfoBarSeek, InfoBarCueSheetSupport, He
 			{
 				"setIn": (self.setIn, _("Make this mark an 'in' point")),
 				"setOut": (self.setOut, _("Make this mark an 'out' point")),
-				"setStart": (self.setStart, _("Make this mark the initial 'in' point")),
-				"setEnd": (self.setEnd, _("Make this mark the final 'out' point")),
 				"setMark": (self.setMark, _("Make this mark just a mark")),
 				"addMark": (self.__addMark, _("Add a mark")),
 				"removeMark": (self.__removeMark, _("Remove a mark")),
-				"execute": (self.execute, _("Execute cuts and exit")),
-				"quickExecute": (self.quickExecute, _("Quick execute...")),
 				"leave": (self.exit, _("Exit editor")),
-				"showMenu": (self.showMenu, _("Menu")),
-				"backMenu": (self.backMenu, _("Restore previous cuts...")),
+				"showMenu": (self.showMenu, _("menu")),
 			}, prio=-4)
 
 		self.onExecBegin.append(self.showTutorial)
@@ -255,115 +231,43 @@ class CutListEditor(Screen, InfoBarBase, InfoBarSeek, InfoBarCueSheetSupport, He
 		# to track new entries we save the last version of the cutlist
 		self.last_cuts = self.getCutlist()
 		self.cut_start = None
-		self.cut_end = None
-		self.state = CutListContextMenu.SHOW_DELETECUT
 		self.inhibit_seek = False
-		self.inhibit_cut = False
 		self.onClose.append(self.__onClose)
-		# Use onShown to set the initial list index, since apparently that doesn't
-		# work from here.
-		self.onShown.append(self.__onShown)
-
-	def __onShown(self, override=False):
-		if self.already_shown and not override:
-			return
-		if self.cut_list:
-			cl = self["cutlist"]
-			# If there's only marks, jump to the first (assuming a new recording).
-			if not [x for x in self.cut_list if x[1] != self.CUT_TYPE_MARK]:
-				# Assume the start mark has been missed if it's not less than
-				# 16 minutes.
-				if self.cut_list[0][0] < 16 * 60 * 90000:
-					cl.index = 1
-			else:
-				# Playback will start at the initial IN cut, so point the list
-				# there, too.
-				if cl.list[0][0][1] == self.CUT_TYPE_OUT:
-					cl.index = 1
 
 	def __onClose(self):
-		if self.MovieSelection:
-			if self.last_mark and not [x for x in self.cut_list if x[1] == self.CUT_TYPE_LAST]:
-				from Screens.InfoBarGenerics import delResumePoint
-				delResumePoint(self.service)
-				self.MovieSelection["list"].invalidateCurrentItem()
-			if self.edited:
-				self.MovieSelection.diskinfo.update()
-		self.session.nav.playService(self.old_service, forceRestart=True)
+		need_restart = self.old_service and self.session.nav.getCurrentlyPlayingServiceOrGroup() and self.old_service != self.session.nav.getCurrentlyPlayingServiceOrGroup()
+		self.session.nav.playService(self.old_service, forceRestart=need_restart, adjust=False)
 
 	def updateStateLabel(self, state):
 		self["SeekState"].setText(state[3].strip())
 
 	def showTutorial(self):
-		if not config.usage.cutlisteditor_tutorial_seen.value:
-			config.usage.cutlisteditor_tutorial_seen.value = True
-			config.usage.cutlisteditor_tutorial_seen.save()
-			self.session.open(MessageBox, _("Welcome to the cutlist editor.\n\nSeek to the start of the stuff you want to cut away, press RED.\n\nThen seek to the end, press GREEN. That's it."), MessageBox.TYPE_INFO)
+		if config.plugins.CutListEditor.showIntro.value and not CutListEditor.tutorial_seen:
+			CutListEditor.tutorial_seen = True
+			self.session.open(MessageBox, _("Welcome to the cutlist editor.\n\nSeek to the start of the stuff you want to cut away. Press OK, select 'start cut'.\n\nThen seek to the end, press OK, select 'end cut'. That's it."), MessageBox.TYPE_INFO)
 
 	def checkSkipShowHideLock(self):
 		pass
-
-	def setCutListEnable(self):
-		service = self.session.nav.getCurrentService()
-		cue = service and service.cueSheet()
-		if cue is not None:
-			cue.setCutListEnable(self.cut_state)
-
-	def getCuesheet(self):
-		self.downloadCuesheet()
-		self.setCutListEnable()
-
-	def putCuesheet(self):
-		self.uploadCuesheet()
-		self.setCutListEnable()
 
 	def setType(self, index, type):
 		if len(self.cut_list):
 			self.cut_list[index] = (self.cut_list[index][0], type)
 			self["cutlist"].modifyEntry(index, CutListEntry(*self.cut_list[index]))
 
-	def setOut(self):
-		if self.inhibit_cut:
-			self.inhibit_cut = False
-			return
-		self.setSeekState(self.SEEK_STATE_PAUSE)
-		self.context_position = self.cueGetCurrentPosition()
-		self.menuCallback(CutListContextMenu.RET_STARTCUT)
-
 	def setIn(self):
-		if self.inhibit_cut:
-			self.inhibit_cut = False
-			return
-		self.setSeekState(self.SEEK_STATE_PAUSE)
-		self.context_position = self.cueGetCurrentPosition()
-		self.menuCallback(CutListContextMenu.RET_ENDCUT)
+		m = self["cutlist"].getIndex()
+		self.setType(m, 0)
+		self.uploadCuesheet()
 
-	def setStart(self):
-		self.setSeekState(self.SEEK_STATE_PAUSE)
-		self.context_position = self.cueGetCurrentPosition()
-		self.menuCallback(CutListContextMenu.RET_REMOVEBEFORE)
-		self.inhibit_cut = True
-
-	def setEnd(self):
-		self.setSeekState(self.SEEK_STATE_PAUSE)
-		self.context_position = self.cueGetCurrentPosition()
-		self.menuCallback(CutListContextMenu.RET_REMOVEAFTER)
-		self.inhibit_cut = True
-
-	def quickExecute(self):
-		self.setSeekState(self.SEEK_STATE_PAUSE)
-		self.context_position = self.cueGetCurrentPosition()
-		self.menuCallback(CutListContextMenu.RET_QUICKEXECUTE)
-
-	def execute(self):
-		self.setSeekState(self.SEEK_STATE_PAUSE)
-		self.context_position = self.cueGetCurrentPosition()
-		self.menuCallback(CutListContextMenu.RET_EXECUTECUTS)
+	def setOut(self):
+		m = self["cutlist"].getIndex()
+		self.setType(m, 1)
+		self.uploadCuesheet()
 
 	def setMark(self):
 		m = self["cutlist"].getIndex()
 		self.setType(m, 2)
-		self.putCuesheet()
+		self.uploadCuesheet()
 
 	def __addMark(self):
 		self.toggleMark(onlyadd=True, tolerance=90000) # do not allow two marks in <1s
@@ -378,38 +282,9 @@ class CutListEditor(Screen, InfoBarBase, InfoBarSeek, InfoBarCueSheetSupport, He
 		self.close()
 
 	def getCutlist(self):
-		length = self.getSeek() and self.getSeek().getLength()
-		length = not length[0] and length[1] or 0
-
-		in_len = out_len = 0
-		last_pts, last_type = 0, self.CUT_TYPE_LAST
-		for pts, type in self.cut_list:
-			if last_type != type in (self.CUT_TYPE_IN, self.CUT_TYPE_OUT):
-				if type == self.CUT_TYPE_IN:
-					out_len += pts - last_pts
-				else:
-					in_len += pts - last_pts
-				last_pts, last_type = pts, type
-		if length:
-			if last_type == self.CUT_TYPE_OUT:
-				out_len += length - last_pts
-			else:
-				in_len += length - last_pts
-		self["InLen"].setText(SecToMSS(in_len / 90000))
-		self["OutLen"].setText(SecToMSS(out_len / 90000))
-
-		cl = self.cut_list
-		if cl and cl[0][1] == self.CUT_TYPE_LAST and cl[0][0] <= 1: # remove state indicator marks
-			cl = cl[1:]
-		r = [CutListEntry(0, self.CUT_TYPE_START, cl[0][0] if cl else length)]
-		for i, e in enumerate(cl):
-			if i == len(cl) - 1:
-				n = length
-			else:
-				n = cl[i + 1][0]
-			r.append(CutListEntry(*e, where_next=n))
-		if length:
-			r.append(CutListEntry(length, self.CUT_TYPE_END))
+		r = []
+		for e in self.cut_list:
+			r.append(CutListEntry(*e))
 		return r
 
 	def selectionChanged(self):
@@ -423,89 +298,84 @@ class CutListEditor(Screen, InfoBarBase, InfoBarSeek, InfoBarCueSheetSupport, He
 			if seek is None:
 				print("[CutListEditor] no seek")
 				return
-			# EOF may not be seekable, so go back a bit (2 seems sufficient) and then
-			# forward to the next access point (which will flicker if EOF is
-			# seekable, but better than waiting for a timeout when it's not).
-			if where[0][1] == self.CUT_TYPE_END:
-				curpos = seek.getPlayPosition()
-				seek.seekTo(pts - 2)
-				i = 0
-				while i < 15:
-					i += 1
-					sleep(0.01)
-					if seek.getPlayPosition() != curpos:
-						seek.seekRelative(1, 1)
-						break
-			else:
-				seek.seekTo(pts)
+			seek.seekTo(pts)
 
 	def refillList(self):
 		print("[CutListEditor] cue sheet changed, refilling")
-		self.getCuesheet()
+		self.downloadCuesheet()
 
-		# select the first changed entry from the end (not counting EOF)
+		# get the first changed entry, counted from the end, and select it
 		new_list = self.getCutlist()
 		self["cutlist"].list = new_list
 
-		l1 = len(new_list) - 1
-		l2 = len(self.last_cuts) - 1
-		if new_list[l1][0][1] != 4:
-			l1 += 1
-		if self.last_cuts[l2][0][1] != 4:
-			l2 += 1
+		l1 = len(new_list)
+		l2 = len(self.last_cuts)
 		for i in range(min(l1, l2)):
-			if new_list[l1 - i - 1][0] != self.last_cuts[l2 - i - 1][0]:
+			if new_list[l1 - i - 1] != self.last_cuts[l2 - i - 1]:
 				self["cutlist"].setIndex(l1 - i - 1)
 				break
 		self.last_cuts = new_list
+
+	def getStateForPosition(self, pos):
+		state = -1
+		for (where, what) in self.cut_list:
+			if what in [0, 1]:
+				if where < pos:
+					state = what
+				elif where == pos:
+					state = 1
+				elif state == -1:
+					state = 1 - what
+		if state == -1:
+			state = 0
+		return state
 
 	def showMenu(self):
 		curpos = self.cueGetCurrentPosition()
 		if curpos is None:
 			return
+
 		self.setSeekState(self.SEEK_STATE_PAUSE)
+
 		self.context_position = curpos
 
 		self.context_nearest_mark = self.toggleMark(onlyreturn=True)
+
+		cur_state = self.getStateForPosition(curpos)
+		if cur_state == 0:
+			print("[CutListEditor] currently in 'IN'")
+			if self.cut_start is None or self.context_position < self.cut_start:
+				state = CutListContextMenu.SHOW_STARTCUT
+			else:
+				state = CutListContextMenu.SHOW_ENDCUT
+		else:
+			print("[CutListEditor] currently in 'OUT'")
+			state = CutListContextMenu.SHOW_DELETECUT
+
 		if self.context_nearest_mark is None:
 			nearmark = False
 		else:
 			nearmark = True
 
-		self.session.openWithCallback(self.menuCallback, CutListContextMenu, self.state, nearmark, self.cut_state)
+		self.session.openWithCallback(self.menuCallback, CutListContextMenu, state, nearmark)
 
 	def menuCallback(self, *result):
 		if not len(result):
 			return
 		result = result[0]
 
-		if result in (CutListContextMenu.RET_STARTCUT, CutListContextMenu.RET_ENDCUT):
-			if result == CutListContextMenu.RET_STARTCUT:
-				self.cut_start = self.context_position
-				self.state = CutListContextMenu.SHOW_STARTCUT
-				if self.cut_end is None:
-					return
-				if self.cut_start >= self.cut_end:
-					self.cut_end = None
-					return
-			else: # CutListContextMenu.RET_ENDCUT
-				self.cut_end = self.context_position
-				self.state = CutListContextMenu.SHOW_ENDCUT
-				if self.cut_start is None:
-					return
-				if self.cut_end <= self.cut_start:
-					self.cut_start = None
-					return
-			# remove marks between the new cut
+		if result == CutListContextMenu.RET_STARTCUT:
+			self.cut_start = self.context_position
+		elif result == CutListContextMenu.RET_ENDCUT:
+			# remove in/out marks between the new cut
 			for (where, what) in self.cut_list[:]:
-				if self.cut_start <= where <= self.cut_end:
+				if self.cut_start <= where <= self.context_position and (not config.plugins.CutListEditor.keep_bookmarks.value or what in (0, 1)):
 					self.cut_list.remove((where, what))
 
 			bisect.insort(self.cut_list, (self.cut_start, 1))
-			bisect.insort(self.cut_list, (self.cut_end, 0))
-			self.putCuesheet()
-			self.cut_start = self.cut_end = None
-			self.state = CutListContextMenu.SHOW_DELETECUT
+			bisect.insort(self.cut_list, (self.context_position, 0))
+			self.uploadCuesheet()
+			self.cut_start = None
 		elif result == CutListContextMenu.RET_DELETECUT:
 			out_before = None
 			in_after = None
@@ -524,144 +394,54 @@ class CutListEditor(Screen, InfoBarBase, InfoBarSeek, InfoBarCueSheetSupport, He
 			if in_after is not None:
 				self.cut_list.remove(in_after)
 			self.inhibit_seek = True
-			self.putCuesheet()
-			self.inhibit_seek = False
-		elif result == CutListContextMenu.RET_MARKIN:
-			added = 1
-			first = True
-			for (i, (where, what)) in enumerate(self.cut_list[:]):
-				if what == self.CUT_TYPE_IN:
-					if not first:
-						self.cut_list.insert(i + added, (where, self.CUT_TYPE_MARK))
-						added += 1
-					first = False
-			self.inhibit_seek = True
-			self.putCuesheet()
+			self.uploadCuesheet()
 			self.inhibit_seek = False
 		elif result == CutListContextMenu.RET_MARK:
 			self.__addMark()
 		elif result == CutListContextMenu.RET_DELETEMARK:
 			self.cut_list.remove(self.context_nearest_mark)
 			self.inhibit_seek = True
-			self.putCuesheet()
+			self.uploadCuesheet()
 			self.inhibit_seek = False
 		elif result == CutListContextMenu.RET_REMOVEBEFORE:
-			# remove marks before current position
+			# remove in/out marks before current position
 			for (where, what) in self.cut_list[:]:
-				if where <= self.context_position:
+				if where <= self.context_position and (not config.plugins.CutListEditor.keep_bookmarks.value or what in (0, 1)):
 					self.cut_list.remove((where, what))
 			# add 'in' point
 			bisect.insort(self.cut_list, (self.context_position, 0))
 			self.inhibit_seek = True
-			self.putCuesheet()
+			self.uploadCuesheet()
 			self.inhibit_seek = False
 		elif result == CutListContextMenu.RET_REMOVEAFTER:
-			# remove marks after current position
+			# remove in/out marks after current position
 			for (where, what) in self.cut_list[:]:
-				if where >= self.context_position:
+				if where >= self.context_position and (not config.plugins.CutListEditor.keep_bookmarks.value or what in (0, 1)):
 					self.cut_list.remove((where, what))
 			# add 'out' point
 			bisect.insort(self.cut_list, (self.context_position, 1))
 			self.inhibit_seek = True
-			self.putCuesheet()
+			self.uploadCuesheet()
 			self.inhibit_seek = False
-		elif result == CutListContextMenu.RET_QUICKEXECUTE:
-			menu = [(_("cancel"), 0),
-					(_("end at this position"), 1),
-					(_("punch cuts"), 2),
-					(_("both"), 3)]
-			self.session.openWithCallback(self.quickCallback, ChoiceBox, title=_("How would you like to modify the movie?\nWarning: This operation cannot be undone!"), list=menu)
-		elif result == CutListContextMenu.RET_ENABLECUTS:
-			self.cut_state = 3
-			self.setCutListEnable()
-		elif result == CutListContextMenu.RET_DISABLECUTS:
-			self.cut_state = 2
-			self.setCutListEnable()
-		elif result == CutListContextMenu.RET_EXECUTECUTS:
-			try:
-				from Plugins.Extensions.MovieCut.ui import MovieCut
-				self.session.nav.stopService()	# need to stop to save the cuts file
-				self.session.openWithCallback(self.executeCallback, MovieCut, self.service)
-			except ImportError as e:
-				self.session.open(MessageBox, _("The MovieCut plugin is not installed."), type=MessageBox.TYPE_INFO, timeout=10)
+		elif result == CutListContextMenu.RET_KEEPBOOKMARKS:
+			config.plugins.CutListEditor.keep_bookmarks.value = not config.plugins.CutListEditor.keep_bookmarks.value
+			config.plugins.CutListEditor.keep_bookmarks.save()
 		elif result == CutListContextMenu.RET_GRABFRAME:
 			self.grabFrame()
-
-	def executeCallback(self, answer):
-		if answer:
-			self.close()
-		else:
-			self.session.nav.playService(self.service)
-			self.pauseService()
-			self.setCutListEnable()
-			self.__onShown(override=True)
-
-	def quickCallback(self, answer):
-		answer = answer and answer[1]
-		if not answer:
-			return
-		truncpts = None
-		endpts = None
-		for cut in reversed(self.cut_list):
-			if cut[1] == self.CUT_TYPE_OUT:
-				endpts = cut[0]
-				break
-			if cut[1] == self.CUT_TYPE_IN:
-				break
-		if answer & 1:
-			truncpts = endpts and min(endpts, self.context_position) or self.context_position
-		elif endpts:
-			truncpts = endpts
-		if truncpts:
-			# remove marks from the truncate position
-			for (where, what) in self.cut_list[:]:
-				if where >= truncpts:
-					self.cut_list.remove((where, what))
+		elif result == CutListContextMenu.RET_TOGGLEINTRO:
+			config.plugins.CutListEditor.showIntro.value = not config.plugins.CutListEditor.showIntro.value
+			config.plugins.CutListEditor.showIntro.save()
+		elif result == CutListContextMenu.RET_MOVIECUT:
 			self.inhibit_seek = True
-			self.putCuesheet()
+			self.uploadCuesheet()
 			self.inhibit_seek = False
-			self.prev_cuts = self.cut_list[:]
-			self.last_cuts = self.getCutlist()
-		self.session.nav.stopService()
-		movie = self.service.getPath()
-		if self.loadAP(movie):
-			if truncpts:
-				self.trunc(movie, truncpts)
-			if answer & 2:
-				self.punch(movie)
-			self.edited = True
-		self.session.nav.playService(self.service)
-		self.pauseService()
-		self.setCutListEnable()
-		self.__onShown(override=True)
-
-	def backMenu(self):
-		menu = [(_("back"), self.BACK_BACK),
-				(_("restore previous cuts"), self.BACK_RESTORE),
-				(_("restore previous cuts & exit"), self.BACK_RESTOREEXIT),
-				(_("remove marks (preserve cuts)"), self.BACK_REMOVEMARKS),
-				(_("remove cuts (preserve marks)"), self.BACK_REMOVECUTS),
-				(_("remove all"), self.BACK_REMOVEALL)]
-		self.session.openWithCallback(self.backCallback, ChoiceBox, title=_("Restore cuts"), list=menu)
-
-	def backCallback(self, result):
-		if result and result[1]:
-			if result[1] == self.BACK_REMOVEALL:
-				self.cut_list = []
-			elif result[1] == self.BACK_REMOVEMARKS:
-				self.cut_list = [x for x in self.cut_list if x[1] != self.CUT_TYPE_MARK]
-			elif result[1] == self.BACK_REMOVECUTS:
-				self.cut_list = [x for x in self.cut_list if x[1] not in (self.CUT_TYPE_IN, self.CUT_TYPE_OUT)]
-			else:
-				self.cut_list = self.prev_cuts
-			self.inhibit_seek = True
-			self.putCuesheet()
-			self.inhibit_seek = False
-			if result[1] == self.BACK_RESTOREEXIT:
-				self.close()
-
-	def stepFwd(self):
-		self.doSeekRelative(1)
+			self.session.nav.playService(self.old_service, forceRestart=True, adjust=False)
+			if self.cut_service:
+				try:
+					MovieCut(session=self.session, service=self.cut_service)
+				except:
+					print("[CutListEditor] calling MovieCut failed")
+			self.exit()
 
 	# we modify the "play" behavior a bit:
 	# if we press pause while being in slowmotion, we will pause (and not play)
@@ -672,98 +452,19 @@ class CutListEditor(Screen, InfoBarBase, InfoBarSeek, InfoBarCueSheetSupport, He
 			self.pauseService()
 
 	def grabFrame(self):
-		path = self.service.getPath()
-		from Components.Console import Console
-		grabConsole = Console()
-		cmd = 'grab -vblpr%d "%s"' % (180, path.rsplit('.', 1)[0] + ".png")
-		grabConsole.ePopen(cmd)
-		self.playpauseService()
-
-	def trunc(self, movie, pts):
-		i = self.getAP(pts)
-		if i < len(self.ap):
-			i += 1
-		offset = self.ap[i][1]
-		with open(movie, "r+b") as f:
-			f.truncate(offset)
-
-		def truncapsc(suffix):
-			with open(movie + suffix, "r+b") as f:
-				while True:
-					data = f.read(8192 * apscParser.size)
-					if len(data) < apscParser.size:
-						break
-					ofs = apscParser.unpack_from(data, len(data) - apscParser.size)[0]
-					if ofs >= offset:
-						apsc = unpack(">%dq" % (len(data) / 8), data)
-						for i, ofs in enumerate(apsc[::2]):
-							if ofs >= offset:
-								f.truncate(f.tell() - len(data) + i * apscParser.size)
-								return
-
-		truncapsc(".ap")
-		truncapsc(".sc")
-
-	def punch(self, movie):
-		outpts = [x[0] for x in self.cut_list if x[1] == self.CUT_TYPE_OUT]
-		inpts = [x[0] for x in self.cut_list if x[1] == self.CUT_TYPE_IN]
-		if not outpts and not inpts:
-			return
-		if not outpts or inpts[0] < outpts[0]:
-			outpts.insert(0, 0)
-		# Final out was removed before being called.
-		try:
-			so = CDLL("libext2fs.so.2")
-			fallocate64 = so.fallocate64
-		except:
-			return
-		with open(movie, "r+b") as f:
-			fd = f.fileno()
-			last = len(self.ap) - 1
-			for c in range(0, len(outpts)):
-				o = self.getAP(outpts[c]) + 2
-				if o > last:
-					o = last
-				i = self.getAP(inpts[c]) - 1
-				if i < 0:
-					i = 0
-				# FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE
-				fallocate64(fd, 3, c_longlong(self.ap[o][1]), c_longlong(self.ap[i][1] - self.ap[o][1]))
-
-	# Return the index of the access point at or after PTS.
-	def getAP(self, pts):
-		i = bisect.bisect_left(self.ap, (pts, 0))
-		return i if i < len(self.ap) else i - 1
-
-	def loadAP(self, movie):
-		self.ap = []
-		try:
-			with open(movie + ".ap", "rb") as f:
-				data = f.read()
-		except:
-			return False
-		if len(data) < 2 * apscParser.size:
-			return False
-
-		data = unpack(">%dq" % (len(data) / 8), data)
-
-		ofs1, currentDelta = data[0], data[1]
-		if ofs1 != 0:
-			ofs2, pts2 = data[2], data[3]
-			if ofs1 < ofs2:
-				diff = ofs2 - ofs1
-				tdiff = pts2 - currentDelta
-				tdiff *= ofs1
-				tdiff /= diff
-				currentDelta -= tdiff
-		lastpts_t = -1
-		append = self.ap.append
-		for i in zip(data[0::2], data[1::2]):
-			current = i[1] - currentDelta
-			diff = current - lastpts_t
-			if diff <= 0 or diff > 90000 * 10:
-				currentDelta = i[1] - lastpts_t - 90000 / 25
-			lastpts_t = i[1] - currentDelta
-			append((lastpts_t, i[0]))
-
-		return True
+		service = self.session.nav.getCurrentlyPlayingServiceReference()
+		if service:
+			def grabCallback(choice=None):
+				if choice is None:
+					self.playpauseService()
+					return
+				x_size = choice[1]
+				path = service.getPath()
+				grabConsole = Console()
+				cmd = 'grab -vblpr%d "%s"' % (x_size, path.rsplit('.', 1)[0] + strftime("_%Y%m%d%H%M%S", gmtime()) + ".png")
+				grabConsole.ePopen(cmd)
+				self.playpauseService()
+			menu = [("1920", 1920), ("720", 720), ("360", 360), ("180", 180)]
+			buttons = ["1", "2", "3", "4"]
+			text = _("Select horizontal resolution:")
+			self.session.openWithCallback(grabCallback, ChoiceBox, title=text, list=menu, keys=buttons)

@@ -35,7 +35,7 @@ from Plugins.SystemPlugins.SoftwareManager.SoftwareTools import iSoftwareTools
 
 config.plugins.configurationbackup = ConfigSubsection()
 config.plugins.configurationbackup.backuplocation = ConfigText(default='/media/hdd/', visible_width=50, fixed_size=False)
-config.plugins.configurationbackup.backupdirs = ConfigLocations(default=[eEnv.resolve('${sysconfdir}/enigma2/'), '/etc/network/interfaces', '/etc/wpa_supplicant.conf', '/etc/wpa_supplicant.ath0.conf', '/etc/wpa_supplicant.wlan0.conf', '/etc/resolv.conf', '/etc/enigma2/nameserversdns.conf', '/etc/default_gw', '/etc/hostname'])
+config.plugins.configurationbackup.backupdirs = ConfigLocations(default=[eEnv.resolve('${sysconfdir}/enigma2/'), '/etc/network/interfaces', '/etc/wpa_supplicant.conf', '/etc/wpa_supplicant.ath0.conf', '/etc/wpa_supplicant.wlan0.conf', '/etc/resolv.conf', '/etc/default_gw', '/etc/hostname'])
 
 config.plugins.softwaremanager = ConfigSubsection()
 config.plugins.softwaremanager.overwriteConfigFiles = ConfigSelection(
@@ -44,7 +44,7 @@ config.plugins.softwaremanager.overwriteConfigFiles = ConfigSelection(
 					("N", _("No, never")),
 					("ask", _("Always ask"))
 				], "Y")
-config.plugins.softwaremanager.onSetupMenu = ConfigYesNo(default=True)
+config.plugins.softwaremanager.onSetupMenu = ConfigYesNo(default=False)
 config.plugins.softwaremanager.onBlueButton = ConfigYesNo(default=False)
 config.plugins.softwaremanager.epgcache = ConfigYesNo(default=False)
 
@@ -318,7 +318,7 @@ class UpdatePluginMenu(Screen):
 			self.session.open(RestoreScreen, runRestore=True)
 
 
-class SoftwareManagerSetup(Screen, ConfigListScreen):
+class SoftwareManagerSetup(ConfigListScreen, Screen):
 
 	skin = """
 		<screen name="SoftwareManagerSetup" position="center,center" size="560,440" title="SoftwareManager setup">
@@ -417,22 +417,6 @@ class SoftwareManagerSetup(Screen, ConfigListScreen):
 			self.session.openWithCallback(self.cancelConfirm, MessageBox, _("Really close without saving settings?"), MessageBox.TYPE_YESNO, timeout=20, default=True)
 		else:
 			self.close()
-
-	# for summary:
-	def changedEntry(self):
-		for x in self.onChangedEntry:
-			x()
-		self.selectionChanged()
-
-	def getCurrentEntry(self):
-		return self["config"].getCurrent()[0]
-
-	def getCurrentValue(self):
-		return str(self["config"].getCurrent()[1].value)
-
-	def createSummary(self):
-		from Screens.Setup import SetupSummary
-		return SetupSummary
 
 
 class SoftwareManagerInfo(Screen):

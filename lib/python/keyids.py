@@ -1,6 +1,6 @@
 # The following KEYID numbers are currently unused:
 #
-# 199, 204, 228-237, 239, 241-255, 258-303, 316-350,
+# 199, 204, 228-237, 239, 241-255, 258-303, 316-351,
 # 416-437, 439-447, 452-509, 512-529, 531-626, 628-UP.
 #
 # PLEASE NOTE: If you add any buttons PLEASE update this list to assist
@@ -250,7 +250,6 @@ KEYIDS = {
 	"BtnTR2": 313,
 	"BtnSelect": 314,
 	"BtnStart": 315,
-	"KEY_SHIFT": 351,  # This is not a transmitted key but rather a place holder for remote controls that have a SHIFT function.
 	"KEY_OK": 352,
 	"KEY_SELECT": 353,
 	"KEY_GOTO": 354,
@@ -352,7 +351,5 @@ def invertKeyIds():
 			if value in knownAlisaes and key in knownAlisaes[value]:
 				invKeyIds[value] = knownAlisaes[value][0]
 			else:
-				print("[keyids] Error: Key code %d is mapped to both '%s' and '%s'!" % (value, invKeyIds[value], key))
+				print("[Keyids] Error: Key code %d is mapped to both '%s' and '%s'!" % (value, invKeyIds[value], key))
 	return invKeyIds
-
-KEYIDNAMES = invertKeyIds()

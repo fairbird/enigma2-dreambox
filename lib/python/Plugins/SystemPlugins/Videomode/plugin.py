@@ -11,7 +11,7 @@ from Plugins.SystemPlugins.Videomode.VideoHardware import video_hw
 config.misc.videowizardenabled = ConfigBoolean(default=True)
 
 
-class VideoSetup(Screen, ConfigListScreen):
+class VideoSetup(ConfigListScreen, Screen):
 
 	def __init__(self, session, hw):
 		Screen.__init__(self, session)
@@ -105,8 +105,6 @@ class VideoSetup(Screen, ConfigListScreen):
 					self.list.append(getConfigListEntry(_("HDR10 support"), config.av.hdr10_support, _("This option allows you to force the HDR10 modes for UHD")))
 					self.list.append(getConfigListEntry(_("Allow 12bit"), config.av.allow_12bit, _("This option allows you to enable or disable the 12 bit color mode")))
 					self.list.append(getConfigListEntry(_("Allow 10bit"), config.av.allow_10bit, _("This option allows you to enable or disable the 10 bit color mode")))
-				if SystemInfo["CanSyncMode"]:
-					self.list.append(getConfigListEntry(_("Video sync mode"), config.av.sync_mode, _("This option allows you to use video sync mode.")))
 
 		if config.av.videoport.value == "Scart":
 			self.list.append(getConfigListEntry(_("Color format"), config.av.colorformat, _("Configure which color format should be used on the SCART output.")))
@@ -119,22 +117,10 @@ class VideoSetup(Screen, ConfigListScreen):
 			self.list.append(getConfigListEntry(_("Audio volume step size"), config.av.volume_stepsize, _("Configure the general audio volume step size (limit 1-10).")))
 			if SystemInfo["CanDownmixAC3"]:
 				self.list.append(getConfigListEntry(_("AC3 downmix"), config.av.downmix_ac3, _("Configure whether multi channel sound tracks should be downmixed to stereo.")))
-			if SystemInfo["CanAC3plusTranscode"]:
-				self.list.append(getConfigListEntry(_("AC3 plus transcoding"), config.av.transcodeac3plus, _("Choose whether AC3 Plus sound tracks should be transcoded to AC3.")))
 			if SystemInfo["CanDownmixDTS"]:
 				self.list.append(getConfigListEntry(_("DTS downmix"), config.av.downmix_dts, _("Configure whether multi channel sound tracks should be downmixed to stereo.")))
-			if SystemInfo["CanDTSHD"]:
-				self.list.append(getConfigListEntry(_("DTS/DTS-HD HR/DTS-HD MA/DTS:X"), config.av.dtshd, _("Choose whether DTS channel sound tracks should be downmixed or transcoded.")))
-			if SystemInfo["CanWMAPRO"]:
-				self.list.append(getConfigListEntry(_("WMA Pro"), config.av.wmapro, _("Choose whether WMA Pro channel sound tracks should be downmixed or transcoded.")))
 			if SystemInfo["CanDownmixAAC"]:
 				self.list.append(getConfigListEntry(_("AAC downmix"), config.av.downmix_aac, _("Configure whether multi channel sound tracks should be downmixed to stereo.")))
-			if SystemInfo["CanDownmixAACPlus"]:
-				self.list.append(getConfigListEntry(_("AAC plus downmix"), config.av.downmix_aacplus, _("Configure whether multi channel sound tracks should be downmixed to stereo.")))
-			if SystemInfo["HDMIAudioSource"]:
-				self.list.append(getConfigListEntry(_("Audio Source"), config.av.hdmi_audio_source, _("Choose whether multi channel sound tracks should be convert to PCM or SPDIF.")))
-			if SystemInfo["CanAACTranscode"]:
-				self.list.append(getConfigListEntry(_("AAC transcoding"), config.av.transcodeaac, _("Choose whether AAC sound tracks should be transcoded.")))
 			self.list.extend((
 				getConfigListEntry(_("General AC3 delay"), config.av.generalAC3delay, _("Configure the general audio delay of Dolby Digital sound tracks.")),
 				getConfigListEntry(_("General PCM delay"), config.av.generalPCMdelay, _("Configure the general audio delay of stereo sound tracks."))
@@ -152,14 +138,8 @@ class VideoSetup(Screen, ConfigListScreen):
 				if SystemInfo["Has3DSurroundSoftLimiter"] and config.av.surround_3d_speaker.value != "disabled":
 					self.list.append(getConfigListEntry(_("3D surround softlimiter"), config.av.surround_softlimiter_3d, _("This option allows you to enable 3D surround softlimiter.")))
 
-			if SystemInfo["CanBTAudio"]:
-				self.list.append(getConfigListEntry(_("Enable BT audio"), config.av.btaudio, _("This option allows you to switch audio to BT speakers.")))
-			if SystemInfo["CanBTAudioDelay"]:
-				self.list.append(getConfigListEntry(_("General BT audio delay"), config.av.btaudiodelay, _("This option configures the general audio delay for BT speakers.")))
-
 		if SystemInfo["CanChangeOsdAlpha"]:
 			self.list.append(getConfigListEntry(_("OSD transparency"), config.av.osd_alpha, _("Configure the transparency of the OSD.")))
-			self.list.append(getConfigListEntry(_("Teletext base visibility"), config.osd.alpha_teletext, _("Base transparency for teletext, more options available within teletext screen.")))
 
 		if not isinstance(config.av.scaler_sharpness, ConfigNothing):
 			self.list.append(getConfigListEntry(_("Scaler sharpness"), config.av.scaler_sharpness, _("Configure the sharpness of the video scaling.")))
@@ -199,10 +179,6 @@ class VideoSetup(Screen, ConfigListScreen):
 			self.session.openWithCallback(self.confirm, MessageBox, _("Is this video mode ok?"), MessageBox.TYPE_YESNO, timeout=20, default=False)
 		else:
 			self.keySave()
-
-	def createSummary(self):
-		from Screens.Setup import SetupSummary
-		return SetupSummary
 
 
 class VideomodeHotplug:

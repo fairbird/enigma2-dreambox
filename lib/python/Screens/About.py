@@ -19,8 +19,6 @@ from enigma import eTimer, eLabel, eConsoleAppContainer, getDesktop, eGetEnigmaD
 from Components.GUIComponent import GUIComponent
 from skin import applySkinFactor, parameters, parseScale
 
-from time import strftime
-
 import os
 
 
@@ -35,9 +33,7 @@ class About(Screen):
 		AboutText += _("CPU: ") + cpu + "\n"
 		AboutText += _("Image: ") + about.getImageTypeString() + "\n"
 		AboutText += _("Build date: ") + about.getBuildDateString() + "\n"
-		ImageVersion = _("Last update: ") + about.getImageVersionString()
-		self["ImageVersion"] = StaticText(ImageVersion)
-		AboutText += ImageVersion + "\n"
+		AboutText += _("Last update: ") + about.getUpdateDateString() + "\n"
 
 		# [WanWizard] Removed until we find a reliable way to determine the installation date
 		# AboutText += _("Installed: ") + about.getFlashDateString() + "\n"
@@ -56,20 +52,16 @@ class About(Screen):
 
 		AboutText += _("DVB driver version: ") + about.getDriverInstalledDate() + "\n"
 
-		#GStreamerVersion = _("Media player: GStreamer, version ") + about.getGStreamerVersionString().replace("GStreamer", "")
-		#self["GStreamerVersion"] = StaticText(GStreamerVersion)
-		AboutText += _("GStreamer version: ") + about.getGStreamerVersionString() + "\n"
+		GStreamerVersion = _("Media player: GStreamer, version ") + about.getGStreamerVersionString().replace("GStreamer", "")
+		self["GStreamerVersion"] = StaticText(GStreamerVersion)
 
-		#ffmpegVersion = _("Media player: ffmpeg, version ") + about.getffmpegVersionString()
-		#self["ffmpegVersion"] = StaticText(ffmpegVersion)
-		AboutText += _("FFmpeg version: ") + about.getffmpegVersionString() + "\n"
+		ffmpegVersion = _("Media player: ffmpeg, version ") + about.getffmpegVersionString()
+		self["ffmpegVersion"] = StaticText(ffmpegVersion)
 
-		#if cpu.upper().startswith('HI') or os.path.isdir('/proc/hisi'):
-		#	AboutText += ffmpegVersion + "\n"
-		#else:
-		#	AboutText += GStreamerVersion + "\n"
-
-		AboutText += _("OpenSSL version: ") + about.getOpenSSLVersion() + "\n"
+		if cpu.upper().startswith('HI') or os.path.isdir('/proc/hisi'):
+			AboutText += ffmpegVersion + "\n"
+		else:
+			AboutText += GStreamerVersion + "\n"
 
 		AboutText += _("Python version: ") + about.getPythonVersionString() + "\n"
 
@@ -225,7 +217,6 @@ class CommitInfo(Screen):
 			("https://api.github.com/repos/openpli/enigma2-plugins/commits", "Enigma2 Plugins"),
 			("https://api.github.com/repos/openpli/aio-grab/commits", "Aio Grab"),
 			("https://api.github.com/repos/openpli/enigma2-plugin-extensions-epgimport/commits", "Plugin EPGImport"),
-			("https://api.github.com/repos/openpli/enigma2-plugin-skins-magic/commits", "Skin Magic SD"),
 			("https://api.github.com/repos/littlesat/skin-PLiHD/commits", "Skin PLi HD"),
 			("https://api.github.com/repos/E2OpenPlugins/e2openplugin-OpenWebif/commits", "OpenWebif"),
 			("https://api.github.com/repos/technl/HansSettings/commits", "Hans settings")

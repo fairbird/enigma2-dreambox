@@ -208,7 +208,6 @@ class SetupFallbacktuner(ConfigListScreen, Screen):
 						config.usage.remote_fallback_atsc,
 						_("URL of fallback remote receiver")))
 		self["config"].list = self.list
-		self["config"].l.setList(self.list)
 
 	def selectionChanged(self):
 		if self.force_update_list:
@@ -218,7 +217,6 @@ class SetupFallbacktuner(ConfigListScreen, Screen):
 			self.force_update_list = False
 		if not (isinstance(self["config"].getCurrent()[1], ConfigBoolean) or isinstance(self["config"].getCurrent()[1], ConfigSelection)):
 			self.force_update_list = True
-		self["description"].setText(self.getCurrentDescription())
 
 	def changedEntry(self):
 		if isinstance(self["config"].getCurrent()[1], ConfigBoolean) or isinstance(self["config"].getCurrent()[1], ConfigSelection):

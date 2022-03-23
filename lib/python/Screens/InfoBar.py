@@ -12,14 +12,14 @@ import enigma
 
 profile("LOAD:InfoBarGenerics")
 from Screens.InfoBarGenerics import InfoBarShowHide, \
-	InfoBarNumberZap, InfoBarChannelSelection, InfoBarMenu, InfoBarRdsDecoder, InfoBarResolutionSelection, InfoBarAspectSelection, \
-	InfoBarEPG, InfoBarSeek, InfoBarInstantRecord, InfoBarRedButton, InfoBarTimerButton, InfoBarVmodeButton, InfoBarHandleBsod, \
+	InfoBarNumberZap, InfoBarChannelSelection, InfoBarMenu, InfoBarRdsDecoder, \
+	InfoBarEPG, InfoBarSeek, InfoBarInstantRecord, InfoBarRedButton, InfoBarTimerButton, InfoBarVmodeButton, \
 	InfoBarAudioSelection, InfoBarAdditionalInfo, InfoBarNotifications, InfoBarDish, InfoBarUnhandledKey, \
 	InfoBarSubserviceSelection, InfoBarShowMovies, InfoBarTimeshift,  \
 	InfoBarServiceNotifications, InfoBarPVRState, InfoBarCueSheetSupport, InfoBarBuffer, \
 	InfoBarSummarySupport, InfoBarMoviePlayerSummarySupport, InfoBarTimeshiftState, InfoBarTeletextPlugin, InfoBarExtensions, \
 	InfoBarSubtitleSupport, InfoBarPiP, InfoBarPlugins, InfoBarServiceErrorPopupSupport, InfoBarJobman, InfoBarPowersaver, \
-	InfoBarHDMI, InfoBarHdmi2, setResumePoint, delResumePoint
+	InfoBarHDMI, setResumePoint, delResumePoint
 from Screens.Hotkey import InfoBarHotkey
 
 profile("LOAD:InitBar_Components")
@@ -32,13 +32,13 @@ from Screens.HelpMenu import HelpableScreen
 
 
 class InfoBar(InfoBarBase, InfoBarShowHide,
-	InfoBarNumberZap, InfoBarChannelSelection, InfoBarMenu, InfoBarEPG, InfoBarRdsDecoder, InfoBarResolutionSelection, InfoBarAspectSelection,
+	InfoBarNumberZap, InfoBarChannelSelection, InfoBarMenu, InfoBarEPG, InfoBarRdsDecoder,
 	InfoBarInstantRecord, InfoBarAudioSelection, InfoBarRedButton, InfoBarTimerButton, InfoBarVmodeButton,
 	HelpableScreen, InfoBarAdditionalInfo, InfoBarNotifications, InfoBarDish, InfoBarUnhandledKey,
 	InfoBarSubserviceSelection, InfoBarTimeshift, InfoBarSeek, InfoBarCueSheetSupport, InfoBarBuffer,
 	InfoBarSummarySupport, InfoBarTimeshiftState, InfoBarTeletextPlugin, InfoBarExtensions,
 	InfoBarPiP, InfoBarPlugins, InfoBarSubtitleSupport, InfoBarServiceErrorPopupSupport, InfoBarJobman, InfoBarPowersaver,
-	InfoBarHDMI, InfoBarHdmi2, InfoBarHotkey, InfoBarHandleBsod, Screen):
+	InfoBarHDMI, InfoBarHotkey, Screen):
 
 	ALLOW_SUSPEND = True
 	instance = None
@@ -58,12 +58,12 @@ class InfoBar(InfoBarBase, InfoBarShowHide,
 
 		for x in HelpableScreen, \
 				InfoBarBase, InfoBarShowHide, \
-				InfoBarNumberZap, InfoBarChannelSelection, InfoBarMenu, InfoBarEPG, InfoBarRdsDecoder, InfoBarResolutionSelection, InfoBarAspectSelection, \
+				InfoBarNumberZap, InfoBarChannelSelection, InfoBarMenu, InfoBarEPG, InfoBarRdsDecoder, \
 				InfoBarInstantRecord, InfoBarAudioSelection, InfoBarRedButton, InfoBarTimerButton, InfoBarUnhandledKey, InfoBarVmodeButton,\
 				InfoBarAdditionalInfo, InfoBarNotifications, InfoBarDish, InfoBarSubserviceSelection, InfoBarBuffer, \
 				InfoBarTimeshift, InfoBarSeek, InfoBarCueSheetSupport, InfoBarSummarySupport, InfoBarTimeshiftState, \
-				InfoBarTeletextPlugin, InfoBarExtensions, InfoBarPiP, InfoBarSubtitleSupport, InfoBarHandleBsod, InfoBarJobman, InfoBarPowersaver, \
-				InfoBarHdmi2, InfoBarPlugins, InfoBarServiceErrorPopupSupport, InfoBarHotkey:
+				InfoBarTeletextPlugin, InfoBarExtensions, InfoBarPiP, InfoBarSubtitleSupport, InfoBarJobman, InfoBarPowersaver, \
+				InfoBarPlugins, InfoBarServiceErrorPopupSupport, InfoBarHotkey:
 			x.__init__(self)
 
 		self.helpList.append((self["actions"], "InfobarActions", [("showMovies", _("Watch recordings..."))]))
@@ -149,10 +149,10 @@ class InfoBar(InfoBarBase, InfoBarShowHide,
 		self.session.open(MoviePlayer, ref, slist=self.servicelist, lastservice=self.session.nav.getCurrentlyPlayingServiceOrGroup(), infobar=self)
 
 
-class MoviePlayer(InfoBarBase, InfoBarShowHide, InfoBarMenu, InfoBarSeek, InfoBarShowMovies, InfoBarInstantRecord, InfoBarVmodeButton, InfoBarResolutionSelection, InfoBarAspectSelection,
+class MoviePlayer(InfoBarBase, InfoBarShowHide, InfoBarMenu, InfoBarSeek, InfoBarShowMovies, InfoBarInstantRecord, InfoBarVmodeButton,
 		InfoBarAudioSelection, HelpableScreen, InfoBarNotifications, InfoBarServiceNotifications, InfoBarPVRState,
 		InfoBarCueSheetSupport, InfoBarMoviePlayerSummarySupport, InfoBarSubtitleSupport, Screen, InfoBarTeletextPlugin,
-		InfoBarServiceErrorPopupSupport, InfoBarExtensions, InfoBarPlugins, InfoBarPiP, InfoBarHDMI, InfoBarHdmi2, InfoBarHotkey):
+		InfoBarServiceErrorPopupSupport, InfoBarExtensions, InfoBarPlugins, InfoBarPiP, InfoBarHDMI, InfoBarHotkey):
 
 	ENABLE_RESUME_SUPPORT = True
 	ALLOW_SUSPEND = True
@@ -179,7 +179,7 @@ class MoviePlayer(InfoBarBase, InfoBarShowHide, InfoBarMenu, InfoBarSeek, InfoBa
 
 		for x in HelpableScreen, InfoBarShowHide, InfoBarMenu, \
 				InfoBarBase, InfoBarSeek, InfoBarShowMovies, InfoBarInstantRecord, InfoBarVmodeButton,\
-				InfoBarAudioSelection, InfoBarNotifications, InfoBarResolutionSelection, InfoBarAspectSelection, \
+				InfoBarAudioSelection, InfoBarNotifications, \
 				InfoBarServiceNotifications, InfoBarPVRState, InfoBarCueSheetSupport, \
 				InfoBarMoviePlayerSummarySupport, InfoBarSubtitleSupport, \
 				InfoBarTeletextPlugin, InfoBarServiceErrorPopupSupport, InfoBarExtensions, \
