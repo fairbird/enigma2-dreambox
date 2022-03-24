@@ -6,7 +6,7 @@ from os import F_OK, R_OK, W_OK, access, chmod, listdir, makedirs, mkdir, readli
 from os.path import basename, dirname, exists, getsize, isdir, isfile, islink, join as pathjoin, normpath, splitext
 from enigma import eEnv, getDesktop, eGetEnigmaDebugLvl
 from errno import ENOENT, EXDEV
-from re import compile, split
+from re import compile
 from stat import S_IMODE
 from xml.etree.cElementTree import Element, ParseError, fromstring, parse
 
@@ -16,62 +16,64 @@ forceDebug = eGetEnigmaDebugLvl() > 4
 pathExists = exists
 isMount = os.path.ismount  # Only used in OpenATV /lib/python/Plugins/SystemPlugins/NFIFlash/downloader.py.
 
-DEFAULT_MODULE_NAME = __name__.split(".")[-1]
-
-SCOPE_TRANSPONDERDATA = 0
-SCOPE_SYSETC = 1
-SCOPE_FONTS = 2
-SCOPE_SKIN = 3
-SCOPE_SKIN_IMAGE = 4  # DEBUG: How is this different from SCOPE_SKIN?
-SCOPE_USERETC = 5  # DEBUG: Not used in Enigma2.
-SCOPE_CONFIG = 6
-SCOPE_LANGUAGE = 7
-SCOPE_HDD = 8
-SCOPE_PLUGINS = 9
-SCOPE_MEDIA = 10
-SCOPE_PLAYLIST = 11
-SCOPE_CURRENT_SKIN = 12
+SCOPE_HOME = 0  # DEBUG: Not currently used in Enigma2.
+SCOPE_TRANSPONDERDATA = 1
+SCOPE_SYSETC = 2
+SCOPE_FONTS = 3
+SCOPE_CONFIG = 4
+SCOPE_LANGUAGE = 5
+SCOPE_HDD = 6
+SCOPE_PLUGINS = 7
+SCOPE_PLUGIN = 8
+SCOPE_MEDIA = 9
+SCOPE_SKINS = 10
+SCOPE_GUISKIN = 11
+SCOPE_PLAYLIST = 12
 SCOPE_CURRENT_PLUGIN_ABSOLUTE = 13
 SCOPE_CURRENT_PLUGIN_RELATIVE = 14
 SCOPE_KEYMAPS = 15
 SCOPE_METADIR = 16
-SCOPE_CURRENT_PLUGIN = 17
-SCOPE_TIMESHIFT = 18
-SCOPE_ACTIVE_SKIN = 19  # DEBUG: Deprecated scope function - use SCOPE_CURRENT_SKIN instead.
-SCOPE_LCDSKIN = 20
-SCOPE_CURRENT_LCDSKIN = 21
-SCOPE_ACTIVE_LCDSKIN = 21  # DEBUG: Deprecated scope function name - use SCOPE_CURRENT_LCDSKIN instead.
-SCOPE_AUTORECORD = 22
-SCOPE_DEFAULTDIR = 23
-SCOPE_DEFAULTPARTITION = 24
-SCOPE_DEFAULTPARTITIONMOUNTDIR = 25
-SCOPE_LIBDIR = 26
+SCOPE_TIMESHIFT = 17
+SCOPE_LCDSKIN = 18
+SCOPE_AUTORECORD = 19
+SCOPE_DEFAULTDIR = 20
+SCOPE_DEFAULTPARTITION = 21
+SCOPE_DEFAULTPARTITIONMOUNTDIR = 22
+SCOPE_LIBDIR = 23
+
+# Deprecated scopes:
+SCOPE_ACTIVE_LCDSKIN = SCOPE_LCDSKIN
+SCOPE_ACTIVE_SKIN = SCOPE_GUISKIN
+SCOPE_CURRENT_LCDSKIN = SCOPE_LCDSKIN
+SCOPE_CURRENT_PLUGIN = SCOPE_PLUGIN
+SCOPE_CURRENT_SKIN = SCOPE_GUISKIN
+SCOPE_SKIN = SCOPE_SKINS
+SCOPE_SKIN_IMAGE = SCOPE_SKINS
+SCOPE_USERETC = SCOPE_HOME
+
 PATH_CREATE = 0
 PATH_DONTCREATE = 1
 
 defaultPaths = {
+	SCOPE_HOME: ("", PATH_DONTCREATE),  # User home directory
 	SCOPE_TRANSPONDERDATA: (eEnv.resolve("${sysconfdir}/"), PATH_DONTCREATE),
 	SCOPE_SYSETC: (eEnv.resolve("${sysconfdir}/"), PATH_DONTCREATE),
 	SCOPE_FONTS: (eEnv.resolve("${datadir}/fonts/"), PATH_DONTCREATE),
-	SCOPE_SKIN: (eEnv.resolve("${datadir}/enigma2/"), PATH_DONTCREATE),
-	SCOPE_SKIN_IMAGE: (eEnv.resolve("${datadir}/enigma2/"), PATH_DONTCREATE),
-	SCOPE_USERETC: ("", PATH_DONTCREATE),  # User home directory
 	SCOPE_CONFIG: (eEnv.resolve("${sysconfdir}/enigma2/"), PATH_CREATE),
 	SCOPE_LANGUAGE: (eEnv.resolve("${datadir}/enigma2/po/"), PATH_DONTCREATE),
 	SCOPE_HDD: ("/media/hdd/movie/", PATH_DONTCREATE),
 	SCOPE_PLUGINS: (eEnv.resolve("${libdir}/enigma2/python/Plugins/"), PATH_CREATE),
+	SCOPE_PLUGIN: (eEnv.resolve("${libdir}/enigma2/python/Plugins/"), PATH_CREATE),
 	SCOPE_MEDIA: ("/media/", PATH_DONTCREATE),
+	SCOPE_SKINS: (eEnv.resolve("${datadir}/enigma2/"), PATH_DONTCREATE),
+	SCOPE_GUISKIN: (eEnv.resolve("${datadir}/enigma2/"), PATH_DONTCREATE),
 	SCOPE_PLAYLIST: (eEnv.resolve("${sysconfdir}/enigma2/playlist/"), PATH_CREATE),
-	SCOPE_CURRENT_SKIN: (eEnv.resolve("${datadir}/enigma2/"), PATH_DONTCREATE),
 	SCOPE_CURRENT_PLUGIN_ABSOLUTE: (eEnv.resolve("${libdir}/enigma2/python/Plugins/"), PATH_DONTCREATE),
 	SCOPE_CURRENT_PLUGIN_RELATIVE: (eEnv.resolve("${libdir}/enigma2/python/Plugins/"), PATH_DONTCREATE),
 	SCOPE_KEYMAPS: (eEnv.resolve("${datadir}/keymaps/"), PATH_CREATE),
 	SCOPE_METADIR: (eEnv.resolve("${datadir}/meta"), PATH_CREATE),
-	SCOPE_CURRENT_PLUGIN: (eEnv.resolve("${libdir}/enigma2/python/Plugins/"), PATH_CREATE),
 	SCOPE_TIMESHIFT: ("/media/hdd/timeshift/", PATH_DONTCREATE),
-	SCOPE_ACTIVE_SKIN: (eEnv.resolve("${datadir}/enigma2/"), PATH_DONTCREATE),
 	SCOPE_LCDSKIN: (eEnv.resolve("${datadir}/enigma2/display/"), PATH_DONTCREATE),
-	SCOPE_CURRENT_LCDSKIN: (eEnv.resolve("${datadir}/enigma2/display/"), PATH_DONTCREATE),
 	SCOPE_AUTORECORD: ("/media/hdd/movie/", PATH_DONTCREATE),
 	SCOPE_DEFAULTDIR: (eEnv.resolve("${datadir}/enigma2/defaults/"), PATH_CREATE),
 	SCOPE_DEFAULTPARTITION: ("/dev/mtdblock6", PATH_DONTCREATE),
