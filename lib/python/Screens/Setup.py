@@ -100,7 +100,7 @@ class Setup(ConfigListScreen, Screen):
 
 		ConfigListScreen.__init__(self, self.list, session=session, on_change=self.changedEntry)
 		self.createSetupList()
-		self.title = _(self.setup.get("title", "").encode("UTF-8"))
+		self.title = _(self.setup.get("title", ""))
 
 	def createSetupList(self):
 		currentItem = self["config"].getCurrent()
@@ -185,4 +185,5 @@ def getSetupTitle(id):
 	for x in xmldata.findall("setup"):
 		if x.get("key") == id:
 			return x.get("title", "")
+	print("[Setup] Error: Unknown setup id '%s'!" % repr(id))
 	raise SetupError("unknown setup id '%s'!" % repr(id))
