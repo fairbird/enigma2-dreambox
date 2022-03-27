@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: enigma2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-26 15:37+0100\n"
+"POT-Creation-Date: 2022-03-27 12:31+0200\n"
 "PO-Revision-Date: 2021-11-26 14:55+0300\n"
 "Last-Translator: RAED - Fairbirb <rrrr53@hotmail.com>\n"
 "Language-Team: \n"
@@ -2922,8 +2922,8 @@ msgid "ERROR - failed to scan (%s)!"
 msgstr "!(%s) خطأ - فشل البحث"
 
 #, python-format
-msgid "ERROR downloading file %s"
-msgstr "!(%s) خطأ تحميل الملف"
+msgid "ERROR downloading file /etc/enigma2/%s"
+msgstr "/etc/enigma2/%s خطأ تحميل الملف"
 
 msgid "East"
 msgstr "شرق"
@@ -3215,9 +3215,6 @@ msgid "Eritrea"
 msgstr "إريتريا"
 
 msgid "Error"
-msgstr "خطأ"
-
-msgid "Error %s"
 msgstr "خطأ"
 
 msgid "Error code"
