@@ -175,6 +175,24 @@ def InitAVSwitch():
 	iAVSwitch.setInput("ENCODER") # init on startup
 	SystemInfo["ScartSwitch"] = eAVSwitch.getInstance().haveScartSwitch()
 
+	def readChoices(procx, choices, default):
+		try:
+			with open(procx, "r") as myfile:
+				procChoices = myfile.read().strip()
+		except:
+			procChoices = ""
+		if procChoices:
+			choiceslist = procChoices.split(" ")
+			choices = [(item, _(item)) for item in choiceslist]
+			default = choiceslist[0]
+		return (choices, default)
+
+	if SystemInfo["HasMultichannelPCM"]:
+		def setMultichannelPCM(configElement):
+			open(SystemInfo["HasMultichannelPCM"], "w").write(configElement.value and "enable" or "disable")
+		config.av.multichannel_pcm = ConfigYesNo(default=False)
+		config.av.multichannel_pcm.addNotifier(setMultichannelPCM)
+
 	if SystemInfo["CanDownmixAC3"]:
 		def setAC3Downmix(configElement):
 			print("[AVSwitch] Write to /proc/stb/audio/ac3")
@@ -203,8 +221,16 @@ def InitAVSwitch():
 
 	if SystemInfo["CanDownmixDTS"]:
 		def setDTSDownmix(configElement):
-			open("/proc/stb/audio/dts", "w").write(configElement.value and "downmix" or "passthrough")
-		config.av.downmix_dts = ConfigYesNo(default=True)
+			open("/proc/stb/audio/dts", "w").write(configElement.value)
+		choices = [
+			("downmix", _("Downmix")),
+			("passthrough", _("Passthrough"))
+		]
+		default = "downmix"
+		if SystemInfo["CanProc"]:
+			f = "/proc/stb/audio/dts_choices"
+			(choices, default) = readChoices(f, choices, default)
+		config.av.downmix_dts = ConfigSelection(choices=choices, default=default)
 		config.av.downmix_dts.addNotifier(setDTSDownmix)
 
 	if SystemInfo["CanDTSHD"]:
@@ -267,7 +293,7 @@ def InitAVSwitch():
 		config.av.osd_alpha = ConfigSlider(default=255, limits=(0, 255))
 		config.av.osd_alpha.addNotifier(setAlpha)
 
-	if os.path.exists("/proc/stb/vmpeg/0/pep_scaler_sharpness"):
+	if SystemInfo["HasScaler_sharpness"]:
 		def setScaler_sharpness(config):
 			myval = int(config.value)
 			try:
@@ -281,12 +307,6 @@ def InitAVSwitch():
 		config.av.scaler_sharpness.addNotifier(setScaler_sharpness)
 	else:
 		config.av.scaler_sharpness = NoSave(ConfigNothing())
-
-	if SystemInfo["HasMultichannelPCM"]:
-		def setMultichannelPCM(configElement):
-			open(SystemInfo["HasMultichannelPCM"], "w").write(configElement.value and "enable" or "disable")
-		config.av.multichannel_pcm = ConfigYesNo(default=False)
-		config.av.multichannel_pcm.addNotifier(setMultichannelPCM)
 
 	if SystemInfo["HasAutoVolume"]:
 		def setAutoVolume(configElement):
@@ -303,7 +323,17 @@ def InitAVSwitch():
 	if SystemInfo["Has3DSurround"]:
 		def set3DSurround(configElement):
 			open(SystemInfo["Has3DSurround"], "w").write(configElement.value)
-		config.av.surround_3d = ConfigSelection(default="none", choices=[("none", _("off")), ("hdmi", _("HDMI")), ("spdif", _("SPDIF")), ("dac", _("DAC"))])
+		choices = [
+			("none", _("off")),
+			("hdmi", _("HDMI")),
+			("spdif", _("SPDIF")),
+			("dac", _("DAC"))
+		]
+		default = "none"
+		if SystemInfo["CanProc"]:
+			f = "/proc/stb/audio/3d_surround_choices"
+			(choices, default) = readChoices(f, choices, default)
+		config.av.surround_3d = ConfigSelection(choices=choices, default=default)
 		config.av.surround_3d.addNotifier(set3DSurround)
 
 	if SystemInfo["Has3DSpeaker"]:

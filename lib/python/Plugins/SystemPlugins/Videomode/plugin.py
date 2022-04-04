@@ -131,6 +131,8 @@ class VideoSetup(ConfigListScreen, Screen):
 				self.list.append(getConfigListEntry(_("AAC downmix"), config.av.downmix_aac, _("Configure whether multi channel sound tracks should be downmixed to stereo.")))
 			if SystemInfo["CanDownmixAACPlus"]:
 				self.list.append(getConfigListEntry(_("AAC plus downmix"), config.av.downmix_aacplus, _("Configure whether multi channel sound tracks should be downmixed to stereo.")))
+			if SystemInfo["CanAC3Transcode"]:
+				self.list.append(getConfigListEntry(_("AC3 transcoding"), config.av.transcodeac3plus, _("Choose whether AC3 sound tracks should be transcoded.")))
 			if SystemInfo["HDMIAudioSource"]:
 				self.list.append(getConfigListEntry(_("Audio Source"), config.av.hdmi_audio_source, _("Choose whether multi channel sound tracks should be convert to PCM or SPDIF.")))
 			if SystemInfo["CanAACTranscode"]:
