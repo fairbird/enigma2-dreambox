@@ -8,6 +8,7 @@ from enigma import eEnv, getDesktop, eGetEnigmaDebugLvl
 from errno import ENOENT, EXDEV
 from re import compile
 from stat import S_IMODE
+from unicodedata import normalize
 from xml.etree.cElementTree import Element, ParseError, fromstring, parse
 
 DEFAULT_MODULE_NAME = __name__.split(".")[-1]
@@ -490,7 +491,7 @@ def fileReadXML(filename, default=None, source=DEFAULT_MODULE_NAME, debug=False)
 def getRecordingFilename(basename, dirname=None):
 	# Filter out non-allowed characters.
 	non_allowed_characters = "/.\\:*?<>|\""
-	basename = basename.replace("\xc2\x86", "").replace("\xc2\x87", "")
+	basename = basename.replace("\x86", "").replace("\x87", "")
 	filename = ""
 	for c in basename:
 		if c in non_allowed_characters or ord(c) < 32:
@@ -500,17 +501,17 @@ def getRecordingFilename(basename, dirname=None):
 	# but must not truncate in the middle of a multi-byte utf8 character!
 	# So convert the truncation to unicode and back, ignoring errors, the
 	# result will be valid utf8 and so xml parsing will be OK.
-	filename = unicode(filename[:247], "utf8", "ignore").encode("utf8", "ignore")
+	filename = filename[:247]
 	if dirname is not None:
 		if not dirname.startswith("/"):
-			dirname = pathjoin(defaultRecordingLocation(), dirname)
+			dirname = os.path.join(defaultRecordingLocation(), dirname)
 	else:
 		dirname = defaultRecordingLocation()
-	filename = pathjoin(dirname, filename)
+	filename = os.path.join(dirname, filename)
 	path = filename
 	i = 1
 	while True:
-		if not isfile(path + ".ts"):
+		if not os.path.isfile(path + ".ts"):
 			return path
 		path += "_%03d" % i
 		i += 1
