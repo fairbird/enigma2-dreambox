@@ -67,6 +67,8 @@ config.misc.prev_wakeup_time = ConfigInteger(default=0)
 config.misc.prev_wakeup_time_type = ConfigInteger(default=0)
 # 0 = RecordTimer, 1 = ZapTimer, 2 = Plugins, 3 = WakeupTimer
 config.misc.epgcache_filename = ConfigText(default="/media/hdd/epg.dat", fixed_size=False)
+config.misc.SyncTimeUsing = ConfigSelection(default="0", choices=[("0", _("Transponder Time")), ("1", _("NTP"))])
+config.misc.NTPserver = ConfigText(default="pool.ntp.org", fixed_size=False)
 
 
 def setEPGCachePath(configElement):
@@ -537,8 +539,8 @@ def runScreenTest():
 			wptime = nowTime + 30  # so switch back on in 30 seconds
 		else:
 			wptime = startTime[0] - 240
-		if not config.misc.useTransponderTime.value:
-			print("[StartEnigma] DVB time sync disabled... so set RTC now to current linux time!", strftime("%Y/%m/%d %H:%M", localtime(nowTime)))
+		if not config.misc.SyncTimeUsing.value == "0":
+			print("[StartEnigma] DVB time sync disabled, so set RTC now to current Linux time!  (%s)" % strftime("%Y/%m/%d %H:%M", localtime(nowTime)))
 			setRTCtime(nowTime)
 		print("[StartEnigma] Set wakeup time to", strftime("%Y/%m/%d %H:%M", localtime(wptime)))
 		setFPWakeuptime(wptime)
@@ -596,8 +598,8 @@ import Components.Timezones
 Components.Timezones.InitTimeZones()
 
 profile("Init:NTPSync")
-import Components.NetworkTime
-Components.NetworkTime.AutoNTPSync()
+from Components.NetworkTime import ntpSyncPoller
+ntpSyncPoller.startTimer()
 
 profile("Init:DebugLogCheck")
 import Screens.LogManager

@@ -85,6 +85,10 @@ class ConfigElement:
 	def tostring(self, value):
 		return str(value)
 
+	# You need to override this to do appropriate value conversion to a displayable string in the Setup / ConfigList UI.
+	def toDisplayString(self, value):
+		return str(value)
+
 	# you need to override this if str(self.value) doesn't work
 	def save(self):
 		if self.save_disabled or (self.value == self.default and not self.save_forced):
@@ -353,6 +357,9 @@ class ConfigSelection(ConfigElement):
 	def tostring(self, val):
 		return str(val)
 
+	def toDisplayString(self, val):
+		return self.description[val]
+
 	def getValue(self):
 		return self._value
 
@@ -492,6 +499,9 @@ class ConfigBoolean(ConfigElement):
 			self.changedFinal()
 			self.last_value = self.value
 
+	def toDisplayString(self, value):
+		return self.descriptions[True] if value or str(value).lower() in self.trueValues else self.descriptions[False]
+
 
 class ConfigYesNo(ConfigBoolean):
 	def __init__(self, default=False, graphic=True):
@@ -531,6 +541,9 @@ class ConfigDateTime(ConfigElement):
 
 	def fromstring(self, val):
 		return int(val)
+
+	def toDisplayString(self, value):
+		return strftime(self.formatString, localtime(value))
 
 # *THE* mighty config element class
 #
@@ -687,6 +700,9 @@ class ConfigSequence(ConfigElement):
 
 	def tostring(self, val):
 		return self.seperator.join([self.saveSingle(x) for x in val])
+
+	def toDisplayString(self, value):
+		return self.seperator.join(["%%0%sd" % (str(self.blockLen[index]) if self.zeroPad else "") % value for index, value in enumerate(self._value)])
 
 	def saveSingle(self, v):
 		return str(v)
@@ -1457,6 +1473,9 @@ class ConfigSet(ConfigElement):
 
 	def tostring(self, value):
 		return str(value)
+
+	def toDisplayString(self, value):
+		return ", ".join([self.description[x] for x in value])
 
 	def fromstring(self, val):
 		return eval(val)

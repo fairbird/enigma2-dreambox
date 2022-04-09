@@ -160,6 +160,7 @@ class ConfigListScreen:
 		}, -1)  # to prevent left/right overriding the listbox
 
 		self.onChangedEntry = []
+		self.onSave = []
 
 		self["VirtualKB"] = ActionMap(["VirtualKeyboardActions"], {
 			"showVirtualKeyboard": self.KeyText,
@@ -287,6 +288,12 @@ class ConfigListScreen:
 	def saveAll(self):
 		for x in self["config"].list:
 			x[1].save()
+
+	def addSaveNotifier(self, notifier):
+		if callable(notifier):
+			self.onSave.append(notifier)
+		else:
+			raise TypeError("[ConfigList] Error: Notifier must be callable!")
 
 	# keySave and keyCancel are just provided in case you need them.
 	# you have to call them by yourself.
