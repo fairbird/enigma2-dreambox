@@ -208,6 +208,9 @@
 		<item level="0" text="Date style" description="Choose the display formatting style for dates. 'D' / 'DD' is the date and 'M' / 'MM' is the month in digits.  ('DD' and 'MM' have leading zeros for single digit values.) The screen display will be based on your choice but can be influenced by the skin." requires="config.usage.date.enabled">config.usage.date.dayfull</item>
 		<item level="0" text="Time style" description="Choose the display formatting style for times. 'H' / 'HH' is the hour for a 24 hour clock, 'h' / 'hh' is the hour for a 12 hour clock, 'mm' is the minutes and 'ss' is the seconds.  ('HH' and 'hh' have leading zeros for single digit values.) The screen display will be based on your choice but can be influenced by the skin." requires="config.usage.time.enabled">config.usage.time.long</item>
 	</setup>
+	<setup key="DNS" title="DNS Settings">
+		<item level="0" text="DNS data source" description="Select the source of the default DNS settings.">config.usage.dns</item>
+	</setup>
 	<setup key="Recording" title="Recording Setup">
 		<item level="0" text="Default movie location" description="Set the default location for your recordings. Press OK to add new locations, LEFT/RIGHT to select from any existing locations.">config.usage.default_path</item>
 		<item level="2" text="Timer recording location" description="Set the default location for your timers. Press OK to add new locations, LEFT/RIGHT to select from any existing locations.">config.usage.timer_path</item>
