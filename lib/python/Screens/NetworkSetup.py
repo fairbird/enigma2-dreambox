@@ -234,9 +234,6 @@ class DNSSettings(Setup):
 			"moveDown": (self.moveEntryDown, _("Move the current DNS entry down one line"))
 		}, prio=0, description=dnsDescription)
 		self["moveDownAction"].setEnabled(False)
-		
-		dnsList = self["config"].getList()
-		self.dnsStart = len(dnsList)
 
 	def dnsCheck(self, dnsServers, refresh=True):
 		def dnsRefresh(refresh):
@@ -260,6 +257,8 @@ class DNSSettings(Setup):
 		return option
 
 	def createSetup(self):
+		Setup.createSetupList(self)
+		dnsList = self["config"].getList()
 		self.dnsStart = len(dnsList)
 		for item, entry in enumerate([NoSave(ConfigIP(default=x)) for x in self.dnsServers], start=1):
 			dnsList.append(getConfigListEntry(_("Name server %d") % item, entry, _("Enter DNS (Dynamic Name Server) %d's IP address.") % item))
@@ -285,6 +284,8 @@ class DNSSettings(Setup):
 		self.updateControls()
 
 	def updateControls(self):
+		dnsList = self["config"].getList()
+		self.dnsStart = len(dnsList)
 		index = self["config"].getCurrentIndex() - self.dnsStart
 		if 0 <= index < self.dnsLength:
 			self["key_blue"].setText(_("Delete") if self.dnsLength > 1 or self.dnsServers[0] != [0, 0, 0, 0] else "")
