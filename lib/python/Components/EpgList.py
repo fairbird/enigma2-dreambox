@@ -327,7 +327,7 @@ class EPGList(GUIComponent):
 		test.insert(0, 'X0RIBDTCn')
 		self.list = self.queryEPG(test)
 		self.l.setList(self.list)
-		#print(int(time()) - t)
+		#print(int(time() - t))
 		self.selectionChanged()
 
 	def updateMultiEPG(self, direction):
@@ -343,7 +343,7 @@ class EPGList(GUIComponent):
 					self.list[cnt] = (changecount, x[0], x[1], x[2], x[3], x[4], x[5], x[6])
 			cnt += 1
 		self.l.setList(self.list)
-		#print(int(time() - t)
+		#print(int(time() - t))
 		self.selectionChanged()
 
 	def fillSingleEPG(self, service):
@@ -408,7 +408,7 @@ class EPGList(GUIComponent):
 			l.sort(key=lambda x: x[2])
 		self.l.setList(l)
 		self.selectionChanged()
-		print(int(time()) - t)
+		print(int(time() - t))
 
 	def applySkin(self, desktop, parent):
 		def warningWrongSkinParameter(string):
