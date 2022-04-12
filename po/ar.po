@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: enigma2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-03-27 12:31+0200\n"
+"POT-Creation-Date: 2022-04-12 12:11+0200\n"
 "PO-Revision-Date: 2021-11-26 14:55+0300\n"
 "Last-Translator: RAED - Fairbirb <rrrr53@hotmail.com>\n"
 "Language-Team: \n"
@@ -558,8 +558,23 @@ msgstr "إعدادات دليل البرامج الإلكترونية"
 msgid "AAC downmix"
 msgstr "ترميز الصوت الرقمي المزدوج"
 
+#, fuzzy
+msgid "AAC transcoding"
+msgstr "بث القنوات عبر الشبكة: "
+
+#, fuzzy
+msgid "AAC+ downmix"
+msgstr "ترميز الصوت الرقمي المزدوج"
+
+msgid "AC3"
+msgstr ""
+
 msgid "AC3 downmix"
 msgstr "ترميز الصوت الثلاثي المنخفض"
+
+#, fuzzy
+msgid "AC3 transcoding"
+msgstr "بث القنوات عبر الشبكة: "
 
 msgid "ACQUIRING TSID/ONID"
 msgstr "الحصول على معرف القناة/معرف الخدمة"
@@ -1646,6 +1661,22 @@ msgstr "أختار الباقة"
 msgid "Choose bouquet"
 msgstr "أختار الباقة"
 
+#, fuzzy
+msgid "Choose whether AAC sound tracks should be transcoded."
+msgstr "اختار ما إذا كانت المسارات الصوتية متعددة القنوات يجب أن تكون مختلطة إلى ستريو."
+
+#, fuzzy
+msgid "Choose whether AC3 sound tracks should be transcoded."
+msgstr "اختار ما إذا كانت المسارات الصوتية متعددة القنوات يجب أن تكون مختلطة إلى ستريو."
+
+#, fuzzy
+msgid "Choose whether WMA Pro sound tracks should be downmixed."
+msgstr "اختار ما إذا كانت المسارات الصوتية متعددة القنوات يجب أن تكون مختلطة إلى ستريو."
+
+#, fuzzy
+msgid "Choose whether multi channel aac+ sound tracks should be downmixed to stereo."
+msgstr "اختار ما إذا كانت المسارات الصوتية متعددة القنوات يجب أن تكون مختلطة إلى ستريو."
+
 msgid "Choose which tuner to configure."
 msgstr "اختيار أي موالف لتكوين."
 
@@ -2334,6 +2365,10 @@ msgstr "التشيكية"
 msgid "D"
 msgstr "ثلاثي الابعاد"
 
+#, fuzzy
+msgid "DAC"
+msgstr "PDC"
+
 msgid "DHCP"
 msgstr "برتوكول تكوين المضيف آليا"
 
@@ -2343,8 +2378,14 @@ msgstr "ضبط الريموت المتقدم"
 msgid "DMM normal"
 msgstr "ضبط الريموت العادي"
 
+msgid "DTS"
+msgstr ""
+
 msgid "DTS downmix"
 msgstr "الصوت الدولبي / نظام المسرح الرقمي المزدوج"
+
+msgid "DTS-HD HR/DTS-HD MA/DTS"
+msgstr ""
 
 msgid "DUAL LAYER DVD"
 msgstr "ديفيدي ثنائي الشاشة"
@@ -2640,6 +2681,10 @@ msgstr ".%(subdir)s و %(file)s محتوى المجلد"
 msgid "Disable"
 msgstr "تعطيل"
 
+#, fuzzy
+msgid "Disable FCC during recordings"
+msgstr "إيقاف جميع التسجيلات الحالية"
+
 msgid "Disable Picture in Picture"
 msgstr "تعطيل صوره داخل صوره"
 
@@ -2878,6 +2923,10 @@ msgstr "جاري التحميل"
 msgid "Downloading plugin information. Please wait..."
 msgstr "جاري تحميل معلومات عن الإضافة. رجاء الانتظار.."
 
+#, fuzzy
+msgid "Downmix"
+msgstr "الصوت الدولبي / نظام المسرح الرقمي المزدوج"
+
 msgid "Drama and Films"
 msgstr "دراما و أفلام"
 
@@ -2922,7 +2971,7 @@ msgid "ERROR - failed to scan (%s)!"
 msgstr "!(%s) خطأ - فشل البحث"
 
 #, python-format
-msgid "ERROR downloading file /etc/enigma2/%s"
+msgid "ERROR downloading file %s/%s"
 msgstr "/etc/enigma2/%s خطأ تحميل الملف"
 
 msgid "East"
@@ -3039,6 +3088,10 @@ msgstr "تمكين البحث السريع الآلي"
 #, python-format
 msgid "Enable auto fastscan for %s"
 msgstr "تفعيل البحث التلقائي السريع %s"
+
+#, fuzzy
+msgid "Enable bluetooth audio"
+msgstr "تمكين تعديل الباقة"
 
 msgid "Enable bouquet edit"
 msgstr "تمكين تعديل الباقة"
@@ -3452,6 +3505,14 @@ msgid "FBC automatic\n"
 msgstr "لاقط أف بي سي التلقائي\n"
 "غير نشط"
 
+#, fuzzy
+msgid "FCC enabled"
+msgstr "تم التفعيل"
+
+#, fuzzy
+msgid "FCCSetup"
+msgstr "الضبط"
+
 #, python-format
 msgid "FBC socket %s"
 msgstr "FBC socket %s"
@@ -3552,6 +3613,15 @@ msgstr "جزر فاروي"
 
 msgid "Fast"
 msgstr "سريع"
+
+msgid "Fast Channel Change"
+msgstr ""
+
+msgid "Fast Channel Change Setup"
+msgstr ""
+
+msgid "Fast Channel Change setup"
+msgstr ""
 
 msgid "Fast DiSEqC"
 msgstr "دايزك سريع"
@@ -3761,6 +3831,10 @@ msgstr "تأخير ترميز الصوت الثلاثي العام"
 msgid "General PCM delay"
 msgstr "تأخير تعديل ترميز الذبذبة العام"
 
+#, fuzzy
+msgid "General bluetooth audio delay"
+msgstr "تأخير ترميز الصوت الثلاثي العام"
+
 msgid "Genre"
 msgstr "تصنيف"
 
@@ -3920,6 +3994,9 @@ msgstr "HD2400"
 msgid "HD60/HD66SE/Multibox/Multibox SE"
 msgstr "HD60/HD66SE/Multibox/Multibox SE"
 
+msgid "HDMI"
+msgstr ""
+
 msgid "HDMI Colordepth"
 msgstr "عمق ألوان كيبل عالي الوضوح"
 
@@ -4024,6 +4101,10 @@ msgstr "معلومات المراتب"
 
 msgid "High bitrate support"
 msgstr "دعم معدل البث العالي"
+
+#, fuzzy
+msgid "History Prev/Next"
+msgstr "التحكم في القناة التالية في سجل التنقلات"
 
 msgid "History back"
 msgstr "التحكم في القناة السابقة في سجل التنقلات"
@@ -4845,6 +4926,10 @@ msgstr "موريتانيا"
 
 msgid "Mauritius"
 msgstr "موريشيوس"
+
+#, fuzzy
+msgid "Max channels"
+msgstr "قنوات"
 
 msgid "Max memory positions"
 msgstr "أماكن الذاكرة القصوى"
@@ -5695,6 +5780,9 @@ msgstr "إظهار خدمات الرقابة الأبوية"
 msgid "Parental control setup"
 msgstr "الرقابة الأبوية"
 
+msgid "Passthrough"
+msgstr ""
+
 msgid "Password"
 msgstr "كلمة المرور"
 
@@ -6423,6 +6511,9 @@ msgstr "تسجيل"
 msgid "Recall to previous service"
 msgstr "العوده إلى خدمة القناة السابقه"
 
+msgid "Receiver or driver does not support FCC"
+msgstr ""
+
 msgid "Reception settings"
 msgstr "إعدادات المجموعة"
 
@@ -6834,6 +6925,9 @@ msgstr "الإشارة:"
 
 msgid "SNR:"
 msgstr "الإشارة:"
+
+msgid "SPDIF"
+msgstr ""
 
 msgid "SRT file"
 msgstr "ملف الترجمة"
@@ -8966,11 +9060,19 @@ msgstr "هذا الخيار يسمح لك لإظهار الأرقام في ال�
 msgid "This option allows you to show the full screen path leading to the current screen."
 msgstr "يسمح لك هذا الخيار لإظهار مسار القائمة الكاملة"
 
+#, fuzzy
+msgid "This option allows you to switch audio to bluetooth speakers."
+msgstr "يتيح لك هذا الخيار بتعيين عرض التصميم (نصوص أو الرسم البياني)"
+
 msgid "This option allows you to view the old and new settings side by side."
 msgstr "يتيح لك هذا الخيار لعرض الجانب الإعدادات القديمة والجديدة جنبآ إلى جنب."
 
 msgid "This option can be useful for long HDMI cables."
 msgstr ".يمكن أن يكون هذا الخيار مفيدًا لكابلات HDMI الطويلة"
+
+#, fuzzy
+msgid "This option configures the general audio delay for bluetooth speakers."
+msgstr "هذا الخيار لإعداد تأخير الصوت العام من المسارات صوت الاستيريو."
 
 msgid "This option set the level of surpression of mosquito noise (Mosquito Noise is random aliasing as a result of strong compression). Obviously this goes at the cost of picture details."
 msgstr "هذا الخيار تعيين مستوي الذبذبة من الضوضاء البعوض (البعوض الضوضاء هو التعرج عشوائي نتيجة لضغط قوي). ومن الواضح ان هذا ينطبق علي تكلفه تفاصيل الصورة."
@@ -9894,6 +9996,10 @@ msgstr "W"
 msgid "WLAN connection"
 msgstr "إتصال شبكة عبر الوايفاي"
 
+#, fuzzy
+msgid "WMA Pro downmix"
+msgstr "ترميز الصوت الرقمي المزدوج"
+
 msgid "WSS on 4:3"
 msgstr "الشاشة العريضة تعمل 4:3"
 
@@ -10551,6 +10657,10 @@ msgstr "زامبيا"
 msgid "Zap"
 msgstr "التنقل"
 
+#, fuzzy
+msgid "Zap Up/Down"
+msgstr "أنتقل للاسفل"
+
 msgid "Zap back to previously tuned service?"
 msgstr "هل تريد الإنتقال إلى أخر قناة في البحث؟"
 
@@ -10787,6 +10897,16 @@ msgstr "تم الاتصال"
 msgid "controlled by HDMI"
 msgstr "يتحكم فيها كيبل عالي الدقة"
 
+msgid "convert to AC3"
+msgstr ""
+
+msgid "convert to DTS"
+msgstr ""
+
+#, fuzzy
+msgid "convert to multi-channel PCM"
+msgstr "قنوات متعددة لترميز الذبذبة العام"
+
 msgid "cooking"
 msgstr "الطبخ"
 
@@ -10908,6 +11028,10 @@ msgid "experimental film/video"
 msgstr "فيلم تجريبي/فيديو"
 
 msgid "extra wide"
+msgstr "عريض واسع"
+
+#, fuzzy
+msgid "extrawide"
 msgstr "عريض واسع"
 
 msgid "failed"
@@ -11270,6 +11394,10 @@ msgstr "برنامج الأطفال قبل المدرسة"
 msgid "preserve bookmarks in cuts"
 msgstr "الحفاظ على الإشارات المرجعية في القطع"
 
+#, fuzzy
+msgid "priority"
+msgstr "الأولوية"
+
 msgid "receiver software because updates are available."
 msgstr ".برنامج المتلقي لأن التحديثات متوفرة"
 
@@ -11537,6 +11665,12 @@ msgstr "تفعيل"
 
 msgid "until standby/restart"
 msgstr "حتى وضع الانتظار/إعادة التشغيل"
+
+msgid "use best / controlled by HDMI"
+msgstr ""
+
+msgid "use_hdmi_cacenter"
+msgstr ""
 
 msgid "user defined"
 msgstr "محدده من قبل المستخدم"
