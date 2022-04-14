@@ -5,7 +5,7 @@ from Components.Harddisk import harddiskmanager
 from Tools.LoadPixmap import LoadPixmap
 import copy
 import os
-from time import localtime, strftime
+from time import localtime, strftime, struct_time
 
 # ConfigElement, the base class of all ConfigElements.
 
@@ -949,6 +949,7 @@ class ConfigClock(ConfigSequence):
 		newtime = list(self.t)
 		newtime[3] = self._value[0]
 		newtime[4] = self._value[1]
+		newtime = struct_time(newtime)
 		value = strftime(config.usage.time.short.value.replace("%-I", "%_I").replace("%-H", "%_H"), newtime)
 		return (value, mPos)
 
