@@ -502,6 +502,12 @@ long eHdmiCEC::translateKey(unsigned char code)
 		case 0x0d:
 			key = 0xae;
 			break;
+		case 0x4c:
+			key = 0x193;
+			break;
+		case 0x4b:
+			key = 0x192;
+			break;
 		case 0x72:
 			key = 0x18e;
 			break;
