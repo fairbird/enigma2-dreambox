@@ -1026,6 +1026,7 @@ self.autoResize()
 		<widget name="list" position="100,100" size="480,375"/>
 		<applet type="onLayoutFinish">
 from enigma import getDesktop, ePoint, eSize
+from __future__ import division
 try:
 	maxw = 520
 	count = len(self.list) if hasattr(self, "list") and self.list else 0
@@ -1047,7 +1048,7 @@ try:
 	wsizex = textsize[0] + poffset
 	wsizey = textsize[1] + listsize[1]
 	self.instance.resize(eSize(*(wsizex, wsizey)))
-	self.instance.move(ePoint(int((getDesktop(0).size().width() - wsizex) / 2), int((getDesktop(0).size().height() - wsizey) / 2)))
+	self.instance.move(ePoint(int((getDesktop(0).size().width() - wsizex) // 2), int((getDesktop(0).size().height() - wsizey) // 2)))
 except Exception as e:
 	print("[MessageBoxTemplate] onLayoutFinish Error: %s", str(e))
 		</applet>
