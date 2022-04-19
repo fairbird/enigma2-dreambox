@@ -736,7 +736,7 @@ class ConfigSequence(ConfigElement):
 		return self.seperator.join([self.saveSingle(x) for x in val])
 
 	def toDisplayString(self, value):
-		return self.seperator.join(["%%0%sd" % (str(self.blockLen[index]) if self.zeroPad else "") % value for index, value in enumerate(self._value)])
+		return self.seperator.join(["%%0%sd" % (str(self.block_len[index]) if self.zeroPad else "") % value for index, value in enumerate(self._value)])
 
 	def saveSingle(self, v):
 		return str(v)
@@ -762,7 +762,7 @@ class ConfigIP(ConfigSequence):
 		self.overwrite = True
 		self.auto_jump = auto_jump
 
-	def handleKey(self, key):
+	def handleKey(self, key, callback=None):
 		if key == ACTIONKEY_LEFT:
 			if self.marked_block > 0:
 				self.marked_block -= 1
@@ -796,13 +796,13 @@ class ConfigIP(ConfigSequence):
 				self.overwrite = False
 			else:
 				newValue = (self._value[self.marked_pos] * 10) + number
-				if self.autoJump and newValue > self.limits[self.marked_pos][1] and self.marked_pos < len(self.limits) - 1:
+				if self.auto_jump and newValue > self.limits[self.marked_pos][1] and self.marked_pos < len(self.limits) - 1:
 					self.handleKey(ACTIONKEY_RIGHT)
 					self.handleKey(key)
 					return
 				else:
 					self._value[self.marked_pos] = newValue
-			if len(str(self._value[self.marked_pos])) >= self.blockLen[self.marked_pos]:
+			if len(str(self._value[self.marked_pos])) >= self.block_len[self.marked_pos]:
 				self.handleKey(ACTIONKEY_RIGHT)
 
 			self.validate()
@@ -813,9 +813,9 @@ class ConfigIP(ConfigSequence):
 
 	def genText(self):
 		value = self.seperator.join([str(x) for x in self._value])
-		blockLen = [len(str(x)) for x in self._value]
-		leftPos = sum(blockLen[:self.marked_pos]) + self.marked_pos
-		rightPos = sum(blockLen[:self.marked_pos + 1]) + self.marked_pos
+		block_len = [len(str(x)) for x in self._value]
+		leftPos = sum(block_len[:self.marked_pos]) + self.marked_pos
+		rightPos = sum(block_len[:self.marked_pos + 1]) + self.marked_pos
 		mBlock = list(range(leftPos, rightPos))
 		return (value, mBlock)
 
@@ -2075,7 +2075,6 @@ cec_limits = [(0, 15), (0, 15), (0, 15), (0, 15)]
 class ConfigCECAddress(ConfigSequence):
 	def __init__(self, default, auto_jump=False):
 		ConfigSequence.__init__(self, seperator=".", limits=cec_limits, default=default)
-		self.autoJump = auto_jump
 		self.marked_pos = 0
 		self.overwrite = True
 		self.auto_jump = auto_jump
@@ -2116,7 +2115,7 @@ class ConfigCECAddress(ConfigSequence):
 					return
 				else:
 					self._value[self.marked_block] = newvalue
-			if len(str(self._value[self.marked_block])) >= self.blockLen[self.marked_block]:
+			if len(str(self._value[self.marked_block])) >= self.block_len[self.marked_block]:
 				self.handleKey(ACTIONKEY_RIGHT, callback)
 			self.validate()
 			self.changed()
