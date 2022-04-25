@@ -546,25 +546,66 @@ class PluginBrowserNew(Screen):
 		self.current = 0
 		self.current_page = 0
 		if config.misc.plugin_style.value == "newstyle1":
+			self.backgroundPixmap = ""
 			self.backgroundColor = "#44000000"
+			self.foregroundColor = "#000080ff"
 			self.primaryColor = "#282828"
 			self.primaryColorLabel = "#DCE1E3"
 			self.secondaryColor = "#4e4e4e"
 			self.secondaryColorLabel = "#00000000"
 		elif config.misc.plugin_style.value == "newstyle2":
+			self.backgroundPixmap = ""
 			self.backgroundColor = "#21292A"
+			self.foregroundColor = "#000080ff"
 			self.primaryColor = "#191F22"
 			self.primaryColorLabel = "#DCE1E3"
 			self.secondaryColor = "#39474F"
 			self.secondaryColorLabel = "#00000000"
 		elif config.misc.plugin_style.value == "newstyle3":
+			self.backgroundPixmap = ""
 			self.backgroundColor = "#44000000"
+			self.foregroundColor = "#000080ff"
 			self.primaryColor = "#16000000"
 			self.primaryColorLabel = "#00ffffff"
 			self.secondaryColor = "#696969"
 			self.secondaryColorLabel = "#00000000"
-		else:
+		elif config.misc.plugin_style.value == "newstyle4":
+			if isFullHD():
+				self.backgroundPixmap = '<ePixmap position="0,0" size="1920,1080" pixmap="skin_default/style4.jpg" transparent="1" zPosition="-1" />'
+			else:
+				self.backgroundPixmap = '<ePixmap position="0,0" size="1280,720" pixmap="skin_default/style4hd.jpg" transparent="1" zPosition="-1" />'
 			self.backgroundColor = "#44000000"
+			self.foregroundColor = "#FFFFFF"
+			self.primaryColor = "#000000"
+			self.primaryColorLabel = "#00ffffff"
+			self.secondaryColor = "#1b3c85"
+			self.secondaryColorLabel = "#00ffc000"
+		elif config.misc.plugin_style.value == "newstyle5":
+			if isFullHD():
+				self.backgroundPixmap = '<ePixmap position="0,0" size="1920,1080" pixmap="skin_default/style5.jpg" transparent="1" zPosition="-1" />'
+			else:
+				self.backgroundPixmap = '<ePixmap position="0,0" size="1280,720" pixmap="skin_default/style5hd.jpg" transparent="1" zPosition="-1" />'
+			self.backgroundColor = "#44000000"
+			self.foregroundColor = "#000080ff"
+			self.primaryColor = "#000000"
+			self.primaryColorLabel = "#00ffffff"
+			self.secondaryColor = "#1b3c85"
+			self.secondaryColorLabel = "#00ffc000"
+		elif config.misc.plugin_style.value == "newstyle6":
+			if isFullHD():
+				self.backgroundPixmap = '<ePixmap position="0,0" size="1920,1080" pixmap="skin_default/style6.jpg" transparent="1" zPosition="-1" />'
+			else:
+				self.backgroundPixmap = '<ePixmap position="0,0" size="1280,720" pixmap="skin_default/style6hd.jpg" transparent="1" zPosition="-1" />'
+			self.backgroundColor = "#44000000"
+			self.foregroundColor = "#000080ff"
+			self.primaryColor = "#451b49"
+			self.primaryColorLabel = "#DCE1E3"
+			self.secondaryColor = "#725083"
+			self.secondaryColorLabel = "#00ffc000"
+		else:
+			self.backgroundPixmap = ""
+			self.backgroundColor = "#44000000"
+			self.foregroundColor = "#000080ff"
 			self.primaryColor = "#282828"
 			self.primaryColorLabel = "#DCE1E3"
 			self.secondaryColor = "#4e4e4e"
@@ -573,8 +614,8 @@ class PluginBrowserNew(Screen):
 		self.firsttime = True
 		self.list = []
 		self["list"] = PluginList(self.list)
-		self['pages'] = Label()
-		self['plugin_description'] = Label()
+		self["pages"] = Label()
+		self["plugin_description"] = Label()
 		self["key_red"] = self["red"] = Label(_("Remove plugins"))
 		self["key_green"] = self["green"] = Label(_("Download plugins"))
 
@@ -593,23 +634,27 @@ class PluginBrowserNew(Screen):
 		self.onLayoutFinish.append(self.setIcons)
 		self.onLayoutFinish.append(self.activeBox)
 		self.onLayoutFinish.append(self.saveListsize)
-		self.setTitle(_('Plugin browser'))
+		self.setTitle(_("Plugin browser"))
 
 	def exit(self):
 		self.close()
 
 	def saveListsize(self):
-		listsize = self['list'].instance.size()
+		listsize = self["list"].instance.size()
 		self.listWidth = listsize.width()
 		self.listHeight = listsize.height()
 
 	def isProtected(self):
-		return config.ParentalControl.setuppinactive.value and (not config.ParentalControl.config_sections.main_menu.value or hasattr(self.session, 'infobar') and self.session.infobar is None) and config.ParentalControl.config_sections.plugin_browser.value
+		return config.ParentalControl.setuppinactive.value and (not config.ParentalControl.config_sections.main_menu.value or hasattr(self.session, "infobar") and self.session.infobar is None) and config.ParentalControl.config_sections.plugin_browser.value
 
 	def buildSkin(self):
 		if isFullHD():
 			# panel backgroundColor
 			backgroundColor = self.backgroundColor
+			# panel foregroundColor
+			foregroundColor = self.foregroundColor
+			# panel backgroundPixmap
+			backgroundPixmap = self.backgroundPixmap
 			# panel position
 			posxstart = 50
 			posystart = 190
@@ -676,6 +721,10 @@ class PluginBrowserNew(Screen):
 		else:
 			# panel backgroundColor
 			backgroundColor = self.backgroundColor
+			# panel foregroundColor
+			foregroundColor = self.foregroundColor
+			# panel backgroundPixmap
+			backgroundPixmap = self.backgroundPixmap
 			# panel position
 			posxstart = 10
 			posystart = 110
@@ -745,8 +794,9 @@ class PluginBrowserNew(Screen):
 		skincontent = ""
 		skin = """
 			<screen name="PluginBrowserNew" position="%d,%d" size="%d,%d" flags="wfNoBorder" backgroundColor="%s">
+				%s
 				<eLabel text="Plugin Browser" position="%d,%d" size="%d,%d" font="Regular;%d" foregroundColor="#00ffffff" backgroundColor="#44000000" transparent="1" zPosition="2" />
-				<widget name="plugin_description" position="%d,%d" size="%d,%d" font="Regular;%d" foregroundColor="#000080ff" backgroundColor="#44000000" transparent="1" zPosition="2" />
+				<widget name="plugin_description" position="%d,%d" size="%d,%d" font="Regular;%d" foregroundColor="%s" backgroundColor="#44000000" transparent="1" zPosition="2" />
 				<widget source="global.CurrentTime" render="Label" position="%d,%d" size="%d,%d" font="Regular;%d" halign="right" backgroundColor="#44000000" transparent="1" foregroundColor="#00ffffff">
 					<convert type="ClockToText">
 				</convert>
@@ -759,7 +809,7 @@ class PluginBrowserNew(Screen):
 				<eLabel position="%d,%d" size="%d,%d" backgroundColor="#00389416" foregroundColor="#00389416" zPosition="4"/>
 				<widget name="key_red" position="%d,%d" size="%d,%d" font="Regular;%d" zPosition="1" halign="center" valign="center" foregroundColor="#00ffffff" backgroundColor="#16000000" transparent="1"/>
 				<widget name="key_green" position="%d,%d" size="%d,%d" font="Regular;%d" zPosition="1" halign="center" valign="center" foregroundColor="#00ffffff" backgroundColor="#16000000" transparent="1"/>
-			""" % (positionx, positiony, sizex, sizey, backgroundColor, positionx1, positiony1, sizex1, sizey1, font1, positionx2, positiony2, sizex2, sizey2, font2, positionx3, positiony3, sizex3, sizey3, font3, positionx4, positiony4, sizex4, sizey4, font4, positionx5, positiony5, sizex5, sizey5, font5, eLabelx1, eLabely1, eLabel1ysizex, eLabel1ysizey, eLabelx2, eLabely2, eLabel1ysizex, eLabel1ysizey, positionxkey1, positionykey, sizekeysx, sizekeysy, fontkey, positionxkey2, positionykey, sizekeysx, sizekeysy, fontkey)
+			""" % (positionx, positiony, sizex, sizey, backgroundColor, backgroundPixmap, positionx1, positiony1, sizex1, sizey1, font1, positionx2, positiony2, sizex2, sizey2, font2, foregroundColor, positionx3, positiony3, sizex3, sizey3, font3, positionx4, positiony4, sizex4, sizey4, font4, positionx5, positiony5, sizex5, sizey5, font5, eLabelx1, eLabely1, eLabel1ysizex, eLabel1ysizey, eLabelx2, eLabely2, eLabel1ysizex, eLabel1ysizey, positionxkey1, positionykey, sizekeysx, sizekeysy, fontkey, positionxkey2, positionykey, sizekeysx, sizekeysy, fontkey)
 		count = 0
 		for x, p in enumerate(plugins.getPlugins(PluginDescriptor.WHERE_PLUGINMENU)):
 			x += 1
@@ -949,5 +999,5 @@ class PluginBrowserNew(Screen):
 			else:
 				self.session.openWithCallback(self.PluginDownloadBrowserClosed, PluginManager)
 
-if config.misc.plugin_style.value == "newstyle1" or config.misc.plugin_style.value == "newstyle2" or config.misc.plugin_style.value == "newstyle3":
+if config.misc.plugin_style.value == "newstyle1" or config.misc.plugin_style.value == "newstyle2" or config.misc.plugin_style.value == "newstyle3" or config.misc.plugin_style.value == "newstyle4" or config.misc.plugin_style.value == "newstyle5" or config.misc.plugin_style.value == "newstyle6":
 	PluginBrowser = PluginBrowserNew
