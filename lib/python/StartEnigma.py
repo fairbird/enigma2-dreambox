@@ -23,11 +23,14 @@ config.plugins.remotecontroltype = ConfigSubsection()
 config.plugins.remotecontroltype.rctype = ConfigInteger(default=0)
 
 # New Plugin Style
-config.misc.plugin_style = ConfigSelection(default='normallstyle', choices=[
-	('normallstyle', _('Normall Style')),
-	('newstyle1', _('New Style 1')),
-	('newstyle2', _('New Style 2')),
-	('newstyle3', _('New Style 3'))])
+config.misc.plugin_style = ConfigSelection(default="normallstyle", choices=[
+	("normallstyle", _("Normall Style")),
+	("newstyle1", _("New Style 1")),
+	("newstyle2", _("New Style 2")),
+	("newstyle3", _("New Style 3")),
+	("newstyle4", _("New Style 4")),
+	("newstyle5", _("New Style 5")),
+	("newstyle6", _("New Style 6"))])
 
 profile("SimpleSummary")
 from Screens import InfoBar

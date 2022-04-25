@@ -63,4 +63,10 @@ dist_install_DATA = \
 	unhandled-key.png \
 	volume.png \
 	wizard.png \
-	yellow_circle23x23.png
+	yellow_circle23x23.png \
+	style4.jpg \
+	style4hd.jpg \
+	style5.jpg \
+	style5hd.jpg \
+	style6.jpg \
+	style6hd.jpg
