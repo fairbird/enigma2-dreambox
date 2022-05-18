@@ -1249,7 +1249,6 @@ void eDVBFrontend::calculateSignalQuality(int snr, int &signalquality, int &sign
 		|| !strcmp(m_description, "GIGA DVB-C/T2 NIM (SI4768)")
 		|| !strcmp(m_description, "GIGA DVB-C/T2 NIM (SI41682)")
 		|| !strcmp(m_description, "GIGA DVB-T2/C NIM (TT2L10)")
-		|| !strcmp(m_description, "GIGA DVB-T2/C NIM (TT3L10)")
 		)
 	{
 		int type = -1;
@@ -1265,6 +1264,10 @@ void eDVBFrontend::calculateSignalQuality(int snr, int &signalquality, int &sign
 				ter_max = 4200;
 				break;
 		}
+	}
+	else if (!strcmp(m_description, "GIGA DVB-T2/C NIM (TT3L10)")) // dual plug & play tuner GB UE/Quad UHD 4K 
+	{
+		ret = (int)(snr / 15);
 	}
 	else if (!strcmp(m_description, "BCM7356 DVB-S2 NIM (internal)") // VU+ Solo2
 		|| !strcmp(m_description, "BCM7346 DVB-S2 NIM (internal)")
