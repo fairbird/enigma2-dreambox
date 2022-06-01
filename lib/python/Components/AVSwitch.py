@@ -175,6 +175,31 @@ def InitAVSwitch():
 	iAVSwitch.setInput("ENCODER") # init on startup
 	SystemInfo["ScartSwitch"] = eAVSwitch.getInstance().haveScartSwitch()
 
+	def ch(node):
+		return node, pnD.get(node) if pnD.get(node) else node
+
+	# dictionary ... "proc_node_name" : _("human translatable texts"),
+	pnD = {
+		"ac3" : _("AC3"),
+		"dac" : _("DAC"),
+		"dts" : _("DTS"),
+		"downmix" : _("Downmix"),
+		"extrawide" : _("extrawide"),
+		"force_ac3" : _("convert to AC3"),
+		"force_dts" : _("convert to DTS"),
+		"hdmi" : _("HDMI"),
+		"hdmi_best" : _("use best / controlled by HDMI"),
+		"multichannel" : _("convert to multi-channel PCM"),
+		"none" : _("off"),
+		"off" : _("Off"),
+		"on" : _("On"),
+		"passthrough" : _("Passthrough"),
+		"spdif" : _("SPDIF"),
+		"use_hdmi_cacenter" : _("use HDMI cacenter"),
+		"use_hdmi_caps" : _("controlled by HDMI"),
+		"wide" : _("wide"),
+	}
+
 	def readChoices(procx, choices, default):
 		try:
 			with open(procx, "r") as myfile:
