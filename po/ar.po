@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: enigma2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-04-12 12:11+0200\n"
-"PO-Revision-Date: 2021-11-26 14:55+0300\n"
+"POT-Creation-Date: 2022-05-08 10:54+0200\n"
 "Last-Translator: RAED - Fairbirb <rrrr53@hotmail.com>\n"
 "Language-Team: \n"
 "Language: ar\n"
@@ -2465,6 +2465,9 @@ msgstr "نوع التسيجل الإفتراضي"
 msgid "Default+Picon"
 msgstr "الإفتراضي"
 
+msgid "Define additional delay in milliseconds before start of http(s) streams, e.g. to connect a remote tuner, you use a complex system of DiSEqC."
+msgstr "DiSEqC. على سبيل المثال لتوصيل موالف عن بعد ، يمكنك استخدام نظام معقد من http(s) حدد تأخيرًا إضافيًا بالملي ثانية قبل بدء تدفقات بث تيارات"
+
 msgid "Define the location of the EPG Cache file."
 msgstr "حدد موقع ملف مسار  ملف الدليل الإلكتروني"
 
@@ -4159,6 +4162,9 @@ msgstr "كم عدد الدقائق التي تريد إضافتها إلى ال�
 
 msgid "How many minutes do you want to record?"
 msgstr "كم عدد الدقائق التي تريد تسجيلها ؟"
+
+msgid "Http(s) stream start delay"
+msgstr "Http(s) تأخير بدء الدفق"
 
 msgid "Hue"
 msgstr "درجة اللون"
