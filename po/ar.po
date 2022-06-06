@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: enigma2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-04-12 12:11+0200\n"
-"POT-Creation-Date: 2022-05-08 10:54+0200\n"
+"POT-Creation-Date: 2022-06-06 17:18+0200\n"
 "Last-Translator: RAED - Fairbirb <rrrr53@hotmail.com>\n"
 "Language-Team: \n"
 "Language: ar\n"
@@ -1133,6 +1133,9 @@ msgstr "بحث آلـى"
 msgid "Automatic scan"
 msgstr "بحث آلـى"
 
+msgid "Automatically power off box to deep standby mode."
+msgstr ".إيقاف تشغيل الجهاز تلقائيًا إلى وضع الاستعداد العميق"
+
 msgid "Automatically put the TV in standby whenever the receiver goes into standby or deep standby."
 msgstr ".ضع التلفزيون تلقائيًا في وضع الاستعداد عندما ينتقل جهاز الاستقبال إلى وضع الاستعداد أو وضع الاستعداد العميق"
 
@@ -1671,6 +1674,10 @@ msgstr "اختار ما إذا كانت المسارات الصوتية متعد
 
 #, fuzzy
 msgid "Choose whether WMA Pro sound tracks should be downmixed."
+msgstr "اختار ما إذا كانت المسارات الصوتية متعددة القنوات يجب أن تكون مختلطة إلى ستريو."
+
+#, fuzzy
+msgid "Choose whether multi channel DTS-HD(HR/MA) sound tracks should be downmixed or transcoded."
 msgstr "اختار ما إذا كانت المسارات الصوتية متعددة القنوات يجب أن تكون مختلطة إلى ستريو."
 
 #, fuzzy
@@ -2384,8 +2391,9 @@ msgstr ""
 msgid "DTS downmix"
 msgstr "الصوت الدولبي / نظام المسرح الرقمي المزدوج"
 
-msgid "DTS-HD HR/DTS-HD MA/DTS"
-msgstr ""
+#, fuzzy
+msgid "DTS-HD(HR/MA) downmix"
+msgstr "الصوت الدولبي / نظام المسرح الرقمي المزدوج"
 
 msgid "DUAL LAYER DVD"
 msgstr "ديفيدي ثنائي الشاشة"
@@ -3126,6 +3134,10 @@ msgstr "تعطيل او تمكين إستخدام  كيبل عالي الوضو�
 msgid "Enable parental protection"
 msgstr "تمكين الحماية الأبوية"
 
+#, fuzzy
+msgid "Enable power off timer"
+msgstr "تمكين وضع التحريك للقنوات"
+
 msgid "Enable remote enigma2 receiver to be tried to tune into services that cannot be tuned into locally (e.g. tuner is occupied or service type is unavailable on the local tuner. Specify complete URL including http:// and port number (normally ...:8001), e.g. http://second_box:8001."
 msgstr "http://second_box:8001 ورقم المنفذ (عادة ...:8001), على سبيل المثال http:// الكامل بما في ذلك URL قم بتمكين مستقبل الأنجيما البعيد لمحاولة ضبط الخدمات التي لا يمكن ضبطها محليًا (على سبيل المثال ، الموالف مشغول أو نوع الخدمة غير متاح على الموالف المحلي. حدد عنوان"
 
@@ -3716,8 +3728,14 @@ msgstr "سيتم تنفيذ المهام التالية بعد الضغط على
 msgid "Force legacy signal stats"
 msgstr "فرض إحصاءات الإشارات القديمة"
 
+msgid "Force power off (even when not in standby)"
+msgstr "إطفاء الجهاز (حتى عندما لا تكون في وضع الاستعداد)"
+
 msgid "Force zap to recording service in standby"
 msgstr "فرض نقل خدمة التسجيل في وضع الاستعداد"
+
+msgid "Forces deep standby, even when not in standby mode. Scheduled recordings remain unaffected."
+msgstr "يفرض استعدادًا عميقًا ، حتى عندما لا تكون في وضع الاستعداد. التسجيلات المجدولة تظل غير متأثرة."
 
 msgid "Format"
 msgstr "تهئية"
@@ -4237,6 +4255,9 @@ msgstr "إذا تم تعيينها على قيم إشارة 'نعم' (معدل �
 
 msgid "If set to 'yes' the same commands will be sent to the TV for deep standby events, as are sent during regular standby events."
 msgstr ".إذا تم الضبط على 'نعم' ، فسيتم إرسال نفس الأوامر إلى التلفزيون لأحداث الاستعداد العميق ، كما يتم إرسالها أثناء أحداث الاستعداد العادية"
+
+msgid "If the box is supposed to enter deep standby e.g. monday night at 1 AM, it actually is already tuesday. To enable this anyway, differing next day start time can be specified here."
+msgstr "إذا كان من المفترض أن يدخل الصندوق في وضع الاستعداد العميق ، على سبيل المثال ليلة الاثنين الساعة 1 صباحًا ، إنه بالفعل يوم الثلاثاء. لتمكين هذا على أي حال ، يمكن هنا تحديد وقت بدء اليوم التالي المختلف."
 
 msgid "If using multiple uncommitted switches the DiSEqC commands must be sent multiple times. Set to the number of uncommitted switches in the chain minus one."
 msgstr ".عدة مرات. قم بالتعيين على عدد المفاتيح غير الملتزم بها في السلسلة مطروحًا منها واحد DiSEqC في حالة استخدام عدة محولات غير ملتزمة ، يجب إرسال أوامر"
@@ -5335,6 +5356,9 @@ msgctxt "now/next: 'next' event label"
 msgid "Next"
 msgstr "التالي"
 
+msgid "Next day starts at"
+msgstr "يبدأ اليوم التالي في"
+
 msgid "Nicaragua"
 msgstr "نيكاراغوا"
 
@@ -6185,6 +6209,13 @@ msgstr "الأغلاق"
 
 msgid "Power management. Consult your receiver's manual for more information."
 msgstr "إدارة الإغلاق. راجع دليل المتلقي الخاص بك للحصول على المعلومات."
+
+#, fuzzy
+msgid "Power off time"
+msgstr "وقت البدء"
+
+msgid "Power off timer"
+msgstr ""
 
 msgid "Power on display"
 msgstr "إغلاق شاشة العرض الصغيرة"
@@ -11672,10 +11703,10 @@ msgstr "تفعيل"
 msgid "until standby/restart"
 msgstr "حتى وضع الانتظار/إعادة التشغيل"
 
-msgid "use best / controlled by HDMI"
+msgid "use HDMI cacenter"
 msgstr ""
 
-msgid "use_hdmi_cacenter"
+msgid "use best / controlled by HDMI"
 msgstr ""
 
 msgid "user defined"
