@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: enigma2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-04-12 12:11+0200\n"
-"POT-Creation-Date: 2022-06-06 17:18+0200\n"
+"POT-Creation-Date: 2022-06-19 14:33+0200\n"
 "Last-Translator: RAED - Fairbirb <rrrr53@hotmail.com>\n"
 "Language-Team: \n"
 "Language: ar\n"
@@ -1390,7 +1390,11 @@ msgstr "القناة"
 
 #, python-format
 msgid "CH%s"
-msgstr ""
+msgstr "CH%s"
+
+#, fuzzy, python-format
+msgid "CI %s enabled"
+msgstr "تم التفعيل"
 
 msgid "CI (Common Interface) Setup"
 msgstr "ضبط الكامة الداخلية (واجهة المستخدم)"
@@ -11259,6 +11263,10 @@ msgstr "القائمة"
 
 msgid "mins"
 msgstr "دقائق"
+
+#, fuzzy
+msgid "module disabled"
+msgstr "تم التعطيل"
 
 msgid "month"
 msgstr "شهر"
