@@ -1026,7 +1026,6 @@ self.autoResize()
 		<widget name="list" position="100,100" size="480,375"/>
 		<applet type="onLayoutFinish">
 from enigma import getDesktop, ePoint, eSize
-from __future__ import division
 try:
 	maxw = 520
 	count = len(self.list) if hasattr(self, "list") and self.list else 0
