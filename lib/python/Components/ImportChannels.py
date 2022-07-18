@@ -86,6 +86,7 @@ class ImportChannels:
 				if remote:
 					try:
 						content = self.getUrl("%s/file?file=/etc/enigma2/%s" % (self.url, quote(file))).readlines()
+						content = map(bytes.decode, content)
 					except Exception as e:
 						print("[Import Channels] Exception: %s" % str(e))
 						self.ImportChannelsDone(False, _("ERROR downloading file /etc/enigma2/%s") % file)
@@ -100,8 +101,9 @@ class ImportChannels:
 
 			# check the contents for more bouquet files
 			for line in content:
+				print ("[Import Channels] %s" % line)
 				# check if it contains another bouquet reference
-				r = re.match('#SERVICE 1:7:%d:0:0:0:0:0:0:0:FROM BOUQUET "(.*)" ORDER BY bouquet' % type, line.decode())
+				r = re.match('#SERVICE 1:7:%d:0:0:0:0:0:0:0:FROM BOUQUET "(.*)" ORDER BY bouquet' % type, line)
 				if r:
 					# recurse
 					result.extend(self.ImportGetFilelist(remote, r.group(1)))
