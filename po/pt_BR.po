@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: enigma2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-26 15:37+0100\n"
+"POT-Creation-Date: 2022-07-06 22:43+0200\n"
 "PO-Revision-Date: 2013-10-20 19:13-0300\n"
 "Last-Translator: Diogo <pingflood@gmail.com>\n"
 "Language-Team: Traduzido por Frank Viana <franksrviana@gmail.com>\n"
@@ -592,8 +592,21 @@ msgstr "Áudio e vídeo"
 msgid "AAC downmix"
 msgstr ""
 
+msgid "AAC transcoding"
+msgstr ""
+
+#, fuzzy
+msgid "AAC+ downmix"
+msgstr "AC3 downmix"
+
+msgid "AC3"
+msgstr ""
+
 msgid "AC3 downmix"
 msgstr "AC3 downmix"
+
+msgid "AC3 transcoding"
+msgstr ""
 
 msgid "ACQUIRING TSID/ONID"
 msgstr ""
@@ -1175,6 +1188,9 @@ msgstr "Busca automática"
 msgid "Automatic scan"
 msgstr "Busca automática"
 
+msgid "Automatically power off box to deep standby mode."
+msgstr ""
+
 msgid "Automatically put the TV in standby whenever the receiver goes into standby or deep standby."
 msgstr ""
 
@@ -1443,6 +1459,10 @@ msgstr ""
 msgid "CI assignment"
 msgstr "Definição de CI"
 
+#, fuzzy
+msgid "CI enabled"
+msgstr "Ativo"
+
 msgid "CI slot: "
 msgstr ""
 
@@ -1703,6 +1723,26 @@ msgstr "Escolha o tuner"
 
 msgid "Choose bouquet"
 msgstr ""
+
+#, fuzzy
+msgid "Choose whether AAC sound tracks should be transcoded."
+msgstr "Configurar se trilhas de áudio multicanais devem ser mixadas em estéreo."
+
+#, fuzzy
+msgid "Choose whether AC3 sound tracks should be transcoded."
+msgstr "Configurar se trilhas de áudio multicanais devem ser mixadas em estéreo."
+
+#, fuzzy
+msgid "Choose whether WMA Pro sound tracks should be downmixed."
+msgstr "Configurar se trilhas de áudio multicanais devem ser mixadas em estéreo."
+
+#, fuzzy
+msgid "Choose whether multi channel DTS-HD(HR/MA) sound tracks should be downmixed or transcoded."
+msgstr "Configurar se trilhas de áudio multicanais devem ser mixadas em estéreo."
+
+#, fuzzy
+msgid "Choose whether multi channel aac+ sound tracks should be downmixed to stereo."
+msgstr "Configurar se trilhas de áudio multicanais devem ser mixadas em estéreo."
 
 msgid "Choose whether to scan a single transponder, one satellite or multiple satellites."
 msgstr ""
@@ -2409,6 +2449,9 @@ msgstr "Checo"
 msgid "D"
 msgstr ""
 
+msgid "DAC"
+msgstr ""
+
 msgid "DHCP"
 msgstr ""
 
@@ -2418,7 +2461,14 @@ msgstr "DMM avançado"
 msgid "DMM normal"
 msgstr "DMM normal"
 
+msgid "DTS"
+msgstr ""
+
 msgid "DTS downmix"
+msgstr "Downmix DTS"
+
+#, fuzzy
+msgid "DTS-HD(HR/MA) downmix"
 msgstr "Downmix DTS"
 
 msgid "DUAL LAYER DVD"
@@ -2504,6 +2554,9 @@ msgstr "Ação do temporizador"
 #, fuzzy
 msgid "Default+Picon"
 msgstr "Configuração padrão"
+
+msgid "Define additional delay in milliseconds before start of http(s) streams, e.g. to connect a remote tuner, you use a complex system of DiSEqC."
+msgstr ""
 
 #, fuzzy
 msgid "Define the location of the EPG Cache file."
@@ -2725,6 +2778,9 @@ msgstr "O diretório contém %(file)s e %(subdir)s."
 
 msgid "Disable"
 msgstr "Desativar"
+
+msgid "Disable FCC during recordings"
+msgstr ""
 
 msgid "Disable Picture in Picture"
 msgstr "Desativar PiP"
@@ -2992,6 +3048,10 @@ msgstr "Obtendo lista de pacotes. Aguarde..."
 msgid "Downloading plugin information. Please wait..."
 msgstr "Obtendo informações. Aguarde..."
 
+#, fuzzy
+msgid "Downmix"
+msgstr "Downmix DTS"
+
 msgid "Drama and Films"
 msgstr ""
 
@@ -3038,7 +3098,7 @@ msgid "ERROR - failed to scan (%s)!"
 msgstr "ERRO - Falha na busca (%s)!"
 
 #, python-format
-msgid "ERROR downloading file %s"
+msgid "ERROR downloading file %s/%s"
 msgstr ""
 
 msgid "East"
@@ -3160,6 +3220,10 @@ msgstr ""
 msgid "Enable auto fastscan for %s"
 msgstr ""
 
+#, fuzzy
+msgid "Enable bluetooth audio"
+msgstr "Editar grupo de favoritos"
+
 msgid "Enable bouquet edit"
 msgstr "Editar grupo de favoritos"
 
@@ -3190,6 +3254,10 @@ msgstr "Ativar EPG EIT"
 
 msgid "Enable parental protection"
 msgstr ""
+
+#, fuzzy
+msgid "Enable power off timer"
+msgstr "Organizar/mover itens"
 
 msgid "Enable remote enigma2 receiver to be tried to tune into services that cannot be tuned into locally (e.g. tuner is occupied or service type is unavailable on the local tuner. Specify complete URL including http:// and port number (normally ...:8001), e.g. http://second_box:8001."
 msgstr ""
@@ -3335,10 +3403,6 @@ msgid "Eritrea"
 msgstr ""
 
 msgid "Error"
-msgstr "Erro"
-
-#, fuzzy, python-format
-msgid "Error %s"
 msgstr "Erro"
 
 msgid "Error code"
@@ -3579,6 +3643,14 @@ msgid ""
 "inactive"
 msgstr ""
 
+#, fuzzy
+msgid "FCC enabled"
+msgstr "Ativo"
+
+#, fuzzy
+msgid "FCCSetup"
+msgstr "Configurar"
+
 msgid "FEC"
 msgstr ""
 
@@ -3669,6 +3741,15 @@ msgstr ""
 
 msgid "Fast"
 msgstr "Rápido"
+
+msgid "Fast Channel Change"
+msgstr ""
+
+msgid "Fast Channel Change Setup"
+msgstr ""
+
+msgid "Fast Channel Change setup"
+msgstr ""
 
 msgid "Fast DiSEqC"
 msgstr "DiSEqC rápida"
@@ -3765,7 +3846,13 @@ msgstr "As tarefas irão terminar após pressionar OK!"
 msgid "Force legacy signal stats"
 msgstr ""
 
+msgid "Force power off (even when not in standby)"
+msgstr ""
+
 msgid "Force zap to recording service in standby"
+msgstr ""
+
+msgid "Forces deep standby, even when not in standby mode. Scheduled recordings remain unaffected."
 msgstr ""
 
 msgid "Format"
@@ -3888,6 +3975,10 @@ msgstr "Atraso AC3 geral"
 
 msgid "General PCM delay"
 msgstr "Atraso PCM geral"
+
+#, fuzzy
+msgid "General bluetooth audio delay"
+msgstr "Atraso AC3 geral"
 
 msgid "Genre"
 msgstr "Gênero"
@@ -4052,6 +4143,9 @@ msgstr ""
 msgid "HD60/HD66SE/Multibox/Multibox SE"
 msgstr ""
 
+msgid "HDMI"
+msgstr ""
+
 msgid "HDMI Colordepth"
 msgstr ""
 
@@ -4161,6 +4255,10 @@ msgstr "Informação hierárquica"
 msgid "High bitrate support"
 msgstr "Suporte para bitrate alto"
 
+#, fuzzy
+msgid "History Prev/Next"
+msgstr "Padrão de fábrica"
+
 msgid "History back"
 msgstr ""
 
@@ -4215,6 +4313,9 @@ msgstr "Gravar por quantos minutos?"
 
 msgid "How many minutes do you want to record?"
 msgstr "Gravar por quantos minutos?"
+
+msgid "Http(s) stream start delay"
+msgstr ""
 
 msgid "Hue"
 msgstr "Tom"
@@ -4289,6 +4390,9 @@ msgid "If set to 'yes' signal values (SNR, etc) will be calculated from API V3. 
 msgstr ""
 
 msgid "If set to 'yes' the same commands will be sent to the TV for deep standby events, as are sent during regular standby events."
+msgstr ""
+
+msgid "If the box is supposed to enter deep standby e.g. monday night at 1 AM, it actually is already tuesday. To enable this anyway, differing next day start time can be specified here."
 msgstr ""
 
 msgid "If using multiple uncommitted switches the DiSEqC commands must be sent multiple times. Set to the number of uncommitted switches in the chain minus one."
@@ -4996,6 +5100,10 @@ msgstr "Lituano"
 msgid "Mauritius"
 msgstr "Favoritos"
 
+#, fuzzy
+msgid "Max channels"
+msgstr "Canal"
+
 msgid "Max memory positions"
 msgstr ""
 
@@ -5011,12 +5119,8 @@ msgstr ""
 msgid "Media player"
 msgstr "Reprodutor de mídia"
 
-#, fuzzy
-msgid "Media player: GStreamer, version "
-msgstr "Versão do Kernel:"
-
-msgid "Media player: ffmpeg, version "
-msgstr ""
+msgid "version"
+msgstr "versão"
 
 msgid "Media scanner"
 msgstr "Buscar mídia"
@@ -5409,6 +5513,9 @@ msgctxt "now/next: 'next' event label"
 msgid "Next"
 msgstr "A seguir"
 
+msgid "Next day starts at"
+msgstr ""
+
 msgid "Nicaragua"
 msgstr ""
 
@@ -5731,6 +5838,10 @@ msgstr ""
 msgid "Only on startup"
 msgstr ""
 
+#, fuzzy
+msgid "Only power off"
+msgstr "Organizar/mover itens"
+
 msgid "Only select 'yes' if you are using a multiswich that requires a DiSEqC Port-A command signal. For all other setups select 'no'."
 msgstr ""
 
@@ -5883,6 +5994,9 @@ msgstr "Editor de canais do controle de acesso"
 
 msgid "Parental control setup"
 msgstr "Controle de acesso"
+
+msgid "Passthrough"
+msgstr ""
 
 msgid "Password"
 msgstr ""
@@ -6306,6 +6420,13 @@ msgstr ""
 msgid "Power management. Consult your receiver's manual for more information."
 msgstr ""
 
+#, fuzzy
+msgid "Power off time"
+msgstr "Cronológico"
+
+msgid "Power off timer"
+msgstr ""
+
 msgid "Power on display"
 msgstr ""
 
@@ -6642,6 +6763,9 @@ msgid "Rec"
 msgstr ""
 
 msgid "Recall to previous service"
+msgstr ""
+
+msgid "Receiver or driver does not support FCC"
 msgstr ""
 
 msgid "Reception settings"
@@ -7066,6 +7190,9 @@ msgid "SNR"
 msgstr ""
 
 msgid "SNR:"
+msgstr ""
+
+msgid "SPDIF"
 msgstr ""
 
 msgid "SRT file"
@@ -9288,11 +9415,18 @@ msgstr ""
 msgid "This option allows you to show the full screen path leading to the current screen."
 msgstr ""
 
+msgid "This option allows you to switch audio to bluetooth speakers."
+msgstr ""
+
 msgid "This option allows you to view the old and new settings side by side."
 msgstr ""
 
 msgid "This option can be useful for long HDMI cables."
 msgstr ""
+
+#, fuzzy
+msgid "This option configures the general audio delay for bluetooth speakers."
+msgstr "Configurar o atraso geral das trilhas de áudio em estéreo."
 
 msgid "This option set the level of surpression of mosquito noise (Mosquito Noise is random aliasing as a result of strong compression). Obviously this goes at the cost of picture details."
 msgstr ""
@@ -10252,6 +10386,10 @@ msgstr ""
 msgid "WLAN connection"
 msgstr "Conexão sem fio"
 
+#, fuzzy
+msgid "WMA Pro downmix"
+msgstr "AC3 downmix"
+
 msgid "WSS on 4:3"
 msgstr "WSS em 4:3"
 
@@ -10929,6 +11067,9 @@ msgstr ""
 msgid "Zap"
 msgstr "Assistir"
 
+msgid "Zap Up/Down"
+msgstr ""
+
 msgid "Zap back to previously tuned service?"
 msgstr "Voltar ao canal sintonizado anteriormente?"
 
@@ -11173,6 +11314,16 @@ msgstr "Conectado"
 
 msgid "controlled by HDMI"
 msgstr ""
+
+msgid "convert to AC3"
+msgstr ""
+
+msgid "convert to DTS"
+msgstr ""
+
+#, fuzzy
+msgid "convert to multi-channel PCM"
+msgstr "Exibir EPG múltiplo"
 
 msgid "cooking"
 msgstr "Cozinha"
@@ -11495,6 +11646,10 @@ msgstr "Menu"
 msgid "mins"
 msgstr "mins"
 
+#, fuzzy
+msgid "module disabled"
+msgstr "Desativado"
+
 msgid "month"
 msgstr "mês"
 
@@ -11674,6 +11829,10 @@ msgstr "Programa infantil pré-escolar"
 
 msgid "preserve bookmarks in cuts"
 msgstr ""
+
+#, fuzzy
+msgid "priority"
+msgstr "Prioridade"
 
 msgid "receiver software because updates are available."
 msgstr "software do receptor porque há atualizações disponíveis."
@@ -11957,6 +12116,12 @@ msgstr ""
 
 msgid "until standby/restart"
 msgstr "até standby/reiniciar"
+
+msgid "use HDMI cacenter"
+msgstr ""
+
+msgid "use best / controlled by HDMI"
+msgstr ""
 
 msgid "user defined"
 msgstr "Manual"

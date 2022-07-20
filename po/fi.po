@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: enigma2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-26 15:37+0100\n"
+"POT-Creation-Date: 2022-07-06 22:43+0200\n"
 "PO-Revision-Date: 2020-05-16 18:41+0200\n"
 "Last-Translator: jamu\n"
 "Language-Team: BoxFreak/jamu\n"
@@ -640,9 +640,24 @@ msgstr "Ääni- ja kuvalähtöjen asetukset"
 msgid "AAC downmix"
 msgstr "AAC:n muunto stereoksi"
 
+#, fuzzy
+msgid "AAC transcoding"
+msgstr "Transkoodaus:"
+
+#, fuzzy
+msgid "AAC+ downmix"
+msgstr "AAC:n muunto stereoksi"
+
+msgid "AC3"
+msgstr ""
+
 #
 msgid "AC3 downmix"
 msgstr "AC3 muunnos stereoksi"
+
+#, fuzzy
+msgid "AC3 transcoding"
+msgstr "Transkoodaus:"
 
 msgid "ACQUIRING TSID/ONID"
 msgstr "HAETAAN TSID/ONID"
@@ -1299,6 +1314,9 @@ msgstr "Automaattiset kirjanmerkit"
 msgid "Automatic scan"
 msgstr "Automaattihaku"
 
+msgid "Automatically power off box to deep standby mode."
+msgstr ""
+
 msgid "Automatically put the TV in standby whenever the receiver goes into standby or deep standby."
 msgstr ""
 
@@ -1592,6 +1610,11 @@ msgstr "CI-liitäntä/CAM"
 msgid "CI assignment"
 msgstr "CI-määritys"
 
+#
+#, fuzzy
+msgid "CI enabled"
+msgstr "Päällä"
+
 msgid "CI slot: "
 msgstr ""
 
@@ -1877,6 +1900,26 @@ msgstr "Valitse viritin"
 
 msgid "Choose bouquet"
 msgstr ""
+
+#, fuzzy
+msgid "Choose whether AAC sound tracks should be transcoded."
+msgstr "Määritä haluatko että monikanavaääni miksataan stereoääneksi."
+
+#, fuzzy
+msgid "Choose whether AC3 sound tracks should be transcoded."
+msgstr "Määritä haluatko että monikanavaääni miksataan stereoääneksi."
+
+#, fuzzy
+msgid "Choose whether WMA Pro sound tracks should be downmixed."
+msgstr "Määritä haluatko että monikanavaääni miksataan stereoääneksi."
+
+#, fuzzy
+msgid "Choose whether multi channel DTS-HD(HR/MA) sound tracks should be downmixed or transcoded."
+msgstr "Määritä haluatko että monikanavaääni miksataan stereoääneksi."
+
+#, fuzzy
+msgid "Choose whether multi channel aac+ sound tracks should be downmixed to stereo."
+msgstr "Määritä haluatko että monikanavaääni miksataan stereoääneksi."
 
 msgid "Choose whether to scan a single transponder, one satellite or multiple satellites."
 msgstr ""
@@ -2633,6 +2676,10 @@ msgstr "Czechia"
 msgid "D"
 msgstr "D"
 
+#, fuzzy
+msgid "DAC"
+msgstr "PDC"
+
 msgid "DHCP"
 msgstr "DCHP"
 
@@ -2642,7 +2689,14 @@ msgstr "DMM laaja"
 msgid "DMM normal"
 msgstr "DMM normaali"
 
+msgid "DTS"
+msgstr ""
+
 msgid "DTS downmix"
+msgstr "DTS muunnos stereoksi"
+
+#, fuzzy
+msgid "DTS-HD(HR/MA) downmix"
 msgstr "DTS muunnos stereoksi"
 
 msgid "DUAL LAYER DVD"
@@ -2738,6 +2792,9 @@ msgstr "Poista ajastus"
 #, fuzzy
 msgid "Default+Picon"
 msgstr "<Oletus Teema>"
+
+msgid "Define additional delay in milliseconds before start of http(s) streams, e.g. to connect a remote tuner, you use a complex system of DiSEqC."
+msgstr ""
 
 msgid "Define the location of the EPG Cache file."
 msgstr "Määritä ohjelmaoppaan välimuistitiedoston sijainti."
@@ -2988,6 +3045,10 @@ msgstr "Hakemisto sisältää %(file)s ja %(subdir)s."
 #
 msgid "Disable"
 msgstr "Poista käytöstä"
+
+#, fuzzy
+msgid "Disable FCC during recordings"
+msgstr "Sisällytä aina ECM tallennuksiin"
 
 #
 msgid "Disable Picture in Picture"
@@ -3295,6 +3356,10 @@ msgstr "Ladataan uusinta IPKG-ohjelmapakettiluetteloa. Odota..."
 msgid "Downloading plugin information. Please wait..."
 msgstr "Ladataan tietoja lisäosista. Odota..."
 
+#, fuzzy
+msgid "Downmix"
+msgstr "DTS muunnos stereoksi"
+
 msgid "Drama and Films"
 msgstr ""
 
@@ -3344,7 +3409,7 @@ msgid "ERROR - failed to scan (%s)!"
 msgstr "VIRHE - haku epäonnistui (%s)!"
 
 #, python-format
-msgid "ERROR downloading file %s"
+msgid "ERROR downloading file %s/%s"
 msgstr ""
 
 #
@@ -3481,6 +3546,11 @@ msgid "Enable auto fastscan for %s"
 msgstr "Ota käyttöön automaattinen pikahaku -> %s"
 
 #
+#, fuzzy
+msgid "Enable bluetooth audio"
+msgstr "Kanavalistojen lisäys ja poisto"
+
+#
 msgid "Enable bouquet edit"
 msgstr "Kanavalistojen lisäys ja poisto"
 
@@ -3515,6 +3585,10 @@ msgstr "Ota käyttöön HDMI-CEC"
 #
 msgid "Enable parental protection"
 msgstr "Ota käyttöön lapsilukko"
+
+#, fuzzy
+msgid "Enable power off timer"
+msgstr "Herätysajastin"
 
 msgid "Enable remote enigma2 receiver to be tried to tune into services that cannot be tuned into locally (e.g. tuner is occupied or service type is unavailable on the local tuner. Specify complete URL including http:// and port number (normally ...:8001), e.g. http://second_box:8001."
 msgstr "Ota käyttöön etävastaanotin. Etävastaanotinta kokeillaan kun paikallisia virittimiä ei voida käyttään - esimerkiksi kun virittimet ovat varattu, tai soveltuvia virittimiä ei ole. Määrittele koko URL mukaanlukien http:// ja portti (yleensä :8001), esimerkiksi http://toinen_laite:8001."
@@ -3673,11 +3747,6 @@ msgstr "Eritrea"
 
 #
 msgid "Error"
-msgstr "Virhe"
-
-#
-#, fuzzy, python-format
-msgid "Error %s"
 msgstr "Virhe"
 
 msgid "Error code"
@@ -3942,6 +4011,16 @@ msgstr ""
 "ei käytössä"
 
 #
+#, fuzzy
+msgid "FCC enabled"
+msgstr "Päällä"
+
+#
+#, fuzzy
+msgid "FCCSetup"
+msgstr "Asetukset"
+
+#
 msgid "FEC"
 msgstr "FEC"
 
@@ -4038,6 +4117,15 @@ msgstr "Faroe Islands"
 #
 msgid "Fast"
 msgstr "Nopea"
+
+msgid "Fast Channel Change"
+msgstr ""
+
+msgid "Fast Channel Change Setup"
+msgstr ""
+
+msgid "Fast Channel Change setup"
+msgstr ""
 
 #
 msgid "Fast DiSEqC"
@@ -4143,7 +4231,13 @@ msgstr "Seuraavat tehtävät suoritetaan kun painat OK!"
 msgid "Force legacy signal stats"
 msgstr "Pakota vanhat signaalitiedot"
 
+msgid "Force power off (even when not in standby)"
+msgstr ""
+
 msgid "Force zap to recording service in standby"
+msgstr ""
+
+msgid "Forces deep standby, even when not in standby mode. Scheduled recordings remain unaffected."
 msgstr ""
 
 #
@@ -4281,6 +4375,10 @@ msgstr "Yleinen AC3-viive"
 
 msgid "General PCM delay"
 msgstr "Yleinen PCM-viive"
+
+#, fuzzy
+msgid "General bluetooth audio delay"
+msgstr "Yleinen AC3-viive"
 
 #
 msgid "Genre"
@@ -4457,6 +4555,9 @@ msgstr "HD2400"
 msgid "HD60/HD66SE/Multibox/Multibox SE"
 msgstr ""
 
+msgid "HDMI"
+msgstr ""
+
 #
 msgid "HDMI Colordepth"
 msgstr "HDMI värisyvyys"
@@ -4574,6 +4675,10 @@ msgstr "Hierarkia info"
 msgid "High bitrate support"
 msgstr "Suurten bittimäärien tuki"
 
+#, fuzzy
+msgid "History Prev/Next"
+msgstr "Kanavanvaihto historia eteen"
+
 msgid "History back"
 msgstr "Kanavanvaihto historia taakse"
 
@@ -4630,6 +4735,9 @@ msgstr "Kuinka monta minuuttia haluat lisätä tallennukseen?"
 #
 msgid "How many minutes do you want to record?"
 msgstr "Kuinka monta minuuttia haluat tallentaa?"
+
+msgid "Http(s) stream start delay"
+msgstr ""
 
 #
 msgid "Hue"
@@ -4708,6 +4816,9 @@ msgid "If set to 'yes' signal values (SNR, etc) will be calculated from API V3. 
 msgstr "Jos päällä, signaalitiedot (SNR, jne) lasketaan API V3:lla. Tämä on vanhentunut API versio."
 
 msgid "If set to 'yes' the same commands will be sent to the TV for deep standby events, as are sent during regular standby events."
+msgstr ""
+
+msgid "If the box is supposed to enter deep standby e.g. monday night at 1 AM, it actually is already tuesday. To enable this anyway, differing next day start time can be specified here."
 msgstr ""
 
 msgid "If using multiple uncommitted switches the DiSEqC commands must be sent multiple times. Set to the number of uncommitted switches in the chain minus one."
@@ -5513,6 +5624,11 @@ msgid "Mauritius"
 msgstr "Mauritius"
 
 #
+#, fuzzy
+msgid "Max channels"
+msgstr "Kanava"
+
+#
 msgid "Max memory positions"
 msgstr "Max muistipaikat"
 
@@ -5531,12 +5647,8 @@ msgstr "Mayotte"
 msgid "Media player"
 msgstr "Mediasoitin"
 
-#, fuzzy
-msgid "Media player: GStreamer, version "
-msgstr "GStreamer versio:"
-
-msgid "Media player: ffmpeg, version "
-msgstr ""
+msgid "version"
+msgstr "versio"
 
 msgid "Media scanner"
 msgstr "Mediaskanneri"
@@ -5986,6 +6098,9 @@ msgctxt "now/next: 'next' event label"
 msgid "Next"
 msgstr "Seuraava"
 
+msgid "Next day starts at"
+msgstr ""
+
 msgid "Nicaragua"
 msgstr "Nicaragua"
 
@@ -6350,6 +6465,10 @@ msgstr ""
 msgid "Only on startup"
 msgstr "Vain käynnistyksessä"
 
+#, fuzzy
+msgid "Only power off"
+msgstr "Herätysajastin"
+
 msgid "Only select 'yes' if you are using a multiswich that requires a DiSEqC Port-A command signal. For all other setups select 'no'."
 msgstr ""
 
@@ -6510,6 +6629,9 @@ msgstr "Lapsilukon kanavaeditori"
 #
 msgid "Parental control setup"
 msgstr "Lapsilukon asetukset"
+
+msgid "Passthrough"
+msgstr ""
 
 #
 msgid "Password"
@@ -7000,6 +7122,14 @@ msgstr ""
 msgid "Power management. Consult your receiver's manual for more information."
 msgstr ""
 
+#
+#, fuzzy
+msgid "Power off time"
+msgstr "Aikajärj."
+
+msgid "Power off timer"
+msgstr ""
+
 msgid "Power on display"
 msgstr ""
 
@@ -7384,6 +7514,9 @@ msgstr "Tallennus"
 
 msgid "Recall to previous service"
 msgstr "Palaa edelliselle kanavalle"
+
+msgid "Receiver or driver does not support FCC"
+msgstr ""
 
 #
 msgid "Reception settings"
@@ -7863,6 +7996,9 @@ msgstr "SNR"
 
 msgid "SNR:"
 msgstr "SNR:"
+
+msgid "SPDIF"
+msgstr ""
 
 msgid "SRT file"
 msgstr "SRT-tiedosto"
@@ -10328,11 +10464,19 @@ msgstr "Valitse näytetäänkö valikoissa ja/tai lisäosissa numerointi, jotka 
 msgid "This option allows you to show the full screen path leading to the current screen."
 msgstr "Tämä asetus korostaa kuvan vihreitä sävyjä."
 
+#, fuzzy
+msgid "This option allows you to switch audio to bluetooth speakers."
+msgstr "Määritä käytetäänkö automaattista äänenvoimakkuuden tasosäätöä"
+
 msgid "This option allows you to view the old and new settings side by side."
 msgstr "Tämä asetus määrittää näytetäänkö vanhat ja uudet asetuksen rinnakkain."
 
 msgid "This option can be useful for long HDMI cables."
 msgstr ""
+
+#, fuzzy
+msgid "This option configures the general audio delay for bluetooth speakers."
+msgstr "Määrittää yleisen äänen viiveen stereo ääniraidoille."
 
 msgid "This option set the level of surpression of mosquito noise (Mosquito Noise is random aliasing as a result of strong compression). Obviously this goes at the cost of picture details."
 msgstr "Tämä asetus määrittää mosquito-kohinan vaimennuksen määrän (mosquito-kohina on suuren pakkauksen aiheuttama kuvavirhe). Tämä säätö pehmentää kuvan yksityiskohtia."
@@ -11402,6 +11546,10 @@ msgstr "W"
 msgid "WLAN connection"
 msgstr "WLAN-yhteys"
 
+#, fuzzy
+msgid "WMA Pro downmix"
+msgstr "AAC:n muunto stereoksi"
+
 #
 msgid "WSS on 4:3"
 msgstr "WSS-kuvasuhdesignaali"
@@ -12113,6 +12261,10 @@ msgstr "Zambia"
 msgid "Zap"
 msgstr "Kanavanvaihto"
 
+#, fuzzy
+msgid "Zap Up/Down"
+msgstr "Kanava alas"
+
 msgid "Zap back to previously tuned service?"
 msgstr "Palataanko aikaisemmalle kanavalle?"
 
@@ -12381,6 +12533,16 @@ msgstr "Kytketty"
 
 msgid "controlled by HDMI"
 msgstr "HDMI:n määrittelemä"
+
+msgid "convert to AC3"
+msgstr ""
+
+msgid "convert to DTS"
+msgstr ""
+
+#, fuzzy
+msgid "convert to multi-channel PCM"
+msgstr "PCM-monikanavaääni"
 
 msgid "cooking"
 msgstr "kokkaus"
@@ -12745,6 +12907,10 @@ msgstr "Valikko"
 msgid "mins"
 msgstr "minuuttia"
 
+#, fuzzy
+msgid "module disabled"
+msgstr "Pois päältä"
+
 #
 msgid "month"
 msgstr "kuukausi"
@@ -12951,6 +13117,11 @@ msgstr "esikouluikäisten lastenohjelma"
 
 msgid "preserve bookmarks in cuts"
 msgstr ""
+
+#
+#, fuzzy
+msgid "priority"
+msgstr "Prioriteetti"
 
 msgid "receiver software because updates are available."
 msgstr "vastaanottimen ohjelmisto, koska päivityksiä on saatavilla."
@@ -13269,6 +13440,13 @@ msgstr ""
 #
 msgid "until standby/restart"
 msgstr "valmiustilaan/uudelleenkäynnistykseen asti"
+
+msgid "use HDMI cacenter"
+msgstr ""
+
+#, fuzzy
+msgid "use best / controlled by HDMI"
+msgstr "HDMI:n määrittelemä"
 
 #
 msgid "user defined"

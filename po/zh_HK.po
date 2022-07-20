@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-26 15:37+0100\n"
+"POT-Creation-Date: 2022-07-06 22:43+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: 王彪 <satfan@163.com>\n"
 "Language-Team: 中國\n"
@@ -589,8 +589,21 @@ msgstr ""
 msgid "AAC downmix"
 msgstr ""
 
+msgid "AAC transcoding"
+msgstr ""
+
+#, fuzzy
+msgid "AAC+ downmix"
+msgstr "AC3 縮減混音"
+
+msgid "AC3"
+msgstr ""
+
 msgid "AC3 downmix"
 msgstr "AC3 縮減混音"
+
+msgid "AC3 transcoding"
+msgstr ""
 
 msgid "ACQUIRING TSID/ONID"
 msgstr ""
@@ -1159,6 +1172,9 @@ msgstr "自動掃描"
 msgid "Automatic scan"
 msgstr ""
 
+msgid "Automatically power off box to deep standby mode."
+msgstr ""
+
 msgid "Automatically put the TV in standby whenever the receiver goes into standby or deep standby."
 msgstr ""
 
@@ -1428,6 +1444,10 @@ msgstr ""
 msgid "CI assignment"
 msgstr "CI-證書"
 
+#, fuzzy
+msgid "CI enabled"
+msgstr "允許"
+
 msgid "CI slot: "
 msgstr ""
 
@@ -1688,6 +1708,21 @@ msgstr "選擇調諧器"
 
 msgid "Choose bouquet"
 msgstr "選擇自定義組"
+
+msgid "Choose whether AAC sound tracks should be transcoded."
+msgstr ""
+
+msgid "Choose whether AC3 sound tracks should be transcoded."
+msgstr ""
+
+msgid "Choose whether WMA Pro sound tracks should be downmixed."
+msgstr ""
+
+msgid "Choose whether multi channel DTS-HD(HR/MA) sound tracks should be downmixed or transcoded."
+msgstr ""
+
+msgid "Choose whether multi channel aac+ sound tracks should be downmixed to stereo."
+msgstr ""
 
 msgid "Choose whether to scan a single transponder, one satellite or multiple satellites."
 msgstr ""
@@ -2392,6 +2427,9 @@ msgstr "捷克"
 msgid "D"
 msgstr "D"
 
+msgid "DAC"
+msgstr ""
+
 msgid "DHCP"
 msgstr "DHCP"
 
@@ -2401,7 +2439,13 @@ msgstr ""
 msgid "DMM normal"
 msgstr ""
 
+msgid "DTS"
+msgstr ""
+
 msgid "DTS downmix"
+msgstr ""
+
+msgid "DTS-HD(HR/MA) downmix"
 msgstr ""
 
 msgid "DUAL LAYER DVD"
@@ -2486,6 +2530,9 @@ msgstr "定時類型"
 #, fuzzy
 msgid "Default+Picon"
 msgstr "預設設定"
+
+msgid "Define additional delay in milliseconds before start of http(s) streams, e.g. to connect a remote tuner, you use a complex system of DiSEqC."
+msgstr ""
 
 msgid "Define the location of the EPG Cache file."
 msgstr ""
@@ -2707,6 +2754,9 @@ msgstr ""
 
 msgid "Disable"
 msgstr "禁用"
+
+msgid "Disable FCC during recordings"
+msgstr ""
 
 msgid "Disable Picture in Picture"
 msgstr "禁用畫中畫"
@@ -2966,6 +3016,10 @@ msgstr "嘗試下載新的套裝軟體列表. 請稍候..."
 msgid "Downloading plugin information. Please wait..."
 msgstr "正在下載插件列表,請稍候..."
 
+#, fuzzy
+msgid "Downmix"
+msgstr "AC3 縮減混音"
+
 msgid "Drama and Films"
 msgstr ""
 
@@ -3012,7 +3066,7 @@ msgid "ERROR - failed to scan (%s)!"
 msgstr "錯誤 - 掃描 (%s)失敗!"
 
 #, python-format
-msgid "ERROR downloading file %s"
+msgid "ERROR downloading file %s/%s"
 msgstr ""
 
 msgid "East"
@@ -3132,6 +3186,10 @@ msgstr ""
 msgid "Enable auto fastscan for %s"
 msgstr ""
 
+#, fuzzy
+msgid "Enable bluetooth audio"
+msgstr "允許編輯自定義組"
+
 msgid "Enable bouquet edit"
 msgstr "允許編輯自定義組"
 
@@ -3161,6 +3219,10 @@ msgstr ""
 
 msgid "Enable parental protection"
 msgstr ""
+
+#, fuzzy
+msgid "Enable power off timer"
+msgstr "允許移動模式"
 
 msgid "Enable remote enigma2 receiver to be tried to tune into services that cannot be tuned into locally (e.g. tuner is occupied or service type is unavailable on the local tuner. Specify complete URL including http:// and port number (normally ...:8001), e.g. http://second_box:8001."
 msgstr ""
@@ -3304,10 +3366,6 @@ msgid "Eritrea"
 msgstr ""
 
 msgid "Error"
-msgstr "錯誤"
-
-#, fuzzy, python-format
-msgid "Error %s"
 msgstr "錯誤"
 
 msgid "Error code"
@@ -3549,6 +3607,14 @@ msgid ""
 "inactive"
 msgstr ""
 
+#, fuzzy
+msgid "FCC enabled"
+msgstr "允許"
+
+#, fuzzy
+msgid "FCCSetup"
+msgstr "設定"
+
 msgid "FEC"
 msgstr "FEC"
 
@@ -3639,6 +3705,15 @@ msgstr "愛爾蘭"
 
 msgid "Fast"
 msgstr "快速"
+
+msgid "Fast Channel Change"
+msgstr ""
+
+msgid "Fast Channel Change Setup"
+msgstr ""
+
+msgid "Fast Channel Change setup"
+msgstr ""
 
 msgid "Fast DiSEqC"
 msgstr "快速DiSEqC"
@@ -3737,7 +3812,13 @@ msgstr "按下 OK 鍵後將完成以下任務!"
 msgid "Force legacy signal stats"
 msgstr ""
 
+msgid "Force power off (even when not in standby)"
+msgstr ""
+
 msgid "Force zap to recording service in standby"
+msgstr ""
+
+msgid "Forces deep standby, even when not in standby mode. Scheduled recordings remain unaffected."
 msgstr ""
 
 msgid "Format"
@@ -3858,6 +3939,9 @@ msgid "General AC3 delay"
 msgstr ""
 
 msgid "General PCM delay"
+msgstr ""
+
+msgid "General bluetooth audio delay"
 msgstr ""
 
 msgid "Genre"
@@ -4026,6 +4110,9 @@ msgstr ""
 msgid "HD60/HD66SE/Multibox/Multibox SE"
 msgstr ""
 
+msgid "HDMI"
+msgstr ""
+
 msgid "HDMI Colordepth"
 msgstr ""
 
@@ -4133,6 +4220,10 @@ msgstr ""
 msgid "High bitrate support"
 msgstr "高位元率支援"
 
+#, fuzzy
+msgid "History Prev/Next"
+msgstr "出廠設定"
+
 msgid "History back"
 msgstr ""
 
@@ -4187,6 +4278,9 @@ msgstr "您想錄製多少分鐘?"
 
 msgid "How many minutes do you want to record?"
 msgstr "您想錄製多少分鐘?"
+
+msgid "Http(s) stream start delay"
+msgstr ""
 
 msgid "Hue"
 msgstr "色調"
@@ -4261,6 +4355,9 @@ msgid "If set to 'yes' signal values (SNR, etc) will be calculated from API V3. 
 msgstr ""
 
 msgid "If set to 'yes' the same commands will be sent to the TV for deep standby events, as are sent during regular standby events."
+msgstr ""
+
+msgid "If the box is supposed to enter deep standby e.g. monday night at 1 AM, it actually is already tuesday. To enable this anyway, differing next day start time can be specified here."
 msgstr ""
 
 msgid "If using multiple uncommitted switches the DiSEqC commands must be sent multiple times. Set to the number of uncommitted switches in the chain minus one."
@@ -4963,6 +5060,10 @@ msgstr "立陶宛語"
 msgid "Mauritius"
 msgstr "自定義組"
 
+#, fuzzy
+msgid "Max channels"
+msgstr "頻道"
+
 msgid "Max memory positions"
 msgstr ""
 
@@ -4978,12 +5079,8 @@ msgstr ""
 msgid "Media player"
 msgstr "媒體播放器"
 
-#, fuzzy
-msgid "Media player: GStreamer, version "
-msgstr "新版本:"
-
-msgid "Media player: ffmpeg, version "
-msgstr ""
+msgid "version"
+msgstr "版本"
 
 msgid "Media scanner"
 msgstr ""
@@ -5376,6 +5473,9 @@ msgctxt "now/next: 'next' event label"
 msgid "Next"
 msgstr ""
 
+msgid "Next day starts at"
+msgstr ""
+
 msgid "Nicaragua"
 msgstr ""
 
@@ -5698,6 +5798,10 @@ msgstr ""
 msgid "Only on startup"
 msgstr ""
 
+#, fuzzy
+msgid "Only power off"
+msgstr "允許移動模式"
+
 msgid "Only select 'yes' if you are using a multiswich that requires a DiSEqC Port-A command signal. For all other setups select 'no'."
 msgstr ""
 
@@ -5849,6 +5953,9 @@ msgstr ""
 
 msgid "Parental control setup"
 msgstr "家長控制設定"
+
+msgid "Passthrough"
+msgstr ""
 
 msgid "Password"
 msgstr ""
@@ -6267,6 +6374,12 @@ msgstr ""
 msgid "Power management. Consult your receiver's manual for more information."
 msgstr ""
 
+msgid "Power off time"
+msgstr ""
+
+msgid "Power off timer"
+msgstr ""
+
 msgid "Power on display"
 msgstr ""
 
@@ -6602,6 +6715,9 @@ msgid "Rec"
 msgstr ""
 
 msgid "Recall to previous service"
+msgstr ""
+
+msgid "Receiver or driver does not support FCC"
 msgstr ""
 
 msgid "Reception settings"
@@ -7022,6 +7138,9 @@ msgid "SNR"
 msgstr ""
 
 msgid "SNR:"
+msgstr ""
+
+msgid "SPDIF"
 msgstr ""
 
 msgid "SRT file"
@@ -9223,10 +9342,16 @@ msgstr ""
 msgid "This option allows you to show the full screen path leading to the current screen."
 msgstr ""
 
+msgid "This option allows you to switch audio to bluetooth speakers."
+msgstr ""
+
 msgid "This option allows you to view the old and new settings side by side."
 msgstr ""
 
 msgid "This option can be useful for long HDMI cables."
+msgstr ""
+
+msgid "This option configures the general audio delay for bluetooth speakers."
 msgstr ""
 
 msgid "This option set the level of surpression of mosquito noise (Mosquito Noise is random aliasing as a result of strong compression). Obviously this goes at the cost of picture details."
@@ -10161,6 +10286,10 @@ msgstr "W"
 msgid "WLAN connection"
 msgstr ""
 
+#, fuzzy
+msgid "WMA Pro downmix"
+msgstr "AC3 縮減混音"
+
 msgid "WSS on 4:3"
 msgstr "WSS on 4:3"
 
@@ -10795,6 +10924,9 @@ msgstr ""
 msgid "Zap"
 msgstr ""
 
+msgid "Zap Up/Down"
+msgstr ""
+
 msgid "Zap back to previously tuned service?"
 msgstr ""
 
@@ -11034,6 +11166,15 @@ msgid "connected"
 msgstr "已連接"
 
 msgid "controlled by HDMI"
+msgstr ""
+
+msgid "convert to AC3"
+msgstr ""
+
+msgid "convert to DTS"
+msgstr ""
+
+msgid "convert to multi-channel PCM"
 msgstr ""
 
 msgid "cooking"
@@ -11355,6 +11496,10 @@ msgstr "功能表"
 msgid "mins"
 msgstr "分鐘"
 
+#, fuzzy
+msgid "module disabled"
+msgstr "不可用"
+
 msgid "month"
 msgstr "月份"
 
@@ -11532,6 +11677,10 @@ msgstr ""
 
 msgid "preserve bookmarks in cuts"
 msgstr ""
+
+#, fuzzy
+msgid "priority"
+msgstr "次序"
 
 msgid "receiver software because updates are available."
 msgstr ""
@@ -11807,6 +11956,12 @@ msgid "untestable"
 msgstr ""
 
 msgid "until standby/restart"
+msgstr ""
+
+msgid "use HDMI cacenter"
+msgstr ""
+
+msgid "use best / controlled by HDMI"
 msgstr ""
 
 msgid "user defined"

@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: OpenPLI Enigma2 Official Greek Translation\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-26 15:37+0100\n"
+"POT-Creation-Date: 2022-07-06 22:43+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: MCelliotG <mcelliotg@gmail.com>\n"
 "Language-Team: MCelliotG <mcelliotg@gmail.com>\n"
@@ -593,8 +593,23 @@ msgstr "Ρυθμίσεις εικόνας/ήχου"
 msgid "AAC downmix"
 msgstr "Αποκωδικοποίηση & μίξη AAC"
 
+#, fuzzy
+msgid "AAC transcoding"
+msgstr "Διακωδικοποίηση: "
+
+#, fuzzy
+msgid "AAC+ downmix"
+msgstr "Αποκωδικοποίηση & μίξη AAC"
+
+msgid "AC3"
+msgstr ""
+
 msgid "AC3 downmix"
 msgstr "Αποκωδικοποίηση & μίξη AC3"
+
+#, fuzzy
+msgid "AC3 transcoding"
+msgstr "Διακωδικοποίηση: "
 
 msgid "ACQUIRING TSID/ONID"
 msgstr "ΛΗΨΗ TSID/ONID"
@@ -1160,6 +1175,9 @@ msgstr "Αυτόματοι σελιδοδείκτες"
 msgid "Automatic scan"
 msgstr "Αυτόματη ανίχνευση"
 
+msgid "Automatically power off box to deep standby mode."
+msgstr ""
+
 msgid "Automatically put the TV in standby whenever the receiver goes into standby or deep standby."
 msgstr "Θέστε αυτόματα την TV σε αναμονή κάθε φορά που ο δέκτης μεταβαίνει σε κατάσταση κοινής ή βαθιάς αναμονής."
 
@@ -1421,6 +1439,10 @@ msgstr "Ρυθμίσεις CI (κοινής διεπαφής)"
 
 msgid "CI assignment"
 msgstr "Ανάθεση CI"
+
+#, fuzzy
+msgid "CI enabled"
+msgstr "ενεργό"
 
 msgid "CI slot: "
 msgstr "Θύρα CI: "
@@ -1692,6 +1714,26 @@ msgstr "Επιλογή tuner"
 
 msgid "Choose bouquet"
 msgstr "Επιλογή μπουκέτου"
+
+#, fuzzy
+msgid "Choose whether AAC sound tracks should be transcoded."
+msgstr "Ρυθμίστε εάν οι πολυκάναλες φέρουσες ήχου πρέπει να υποβιβάζονται σε στέρεο."
+
+#, fuzzy
+msgid "Choose whether AC3 sound tracks should be transcoded."
+msgstr "Ρυθμίστε εάν οι πολυκάναλες φέρουσες ήχου πρέπει να υποβιβάζονται σε στέρεο."
+
+#, fuzzy
+msgid "Choose whether WMA Pro sound tracks should be downmixed."
+msgstr "Ρυθμίστε εάν οι πολυκάναλες φέρουσες ήχου πρέπει να υποβιβάζονται σε στέρεο."
+
+#, fuzzy
+msgid "Choose whether multi channel DTS-HD(HR/MA) sound tracks should be downmixed or transcoded."
+msgstr "Ρυθμίστε εάν οι πολυκάναλες φέρουσες ήχου πρέπει να υποβιβάζονται σε στέρεο."
+
+#, fuzzy
+msgid "Choose whether multi channel aac+ sound tracks should be downmixed to stereo."
+msgstr "Ρυθμίστε εάν οι πολυκάναλες φέρουσες ήχου πρέπει να υποβιβάζονται σε στέρεο."
 
 msgid "Choose whether to scan a single transponder, one satellite or multiple satellites."
 msgstr "Επιλέξτε αν θα πραγματοποιήσετε ανίχνευση σε έναν αναμεταδότη, έναν δορυφόρο ή πολλούς δορυφόρους."
@@ -2383,6 +2425,10 @@ msgstr "Τσεχία"
 msgid "D"
 msgstr "D"
 
+#, fuzzy
+msgid "DAC"
+msgstr "PDC"
+
 msgid "DHCP"
 msgstr "DHCP"
 
@@ -2392,7 +2438,14 @@ msgstr "DMM προχωρημένο"
 msgid "DMM normal"
 msgstr "DMM κανονικό"
 
+msgid "DTS"
+msgstr ""
+
 msgid "DTS downmix"
+msgstr "Αποκωδικοποίηση & μίξη DTS"
+
+#, fuzzy
+msgid "DTS-HD(HR/MA) downmix"
 msgstr "Αποκωδικοποίηση & μίξη DTS"
 
 msgid "DUAL LAYER DVD"
@@ -2472,6 +2525,9 @@ msgstr "Προεπιλεγμένος τύπος χρονοδιακόπτη"
 
 msgid "Default+Picon"
 msgstr "Προεπιλογή + Λογότυπο"
+
+msgid "Define additional delay in milliseconds before start of http(s) streams, e.g. to connect a remote tuner, you use a complex system of DiSEqC."
+msgstr ""
 
 msgid "Define the location of the EPG Cache file."
 msgstr "Καθορισμός της θέσης του αρχείου πληροφοριών EPG."
@@ -2688,6 +2744,10 @@ msgstr "Ο φάκελος περιέχει %(file)s και %(subdir)s."
 
 msgid "Disable"
 msgstr "Απενεργοποίηση"
+
+#, fuzzy
+msgid "Disable FCC during recordings"
+msgstr "Συμπερίληψη πάντα του ECM στις εγγραφές"
 
 msgid "Disable Picture in Picture"
 msgstr "Απενεργοποίηση Εικόνας σε Εικόνα"
@@ -2942,6 +3002,10 @@ msgstr "Λήψη νέας λίστας πακέτων. Παρακαλώ περι
 msgid "Downloading plugin information. Please wait..."
 msgstr "Λήψη πληροφοριών προσθέτων. Παρακαλώ περιμένετε..."
 
+#, fuzzy
+msgid "Downmix"
+msgstr "Αποκωδικοποίηση & μίξη DTS"
+
 msgid "Drama and Films"
 msgstr ""
 
@@ -2985,8 +3049,8 @@ msgstr "EPG:"
 msgid "ERROR - failed to scan (%s)!"
 msgstr "ΣΦΑΛΜΑ - Αποτυχία ανίχνευσης (%s)!"
 
-#, python-format
-msgid "ERROR downloading file %s"
+#, fuzzy, python-format
+msgid "ERROR downloading file %s/%s"
 msgstr "ΣΦΑΛΜΑ κατά τη λήψη του αρχείου %s"
 
 msgid "East"
@@ -3104,6 +3168,10 @@ msgstr "Ενεργοποίηση της αυτόματης γρήγορης αν
 msgid "Enable auto fastscan for %s"
 msgstr "Ενεργοποίηση αυτόματης γρήγορης ανίχνευσης για το %s"
 
+#, fuzzy
+msgid "Enable bluetooth audio"
+msgstr "Eνεργοποίηση επεξεργασίας μπουκέτου"
+
 msgid "Enable bouquet edit"
 msgstr "Eνεργοποίηση επεξεργασίας μπουκέτου"
 
@@ -3133,6 +3201,10 @@ msgstr "Ενεργοποίηση ή απενεργοποίηση του HDMI-CEC
 
 msgid "Enable parental protection"
 msgstr "Ενεργοποίηση γονικής προστασίας"
+
+#, fuzzy
+msgid "Enable power off timer"
+msgstr "Ενεργοποίηση χρονοδιακόπτη αφύπνισης"
 
 msgid "Enable remote enigma2 receiver to be tried to tune into services that cannot be tuned into locally (e.g. tuner is occupied or service type is unavailable on the local tuner. Specify complete URL including http:// and port number (normally ...:8001), e.g. http://second_box:8001."
 msgstr "Χρήση απομακρυσμένου enigma2 δέκτη για υπηρεσίες που δεν δύναται να συντονιστούν τοπικά (π.χ. το tuner είναι απασχολημένο ή ο τύπος της υπηρεσίας δεν είναι διαθέσιμος στο τοπικό tuner). Πρέπει να οριστεί μία διεύθυνση URL που να συμπεριλαμβάνει το http:// και τον αριθμό θύρας (συνήθως ...:8001), π.χ. http://δεύτερος_δέκτης:8001."
@@ -3276,10 +3348,6 @@ msgstr "Ερυθραία"
 
 msgid "Error"
 msgstr "Σφάλμα"
-
-#, python-format
-msgid "Error %s"
-msgstr "Σφάλμα %s"
 
 msgid "Error code"
 msgstr "Κωδικός σφάλματος"
@@ -3532,6 +3600,14 @@ msgstr ""
 "FBC αυτόματο\n"
 "ανενεργό"
 
+#, fuzzy
+msgid "FCC enabled"
+msgstr "ενεργό"
+
+#, fuzzy
+msgid "FCCSetup"
+msgstr "Ρυθμίσεις"
+
 msgid "FEC"
 msgstr "FEC"
 
@@ -3625,6 +3701,15 @@ msgstr "Νήσοι Φαρόε"
 msgid "Fast"
 msgstr "Γρήγορο"
 
+msgid "Fast Channel Change"
+msgstr ""
+
+msgid "Fast Channel Change Setup"
+msgstr ""
+
+msgid "Fast Channel Change setup"
+msgstr ""
+
 msgid "Fast DiSEqC"
 msgstr "Γρήγορο DiSEqC"
 
@@ -3717,8 +3802,15 @@ msgstr "Οι ακόλουθες ενέργειες θα εκτελεστούν �
 msgid "Force legacy signal stats"
 msgstr "Εξαναγκασμός στατιστικών σήματος παλαιού τύπου"
 
+#, fuzzy
+msgid "Force power off (even when not in standby)"
+msgstr "Mετάβαση στο κανάλι εγγραφής κατά την αναμονή"
+
 msgid "Force zap to recording service in standby"
 msgstr "Mετάβαση στο κανάλι εγγραφής κατά την αναμονή"
+
+msgid "Forces deep standby, even when not in standby mode. Scheduled recordings remain unaffected."
+msgstr ""
 
 msgid "Format"
 msgstr "Φορμά"
@@ -3837,6 +3929,10 @@ msgstr "Γενική καθυστέρηση AC3"
 
 msgid "General PCM delay"
 msgstr "Γενική καθυστέρηση PCM"
+
+#, fuzzy
+msgid "General bluetooth audio delay"
+msgstr "Γενική καθυστέρηση AC3"
 
 msgid "Genre"
 msgstr "Είδος"
@@ -3998,6 +4094,9 @@ msgstr "HD2400"
 msgid "HD60/HD66SE/Multibox/Multibox SE"
 msgstr "HD60/Multibox/Multibox SE"
 
+msgid "HDMI"
+msgstr ""
+
 msgid "HDMI Colordepth"
 msgstr "Βάθος χρώματος HDMI"
 
@@ -4103,6 +4202,10 @@ msgstr "Πληροφορίες ιεραρχίας"
 msgid "High bitrate support"
 msgstr "Υποστήριξη υψηλού bitrate"
 
+#, fuzzy
+msgid "History Prev/Next"
+msgstr "Ιστορικό επόμενο"
+
 msgid "History back"
 msgstr "Ιστορικό πίσω"
 
@@ -4156,6 +4259,9 @@ msgstr "Πόσα λεπτά θέλετε να προστεθούν στην εγ
 
 msgid "How many minutes do you want to record?"
 msgstr "Ποσά λεπτά θέλετε να εγγραφούν;"
+
+msgid "Http(s) stream start delay"
+msgstr ""
 
 msgid "Hue"
 msgstr "Απόχρωση"
@@ -4228,6 +4334,9 @@ msgstr "Αν επιλεγεί το 'ναι' οι τιμές σήματος (SNR,
 
 msgid "If set to 'yes' the same commands will be sent to the TV for deep standby events, as are sent during regular standby events."
 msgstr "Αν επιλεγεί το 'ναι', οι ίδιες εντολές που στέλνονται στην TV για την κοινή αναμονή, θα αποστέλλονται και για τη βαθιά αναμονή."
+
+msgid "If the box is supposed to enter deep standby e.g. monday night at 1 AM, it actually is already tuesday. To enable this anyway, differing next day start time can be specified here."
+msgstr ""
 
 msgid "If using multiple uncommitted switches the DiSEqC commands must be sent multiple times. Set to the number of uncommitted switches in the chain minus one."
 msgstr "Αν χρησιμοποιείτε πολλαπλές μη δεσμευμένες εντολές DiSEqC, αυτές πρέπει να σταλούν πολλές φορές. Ορίστε τον αριθμό των μη δεσμευμένων διακοπτών στην αλληλουχία πλην ενός."
@@ -4928,6 +5037,10 @@ msgstr "Μαυριτανία"
 msgid "Mauritius"
 msgstr "Μαυρίκιος"
 
+#, fuzzy
+msgid "Max channels"
+msgstr "Κανάλια"
+
 msgid "Max memory positions"
 msgstr "Μέγιστος αριθμός θέσεων"
 
@@ -4943,11 +5056,8 @@ msgstr "Μαγιότ"
 msgid "Media player"
 msgstr "Αναπαραγωγή πολυμέσων"
 
-msgid "Media player: GStreamer, version "
-msgstr "Αναπαραγωγός πολυμέσων: GStreamer, έκδοση "
-
-msgid "Media player: ffmpeg, version "
-msgstr "Αναπαραγωγός πολυμέσων: ffmpeg, έκδοση "
+msgid "version"
+msgstr "έκδοση"
 
 msgid "Media scanner"
 msgstr "Ανίχνευση πολυμέσων"
@@ -5327,6 +5437,9 @@ msgctxt "now/next: 'next' event label"
 msgid "Next"
 msgstr "Επόμενο"
 
+msgid "Next day starts at"
+msgstr ""
+
 msgid "Nicaragua"
 msgstr "Νικαράγουα"
 
@@ -5639,6 +5752,10 @@ msgstr "Γρήγορη κίνηση του κατόπτρου μόνο πριν 
 msgid "Only on startup"
 msgstr "Μόνο κατά την εκκίνηση"
 
+#, fuzzy
+msgid "Only power off"
+msgstr "Ενεργοποίηση χρονοδιακόπτη αφύπνισης"
+
 msgid "Only select 'yes' if you are using a multiswich that requires a DiSEqC Port-A command signal. For all other setups select 'no'."
 msgstr "Επιλέξτε το 'ναι' μόνο αν χρησιμοποιείτε έναν πολλαπλό διακόπτη που απαιτεί εντολή από τη θύρα Α του DiSEqC. Για όλες τις άλλες ρυθμίσεις επιλέξτε 'όχι'."
 
@@ -5789,6 +5906,9 @@ msgstr "Επεξεργασία υπηρεσιών γονικού έλεγχου"
 
 msgid "Parental control setup"
 msgstr "Παραμετροποίηση γονικού ελέγχου"
+
+msgid "Passthrough"
+msgstr ""
 
 msgid "Password"
 msgstr "Κωδικός"
@@ -6198,6 +6318,13 @@ msgstr "LED ένδειξης λειτουργίας"
 msgid "Power management. Consult your receiver's manual for more information."
 msgstr "Διαχείριση ισχύος. Συμβουλευτείτε το εγχειρίδιο χρήσης του δέκτη σας για περισσότερες πληροφορίες."
 
+#, fuzzy
+msgid "Power off time"
+msgstr "Ταξινόμηση κατά χρόνο"
+
+msgid "Power off timer"
+msgstr ""
+
 msgid "Power on display"
 msgstr "Ενεργοποίηση οθόνης πρόσοψης"
 
@@ -6530,6 +6657,9 @@ msgstr "Εγγρ."
 
 msgid "Recall to previous service"
 msgstr "Επιστροφή στην προηγούμενη υπηρεσία"
+
+msgid "Receiver or driver does not support FCC"
+msgstr ""
 
 msgid "Reception settings"
 msgstr "Ρυθμίσεις λήψης"
@@ -6942,6 +7072,9 @@ msgstr "SNR"
 
 msgid "SNR:"
 msgstr "SNR:"
+
+msgid "SPDIF"
+msgstr ""
 
 msgid "SRT file"
 msgstr "αρχείο SRT"
@@ -9127,11 +9260,19 @@ msgstr "Αυτή η επιλογή επιτρέπει την εμφάνιση α
 msgid "This option allows you to show the full screen path leading to the current screen."
 msgstr "Αυτή η επιλογή επιτρέπει την εμφάνιση της πλήρους διαδρομής που οδηγεί στην τρέχουσα οθόνη."
 
+#, fuzzy
+msgid "This option allows you to switch audio to bluetooth speakers."
+msgstr "Αυτή η επιλογή ρυθμίζει την αυτόματη ένταση του ήχου."
+
 msgid "This option allows you to view the old and new settings side by side."
 msgstr "Αυτή η επιλογή επιτρέπει την επισκόπηση των παλιών με τις νέες ρυθμίσεις σε παράθεση."
 
 msgid "This option can be useful for long HDMI cables."
 msgstr "Αυτή η επιλογή μπορεί να είναι χρήσιμη για μακριά καλώδια HDMI."
+
+#, fuzzy
+msgid "This option configures the general audio delay for bluetooth speakers."
+msgstr "Ρύθμιση γενικής καθυστέρησης των στερεοφωνικών καναλιών ήχου."
 
 msgid "This option set the level of surpression of mosquito noise (Mosquito Noise is random aliasing as a result of strong compression). Obviously this goes at the cost of picture details."
 msgstr "Αυτή η επιλογή ορίζει το επίπεδο μείωσης του θορύβου κουνουπιού (ο Θόρυβος Κουνουπιού είναι η τυχαία παραποίηση της εικόνας ως αποτέλεσμα της έντονης συμπίεσης). Προφανώς αυτό μειώνει τις λεπτομέρειες της εικόνας."
@@ -10064,6 +10205,10 @@ msgstr "Δ"
 msgid "WLAN connection"
 msgstr "Σύνδεση WLAN"
 
+#, fuzzy
+msgid "WMA Pro downmix"
+msgstr "Αποκωδικοποίηση & μίξη AAC"
+
 msgid "WSS on 4:3"
 msgstr "WSS σε 4:3"
 
@@ -10742,6 +10887,10 @@ msgstr "Ζάμπια"
 msgid "Zap"
 msgstr "Μετάβαση"
 
+#, fuzzy
+msgid "Zap Up/Down"
+msgstr "Ζάπινγκ προς τα κάτω"
+
 msgid "Zap back to previously tuned service?"
 msgstr "Επιστροφή στην προηγούμενη υπηρεσία;"
 
@@ -10984,6 +11133,16 @@ msgstr "συνδεδεμένο"
 
 msgid "controlled by HDMI"
 msgstr "ελέγχεται από το HDMI"
+
+msgid "convert to AC3"
+msgstr ""
+
+msgid "convert to DTS"
+msgstr ""
+
+#, fuzzy
+msgid "convert to multi-channel PCM"
+msgstr "Πολυκάναλο PCM"
 
 msgid "cooking"
 msgstr "μαγειρική"
@@ -11300,6 +11459,10 @@ msgstr "μενού"
 msgid "mins"
 msgstr "λεπτά"
 
+#, fuzzy
+msgid "module disabled"
+msgstr "αναγκαστική απενεργοποίηση"
+
 msgid "month"
 msgstr "μήνας"
 
@@ -11474,6 +11637,10 @@ msgstr "πρόγραμμα για παιδιά προσχολικής ηλικί
 
 msgid "preserve bookmarks in cuts"
 msgstr ""
+
+#, fuzzy
+msgid "priority"
+msgstr "Προτεραιότητα"
 
 msgid "receiver software because updates are available."
 msgstr "λογισμικού του δέκτη, διότι υπάρχουν διαθέσιμες ενημερώσεις."
@@ -11750,6 +11917,13 @@ msgstr "μη εφικτός έλεγχος"
 
 msgid "until standby/restart"
 msgstr "μέχρι την αναμονή/επανεκκίνηση"
+
+msgid "use HDMI cacenter"
+msgstr ""
+
+#, fuzzy
+msgid "use best / controlled by HDMI"
+msgstr "ελέγχεται από το HDMI"
 
 msgid "user defined"
 msgstr "ορισμένο από τον χρήστη"

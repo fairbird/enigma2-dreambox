@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: enigma2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-26 15:37+0100\n"
+"POT-Creation-Date: 2022-07-06 22:43+0200\n"
 "PO-Revision-Date: 2021-02-19 14:49+0100\n"
 "Last-Translator: \n"
 "Language-Team: Muzoss-VELEBRDO\n"
@@ -594,8 +594,23 @@ msgstr "Поставки за A / V"
 msgid "AAC downmix"
 msgstr "AAC downmix"
 
+#, fuzzy
+msgid "AAC transcoding"
+msgstr "Транскодирање: "
+
+#, fuzzy
+msgid "AAC+ downmix"
+msgstr "AAC downmix"
+
+msgid "AC3"
+msgstr ""
+
 msgid "AC3 downmix"
 msgstr "AC3 downmix"
+
+#, fuzzy
+msgid "AC3 transcoding"
+msgstr "Транскодирање: "
 
 msgid "ACQUIRING TSID/ONID"
 msgstr "СТЕКНУВАЊЕ TSID / ONID"
@@ -1168,6 +1183,9 @@ msgstr "Автоматски обележувачи"
 msgid "Automatic scan"
 msgstr "Автоматско пребарување"
 
+msgid "Automatically power off box to deep standby mode."
+msgstr ""
+
 msgid "Automatically put the TV in standby whenever the receiver goes into standby or deep standby."
 msgstr ""
 
@@ -1429,6 +1447,10 @@ msgstr "Поставки за CI (Заеднички интерфејс)"
 
 msgid "CI assignment"
 msgstr "Назначување на CI"
+
+#, fuzzy
+msgid "CI enabled"
+msgstr "овозможено"
 
 msgid "CI slot: "
 msgstr "CI слот: "
@@ -1700,6 +1722,26 @@ msgstr "Изберете го тјунерот"
 
 msgid "Choose bouquet"
 msgstr "Изберете го букетот"
+
+#, fuzzy
+msgid "Choose whether AAC sound tracks should be transcoded."
+msgstr "Мешање на повеќеканален звук во стерео."
+
+#, fuzzy
+msgid "Choose whether AC3 sound tracks should be transcoded."
+msgstr "Мешање на повеќеканален звук во стерео."
+
+#, fuzzy
+msgid "Choose whether WMA Pro sound tracks should be downmixed."
+msgstr "Мешање на повеќеканален звук во стерео."
+
+#, fuzzy
+msgid "Choose whether multi channel DTS-HD(HR/MA) sound tracks should be downmixed or transcoded."
+msgstr "Мешање на повеќеканален звук во стерео."
+
+#, fuzzy
+msgid "Choose whether multi channel aac+ sound tracks should be downmixed to stereo."
+msgstr "Мешање на повеќеканален звук во стерео."
 
 msgid "Choose whether to scan a single transponder, one satellite or multiple satellites."
 msgstr ""
@@ -2391,6 +2433,10 @@ msgstr "Чешка"
 msgid "D"
 msgstr "Д"
 
+#, fuzzy
+msgid "DAC"
+msgstr "PDC"
+
 msgid "DHCP"
 msgstr "DHCP"
 
@@ -2400,7 +2446,14 @@ msgstr "ДММ напредно"
 msgid "DMM normal"
 msgstr "ДММ нормално"
 
+msgid "DTS"
+msgstr ""
+
 msgid "DTS downmix"
+msgstr "DTS downmix"
+
+#, fuzzy
+msgid "DTS-HD(HR/MA) downmix"
 msgstr "DTS downmix"
 
 msgid "DUAL LAYER DVD"
@@ -2480,6 +2533,9 @@ msgstr "Стандарден тип на тајмер"
 
 msgid "Default+Picon"
 msgstr "Стандардно + Пикон"
+
+msgid "Define additional delay in milliseconds before start of http(s) streams, e.g. to connect a remote tuner, you use a complex system of DiSEqC."
+msgstr ""
 
 msgid "Define the location of the EPG Cache file."
 msgstr "Дефинирајте ја локацијата на датотеката Меморија за EPG."
@@ -2696,6 +2752,10 @@ msgstr "Директориумот содржи %(file)s и %(subdir)s."
 
 msgid "Disable"
 msgstr "Оневозможи"
+
+#, fuzzy
+msgid "Disable FCC during recordings"
+msgstr "Секогаш вклучувај ECM во снимките"
 
 msgid "Disable Picture in Picture"
 msgstr "Деактивирај PIP"
@@ -2955,6 +3015,10 @@ msgstr "Обидете се да преземете нов список со п�
 msgid "Downloading plugin information. Please wait..."
 msgstr "Се преземаат информации за плагин. Ве молам почекајте..."
 
+#, fuzzy
+msgid "Downmix"
+msgstr "DTS downmix"
+
 msgid "Drama and Films"
 msgstr ""
 
@@ -2998,8 +3062,8 @@ msgstr "EPG:"
 msgid "ERROR - failed to scan (%s)!"
 msgstr "ГРЕШКА - Пребарувањето не успеа (%s)!"
 
-#, python-format
-msgid "ERROR downloading file %s"
+#, fuzzy, python-format
+msgid "ERROR downloading file %s/%s"
 msgstr "ГРЕШКА при преземање на датотеката %s"
 
 msgid "East"
@@ -3118,6 +3182,10 @@ msgstr "Активирај автоматско брзо пребарување"
 msgid "Enable auto fastscan for %s"
 msgstr "Активирај автоматско пребарување на брзо за %s"
 
+#, fuzzy
+msgid "Enable bluetooth audio"
+msgstr "Активирај го уредувањето букети"
+
 msgid "Enable bouquet edit"
 msgstr "Активирај го уредувањето букети"
 
@@ -3147,6 +3215,10 @@ msgstr "Активирај или деактивирај користење на
 
 msgid "Enable parental protection"
 msgstr "Активирај родителска заштита"
+
+#, fuzzy
+msgid "Enable power off timer"
+msgstr "Активирајте тајмер за будење"
 
 msgid "Enable remote enigma2 receiver to be tried to tune into services that cannot be tuned into locally (e.g. tuner is occupied or service type is unavailable on the local tuner. Specify complete URL including http:// and port number (normally ...:8001), e.g. http://second_box:8001."
 msgstr "Дозволете да пробате да пренесувате канал од дополнителен приемник енигма2 ако локалниот тјунер е зафатен. Наведете го целиот URL, вклучително и http:// и бројот на портата (обично ...:8001), пример: http://IP_addition.Приемник:8001."
@@ -3290,10 +3362,6 @@ msgstr "Еритреја"
 
 msgid "Error"
 msgstr "Грешка"
-
-#, python-format
-msgid "Error %s"
-msgstr "Грешка %s"
 
 msgid "Error code"
 msgstr "Грешка на кодот"
@@ -3546,6 +3614,14 @@ msgstr ""
 "FBC автоматски\n"
 "неактивен"
 
+#, fuzzy
+msgid "FCC enabled"
+msgstr "овозможено"
+
+#, fuzzy
+msgid "FCCSetup"
+msgstr "Поставки"
+
 msgid "FEC"
 msgstr "FEC"
 
@@ -3639,6 +3715,15 @@ msgstr "Фарски Острови"
 msgid "Fast"
 msgstr "Брзо"
 
+msgid "Fast Channel Change"
+msgstr ""
+
+msgid "Fast Channel Change Setup"
+msgstr ""
+
+msgid "Fast Channel Change setup"
+msgstr ""
+
 msgid "Fast DiSEqC"
 msgstr "Брз DiSEqC"
 
@@ -3731,7 +3816,13 @@ msgstr "Следниве задачи ќе бидат направени отк�
 msgid "Force legacy signal stats"
 msgstr "Принудени статистики за наследниот сигнал"
 
+msgid "Force power off (even when not in standby)"
+msgstr ""
+
 msgid "Force zap to recording service in standby"
+msgstr ""
+
+msgid "Forces deep standby, even when not in standby mode. Scheduled recordings remain unaffected."
 msgstr ""
 
 msgid "Format"
@@ -3852,6 +3943,10 @@ msgstr "Општо одложување на AC3"
 
 msgid "General PCM delay"
 msgstr "Општо одложување на PCM"
+
+#, fuzzy
+msgid "General bluetooth audio delay"
+msgstr "Општо одложување на AC3"
 
 msgid "Genre"
 msgstr "Жанр"
@@ -4012,6 +4107,9 @@ msgstr "HD2400"
 msgid "HD60/HD66SE/Multibox/Multibox SE"
 msgstr ""
 
+msgid "HDMI"
+msgstr ""
+
 msgid "HDMI Colordepth"
 msgstr "HDMI Colordepth"
 
@@ -4118,6 +4216,10 @@ msgstr "Информации за хиерархијата"
 msgid "High bitrate support"
 msgstr "Поддршка за висока бит-стапка"
 
+#, fuzzy
+msgid "History Prev/Next"
+msgstr "Историја следно"
+
 msgid "History back"
 msgstr "Историја назад"
 
@@ -4171,6 +4273,9 @@ msgstr "Колку минути сакате да додадете на сним
 
 msgid "How many minutes do you want to record?"
 msgstr "Колку минути сакате да снимите?"
+
+msgid "Http(s) stream start delay"
+msgstr ""
 
 msgid "Hue"
 msgstr "Нијанса"
@@ -4244,6 +4349,9 @@ msgstr "Ако е избрано „Да“, вредноста на сигна�
 
 msgid "If set to 'yes' the same commands will be sent to the TV for deep standby events, as are sent during regular standby events."
 msgstr "Ако е поставено на „да“, истите команди ќе бидат испратени до телевизорот за настани во дееп стендбај, како што се испраќаат за време на редовни настани во стендбај."
+
+msgid "If the box is supposed to enter deep standby e.g. monday night at 1 AM, it actually is already tuesday. To enable this anyway, differing next day start time can be specified here."
+msgstr ""
 
 msgid "If using multiple uncommitted switches the DiSEqC commands must be sent multiple times. Set to the number of uncommitted switches in the chain minus one."
 msgstr "Ако се користат неколку неконтригирани switches - прекинувачи, командите DiSEqC мора да се испраќаат неколку пати. Поставете го бројот на неповрзани switches - прекинувачи на ланецот минус еден."
@@ -4944,6 +5052,10 @@ msgstr "Мавританија"
 msgid "Mauritius"
 msgstr "Маврициус"
 
+#, fuzzy
+msgid "Max channels"
+msgstr "Канали"
+
 msgid "Max memory positions"
 msgstr "Максимални позиции на меморија"
 
@@ -4959,12 +5071,8 @@ msgstr "Мајот"
 msgid "Media player"
 msgstr "Медиа плеер"
 
-#, fuzzy
-msgid "Media player: GStreamer, version "
-msgstr "Верзија за GStreamer: "
-
-msgid "Media player: ffmpeg, version "
-msgstr ""
+msgid "version"
+msgstr "верзија"
 
 msgid "Media scanner"
 msgstr "Медиумски скенер"
@@ -5344,6 +5452,9 @@ msgctxt "now/next: 'next' event label"
 msgid "Next"
 msgstr "Следно"
 
+msgid "Next day starts at"
+msgstr ""
+
 msgid "Nicaragua"
 msgstr "Никарагва"
 
@@ -5656,6 +5767,10 @@ msgstr "Завртете ја сателитскиот антена кратко
 msgid "Only on startup"
 msgstr "На почеток"
 
+#, fuzzy
+msgid "Only power off"
+msgstr "Активирајте тајмер за будење"
+
 msgid "Only select 'yes' if you are using a multiswich that requires a DiSEqC Port-A command signal. For all other setups select 'no'."
 msgstr "Изберете „Да“ само ако користите multiswich за кој е потребен команден сигнал DiSEqC Port-A. За сите други поставувања, изберете \"Не\"."
 
@@ -5807,6 +5922,9 @@ msgstr "Уредник на каналот за родителска контр�
 
 msgid "Parental control setup"
 msgstr "Поставки за родителска контрола"
+
+msgid "Passthrough"
+msgstr ""
 
 msgid "Password"
 msgstr "Лозинка"
@@ -6216,6 +6334,13 @@ msgstr "ЛЕД-напојување"
 msgid "Power management. Consult your receiver's manual for more information."
 msgstr "Моќен менаџмент. За повеќе информации, видете ги упатствата за работа на вашиот приемник."
 
+#, fuzzy
+msgid "Power off time"
+msgstr "Сортирај според времето"
+
+msgid "Power off timer"
+msgstr ""
+
 msgid "Power on display"
 msgstr "Вклучете го екранот"
 
@@ -6548,6 +6673,9 @@ msgstr "Rec"
 
 msgid "Recall to previous service"
 msgstr "Назад на последниот канал"
+
+msgid "Receiver or driver does not support FCC"
+msgstr ""
 
 msgid "Reception settings"
 msgstr "Поставки за прием"
@@ -6960,6 +7088,9 @@ msgstr "SNR"
 
 msgid "SNR:"
 msgstr "SNR:"
+
+msgid "SPDIF"
+msgstr ""
 
 msgid "SRT file"
 msgstr "SRT-датотека"
@@ -9141,11 +9272,19 @@ msgstr "Оваа опција ви овозможува да прикажете 
 msgid "This option allows you to show the full screen path leading to the current screen."
 msgstr "Оваа опција ви овозможува да ја прикажете патеката на целиот екран што води до тековниот екран."
 
+#, fuzzy
+msgid "This option allows you to switch audio to bluetooth speakers."
+msgstr "Оваа опција ви овозможува да ја поставите автоматската јачина на звук."
+
 msgid "This option allows you to view the old and new settings side by side."
 msgstr "Оваа опција ви овозможува да ги прегледувате старите и новите поставки side by side."
 
 msgid "This option can be useful for long HDMI cables."
 msgstr "Оваа опција може да биде корисна за долгите HDMI кабли."
+
+#, fuzzy
+msgid "This option configures the general audio delay for bluetooth speakers."
+msgstr "Поставете го општото аудио одложување на стерео звучните записи."
 
 msgid "This option set the level of surpression of mosquito noise (Mosquito Noise is random aliasing as a result of strong compression). Obviously this goes at the cost of picture details."
 msgstr "Оваа опција го дефинира сузбивањето на бучавата од комарецот (бучавата од комарец е случајно измазнување како резултат на силна компресија). Ова секако е на штета на деталите за сликата."
@@ -10078,6 +10217,10 @@ msgstr "W"
 msgid "WLAN connection"
 msgstr "WLAN врска"
 
+#, fuzzy
+msgid "WMA Pro downmix"
+msgstr "AAC downmix"
+
 msgid "WSS on 4:3"
 msgstr "WSS on 4:3"
 
@@ -10754,6 +10897,10 @@ msgstr "Замбија"
 msgid "Zap"
 msgstr "Префрлување"
 
+#, fuzzy
+msgid "Zap Up/Down"
+msgstr "Префрли го каналот надолу"
+
 msgid "Zap back to previously tuned service?"
 msgstr "Назад на претходниот канал?"
 
@@ -10998,6 +11145,16 @@ msgstr "поврзано"
 
 msgid "controlled by HDMI"
 msgstr "контролирана од HDMI"
+
+msgid "convert to AC3"
+msgstr ""
+
+msgid "convert to DTS"
+msgstr ""
+
+#, fuzzy
+msgid "convert to multi-channel PCM"
+msgstr "Повеќеканален PCM"
 
 msgid "cooking"
 msgstr "готвење"
@@ -11315,6 +11472,10 @@ msgstr "мени"
 msgid "mins"
 msgstr "мин"
 
+#, fuzzy
+msgid "module disabled"
+msgstr "принудно оневозможена"
+
 msgid "month"
 msgstr "месец"
 
@@ -11493,6 +11654,10 @@ msgstr "програма за деца од предучилишна возра�
 
 msgid "preserve bookmarks in cuts"
 msgstr ""
+
+#, fuzzy
+msgid "priority"
+msgstr "Приоритет"
 
 msgid "receiver software because updates are available."
 msgstr "софтвер за приемник затоа што се достапни ажурирања."
@@ -11771,6 +11936,13 @@ msgstr "неиспитано"
 
 msgid "until standby/restart"
 msgstr "до стендбај / рестартирање"
+
+msgid "use HDMI cacenter"
+msgstr ""
+
+#, fuzzy
+msgid "use best / controlled by HDMI"
+msgstr "контролирана од HDMI"
 
 msgid "user defined"
 msgstr "корисник дефиниран"

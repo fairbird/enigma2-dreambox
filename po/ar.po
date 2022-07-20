@@ -1118,6 +1118,9 @@ msgstr "بحث آلـى"
 msgid "Automatic scan"
 msgstr "بحث آلـى"
 
+msgid "Automatically power off box to deep standby mode."
+msgstr "إيقاف تشغيل الصندوق تلقائيًا إلى وضع الاستعداد العميق."
+
 msgid "Automatically put the TV in standby whenever the receiver goes into standby or deep standby."
 msgstr ".ضع التلفزيون تلقائيًا في وضع الاستعداد عندما ينتقل جهاز الاستقبال إلى وضع الاستعداد أو وضع الاستعداد العميق"
 
@@ -1379,6 +1382,10 @@ msgstr "ضبط الكامة الداخلية (واجهة المستخدم)"
 
 msgid "CI assignment"
 msgstr "مهمة واجهة المستخدم"
+
+#, fuzzy
+msgid "CI enabled"
+msgstr "تم التفعيل"
 
 msgid "CI slot: "
 msgstr " :CI مدخل"
@@ -2423,6 +2430,9 @@ msgstr "نوع التسيجل الإفتراضي"
 
 msgid "Default+Picon"
 msgstr "الإفتراضي"
+
+msgid "Define additional delay in milliseconds before start of http(s) streams, e.g. to connect a remote tuner, you use a complex system of DiSEqC."
+msgstr "حدد تأخيرًا إضافيًا بالمللي ثانية قبل بدء تدفقات http (s) ، على سبيل المثال لتوصيل موالف بعيد ، يمكنك استخدام نظام معقد من DiSEqC."
 
 msgid "Define the location of the EPG Cache file."
 msgstr "حدد موقع ملف مسار  ملف الدليل الإلكتروني"
@@ -4082,6 +4092,9 @@ msgstr "كم عدد الدقائق التي تريد إضافتها إلى ال�
 msgid "How many minutes do you want to record?"
 msgstr "كم عدد الدقائق التي تريد تسجيلها ؟"
 
+msgid "Http(s) stream start delay"
+msgstr "Http (s) تأخير بدء البث"
+
 msgid "Hue"
 msgstr "درجة اللون"
 
@@ -4864,11 +4877,8 @@ msgstr "مايوت"
 msgid "Media player"
 msgstr "مشغل الوسائط"
 
-msgid "Media player: GStreamer, version "
-msgstr "إصدار جديد:"
-
-msgid "Media player: ffmpeg, version "
-msgstr "الإصدار ,ffmpeg :مشغل الوسائط"
+msgid "version"
+msgstr "إصدار"
 
 msgid "Media scanner"
 msgstr "باحث الوسائط"
@@ -5546,6 +5556,10 @@ msgstr "فقط حرك الطبق بسرعة قبل هذه الساعة."
 
 msgid "Only on startup"
 msgstr "فقط عند بدء التشغيل"
+
+#, fuzzy
+msgid "Only power off"
+msgstr "تمكين وضع التحريك للقنوات"
 
 msgid "Only select 'yes' if you are using a multiswich that requires a DiSEqC Port-A command signal. For all other setups select 'no'."
 msgstr "حدد فقط 'نعم' إذا كنت تستخدم جهاز القسام المتعدد الذي يتطلب إشارة أمر الدايزك بمنفذ أ. بالنسبة إلى جميع الإعدادات الأخرى ، حدد 'لا'."
@@ -10910,9 +10924,6 @@ msgstr "الخروج من قائمه إعداد الشبكة"
 msgid "experimental film/video"
 msgstr "فيلم تجريبي/فيديو"
 
-msgid "extra wide"
-msgstr "عريض واسع"
-
 msgid "failed"
 msgstr "فشل"
 
@@ -11101,6 +11112,10 @@ msgstr "القائمة"
 
 msgid "mins"
 msgstr "دقائق"
+
+#, fuzzy
+msgid "module disabled"
+msgstr "تم التعطيل"
 
 msgid "month"
 msgstr "شهر"

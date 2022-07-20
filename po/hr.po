@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: enigma2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-27 19:45+0100\n"
-"PO-Revision-Date: 2022-02-27 19:03+0100\n"
+"POT-Creation-Date: 2022-07-06 22:43+0200\n"
+"PO-Revision-Date: 2022-03-28 16:33+0200\n"
 "Last-Translator: Željko <zdezmar2@gmail.com>\n"
 "Language-Team: Željko\n"
 "Language: hr_HR\n"
@@ -605,8 +605,23 @@ msgstr "A/V postavke"
 msgid "AAC downmix"
 msgstr "AAC mikser"
 
+#, fuzzy
+msgid "AAC transcoding"
+msgstr "Transkodiranje: "
+
+#, fuzzy
+msgid "AAC+ downmix"
+msgstr "AAC mikser"
+
+msgid "AC3"
+msgstr ""
+
 msgid "AC3 downmix"
 msgstr "AC3 mikser"
+
+#, fuzzy
+msgid "AC3 transcoding"
+msgstr "Transkodiranje: "
 
 msgid "ACQUIRING TSID/ONID"
 msgstr "STJECANJE TSID/ONID"
@@ -1025,7 +1040,7 @@ msgid "Artist"
 msgstr "Umjetnik"
 
 msgid "Arts/Culture (without music)"
-msgstr "umjetnost/kultura (bez glazbe, općenito)"
+msgstr "umjetnost/kultura (bez glazbe)"
 
 msgid "Aruba"
 msgstr "Aruba"
@@ -1179,6 +1194,9 @@ msgstr "Automatsko stvaranje oznaka"
 
 msgid "Automatic scan"
 msgstr "Automatska pretraga"
+
+msgid "Automatically power off box to deep standby mode."
+msgstr ""
 
 msgid "Automatically put the TV in standby whenever the receiver goes into standby or deep standby."
 msgstr "Automatski stavite TV u stanje čekanja kada resiver pređe u stanje čekanja ili u duboko stanje čekanja."
@@ -1441,6 +1459,10 @@ msgstr "Postavljanje CI modula (Zajedničko sućelje)"
 
 msgid "CI assignment"
 msgstr "CI zadatak"
+
+#, fuzzy
+msgid "CI enabled"
+msgstr "omogućeno"
 
 msgid "CI slot: "
 msgstr "CI utor: "
@@ -1711,6 +1733,26 @@ msgstr "Odaberite tjuner"
 
 msgid "Choose bouquet"
 msgstr "Odaberite paket"
+
+#, fuzzy
+msgid "Choose whether AAC sound tracks should be transcoded."
+msgstr "Konfigurirajte da li se višekanalni zvučni zapisi trebaju miješati u stereo."
+
+#, fuzzy
+msgid "Choose whether AC3 sound tracks should be transcoded."
+msgstr "Konfigurirajte da li se višekanalni zvučni zapisi trebaju miješati u stereo."
+
+#, fuzzy
+msgid "Choose whether WMA Pro sound tracks should be downmixed."
+msgstr "Konfigurirajte da li se višekanalni zvučni zapisi trebaju miješati u stereo."
+
+#, fuzzy
+msgid "Choose whether multi channel DTS-HD(HR/MA) sound tracks should be downmixed or transcoded."
+msgstr "Konfigurirajte da li se višekanalni zvučni zapisi trebaju miješati u stereo."
+
+#, fuzzy
+msgid "Choose whether multi channel aac+ sound tracks should be downmixed to stereo."
+msgstr "Konfigurirajte da li se višekanalni zvučni zapisi trebaju miješati u stereo."
 
 msgid "Choose whether to scan a single transponder, one satellite or multiple satellites."
 msgstr "Odaberite hoćete li skenirati jedan transponder, jedan satelit ili više satelita."
@@ -2402,6 +2444,10 @@ msgstr "Češka"
 msgid "D"
 msgstr "D"
 
+#, fuzzy
+msgid "DAC"
+msgstr "PDC"
+
 msgid "DHCP"
 msgstr "DHCP"
 
@@ -2411,7 +2457,14 @@ msgstr "DMM napredna"
 msgid "DMM normal"
 msgstr "DMM normalna"
 
+msgid "DTS"
+msgstr ""
+
 msgid "DTS downmix"
+msgstr "DTS miješanje"
+
+#, fuzzy
+msgid "DTS-HD(HR/MA) downmix"
 msgstr "DTS miješanje"
 
 msgid "DUAL LAYER DVD"
@@ -2491,6 +2544,9 @@ msgstr "Zadana vrsta tajmera"
 
 msgid "Default+Picon"
 msgstr "Zadano+pikon"
+
+msgid "Define additional delay in milliseconds before start of http(s) streams, e.g. to connect a remote tuner, you use a complex system of DiSEqC."
+msgstr ""
 
 msgid "Define the location of the EPG Cache file."
 msgstr "Definirajte mjesto datoteke EPG predmemorije."
@@ -2707,6 +2763,10 @@ msgstr "Direktorij sadrži %(file)s i %(subdir)s."
 
 msgid "Disable"
 msgstr "Onemogućite"
+
+#, fuzzy
+msgid "Disable FCC during recordings"
+msgstr "Uključivanje ECM-a u snimanjima"
 
 msgid "Disable Picture in Picture"
 msgstr "Onemogućite sliku u slici"
@@ -2967,6 +3027,10 @@ msgstr "Pokušavate preuzeti novi popis paketa. Molim pričekajte..."
 msgid "Downloading plugin information. Please wait..."
 msgstr "Preuzimanje informacija o dodacima. Molim pričekajte..."
 
+#, fuzzy
+msgid "Downmix"
+msgstr "DTS miješanje"
+
 msgid "Drama and Films"
 msgstr "Drama i Film"
 
@@ -3010,9 +3074,9 @@ msgstr "EPG:"
 msgid "ERROR - failed to scan (%s)!"
 msgstr "GREŠKA - nije uspjelo skeniranje (%s)!"
 
-#, python-format
-msgid "ERROR downloading file %s"
-msgstr "GREŠKA u preuzimanju datoteke %s"
+#, fuzzy, python-format
+msgid "ERROR downloading file %s/%s"
+msgstr "GREŠKA u preuzimanju datoteke /etc/enigma2/%s"
 
 msgid "East"
 msgstr "Istok"
@@ -3129,6 +3193,10 @@ msgstr "Omogućite automatsko brzo skeniranje"
 msgid "Enable auto fastscan for %s"
 msgstr "Omogućite automatsko brzo skeniranje za %s"
 
+#, fuzzy
+msgid "Enable bluetooth audio"
+msgstr "Omogući uređivanje paketa"
+
 msgid "Enable bouquet edit"
 msgstr "Omogući uređivanje paketa"
 
@@ -3158,6 +3226,10 @@ msgstr "Omogućite ili onemogućite korištenje HDMI-CEC-a."
 
 msgid "Enable parental protection"
 msgstr "Omogućite roditeljsku zaštitu"
+
+#, fuzzy
+msgid "Enable power off timer"
+msgstr "Omogućite odbrojavanje vremena"
 
 msgid "Enable remote enigma2 receiver to be tried to tune into services that cannot be tuned into locally (e.g. tuner is occupied or service type is unavailable on the local tuner. Specify complete URL including http:// and port number (normally ...:8001), e.g. http://second_box:8001."
 msgstr "Omogućavanje pokušaja podešavanja udaljenog enigma2 prijamnika u usluge koje se ne mogu lokalno ugađati (npr. tjuner je zauzet ili vrsta usluge nije dostupna na lokalnom tjuneru. Navedite potpuni URL uključujući http:// i broj porta (normalno ...:8001), primjer: http://ip_udaljeni_resiver:8001."
@@ -3301,10 +3373,6 @@ msgstr "Eritreja"
 
 msgid "Error"
 msgstr "Greška"
-
-#, python-format
-msgid "Error %s"
-msgstr "Greška %s"
 
 msgid "Error code"
 msgstr "Greška koda"
@@ -3557,6 +3625,14 @@ msgstr ""
 "FBC - automatski\n"
 "neaktivan"
 
+#, fuzzy
+msgid "FCC enabled"
+msgstr "omogućeno"
+
+#, fuzzy
+msgid "FCCSetup"
+msgstr "Postavljanje"
+
 msgid "FEC"
 msgstr "FEC"
 
@@ -3650,6 +3726,15 @@ msgstr "Farski otoci"
 msgid "Fast"
 msgstr "Brzo"
 
+msgid "Fast Channel Change"
+msgstr ""
+
+msgid "Fast Channel Change Setup"
+msgstr ""
+
+msgid "Fast Channel Change setup"
+msgstr ""
+
 msgid "Fast DiSEqC"
 msgstr "Brzi DiSEqC (bez odgode naredbe)"
 
@@ -3742,8 +3827,15 @@ msgstr "Sljedeći zadaci bit će izvršeni nakon što pritisnete OK!"
 msgid "Force legacy signal stats"
 msgstr "Forsiraj statistiku naslijeđenih signala"
 
+#, fuzzy
+msgid "Force power off (even when not in standby)"
+msgstr "Prisilno zaustavite uslugu snimanja u stanju pripravnosti"
+
 msgid "Force zap to recording service in standby"
 msgstr "Prisilno zaustavite uslugu snimanja u stanju pripravnosti"
+
+msgid "Forces deep standby, even when not in standby mode. Scheduled recordings remain unaffected."
+msgstr ""
 
 msgid "Format"
 msgstr "Format"
@@ -3861,6 +3953,10 @@ msgstr "Ukupno AC3 kašnjenje"
 
 msgid "General PCM delay"
 msgstr "Ukupno PCM kašnjenje"
+
+#, fuzzy
+msgid "General bluetooth audio delay"
+msgstr "Ukupno AC3 kašnjenje"
 
 msgid "Genre"
 msgstr "Žanr"
@@ -4021,6 +4117,9 @@ msgstr "HD2400"
 msgid "HD60/HD66SE/Multibox/Multibox SE"
 msgstr "HD60/HD66SE/Multibox/Multibox SE"
 
+msgid "HDMI"
+msgstr ""
+
 msgid "HDMI Colordepth"
 msgstr "HDMI dubina boje"
 
@@ -4126,6 +4225,10 @@ msgstr "Informacije o hijerarhiji"
 msgid "High bitrate support"
 msgstr "Podrška za velike brzine prijenosa"
 
+#, fuzzy
+msgid "History Prev/Next"
+msgstr "Povijest kanala - sljedeći"
+
 msgid "History back"
 msgstr "Povijest kanala - unatrag"
 
@@ -4179,6 +4282,9 @@ msgstr "Koliko minuta želite dodati snimci?"
 
 msgid "How many minutes do you want to record?"
 msgstr "Koliko minuta želite snimiti?"
+
+msgid "Http(s) stream start delay"
+msgstr ""
 
 msgid "Hue"
 msgstr "Nijansa"
@@ -4251,6 +4357,9 @@ msgstr "Ako je postavljeno na \"da\" vrijednosti signala (SNR, itd.) Izračunat 
 
 msgid "If set to 'yes' the same commands will be sent to the TV for deep standby events, as are sent during regular standby events."
 msgstr "Ako je postavljeno na \"da\", iste će se naredbe slati na televizor za događaje u dubokom stanju čekanja, kao i tijekom redovnih događaja u stanju čekanja."
+
+msgid "If the box is supposed to enter deep standby e.g. monday night at 1 AM, it actually is already tuesday. To enable this anyway, differing next day start time can be specified here."
+msgstr ""
 
 msgid "If using multiple uncommitted switches the DiSEqC commands must be sent multiple times. Set to the number of uncommitted switches in the chain minus one."
 msgstr "Ako koristite višestruke neopredijeljene prekidače, naredbe se moraju poslati više puta. Postavite broj neopredijeljenih prekidača na minus jedan."
@@ -4952,6 +5061,10 @@ msgstr "Mauritanija"
 msgid "Mauritius"
 msgstr "Mauricijus"
 
+#, fuzzy
+msgid "Max channels"
+msgstr "Kanali"
+
 msgid "Max memory positions"
 msgstr "Maksimalna pozicija memorije"
 
@@ -4967,11 +5080,8 @@ msgstr "Mayotte"
 msgid "Media player"
 msgstr "Medija player"
 
-msgid "Media player: GStreamer, version "
-msgstr "Media player: GStreamer, verzija "
-
-msgid "Media player: ffmpeg, version "
-msgstr "Media player: ffmpeg, verzija "
+msgid "version"
+msgstr "verzija"
 
 msgid "Media scanner"
 msgstr "Medija skener"
@@ -5350,6 +5460,9 @@ msgctxt "now/next: 'next' event label"
 msgid "Next"
 msgstr "Sljedeći"
 
+msgid "Next day starts at"
+msgstr ""
+
 msgid "Nicaragua"
 msgstr "Nikaragva"
 
@@ -5662,6 +5775,10 @@ msgstr "Pokrenuti tanjur brzo prije tog vremena."
 msgid "Only on startup"
 msgstr "Samo pri pokretanju"
 
+#, fuzzy
+msgid "Only power off"
+msgstr "Omogućite odbrojavanje vremena"
+
 msgid "Only select 'yes' if you are using a multiswich that requires a DiSEqC Port-A command signal. For all other setups select 'no'."
 msgstr "Odaberite 'da' samo ako koristite multiswich koji zahtijeva DiSEqC naredbeni signal. Za sve ostale postavke odaberite 'ne'."
 
@@ -5812,6 +5929,9 @@ msgstr "Uređivač usluga za roditeljski nadzor"
 
 msgid "Parental control setup"
 msgstr "Postavljanje roditeljske kontrole"
+
+msgid "Passthrough"
+msgstr ""
 
 msgid "Password"
 msgstr "Lozinka"
@@ -6221,6 +6341,13 @@ msgstr "Napajanje LED-a"
 msgid "Power management. Consult your receiver's manual for more information."
 msgstr "Upravljanje napajanjem. Dodatne informacije potražite u priručniku prijemnika."
 
+#, fuzzy
+msgid "Power off time"
+msgstr "Sortiranje po vremenu"
+
+msgid "Power off timer"
+msgstr ""
+
 msgid "Power on display"
 msgstr "Prikaz na zaslonu"
 
@@ -6553,6 +6680,9 @@ msgstr "Rec"
 
 msgid "Recall to previous service"
 msgstr "Povratak na prethodnu uslugu"
+
+msgid "Receiver or driver does not support FCC"
+msgstr ""
 
 msgid "Reception settings"
 msgstr "Postavke prijema"
@@ -6965,6 +7095,9 @@ msgstr "SNR"
 
 msgid "SNR:"
 msgstr "SNR:"
+
+msgid "SPDIF"
+msgstr ""
 
 msgid "SRT file"
 msgstr "SRT datoteka"
@@ -9149,11 +9282,19 @@ msgstr "Ova opcija vam omogućuje prikaz brzih veza izbornika i/ili dodatka."
 msgid "This option allows you to show the full screen path leading to the current screen."
 msgstr "Ova vam opcija omogućuje prikaz preko cijelog zaslona putem koji vodi do trenutnog zaslona."
 
+#, fuzzy
+msgid "This option allows you to switch audio to bluetooth speakers."
+msgstr "Ova opcija omogućuje da postavite razinu automatske glasnoće."
+
 msgid "This option allows you to view the old and new settings side by side."
 msgstr "Ova opcija omogućuje vam pregled starih i novih postavki usporedno."
 
 msgid "This option can be useful for long HDMI cables."
 msgstr "Ova opcija može biti korisna za dugačke HDMI kabele."
+
+#, fuzzy
+msgid "This option configures the general audio delay for bluetooth speakers."
+msgstr "Konfigurirajte kašnjenje zvuka stereo zvučnih zapisa."
 
 msgid "This option set the level of surpression of mosquito noise (Mosquito Noise is random aliasing as a result of strong compression). Obviously this goes at the cost of picture details."
 msgstr "Ova opcija omogućuje podešavanje razine smanjenja buke šuma (šum je slučajno preklapanje zbog jake kompresije). Očito je to zbog detalja slike."
@@ -10087,6 +10228,10 @@ msgstr "W"
 msgid "WLAN connection"
 msgstr "WLAN veza"
 
+#, fuzzy
+msgid "WMA Pro downmix"
+msgstr "AAC mikser"
+
 msgid "WSS on 4:3"
 msgstr "WSS na 4:3"
 
@@ -10764,6 +10909,10 @@ msgstr "Zambija"
 msgid "Zap"
 msgstr "Prebacivanje"
 
+#, fuzzy
+msgid "Zap Up/Down"
+msgstr "Prebacivanje kanala prema dolje"
+
 msgid "Zap back to previously tuned service?"
 msgstr "Prebacivanje vratiti na prethodno podešenu uslugu?"
 
@@ -11003,6 +11152,16 @@ msgstr "povezano"
 
 msgid "controlled by HDMI"
 msgstr "upravljano po HDMI"
+
+msgid "convert to AC3"
+msgstr ""
+
+msgid "convert to DTS"
+msgstr ""
+
+#, fuzzy
+msgid "convert to multi-channel PCM"
+msgstr "Višekanalni PCM"
 
 msgid "cooking"
 msgstr "kuhanje"
@@ -11316,6 +11475,10 @@ msgstr "izbornik"
 msgid "mins"
 msgstr "min"
 
+#, fuzzy
+msgid "module disabled"
+msgstr "prisilno onemogućen"
+
 msgid "month"
 msgstr "mjesec"
 
@@ -11489,6 +11652,10 @@ msgstr "predškolski program za djecu"
 
 msgid "preserve bookmarks in cuts"
 msgstr "sačuvati oznake u rezovima"
+
+#, fuzzy
+msgid "priority"
+msgstr "Prioritet"
 
 msgid "receiver software because updates are available."
 msgstr "dostupno je ažuriranje za vaš prijemnik."
@@ -11760,6 +11927,13 @@ msgstr "nestabilan"
 
 msgid "until standby/restart"
 msgstr "do stanja čekanja/restarta"
+
+msgid "use HDMI cacenter"
+msgstr ""
+
+#, fuzzy
+msgid "use best / controlled by HDMI"
+msgstr "upravljano po HDMI"
 
 msgid "user defined"
 msgstr "korisnički definirano"

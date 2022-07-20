@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: enigma 2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-26 15:37+0100\n"
+"POT-Creation-Date: 2022-07-06 22:43+0200\n"
 "PO-Revision-Date: 2021-08-02 09:19+0700\n"
 "Last-Translator: krong\n"
 "Language-Team: none\n"
@@ -579,8 +579,23 @@ msgstr "Cài đặt A / V"
 msgid "AAC downmix"
 msgstr "AAC kết hợp"
 
+#, fuzzy
+msgid "AAC transcoding"
+msgstr "Chuyển mã: "
+
+#, fuzzy
+msgid "AAC+ downmix"
+msgstr "AAC kết hợp"
+
+msgid "AC3"
+msgstr ""
+
 msgid "AC3 downmix"
 msgstr "AC3 kết hợp"
+
+#, fuzzy
+msgid "AC3 transcoding"
+msgstr "Chuyển mã: "
 
 msgid "ACQUIRING TSID/ONID"
 msgstr "THU NHẬP TSID / ONID"
@@ -1149,6 +1164,9 @@ msgstr "Đánh dấu tự động"
 msgid "Automatic scan"
 msgstr "Quét tự động"
 
+msgid "Automatically power off box to deep standby mode."
+msgstr ""
+
 msgid "Automatically put the TV in standby whenever the receiver goes into standby or deep standby."
 msgstr "Tự động đặt TV ở chế độ chờ bất cứ khi nào đầu thu chuyển sang chế độ chờ hoặc chế độ chờ sâu."
 
@@ -1410,6 +1428,10 @@ msgstr "Cài đặt CI (Giao diện chung)"
 
 msgid "CI assignment"
 msgstr "Phân công CI"
+
+#, fuzzy
+msgid "CI enabled"
+msgstr "kích hoạt"
 
 msgid "CI slot: "
 msgstr "Khe CI: "
@@ -1681,6 +1703,26 @@ msgstr "Chọn bộ chỉnh"
 
 msgid "Choose bouquet"
 msgstr "Chọn gói kênh"
+
+#, fuzzy
+msgid "Choose whether AAC sound tracks should be transcoded."
+msgstr "Định cấu hình xem các bản âm thanh đa kênh có được trộn lẫn thành âm thanh nổi hay không."
+
+#, fuzzy
+msgid "Choose whether AC3 sound tracks should be transcoded."
+msgstr "Định cấu hình xem các bản âm thanh đa kênh có được trộn lẫn thành âm thanh nổi hay không."
+
+#, fuzzy
+msgid "Choose whether WMA Pro sound tracks should be downmixed."
+msgstr "Định cấu hình xem các bản âm thanh đa kênh có được trộn lẫn thành âm thanh nổi hay không."
+
+#, fuzzy
+msgid "Choose whether multi channel DTS-HD(HR/MA) sound tracks should be downmixed or transcoded."
+msgstr "Định cấu hình xem các bản âm thanh đa kênh có được trộn lẫn thành âm thanh nổi hay không."
+
+#, fuzzy
+msgid "Choose whether multi channel aac+ sound tracks should be downmixed to stereo."
+msgstr "Định cấu hình xem các bản âm thanh đa kênh có được trộn lẫn thành âm thanh nổi hay không."
 
 msgid "Choose whether to scan a single transponder, one satellite or multiple satellites."
 msgstr ""
@@ -2372,6 +2414,10 @@ msgstr "Séc"
 msgid "D"
 msgstr "D"
 
+#, fuzzy
+msgid "DAC"
+msgstr "PDC"
+
 msgid "DHCP"
 msgstr "DHCP"
 
@@ -2381,7 +2427,14 @@ msgstr "DMM nâng cao"
 msgid "DMM normal"
 msgstr "DMM bình thường"
 
+msgid "DTS"
+msgstr ""
+
 msgid "DTS downmix"
+msgstr "DTS downmix"
+
+#, fuzzy
+msgid "DTS-HD(HR/MA) downmix"
 msgstr "DTS downmix"
 
 msgid "DUAL LAYER DVD"
@@ -2461,6 +2514,9 @@ msgstr "Loại hẹn giờ mặc định"
 
 msgid "Default+Picon"
 msgstr "Mặc định + Picon"
+
+msgid "Define additional delay in milliseconds before start of http(s) streams, e.g. to connect a remote tuner, you use a complex system of DiSEqC."
+msgstr ""
 
 msgid "Define the location of the EPG Cache file."
 msgstr "Xác định vị trí của tệp EPG Cache."
@@ -2677,6 +2733,10 @@ msgstr "Thư mục chứa %(file)s và %(subdir)s."
 
 msgid "Disable"
 msgstr "Vô hiệu hóa"
+
+#, fuzzy
+msgid "Disable FCC during recordings"
+msgstr "Luôn bao gồm ECM trong bản ghi"
 
 msgid "Disable Picture in Picture"
 msgstr "Vô hiệu hóa hình ảnh trong hình ảnh"
@@ -2935,6 +2995,10 @@ msgstr "Đang cố gắng tải xuống một danh sách gói mới. Xin vui lò
 msgid "Downloading plugin information. Please wait..."
 msgstr "Tải về thông tin plugin. Xin vui lòng chờ ..."
 
+#, fuzzy
+msgid "Downmix"
+msgstr "DTS downmix"
+
 msgid "Drama and Films"
 msgstr ""
 
@@ -2978,8 +3042,8 @@ msgstr "EPG:"
 msgid "ERROR - failed to scan (%s)!"
 msgstr "LỖI - không quét được (%s)!"
 
-#, python-format
-msgid "ERROR downloading file %s"
+#, fuzzy, python-format
+msgid "ERROR downloading file %s/%s"
 msgstr "LỖI tải xuống tệp%s"
 
 msgid "East"
@@ -3097,6 +3161,10 @@ msgstr "Bật quét nhanh tự động"
 msgid "Enable auto fastscan for %s"
 msgstr "Bật quét nhanh tự động cho%s"
 
+#, fuzzy
+msgid "Enable bluetooth audio"
+msgstr "Cho phép chỉnh sửa gói kênh"
+
 msgid "Enable bouquet edit"
 msgstr "Cho phép chỉnh sửa gói kênh"
 
@@ -3126,6 +3194,10 @@ msgstr "Bật hoặc tắt bằng HDMI-CEC."
 
 msgid "Enable parental protection"
 msgstr "Bật tính năng bảo vệ của phụ huynh"
+
+#, fuzzy
+msgid "Enable power off timer"
+msgstr "Bật hẹn giờ đánh thức"
 
 msgid "Enable remote enigma2 receiver to be tried to tune into services that cannot be tuned into locally (e.g. tuner is occupied or service type is unavailable on the local tuner. Specify complete URL including http:// and port number (normally ...:8001), e.g. http://second_box:8001."
 msgstr "Cho phép máy thu enigma2 từ xa cố gắng điều chỉnh các dịch vụ không thể điều chỉnh cục bộ (ví dụ: bộ điều chỉnh bị chiếm dụng hoặc loại dịch vụ không khả dụng trên bộ điều chỉnh cục bộ. Chỉ định URL hoàn chỉnh bao gồm http:// và số cổng (thông thường ...:8001 ), ví dụ http://second_box:8001."
@@ -3269,10 +3341,6 @@ msgstr "Eritrea"
 
 msgid "Error"
 msgstr "Lỗi"
-
-#, python-format
-msgid "Error %s"
-msgstr "Lỗi%s"
 
 msgid "Error code"
 msgstr "Mã lỗi"
@@ -3525,6 +3593,14 @@ msgstr ""
 "FBC tự động\n"
 "không hoạt động"
 
+#, fuzzy
+msgid "FCC enabled"
+msgstr "kích hoạt"
+
+#, fuzzy
+msgid "FCCSetup"
+msgstr "Thiết lập"
+
 msgid "FEC"
 msgstr "FEC"
 
@@ -3618,6 +3694,15 @@ msgstr "Quần đảo Faroe"
 msgid "Fast"
 msgstr "Nhanh"
 
+msgid "Fast Channel Change"
+msgstr ""
+
+msgid "Fast Channel Change Setup"
+msgstr ""
+
+msgid "Fast Channel Change setup"
+msgstr ""
+
 msgid "Fast DiSEqC"
 msgstr "DiSEqC nhanh"
 
@@ -3710,8 +3795,15 @@ msgstr "Các tác vụ sau sẽ được thực hiện sau khi bạn nhấn OK!"
 msgid "Force legacy signal stats"
 msgstr "Lực lượng thống kê tín hiệu kế thừa"
 
+#, fuzzy
+msgid "Force power off (even when not in standby)"
+msgstr "Buộc chuyển sang dịch vụ ghi âm ở chế độ chờ"
+
 msgid "Force zap to recording service in standby"
 msgstr "Buộc chuyển sang dịch vụ ghi âm ở chế độ chờ"
+
+msgid "Forces deep standby, even when not in standby mode. Scheduled recordings remain unaffected."
+msgstr ""
 
 msgid "Format"
 msgstr "Định dạng"
@@ -3831,6 +3923,10 @@ msgstr "Độ trễ AC3 chung"
 
 msgid "General PCM delay"
 msgstr "Độ trễ PCM chung"
+
+#, fuzzy
+msgid "General bluetooth audio delay"
+msgstr "Độ trễ AC3 chung"
 
 msgid "Genre"
 msgstr "Thể loại"
@@ -3992,6 +4088,9 @@ msgstr "HD2400"
 msgid "HD60/HD66SE/Multibox/Multibox SE"
 msgstr "HD60/Multibox/Multibox SE"
 
+msgid "HDMI"
+msgstr ""
+
 msgid "HDMI Colordepth"
 msgstr "Cổng thông tin HDMI"
 
@@ -4098,6 +4197,10 @@ msgstr "Thông tin phân cấp"
 msgid "High bitrate support"
 msgstr "Hỗ trợ tốc độ bit cao"
 
+#, fuzzy
+msgid "History Prev/Next"
+msgstr "Lịch sử tiếp theo"
+
 msgid "History back"
 msgstr "Lịch sử trở lại"
 
@@ -4151,6 +4254,9 @@ msgstr "Bạn muốn thêm bao nhiêu phút để ghi âm?"
 
 msgid "How many minutes do you want to record?"
 msgstr "Bạn muốn ghi lại bao nhiêu phút?"
+
+msgid "Http(s) stream start delay"
+msgstr ""
 
 msgid "Hue"
 msgstr "Màu sắc"
@@ -4223,6 +4329,9 @@ msgstr "Nếu được đặt thành giá trị tín hiệu 'có' (SNR, v.v.) s�
 
 msgid "If set to 'yes' the same commands will be sent to the TV for deep standby events, as are sent during regular standby events."
 msgstr "Nếu được đặt thành 'có', các lệnh tương tự sẽ được gửi đến TV cho các sự kiện chờ sâu, như được gửi trong các sự kiện chờ thông thường."
+
+msgid "If the box is supposed to enter deep standby e.g. monday night at 1 AM, it actually is already tuesday. To enable this anyway, differing next day start time can be specified here."
+msgstr ""
 
 msgid "If using multiple uncommitted switches the DiSEqC commands must be sent multiple times. Set to the number of uncommitted switches in the chain minus one."
 msgstr "Nếu sử dụng nhiều chuyển mạch không được cam kết, các lệnh DiSEqC phải được gửi nhiều lần. Đặt thành số lượng công tắc không được cam kết trong chuỗi trừ đi một."
@@ -4922,6 +5031,10 @@ msgstr "Mauritania"
 msgid "Mauritius"
 msgstr "Mô-ri-xơ"
 
+#, fuzzy
+msgid "Max channels"
+msgstr "Kênh truyền hình"
+
 msgid "Max memory positions"
 msgstr "Vị trí bộ nhớ tối đa"
 
@@ -4937,11 +5050,8 @@ msgstr "Mayotte"
 msgid "Media player"
 msgstr "Phương tiện truyền thông"
 
-msgid "Media player: GStreamer, version "
-msgstr "Trình phát media: GStreamer, phiên bản "
-
-msgid "Media player: ffmpeg, version "
-msgstr "Trình phát media: ffmpeg, phiên bản "
+msgid "version"
+msgstr "phiên bản"
 
 msgid "Media scanner"
 msgstr "Máy quét phương tiện truyền thông"
@@ -5321,6 +5431,9 @@ msgctxt "now/next: 'next' event label"
 msgid "Next"
 msgstr "Kế tiếp"
 
+msgid "Next day starts at"
+msgstr ""
+
 msgid "Nicaragua"
 msgstr "Nicaragua"
 
@@ -5633,6 +5746,10 @@ msgstr "Chỉ di chuyển chảo nhanh chóng trước giờ này."
 msgid "Only on startup"
 msgstr "Chỉ khi khởi động"
 
+#, fuzzy
+msgid "Only power off"
+msgstr "Bật hẹn giờ đánh thức"
+
 msgid "Only select 'yes' if you are using a multiswich that requires a DiSEqC Port-A command signal. For all other setups select 'no'."
 msgstr "Chỉ chọn 'có' nếu bạn đang sử dụng đa tín hiệu yêu cầu tín hiệu lệnh DiSEqC Port-A. Đối với tất cả các thiết lập khác, chọn 'không'."
 
@@ -5785,6 +5902,9 @@ msgstr "Biên tập dịch vụ kiểm soát của phụ huynh"
 
 msgid "Parental control setup"
 msgstr "Thiết lập kiểm soát của cha mẹ"
+
+msgid "Passthrough"
+msgstr ""
 
 msgid "Password"
 msgstr "Mật khẩu"
@@ -6194,6 +6314,13 @@ msgstr "Đèn LED nguồn"
 msgid "Power management. Consult your receiver's manual for more information."
 msgstr "Quản lý năng lượng. Tham khảo hướng dẫn sử dụng của người nhận để biết thêm thông tin."
 
+#, fuzzy
+msgid "Power off time"
+msgstr "Sắp xếp thời gian"
+
+msgid "Power off timer"
+msgstr ""
+
 msgid "Power on display"
 msgstr "Năng lượng hiển thị"
 
@@ -6526,6 +6653,9 @@ msgstr "Ghi"
 
 msgid "Recall to previous service"
 msgstr "Nhớ lại dịch vụ trước"
+
+msgid "Receiver or driver does not support FCC"
+msgstr ""
 
 msgid "Reception settings"
 msgstr "Cài đặt tiếp tân"
@@ -6938,6 +7068,9 @@ msgstr "SNR"
 
 msgid "SNR:"
 msgstr "SNR:"
+
+msgid "SPDIF"
+msgstr ""
 
 msgid "SRT file"
 msgstr "Tệp SRT"
@@ -9124,11 +9257,19 @@ msgstr "Tùy chọn của anh ấy cho phép bạn hiển thị menu và / hoặ
 msgid "This option allows you to show the full screen path leading to the current screen."
 msgstr "Tùy chọn này cho phép bạn hiển thị đường dẫn toàn màn hình dẫn đến màn hình hiện tại."
 
+#, fuzzy
+msgid "This option allows you to switch audio to bluetooth speakers."
+msgstr "Tùy chọn này cho phép bạn có thể đặt mức âm lượng tự động."
+
 msgid "This option allows you to view the old and new settings side by side."
 msgstr "Tùy chọn này cho phép bạn xem các cài đặt cũ và mới cạnh nhau."
 
 msgid "This option can be useful for long HDMI cables."
 msgstr "Tùy chọn này có thể hữu ích cho cáp HDMI dài."
+
+#, fuzzy
+msgid "This option configures the general audio delay for bluetooth speakers."
+msgstr "Định cấu hình độ trễ âm thanh chung của các rãnh âm thanh nổi."
 
 msgid "This option set the level of surpression of mosquito noise (Mosquito Noise is random aliasing as a result of strong compression). Obviously this goes at the cost of picture details."
 msgstr "Tùy chọn này đặt mức độ triệt tiêu tiếng ồn của muỗi (Tiếng ồn của muỗi là răng cưa ngẫu nhiên do nén mạnh). Rõ ràng điều này đi với chi phí hình ảnh chi tiết."
@@ -10060,6 +10201,10 @@ msgstr "W"
 msgid "WLAN connection"
 msgstr "Kết nối mạng WLAN"
 
+#, fuzzy
+msgid "WMA Pro downmix"
+msgstr "AAC kết hợp"
+
 msgid "WSS on 4:3"
 msgstr "WSS on 4:3"
 
@@ -10738,6 +10883,10 @@ msgstr "Zambia"
 msgid "Zap"
 msgstr "Kinh điển"
 
+#, fuzzy
+msgid "Zap Up/Down"
+msgstr "Hạ xuống"
+
 msgid "Zap back to previously tuned service?"
 msgstr "Quay trở lại dịch vụ điều chỉnh trước đây?"
 
@@ -10981,6 +11130,16 @@ msgstr "đã kết nối"
 
 msgid "controlled by HDMI"
 msgstr "được điều khiển bởi HDMI"
+
+msgid "convert to AC3"
+msgstr ""
+
+msgid "convert to DTS"
+msgstr ""
+
+#, fuzzy
+msgid "convert to multi-channel PCM"
+msgstr "PCM đa kênh"
 
 msgid "cooking"
 msgstr "nấu ăn"
@@ -11298,6 +11457,10 @@ msgstr "menu chính"
 msgid "mins"
 msgstr "phút"
 
+#, fuzzy
+msgid "module disabled"
+msgstr "lực lượng vô hiệu hóa"
+
 msgid "month"
 msgstr "tháng"
 
@@ -11475,6 +11638,10 @@ msgstr "chương trình trẻ em mẫu giáo"
 
 msgid "preserve bookmarks in cuts"
 msgstr ""
+
+#, fuzzy
+msgid "priority"
+msgstr "Sự ưu tiên"
 
 msgid "receiver software because updates are available."
 msgstr "phần mềm đầu thu vì cập nhật có sẵn."
@@ -11752,6 +11919,13 @@ msgstr "không thể kiểm chứng"
 
 msgid "until standby/restart"
 msgstr "cho đến khi chờ / khởi động lại"
+
+msgid "use HDMI cacenter"
+msgstr ""
+
+#, fuzzy
+msgid "use best / controlled by HDMI"
+msgstr "được điều khiển bởi HDMI"
 
 msgid "user defined"
 msgstr "đã xác định người dùng"

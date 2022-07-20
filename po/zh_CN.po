@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: enigma2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-26 15:37+0100\n"
+"POT-Creation-Date: 2022-07-06 22:43+0200\n"
 "PO-Revision-Date: 2021-07-31 17:00+0800\n"
 "Last-Translator: 孤独之剑 <haotzyy1970@yahoo.com>\n"
 "Language-Team: 孤独之剑 <haotzyy1970@yahoo.com>\n"
@@ -594,8 +594,23 @@ msgstr "音/视频设置"
 msgid "AAC downmix"
 msgstr "AAC缩减混音"
 
+#, fuzzy
+msgid "AAC transcoding"
+msgstr "转码: "
+
+#, fuzzy
+msgid "AAC+ downmix"
+msgstr "AAC缩减混音"
+
+msgid "AC3"
+msgstr ""
+
 msgid "AC3 downmix"
 msgstr "AC3缩减混音"
+
+#, fuzzy
+msgid "AC3 transcoding"
+msgstr "转码: "
 
 msgid "ACQUIRING TSID/ONID"
 msgstr "获取TSID/ONID"
@@ -1168,6 +1183,9 @@ msgstr "自动书签"
 msgid "Automatic scan"
 msgstr "自动扫描"
 
+msgid "Automatically power off box to deep standby mode."
+msgstr ""
+
 msgid "Automatically put the TV in standby whenever the receiver goes into standby or deep standby."
 msgstr "当接收器进入待机或深度待机时,自动将电视置于待机状态."
 
@@ -1429,6 +1447,10 @@ msgstr "CI 通用接口选择"
 
 msgid "CI assignment"
 msgstr "CI选择"
+
+#, fuzzy
+msgid "CI enabled"
+msgstr "启用"
 
 msgid "CI slot: "
 msgstr "CI插槽: "
@@ -1700,6 +1722,26 @@ msgstr "选择调谐器"
 
 msgid "Choose bouquet"
 msgstr "选择自定义组"
+
+#, fuzzy
+msgid "Choose whether AAC sound tracks should be transcoded."
+msgstr "配置多音轨频道是否缩混音频为立体声."
+
+#, fuzzy
+msgid "Choose whether AC3 sound tracks should be transcoded."
+msgstr "配置多音轨频道是否缩混音频为立体声."
+
+#, fuzzy
+msgid "Choose whether WMA Pro sound tracks should be downmixed."
+msgstr "配置多音轨频道是否缩混音频为立体声."
+
+#, fuzzy
+msgid "Choose whether multi channel DTS-HD(HR/MA) sound tracks should be downmixed or transcoded."
+msgstr "配置多音轨频道是否缩混音频为立体声."
+
+#, fuzzy
+msgid "Choose whether multi channel aac+ sound tracks should be downmixed to stereo."
+msgstr "配置多音轨频道是否缩混音频为立体声."
 
 msgid "Choose whether to scan a single transponder, one satellite or multiple satellites."
 msgstr ""
@@ -2391,6 +2433,10 @@ msgstr "捷克语"
 msgid "D"
 msgstr "D"
 
+#, fuzzy
+msgid "DAC"
+msgstr "PDC"
+
 msgid "DHCP"
 msgstr "自动分配地址(DHCP)"
 
@@ -2400,7 +2446,14 @@ msgstr "DMM高级"
 msgid "DMM normal"
 msgstr "DMM标准"
 
+msgid "DTS"
+msgstr ""
+
 msgid "DTS downmix"
+msgstr "DTS缩减混音"
+
+#, fuzzy
+msgid "DTS-HD(HR/MA) downmix"
 msgstr "DTS缩减混音"
 
 msgid "DUAL LAYER DVD"
@@ -2480,6 +2533,9 @@ msgstr "默认定时器类型"
 
 msgid "Default+Picon"
 msgstr "默认+Picon"
+
+msgid "Define additional delay in milliseconds before start of http(s) streams, e.g. to connect a remote tuner, you use a complex system of DiSEqC."
+msgstr ""
 
 msgid "Define the location of the EPG Cache file."
 msgstr "自定义EPG缓存文件的位置."
@@ -2696,6 +2752,10 @@ msgstr "目录包含 %(file)s 和 %(subdir)s."
 
 msgid "Disable"
 msgstr "禁用"
+
+#, fuzzy
+msgid "Disable FCC during recordings"
+msgstr "媒体流里总是包含ECM"
 
 msgid "Disable Picture in Picture"
 msgstr "禁用画中画"
@@ -2951,6 +3011,10 @@ msgstr "尝试下载新的软件包列表.请稍候..."
 msgid "Downloading plugin information. Please wait..."
 msgstr "正在下载插件列表,请稍候..."
 
+#, fuzzy
+msgid "Downmix"
+msgstr "DTS缩减混音"
+
 msgid "Drama and Films"
 msgstr ""
 
@@ -2994,8 +3058,8 @@ msgstr "EPG:"
 msgid "ERROR - failed to scan (%s)!"
 msgstr "错误 - 扫描 (%s)失败!"
 
-#, python-format
-msgid "ERROR downloading file %s"
+#, fuzzy, python-format
+msgid "ERROR downloading file %s/%s"
 msgstr "下载文件 %s 时出错"
 
 msgid "East"
@@ -3113,6 +3177,10 @@ msgstr "启用自动快速扫描"
 msgid "Enable auto fastscan for %s"
 msgstr "为 %s 启用自动快速扫描"
 
+#, fuzzy
+msgid "Enable bluetooth audio"
+msgstr "允许编辑自定义组"
+
 msgid "Enable bouquet edit"
 msgstr "允许编辑自定义组"
 
@@ -3142,6 +3210,10 @@ msgstr "使用HDMI-CEC启用或禁用."
 
 msgid "Enable parental protection"
 msgstr "启用家长保护"
+
+#, fuzzy
+msgid "Enable power off timer"
+msgstr "启用唤醒定时器"
 
 msgid "Enable remote enigma2 receiver to be tried to tune into services that cannot be tuned into locally (e.g. tuner is occupied or service type is unavailable on the local tuner. Specify complete URL including http:// and port number (normally ...:8001), e.g. http://second_box:8001."
 msgstr "启用远程enigma2接收机来尝试介入本地服务器 (如：当本地调谐器被占用或者频道类型不可用时. 指定完整的URL 包括 http:// 和端口数字 (一般为...:8001),如： http://second_box:8001."
@@ -3285,10 +3357,6 @@ msgstr "厄立特里亚"
 
 msgid "Error"
 msgstr "错误"
-
-#, python-format
-msgid "Error %s"
-msgstr "错误 %s"
 
 msgid "Error code"
 msgstr "错误码"
@@ -3541,6 +3609,14 @@ msgstr ""
 "FBC自动\n"
 "非活动"
 
+#, fuzzy
+msgid "FCC enabled"
+msgstr "启用"
+
+#, fuzzy
+msgid "FCCSetup"
+msgstr "设置"
+
 msgid "FEC"
 msgstr "前向纠错码(FEC)"
 
@@ -3634,6 +3710,15 @@ msgstr "法罗群岛"
 msgid "Fast"
 msgstr "快速"
 
+msgid "Fast Channel Change"
+msgstr ""
+
+msgid "Fast Channel Change Setup"
+msgstr ""
+
+msgid "Fast Channel Change setup"
+msgstr ""
+
 msgid "Fast DiSEqC"
 msgstr "快速DiSEqC"
 
@@ -3726,8 +3811,15 @@ msgstr "按OK键后,以下任务将被执行!"
 msgid "Force legacy signal stats"
 msgstr "强制旧类型信号状态"
 
+#, fuzzy
+msgid "Force power off (even when not in standby)"
+msgstr "在待机状态下强制切换到录制频道"
+
 msgid "Force zap to recording service in standby"
 msgstr "在待机状态下强制切换到录制频道"
+
+msgid "Forces deep standby, even when not in standby mode. Scheduled recordings remain unaffected."
+msgstr ""
 
 msgid "Format"
 msgstr "格式化"
@@ -3847,6 +3939,10 @@ msgstr "一般AC3延迟"
 
 msgid "General PCM delay"
 msgstr "一般PCM延迟"
+
+#, fuzzy
+msgid "General bluetooth audio delay"
+msgstr "一般AC3延迟"
 
 msgid "Genre"
 msgstr "类型"
@@ -4008,6 +4104,9 @@ msgstr "HD2400"
 msgid "HD60/HD66SE/Multibox/Multibox SE"
 msgstr "HD60/Multibox/Multibox SE"
 
+msgid "HDMI"
+msgstr ""
+
 msgid "HDMI Colordepth"
 msgstr "HDMI色彩深度"
 
@@ -4114,6 +4213,10 @@ msgstr "分级模式"
 msgid "High bitrate support"
 msgstr "高比特率支持"
 
+#, fuzzy
+msgid "History Prev/Next"
+msgstr "历史记录里的下一个频道"
+
 msgid "History back"
 msgstr "历史记录里的上一个频道"
 
@@ -4167,6 +4270,9 @@ msgstr "您想在录制中加多少分钟?"
 
 msgid "How many minutes do you want to record?"
 msgstr "您想录制多少分钟?"
+
+msgid "Http(s) stream start delay"
+msgstr ""
 
 msgid "Hue"
 msgstr "色相"
@@ -4239,6 +4345,9 @@ msgstr "如果设置为“是”,信号值（信噪比等）将根据API v3计�
 
 msgid "If set to 'yes' the same commands will be sent to the TV for deep standby events, as are sent during regular standby events."
 msgstr "如果设置为'是',则与常规待机事件中发送的命令相同,深度待机事件中也会发送相同的命令."
+
+msgid "If the box is supposed to enter deep standby e.g. monday night at 1 AM, it actually is already tuesday. To enable this anyway, differing next day start time can be specified here."
+msgstr ""
 
 msgid "If using multiple uncommitted switches the DiSEqC commands must be sent multiple times. Set to the number of uncommitted switches in the chain minus one."
 msgstr "如果使用多个未提交的开关,则必须发送DISEQC命令 多次.设置为链中未提交的开关数减去一个."
@@ -4936,6 +5045,10 @@ msgstr "毛里塔尼亚"
 msgid "Mauritius"
 msgstr "毛里求斯"
 
+#, fuzzy
+msgid "Max channels"
+msgstr "频道"
+
 msgid "Max memory positions"
 msgstr "最大存储位置"
 
@@ -4951,8 +5064,8 @@ msgstr "马约特岛"
 msgid "Media player"
 msgstr "媒体播放器"
 
-msgid "Media player: GStreamer, version "
-msgstr "媒体播放器:GStreamer,版本 "
+msgid "version"
+msgstr "版本"
 
 msgid "Media player: ffmpeg, version "
 msgstr "媒体播放器:ffmpeg,版本 "
@@ -5335,6 +5448,9 @@ msgctxt "now/next: 'next' event label"
 msgid "Next"
 msgstr "稍候播出"
 
+msgid "Next day starts at"
+msgstr ""
+
 msgid "Nicaragua"
 msgstr "尼加拉瓜"
 
@@ -5647,6 +5763,10 @@ msgstr "在这段时间前才能快速转动卫星天线."
 msgid "Only on startup"
 msgstr "仅仅在启动时"
 
+#, fuzzy
+msgid "Only power off"
+msgstr "启用唤醒定时器"
+
 msgid "Only select 'yes' if you are using a multiswich that requires a DiSEqC Port-A command signal. For all other setups select 'no'."
 msgstr "只有在使用需要DiSEqC端口A命令信号的多开关时,才选择'是'.对于所有其他设置,选择'否'."
 
@@ -5799,6 +5919,9 @@ msgstr "家长控制服务编辑"
 
 msgid "Parental control setup"
 msgstr "家长控制设置"
+
+msgid "Passthrough"
+msgstr ""
 
 msgid "Password"
 msgstr "密码"
@@ -6208,6 +6331,13 @@ msgstr "电源LED"
 msgid "Power management. Consult your receiver's manual for more information."
 msgstr "电源管理.有关更多信息,请查阅接收器手册."
 
+#, fuzzy
+msgid "Power off time"
+msgstr "按时间排序"
+
+msgid "Power off timer"
+msgstr ""
+
 msgid "Power on display"
 msgstr "接通电源显示"
 
@@ -6540,6 +6670,9 @@ msgstr "录制"
 
 msgid "Recall to previous service"
 msgstr "返回之前的频道"
+
+msgid "Receiver or driver does not support FCC"
+msgstr ""
 
 msgid "Reception settings"
 msgstr "接收设置"
@@ -6952,6 +7085,9 @@ msgstr "SNR"
 
 msgid "SNR:"
 msgstr "SNR:"
+
+msgid "SPDIF"
+msgstr ""
 
 msgid "SRT file"
 msgstr "SRT文件"
@@ -9142,11 +9278,19 @@ msgstr "此选项允许您显示菜单或插件编号快速链接."
 msgid "This option allows you to show the full screen path leading to the current screen."
 msgstr "此选项允许您显示通向当前屏幕的全屏路径."
 
+#, fuzzy
+msgid "This option allows you to switch audio to bluetooth speakers."
+msgstr "此选项允许您设置自动音量."
+
 msgid "This option allows you to view the old and new settings side by side."
 msgstr "此选项允许您并排查看旧设置和新设置."
 
 msgid "This option can be useful for long HDMI cables."
 msgstr "此选项可用于长HDMI电缆."
+
+#, fuzzy
+msgid "This option configures the general audio delay for bluetooth speakers."
+msgstr "配置音频延迟和立体声音轨."
 
 msgid "This option set the level of surpression of mosquito noise (Mosquito Noise is random aliasing as a result of strong compression). Obviously this goes at the cost of picture details."
 msgstr "此选项设置蚊子噪声的意外压缩级别（蚊子噪声是强压缩导致的随机混叠）.显然,这是 以图片细节为代价的."
@@ -10081,6 +10225,10 @@ msgstr "W"
 msgid "WLAN connection"
 msgstr "WLAN连接"
 
+#, fuzzy
+msgid "WMA Pro downmix"
+msgstr "AAC缩减混音"
+
 msgid "WSS on 4:3"
 msgstr "宽高比在4:3时显示宽屏幕信号"
 
@@ -10759,6 +10907,10 @@ msgstr "赞比亚"
 msgid "Zap"
 msgstr "跳转"
 
+#, fuzzy
+msgid "Zap Up/Down"
+msgstr "向下切换频道"
+
 msgid "Zap back to previously tuned service?"
 msgstr "是否回到上次的频道？"
 
@@ -11002,6 +11154,16 @@ msgstr "已连接"
 
 msgid "controlled by HDMI"
 msgstr "由HDMI控制"
+
+msgid "convert to AC3"
+msgstr ""
+
+msgid "convert to DTS"
+msgstr ""
+
+#, fuzzy
+msgid "convert to multi-channel PCM"
+msgstr "多通道PCM"
 
 msgid "cooking"
 msgstr "烹饪"
@@ -11319,6 +11481,10 @@ msgstr "菜单"
 msgid "mins"
 msgstr "分钟"
 
+#, fuzzy
+msgid "module disabled"
+msgstr "强制禁用"
+
 msgid "month"
 msgstr "月"
 
@@ -11496,6 +11662,10 @@ msgstr "学前儿童程序（早教程序）"
 
 msgid "preserve bookmarks in cuts"
 msgstr ""
+
+#, fuzzy
+msgid "priority"
+msgstr "次序"
 
 msgid "receiver software because updates are available."
 msgstr "机顶盒软件有可用的更新."
@@ -11773,6 +11943,13 @@ msgstr "不可以测试"
 
 msgid "until standby/restart"
 msgstr "直到待机/重启"
+
+msgid "use HDMI cacenter"
+msgstr ""
+
+#, fuzzy
+msgid "use best / controlled by HDMI"
+msgstr "由HDMI控制"
 
 msgid "user defined"
 msgstr "用户定义"
