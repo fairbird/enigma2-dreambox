@@ -1652,27 +1652,6 @@ msgstr "أختار الباقة"
 msgid "Choose bouquet"
 msgstr "أختار الباقة"
 
-msgid "Choose whether AAC sound tracks should be transcoded."
-msgstr "اختار ما إذا كانت المسارات الصوتية متعددة القنوات يجب أن تكون مختلطة إلى ستريو."
-
-msgid "Choose whether AC3 sound tracks should be transcoded."
-msgstr "اختار ما إذا كانت المسارات الصوتية متعددة القنوات يجب أن تكون مختلطة إلى ستريو."
-
-msgid "Choose whether WMA Pro sound tracks should be downmixed."
-msgstr "اختار ما إذا كانت المسارات الصوتية متعددة القنوات يجب أن تكون مختلطة إلى ستريو."
-
-msgid "Choose whether multi channel DTS-HD(HR/MA) sound tracks should be downmixed or transcoded."
-msgstr "اختار ما إذا كانت المسارات الصوتية متعددة القنوات يجب أن تكون مختلطة إلى ستريو."
-
-msgid "Choose whether multi channel aac+ sound tracks should be downmixed to stereo."
-msgstr "اختار ما إذا كانت المسارات الصوتية متعددة القنوات يجب أن تكون مختلطة إلى ستريو."
-
-msgid "Choose whether to scan a single transponder, one satellite or multiple satellites."
-msgstr "اختر ما إذا كنت تريد مسح مرسل مستجيب واحد أو قمر صناعي واحد أو أقمار صناعية متعددة."
-
-msgid "Choose whether to scan for free services only or whether to include paid/encrypted services too."
-msgstr "اختر ما إذا كنت تريد البحث عن خدمات مجانية فقط أو ما إذا كنت تريد تضمين الخدمات المدفوعة / المشفرة أيضًا."
-
 msgid "Choose which tuner to configure."
 msgstr "اختيار أي موالف لتكوين."
 
