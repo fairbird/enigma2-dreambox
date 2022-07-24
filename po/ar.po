@@ -1383,7 +1383,6 @@ msgstr "ضبط الكامة الداخلية (واجهة المستخدم)"
 msgid "CI assignment"
 msgstr "مهمة واجهة المستخدم"
 
-#, fuzzy
 msgid "CI enabled"
 msgstr "تم التفعيل"
 
@@ -1653,23 +1652,18 @@ msgstr "أختار الباقة"
 msgid "Choose bouquet"
 msgstr "أختار الباقة"
 
-#, fuzzy
 msgid "Choose whether AAC sound tracks should be transcoded."
 msgstr "اختار ما إذا كانت المسارات الصوتية متعددة القنوات يجب أن تكون مختلطة إلى ستريو."
 
-#, fuzzy
 msgid "Choose whether AC3 sound tracks should be transcoded."
 msgstr "اختار ما إذا كانت المسارات الصوتية متعددة القنوات يجب أن تكون مختلطة إلى ستريو."
 
-#, fuzzy
 msgid "Choose whether WMA Pro sound tracks should be downmixed."
 msgstr "اختار ما إذا كانت المسارات الصوتية متعددة القنوات يجب أن تكون مختلطة إلى ستريو."
 
-#, fuzzy
 msgid "Choose whether multi channel DTS-HD(HR/MA) sound tracks should be downmixed or transcoded."
 msgstr "اختار ما إذا كانت المسارات الصوتية متعددة القنوات يجب أن تكون مختلطة إلى ستريو."
 
-#, fuzzy
 msgid "Choose whether multi channel aac+ sound tracks should be downmixed to stereo."
 msgstr "اختار ما إذا كانت المسارات الصوتية متعددة القنوات يجب أن تكون مختلطة إلى ستريو."
 
@@ -3106,7 +3100,6 @@ msgstr "تعطيل او تمكين إستخدام  كيبل عالي الوضو�
 msgid "Enable parental protection"
 msgstr "تمكين الحماية الأبوية"
 
-#, fuzzy
 msgid "Enable power off timer"
 msgstr "تمكين وضع التحريك للقنوات"
 
@@ -5599,7 +5592,6 @@ msgstr "فقط حرك الطبق بسرعة قبل هذه الساعة."
 msgid "Only on startup"
 msgstr "فقط عند بدء التشغيل"
 
-#, fuzzy
 msgid "Only power off"
 msgstr "تمكين وضع التحريك للقنوات"
 
@@ -6150,10 +6142,6 @@ msgstr "الأغلاق"
 
 msgid "Power management. Consult your receiver's manual for more information."
 msgstr "إدارة الإغلاق. راجع دليل المتلقي الخاص بك للحصول على المعلومات."
-
-#, fuzzy
-msgid "Power off time"
-msgstr "وقت انقطاع التيار الكهربائي"
 
 msgid "Power off timer"
 msgstr "مؤقت انقطاع التيار الكهربائي"
@@ -10278,7 +10266,6 @@ msgstr "عند التمكين، سيختار جهاز الاستقبال مسا�
 msgid "When enabled, the receiver will select an AC3+ track (when available)."
 msgstr "عند التمكين، سيختار جهاز الاستقبال مسار الصوتي الثلاثي (عند توفره)."
 
-#, fuzzy
 msgid "When enabled, then when changing bouquets, set the cursor on the service from the channel history in the channel selection list."
 msgstr "عند التمكين، سيعرض أرقام القنوات في شاشة اختيار القناة."
 
@@ -11162,7 +11149,6 @@ msgstr "القائمة"
 msgid "mins"
 msgstr "دقائق"
 
-#, fuzzy
 msgid "module disabled"
 msgstr "تم التعطيل"
 
