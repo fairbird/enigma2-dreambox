@@ -304,7 +304,7 @@ class DNSSettings(Setup):
 			iNetwork.addNameserver(dnsServer)
 		print("[NetworkSetup] DNSSettings: Saved DNS list: %s." % str(iNetwork.getNameserverList()))
 		# iNetwork.saveNameserverConfig()
-		iNetwork.writeNameserverConfig()
+		iNetwork.writeNetworkConfig()
 		Setup.keySave(self)
 
 	def addDNSServer(self):
@@ -506,7 +506,7 @@ class AdapterSetup(ConfigListScreen, HelpableScreen, Screen):
 			self.dhcpdefault = False
 		self.hasGatewayConfigEntry = NoSave(ConfigYesNo(default=self.dhcpdefault or False))
 		self.gatewayConfigEntry = NoSave(ConfigIP(default=iNetwork.getAdapterAttribute(self.iface, "gateway") or [0, 0, 0, 0]))
-		nameserver = (iNetwork.getNameserverList() + [[0, 0, 0, 0]] * 2)[0:2]
+		nameserver = (iNetwork.getNameserverList(dhcp=True) + [[0, 0, 0, 0]] * 2)[0:2]
 		self.primaryDNS = NoSave(ConfigIP(default=nameserver[0]))
 		self.secondaryDNS = NoSave(ConfigIP(default=nameserver[1]))
 
