@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: enigma2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-02-07 15:38+0100\n"
-"PO-Revision-Date: 2021-11-26 14:55+0300\n"
+"POT-Creation-Date: 2022-07-30 14:55+0200\n"
 "Last-Translator: RAED - Fairbirb <rrrr53@hotmail.com>\n"
 "Language-Team: \n"
 "Language: ar\n"
@@ -4001,6 +4001,9 @@ msgstr "القرص الصلب"
 msgid "Harddisk Setup"
 msgstr "ضبط القرص الصلب"
 
+msgid "Hardware Accelerated"
+msgstr "تسريع الأجهزة"
+
 msgid "Hardware: "
 msgstr ":المعدات"
 
@@ -4888,9 +4891,6 @@ msgstr "مايوت"
 msgid "Media player"
 msgstr "مشغل الوسائط"
 
-msgid "version"
-msgstr "إصدار"
-
 msgid "Media scanner"
 msgstr "باحث الوسائط"
 
@@ -5598,7 +5598,7 @@ msgstr "في وضع الاستعداد العميق LED حالة تشغيل"
 msgid "Operating LED status in standby mode"
 msgstr "على الوضع في وضع الاستعداد LED حالة تشغيل"
 
-msgid "Operating LED status while running."
+msgid "Operating LED status while running"
 msgstr ".الحالة أثناء الجري LED حالة تشغيل"
 
 msgid "Opkg"
@@ -7535,6 +7535,9 @@ msgstr "بحث عـن القنـوات"
 msgid "Service title mode"
 msgstr "وضع عنوان الخدمة"
 
+msgid "Service type 4097 incorrect for PiP!"
+msgstr "PiP! نوع الخدمة 4097 غير صحيح لـ"
+
 msgid "Service unavailable!\n"
 "Check tuner configuration!"
 msgstr "القناة غير متوفرة !\n"
@@ -8565,7 +8568,7 @@ msgstr "قم بتشغيل العرض أثناء وضع الاستعداد"
 msgid "Switch on the display during Suspend Mode"
 msgstr "قم بتشغيل العرض أثناء وضع الإيقاف المرحلي"
 
-msgid "Switch on the display during operation."
+msgid "Switch on the display during operation"
 msgstr "قم بتشغيل العرض أثناء التشغيل."
 
 msgid "Switch to Android"
@@ -11578,6 +11581,9 @@ msgstr "محدده من قبل المستخدم"
 
 msgid "variety show"
 msgstr "عرض متنوع"
+
+msgid "version"
+msgstr "إصدار"
 
 msgid "vertical"
 msgstr "رأسي"
