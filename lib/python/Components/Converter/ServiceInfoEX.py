@@ -1,5 +1,25 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+# Copyright (c) 2boom 2013-18
+# v.1.4.5
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program. If not, see <http://www.gnu.org/licenses/>.
+#
+# 26.11.2018 add terrestrial and cable type mod by Sirius
+# 01.12.2018 fix video codec mod by Sirius
+# 25.12.2018 add support for gamma values mod by Sirius
+# 05.08.2021 add support Python3 mod by RAED
+
 from Components.Converter.Poll import Poll
 from Components.Converter.Converter import Converter
 from enigma import iServiceInformation, iPlayableService
@@ -19,7 +39,8 @@ if fileExists('/etc/issue'):
             gamma_data = {-1: 'N/A', 0: 'SDR', 1: 'HDR', 2: 'HDR10', 3: 'HLG', 4: ' '}
             codec_data = {-1: 'N/A', 0: 'MPEG2', 1: 'AVC', 2: 'H263', 3: 'VC1', 4: 'MPEG4-VC', 5: 'VC1-SM', 6: 'MPEG1', 7: 'HEVC', 8: 'VP8', 9: 'VP9', 10: 'XVID', 11: 'N/A 11', 12: 'N/A 12', 13: 'DIVX 3', 14: 'DIVX 4', 15: 'DIVX 5', 16: 'AVS', 17: 'N/A 17', 18: 'VP6', 19: 'N/A 19', 20: 'N/A 20', 21: 'SPARK'}
 
-WIDESCREEN = [3, 4, 7, 8, 11, 12, 15, 16]
+#WIDESCREEN = [3, 4, 7, 8, 11, 12, 15, 16]
+WIDESCREEN = [1, 3, 4, 7, 8, 0xB, 0xC, 0xF, 0x10]
 
 class ServiceInfoEX(Poll, Converter, object):
         apid = 0
@@ -244,7 +265,10 @@ class ServiceInfoEX(Poll, Converter, object):
                 if audio:
                         if audio.getCurrentTrack() > -1:
                                 self.stream['atype'] = str(audio.getTrackInfo(audio.getCurrentTrack()).getDescription()).replace(",", "")
-                self.stream['vtype'] = codec_data[info.getInfo(iServiceInformation.sVideoType)]
+                try:
+                	self.stream['vtype'] = codec_data[info.getInfo(iServiceInformation.sVideoType)]
+                except:
+                	pass
                 self.stream['avtype'] = self.stream['vtype'] + '/' + self.stream['atype']
                 if self.getServiceInfoString(info, iServiceInformation.sFrameRate, lambda x: "%d" % ((x + 500) / 1000)) != "N/A":
                         self.stream['fps'] = self.getServiceInfoString(info, iServiceInformation.sFrameRate, lambda x: "%d" % ((x + 500) / 1000))
