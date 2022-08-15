@@ -224,7 +224,7 @@ class CommitInfo(Screen):
 		self.projects = [
 			("https://api.github.com/repos/fairbird/enigma2-dreambox/commits" + branch, "Enigma2"),
 			("https://api.github.com/repos/openpli/openpli-oe-core/commits" + branch_oe, "Openpli Oe Core"),
-			("https://api.github.com/repos/openpli/enigma2-plugins/commits", "Enigma2 Plugins"),
+			("https://api.github.com/repos/openpli/enigma2-plugins/commits" + branch, "Enigma2 Plugins"),
 			("https://api.github.com/repos/oe-alliance/aio-grab/commits", "Aio Grab"),
 			("https://api.github.com/repos/oe-alliance/XMLTV-Import/commits/master", "Plugin EPGImport"),
 			("https://api.github.com/repos/littlesat/skin-PLiHD/commits", "Skin PLi HD"),
