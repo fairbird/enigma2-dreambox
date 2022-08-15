@@ -291,6 +291,7 @@ CXXFLAGS="$CXXFLAGS -Wall -Wextra -Werror \
 	-Wstringop-overflow=3 -Woverlength-strings -Wno-error=deprecated-declarations\
 	-Wunsafe-loop-optimizations -Wpointer-arith \
 	-Wfloat-equal -Wlogical-op \
+	-Wno-error=mismatched-new-delete \
 	-Wno-error=cast-align=strict -Wno-error=ignored-qualifiers \
 	-Wno-error=cast-function-type -Wno-error=deprecated-declarations \
 	-Wno-error=use-after-free -Wno-error=dangling-pointer= \
