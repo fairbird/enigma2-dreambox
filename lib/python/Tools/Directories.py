@@ -493,7 +493,7 @@ def fileReadXML(filename, default=None, source=DEFAULT_MODULE_NAME, debug=False)
 def getRecordingFilename(basename, dirname=None):
 	# Filter out non-allowed characters.
 	non_allowed_characters = "/.\\:*?<>|\""
-	basename = basename.replace("\x86", "").replace("\x87", "")
+	basename = basename.replace("\xc2\x86", "").replace("\xc2\x87", "")
 	filename = ""
 	for c in basename:
 		if c in non_allowed_characters or ord(c) < 32:
