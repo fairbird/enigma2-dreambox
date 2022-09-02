@@ -2688,9 +2688,11 @@ msgstr "اعرض الدليل الإلكتروني للحدث الحالي"
 msgid "Display EPG list for current channel"
 msgstr "عرض دليل البرامج الإلكتروني للقناة الحالية"
 
+#, fuzzy
 msgid "Display Skin"
 msgstr "لوحة تحكم عرض الإضاءة"
 
+#, fuzzy
 msgid "Display and userinterface"
 msgstr "واجهة العرض والمستخدم"
 
@@ -2824,13 +2826,15 @@ msgstr "هل تريد إستعادة الاعدادات ؟"
 msgid "Do you want to resume this playback?"
 msgstr "هل تريد استئناف التشغيل ؟"
 
+#, fuzzy
 msgid "Do you want to select a different skin?"
 msgstr "هل تريد عمل بحث؟"
 
+#, fuzzy
 msgid "Do you want to update the package:\n"
 msgstr "هل تريد ترقية الحزمة:\n"
 
-#, python-format
+#, fuzzy, python-format
 msgid "Do you want to update your receiver to %s?"
 msgstr "هل تريد تحديث جهاز الاستقبال الخاص بك إلى %s؟"
 
@@ -3759,9 +3763,11 @@ msgstr "GB"
 msgid "GUI Settings"
 msgstr "إعدادات إعادة تشغيل واجهة المستخدم"
 
+#, fuzzy
 msgid "GUI Skin"
 msgstr "الجلد"
 
+#, fuzzy
 msgid "GUI needs a restart to apply a new language\n"
 "Do you want to restart the GUI now?"
 msgstr "يجب إعادة تشغيل الاينجما2 لتطبيق السكن \n"
@@ -5051,12 +5057,14 @@ msgstr "الانتقال إلى المكان إكس"
 msgid "Move to the next page"
 msgstr "الانتقال الى الزاوية التالية"
 
+#, fuzzy
 msgid "Move to the next skin"
 msgstr "أنتقل للأسفل إلى الإدخال التالي"
 
 msgid "Move to the previous page"
 msgstr "عوده للفصل السابق"
 
+#, fuzzy
 msgid "Move to the previous skin"
 msgstr "تحرك للأعلى المدخل السابق"
 
@@ -6215,6 +6223,7 @@ msgstr "اضغط مفتاح القائمة من ريموت التحكم عن ب�
 msgid "Press OK on your remote control to continue."
 msgstr "أضغط موافق من ريموت التحكم عن بعد للإستمرار."
 
+#, fuzzy, python-format
 msgid "Press OK to activate the selected %s skin."
 msgstr "أضغط موافق لتفعيل السكن المختار."
 
@@ -6228,6 +6237,7 @@ msgstr "أضغط موافق لتحرير الاعدادات."
 msgid "Press OK to get further details for %s"
 msgstr "أضغط موافق للحصول على تفاصيل أكثر %s"
 
+#, fuzzy, python-format
 msgid "Press OK to keep the currently selected %s skin."
 msgstr "أضغط موافق لتفعيل السكن المختار."
 
@@ -8012,9 +8022,11 @@ msgstr "موقع خط طول"
 msgid "Skin & Resolution: %s (%sx%s)\n"
 msgstr "الجلد والدقة: %s (%sx%s)\n"
 
+#, fuzzy
 msgid "Skin Selection Actions"
 msgstr "حدد الاجراء"
 
+#, fuzzy
 msgid "SkinSelector: Restart GUI"
 msgstr "إعادة تشغيل الاينجما"
 
@@ -8855,6 +8867,7 @@ msgstr "ملف المؤقت (المؤقتات.xml) غير صالح ولا يمك
 msgid "The user interface of the receiver will now restart to select the selected skin"
 msgstr "سيتم الآن إعادة تشغيل واجهة المستخدم الخاصة بجهاز الاستقبال لتحديد السطح المحدد"
 
+#, fuzzy
 msgid "The user interface of your receiver is restarting"
 msgstr "جاري إعادة تشغيل واجهة المستخدم على الخاص بك"
 
@@ -9224,6 +9237,7 @@ msgstr "وضع عنوان للإعدادات"
 msgid "To apply the selected '%s' skin the GUI needs to restart. Would you like to restart the GUI now?"
 msgstr "تحتاج واجهة المستخدم الرسومية إلى إعادة التشغيل. هل ترغب في إعادة تشغيل واجهة المستخدم الرسومية الآن؟ '%s' لتطبيق السطح المحدد"
 
+#, fuzzy
 msgid "To audio selection"
 msgstr "أختيار الأفلام"
 
@@ -10158,15 +10172,19 @@ msgstr "عند التمكين، يتم نقل التسجيلات المحذوف�
 msgid "When enabled, display the EIT now/next eventdata in infobar. When disabled, display now/next eventdata from the EPG cache instead."
 msgstr ".عند التمكين ، اعرض بيانات الحدث التي تمر بمرحلة انتقالية الآن/التالي في شريط المعلومات. عند التعطيل ، اعرض بيانات الحدث الآن/التالي من ذاكرة التخزين المؤقت لـ الدليل الإلكتروني بدلاً من ذلك"
 
+#, fuzzy
 msgid "When enabled, encryption info will be shown in the infobar (when supported by the skin)."
 msgstr "عرض معلومات التشفير في شريط المعلومات (عندما بدعم السكن)."
 
+#, fuzzy
 msgid "When enabled, error messages related to zapping will not be shown."
 msgstr ".عند التمكين ، لن يتم عرض رسائل الخطأ المتعلقة بالانطلاق"
 
+#, fuzzy
 msgid "When enabled, external subtitles will be always turned on for playback movie."
 msgstr "عند التمكين، سيتم دائما تشغيل الترجمة المرفقة مع الفيلم في الوسائط الخارجية على مشغل الفيلم."
 
+#, fuzzy
 msgid "When enabled, graphical DVB subtitles are preferred over teletext subtitles, when both types are available."
 msgstr "عند التمكين، يتم تفضيل الترجمة النصية الموجودة في القنوات على الترجمة النصية المضافة من قبل المستخدم، عندما يتوفر كلا النوعين."
 
