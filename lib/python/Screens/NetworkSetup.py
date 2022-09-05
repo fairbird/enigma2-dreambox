@@ -19,7 +19,6 @@ from Tools.LoadPixmap import LoadPixmap
 from Plugins.Plugin import PluginDescriptor
 from enigma import eTimer
 
-
 MODULE_NAME = __name__.split(".")[-1]
 
 
@@ -235,6 +234,8 @@ class DNSSettings(Setup):
 		}, prio=0, description=dnsDescription)
 		self["moveDownAction"].setEnabled(False)
 
+		self.updateControls()
+
 	def dnsCheck(self, dnsServers, refresh=True):
 		def dnsRefresh(refresh):
 			if refresh:
@@ -271,6 +272,8 @@ class DNSSettings(Setup):
 	def changedEntry(self):
 		current = self["config"].getCurrent()[1]
 		index = self["config"].getCurrentIndex()
+		dnsList = self["config"].getList()
+		self.dnsStart = len(dnsList)
 		if current == config.usage.dns:
 			self.dnsServers = self.dnsOptions[config.usage.dns.value][:]
 		elif self.dnsStart <= index < self.dnsStart + self.dnsLength:
@@ -286,8 +289,11 @@ class DNSSettings(Setup):
 	def updateControls(self):
 		dnsList = self["config"].getList()
 		self.dnsStart = len(dnsList)
+		for item, entry in enumerate([NoSave(ConfigIP(default=x)) for x in self.dnsServers], start=1):
+			dnsList.append(getConfigListEntry(_("Name server %d") % item, entry, _("Enter DNS (Dynamic Name Server) %d's IP address.") % item))
+		self.dnsLength = item
 		index = self["config"].getCurrentIndex() - self.dnsStart
-		if 0 <= index < self.dnsLength:
+		if -1 <= index < self.dnsLength:
 			self["key_blue"].setText(_("Delete") if self.dnsLength > 1 or self.dnsServers[0] != [0, 0, 0, 0] else "")
 			self["removeAction"].setEnabled(self.dnsLength > 1 or self.dnsServers[0] != [0, 0, 0, 0])
 			self["moveUpAction"].setEnabled(index > 0)
@@ -304,7 +310,7 @@ class DNSSettings(Setup):
 			iNetwork.addNameserver(dnsServer)
 		print("[NetworkSetup] DNSSettings: Saved DNS list: %s." % str(iNetwork.getNameserverList()))
 		# iNetwork.saveNameserverConfig()
-		iNetwork.writeNetworkConfig()
+		iNetwork.writeNameserverConfig()
 		Setup.keySave(self)
 
 	def addDNSServer(self):
@@ -506,7 +512,7 @@ class AdapterSetup(ConfigListScreen, HelpableScreen, Screen):
 			self.dhcpdefault = False
 		self.hasGatewayConfigEntry = NoSave(ConfigYesNo(default=self.dhcpdefault or False))
 		self.gatewayConfigEntry = NoSave(ConfigIP(default=iNetwork.getAdapterAttribute(self.iface, "gateway") or [0, 0, 0, 0]))
-		nameserver = (iNetwork.getNameserverList(dhcp=True) + [[0, 0, 0, 0]] * 2)[0:2]
+		nameserver = (iNetwork.getNameserverList() + [[0, 0, 0, 0]] * 2)[0:2]
 		self.primaryDNS = NoSave(ConfigIP(default=nameserver[0]))
 		self.secondaryDNS = NoSave(ConfigIP(default=nameserver[1]))
 
