@@ -631,6 +631,10 @@ class ConfigSequence(ConfigElement):
 		# assert isinstance(default[0], int), "list must contain numbers"
 		# assert len(default) == len(limits), "length must match"
 
+		self.limits = limits
+		self.blockLen = [len(str(x[1])) for x in limits]
+		self.totalLen = sum(self.blockLen) - 1
+
 		self.marked_pos = 0
 		self.seperator = seperator
 		self.limits = limits
@@ -663,8 +667,8 @@ class ConfigSequence(ConfigElement):
 			pos = 0
 			blockNumber = 0
 			block_len_total = [0]
-			for x in self.block_len:
-				pos += self.block_len[blockNumber]
+			for x in self.blockLen:
+				pos += self.blockLen[blockNumber]
 				block_len_total.append(pos)
 				if pos - 1 >= self.marked_pos:
 					pass
@@ -754,7 +758,7 @@ class ConfigSequence(ConfigElement):
 		return self.seperator.join([self.saveSingle(x) for x in val])
 
 	def toDisplayString(self, value):
-		return self.seperator.join(["%%0%sd" % (str(self.block_len[index]) if self.zeroPad else "") % value for index, value in enumerate(self._value)])
+		return self.seperator.join(["%%0%sd" % (str(self.blockLen[index]) if self.zeroPad else "") % value for index, value in enumerate(self._value)])
 
 	def saveSingle(self, v):
 		return str(v)
@@ -775,7 +779,7 @@ ip_limits = [(0, 255), (0, 255), (0, 255), (0, 255)]
 class ConfigIP(ConfigSequence):
 	def __init__(self, default, auto_jump=False):
 		ConfigSequence.__init__(self, seperator=".", limits=ip_limits, default=default)
-		self.block_len = [len(str(x[1])) for x in self.limits]
+		self.blockLen = [len(str(x[1])) for x in self.limits]
 		self.marked_block = 0
 		self.overwrite = True
 		self.auto_jump = auto_jump
@@ -822,7 +826,7 @@ class ConfigIP(ConfigSequence):
 					return
 				else:
 					self._value[self.marked_pos] = newValue
-			if len(str(self._value[self.marked_pos])) >= self.block_len[self.marked_pos]:
+			if len(str(self._value[self.marked_pos])) >= self.blockLen[self.marked_pos]:
 				self.handleKey(ACTIONKEY_RIGHT, callback)
 			self.validate()
 			if self._value != prev:
@@ -832,9 +836,9 @@ class ConfigIP(ConfigSequence):
 
 	def genText(self):
 		value = self.seperator.join([str(x) for x in self._value])
-		block_len = [len(str(x)) for x in self._value]
-		leftPos = sum(block_len[:self.marked_pos]) + self.marked_pos
-		rightPos = sum(block_len[:self.marked_pos + 1]) + self.marked_pos
+		blockLen = [len(str(x)) for x in self._value]
+		leftPos = sum(blockLen[:self.marked_pos]) + self.marked_pos
+		rightPos = sum(blockLen[:self.marked_pos + 1]) + self.marked_pos
 		mBlock = list(range(leftPos, rightPos))
 		return (value, mBlock)
 
@@ -2100,7 +2104,7 @@ class ConfigCECAddress(ConfigSequence):
 					return
 				else:
 					self._value[self.marked_block] = newvalue
-			if len(str(self._value[self.marked_block])) >= self.block_len[self.marked_block]:
+			if len(str(self._value[self.marked_block])) >= self.blockLen[self.marked_block]:
 				self.handleKey(ACTIONKEY_RIGHT, callback)
 			self.validate()
 			self.changed()
