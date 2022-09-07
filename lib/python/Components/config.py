@@ -107,6 +107,7 @@ class ConfigElement:
 		self.__notifiers_final = None
 		self.enabled = True
 		self.callNotifiersOnSaveAndCancel = False
+		self.callback = None
 
 	def getNotifiers(self):
 		if self.__notifiers is None:
@@ -1043,13 +1044,14 @@ class ConfigText(ConfigElement, NumericalTextInput):
 		NumericalTextInput.__init__(self, nextFunc=self.nextFunc, handleTimeout=False)
 
 		self.marked_pos = 0
-		self.allmarked = (default != "")
+		self.allmarked = (default != "")  # This is also used in Input.py!
 		self.fixed_size = fixed_size
 		self.visible_width = visible_width
 		self.offset = 0
 		self.overwrite = fixed_size
-		self.help_window = None
+		self.help_window = None  # DEBUG: Used in ConfigList.py, Wizard.py and NetworkSetup.py!
 		self.value = self.last_value = self.default = default
+		self.callback = None
 
 	def validateMarker(self):
 		textlen = len(self.text)
@@ -1180,6 +1182,8 @@ class ConfigText(ConfigElement, NumericalTextInput):
 		self.marked_pos += 1
 		self.validateMarker()
 		self.changed()
+		if self.callback:
+			self.callback()
 
 	def getValue(self):
 		return self.text
@@ -1551,11 +1555,16 @@ class ConfigDictionarySet(ConfigElement):
 		self.default = default
 		self.dirs = {}
 		self.value = self.default
+		self.callback = None
 
 	def setValue(self, value):
 		if isinstance(value, dict):
+			prev = self.dirs
 			self.dirs = value
-			self.changed()
+			if self.dirs != prev:
+				self.changed()
+				if callable(self.callback):
+					self.callback()
 
 	def getValue(self):
 		return self.dirs
@@ -1583,6 +1592,8 @@ class ConfigDictionarySet(ConfigElement):
 			else:
 				self.dirs[value] = {config_key: config_value}
 			self.changed()
+			if callable(self.callback):
+				self.callback()
 
 	def getConfigValue(self, value, config_key):
 		if isinstance(value, str) and isinstance(config_key, str):
@@ -1591,13 +1602,11 @@ class ConfigDictionarySet(ConfigElement):
 		return None
 
 	def removeConfigValue(self, value, config_key):
-		if isinstance(value, str) and isinstance(config_key, str):
-			if value in self.dirs and config_key in self.dirs[value]:
-				try:
-					del self.dirs[value][config_key]
-				except KeyError:
-					pass
-				self.changed()
+		if isinstance(value, str) and isinstance(config_key, str) and value in self.dirs and config_key in self.dirs[value]:
+			del self.dirs[value][config_key]
+			self.changed()
+			if callable(self.callback):
+				self.callback()
 
 	def save(self):
 		del_keys = []
@@ -1610,6 +1619,8 @@ class ConfigDictionarySet(ConfigElement):
 			except KeyError:
 				pass
 			self.changed()
+			if callable(self.callback):
+				self.callback()
 		self.saved_value = self.tostring(self.dirs)
 
 	def handleKey(self, key, callback=None):
