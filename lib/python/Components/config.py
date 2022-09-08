@@ -1290,7 +1290,7 @@ class ConfigSelectionNumber(ConfigSelection):
 		ConfigSelection.setValue(self, str(val))
 
 	def handleKey(self, key, callback=None):
-		if not self.wrap:
+		if not self.wraparound:
 			value = str(self.value)
 			if key == ACTIONKEY_RIGHT and self.choices.index(value) == len(self.choices) - 1:
 				return
