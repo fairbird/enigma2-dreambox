@@ -781,15 +781,12 @@ class AdapterSetupConfiguration(Screen, HelpableScreen):
 
 	def queryWirelessDevice(self, iface):
 		try:
-			#from pythonwifi.iwlibs import Wireless
 			from wifi.scan import Cell
 			import errno
 		except ImportError:
 			return False
 		else:
 			try:
-				#ifobj = Wireless(iface) # a Wireless NIC Object
-				#wlanresponse = ifobj.getAPaddr()
 				os.system("ifconfig " + self.iface + " up")
 				wlanresponse = list(Cell.all(iface))
 			except IOError as xxx_todo_changeme:
