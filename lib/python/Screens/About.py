@@ -22,6 +22,7 @@ from skin import applySkinFactor, parameters, parseScale
 from time import strftime
 
 import os
+import glob
 
 
 class About(Screen):
@@ -56,18 +57,9 @@ class About(Screen):
 
 		AboutText += _("DVB driver version: ") + about.getDriverInstalledDate() + "\n"
 
-		#GStreamerVersion = _("Media player: GStreamer, version ") + about.getGStreamerVersionString().replace("GStreamer", "")
-		#self["GStreamerVersion"] = StaticText(GStreamerVersion)
 		AboutText += _("GStreamer version: ") + about.getGStreamerVersionString() + "\n"
 
-		#ffmpegVersion = _("Media player: ffmpeg, version ") + about.getffmpegVersionString()
-		#self["ffmpegVersion"] = StaticText(ffmpegVersion)
 		AboutText += _("FFmpeg version: ") + about.getffmpegVersionString() + "\n"
-
-		#if cpu.upper().startswith('HI') or os.path.isdir('/proc/hisi'):
-		#	AboutText += ffmpegVersion + "\n"
-		#else:
-		#	AboutText += GStreamerVersion + "\n"
 
 		AboutText += _("OpenSSL version: ") + about.getOpenSSLVersion() + "\n"
 
@@ -462,11 +454,9 @@ class Troubleshoot(Screen):
 		self.close()
 
 	def getDebugFilesList(self):
-		import glob
 		return [x for x in sorted(glob.glob("/home/root/enigma.*.debuglog"), key=lambda x: os.path.isfile(x) and os.path.getmtime(x))]
 
 	def getLogFilesList(self):
-		import glob
 		home_root = "/home/root/enigma2_crash.log"
 		tmp = "/tmp/enigma2_crash.log"
 		return [x for x in sorted(glob.glob("/mnt/hdd/*.log"), key=lambda x: os.path.isfile(x) and os.path.getmtime(x))] + (os.path.isfile(home_root) and [home_root] or []) + (os.path.isfile(tmp) and [tmp] or [])
