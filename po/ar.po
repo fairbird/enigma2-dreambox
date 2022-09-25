@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: enigma2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-07 15:38+0100\n"
+"POT-Creation-Date: 2022-09-24 20:36+0200\n"
 "POT-Creation-Date: 2022-07-30 14:55+0200\n"
 "Last-Translator: RAED - Fairbirb <rrrr53@hotmail.com>\n"
 "Language-Team: \n"
@@ -2298,7 +2298,7 @@ msgstr "قنوات التردد الحالي"
 msgid "Current value: "
 msgstr " :القيمة الحالية"
 
-msgid "Currently the commit log cannot be retrieved - please try later again"
+msgid "Currently the commit log cannot be retrieved - please try later again."
 msgstr "لا يمكن استرجاع سجل الالتزام في الوقت الحالي - يرجى المحاولة مرة أخرى في وقت لاحق."
 
 msgid "Custom skip time for '1'/'3' buttons"
@@ -3262,16 +3262,17 @@ msgstr "خطأ خلال تفكيك الصورة\n"
 msgid "Error stop stream!"
 msgstr "إيقاف التدفق"
 
-msgid "Error when writing epg.dat on server"
-msgstr "خطأ عند كتابة بيانات الدليل الإلكتروني على الخادم"
+#, fuzzy
+msgid "Error when writing epg.dat on the fallback receiver"
+msgstr "خطأ عند كتابة الدليل الإلكتروني على جهاز الاستقبال الاحتياطي"
 
-msgid "Error while retreiving epg.dat from server"
-msgstr "خطأ أثناء استرداد بيانات الدليل الإلكتروني من الخادم"
+msgid "Error while retreiving epg.dat from the fallback receiver"
+msgstr "خطأ أثناء استرداد بيانات الدليل الإلكتروني من جهاز الاستقبال الاحتياطي"
 
 #, python-format
-msgid "Error while retreiving fallback timer information\n"
+msgid "Error while retreiving location of epg.dat on the fallback receiver"
 "%s"
-msgstr "خطأ أثناء استرداد معلومات المؤقت الاحتياطي\n"
+msgstr "حدث خطأ أثناء استرداد موقع الدليل الإلكتروني على جهاز الاستقبال الاحتياطي\n"
 "%s"
 
 msgid "Error while retreiving location of epg.dat on server"
@@ -3514,6 +3515,9 @@ msgstr "فشل"
 
 msgid "Falkland Islands (Malvinas)"
 msgstr "جزر فوكلاند (مالفيناس)"
+
+msgid "Fallback API did not return a valid result."
+msgstr "لم تُرجع واجهة برمجة التطبيقات الاحتياطية نتيجة صحيحة."
 
 msgid "Fallback Timer"
 msgstr "ضبط مؤالف التراجع"
@@ -5329,8 +5333,9 @@ msgstr "لايوجد وصف متوفر."
 msgid "No displayable files on this medium found!"
 msgstr "لا يوجد ملفات للعرض على هذا الوسيط !"
 
-msgid "No epg.dat file found server"
-msgstr "لم يتم العثور على ملف معلومات الدليل الإلكتروني على الخادم"
+#, fuzzy
+msgid "No epg.dat file found on the fallback receiver"
+msgstr "لم يتم العثور على ملف معلومات الدليل الإلكتروني على جهاز الاستقبال الاحتياطي"
 
 msgid "No event info found, recording indefinitely."
 msgstr "لا يوجد معلومات عن الحدث, تسجيل إلى أجل غير مسمى."
@@ -7544,9 +7549,6 @@ msgstr "بحث عـن القنـوات"
 
 msgid "Service title mode"
 msgstr "وضع عنوان الخدمة"
-
-msgid "Service type 4097 incorrect for PiP!"
-msgstr "PiP! نوع الخدمة 4097 غير صحيح لـ"
 
 msgid "Service unavailable!\n"
 "Check tuner configuration!"
