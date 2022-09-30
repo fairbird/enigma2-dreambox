@@ -160,7 +160,7 @@ class MessageBox(Screen):
 		self.stopTimer()
 
 	def __repr__(self):
-		return str(type(self)) + "(" + self.text + ")"
+		return "%s(%s)" % (str(type(self)), self.text)
 
 	def getListWidth(self):
 		def getListLineTextWidth(text):
