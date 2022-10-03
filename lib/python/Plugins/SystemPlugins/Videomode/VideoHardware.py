@@ -482,4 +482,3 @@ class VideoHardware:
 
 video_hw = VideoHardware()
 video_hw.setConfiguredMode()
-
