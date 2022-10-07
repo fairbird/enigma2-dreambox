@@ -52,6 +52,7 @@ void gRC::lock()
 	pthread_mutex_lock(&mutex);
 #endif
 }
+
 void gRC::unlock()
 {
 #ifndef SYNC_PAINT
@@ -202,7 +203,7 @@ void *gRC::thread()
 				{
 					if (!m_spinner_enabled)
 					{
-						eDebug("[gRC] main thread is non-idle! display spinner!");
+						eDebug("[gRC] Warning: Main thread is busy, displaying spinner!");
 							std::ofstream dummy("/tmp/doPythonStackTrace");
 							dummy.close();
 					}
