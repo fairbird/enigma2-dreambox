@@ -256,26 +256,13 @@ def InitAVSwitch():
 	else:
 		config.av.transcodeaac = ConfigNothing()
 
-	try:
-		SystemInfo["CanChangeOsdAlpha"] = open("/proc/stb/video/alpha", "r") and True or False
-	except:
-		SystemInfo["CanChangeOsdAlpha"] = False
-
-	if SystemInfo["CanChangeOsdAlpha"]:
-		def setAlpha(config):
-			open("/proc/stb/video/alpha", "w").write(str(config.value))
-		config.av.osd_alpha = ConfigSlider(default=255, limits=(0, 255))
-		config.av.osd_alpha.addNotifier(setAlpha)
-
-	if os.path.exists("/proc/stb/vmpeg/0/pep_scaler_sharpness"):
-		def setScaler_sharpness(config):
-			myval = int(config.value)
+	if SystemInfo["HasScaler_sharpness"]:
+		def setScaler_sharpness(configElement):
 			try:
-				print("--> setting scaler_sharpness to: %0.8X" % myval)
-				open("/proc/stb/vmpeg/0/pep_scaler_sharpness", "w").write("%0.8X" % myval)
+				open("/proc/stb/vmpeg/0/pep_scaler_sharpness", "w").write("%0.8X" % int(configElement.value))
 				open("/proc/stb/vmpeg/0/pep_apply", "w").write("1")
-			except IOError:
-				print("couldn't write pep_scaler_sharpness")
+			except:
+				pass
 
 		config.av.scaler_sharpness = ConfigSlider(default=13, limits=(0, 26))
 		config.av.scaler_sharpness.addNotifier(setScaler_sharpness)
@@ -353,3 +340,12 @@ def InitAVSwitch():
 		eDVBVolumecontrol.getInstance().setVolumeSteps(int(configElement.value))
 	config.av.volume_stepsize = ConfigSelectionNumber(1, 10, 1, default=5)
 	config.av.volume_stepsize.addNotifier(setVolumeStepsize)
+
+	if SystemInfo["CanChangeOsdAlpha"]:
+		def setAlpha(config):
+			try:
+				open("/proc/stb/video/alpha", "w").write(str(config.value))
+			except:
+				print("[AVSwitch] Write to /proc/stb/video/alpha failed!")
+		config.av.osd_alpha = ConfigSlider(default=255, limits=(0, 255))
+		config.av.osd_alpha.addNotifier(setAlpha)
