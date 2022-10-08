@@ -299,7 +299,7 @@ int fbClass::waitVSync()
 
 void fbClass::blit()
 {
-#if !defined(CONFIG_ION) && !defined(HAVE_HISIAPI)
+#ifndef CONFIG_ION
 	if (m_manual_blit == 1) {
 		if (ioctl(fbFd, FBIO_BLIT) < 0)
 			eDebug("[fb] FBIO_BLIT %m");
