@@ -812,13 +812,13 @@ class ConfigIP(ConfigSequence):
 				self.overwrite = False
 			else:
 				newValue = (self._value[self.marked_pos] * 10) + number
-				if self.autoJump and newValue > self.limits[self.marked_pos][1] and self.marked_pos < len(self.limits) - 1:
+				if self.auto_jump and newValue > self.limits[self.marked_pos][1] and self.marked_pos < len(self.limits) - 1:
 					self.handleKey(ACTIONKEY_RIGHT, callback)
 					self.handleKey(key, callback)
 					return
 				else:
 					self._value[self.marked_pos] = newValue
-			if len(str(self._value[self.marked_pos])) >= self.blockLen[self.marked_pos]:
+			if len(str(self._value[self.marked_pos])) >= self.block_len[self.marked_pos]:
 				self.handleKey(ACTIONKEY_RIGHT, callback)
 			self.validate()
 			if self._value != prev:
@@ -2130,7 +2130,7 @@ class ConfigCECAddress(ConfigSequence):
 					return
 				else:
 					self._value[self.marked_block] = newvalue
-			if len(str(self._value[self.marked_block])) >= self.blockLen[self.marked_block]:
+			if len(str(self._value[self.marked_block])) >= self.block_len[self.marked_block]:
 				self.handleKey(ACTIONKEY_RIGHT, callback)
 			self.validate()
 			self.changed()
