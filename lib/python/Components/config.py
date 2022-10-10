@@ -7,6 +7,7 @@ import copy
 import os
 from time import localtime, strftime, struct_time
 
+
 ACTIONKEY_LEFT = 0
 ACTIONKEY_RIGHT = 1
 ACTIONKEY_SELECT = 2
@@ -95,9 +96,7 @@ def NoSave(element):
 #            the default if saved_value is 'None' (default)
 #            or invalid.
 #
-
-
-class ConfigElement:
+class ConfigElement(object):
 	def __init__(self):
 		self.saved_value = None
 		self.save_forced = False
@@ -107,7 +106,6 @@ class ConfigElement:
 		self.__notifiers_final = None
 		self.enabled = True
 		self.callNotifiersOnSaveAndCancel = False
-		self.callback = None
 
 	def getNotifiers(self):
 		if self.__notifiers is None:
@@ -229,11 +227,8 @@ class ConfigElement:
 	def showHelp(self, session):
 		pass
 
-	def handleKey(self, key, callback=None):
-		pass
 
-
-class choicesList:  # XXX: we might want a better name for this
+class choicesList():  # XXX: we might want a better name for this
 	LIST_TYPE_LIST = 1
 	LIST_TYPE_DICT = 2
 
@@ -632,10 +627,6 @@ class ConfigSequence(ConfigElement):
 		# assert isinstance(default[0], int), "list must contain numbers"
 		# assert len(default) == len(limits), "length must match"
 
-		self.limits = limits
-		self.blockLen = [len(str(x[1])) for x in limits]
-		self.totalLen = sum(self.blockLen) - 1
-
 		self.marked_pos = 0
 		self.seperator = seperator
 		self.limits = limits
@@ -644,49 +635,6 @@ class ConfigSequence(ConfigElement):
 		self.last_value = self.default = default
 		self.value = copy.copy(default)
 		self.endNotifier = None
-
-	def handleKey(self, key, callback=None):
-		if key == ACTIONKEY_FIRST:
-			self.marked_pos = 0
-		elif key == ACTIONKEY_LEFT:
-			if self.marked_pos > 0:
-				self.marked_pos -= 1
-		elif key == ACTIONKEY_RIGHT:
-			if self.marked_pos < self.totalLen:
-				self.marked_pos += 1
-		elif key == ACTIONKEY_LAST:
-			self.marked_pos = self.totalLen
-		elif key in ACTIONKEY_NUMBERS or key == ACTIONKEY_ASCII:
-			# prev = self._value
-			if key == ACTIONKEY_ASCII:
-				code = getPrevAsciiCode()
-				if code < 48 or code > 57:
-					return
-				number = code - 48
-			else:
-				number = getKeyNumber(key)
-			pos = 0
-			blockNumber = 0
-			block_len_total = [0]
-			for x in self.blockLen:
-				pos += self.blockLen[blockNumber]
-				block_len_total.append(pos)
-				if pos - 1 >= self.marked_pos:
-					pass
-				else:
-					blockNumber += 1
-			number_len = len(str(self.limits[blockNumber][1]))  # Length of number block.
-			posinblock = self.marked_pos - block_len_total[blockNumber]  # Position in the block.
-			oldvalue = abs(self._value[blockNumber])  # We are using abs() in order to allow change negative values like default -1.
-			olddec = oldvalue % 10 ** (number_len - posinblock) - (oldvalue % 10 ** (number_len - posinblock - 1))
-			newvalue = oldvalue - olddec + (10 ** (number_len - posinblock - 1) * number)
-			self._value[blockNumber] = newvalue
-			self.marked_pos += 1
-			self.validate()
-			# if self._value != prev:
-			self.changed()
-			if callable(callback):
-				callback()
 
 	def validate(self):
 		max_pos = 0
@@ -726,6 +674,49 @@ class ConfigSequence(ConfigElement):
 			self.endNotifier = []
 		self.endNotifier.append(notifier)
 
+	def handleKey(self, key, callback=None):
+		if key == ACTIONKEY_FIRST:
+			self.marked_pos = 0
+		elif key == ACTIONKEY_LEFT:
+			if self.marked_pos > 0:
+				self.marked_pos -= 1
+		elif key == ACTIONKEY_RIGHT:
+			if self.marked_pos < total_len:
+				self.marked_pos += 1
+		elif key == ACTIONKEY_LAST:
+			self.marked_pos = total_len
+		elif key in ACTIONKEY_NUMBERS or key == ACTIONKEY_ASCII:
+			# prev = self._value
+			if key == ACTIONKEY_ASCII:
+				code = getPrevAsciiCode()
+				if code < 48 or code > 57:
+					return
+				number = code - 48
+			else:
+				number = getKeyNumber(key)
+			pos = 0
+			blockNumber = 0
+			block_len_total = [0]
+			for x in block_len:
+				pos += block_len[blockNumber]
+				block_len_total.append(pos)
+				if pos - 1 >= self.marked_pos:
+					pass
+				else:
+					blockNumber += 1
+			number_len = len(str(self.limits[blockNumber][1]))  # Length of number block.
+			posinblock = self.marked_pos - block_len_total[blockNumber]  # Position in the block.
+			oldvalue = abs(self._value[blockNumber])  # We are using abs() in order to allow change negative values like default -1.
+			olddec = oldvalue % 10 ** (number_len - posinblock) - (oldvalue % 10 ** (number_len - posinblock - 1))
+			newvalue = oldvalue - olddec + (10 ** (number_len - posinblock - 1) * number)
+			self._value[blockNumber] = newvalue
+			self.marked_pos += 1
+			self.validate()
+			# if self._value != prev:
+			self.changed()
+			if callable(callback):
+				callback()
+
 	def genText(self):
 		value = ""
 		mPos = self.marked_pos
@@ -759,7 +750,7 @@ class ConfigSequence(ConfigElement):
 		return self.seperator.join([self.saveSingle(x) for x in val])
 
 	def toDisplayString(self, value):
-		return self.seperator.join(["%%0%sd" % (str(self.blockLen[index]) if self.zeroPad else "") % value for index, value in enumerate(self._value)])
+		return self.seperator.join(["%%0%sd" % (str(self.block_len[index]) if self.zeroPad else "") % value for index, value in enumerate(self._value)])
 
 	def saveSingle(self, v):
 		return str(v)
@@ -780,7 +771,7 @@ ip_limits = [(0, 255), (0, 255), (0, 255), (0, 255)]
 class ConfigIP(ConfigSequence):
 	def __init__(self, default, auto_jump=False):
 		ConfigSequence.__init__(self, seperator=".", limits=ip_limits, default=default)
-		self.blockLen = [len(str(x[1])) for x in self.limits]
+		self.block_len = [len(str(x[1])) for x in self.limits]
 		self.marked_block = 0
 		self.overwrite = True
 		self.auto_jump = auto_jump
@@ -821,7 +812,7 @@ class ConfigIP(ConfigSequence):
 				self.overwrite = False
 			else:
 				newValue = (self._value[self.marked_pos] * 10) + number
-				if self.auto_jump and newValue > self.limits[self.marked_pos][1] and self.marked_pos < len(self.limits) - 1:
+				if self.autoJump and newValue > self.limits[self.marked_pos][1] and self.marked_pos < len(self.limits) - 1:
 					self.handleKey(ACTIONKEY_RIGHT, callback)
 					self.handleKey(key, callback)
 					return
@@ -837,9 +828,9 @@ class ConfigIP(ConfigSequence):
 
 	def genText(self):
 		value = self.seperator.join([str(x) for x in self._value])
-		blockLen = [len(str(x)) for x in self._value]
-		leftPos = sum(blockLen[:self.marked_pos]) + self.marked_pos
-		rightPos = sum(blockLen[:self.marked_pos + 1]) + self.marked_pos
+		block_len = [len(str(x)) for x in self._value]
+		leftPos = sum(block_len[:self.marked_pos]) + self.marked_pos
+		rightPos = sum(block_len[:self.marked_pos + 1]) + self.marked_pos
 		mBlock = list(range(leftPos, rightPos))
 		return (value, mBlock)
 
@@ -1044,14 +1035,13 @@ class ConfigText(ConfigElement, NumericalTextInput):
 		NumericalTextInput.__init__(self, nextFunc=self.nextFunc, handleTimeout=False)
 
 		self.marked_pos = 0
-		self.allmarked = (default != "")  # This is also used in Input.py!
+		self.allmarked = (default != "")
 		self.fixed_size = fixed_size
 		self.visible_width = visible_width
 		self.offset = 0
 		self.overwrite = fixed_size
-		self.help_window = None  # DEBUG: Used in ConfigList.py, Wizard.py and NetworkSetup.py!
+		self.help_window = None
 		self.value = self.last_value = self.default = default
-		self.callback = None
 
 	def validateMarker(self):
 		textlen = len(self.text)
@@ -1182,8 +1172,6 @@ class ConfigText(ConfigElement, NumericalTextInput):
 		self.marked_pos += 1
 		self.validateMarker()
 		self.changed()
-		if self.callback:
-			self.callback()
 
 	def getValue(self):
 		return self.text
@@ -1290,11 +1278,10 @@ class ConfigSelectionNumber(ConfigSelection):
 		ConfigSelection.setValue(self, str(val))
 
 	def handleKey(self, key, callback=None):
-		if not self.wraparound:
-			value = str(self.value)
-			if key == ACTIONKEY_RIGHT and self.choices.index(value) == len(self.choices) - 1:
+		if not self.wrapAround:
+			if key == ACTIONKEY_RIGHT and self.choices.index(self.value) == len(self.choices) - 1:
 				return
-			if key == ACTIONKEY_LEFT and self.choices.index(value) == 0:
+			if key == ACTIONKEY_LEFT and self.choices.index(self.value) == 0:
 				return
 		ConfigSelection.handleKey(self, key, callback)
 
@@ -1302,7 +1289,32 @@ class ConfigSelectionNumber(ConfigSelection):
 class ConfigNumber(ConfigText):
 	def __init__(self, default=0):
 		ConfigText.__init__(self, str(default), fixed_size=False)
-		self.value = self.lastValue = self.default = default
+
+	def getValue(self):
+		return int(self.text)
+
+	def setValue(self, val):
+		self.text = str(val)
+
+	value = property(getValue, setValue)
+	_value = property(getValue, setValue)
+
+	def isChanged(self):
+		sv = self.saved_value
+		strv = self.tostring(self.value)
+		if sv is None and strv == self.default:
+			return False
+		return strv != sv
+
+	def conform(self):
+		pos = len(self.text) - self.marked_pos
+		self.text = self.text.lstrip("0")
+		if self.text == "":
+			self.text = "0"
+		if pos > len(self.text):
+			self.marked_pos = 0
+		else:
+			self.marked_pos = len(self.text) - pos
 
 	def handleKey(self, key, callback=None):
 		if key in ACTIONKEY_NUMBERS or key == ACTIONKEY_ASCII:
@@ -1327,31 +1339,15 @@ class ConfigNumber(ConfigText):
 		else:
 			ConfigText.handleKey(self, key, callback)
 
-	def validateMarker(self):
-		pos = len(self.text) - self.marked_pos
-		self.text = self.text.lstrip("0")
-		if self.text == "":
-			self.text = "0"
-		if pos > len(self.text):
-			self.marked_pos = 0
-		else:
-			self.marked_pos = len(self.text) - pos
+	def onSelect(self, session):
+		self.allmarked = (self.value != "")
 
-	def getValue(self):
-		try:
-			return int(self.text)
-		except ValueError:
-			self.text = "1" if self.text.lower() == "true" else self.default
-			return int(self.text)
-
-	def setValue(self, value):
-		prev = self.text if hasattr(self, "text") else None
-		self.text = str(value)
-		if self.text != prev:
-			self.changed()
-
-	value = property(getValue, setValue)
-	_value = property(getValue, setValue)
+	def onDeselect(self, session):
+		self.marked_pos = 0
+		self.offset = 0
+		if not self.last_value == self.value:
+			self.changedFinal()
+			self.last_value = self.value
 
 
 class ConfigSearchText(ConfigText):
@@ -1430,11 +1426,11 @@ class ConfigSlider(ConfigElement):
 				callback()
 
 	def getText(self):
-		return "%d / %d / %d" % (self.min, self.value, self.max)
+		return "%d / %d" % (self.value, self.max)
 
 	def getMulti(self, selected):
 		self.checkValues()
-		return ("slider", self.value, self.min, self.max)
+		return ("slider", self.value, self.max)
 
 	def fromstring(self, value):
 		return int(value)
@@ -1555,16 +1551,11 @@ class ConfigDictionarySet(ConfigElement):
 		self.default = default
 		self.dirs = {}
 		self.value = self.default
-		self.callback = None
 
 	def setValue(self, value):
 		if isinstance(value, dict):
-			prev = self.dirs
 			self.dirs = value
-			if self.dirs != prev:
-				self.changed()
-				if callable(self.callback):
-					self.callback()
+			self.changed()
 
 	def getValue(self):
 		return self.dirs
@@ -1592,8 +1583,6 @@ class ConfigDictionarySet(ConfigElement):
 			else:
 				self.dirs[value] = {config_key: config_value}
 			self.changed()
-			if callable(self.callback):
-				self.callback()
 
 	def getConfigValue(self, value, config_key):
 		if isinstance(value, str) and isinstance(config_key, str):
@@ -1602,11 +1591,13 @@ class ConfigDictionarySet(ConfigElement):
 		return None
 
 	def removeConfigValue(self, value, config_key):
-		if isinstance(value, str) and isinstance(config_key, str) and value in self.dirs and config_key in self.dirs[value]:
-			del self.dirs[value][config_key]
-			self.changed()
-			if callable(self.callback):
-				self.callback()
+		if isinstance(value, str) and isinstance(config_key, str):
+			if value in self.dirs and config_key in self.dirs[value]:
+				try:
+					del self.dirs[value][config_key]
+				except KeyError:
+					pass
+				self.changed()
 
 	def save(self):
 		del_keys = []
@@ -1619,12 +1610,7 @@ class ConfigDictionarySet(ConfigElement):
 			except KeyError:
 				pass
 			self.changed()
-			if callable(self.callback):
-				self.callback()
 		self.saved_value = self.tostring(self.dirs)
-
-	def handleKey(self, key, callback=None):
-		self.callback = callback
 
 
 class ConfigLocations(ConfigElement):
@@ -2069,6 +2055,35 @@ class ConfigFile:
 		return ""
 
 
+config = Config()
+config.misc = ConfigSubsection()
+configfile = ConfigFile()
+configfile.load()
+
+# def _(x):
+# 	return x
+#
+# config.bla = ConfigSubsection()
+# config.bla.test = ConfigYesNo()
+# config.nim = ConfigSubList()
+# config.nim.append(ConfigSubsection())
+# config.nim[0].bla = ConfigYesNo()
+# config.nim.append(ConfigSubsection())
+# config.nim[1].bla = ConfigYesNo()
+# config.nim[1].blub = ConfigYesNo()
+# config.arg = ConfigSubDict()
+# config.arg["Hello"] = ConfigYesNo()
+#
+# config.arg["Hello"].handleKey(KEY_RIGHT)
+# config.arg["Hello"].handleKey(KEY_RIGHT)
+#
+# #config.saved_value
+#
+# #configfile.save()
+# config.save()
+# print config.pickle()
+
+
 cec_limits = [(0, 15), (0, 15), (0, 15), (0, 15)]
 
 
@@ -2158,31 +2173,3 @@ class ConfigAction(ConfigElement):
 
 	def getMulti(self, dummy):
 		pass
-
-# def _(x):
-# 	return x
-#
-# config.bla = ConfigSubsection()
-# config.bla.test = ConfigYesNo()
-# config.nim = ConfigSubList()
-# config.nim.append(ConfigSubsection())
-# config.nim[0].bla = ConfigYesNo()
-# config.nim.append(ConfigSubsection())
-# config.nim[1].bla = ConfigYesNo()
-# config.nim[1].blub = ConfigYesNo()
-# config.arg = ConfigSubDict()
-# config.arg["Hello"] = ConfigYesNo()
-#
-# config.arg["Hello"].handleKey(KEY_RIGHT)
-# config.arg["Hello"].handleKey(KEY_RIGHT)
-#
-# #config.saved_value
-#
-# #configfile.save()
-# config.save()
-# print config.pickle()
-
-config = Config()
-config.misc = ConfigSubsection()
-configfile = ConfigFile()
-configfile.load()
