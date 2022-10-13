@@ -620,6 +620,9 @@ class ConfigSequence(ConfigElement):
 		self.limits = limits
 		self.censor_char = censor_char
 
+		self.block_len = [len(str(x[1])) for x in limits]
+		self.total_len = sum(self.block_len) - 1
+
 		self.last_value = self.default = default
 		self.value = copy.copy(default)
 		self.endNotifier = None
@@ -662,17 +665,17 @@ class ConfigSequence(ConfigElement):
 			self.endNotifier = []
 		self.endNotifier.append(notifier)
 
-	def handleKey(self, key):
+	def handleKey(self, key, callback=None):
 		if key == ACTIONKEY_FIRST:
 			self.marked_pos = 0
 		elif key == ACTIONKEY_LEFT:
 			if self.marked_pos > 0:
 				self.marked_pos -= 1
 		elif key == ACTIONKEY_RIGHT:
-			if self.marked_pos < total_len:
+			if self.marked_pos < self.total_len:
 				self.marked_pos += 1
 		elif key == ACTIONKEY_LAST:
-			self.marked_pos = total_len
+			self.marked_pos = self.total_len
 		elif key in ACTIONKEY_NUMBERS or key == ACTIONKEY_ASCII:
 			# prev = self._value
 			if key == ACTIONKEY_ASCII:
@@ -682,15 +685,11 @@ class ConfigSequence(ConfigElement):
 				number = code - 48
 			else:
 				number = getKeyNumber(key)
-			
-			block_len = [len(str(x[1])) for x in self.limits]
-			total_len = sum(block_len)
-
 			pos = 0
 			blockNumber = 0
 			block_len_total = [0]
-			for x in block_len:
-				pos += block_len[blockNumber]
+			for x in self.block_len:
+				pos += self.block_len[blockNumber]
 				block_len_total.append(pos)
 				if pos - 1 >= self.marked_pos:
 					pass
@@ -706,6 +705,8 @@ class ConfigSequence(ConfigElement):
 			self.validate()
 			# if self._value != prev:
 			self.changed()
+			if callable(callback):
+				callback()
 
 	def genText(self):
 		value = ""
