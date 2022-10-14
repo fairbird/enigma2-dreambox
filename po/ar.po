@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: enigma2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-09-24 20:36+0200\n"
+"POT-Creation-Date: 2022-10-14 09:11+0200\n"
 "POT-Creation-Date: 2022-07-30 14:55+0200\n"
 "Last-Translator: RAED - Fairbirb <rrrr53@hotmail.com>\n"
 "Language-Team: \n"
@@ -84,6 +84,10 @@ msgstr " (أقل من أي تلقائي)"
 
 msgid " - Unicable/JESS LNBs not found"
 msgstr "- Unicable/JESS LNBs لم يتم العثور عليه"
+
+#, fuzzy
+msgid " - information"
+msgstr "معلومات"
 
 msgid " Warning: the selected tuner should not use SCR Unicable type for LNBs because each tuner need a own SCR number."
 msgstr " .خاص به SCR لأن كل موالف يحتاج إلى رقم LNBs لـ SCR Unicable تحذير: يجب ألا يستخدم الموالف المحدد نوع"
@@ -312,8 +316,8 @@ msgstr "%s لم يعد يستخدم. هل يجب حذفها ؟"
 #, python-format
 msgid "%s updated package available"
 msgid_plural "%s updated packages available"
-msgstr[0] "%s التحديثات المتوفرة"
-msgstr[1] "%s التحديثات المتوفرة"
+msgstr[4] "التحديثات المتوفرة."
+msgstr[5] "التحديثات المتوفرة."
 
 msgid "(VU+ type)"
 msgstr ""
@@ -2566,16 +2570,16 @@ msgid "Deselect"
 msgstr "إلغاء الاختيار"
 
 msgid "Destination of fallback remote receiver"
-msgstr "تمكين الريموت الإحتياطي في الرسيفر"
+msgstr "وجهة جهاز الاستقبال البعيد الاحتياطي"
 
 msgid "Destination of fallback remote receiver for ATSC"
-msgstr "تمكين الريموت الإحتياطي في الرسيفر"
+msgstr "ATSC وجهة جهاز الاستقبال البعيد الاحتياطي إلى"
 
 msgid "Destination of fallback remote receiver for DVB-C"
-msgstr "تمكين الريموت الإحتياطي في الرسيفر"
+msgstr "DVB-C وجهة جهاز الاستقبال البعيد الاحتياطي إلى"
 
 msgid "Destination of fallback remote receiver for DVB-T"
-msgstr "تمكين الريموت الإحتياطي في الرسيفر"
+msgstr "DVB-T وجهة جهاز الاستقبال البعيد الاحتياطي إلى"
 
 msgid "Details for plugin: "
 msgstr " :تفاصيل الإضافات"
@@ -3263,14 +3267,23 @@ msgid "Error stop stream!"
 msgstr "إيقاف التدفق"
 
 #, fuzzy
-msgid "Error when writing epg.dat on the fallback receiver"
+msgid "Error while retrieving epg.dat from the fallback receiver"
 msgstr "خطأ عند كتابة الدليل الإلكتروني على جهاز الاستقبال الاحتياطي"
+
+#, python-format
+msgid ""
+"Error while retrieving fallback timer information\n"
+"%s"
+msgstr ""
+"خطأ أثناء استرداد معلومات المؤقت الاحتياطي\n"
+"%s"
 
 msgid "Error while retreiving epg.dat from the fallback receiver"
 msgstr "خطأ أثناء استرداد بيانات الدليل الإلكتروني من جهاز الاستقبال الاحتياطي"
 
 #, python-format
-msgid "Error while retreiving location of epg.dat on the fallback receiver"
+#, fuzzy
+msgid "Error while retrieving location of epg.dat on the fallback receiver"
 "%s"
 msgstr "حدث خطأ أثناء استرداد موقع الدليل الإلكتروني على جهاز الاستقبال الاحتياطي\n"
 "%s"
@@ -3679,6 +3692,10 @@ msgid "Format"
 msgstr "تهئية"
 
 msgid "Forward volume keys"
+msgstr "مفاتيح رفع مستوى الصوت"
+
+#, fuzzy
+msgid "Forwarded volume step size"
 msgstr "مفاتيح رفع مستوى الصوت"
 
 msgid "Frame size in full view"
@@ -4147,7 +4164,7 @@ msgid "IP address"
 msgstr "عنوان الأيبي"
 
 msgid "IP of fallback remote receiver"
-msgstr "تمكين الريموت الإحتياطي في الرسيفر"
+msgstr "عنوان جهاز الاستقبال البعيد الاحتياطي"
 
 msgid "ISO file is too large for this filesystem!"
 msgstr "ملف الايزو كبير جدا على ملفات النظام !"
@@ -6100,7 +6117,7 @@ msgid "Port D"
 msgstr "المنفذ د"
 
 msgid "Port of fallback remote receiver"
-msgstr "تمكين الريموت الإحتياطي في الرسيفر"
+msgstr "منفذ جهاز استقبال بعيد احتياطي"
 
 msgid "Portugal"
 msgstr "البرتغال"
@@ -8802,6 +8819,9 @@ msgid "The network wizard extension is not installed!\n"
 msgstr "لم يتم تثبيت ملحقات معالج الشبكة!\n"
 "الرجاء منك تثبيتها."
 
+msgid "The number of steps to change the volume on the device the keys are forwarded to."
+msgstr ".عدد الخطوات لتغيير مستوى الصوت على الجهاز الذي تتم إعادة توجيه المفاتيح إليه"
+
 msgid "The overscan wizard has been completed.\n"
 "\n"
 "Note: you can always start the Overscan wizard later, via\n"
@@ -9464,7 +9484,7 @@ msgid "URL"
 msgstr "الرابط"
 
 msgid "URL of fallback remote receiver"
-msgstr "تمكين الريموت الإحتياطي في الرسيفر"
+msgstr "عنوان الإنترنيت لجهاز الاستقبال البعيد الاحتياطي"
 
 msgid "USALS automatically moves a motorised dish to the correct satellite based on the coordinates entered by the user. Without USALS each satellite will need to be setup and saved individually."
 msgstr "يقوم نظام الأقمار العالمي تلقائيا بتحريك الطبق المتحرك إلى القمر الصناعي الصحيح استنادا إلى الإحداثيات التي ادخلها المستخدم. بدون نظام الأقمار العالمي كل الأقمار الصناعية ونحن بحاجه إلى ان يكون إعدادها وحفظها بشكل فردي."
@@ -9512,7 +9532,7 @@ msgstr "تراجع عن إلغاء التثبيت"
 msgid "Unencrypted"
 msgstr "غير مشفرة"
 
-msgid "Unexpected error while retreiving fallback tuner's timer information"
+msgid "Unexpected error while retrieving fallback tuner's timer information"
 msgstr "خطأ غير متوقع أثناء استرداد معلومات عداد الوقت الاحتياطي"
 
 msgid "UnhandledKey"
