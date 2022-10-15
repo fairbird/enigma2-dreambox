@@ -11,7 +11,9 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 3.0\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Poedit-Basepath: .\n"
+"Plural-Forms: nplurals=6; plural=(n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5);\n"
+"X-Poedit-SearchPath-0: D:/Decoder/VU+/OBH 4.2/it/LC_MESSAGES/enigma2/OBH/OBH LOCALE\n"
 
 msgid "\n"
 " Do you want to switch to Android ?"
@@ -162,11 +164,12 @@ msgstr "%a %e/%m  %-H:%M"
 msgid "%d MB"
 msgstr "%d ميقابايت"
 
-#. TRANSLATORS: Intermediate scanning result, '%d' channel(s) have been found so far, python-format
+#. TRANSLATORS: Intermediate scanning result, '%d' channel(s) have been found so far
+#, fuzzy, python-format
 msgid "%d channel found"
 msgid_plural "%d channels found"
-msgstr[0] "لم يعثر على قناة نشطة."
-msgstr[1] "لم يعثر على قناة نشطة."
+msgstr[0] "%d تم العثر على قناة"
+msgstr[1] "%d تم العثر على قناة"
 
 #, python-format
 msgid "%d core"
@@ -174,27 +177,28 @@ msgid_plural "%d cores"
 msgstr[0] ""
 msgstr[1] ""
 
-#, python-format
+#, fuzzy, python-format
 msgid "%d day"
 msgid_plural "%d days"
-msgstr[0] "يوم %d"
-msgstr[1] "يوم %d"
+msgstr[0] "%d يوم"
+msgstr[1] "%d أيام"
 
-#, python-format
+#, fuzzy, python-format
 msgid "%d file"
 msgid_plural "%d files"
-msgstr[0] "ملفات %d"
-msgstr[1] "ملفات %d"
+msgstr[0] "%d ملفات"
+msgstr[1] "%d ملفات"
 
 msgid "%d fps"
 msgstr "ملف %d"
 
-#, python-format
+#, fuzzy, python-format
 msgid "%d hour"
 msgid_plural "%d hours"
 msgstr[0] "ساعة %d"
 msgstr[1] "ساعات %d"
 
+#, fuzzy, python-format
 msgid "%d job is running in the background!"
 msgid_plural "%d jobs are running in the background!"
 msgstr[0] "!الوظيفة تعمل فى الخلفية %d"
@@ -208,12 +212,13 @@ msgstr "كيلوبايت/ثانية %d"
 msgid "%d min"
 msgstr "دقائق %d"
 
+#, fuzzy, python-format
 msgid "%d minute"
 msgid_plural "%d minutes"
 msgstr[0] "دقيقة %d"
 msgstr[1] "دقائق %d"
 
-#, python-format
+#, fuzzy, python-format
 msgid "%d minutes"
 msgstr "دقائق %d"
 
@@ -221,6 +226,7 @@ msgstr "دقائق %d"
 msgid "%d ms"
 msgstr "جزء من الثانية %d"
 
+#, fuzzy, python-format
 msgid "%d package selected."
 msgid_plural "%d packages selected."
 msgstr[0] "الحزم المختارة"
@@ -232,22 +238,23 @@ msgid_plural "%d pixels wide"
 msgstr[0] ""
 msgstr[1] ""
 
-#, python-format
+#, fuzzy, python-format
 msgid "%d sec"
 msgstr "ثانية %d"
 
-#, python-format
+#, fuzzy, python-format
 msgid "%d second"
 msgid_plural "%d seconds"
 msgstr[0] "ثانية %d"
 msgstr[1] "ثواني %d"
 
+#, fuzzy, python-format
 msgid "%d subdirectory"
 msgid_plural "%d subdirectories"
 msgstr[0] "دليل الجذر"
 msgstr[1] "دليل الجذر"
 
-#, python-format
+#, fuzzy, python-format
 msgid "%d wireless network found!"
 msgid_plural "%d wireless networks found!"
 msgstr[0] "!وجدت شبكة لاسلكية %d"
@@ -313,12 +320,17 @@ msgstr "مستوردة من موالف احتياطي %s"
 msgid "%s is no longer used. Should it be deleted?"
 msgstr "%s لم يعد يستخدم. هل يجب حذفها ؟"
 
-#, python-format
+#, fuzzy, python-format
 msgid "%s updated package available"
 msgid_plural "%s updated packages available"
+msgstr[0] "التحديثات المتوفرة."
+msgstr[1] "التحديثات المتوفرة."
+msgstr[2] "التحديثات المتوفرة."
+msgstr[3] "التحديثات المتوفرة."
 msgstr[4] "التحديثات المتوفرة."
 msgstr[5] "التحديثات المتوفرة."
 
+#, fuzzy
 msgid "(VU+ type)"
 msgstr ""
 
@@ -328,7 +340,7 @@ msgstr "(التنقل بين قناة داخل قناة)"
 msgid "(ZAP)"
 msgstr "(تنقل)"
 
-#, python-format
+#, fuzzy, python-format
 msgid "(activated +%d min)"
 msgstr "(تفعيلها +%d دقيقة)"
 
@@ -2869,6 +2881,7 @@ msgstr "لا تتنقل وأحذف المؤقت"
 msgid "Done"
 msgstr "إنتهى"
 
+#, fuzzy, python-format
 msgid "Done - Installed, updated or removed %d package (%s)"
 msgid_plural "Done - Installed, updated or removed %d packages (%s)"
 msgstr[0] "أخطاء %d الحزم مع %d منتهي - مثبتة أو محدثة أو مُزالة"
@@ -4709,7 +4722,7 @@ msgstr "قائمة أجهزة التخزين"
 msgid "List type"
 msgstr "نوع الاختبار"
 
-#, python-format
+#, fuzzy, python-format
 msgid "List version %(ver)d, found %(num)d channel"
 msgid_plural "List version %(ver)d, found %(num)d channels"
 msgstr[0] "قناة %(num)d وجدت ,%(ver)d نسخة القائمة"
@@ -7054,6 +7067,7 @@ msgstr "تردد %s البحث"
 msgid "Scan additional SR"
 msgstr "البحث الإضافي عن إشارة الإستقبال"
 
+#, fuzzy, python-format
 msgid "Scan completed, %d channel found."
 msgid_plural "Scan completed, %d channels found."
 msgstr[0] "قنوات وجدت %d ,البحث إكتمل"
@@ -7087,12 +7101,14 @@ msgstr "أبحث فى الشبكة عن نقاط دخول لاسلكيه وأت�
 msgid "Scanning %s..."
 msgstr "...%s جاري البحث"
 
+#, fuzzy, python-format
 #. TRANSLATORS: The stb is performing a channel scan, progress percentage is printed in '%d' (and '%%' will show a single '%' symbol), python-format
 msgid "Scanning - %d%% completed"
 msgid_plural "Scanning - %d%% completed"
 msgstr[0] "اكتمل %d ,المسح"
 msgstr[1] "اكتمل %d ,المسح"
 
+#, fuzzy, python-format
 msgid "Scanning completed, %d channel found"
 msgid_plural "Scanning completed, %d channels found"
 msgstr[0] "قناة وجدت %d ,اكتمل المسح"
@@ -9604,7 +9620,7 @@ msgstr "إضافة علامة مرجعية"
 msgid "Update channel list only"
 msgstr "تحديث قائمة القنوات فقط"
 
-#, python-format
+#, fuzzy, python-format
 msgid "Update completed, %d package was installed."
 msgid_plural "Update completed, %d packages were installed."
 msgstr[0] ".تم تثبيت حزمة %d ,اكتمل التحديث"
@@ -11670,7 +11686,7 @@ msgstr "الرياضة الشتوية"
 msgid "wireless network interface"
 msgstr "واجهة الشبكة اللاسلكية"
 
-#, python-format
+#, fuzzy, python-format
 msgid "with %d error"
 msgid_plural "with %d errors"
 msgstr[0] "خطأ %d مع"
