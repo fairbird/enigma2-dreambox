@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: enigma2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-10-14 09:11+0200\n"
-"POT-Creation-Date: 2022-07-30 14:55+0200\n"
+"POT-Creation-Date: 2022-11-01 12:32+0100\n"
 "Last-Translator: RAED - Fairbirb <rrrr53@hotmail.com>\n"
 "Language-Team: \n"
 "Language: ar\n"
@@ -3278,6 +3278,10 @@ msgstr "خطأ خلال تفكيك الصورة\n"
 
 msgid "Error stop stream!"
 msgstr "إيقاف التدفق"
+
+#, fuzzy
+msgid "Error while moving epg.dat to its destination"
+msgstr "خطأ أثناء نقل epg.dat إلى وجهتها"
 
 #, fuzzy
 msgid "Error while retrieving epg.dat from the fallback receiver"
