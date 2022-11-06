@@ -20,7 +20,7 @@ from glob import glob
 import Components.Task
 
 # Import smtplib for the actual sending function
-import smtplib, base64
+import smtplib, base64, sys
 
 # Here are the email package modules we'll need
 from email.mime.multipart import MIMEMultipart
@@ -125,6 +125,10 @@ class LogManagerPoller:
 		self.TrimTimer.startLongTimer(3600) #once an hour
 
 	def JobTrash(self):
+		try:
+			sys.set_int_max_str_digits(0)
+		except AttributeError:
+			pass
 		ctimeLimit = int(time()) - int(config.crash.daysloglimit.value * 3600 * 24)
 		allowedBytes = 1024*1024 * int(config.crash.sizeloglimit.value)
 
