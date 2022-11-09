@@ -44,6 +44,7 @@
 					<item level="0" entryID="av_setup"><setup id="avsetup"/></item>
 					<item entryID="subtitle_setup" level="2" text="Subtitle Setup" weight="20"><setup id="subtitlesetup" /></item>
 					<item level="0" entryID="autolanguage_setup" text="Auto Language Setup"><setup id="autolanguagesetup"/></item>
+					<item key="osdsetup" level="1" text="OSD Position Settings" weight="50" requires="CanChangeOsdPosition"><screen module="UserInterfacePositioner" screen="UserInterfacePositioner2" /></item>
 				</menu>
 				<menu level="0" text="GUI Settings" entryID="gui_settings">
 					<id val="gui"/>

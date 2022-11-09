@@ -649,6 +649,10 @@ import Components.EpgLoadSave
 Components.EpgLoadSave.EpgCacheSaveCheck()
 Components.EpgLoadSave.EpgCacheLoadCheck()
 
+profile("UserInterface")
+import Screens.UserInterfacePositioner
+Screens.UserInterfacePositioner.InitOsd()
+
 profile("Init:PowerOffTimer")
 from Components.PowerOffTimer import powerOffTimer
 
