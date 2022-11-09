@@ -1413,6 +1413,26 @@ def InitUsageConfig():
 
 	config.misc.useNTPminutes = ConfigSelection(default="30", choices=[("30", "30" + " " + _("minutes")), ("60", _("Hour")), ("1440", _("Once per day"))])
 
+	config.ntp = ConfigSubsection()
+
+	def timesyncChanged(configElement):
+		if configElement.value == "dvb" or not GetIPsFromNetworkInterfaces():
+			eDVBLocalTimeHandler.getInstance().setUseDVBTime(True)
+			eEPGCache.getInstance().timeUpdated()
+			if configElement.value == "dvb" and islink("/etc/network/if-up.d/ntpdate-sync"):
+				Console().ePopen("sed -i '/ntpdate-sync/d' /etc/cron/crontabs/root;unlink /etc/network/if-up.d/ntpdate-sync")
+		else:
+			eDVBLocalTimeHandler.getInstance().setUseDVBTime(False)
+			eEPGCache.getInstance().timeUpdated()
+			if not islink("/etc/network/if-up.d/ntpdate-sync"):
+				Console().ePopen("echo '30 * * * * /usr/bin/ntpdate-sync silent' >>/etc/cron/crontabs/root;ln -s /usr/bin/ntpdate-sync /etc/network/if-up.d/ntpdate-sync")
+	config.ntp.timesync = ConfigSelection(default="ntp", choices=[
+		("auto", _("Auto")),
+		("dvb", _("Transponder time")),
+		("ntp", _("Internet time (NTP)"))
+	])
+	config.ntp.timesync.addNotifier(timesyncChanged)
+	config.ntp.server = ConfigText("pool.ntp.org", fixed_size=False)
 
 def updateChoices(sel, choices):
 	if choices:

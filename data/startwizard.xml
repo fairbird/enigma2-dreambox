@@ -53,17 +53,6 @@ self.selectKey("UP")
 self.selectKey("DOWN")
 			</code>
 		</step>
-		<step id="time">
-			<text value="Please set your time options.\n\nPress YELLOW to set the time zone via geolocation."/>
-			<displaytext value="Please set your time options"/>
-			<config screen="Time" module="Time" type="ConfigList"/>
-			<code>
-self.clearSelectedKeys()
-self.selectKey("LEFT")
-self.selectKey("RIGHT")
-self.selectKey("YELLOW")
-			</code>
-		</step>
 		<step id="nima">
 			<condition>
 from Components.NimManager import nimmanager

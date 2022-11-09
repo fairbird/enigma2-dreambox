@@ -2,6 +2,7 @@ from Screens.Wizard import wizardManager
 from Screens.Screen import Screen
 from Screens.MessageBox import MessageBox
 from Screens.WizardLanguage import WizardLanguage
+from Screens.Time import TimeWizard
 from Screens.HelpMenu import Rc
 from Tools.HardwareInfo import HardwareInfo
 try:
@@ -182,6 +183,7 @@ if not os.path.isfile("/etc/installed"):
 wizardManager.registerWizard(AutoInstallWizard, os.path.isfile("/etc/.doAutoinstall"), priority=0)
 wizardManager.registerWizard(AutoRestoreWizard, config.misc.languageselected.value and config.misc.firstrun.value and checkForAvailableAutoBackup(), priority=0)
 wizardManager.registerWizard(LanguageWizard, config.misc.languageselected.value, priority=10)
+wizardManager.registerWizard(TimeWizard, config.misc.firstrun.value, priority=20)
 if OverscanWizard:
 	wizardManager.registerWizard(OverscanWizard, config.misc.do_overscanwizard.value, priority=30)
 wizardManager.registerWizard(StartWizard, config.misc.firstrun.value, priority=40)
