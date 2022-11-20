@@ -240,8 +240,28 @@ void eDBoxLCD::dumpLCD2PNG(void)
 		switch(bpp)
 		{
 			case 8:
-				eDebug("[eLCD] 8 bit not supportet yet");
-				break;
+				{
+					for (int y = lcd_hight; y != 0; --y)
+					{
+						gRGB pixel32;
+						uint8_t pixval;
+						int x = lcd_width;
+						gRGB *dst = (gRGB *)dstptr;
+						const uint8_t *src = (const uint8_t *)srcptr;
+						while (x--)
+						{
+							pixval = *src++;;
+							pixel32.a = 0xFF;
+							pixel32.r = pixval;
+							pixel32.g = pixval;
+							pixel32.b = pixval;
+							*dst++ = pixel32;
+						}
+						srcptr += _stride;
+						dstptr += pixmap32->surface->stride;
+					}
+					savePNG("/tmp/lcd.png", pixmap32);
+				}
 			case 16:
 				{
 
@@ -272,7 +292,17 @@ void eDBoxLCD::dumpLCD2PNG(void)
 				}
 				break;
 			case 32:
-				eDebug("[eLCD]  32 bit not supportet yet");
+				{
+					srcptr += _stride/4;
+					dstptr += pixmap32->surface->stride/4;
+					for (int y = lcd_hight; y != 0; --y)
+					{
+						memcpy(dstptr, srcptr, lcd_width*bpp);
+						srcptr += _stride;
+						dstptr += pixmap32->surface->stride;
+					}
+					savePNG("/tmp/lcd.png", pixmap32);
+				}
 				break;
 			default:
 				eDebug("[eLCD] %d bit not supportet yet",bpp);
