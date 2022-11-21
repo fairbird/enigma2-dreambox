@@ -601,11 +601,7 @@ void eDVBServiceRecord::fixupCuts(std::list<pts_t> &offsets)
 			eDebug("[eDVBServiceRecord] fixing up PTS failed, not saving");
 			continue;
 		}
-#if HAVE_AMLOGIC
-		eDebug("[eDVBServiceRecord] fixed up %llx to %llx (offset %lx)", i->second, p, offset);
-#else
-		eDebug("[eDVBServiceRecord] fixed up %llx to %llx (offset %llx)", i->second, p, offset);
-#endif
+		eDebug("[eDVBServiceRecord] fixed up %llx to %llx (offset %jx)", i->second, p, offset);
 		offsets.push_back(p);
 	}
 }
