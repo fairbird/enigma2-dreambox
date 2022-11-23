@@ -315,6 +315,7 @@ CXXFLAGS="$CXXFLAGS -Wall -Wextra -Werror \
 	-Wunused-but-set-parameter -Wunused-const-variable=1 -Wuninitialized \
 	-Wstringop-overflow=3 -Woverlength-strings -Wno-error=deprecated-declarations\
 	-Wunsafe-loop-optimizations -Wpointer-arith \
+	-Werror=use-after-free \
 	-Wno-error=unused-result -Wno-error=dangling-pointer= \
 	-Wno-error=mismatched-new-delete -Wfloat-equal -Wlogical-op \
 	-Wno-error=cast-align=strict -Wno-error=ignored-qualifiers \
