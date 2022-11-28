@@ -17,6 +17,7 @@ from Tools.Notifications import AddNotification
 from time import time, localtime
 from GlobalActions import globalActionMap
 from enigma import eDVBVolumecontrol, eTimer, eDVBLocalTimeHandler, eServiceReference, eStreamServer, quitMainloop, iRecordableService
+from Tools.HardwareInfo import HardwareInfo
 
 inStandby = None
 infoBarInstance = None
@@ -31,6 +32,8 @@ QUIT_MANUFACTURER_RESET = 7
 QUIT_RRECVERY_MODE = 16
 QUIT_UPGRADE_PROGRAM = 42
 QUIT_IMAGE_RESTORE = 43
+
+getBoxDisplayName = HardwareInfo().get_device_model()
 
 def isInfoBarInstance():
 	global infoBarInstance
@@ -251,13 +254,13 @@ class QuitMainloopScreen(Screen):
 		Screen.__init__(self, session)
 		from Components.Label import Label
 		text = {
-			QUIT_SHUTDOWN: _("Your receiver is shutting down"),
-			QUIT_REBOOT: _("Your receiver is rebooting"),
-			QUIT_RESTART: _("The user interface of your receiver is restarting"),
-			QUIT_UPGRADE_FP: _("Your frontprocessor will be updated\nPlease wait until your receiver reboots\nThis may take a few minutes"),
-			QUIT_DEBUG_RESTART: _("The user interface of your receiver is restarting in debug mode"),
-			QUIT_RRECVERY_MODE: _("Your receiver is rebooting into Recovery Mode"),
-			QUIT_UPGRADE_PROGRAM: _("Unattended update in progress\nPlease wait until your receiver reboots\nThis may take a few minutes"),
+			QUIT_SHUTDOWN: _("Your %s is shutting down") % getBoxDisplayName,
+			QUIT_REBOOT: _("Your %s is rebooting") % getBoxDisplayName,
+			QUIT_RESTART: _("The user interface of your %s is restarting") % getBoxDisplayName,
+			QUIT_UPGRADE_FP: _("Your front panel processor will be upgraded\nPlease wait until your %s reboots\nThis may take a few minutes") % getBoxDisplayName,
+			QUIT_DEBUG_RESTART: _("The user interface of your %s is restarting\ndue to an error in StartEnigma.py") % getBoxDisplayName,
+			QUIT_RRECVERY_MODE: _("Your %s is rebooting into Recovery Mode") % getBoxDisplayName,
+			QUIT_UPGRADE_PROGRAM: _("Unattended update in progress\nPlease wait until your %s reboots\nThis may take a few minutes") % getBoxDisplayName,
 			QUIT_MANUFACTURER_RESET: _("Manufacturer reset in progress\nPlease wait until enigma2 restarts")
 		}.get(retvalue)
 		self["text"] = Label(text)
@@ -303,7 +306,7 @@ class TryQuitMainloop(MessageBox):
 				QUIT_UPGRADE_FP: _("Really update the frontprocessor and reboot now?"),
 				QUIT_DEBUG_RESTART: _("Really restart in debug mode now?"),
 				QUIT_RRECVERY_MODE: _("Really reboot into Recovery Mode?"),
-				QUIT_UPGRADE_PROGRAM: _("Really update your settop box and reboot now?"),
+				QUIT_UPGRADE_PROGRAM: _("Really update your %s and reboot now?") % getBoxDisplayName,
 				QUIT_MANUFACTURER_RESET: _("Really perform a manufacturer reset now?")
 			}.get(retvalue, None)
 			if text:
