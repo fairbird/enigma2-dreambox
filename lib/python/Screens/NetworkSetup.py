@@ -314,6 +314,8 @@ class DNSSettings(Setup):
 		Setup.keySave(self)
 
 	def addDNSServer(self):
+		dnsList = self["config"].getList()
+		self.dnsStart = len(dnsList)
 		self.entryAdded = True
 		self.dnsServers = self.dnsServers + [[0, 0, 0, 0]]
 		self.dnsCheck(self.dnsServers, refresh=False)
@@ -321,6 +323,8 @@ class DNSSettings(Setup):
 		self["config"].setCurrentIndex(self.dnsStart + self.dnsLength - 1)
 
 	def removeDNSServer(self):
+		dnsList = self["config"].getList()
+		self.dnsStart = len(dnsList)
 		index = self["config"].getCurrentIndex() - self.dnsStart
 		if self.dnsLength == 1:
 			self.dnsServers = [[0, 0, 0, 0]]
@@ -333,6 +337,8 @@ class DNSSettings(Setup):
 		self["config"].setCurrentIndex(self.dnsStart + index)
 
 	def moveEntryUp(self):
+		dnsList = self["config"].getList()
+		self.dnsStart = len(dnsList)
 		index = self["config"].getCurrentIndex() - self.dnsStart - 1
 		self.dnsServers.insert(index, self.dnsServers.pop(index + 1))
 		self.dnsCheck(self.dnsServers, refresh=False)
@@ -340,6 +346,8 @@ class DNSSettings(Setup):
 		self["config"].setCurrentIndex(self.dnsStart + index)
 
 	def moveEntryDown(self):
+		dnsList = self["config"].getList()
+		self.dnsStart = len(dnsList)
 		index = self["config"].getCurrentIndex() - self.dnsStart + 1
 		self.dnsServers.insert(index, self.dnsServers.pop(index - 1))
 		self.dnsCheck(self.dnsServers, refresh=False)
@@ -365,6 +373,7 @@ class DNSSettings(Setup):
 class NameserverSetup(DNSSettings):
 	def __init__(self, session):
 		DNSSettings.__init__(self, session=session)
+
 
 class AdapterSetup(ConfigListScreen, HelpableScreen, Screen):
 	def __init__(self, session, networkinfo, essid=None):
