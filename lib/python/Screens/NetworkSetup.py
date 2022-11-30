@@ -199,160 +199,104 @@ class NetworkAdapterSelection(Screen, HelpableScreen):
 				if selection is not None:
 					self.session.openWithCallback(self.AdapterSetupClosed, NetworkWizard, selection[0])
 
-class DNSSettings(Setup):
+class NameserverSetup(ConfigListScreen, HelpableScreen, Screen):
 	def __init__(self, session):
-		self.dnsInitial = iNetwork.getNameserverList()
-		print("[NetworkSetup] DNSSettings: Initial DNS list: %s." % str(self.dnsInitial))
-		self.dnsOptions = {
-			"custom": [[0, 0, 0, 0]],
-			"dhcp-router": [list(x[1]) for x in self.getNetworkRoutes()],
-			"google": [[8, 8, 8, 8], [8, 8, 4, 4]],
-			"cloudflare": [[1, 1, 1, 1], [1, 0, 0, 1]],
-			"opendns-familyshield": [[208, 67, 222, 123], [208, 67, 220, 123]],
-			"opendns-home": [[208, 67, 222, 222], [208, 67, 220, 220]]
-		}
-		option = self.dnsCheck(self.dnsInitial, refresh=False)
-		self.dnsServers = self.dnsOptions[option][:]
-		self.entryAdded = False
-		Setup.__init__(self, session=session, setup="DNS")
-		self["key_yellow"] = StaticText(_("Add"))
-		self["key_blue"] = StaticText("")
-		dnsDescription = _("DNS (Dynamic Name Server) Actions")
-		self["addAction"] = HelpableActionMap(self, ["DNSSettingsActions"], {
-			"dnsAdd": (self.addDNSServer, _("Add a DNS entry"))
-		}, prio=0, description=dnsDescription)
-		self["removeAction"] = HelpableActionMap(self, ["DNSSettingsActions"], {
-			"dnsRemove": (self.removeDNSServer, _("Remove a DNS entry"))
-		}, prio=0, description=dnsDescription)
-		self["removeAction"].setEnabled(False)
-		self["moveUpAction"] = HelpableActionMap(self, ["DNSSettingsActions"], {
-			"moveUp": (self.moveEntryUp, _("Move the current DNS entry up one line"))
-		}, prio=0, description=dnsDescription)
-		self["moveUpAction"].setEnabled(False)
-		self["moveDownAction"] = HelpableActionMap(self, ["DNSSettingsActions"], {
-			"moveDown": (self.moveEntryDown, _("Move the current DNS entry down one line"))
-		}, prio=0, description=dnsDescription)
-		self["moveDownAction"].setEnabled(False)
+		Screen.__init__(self, session)
+		HelpableScreen.__init__(self)
+		self.setTitle(_("Configure nameservers"))
+		self.backupNameserverList = iNetwork.getNameserverList()[:]
+		print("[NetworkSetup] backup-list:", self.backupNameserverList)
 
-		self.updateControls()
+		self["key_red"] = StaticText(_("Cancel"))
+		self["key_green"] = StaticText(_("Add"))
+		self["key_yellow"] = StaticText(_("Delete"))
 
-	def dnsCheck(self, dnsServers, refresh=True):
-		def dnsRefresh(refresh):
-			if refresh:
-				for item in self["config"].getList():
-					if item[1] == config.usage.dns:
-						self["config"].invalidate(item)
-						break
+		self["introduction"] = StaticText(_("Press OK to activate the settings."))
+		self.createConfig()
 
-		for option in self.dnsOptions.keys():
-			if dnsServers == self.dnsOptions[option]:
-				if option != "custom":
-					self.dnsOptions["custom"] = [[0, 0, 0, 0]]
-				config.usage.dns.value = option
-				dnsRefresh(refresh)
-				return option
-		option = "custom"
-		self.dnsOptions[option] = dnsServers[:]
-		config.usage.dns.value = option
-		dnsRefresh(refresh)
-		return option
+		self["OkCancelActions"] = HelpableActionMap(self, ["OkCancelActions"],
+			{
+			"cancel": (self.cancel, _("Exit nameserver configuration")),
+			"ok": (self.ok, _("Activate current configuration")),
+			})
+
+		self["ColorActions"] = HelpableActionMap(self, ["ColorActions"],
+			{
+			"red": (self.cancel, _("Exit nameserver configuration")),
+			"green": (self.add, _("Add a nameserver entry")),
+			"yellow": (self.remove, _("Remove a nameserver entry")),
+			})
+
+		self["actions"] = NumberActionMap(["SetupActions"],
+		{
+			"ok": self.ok,
+		}, -2)
+
+		self.list = []
+		ConfigListScreen.__init__(self, self.list)
+		self.createSetup()
+
+	def createConfig(self):
+		self.nameservers = iNetwork.getNameserverList()
+		if config.usage.dns.value == 'google':
+			self.nameserverEntries = [NoSave(ConfigIP(default=[8, 8, 8, 8])), NoSave(ConfigIP(default=[8, 8, 4, 4]))]
+		elif config.usage.dns.value == 'cloudflare':
+			self.nameserverEntries = [NoSave(ConfigIP(default=[1, 1, 1, 1])), NoSave(ConfigIP(default=[1, 0, 0, 1]))]
+		elif config.usage.dns.value == 'opendns-familyshield':
+			self.nameserverEntries = [NoSave(ConfigIP(default=[208, 67, 222, 123])), NoSave(ConfigIP(default=[208, 67, 220, 123]))]
+		elif config.usage.dns.value == 'opendns-home':
+			self.nameserverEntries = [NoSave(ConfigIP(default=[208, 67, 222, 222])), NoSave(ConfigIP(default=[208, 67, 220, 220]))]
+		elif config.usage.dns.value == 'dhcp-router':
+			self.nameserverEntries = [NoSave(ConfigIP(default=nameRoutes)) for nameRoutes in [list(x[1]) for x in self.getNetworkRoutes()]]
+		elif config.usage.dns.value == 'custom':
+			self.nameserverEntries = [NoSave(ConfigIP(default=nameserver)) for nameserver in self.nameservers]
 
 	def createSetup(self):
-		Setup.createSetupList(self)
-		dnsList = self["config"].getList()
-		self.dnsStart = len(dnsList)
-		for item, entry in enumerate([NoSave(ConfigIP(default=x)) for x in self.dnsServers], start=1):
-			dnsList.append(getConfigListEntry(_("Name server %d") % item, entry, _("Enter DNS (Dynamic Name Server) %d's IP address.") % item))
-		self.dnsLength = item
-		if self.entryAdded:
-			entry.default = [256, 256, 256, 256]  # This triggers a cancel confirmation for unedited new entries.
-			self.entryAdded = False
-		self["config"].setList(dnsList)
+		self.list = []
+		self.DNSEntry = getConfigListEntry(_("Nameserver configuration"), config.usage.dns)
+		self.list.append(self.DNSEntry)
 
-	def changedEntry(self):
-		current = self["config"].getCurrent()[1]
-		index = self["config"].getCurrentIndex()
-		dnsList = self["config"].getList()
-		self.dnsStart = len(dnsList)
-		if current == config.usage.dns:
-			self.dnsServers = self.dnsOptions[config.usage.dns.value][:]
-		elif self.dnsStart <= index < self.dnsStart + self.dnsLength:
-			self.dnsServers[index - self.dnsStart] = current.value[:]
-			option = self.dnsCheck(self.dnsServers, refresh=True)
-		Setup.changedEntry(self)
-		self.updateControls()
+		i = 1
+		for x in self.nameserverEntries:
+			self.list.append(getConfigListEntry(_("Nameserver %d") % (i), x))
+			i += 1
 
-	def selectionChanged(self):
-		Setup.selectionChanged(self)
-		self.updateControls()
+		self["config"].list = self.list
 
-	def updateControls(self):
-		dnsList = self["config"].getList()
-		self.dnsStart = len(dnsList)
-		for item, entry in enumerate([NoSave(ConfigIP(default=x)) for x in self.dnsServers], start=1):
-			dnsList.append(getConfigListEntry(_("Name server %d") % item, entry, _("Enter DNS (Dynamic Name Server) %d's IP address.") % item))
-		self.dnsLength = item
-		index = self["config"].getCurrentIndex() - self.dnsStart
-		if -1 <= index < self.dnsLength:
-			self["key_blue"].setText(_("Delete") if self.dnsLength > 1 or self.dnsServers[0] != [0, 0, 0, 0] else "")
-			self["removeAction"].setEnabled(self.dnsLength > 1 or self.dnsServers[0] != [0, 0, 0, 0])
-			self["moveUpAction"].setEnabled(index > 0)
-			self["moveDownAction"].setEnabled(index < self.dnsLength - 1)
-		else:
-			self["key_blue"].setText("")
-			self["removeAction"].setEnabled(False)
-			self["moveUpAction"].setEnabled(False)
-			self["moveDownAction"].setEnabled(False)
-
-	def keySave(self):
+	def ok(self):
+		self.RefreshNameServerUsed()
 		iNetwork.clearNameservers()
-		for dnsServer in self.dnsServers:
-			iNetwork.addNameserver(dnsServer)
-		print("[NetworkSetup] DNSSettings: Saved DNS list: %s." % str(iNetwork.getNameserverList()))
-		# iNetwork.saveNameserverConfig()
+		for nameserver in self.nameserverEntries:
+			iNetwork.addNameserver(nameserver.value)
 		iNetwork.writeNameserverConfig()
-		Setup.keySave(self)
+		config.usage.dns.save()
+		self.close()
 
-	def addDNSServer(self):
-		dnsList = self["config"].getList()
-		self.dnsStart = len(dnsList)
-		self.entryAdded = True
-		self.dnsServers = self.dnsServers + [[0, 0, 0, 0]]
-		self.dnsCheck(self.dnsServers, refresh=False)
-		self.createSetup()
-		self["config"].setCurrentIndex(self.dnsStart + self.dnsLength - 1)
+	def run(self):
+		self.ok()
 
-	def removeDNSServer(self):
-		dnsList = self["config"].getList()
-		self.dnsStart = len(dnsList)
-		index = self["config"].getCurrentIndex() - self.dnsStart
-		if self.dnsLength == 1:
-			self.dnsServers = [[0, 0, 0, 0]]
-		else:
-			del self.dnsServers[index]
-		self.dnsCheck(self.dnsServers, refresh=False)
-		self.createSetup()
-		if index == self.dnsLength:
-			index -= 1
-		self["config"].setCurrentIndex(self.dnsStart + index)
+	def cancel(self):
+		self.close()
 
-	def moveEntryUp(self):
-		dnsList = self["config"].getList()
-		self.dnsStart = len(dnsList)
-		index = self["config"].getCurrentIndex() - self.dnsStart - 1
-		self.dnsServers.insert(index, self.dnsServers.pop(index + 1))
-		self.dnsCheck(self.dnsServers, refresh=False)
+	def add(self):
+		iNetwork.addNameserver([0, 0, 0, 0])
+		self.createConfig()
 		self.createSetup()
-		self["config"].setCurrentIndex(self.dnsStart + index)
 
-	def moveEntryDown(self):
-		dnsList = self["config"].getList()
-		self.dnsStart = len(dnsList)
-		index = self["config"].getCurrentIndex() - self.dnsStart + 1
-		self.dnsServers.insert(index, self.dnsServers.pop(index - 1))
-		self.dnsCheck(self.dnsServers, refresh=False)
-		self.createSetup()
-		self["config"].setCurrentIndex(self.dnsStart + index)
+	def remove(self):
+		print("[NetworkSetup] currentIndex:", self["config"].getCurrentIndex())
+		index = self["config"].getCurrentIndex()
+		if index < len(self.nameservers):
+			iNetwork.removeNameserver(self.nameservers[index])
+			self.createConfig()
+			self.createSetup()
+
+	def RefreshNameServerUsed(self):
+		print("[NetworkSetup] currentIndex:", self["config"].getCurrentIndex())
+		index = self["config"].getCurrentIndex()
+		if index < len(self.nameservers):
+			self.createConfig()
+			self.createSetup()
 
 	def getNetworkRoutes(self):
 		# # cat /proc/net/route
@@ -368,11 +312,6 @@ class DNSSettings(Setup):
 			if data[1] == "00000000" and int(data[3]) & 0x03 and data[7] == "00000000":  # If int(flags) & 0x03 is True this is a gateway (0x02) and it is up (0x01).
 				gateways.append((data[0], tuple(reversed([int(data[2][x:x + 2], 16) for x in range(0, len(data[2]), 2)]))))
 		return gateways
-
-
-class NameserverSetup(DNSSettings):
-	def __init__(self, session):
-		DNSSettings.__init__(self, session=session)
 
 
 class AdapterSetup(ConfigListScreen, HelpableScreen, Screen):
