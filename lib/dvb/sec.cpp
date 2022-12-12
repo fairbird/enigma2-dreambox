@@ -1276,7 +1276,7 @@ RESULT eDVBSatelliteEquipmentControl::clear()
 /* LNB Specific Parameters */
 RESULT eDVBSatelliteEquipmentControl::addLNB()
 {
-	eDVBSatelliteLNBParameters lnb;
+	static eDVBSatelliteLNBParameters lnb;
 	lnb.m_slot_mask = 0;
 	lnb.m_prio = -1; // auto
 	lnb.m_advanced_satposdepends = -1;
