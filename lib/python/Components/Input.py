@@ -103,10 +103,7 @@ class Input(VariableText, GUIComponent, NumericalTextInput):
 		if self.type == self.TEXT:
 			self.timeout()
 		if self.allmarked:
-			if self.maxSize:
-				self.currPos = len(self.Text) - 1
-			else:
-				self.currPos = len(self.Text)
+			self.currPos = len(self.textU) - 1 if self.maxSize else len(self.textU)
 			self.allmarked = False
 		elif self.currPos > 0:
 			self.currPos -= 1
