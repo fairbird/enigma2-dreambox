@@ -1,7 +1,10 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+#
+# Coded by bigroma & 2boom
+# Update By RAED for python3
 from Components.Converter.Converter import Converter
-from enigma import iServiceInformation
+from enigma import iServiceInformation, iPlayableService
 from Tools.Directories import fileExists
 from Components.Element import cached
 from Components.Converter.Poll import Poll
@@ -48,7 +51,10 @@ class CaidInfo2(Poll, Converter, object):
 	CRD = 33
 	CRDTXT = 34
 	SHORT = 35
+	IS_FTA = 36
+	IS_CRYPTED = 37
 	my_interval = 1000
+
 
 	def __init__(self, type):
 		Poll.__init__(self)
@@ -119,6 +125,10 @@ class CaidInfo2(Poll, Converter, object):
 			self.type = self.CRD
 		elif type == "CrdTxt":
 			self.type = self.CRDTXT
+		elif  type == "IsFta":
+			self.type = self.IS_FTA
+		elif  type == "IsCrypted":
+			self.type = self.IS_CRYPTED
 		elif type == "Short":
 			self.type = self.SHORT
 		elif type == "Default" or type == "" or type == None or type == "%":
@@ -169,6 +179,14 @@ class CaidInfo2(Poll, Converter, object):
 			return False
 
 		caids = info.getInfoObject(iServiceInformation.sCAIDs)
+		if self.type is self.IS_FTA:
+			if caids:
+				return False
+			return True
+		if self.type is self.IS_CRYPTED:
+			if caids:
+				return True
+			return False
 		if caids:
 			if self.type == self.SECA:
 				for caid in caids:
@@ -292,9 +310,12 @@ class CaidInfo2(Poll, Converter, object):
 					return using == "emu" or source == "emu" or source == "card" or reader == "emu" or source.find("card") > -1 or source.find("emu") > -1 or source.find("biss") > -1 or source.find("cache") > -1
 				source = ecm_info.get("source", "")
 				if self.type == self.IS_NET:
-					if source != "cache" and source == "net" and source.find("emu") == -1:
-						return True
-						#return  (source != None and source == "net") or (source != None and source != "sci") or (source != None and source != "emu") or (reader != None and reader != "emu") or (source != None and source != "card")
+					if using == "CCcam-s2s":
+						return 1
+					else:
+						if source != "cache" and source == "net" and source.find("emu") == -1:
+							return True
+						#return  (source != None and source == "net") or (source != None and source != "sci") or (source != None and source != "emu") or (reader != None and reader != "emu") or (source != None and source != "card") 
 
 				else:
 					return False
@@ -489,7 +510,8 @@ class CaidInfo2(Poll, Converter, object):
 				if ecm_mtime == old_ecm_mtime:
 					return info
 				old_ecm_mtime = ecm_mtime
-				ecmf = open("/tmp/ecm.info", "r")
+				#ecmf = open("/tmp/ecm.info", "rb")
+				ecmf = open("/tmp/ecm.info", "r") # Fix Python3 (TypeError: a bytes-like object is required, not 'str' )
 				ecm = ecmf.readlines()
 			except:
 				old_ecm_mtime = None
