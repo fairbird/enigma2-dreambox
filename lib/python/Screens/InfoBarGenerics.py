@@ -2652,7 +2652,7 @@ class InfoBarInstantRecord:
 	def startInstantRecording(self, limitEvent=False):
 		begin = int(time())
 		end = begin + 3600      # dummy
-		name = "instant record"
+		name = _("Instant record")
 		info = {}
 
 		self.getProgramInfoAndEvent(info, name)
@@ -2663,8 +2663,10 @@ class InfoBarInstantRecord:
 			if limitEvent:
 				end = info["end"]
 		else:
+			message = _("No event info found, recording indefinitely.")
 			if limitEvent:
-				self.session.open(MessageBox, _("No event info found, recording indefinitely."), MessageBox.TYPE_INFO)
+				message = _("Recording time has been set.")
+			self.session.open(MessageBox, message, MessageBox.TYPE_INFO, timeout=5)
 
 		if isinstance(serviceref, eServiceReference):
 			serviceref = ServiceReference(serviceref)
@@ -2754,7 +2756,7 @@ class InfoBarInstantRecord:
 			self.deleteRecording = True
 			self.stopAllCurrentRecordings(list)
 		elif answer[1] in ("indefinitely", "manualduration", "manualendtime", "event"):
-			self.startInstantRecording(limitEvent=answer[1] in ("event", "manualendtime") or False)
+			self.startInstantRecording(limitEvent=answer[1] in ("event", "manualendtime", "manualduration") or False)
 			if answer[1] == "manualduration":
 				self.changeDuration(len(self.recording) - 1)
 			elif answer[1] == "manualendtime":
