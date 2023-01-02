@@ -38,7 +38,7 @@ class VWatches(Renderer):
 	def hand(self):
 		width = self.instance.size().width()
 		height = self.instance.size().height()
-		r = (min(width, height) / 2)
+		r = (min(width, height) // 2)
 		(endX, endY,) = self.calculate(self.numval, r, r)
 		self.draw_line(r, r, endX, endY)
 
@@ -56,7 +56,7 @@ class VWatches(Renderer):
 			ystep = -1
 		deltax = x1 - x0
 		deltay = abs(y1 - y0)
-		error = -deltax / 2
+		error = -deltax // 2
 		y = y0
 		for x in range(x0, x1 + 1):
 			if steep:
