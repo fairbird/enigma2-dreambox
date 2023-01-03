@@ -81,6 +81,9 @@ class AutoRestoreWizard(MessageBox):
 				os.unlink("/etc/.doNotAutoInstall")
 				MessageBox.close(self, 43)
 			else:
+				# restore network config first, we need it to autoinstall
+				self.console = eConsoleAppContainer()
+				self.console.execute('/etc/init.d/settings-restore.sh network')
 				self.session.open(AutoInstall)
 		MessageBox.close(self)
 

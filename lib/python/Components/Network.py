@@ -682,6 +682,15 @@ class Network:
 			except KeyError:
 				pass
 
+def waitForNetwork(timeout=15):
+	while timeout > 0:
+		gws = ni.gateways()
+		if 'default' in gws and len(gws['default']) > 0:
+			print("[waitForNetwork] Online, reload interface data")
+			iNetwork.getInterfaces()
+			return
+		timeout -= 1
+		print("[waitForNetwork] Not online yet (%d)" % (timeout))
 
 iNetwork = Network()
 
