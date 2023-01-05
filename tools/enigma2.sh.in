@@ -62,6 +62,7 @@ while : ; do
 	#  5 - install new settings
 	#  6 - restart enigma in debug mode
 	#  7 - manufacturer reset
+	# 16 - recovery mode
 	# 42 - restart for unattended update
 	# 43 - restart for autobackup restore
 	#
