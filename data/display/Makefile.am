@@ -1,15 +1,57 @@
-installdir = $(pkgdatadir)/display/skin_default
+SUBDIRS = display
 
-if HAVE_TEXTLCD
-DISPLAYTYPE = text
-else
-DISPLAYTYPE = display
+if HAVE_COLORLCD1
+SUBDIRS += display128
 endif
 
-dist_install_DATA = skin_display.xml progress_oled.png lcd_video_900uhd.png
+if HAVE_COLORLCD2
+SUBDIRS += display96
+endif
 
-# Use box-specific XML if it exists, otherwise get the default
-# TEXTSKIN is either "default" or "7segment"
-# TODO: Missing dependency on optional "skin_$(DISPLAYTYPE)_$(BOXTYPE).xml"
-skin_display.xml:
-	cp $(srcdir)/skin_$(DISPLAYTYPE)_$(BOXTYPE).xml $@ 2>/dev/null || cp $(srcdir)/skin_$(DISPLAYTYPE)_$(TEXTSKIN).xml $@
+if HAVE_COLORLCD220
+SUBDIRS += display220
+endif
+
+if HAVE_COLORLCD240
+SUBDIRS += display240
+endif
+
+if HAVE_COLORLCD3
+SUBDIRS += display128dm
+endif
+
+if HAVE_COLORLCD390
+SUBDIRS += display390
+endif
+
+if HAVE_COLORLCD400
+SUBDIRS += display400
+endif
+
+if HAVE_COLORLCD480
+SUBDIRS += display480
+endif
+
+if HAVE_COLORLCD720
+SUBDIRS += display720
+endif
+
+if HAVE_COLORLCD800
+SUBDIRS += display800
+endif
+
+if HAVE_GRAUTEC70X0
+SUBDIRS += grautec70x0
+endif
+
+if HAVE_GRAUTEC8000
+SUBDIRS += grautec8000
+endif
+
+if HAVE_TEXTLCD
+if HAVE_7SEGMENT
+SUBDIRS += 7segment
+else
+SUBDIRS += displaytext
+endif
+endif
