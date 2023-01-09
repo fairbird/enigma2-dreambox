@@ -64,7 +64,7 @@ class eDVBSectionReader: public iDVBSectionReader, public sigc::trackable
 	void data(int);
 	ePtr<eSocketNotifier> notifier;
 #if defined(DMAMLOGIC)
-	sigc::slot<void(const __u8*)> m_buffer_func;
+	Slot0<void(__u8*)> m_buffer_func;
 	bool m_have_external_buffer_func;
 #endif
 public:
@@ -73,7 +73,7 @@ public:
 	RESULT setBufferSize(int size);
 	RESULT start(const eDVBSectionFilterMask &mask);
 #if defined(DMAMLOGIC)
-	RESULT startWithExternalBufferFunc(const eDVBSectionFilterMask &mask, const sigc::slot<void(const __u8*)> &buffer_func);
+	RESULT startWithExternalBufferFunc(const eDVBSectionFilterMask &mask, const Slot0<void(__u8*)> &buffer_func);
 #endif
 	RESULT stop();
 	RESULT connectRead(const sigc::slot<void(const uint8_t*)> &read, ePtr<eConnection> &conn);

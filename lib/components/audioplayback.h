@@ -35,7 +35,7 @@ public:
 
 	int64_t getPTS();
 
-	RESULT connectPCMEvent(const sigc::slot<void, uint8_t*, int, int64_t>  &pcm_callback, ePtr<eConnection> &connection, int type = 0 /* 0 = eAlsaOutput::HDMI, 1 = eAlsaOutput::SPDIF */);
+	RESULT connectPCMEvent(const sigc::slot<void(uint8_t*, int, int64_t)>  &pcm_callback, ePtr<eConnection> &connection, int type = 0 /* 0 = eAlsaOutput::HDMI, 1 = eAlsaOutput::SPDIF */);
 };
 
 #endif //__LIB_COMPONENTS_AUDIOPLAYBACK_H
