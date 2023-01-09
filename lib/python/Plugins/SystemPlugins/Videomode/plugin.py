@@ -5,7 +5,6 @@ from Components.ConfigList import ConfigListScreen
 from Components.config import getConfigListEntry, config, ConfigBoolean, ConfigNothing
 from Components.Label import Label
 from Components.Sources.StaticText import StaticText
-from Tools.HardwareInfo import HardwareInfo
 
 from Plugins.SystemPlugins.Videomode.VideoHardware import video_hw
 
@@ -159,15 +158,14 @@ class VideoSetup(ConfigListScreen, Screen):
 				self.list.append(getConfigListEntry(_("General BT audio delay"), config.av.btaudiodelay, _("This option configures the general audio delay for BT speakers.")))
 
 		if SystemInfo["CanChangeOsdAlpha"]:
-			if HardwareInfo().get_device_name() in ("dm900", "dm920", "dreamone", "dreamtwo"):
-				self.list.append(getConfigListEntry(_("OSD transparency"), config.av.osd_alpha, _("Configure the transparency of the OSD.")))
+			self.list.append(getConfigListEntry(_("OSD transparency"), config.av.osd_alpha, _("Configure the transparency of the OSD.")))
 			self.list.append(getConfigListEntry(_("Teletext base visibility"), config.osd.alpha_teletext, _("Base transparency for teletext, more options available within teletext screen.")))
 
-		if HardwareInfo().get_device_name() in ("dm900", "dm920", "dreamone", "dreamtwo"):
-			if not isinstance(config.av.scaler_sharpness, ConfigNothing):
-				self.list.append(getConfigListEntry(_("Scaler sharpness"), config.av.scaler_sharpness, _("Configure the sharpness of the video scaling.")))
+		if not isinstance(config.av.scaler_sharpness, ConfigNothing):
+			self.list.append(getConfigListEntry(_("Scaler sharpness"), config.av.scaler_sharpness, _("Configure the sharpness of the video scaling.")))
 
 		self["config"].list = self.list
+		self["config"].l.setList(self.list)
 
 	def keyLeft(self):
 		ConfigListScreen.keyLeft(self)
