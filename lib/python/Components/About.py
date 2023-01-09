@@ -152,10 +152,21 @@ def getCPUInfoString():
 
 
 def getChipSetString():
-	chipset = fileReadLine("/proc/stb/info/chipset", source=MODULE_NAME)
-	if chipset is None:
-		return _("Undefined")
-	return chipset.lower()
+	if HardwareInfo().get_device_name() in ('dm7080', 'dm820'):
+		return "7435"
+	elif HardwareInfo().get_device_name() in ('dm520', 'dm525'):
+		return "73625"
+	elif HardwareInfo().get_device_name() in ('dm900', 'dm920', 'et13000', 'sf5008'):
+		return "7252S"
+	elif HardwareInfo().get_device_name() in ('hd51', 'vs1500', 'h7'):
+		return "7251S"
+	elif HardwareInfo().get_device_name() in ('alien5',):
+		return "S905D"
+	else:
+		chipset = fileReadLine("/proc/stb/info/chipset", source=MODULE_NAME)
+		if chipset is None:
+			return _("Undefined")
+		return str(chipset.lower().replace('\n', '').replace('bcm', '').replace('brcm', '').replace('sti', ''))
 
 def getDVBAPI():
 	if SystemInfo["OLDE2API"]:
