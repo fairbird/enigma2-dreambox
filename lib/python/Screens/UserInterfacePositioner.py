@@ -9,16 +9,21 @@ from Components.Label import Label
 from Tools.Directories import fileExists
 from enigma import getDesktop
 from os import access, R_OK
+from Tools.HardwareInfo import HardwareInfo
 
 
 def getFilePath(setting):
-	return "/proc/stb/vmpeg/0/dst_%s" % (setting)
+	if HardwareInfo().get_device_model() not in ('dreamone', 'dreamtwo'):
+		return "/proc/stb/vmpeg/0/dst_%s" % (setting)
 
 
 def setPositionParameter(parameter, configElement):
-	f = open(getFilePath(parameter), "w")
-	f.write('%08X\n' % int(configElement.value))
-	f.close()
+	try:
+		f = open(getFilePath(parameter), "w")
+		f.write('%08X\n' % int(configElement.value))
+		f.close()
+	except OSError:
+		pass
 	if fileExists(getFilePath("apply")):
 		f = open(getFilePath("apply"), "w")
 		f.write('1')
@@ -518,7 +523,6 @@ class UserInterfacePositioner(Screen, ConfigListScreen):
 		configfile.save()
 		self.close()
 
-
 # FIXME Can be removed
 
 
@@ -548,7 +552,7 @@ class OSD3DSetupScreen(Screen, ConfigListScreen):
 		ConfigListScreen.__init__(self, self.list, session=session, on_change=self.changedEntry)
 		self.list.append(getConfigListEntry(_("3D Mode"), config.osd.threeDmode, _("This option lets you choose the 3D mode")))
 		self.list.append(getConfigListEntry(_("Depth"), config.osd.threeDznorm, _("This option lets you adjust the 3D depth")))
-		self.list.append(getConfigListEntry(_("Show in extensions list"), config.osd.show3dextensions, _("This option lets you show the option in the extension screen")))
+		self.list.append(getConfigListEntry(_("Show in extensions list"), config.osd.show3dextensions, _("This option lets you show the option in the extension screen.")))
 		self["config"].list = self.list
 		self["config"].l.setList(self.list)
 
