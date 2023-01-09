@@ -16,6 +16,16 @@ fi
 
 LIBS=@libdir@/libopen.so.0.0.0
 
+if [ "${PLATFORMCHECK}" == "meson64" ]; then
+	export media_arm_audio_decoder="ape,flac,dts,ac3,eac3,wma,wmapro,mp3,aac,vorbis,raac,cook,amr,pcm,adpcm"
+	echo "1" > /sys/class/graphics/fb0/osd_clear
+	echo "1" > /sys/class/graphics/fb1/osd_clear
+	FIRSTRUN=`sed -En 's|^config\.misc\.firstrun=(.+)$|\1|p' /etc/enigma2/settings | tr [A-Z] [a-z]`
+	if [ "$FIRSTRUN" == "true" ]; then
+		echo "1080p50hz" > /sys/class/display/mode
+	fi
+fi
+
 # enigma main loop
 while : ; do
 	# show bootlogo on enigma2 start
