@@ -373,7 +373,7 @@ class VideoHardware:
 
                 mode = config.av.videomode[port].value
 
-		if mode not in config.av.videorate:
+                if mode not in config.av.videorate:
                         print("[Videomode] VideoHardware current mode not available, not setting videomode")
                         return
 
