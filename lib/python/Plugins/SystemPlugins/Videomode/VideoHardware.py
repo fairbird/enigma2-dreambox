@@ -61,7 +61,7 @@ class VideoHardware:
                 "60Hz": {60: "2160p60"},
                 "multi": {50: "2160p50", 60: "2160p60"},
                 "auto": {50: "2160p50", 60: "2160p60", 24: "2160p24"}}
-        if HardwareInfo().get_device_name() in ("dm900", "dm920", "dreamone", "dreamtwo"):
+        if HardwareInfo().get_device_name() in ("dm900", "dm920", "one", "two"):
                 rates["2160p"] = {"50Hz": {50: "2160p50"}, "60Hz": {60: "2160p60"}, "multi": {50: "2160p50", 60: "2160p60"}, "auto": {50: "2160p50", 60: "2160p60", 24: "2160p24"}}
         else:
                 rates["2160p"] = {"50Hz": {50: "2160p50"}, "60Hz": {60: "2160p"}, "multi": {50: "2160p50", 60: "2160p"}, "auto": {50: "2160p50", 60: "2160p", 24: "2160p24"}}
@@ -95,7 +95,7 @@ class VideoHardware:
 
         modes["DVI-PC"] = ["PC"]
 
-        if HardwareInfo().get_device_name() in ("dreamone", "dreamtwo"):
+        if HardwareInfo().get_device_name() in ("one", "two"):
                 modes["HDMI"] = ["720p", "1080p", "2160p", "1080i", "576p", "576i", "480p", "480i"]
                 widescreen_modes = {"720p", "1080p", "1080i", "2160p"}
 
@@ -170,7 +170,7 @@ class VideoHardware:
 
         def readPreferredModes(self):
                 if config.av.edid_override.value == False:
-                        if HardwareInfo().get_device_name() in ("dreamone", "dreamtwo") and fileExists("/sys/class/amhdmitx/amhdmitx0/disp_cap"):
+                        if HardwareInfo().get_device_name() in ("one", "two") and fileExists("/sys/class/amhdmitx/amhdmitx0/disp_cap"):
                                 print("[Videomode] Read /sys/class/amhdmitx/amhdmitx0/disp_cap")
                                 modes = open("/sys/class/amhdmitx/amhdmitx0/disp_cap").read()[:-1]
                                 self.modes_preferred = modes.splitlines()
@@ -235,7 +235,7 @@ class VideoHardware:
                         if force == 50:
                                 mode_24 = mode_50
 
-                if HardwareInfo().get_device_name() in ("dreamone", "dreamtwo"):
+                if HardwareInfo().get_device_name() in ("one", "two"):
                         open('/sys/class/display/mode', 'w').write('576i50hz')
                         amlmode = mode + rate.lower()
                         try:
@@ -315,7 +315,7 @@ class VideoHardware:
         def getModeList(self, port):
                 print("[Videomode] VideoHardware getModeList for port", port)
                 res = []
-                if HardwareInfo().get_device_name() not in ("dreamone", "dreamtwo"):
+                if HardwareInfo().get_device_name() not in ("one", "two"):
                         for mode in self.modes[port]:
                                 # list all rates which are completely valid
                                 rates = [rate for rate in self.rates[mode] if self.isModeAvailable(port, mode, rate)]
@@ -377,7 +377,7 @@ class VideoHardware:
                         print("[Videomode] VideoHardware current mode not available, not setting videomode")
                         return
 
-                if HardwareInfo().get_device_name() in ("dreamone", "dreamtwo") and (mode.find("0p30") != -1 or mode.find("0p24") != -1 or mode.find("0p25") != -1):
+                if HardwareInfo().get_device_name() in ("one", "two") and (mode.find("0p30") != -1 or mode.find("0p24") != -1 or mode.find("0p25") != -1):
                         match = re.search(r"(\d*?[ip])(\d*?)$", mode)
                         mode = match.group(1)
                         rate = match.group(2) + "Hz"
@@ -443,7 +443,7 @@ class VideoHardware:
                         wss = "auto"
 
                 print("[Videomode] VideoHardware -> setting aspect, policy, policy2, wss", aspect, policy, policy2, wss)
-                if chipsetstring.startswith("meson-6") and HardwareInfo().get_device_name() not in ("dreamone", "dreamtwo"):
+                if chipsetstring.startswith("meson-6") and HardwareInfo().get_device_name() not in ("one", "two"):
                         arw = "0"
                         if config.av.policy_43.value == "bestfit":
                                 arw = "10"
@@ -455,7 +455,7 @@ class VideoHardware:
                                 open("/sys/class/video/screen_mode", "w").write(arw)
                         except IOError:
                                 print("[Videomode] Write to /sys/class/video/screen_mode failed.")
-                elif HardwareInfo().get_device_name() in ("dreamone", "dreamtwo"):
+                elif HardwareInfo().get_device_name() in ("one", "two"):
                         arw = "0"
                         if config.av.policy_43.value == "bestfit":
                                 arw = "10"

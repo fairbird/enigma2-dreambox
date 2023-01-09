@@ -621,7 +621,7 @@ import Components.Lcd
 Components.Lcd.InitLcd()
 
 from Tools.HardwareInfo import HardwareInfo
-if HardwareInfo().get_device_model() in ('dm7080', 'dm820', 'dm900', 'dm920', 'dreamone', 'dreamtwo'):
+if HardwareInfo().get_device_model() in ('dm7080', 'dm820', 'dm900', 'dm920'):
 	print("[StartEnigma] Read /proc/stb/hdmi-rx/0/hdmi_rx_monitor")
 	check = open("/proc/stb/hdmi-rx/0/hdmi_rx_monitor", "r").read()
 	if check.startswith("on"):
