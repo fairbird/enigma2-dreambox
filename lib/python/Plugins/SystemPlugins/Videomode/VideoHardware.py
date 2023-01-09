@@ -4,6 +4,7 @@ from Tools.CList import CList
 from Tools.HardwareInfo import HardwareInfo
 from Components.About import about
 from Tools.Directories import fileExists
+from Components.Console import Console
 import os
 from enigma import getDesktop
 
