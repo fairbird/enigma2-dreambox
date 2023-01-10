@@ -84,7 +84,7 @@ class VideoHardware:
 
         if SystemInfo["HasScart"]:
                 modes["Scart"] = ["PAL", "NTSC", "Multi"]
-        elif SystemInfo["HasComposite"]:
+        if SystemInfo["HasComposite"] and HardwareInfo().get_device_name() in ("dm7020hd", "dm7020hdv2", "dm8000"):
                 modes["RCA"] = ["576i", "PAL", "NTSC", "Multi"]
         if SystemInfo["HasYPbPr"]:
                 modes["YPbPr"] = ["720p", "1080i", "576p", "480p", "576i", "480i"]
