@@ -353,7 +353,6 @@
 		<item level="0" requires="LedPowerColor" text="Operating LED status while running" description="With this option you can switch the LED color or deactivate the LED.">config.lcd.ledpowercolor</item>
 		<item level="0" requires="LedStandbyColor" text="Operating LED status in standby mode" description="With this option you can switch the LED color or deactivate the LED.">config.lcd.ledstandbycolor</item>
 		<item level="0" requires="LedSuspendColor" text="Operating LED status in deep standby mode" description="With this option you can switch the LED color or deactivate the LED.">config.lcd.ledsuspendcolor</item>
-		<item level="0" requires="FrontpanelLEDBlinkControl" text="Operating LED color while blinking." description="With this option you can switch the LED color while blinking.">config.lcd.ledblinkcontrolcolor</item>
 		<item level="0" requires="FrontpanelLEDBrightnessControl" text="Operating LED brightness." description="With this option you can switch the LED brightness.">config.lcd.ledbrightnesscontrol</item>
 		<item level="0" requires="FrontpanelLEDColorControl" text="Operating LED color." description="With this option you can switch the LED color.">config.lcd.ledcolorcontrolcolor</item>
 		<item level="0" requires="FrontpanelLEDFadeControl" text="Operating LED fade." description="With this option you can switch the LED fade.">config.lcd.ledfadecontrolcolor</item>
