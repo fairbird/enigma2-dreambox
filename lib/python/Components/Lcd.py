@@ -411,6 +411,10 @@ def InitLcd():
 			if exists("/proc/stb/fp/ledsuspendledcolor"):
 				fileWriteLine("/proc/stb/fp/ledsuspendledcolor", configElement.value)
 
+		def setLedBlinkControlColor(configElement):
+			if exists("/proc/stb/fp/led_blink"):
+				fileWriteLine("/proc/stb/fp/led_blink", configElement.value)
+
 		def setLedBrightnessControl(configElement):
 			if exists("/proc/stb/fp/led_brightness"):
 				fileWriteLine("/proc/stb/fp/led_brightness", configElement.value)
@@ -506,6 +510,8 @@ def InitLcd():
 			("0xff0066", _("Pink")),
 			("0xffffff", _("White")),
 		]
+		config.lcd.ledblinkcontrolcolor = ConfigSelection(choices=colorsList, default="0xffffff")
+		config.lcd.ledblinkcontrolcolor.addNotifier(setLedBlinkControlColor)
 		config.lcd.ledbrightnesscontrol = ConfigSlider(default=0xff, increment=25, limits=(0, 0xff))
 		config.lcd.ledbrightnesscontrol.addNotifier(setLedBrightnessControl)
 		config.lcd.ledcolorcontrolcolor = ConfigSelection(choices=colorsList, default="0xffffff")
