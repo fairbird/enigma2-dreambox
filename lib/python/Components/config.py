@@ -61,8 +61,7 @@ def getKeyNumber(key):
 
 
 def getConfigListEntry(*args):
-	if len(args) < 1:  # A single argument creates a comment line in the ConfigList.  This item can't be selected!
-		print("[Config] Error: 'getConfigListEntry' needs at least one argument (description)!")
+	assert len(args) > 0, "getConfigListEntry needs a minimum of one argument (descr, configElement)"
 	return args
 
 
