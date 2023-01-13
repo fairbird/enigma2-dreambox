@@ -16,6 +16,8 @@ fi
 
 LIBS=@libdir@/libopen.so.0.0.0
 
+PLATFORMCHECK=`sed -En 's|^platform=(.+)$|\1|p' /usr/lib/enigma.info`
+
 if [ "${PLATFORMCHECK}" == "meson64" ]; then
 	export media_arm_audio_decoder="ape,flac,dts,ac3,eac3,wma,wmapro,mp3,aac,vorbis,raac,cook,amr,pcm,adpcm"
 	echo "1" > /sys/class/graphics/fb0/osd_clear
