@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: enigma2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-10-14 09:11+0200\n"
-"POT-Creation-Date: 2022-11-01 12:32+0100\n"
+"POT-Creation-Date: 2023-01-14 14:37+0100\n"
 "Last-Translator: RAED - Fairbirb <rrrr53@hotmail.com>\n"
 "Language-Team: \n"
 "Language: ar\n"
@@ -1668,6 +1668,9 @@ msgstr "أختار الباقة"
 msgid "Choose bouquet"
 msgstr "أختار الباقة"
 
+msgid "Choose the option to correct invalid EPG data."
+msgstr "اختر خيار تصحيح بيانات دليل البرامج الإلكتروني غير الصالحة."
+
 msgid "Choose which tuner to configure."
 msgstr "اختيار أي موالف لتكوين."
 
@@ -2215,6 +2218,9 @@ msgstr "نسخ"
 msgid "Copy to bouquets"
 msgstr "نسخ إلى الباقات"
 
+msgid "Correct invalid EPG data"
+msgstr "تصحيح بيانات الدليل الإلركتروني غير الصالحة"
+
 msgid "Costa Rica"
 msgstr "كوستا ريكا"
 
@@ -2419,8 +2425,11 @@ msgstr "تاريخ"
 msgid "Date/time input"
 msgstr "دقائق وقت الذروة"
 
+msgid "Debug"
+msgstr "تصحيح"
+
 msgid "Debug to file"
-msgstr "حذف الملف"
+msgstr "تصحيح الملف"
 
 msgid "Deep Standby LED"
 msgstr "الاستعداد العميق"
@@ -4222,6 +4231,9 @@ msgstr "إذا تم تعيينها على قيم إشارة 'نعم' (معدل �
 msgid "If set to 'yes' the same commands will be sent to the TV for deep standby events, as are sent during regular standby events."
 msgstr ".إذا تم الضبط على 'نعم' ، فسيتم إرسال نفس الأوامر إلى التلفزيون لأحداث الاستعداد العميق ، كما يتم إرسالها أثناء أحداث الاستعداد العادية"
 
+msgid "If set to 'yes', allows you to use timeshift with alternative audio plugins."
+msgstr "في حالة الضبط على "نعم" ، يسمح لك باستخدام ميزة تغيير الوقت مع المكونات الإضافية الصوتية البديلة."
+
 msgid "If the box is supposed to enter deep standby e.g. monday night at 1 AM, it actually is already tuesday. To enable this anyway, differing next day start time can be specified here."
 msgstr "إذا كان من المفترض أن يدخل الصندوق في وضع الاستعداد العميق ، على سبيل المثال ليلة الاثنين الساعة 1 صباحًا ، إنه بالفعل يوم الثلاثاء. لتمكين هذا على أي حال ، يمكن هنا تحديد وقت بدء اليوم التالي المختلف."
 
@@ -4426,6 +4438,9 @@ msgstr "نثبيت"
 
 msgid "Installing software..."
 msgstr "تثبيت القنوات"
+
+msgid "Instant record"
+msgstr "جاري التسجيل السريع"
 
 msgid "Instant recording"
 msgstr "جاري التسجيل السريع"
@@ -6521,6 +6536,13 @@ msgstr "تشغيل الافلام المسجلة..."
 msgid "Recording"
 msgstr "تسجيل"
 
+msgid ""
+"Recording IPTV with ServiceApp player enabled, timer ended!\n"
+"Please recheck it!"
+msgstr ""
+"تسجيل IPTV مع مشغل ServiceApp مُفعل ، انتهى المؤقت! \ n"
+"يرجى إعادة التحقق منه!"
+
 msgid "Recording Setup"
 msgstr "نوع التسجيل"
 
@@ -6529,6 +6551,9 @@ msgstr "التسجيل قيد التشغيل"
 
 msgid "Recording paths"
 msgstr "تسجيلات"
+
+msgid "Recording time has been set."
+msgstr "تم ضبط وقت التسجيل."
 
 msgid "Recording type"
 msgstr "نوع التسجيل"
@@ -8077,6 +8102,9 @@ msgstr "تخطي القنوات الفارغة"
 
 msgid "Skip internet connection check (disables automatic package installation)"
 msgstr "تخطي الاختيار اتصال بالإنترنت (تعطيل تثبيت الحزمة التلقائي)"
+
+msgid "Skip jumping to live TV while timeshifting with plugins"
+msgstr "تخطي القفز إلى البث التلفزيوني المباشر أثناء تغيير الوقت باستخدام المكونات الإضافية"
 
 msgid "Sleep timer"
 msgstr "حذف المؤقت"
