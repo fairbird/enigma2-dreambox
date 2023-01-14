@@ -412,7 +412,7 @@ def InitLcd():
 				fileWriteLine("/proc/stb/fp/ledsuspendledcolor", configElement.value)
 
 		def setLedBlinkControlColor(configElement):
-			if exists("/proc/stb/fp/led_blink"):
+			if exists("/proc/stb/fp/led_blink") and HardwareInfo().get_device_model() not in ('one', 'two')::
 				fileWriteLine("/proc/stb/fp/led_blink", configElement.value)
 
 		def setLedBrightnessControl(configElement):

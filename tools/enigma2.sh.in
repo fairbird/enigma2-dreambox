@@ -19,13 +19,24 @@ LIBS=@libdir@/libopen.so.0.0.0
 PLATFORMCHECK=`sed -En 's|^platform=(.+)$|\1|p' /usr/lib/enigma.info`
 
 if [ "${PLATFORMCHECK}" == "meson64" ]; then
-	export media_arm_audio_decoder="ape,flac,dts,ac3,eac3,wma,wmapro,mp3,aac,vorbis,raac,cook,amr,pcm,adpcm"
 	echo "1" > /sys/class/graphics/fb0/osd_clear
 	echo "1" > /sys/class/graphics/fb1/osd_clear
 	FIRSTRUN=`sed -En 's|^config\.misc\.firstrun=(.+)$|\1|p' /etc/enigma2/settings | tr [A-Z] [a-z]`
 	if [ "$FIRSTRUN" == "true" ]; then
 		echo "1080p50hz" > /sys/class/display/mode
 	fi
+fi
+
+if [ -f /proc/stb/fp/led_color ]; then
+	echo "00ffffff" > /proc/stb/fp/led_color
+elif [ -f /proc/stb/fp/led_brightness ]; then
+	echo "000000ff" > /proc/stb/fp/led_brightness
+fi
+
+if [ -f /proc/stb/fp/nec_ir ]; then
+	/sbin/insmod /lib/modules/4.9/extra/lcd/lcd.ko
+	echo "1" > /proc/stb/fp/nec_ir
+	[ -f /sys/class/remote/amremote/protocol ] && echo "2" > /sys/class/remote/amremote/protocol
 fi
 
 # enigma main loop
@@ -83,6 +94,11 @@ while : ; do
 	ret=$?
 	case $ret in
 		1)
+			if [ -f /proc/stb/fp/led_color ]; then
+				echo "00ffffff" > /proc/stb/fp/led_color
+			elif [ -f /proc/stb/fp/led_brightness ]; then
+				echo "00000008" > /proc/stb/fp/led_brightness
+			fi
 			/sbin/halt
 			;;
 		2)
@@ -111,11 +127,9 @@ while : ; do
 			rm -R /etc/enigma2
 			;;
 		16)
-		        if [ -e /proc/stb/info/model ]; then
-				stbcheck=`cat /proc/stb/info/model`
-				if [[ $stbcheck == "one" || $stbcheck == "two" ]]; then
+			stbcheck=`cat /proc/stb/info/model`
+			if [[ $stbcheck == "one" || $stbcheck == "two" ]]; then
 				/usr/sbin/to-the-rescue
-				fi
 			fi
 			if [ -e /dev/block/by-name/flag ]; then
 				echo -n "0" > /dev/block/by-name/flag
