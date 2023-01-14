@@ -60,10 +60,3 @@ baseinclude_HEADERS = \
 	base/httpsstream.h \
 	base/httpstream.h \
 	base/wrappers.h
-
-if DMAMLOGIC
-baseinclude_HEADERS += \
-	base/connection.h \
-	base/io.h \
-	base/sigc.h
-endif
