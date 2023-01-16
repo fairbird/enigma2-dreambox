@@ -9,9 +9,3 @@ componentsincludedir = $(pkgincludedir)/lib/components
 componentsinclude_HEADERS = \
 	components/file_eraser.h \
 	components/scan.h
-
-if DMAMLOGIC
-componentsinclude_HEADERS += \
-	components/audioplayback.h \
-	components/decoder.h
-endif
