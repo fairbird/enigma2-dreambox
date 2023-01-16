@@ -7,7 +7,7 @@ from Screens.ChoiceBox import ChoiceBox
 from Components.ServiceEventTracker import ServiceEventTracker
 from Components.ActionMap import NumberActionMap
 from Components.ConfigList import ConfigListScreen
-from Components.config import config, ConfigSubsection, getConfigListEntry, ConfigNothing, ConfigSelection, ConfigOnOff, ConfigYesNo
+from Components.config import config, ConfigSubsection, ConfigNothing, ConfigSelection, ConfigOnOff, ConfigYesNo
 from Components.Label import Label
 from Components.Sources.List import List
 from Components.Sources.Boolean import Boolean
@@ -100,7 +100,7 @@ class AudioSelection(ConfigListScreen, Screen):
 				else:
 					self.settings.downmix_ac3 = ConfigOnOff(default=config.av.downmix_ac3.value)
 				self.settings.downmix_ac3.addNotifier(self.changeAC3Downmix, initial_call=False)
-				conflist.append(getConfigListEntry(_("AC3 downmix"), self.settings.downmix_ac3, None))
+				conflist.append((_("AC3 downmix"), self.settings.downmix_ac3, None))
 				self["key_red"].setBoolean(True)
 
 			if n > 0:
@@ -109,7 +109,7 @@ class AudioSelection(ConfigListScreen, Screen):
 					choicelist = [("0", _("left")), ("1", _("stereo")), ("2", _("right"))]
 					self.settings.channelmode = ConfigSelection(choices=choicelist, default=str(self.audioChannel.getCurrentChannel()))
 					self.settings.channelmode.addNotifier(self.changeMode, initial_call=False)
-					conflist.append(getConfigListEntry(_("Channel"), self.settings.channelmode))
+					conflist.append((_("Channel"), self.settings.channelmode))
 					self["key_green"].setBoolean(True)
 				else:
 					conflist.append(('',))
@@ -152,7 +152,7 @@ class AudioSelection(ConfigListScreen, Screen):
 
 			if subtitlelist:
 				self["key_yellow"].setBoolean(True)
-				conflist.append(getConfigListEntry(_("To subtitle selection"), self.settings.menupage))
+				conflist.append((_("To subtitle selection"), self.settings.menupage))
 			else:
 				self["key_yellow"].setBoolean(False)
 				conflist.append(('',))
@@ -192,10 +192,10 @@ class AudioSelection(ConfigListScreen, Screen):
 				if self.Plugins:
 					self["key_blue"].setBoolean(True)
 					if len(self.Plugins) > 1:
-						conflist.append(getConfigListEntry(_("Audio plugins"), ConfigNothing()))
+						conflist.append((_("Audio plugins"), ConfigNothing()))
 						self.plugincallfunc = [(x[0], x[1]) for x in self.Plugins]
 					else:
-						conflist.append(getConfigListEntry(self.Plugins[0][0], ConfigNothing()))
+						conflist.append((self.Plugins[0][0], ConfigNothing()))
 						self.plugincallfunc = self.Plugins[0][1]
 
 		elif self.settings.menupage.getValue() == PAGE_SUBTITLES:
@@ -247,11 +247,11 @@ class AudioSelection(ConfigListScreen, Screen):
 				streams.append((x, "", number, description, language, selected))
 				idx += 1
 
-			conflist.append(getConfigListEntry(_("To audio selection"), self.settings.menupage))
+			conflist.append((_("To audio selection"), self.settings.menupage))
 
 			if self.infobar.selected_subtitle and self.infobar.selected_subtitle != (0, 0, 0, 0) and not ".DVDPlayer'>" in repr(self.infobar):
 				self["key_blue"].setBoolean(True)
-				conflist.append(getConfigListEntry(_("Subtitle Quickmenu"), ConfigNothing()))
+				conflist.append((_("Subtitle Quickmenu"), ConfigNothing()))
 
 		self["config"].list = conflist
 
