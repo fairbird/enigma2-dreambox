@@ -4232,7 +4232,7 @@ msgid "If set to 'yes' the same commands will be sent to the TV for deep standby
 msgstr ".إذا تم الضبط على 'نعم' ، فسيتم إرسال نفس الأوامر إلى التلفزيون لأحداث الاستعداد العميق ، كما يتم إرسالها أثناء أحداث الاستعداد العادية"
 
 msgid "If set to 'yes', allows you to use timeshift with alternative audio plugins."
-msgstr "في حالة الضبط على "نعم" ، يسمح لك باستخدام ميزة تغيير الوقت مع المكونات الإضافية الصوتية البديلة."
+msgstr ".في حالة الضبط على 'نعم' ، يسمح لك باستخدام ميزة تغيير الوقت مع المكونات الإضافية الصوتية البديلة"
 
 msgid "If the box is supposed to enter deep standby e.g. monday night at 1 AM, it actually is already tuesday. To enable this anyway, differing next day start time can be specified here."
 msgstr "إذا كان من المفترض أن يدخل الصندوق في وضع الاستعداد العميق ، على سبيل المثال ليلة الاثنين الساعة 1 صباحًا ، إنه بالفعل يوم الثلاثاء. لتمكين هذا على أي حال ، يمكن هنا تحديد وقت بدء اليوم التالي المختلف."
@@ -6540,7 +6540,7 @@ msgid ""
 "Recording IPTV with ServiceApp player enabled, timer ended!\n"
 "Please recheck it!"
 msgstr ""
-"تسجيل IPTV مع مشغل ServiceApp مُفعل ، انتهى المؤقت! \ n"
+"تسجيل IPTV مع مشغل ServiceApp مُفعل ، انتهى المؤقت!\n"
 "يرجى إعادة التحقق منه!"
 
 msgid "Recording Setup"
