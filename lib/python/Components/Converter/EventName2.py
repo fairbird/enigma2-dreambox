@@ -82,7 +82,7 @@ class EventName2(Converter, object):
 		elif self.type is self.NEXT_NAME or self.type is self.NEXT_TIME_DURATION or self.type is self.NEXT_DESCRIPTION or self.type is self.NEXT_NAMEWT:
 			reference = self.source.service
 			info = reference and self.source.info
-			if info is not None:
+			if info != None:
 				eventNext = self.epgcache.lookupEvent(['IBDCTSERNX', (reference.toString(), 1, -1)])
 				if eventNext:
 					if self.type is self.NEXT_NAME or self.type is self.NEXT_NAMEWT or self.type is self.NEXT_TIME_DURATION:
@@ -110,7 +110,7 @@ class EventName2(Converter, object):
 			reference = self.source.service
 			info = reference and self.source.info
 			countitem = 10
-			if info is not None:
+			if info != None:
 				eventNext = self.epgcache.lookupEvent(["IBDCT", (reference.toString(), 0, -1, -1)])
 				if self.type is self.NEXT_NAME_NEXT or self.type is self.NEXT_NAME_NEXTWT:
 					countitem = 4

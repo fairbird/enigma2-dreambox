@@ -57,21 +57,21 @@ class PiconUni(Renderer):
 				if ':' in sname:
 					sname = '_'.join(sname.split(':')[:10])
 				pngname = self.nameCache.get(sname, '')
-				if pngname is '':
+				if pngname == '':
 					pngname = self.findPicon(sname)
-					if not pngname is '':
+					if not pngname == '':
 						self.nameCache[sname] = pngname
-			if pngname is '':
+			if pngname == '':
 				pngname = self.nameCache.get('default', '')
-				if pngname is '':
+				if pngname == '':
 					pngname = self.findPicon('picon_default')
-					if pngname is '':
+					if pngname == '':
 						tmp = resolveFilename(SCOPE_CURRENT_SKIN, 'picon_default.png')
 						if os.path.isfile(tmp):
 							pngname = tmp
 					self.nameCache['default'] = pngname
-			if not self.pngname is pngname:
-				if self.scale is '0':
+			if not self.pngname == pngname:
+				if self.scale == '0':
 					if pngname:
 						self.instance.setScale(1)
 						self.instance.setPixmapFromFile(pngname)
