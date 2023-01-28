@@ -6,7 +6,7 @@ from shutil import rmtree
 from Screens.Screen import Screen
 from Screens.Setup import Setup
 from Components.ActionMap import ActionMap
-from Components.config import ConfigYesNo, config, ConfigSubsection, getConfigListEntry
+from Components.config import ConfigYesNo, config, ConfigSubsection
 from Components.Sources.StaticText import StaticText
 from Components.ConfigList import ConfigListScreen
 from Screens.MessageBox import MessageBox
@@ -106,26 +106,26 @@ class FactoryReset(Screen, ConfigListScreen, ProtectedScreen):
                                 self.others.append(file)
 
                 self.list = []
-                self.list.append(getConfigListEntry(_("Full factory reset"), self.resetFull, _("Select 'Yes' to remove all settings, tuning data, timers, resume pointers etc. Selecting this option will restore the configuration to the initial settings before any configuration settings were applied. This is the most reliable form of Factory Reset.")))
+                self.list.append((_("Full factory reset"), self.resetFull, _("Select 'Yes' to remove all settings, tuning data, timers, resume pointers etc. Selecting this option will restore the configuration to the initial settings before any configuration settings were applied. This is the most reliable form of Factory Reset.")))
                 if not self.resetFull.value:
                         if len(self.bouquets):
-                                self.list.append(getConfigListEntry(_("Remove all bouquet/tuning data"), self.resetBouquets, _("Select 'Yes' to remove all tuning data. Selecting this option will remove all tuning and bouquet data and will make timers non functional until the receiver is retuned.")))
+                                self.list.append((_("Remove all bouquet/tuning data"), self.resetBouquets, _("Select 'Yes' to remove all tuning data. Selecting this option will remove all tuning and bouquet data and will make timers non functional until the receiver is retuned.")))
                         if len(self.keymaps):
-                                self.list.append(getConfigListEntry(_("Remove all keymap data"), self.resetKeymaps, _("Select 'Yes' to remove all keymap data. Selecting this option will remove all keymap override data and restore the default keymap definitions.")))
+                                self.list.append((_("Remove all keymap data"), self.resetKeymaps, _("Select 'Yes' to remove all keymap data. Selecting this option will remove all keymap override data and restore the default keymap definitions.")))
                         if len(self.networks):
-                                self.list.append(getConfigListEntry(_("Remove all network data"), self.resetNetworks, _("Select 'Yes' to remove all network data. Selecting this option will remove all network data including automounts and network connection data including connection accounts and passwords. This could cause some Enigma2 functions to fail if they are configured to use these network resources.")))
+                                self.list.append((_("Remove all network data"), self.resetNetworks, _("Select 'Yes' to remove all network data. Selecting this option will remove all network data including automounts and network connection data including connection accounts and passwords. This could cause some Enigma2 functions to fail if they are configured to use these network resources.")))
                         if len(self.plugins):
-                                self.list.append(getConfigListEntry(_("Remove all plugin setting data"), self.resetPlugins, _("Select 'Yes' to remove all plugin configuration data. Selecting this option will remove all plugin configuration data that is stored in the Enigma2 configuration folder. This will cause all affected plugins to return to their default settings. This could cause some plugins to not function until configured.")))
+                                self.list.append((_("Remove all plugin setting data"), self.resetPlugins, _("Select 'Yes' to remove all plugin configuration data. Selecting this option will remove all plugin configuration data that is stored in the Enigma2 configuration folder. This will cause all affected plugins to return to their default settings. This could cause some plugins to not function until configured.")))
                         if len(self.resumePoints):
-                                self.list.append(getConfigListEntry(_("Remove all resume point data"), self.resetResumePoints, _("Select 'Yes' to remove all media player resume data. Selecting this option will remove the data used to allow playback of media files to resume from the position where playback was last stopped. Playback position of recordings is not affected.")))
+                                self.list.append((_("Remove all resume point data"), self.resetResumePoints, _("Select 'Yes' to remove all media player resume data. Selecting this option will remove the data used to allow playback of media files to resume from the position where playback was last stopped. Playback position of recordings is not affected.")))
                         if len(self.settings):
-                                self.list.append(getConfigListEntry(_("Remove all settings data"), self.resetSettings, _("Select 'Yes' to remove all main settings configuration data. Selecting this option will set all Enigma2 settings back to their default values.  This will also cause Enigma2 to run the Welcome Wizard on restart.")))
+                                self.list.append((_("Remove all settings data"), self.resetSettings, _("Select 'Yes' to remove all main settings configuration data. Selecting this option will set all Enigma2 settings back to their default values.  This will also cause Enigma2 to run the Welcome Wizard on restart.")))
                         if len(self.skins):
-                                self.list.append(getConfigListEntry(_("Remove all skin data"), self.resetSkins, _("Select 'Yes' to remove all user customisations of skin data. Selecting this option will remove all user based skin customisations. All affected skins will return to their standard settings. This will also clear any customied boot logos and backdrops.")))
+                                self.list.append((_("Remove all skin data"), self.resetSkins, _("Select 'Yes' to remove all user customisations of skin data. Selecting this option will remove all user based skin customisations. All affected skins will return to their standard settings. This will also clear any customied boot logos and backdrops.")))
                         if len(self.timers):
-                                self.list.append(getConfigListEntry(_("Remove all timer data"), self.resetTimers, _("Select 'Yes' to remove all timer configuration data. Selecting this option will clear all timers, autotimers and power timers.")))
+                                self.list.append((_("Remove all timer data"), self.resetTimers, _("Select 'Yes' to remove all timer configuration data. Selecting this option will clear all timers, autotimers and power timers.")))
                         if len(self.others):
-                                self.list.append(getConfigListEntry(_("Remove all other data"), self.resetOthers, _("Select 'Yes' to remove all other files and directories not covered by the options above.")))
+                                self.list.append((_("Remove all other data"), self.resetOthers, _("Select 'Yes' to remove all other files and directories not covered by the options above.")))
                 currentItem = self["config"].getCurrent()
                 self["config"].setList(self.list)
                 if config.usage.sort_settings.value:

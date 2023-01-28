@@ -5,7 +5,7 @@ from Screens.ChoiceBox import ChoiceBox
 from Components.ActionMap import ActionMap, NumberActionMap
 from Components.Sources.List import List
 from Components.Sources.StaticText import StaticText
-from Components.config import config, configfile, getConfigListEntry
+from Components.config import config, configfile
 from Components.ConfigList import ConfigList, ConfigListScreen
 from Components.MenuList import MenuList
 
@@ -1266,15 +1266,15 @@ class OscamInfoConfigScreen(ConfigListScreen, Screen):
 	def createSetup(self):
 		NAMEBIN = check_NAMEBIN()
 		self.oscamconfig = []
-		self.oscamconfig.append(getConfigListEntry(_("Read Userdata from %s.conf" % NAMEBIN), config.oscaminfo.userdatafromconf))
+		self.oscamconfig.append((_("Read Userdata from %s.conf" % NAMEBIN), config.oscaminfo.userdatafromconf))
 		if not config.oscaminfo.userdatafromconf.value:
-			self.oscamconfig.append(getConfigListEntry(_("Username (httpuser)"), config.oscaminfo.username))
-			self.oscamconfig.append(getConfigListEntry(_("Password (httpwd)"), config.oscaminfo.password))
-			self.oscamconfig.append(getConfigListEntry(_("IP address"), config.oscaminfo.ip))
-			self.oscamconfig.append(getConfigListEntry(_("Port"), config.oscaminfo.port))
-		self.oscamconfig.append(getConfigListEntry(_("Automatically update Client/Server View?"), config.oscaminfo.autoupdate))
+			self.oscamconfig.append((_("Username (httpuser)"), config.oscaminfo.username))
+			self.oscamconfig.append((_("Password (httpwd)"), config.oscaminfo.password))
+			self.oscamconfig.append((_("IP address"), config.oscaminfo.ip))
+			self.oscamconfig.append((_("Port"), config.oscaminfo.port))
+		self.oscamconfig.append((_("Automatically update Client/Server View?"), config.oscaminfo.autoupdate))
 		if config.oscaminfo.autoupdate.value:
-			self.oscamconfig.append(getConfigListEntry(_("Update interval (in seconds)"), config.oscaminfo.intervall))
+			self.oscamconfig.append((_("Update interval (in seconds)"), config.oscaminfo.intervall))
 
 	def save(self):
 		for x in self.oscamconfig:

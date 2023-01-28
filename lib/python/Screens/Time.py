@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from Components.ActionMap import ActionMap, HelpableActionMap
-from Components.config import config, getConfigListEntry
+from Components.config import config
 from Components.ConfigList import ConfigListScreen
 from Components.Label import Label
 from Components.Pixmap import Pixmap
@@ -201,18 +201,18 @@ class TimeWizard(ConfigListScreen, Screen, Rc):
 
 	def updateTimeList(self):
 		self.list = []
-		self.list.append(getConfigListEntry(_("Time zone area"), config.timezone.area))
-		self.list.append(getConfigListEntry(_("Time zone"), config.timezone.val))
+		self.list.append((_("Time zone area"), config.timezone.area))
+		self.list.append((_("Time zone"), config.timezone.val))
 		if config.usage.date.enabled.value:
-			self.list.append(getConfigListEntry(_("Date style"), config.usage.date.dayfull))
+			self.list.append((_("Date style"), config.usage.date.dayfull))
 			config.usage.date.dayfull.save()
 		if config.usage.time.enabled.value:
-			self.list.append(getConfigListEntry(_("Time style"), config.usage.time.long))
+			self.list.append((_("Time style"), config.usage.time.long))
 			config.usage.time.long.save()
-		self.list.append(getConfigListEntry(_("Time synchronization method"), config.ntp.timesync))
+		self.list.append((_("Time synchronization method"), config.ntp.timesync))
 		config.ntp.timesync.save()
 		if config.ntp.timesync.value != "dvb":
-			self.list.append(getConfigListEntry(_("NTP Hostname"), config.ntp.server))
+			self.list.append((_("NTP Hostname"), config.ntp.server))
 			config.ntp.server.save()
 		config.timezone.val.save()
 		config.timezone.area.save()

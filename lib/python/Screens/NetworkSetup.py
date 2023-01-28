@@ -253,7 +253,7 @@ class NameserverSetup(ConfigListScreen, HelpableScreen, Screen):
 
 	def createSetup(self):
 		self.list = []
-		self.DNSEntry = getConfigListEntry(_("Nameserver configuration"), config.usage.dns)
+		self.DNSEntry = (_("Nameserver configuration"), config.usage.dns)
 		self.list.append(self.DNSEntry)
 
 		i = 1

@@ -7,7 +7,7 @@ from Screens.ParentalControlSetup import ProtectedScreen
 from enigma import eConsoleAppContainer, eDVBDB, eTimer, eSize, ePoint, getDesktop
 
 from Components.ActionMap import ActionMap, NumberActionMap, HelpableActionMap
-from Components.config import config, ConfigSubsection, ConfigSelection, getConfigListEntry, ConfigYesNo, ConfigText, configfile
+from Components.config import config, ConfigSubsection, ConfigSelection, ConfigYesNo, ConfigText, configfile
 from Components.ConfigList import ConfigListScreen
 from Components.PluginComponent import plugins
 from Components.PluginList import *
@@ -1231,20 +1231,20 @@ class PluginFilter(ConfigListScreen, Screen):
 	def createSetup(self):
 		self.editListEntry = None
 		self.list = []
-		self.list.append(getConfigListEntry(_("drivers"), config.pluginfilter.drivers, _("This allows you to show drivers modules in downloads")))
-		self.list.append(getConfigListEntry(_("extensions"), config.pluginfilter.extensions, _("This allows you to show extensions modules in downloads")))
-		self.list.append(getConfigListEntry(_("systemplugins"), config.pluginfilter.systemplugins, _("This allows you to show systemplugins modules in downloads")))
-		self.list.append(getConfigListEntry(_("softcams"), config.pluginfilter.softcams, _("This allows you to show softcams modules in downloads")))
-		self.list.append(getConfigListEntry(_("display"), config.pluginfilter.display , _("This allows you to show display modules in downloads")))
-		self.list.append(getConfigListEntry(_("picons"), config.pluginfilter.picons, _("This allows you to show picons modules in downloads")))
-		self.list.append(getConfigListEntry(_("settings"), config.pluginfilter.settings, _("This allows you to show settings modules in downloads")))
-		self.list.append(getConfigListEntry(_("m2k"), config.pluginfilter.m2k, _("This allows you to show m2k modules in downloads")))
-		self.list.append(getConfigListEntry(_("weblinks"), config.pluginfilter.weblinks, _("This allows you to show weblinks modules in downloads")))
-		self.list.append(getConfigListEntry(_("pli"), config.pluginfilter.pli, _("This allows you to show pli modules in downloads")))
-		self.list.append(getConfigListEntry(_("vix"), config.pluginfilter.vix, _("This allows you to show vix modules in downloads")))
-		self.list.append(getConfigListEntry(_("security"), config.pluginfilter.security, _("This allows you to show security modules in downloads")))
-		self.list.append(getConfigListEntry(_("kernel modules"), config.pluginfilter.kernel, _("This allows you to show kernel modules in downloads")))
-		self.list.append(getConfigListEntry(_("userfeed"), config.pluginfilter.userfeed, _("This allows you to show userfeed modules in downloads")))
+		self.list.append((_("drivers"), config.pluginfilter.drivers, _("This allows you to show drivers modules in downloads")))
+		self.list.append((_("extensions"), config.pluginfilter.extensions, _("This allows you to show extensions modules in downloads")))
+		self.list.append((_("systemplugins"), config.pluginfilter.systemplugins, _("This allows you to show systemplugins modules in downloads")))
+		self.list.append((_("softcams"), config.pluginfilter.softcams, _("This allows you to show softcams modules in downloads")))
+		self.list.append((_("display"), config.pluginfilter.display , _("This allows you to show display modules in downloads")))
+		self.list.append((_("picons"), config.pluginfilter.picons, _("This allows you to show picons modules in downloads")))
+		self.list.append((_("settings"), config.pluginfilter.settings, _("This allows you to show settings modules in downloads")))
+		self.list.append((_("m2k"), config.pluginfilter.m2k, _("This allows you to show m2k modules in downloads")))
+		self.list.append((_("weblinks"), config.pluginfilter.weblinks, _("This allows you to show weblinks modules in downloads")))
+		self.list.append((_("pli"), config.pluginfilter.pli, _("This allows you to show pli modules in downloads")))
+		self.list.append((_("vix"), config.pluginfilter.vix, _("This allows you to show vix modules in downloads")))
+		self.list.append((_("security"), config.pluginfilter.security, _("This allows you to show security modules in downloads")))
+		self.list.append((_("kernel modules"), config.pluginfilter.kernel, _("This allows you to show kernel modules in downloads")))
+		self.list.append((_("userfeed"), config.pluginfilter.userfeed, _("This allows you to show userfeed modules in downloads")))
 
 		self["config"].list = self.list
 		self["config"].setList(self.list)
