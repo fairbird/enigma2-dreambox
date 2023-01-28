@@ -60,44 +60,44 @@ class EventName2(Converter, object):
 	@cached
 	def getText(self):
 		event = self.source.event
-		if event is None:
+		if event == None:
 			return ""
-		if self.type is self.NAME:
+		if self.type == self.NAME:
 			return event.getEventName()
-		elif self.type is self.SHORT_DESCRIPTION:
+		elif self.type == self.SHORT_DESCRIPTION:
 			return event.getShortDescription()
-		elif self.type is self.EXTENDED_DESCRIPTION:
+		elif self.type == self.EXTENDED_DESCRIPTION:
 			text = event.getShortDescription()
-			if text and not text[-1] is '\n' and not text[-1] is ' ':
+			if text and not text[-1] == '\n' and not text[-1] == ' ':
 				text += ' '
 			return text + event.getExtendedDescription() or event.getEventName()
-		elif self.type is self.FULL_DESCRIPTION:
+		elif self.type == self.FULL_DESCRIPTION:
 			description = event.getShortDescription()
 			extended = event.getExtendedDescription()
 			if description and extended:
 				description += '\n'
 			return description + extended
-		elif self.type is self.ID:
+		elif self.type == self.ID:
 			return str(event.getEventId())
-		elif self.type is self.NEXT_NAME or self.type is self.NEXT_TIME_DURATION or self.type is self.NEXT_DESCRIPTION or self.type is self.NEXT_NAMEWT:
+		elif self.type == self.NEXT_NAME or self.type == self.NEXT_TIME_DURATION or self.type == self.NEXT_DESCRIPTION or self.type == self.NEXT_NAMEWT:
 			reference = self.source.service
 			info = reference and self.source.info
 			if info != None:
 				eventNext = self.epgcache.lookupEvent(['IBDCTSERNX', (reference.toString(), 1, -1)])
 				if eventNext:
-					if self.type is self.NEXT_NAME or self.type is self.NEXT_NAMEWT or self.type is self.NEXT_TIME_DURATION:
+					if self.type == self.NEXT_NAME or self.type == self.NEXT_NAMEWT or self.type == self.NEXT_TIME_DURATION:
 						t = localtime(eventNext[0][1])
-						duration = _("%d min") % (int(0 if eventNext[0][2] is None else eventNext[0][2]) / 60)
+						duration = _("%d min") % (int(0 if eventNext[0][2] == None else eventNext[0][2]) / 60)
 						if len(eventNext[0]) > 4 and eventNext[0][4]:
-							if self.type is self.NEXT_NAME:
+							if self.type == self.NEXT_NAME:
 								return "%02d:%02d  (%s)  %s" % (t[3], t[4], duration, eventNext[0][4])
-							elif self.type is self.NEXT_TIME_DURATION:
+							elif self.type == self.NEXT_TIME_DURATION:
 								return "%02d:%02d  (%s)" % (t[3], t[4], duration)
 							else:
 								return "%s" % eventNext[0][4]
 						else:
 							return ''
-					elif self.type is self.NEXT_DESCRIPTION:
+					elif self.type == self.NEXT_DESCRIPTION:
 						for i in (6, 5, 4):
 							if len(eventNext[0]) > i and eventNext[0][i]:
 								return "%s" % eventNext[0][i]
@@ -105,14 +105,14 @@ class EventName2(Converter, object):
 					return ''
 			else:
 				return ''
-		elif self.type is self.NEXT_EVENT_LIST or self.type is self.NEXT_EVENT_LISTWT or\
-			self.type is self.NEXT_EVENT_LIST2 or self.type is self.NEXT_EVENT_LISTWT2 or self.type is self.NEXT_NAME_NEXT or self.type is self.NEXT_NAME_NEXTWT:
+		elif self.type == self.NEXT_EVENT_LIST or self.type == self.NEXT_EVENT_LISTWT or\
+			self.type == self.NEXT_EVENT_LIST2 or self.type == self.NEXT_EVENT_LISTWT2 or self.type == self.NEXT_NAME_NEXT or self.type == self.NEXT_NAME_NEXTWT:
 			reference = self.source.service
 			info = reference and self.source.info
 			countitem = 10
 			if info != None:
 				eventNext = self.epgcache.lookupEvent(["IBDCT", (reference.toString(), 0, -1, -1)])
-				if self.type is self.NEXT_NAME_NEXT or self.type is self.NEXT_NAME_NEXTWT:
+				if self.type == self.NEXT_NAME_NEXT or self.type == self.NEXT_NAME_NEXTWT:
 					countitem = 4
 				if eventNext:
 					listEpg = []
@@ -121,14 +121,14 @@ class EventName2(Converter, object):
 						if i > 0 and i < countitem:
 							if x[4]:
 								t = localtime(x[1])
-								if self.type is self.NEXT_EVENT_LIST or self.type is self.NEXT_EVENT_LIST2 or self.type is self.NEXT_NAME_NEXT:
-									duration = _("%d min") % (int(0 if eventNext[i][2] is None else eventNext[i][2]) / 60)
+								if self.type == self.NEXT_EVENT_LIST or self.type == self.NEXT_EVENT_LIST2 or self.type == self.NEXT_NAME_NEXT:
+									duration = _("%d min") % (int(0 if eventNext[i][2] == None else eventNext[i][2]) / 60)
 									listEpg.append("%02d:%02d (%s) %s" % (t[3], t[4], duration, x[4]))
 								else:
 									listEpg.append("%02d:%02d %s" % (t[3], t[4], x[4]))
 						i += 1
-					if self.type is self.NEXT_EVENT_LIST2 or self.type is self.NEXT_EVENT_LISTWT2 or self.type is self.NEXT_NAME_NEXT or\
-						self.type is self.NEXT_NAME_NEXTWT:
+					if self.type == self.NEXT_EVENT_LIST2 or self.type == self.NEXT_EVENT_LISTWT2 or self.type == self.NEXT_NAME_NEXT or\
+						self.type == self.NEXT_NAME_NEXTWT:
 						if len(listEpg) > 1:
 							listEpg.pop(0)
 						else:
