@@ -61,7 +61,7 @@ class VideoHardware:
                 "60Hz": {60: "2160p60"},
                 "multi": {50: "2160p50", 60: "2160p60"},
                 "auto": {50: "2160p50", 60: "2160p60", 24: "2160p24"}}
-        if HardwareInfo().get_device_name() in ("dm900", "dm920", "one", "two"):
+        if HardwareInfo().get_device_name() in ("dm900", "dm920"):
                 rates["2160p"] = {"50Hz": {50: "2160p50"}, "60Hz": {60: "2160p60"}, "multi": {50: "2160p50", 60: "2160p60"}, "auto": {50: "2160p50", 60: "2160p60", 24: "2160p24"}}
         else:
                 rates["2160p"] = {"50Hz": {50: "2160p50"}, "60Hz": {60: "2160p"}, "multi": {50: "2160p50", 60: "2160p"}, "auto": {50: "2160p50", 60: "2160p", 24: "2160p24"}}
@@ -82,6 +82,33 @@ class VideoHardware:
                 "640x480": {60: "640x480"}
         }
 
+        if HardwareInfo().get_device_name() in ("one", "two"):
+                rates["480i"] = {"60hz": {60: "480i60hz"}}
+                rates["576i"] = {"50hz": {50: "576i50hz"}}
+                rates["480p"] = {"60hz": {60: "480p60hz"}}
+                rates["576p"] = {"50hz": {50: "576p50hz"}}
+                rates["720p"] = {"50hz": {50: "720p50hz"},
+                                                                "60hz": {60: "720p60hz"},
+                                                                "auto": {60: "720p60hz"}}
+                rates["1080i"] = {"50hz": {50: "1080i50hz"},
+                                                                "60hz": {60: "1080i60hz"},
+                                                                "auto": {60: "1080i60hz"}}
+                rates["1080p"] = {"50hz": {50: "1080p50hz"},
+                                                                "60hz": {60: "1080p60hz"},
+                                                                "30hz": {30: "1080p30hz"},
+                                                                "25hz": {25: "1080p25hz"},
+                                                                "24hz": {24: "1080p24hz"},
+                                                                "auto": {60: "1080p60hz"}}
+                rates["2160p"] = {"50hz": {50: "2160p50hz"},
+                                                                "60hz": {60: "2160p60hz"},
+                                                                "30hz": {30: "2160p30hz"},
+                                                                "25hz": {25: "2160p25hz"},
+                                                                "24hz": {24: "2160p24hz"},
+                                                                "auto": {60: "2160p60hz"}}
+                rates["2160p30"] = {"25hz": {50: "2160p25hz"},
+                                                                "30hz": {60: "2160p30hz"},
+                                                                "auto": {60: "2160p30hz"}}
+
         if SystemInfo["HasScart"]:
                 modes["Scart"] = ["PAL", "NTSC", "Multi"]
         if SystemInfo["HasComposite"] and HardwareInfo().get_device_name() in ("dm7020hd", "dm7020hdv2", "dm8000"):
@@ -90,14 +117,13 @@ class VideoHardware:
                 modes["YPbPr"] = ["720p", "1080i", "576p", "480p", "576i", "480i"]
         if SystemInfo["Has2160p"]:
                 modes["DVI"] = ["720p", "1080p", "2160p", "1080i", "576p", "480p", "576i", "480i"]
+        if HardwareInfo().get_device_name() in ("one", "two"):
+                modes["HDMI"] = ["720p", "1080p", "2160p", "1080i", "576p", "576i", "480p", "480i"]
+                widescreen_modes = {"720p", "1080p", "1080i", "2160p"}
         else:
                 modes["DVI"] = ["720p", "1080p", "2160p", "2160p30", "1080i", "576p", "480p", "576i", "480i"]
 
         modes["DVI-PC"] = ["PC"]
-
-        if HardwareInfo().get_device_name() in ("one", "two"):
-                modes["HDMI"] = ["720p", "1080p", "2160p", "1080i", "576p", "576i", "480p", "480i"]
-                widescreen_modes = {"720p", "1080p", "1080i", "2160p"}
 
         def getOutputAspect(self):
                 ret = (16, 9)
@@ -159,20 +185,29 @@ class VideoHardware:
                 config.av.policy_43.addNotifier(self.updateAspect)
 
         def readAvailableModes(self):
-                try:
-                        print("[Videomode] Read /proc/stb/video/videomode_choices")
-                        modes = open("/proc/stb/video/videomode_choices").read()[:-1]
-                except IOError:
-                        print("[Videomode] Read /proc/stb/video/videomode_choices failed.")
-                        self.modes_available = []
-                        return
-                self.modes_available = modes.split(' ')
+                if HardwareInfo().get_device_name() in ("one", "two"):
+                        f = open("/sys/class/amhdmitx/amhdmitx0/disp_cap")
+                        modes = f.read()[:-1].replace('*', '')
+                        f.close()
+                        self.modes_available = modes.splitlines()
+                        return modes.splitlines()
+                else:
+                        try:
+                                f = open("/proc/stb/video/videomode_choices")
+                                modes = f.read()[:-1]
+                                f.close()
+                        except OSError:
+                                print("[Videomode] Read /proc/stb/video/videomode_choices failed.")
+                                self.modes_available = []
+                                return
+                        self.modes_available = modes.split(' ')
 
         def readPreferredModes(self):
                 if config.av.edid_override.value == False:
                         if HardwareInfo().get_device_name() in ("one", "two") and fileExists("/sys/class/amhdmitx/amhdmitx0/disp_cap"):
-                                print("[Videomode] Read /sys/class/amhdmitx/amhdmitx0/disp_cap")
-                                modes = open("/sys/class/amhdmitx/amhdmitx0/disp_cap").read()[:-1]
+                                f = open("/sys/class/amhdmitx/amhdmitx0/disp_cap")
+                                modes = f.read()[:-1].replace('*', '')
+                                f.close()
                                 self.modes_preferred = modes.splitlines()
                                 print("[Videomode] VideoHardware reading disp_cap modes: ", self.modes_preferred)
                         else:
@@ -236,7 +271,7 @@ class VideoHardware:
                                 mode_24 = mode_50
 
                 if HardwareInfo().get_device_name() in ("one", "two"):
-                        open('/sys/class/display/mode', 'w').write('576i50hz')
+                        #open('/sys/class/display/mode', 'w').write('1080p50hz')
                         amlmode = mode + rate.lower()
                         try:
                                 open('/sys/class/display/mode', 'w').write(amlmode)
@@ -324,10 +359,10 @@ class VideoHardware:
                                 if len(rates):
                                         res.append((mode, rates))
                 else:
-                        res = [('2160p', ['50Hz', 'multi', '60Hz', 'auto']),
-                        ('1080p', ['50Hz', 'multi', '60Hz', 'auto']),
-                        ('720p', ['50Hz', 'multi', '60Hz']), ('1080i', ['50Hz', 'multi', '60Hz', 'auto']),
-                        ('576p', ['50Hz']), ('576i', ['50Hz']), ('480p', ['60Hz']), ('480i', ['60Hz'])]
+                        res = [('1080p', ['50hz', '60hz', '30hz', '24hz', '25hz']),
+                        ('2160p', ['50hz', '60hz', '30hz', '24hz', '25hz']),
+                        ('720p', ['50hz', '60hz']), ('1080i', ['50hz', '60hz']),
+                        ('576p', ['50hz']), ('576i', ['50hz']), ('480p', ['60hz']), ('480i', ['60hz'])]
                 return res
 
         def createConfig(self, *args):
