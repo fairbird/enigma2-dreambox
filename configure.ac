@@ -56,6 +56,26 @@ AC_ARG_WITH(boxtype,
 AC_SUBST(BOXTYPE)
 AC_DEFINE_UNQUOTED(BOXTYPE,"$BOXTYPE",[box type])
 
+AC_ARG_WITH(colorlcd,
+	AC_HELP_STRING([--with-colorlcd], [use 96x64 16bpp color display, yes or no]),
+	[[withcolorlcd=$withval]],
+	[[withcolorlcd=no]]
+)
+if test x"$withcolorlcd" != xno ; then
+	AC_DEFINE(HAVE_COLORLCD, 1,[Define when using a 96x64 color display device])
+fi
+AM_CONDITIONAL(HAVE_COLORLCD, test x"$withcolorlcd" != xno)
+
+AC_ARG_WITH(colorlcd128,
+	AC_HELP_STRING([--with-colorlcd128], [use 128x64 16bpp color display, yes or no]),
+	[[withcolorlcd128=$withval]],
+	[[withcolorlcd128=no]]
+)
+if test x"$withcolorlcd128" != xno ; then
+	AC_DEFINE(HAVE_COLORLCD128, 1,[Define when using a 128x64 color display device])
+fi
+AM_CONDITIONAL(HAVE_COLORLCD128, test x"$withcolorlcd" != xno)
+
 AC_ARG_WITH(colorlcd220,
 	AC_HELP_STRING([--with-colorlcd220], [use 220x176 16bpp color display, yes or no]),
 	[[withcolorlcd220=$withval]],
