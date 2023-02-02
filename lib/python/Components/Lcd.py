@@ -158,7 +158,7 @@ class LCD:
 
 	def setDimBright(self, value):
 		value *= 255
-		value /= 10
+		value //= 10
 		if value > 255:
 			value = 255
 		self.dimBrightness = value
