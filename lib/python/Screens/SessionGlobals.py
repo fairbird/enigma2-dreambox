@@ -92,7 +92,7 @@ class SessionGlobals(Screen):
 		if nr_leds == 1:
 			FrontpanelLed(which=0, boolean=False, patterns=[PATTERN_OFF, PATTERN_BLINK, PATTERN_OFF, PATTERN_BLINK]).connect(combine)
 		elif nr_leds == 2:
-			if HardwareInfo().get_device_name() in ("dm500"):
+			if HardwareInfo().get_device_name() in ("dm520"):
 				FrontpanelLed(which=0, boolean=False, patterns=[PATTERN_ON, PATTERN_BLINK, PATTERN_OFF, PATTERN_BLINK]).connect(combine)
 				FrontpanelLed(which=1, boolean=False, patterns=[PATTERN_OFF, PATTERN_OFF, PATTERN_OFF, PATTERN_OFF]).connect(combine)
 			elif HardwareInfo().get_device_name() in ("dm900", "dm920"):
