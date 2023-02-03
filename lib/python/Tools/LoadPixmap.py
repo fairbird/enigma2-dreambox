@@ -7,10 +7,10 @@ from enigma import loadPNG, loadJPG, loadSVG
 def LoadPixmap(path, desktop=None, cached=None, width=0, height=0):
 	if path[-4:] == ".png":
 		# cache unless caller explicity requests to not cache
-		ptr = loadPNG(path, 0, 0 if not cached else 1)
+		ptr = loadPNG(path, 0, 0 if cached is False else 1)
 	elif path[-4:] == ".jpg":
 		# don't cache unless caller explicity requests caching
-		ptr = loadJPG(path, 1 if cached else 0)
+		ptr = loadJPG(path, 1 if cached is True else 0)
 	elif path[-4:] == ".svg":
 		from skin import parameters, getSkinFactor # imported here to avoid circular import
 		autoscale = int(parameters.get("AutoscaleSVG", -1)) # skin_default only == -1, disabled == 0 or enabled == 1
