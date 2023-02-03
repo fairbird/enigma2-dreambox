@@ -15,7 +15,7 @@ def LoadPixmap(path, desktop=None, cached=None, width=0, height=0):
 		from skin import parameters, getSkinFactor # imported here to avoid circular import
 		autoscale = int(parameters.get("AutoscaleSVG", -1)) # skin_default only == -1, disabled == 0 or enabled == 1
 		scale = height == 0 and (autoscale == -1 and "/skin_default/" in path or autoscale == 1) and getSkinFactor() or 0
-		ptr = loadSVG(path, 0 if not cached else 1, width, height, scale)
+		ptr = loadSVG(path, 0 if cached is False else 1, width, height, scale)
 	elif path[-1:] == ".":
 		# caching mechanism isn't suitable for multi file images, so it's explicitly disabled
 		alpha = loadPNG(path + "a.png", 0, 0)
