@@ -15,6 +15,10 @@ class RcModel:
 				m, r = line.strip().split()
 				self.RcModels[m] = r
 
+	def rcIsDefault(self):
+		# Default RC can only happen with DMM type remote controls...
+		return False
+
 	def getRcFile(self, ext):
 		# check for rc/type every time so rctype changes will be noticed
 		if os.path.exists('/proc/stb/ir/rc/type'):
