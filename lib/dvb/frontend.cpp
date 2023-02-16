@@ -1374,7 +1374,15 @@ void eDVBFrontend::calculateSignalQuality(int snr, int &signalquality, int &sign
 	{
 		ret = snr;
 	}
-	
+	else if (!strcmp(m_description, "AVL62X1"))
+	{
+		ret = snr;
+	}
+	else if (!strcmp(m_description, "gService DVB-S2")) // SX88V2
+	{
+		ret = snr;
+	}
+
 	signalqualitydb = ret;
 	if (ret == 0x12345678) // no snr db calculation avail.. return untouched snr value..
 	{
