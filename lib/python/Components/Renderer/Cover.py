@@ -1,5 +1,3 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
 from Components.Renderer.Renderer import Renderer
 from enigma import ePixmap, ePicLoad
 from Components.AVSwitch import AVSwitch
@@ -21,8 +19,6 @@ class Cover(Renderer):
 	GUI_WIDGET = ePixmap
 
 	def changed(self, what):
-		if not config.usage.movielist_show_cover.value:
-			return
 		if not self.instance:
 			return
 		else:
