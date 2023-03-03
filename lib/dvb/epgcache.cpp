@@ -3365,39 +3365,3 @@ void eEPGCache::crossepgImportEPGv21(std::string dbroot)
 	eDebug("[EPGC] imported %d events from crossepg db", events_count);
 	eDebug("[EPGC] %i bytes for cache used", eventData::CacheSize);
 }
-
-typedef struct epgdb_title_s
-{
-	uint16_t	event_id;
-	uint16_t	mjd;
-	time_t		start_time;
-	uint16_t	length;
-	uint8_t		genre_id;
-	uint8_t		flags;
-	uint32_t	description_crc;
-	uint32_t	description_seek;
-	uint32_t	long_description_crc;
-	uint32_t	long_description_seek;
-	uint16_t	description_length;
-	uint16_t	long_description_length;
-	uint8_t		iso_639_1;
-	uint8_t		iso_639_2;
-	uint8_t		iso_639_3;
-	uint8_t		revision;
-} epgdb_title_t;
-
-typedef struct epgdb_channel_s
-{
-	uint16_t	nid;
-	uint16_t	tsid;
-	uint16_t	sid;
-} epgdb_channel_t;
-
-typedef struct epgdb_alasies_s
-{
-	uint16_t	nid[64];
-	uint16_t	tsid[64];
-	uint16_t	sid[64];
-} epgdb_aliases_t;
-
-#define IS_UTF8(x) (x & 0x01)
