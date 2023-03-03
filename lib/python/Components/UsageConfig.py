@@ -868,6 +868,7 @@ def InitUsageConfig():
 	config.epg.opentv = ConfigYesNo(default=False)
 	config.epg.saveepg = ConfigYesNo(default=True)
 
+	config.epg.maxdays = ConfigSelectionNumber(min=1, max=365, stepwidth=1, default=7, wraparound=True)
 	config.epg.joinAbbreviatedEventNames = ConfigYesNo(default=True)
 	config.epg.eventNamePrefixes = ConfigText(default="")
 	config.epg.eventNamePrefixMode = ConfigSelection(choices=[(0, _("Off")), (1, _("Remove")), (2, _("Move to description"))])
