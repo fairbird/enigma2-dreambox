@@ -120,6 +120,7 @@
 		<item level="2" text="Enable Netmed EPG" description="Use Netmed EPG information when it is available.">config.epg.netmed</item>
 		<item level="2" text="Enable Virgin EPG" description="Use Virgin EPG information when it is available.">config.epg.virgin</item>
 		<item level="2" text="Enable OpenTV EPG" description="Use OpenTV EPG information when it is available. For reading OpenTV EPG data tuning to a dedicated transponder is required">config.epg.opentv</item>
+		<item level="2" text="Maintain old EPG data for" description="Configure for how many minutes finished events should remain visible in the EPG. Useful when you need information about an event which has just finished, or has been delayed.">config.epg.histminutes</item>
 		<item level="2" text="Maximum number of EPG days" description="Load only specific days in EPG">config.epg.maxdays</item>
 		<item level="2" text="Maintain old EPG data for" description="Configure for how many minutes finished events should remain visible in the EPG. Useful when you need information about an event which has just finished, or has been delayed.">config.epg.histminutes</item>
 		<item level="2" text="Correct invalid EPG data" description="Choose the option to correct invalid EPG data.">config.epg.correct_invalid_epgdata</item>
@@ -129,6 +130,7 @@
 		<item level="2" text="Country for EPG event genre information" description="Choose a country scheme for decoding genre information in EPG events.">config.misc.epggenrecountry</item>
 		<item level="2" text="Full description separator" description="Configure separator type used in full description for separate short and extended descriptions.">config.epg.fulldescription_separator</item>
 		<item level="2" text="Replace newlines in EPG" description="Select char for replacing newlines in EPG.">config.epg.replace_newlines</item>
+		<item level="2" text="Enable EPG event name abbreviation removal" description="Broadcasters sometimes split long event names into the event description using ... Choose whether to prevent this behaviour.">config.epg.joinAbbreviatedEventNames</item>
 		<if conditional="config.epg.eventNamePrefixMode.value > 0">
 			<item level="2" text="EPG event name prefixes to remove" description="| separated list of prefixes you'd like to be removed from event names, separated with |, e.g. New:|Live:">config.epg.eventNamePrefixes</item>
 		</if>
