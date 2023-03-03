@@ -30,6 +30,9 @@ std::string buildShortName( const std::string &str )
 
 void undoAbbreviation(std::string &str1, std::string &str2)
 {
+	if (!eSimpleConfig::getBool("config.epg.joinAbbreviatedEventNames", true))
+		return;
+
 	std::string s1 = str1;
 	std::string s2 = str2;
 
