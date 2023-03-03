@@ -98,6 +98,10 @@ typedef std::tr1::unordered_map<uniqueEPGKey, EventCacheItem, hash_uniqueEPGKey,
 	typedef std::tr1::unordered_map<uniqueEPGKey, contentMap, hash_uniqueEPGKey, uniqueEPGKey::equal > contentMaps;
 #endif
 
+struct eit_parental_rating {
+        u_char  country_code[3];
+        u_char  rating;
+};
 #endif
 
 class eEPGCache: public eMainloop, private eThread, public sigc::trackable
@@ -160,6 +164,7 @@ private:
 	void gotMessage(const Message &message);
 	void cleanLoop();
 	void submitEventData(const std::vector<int>& sids, const std::vector<eDVBChannelID>& chids, long start, long duration, const char* title, const char* short_summary, const char* long_description, char event_type, int event_id, int source);
+	void submitEventData(const std::vector<int>& sids, const std::vector<eDVBChannelID>& chids, long start, long duration, const char* title, const char* short_summary, const char* long_description, std::vector<uint8_t> event_types, std::vector<eit_parental_rating> parental_ratings, int event_id, int source);
 	void clearCompleteEPGCache();
 
 	eServiceReferenceDVB *m_timeQueryRef;
@@ -198,6 +203,9 @@ private:
 	RESULT lookupEventTime(const eServiceReference &service, time_t, const eventData *&, int direction=0);
 
 public:
+	/* Only used by servicedvbrecord.cpp to write the EIT file */
+	RESULT saveEventToFile(const char* filename, const eServiceReference &service, int eit_event_id, time_t begTime, time_t endTime);
+
 	// Events are parsed epg events.. it's safe to use them after cache unlock
 	// after use the Event pointer must be released using "delete".
 	RESULT lookupEventId(const eServiceReference &service, int event_id, Event* &);
@@ -219,9 +227,6 @@ public:
 	};
 	PyObject *lookupEvent(SWIG_PYOBJECT(ePyObject) list, SWIG_PYOBJECT(ePyObject) convertFunc=(PyObject*)0);
 	PyObject *search(SWIG_PYOBJECT(ePyObject));
-
-	/* Used by servicedvbrecord.cpp, timeshift, etc. to write the EIT file */
-	RESULT saveEventToFile(const char* filename, const eServiceReference &service, int eit_event_id, time_t begTime, time_t endTime);
 
 	// eServiceEvent are parsed epg events.. it's safe to use them after cache unlock
 	// for use from python ( members: m_start_time, m_duration, m_short_description, m_extended_description )
@@ -261,7 +266,7 @@ public:
 	unsigned int getEpgSources();
 	unsigned int getEpgmaxdays();
 
-	void submitEventData(const std::vector<eServiceReferenceDVB>& serviceRefs, long start, long duration, const char* title, const char* short_summary, const char* long_description, char event_type);
+	void submitEventData(const std::vector<eServiceReferenceDVB>& serviceRefs, long start, long duration, const char* title, const char* short_summary, const char* long_description, std::vector<uint8_t> event_types, std::vector<eit_parental_rating> parental_ratings, uint16_t eventId=0);
 
 	void importEvents(SWIG_PYOBJECT(ePyObject) serviceReferences, SWIG_PYOBJECT(ePyObject) list);
 	void importEvent(SWIG_PYOBJECT(ePyObject) serviceReference, SWIG_PYOBJECT(ePyObject) list);

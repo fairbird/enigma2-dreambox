@@ -209,6 +209,7 @@ bool eServiceEvent::loadLanguage(Event *evt, const std::string &lang, int tsidon
 
 	// hack to fix split titles
 	undoAbbreviation(m_event_name, m_short_description);
+	removePrefixesFromEventName(m_event_name, m_short_description);
 
 	if(eServiceEvent::m_UTF8CorrectMode > 0)
 	{
