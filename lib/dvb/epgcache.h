@@ -139,6 +139,7 @@ private:
 	static eEPGCache *instance;
 
 	unsigned int historySeconds;
+	unsigned int maxdays;
 
 	std::vector<int> onid_blacklist;
 	eventCache eventDB;
@@ -178,10 +179,11 @@ public:
 	static eEPGCache *getInstance() { return instance; }
 
 	void crossepgImportEPGv21(std::string dbroot);
-
+	void clear();
 	void save();
 	void load();
 	void timeUpdated();
+	void flushEPG(int sid, int onid, int tsid);
 	void flushEPG(const uniqueEPGKey & s=uniqueEPGKey(), bool lock = true);
 #ifndef SWIG
 	eEPGCache();
@@ -258,9 +260,11 @@ public:
 #endif
 	,EPG_IMPORT=0x80000000
 	};
+	void setEpgmaxdays(unsigned int epgmaxdays);
 	void setEpgHistorySeconds(time_t seconds);
 	void setEpgSources(unsigned int mask);
 	unsigned int getEpgSources();
+	unsigned int getEpgmaxdays();
 
 	void submitEventData(const std::vector<eServiceReferenceDVB>& serviceRefs, long start, long duration, const char* title, const char* short_summary, const char* long_description, std::vector<uint8_t> event_types, std::vector<eit_parental_rating> parental_ratings, uint16_t eventId=0);
 
