@@ -7,6 +7,7 @@
 #include <map>
 #include <lib/base/eerror.h>
 #include <lib/base/encoding.h>
+#include <lib/base/esimpleconfig.h>
 #include <lib/base/estring.h>
 #include "freesatv2.h"
 #include "big5.h"
