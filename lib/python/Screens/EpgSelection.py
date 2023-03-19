@@ -4,7 +4,7 @@ import Screens.InfoBar
 from Components.config import config, ConfigClock
 from Components.Pixmap import Pixmap
 from Components.Label import Label
-from Components.EpgList import EPGList, EPG_TYPE_SINGLE, EPG_TYPE_SIMILAR, EPG_TYPE_MULTI
+from Components.EpgList import EPGList, EPG_TYPE_SINGLE, EPG_TYPE_SIMILAR, EPG_TYPE_MULTI, EPG_TYPE_PARTIAL
 from Components.ActionMap import ActionMap, HelpableActionMap
 from Components.UsageConfig import preferredTimerPath
 from Components.Sources.ServiceEvent import ServiceEvent
@@ -52,9 +52,16 @@ class EPGSelection(Screen):
 		if isinstance(service, str) and eventid is not None:
 			self.type = EPG_TYPE_SIMILAR
 			self.setTitle(_("Similar EPG"))
+			self["key_yellow"] = StaticText(_("Partial"))
+			self["key_blue"] = StaticText()
+			self.currentService = service
+			self.eventid = eventid
+			self.zapFunc = None
+		elif not service and isinstance(eventid, str):
+			self.type = EPG_TYPE_PARTIAL
+			self.title = _("Partial EPG")
 			self["key_yellow"] = StaticText()
 			self["key_blue"] = StaticText()
-			self["key_red"] = StaticText()
 			self.currentService = service
 			self.eventid = eventid
 			self.zapFunc = None
@@ -285,20 +292,22 @@ class EPGSelection(Screen):
 
 	#just used in multipeg
 	def onCreate(self):
-		l = self["list"]
-		l.recalcEntrySize()
+		li = self["list"]
+		li.recalcEntrySize()
 		if self.type == EPG_TYPE_MULTI:
-			l.fillMultiEPG(self.services, self.ask_time)
-			l.moveToService(Screens.InfoBar.InfoBar.instance and Screens.InfoBar.InfoBar.instance.servicelist.getCurrentSelection() or self.session.nav.getCurrentlyPlayingServiceOrGroup())
+			li.fillMultiEPG(self.services, self.ask_time)
+			li.moveToService(Screens.InfoBar.InfoBar.instance and Screens.InfoBar.InfoBar.instance.servicelist.getCurrentSelection() or self.session.nav.getCurrentlyPlayingServiceOrGroup())
 		elif self.type == EPG_TYPE_SINGLE:
 			service = self.currentService
 			self["Service"].newService(service.ref)
 			if not self.saved_title:
 				self.saved_title = self.instance.getTitle()
 			self.setTitle(self.saved_title + ' - ' + service.getServiceName())
-			l.fillSingleEPG(service)
+			li.fillSingleEPG(service)
+		elif self.type == EPG_TYPE_PARTIAL:
+			li.fill_partial_list(self.eventid)
 		else:
-			l.fillSimilarList(self.currentService, self.eventid)
+			li.fillSimilarList(self.currentService, self.eventid)
 
 	def eventViewCallback(self, setEvent, setService, val):
 		l = self["list"]
@@ -358,6 +367,12 @@ class EPGSelection(Screen):
 				self.sort_type = 0
 			self["list"].sortSingleEPG(self.sort_type)
 			self.setSortDescription()
+		elif self.type == EPG_TYPE_SIMILAR:
+			cur = self["list"].getCurrent()
+			cur_event = cur and cur[0]
+			event = cur_event and cur_event.getEventName()
+			if event:
+				self.session.open(EPGSelection, None, None, event)
 
 	def setSortDescription(self):
 		if self.sort_type == 1:
