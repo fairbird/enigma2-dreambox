@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 from Components.ActionMap import ActionMap, HelpableActionMap
+from os.path import islink
+from Components.Console import Console
 from Components.config import config
 from Components.ConfigList import ConfigListScreen
 from Components.Label import Label
@@ -9,6 +11,7 @@ from Components.Sources.StaticText import StaticText
 from Screens.Setup import Setup
 from Screens.Screen import Screen
 from Screens.HelpMenu import Rc
+from Tools.Directories import fileContains
 from Tools.Geolocation import geolocation
 from enigma import getDesktop
 
@@ -26,9 +29,22 @@ class Time(Setup):
 		Setup.__init__(self, session=session, setup="Time")
 		self["key_yellow"] = StaticText("")
 		self["geolocationActions"] = HelpableActionMap(self, ["ColorActions"], {
-			"yellow": (self.useGeolocation, _("Use geolocation to set the current time zone location"))
+			"yellow": (self.useGeolocation, _("Use geolocation to set the current time zone location")),
+			"green": self.keySave
 		}, prio=0, description=_("Time Setup Actions"))
 		self.selectionChanged()
+
+	def checkNtpDateRootFile(self):
+		if config.ntp.timesync.value != "dvb":
+			if not islink("/etc/network/if-up.d/ntpdate-sync") and not fileContains("/var/spool/cron/root", "ntpdate-sync"):
+				Console().ePopen("ln -s /usr/bin/ntpdate-sync /etc/network/if-up.d/ntpdate-sync;echo '30 * * * * /usr/bin/ntpdate-sync silent' >>/var/spool/cron/root")
+		else:
+			if islink("/etc/network/if-up.d/ntpdate-sync") and fileContains("/var/spool/cron/root", "ntpdate-sync"):
+				Console().ePopen("sed -i '/ntpdate-sync/d' /var/spool/cron/root;unlink /etc/network/if-up.d/ntpdate-sync")
+
+	def keySave(self):
+		Setup.keySave(self)
+		self.checkNtpDateRootFile()
 
 	def selectionChanged(self):
 		if Setup.getCurrentItem(self) in (config.timezone.area, config.timezone.val):
@@ -245,10 +261,11 @@ class TimeWizard(ConfigListScreen, Screen, Rc):
 				valItem[1].changed()
 			self["config"].invalidate(valItem)
 			self.updateTimeList()
-			self["text"].setText(_("Your local time has been set successfully. Press \"OK\" to continue wizard."))
+			self["text"].setText(_("Your local time has been set successfully. Settings has been saved.\n\nPress \"OK\" to continue wizard."))
 
 	def red(self):
 		self.close()
 
 	def yellow(self):
 		self.useGeolocation()
+		Time.checkNtpDateRootFile(self)
