@@ -217,25 +217,28 @@ class NameserverSetup(ConfigListScreen, HelpableScreen, Screen):
                 print("[NetworkSetup] backup-list:", self.backupNameserverList)
 
                 self["key_red"] = StaticText(_("Cancel"))
+                self["key_green"] = StaticText(_("Save"))
 
                 self["OkCancelActions"] = HelpableActionMap(self, ["OkCancelActions"],
                         {
                         "cancel": (self.keyCancel, _("Exit nameserver configuration")),
-                        "ok": (self.ok, _("Activate current configuration")),
                         })
 
-                self["actions"] = NumberActionMap(["SetupActions"],
-                {
-                        "ok": self.ok,
-                }, -2)
+                self["ColorActions"] = HelpableActionMap(self, ["ColorActions"],
+                        {
+                        "green": (self.save, _("Activate current configuration")),
+                        "left": (self.keyLeft, _("Change to another server")),
+                        "right": (self.keyRight, _("Change to another server")),
+                        })
 
                 self.list = []
                 ConfigListScreen.__init__(self, self.list)
                 self.createSetup()
                 strdns = str(self.backupNameserverList)
+                dhcp_router = str([list(x[1]) for x in self.getNetworkRoutes()]).replace("[[", "[").replace("]]", "]").replace(",", ".").replace("].", "]")
                 dns = strdns.replace("[[", "[").replace("]]", "]").replace(",", ".").replace("].", "]")
                 if config.usage.dns.value not in ("google", "quad9security", "quad9nosecurity", "cloudflare", "opendns", "opendns-2"):
-                        if fileContains("/etc/network/interfaces", "iface eth0 inet static") or fileContains("/etc/network/interfaces", "iface wlan0 inet static") and fileContains("/run/ifstate", "wlan0=wlan0"):
+                        if dhcp_router != dns:
                                 config.usage.dns.default = "staticip"
                                 config.usage.dns.value = config.usage.dns.default
                                 servername = _("Static IP Router")
@@ -256,7 +259,7 @@ class NameserverSetup(ConfigListScreen, HelpableScreen, Screen):
                                 servername = _("OpenDNS-2")
                         else:
                                 servername = _("Cloudflare")
-                introduction = _("Press LEFT or RIGHT to choose another server. Then press OK to Active it.")
+                introduction = _("Press LEFT or RIGHT to choose another server. Then press Green Button to save it.")
                 if "0. 0. 0. 0" in dns:
                         introduction = _("WARNING: The DNS were not saved in your settings.\n\nActive server: %s\nDNS Active: %s\n\nIt is necessary to choose a server and save with GREEN button!.") % (servername, dns)
                         self["introduction"] = StaticText(introduction)
@@ -294,7 +297,15 @@ class NameserverSetup(ConfigListScreen, HelpableScreen, Screen):
                         self.list.append((_("DNS %d") % (i), x))
                         i += 1
 
-        def ok(self):
+        def keyLeft(self):
+                ConfigListScreen.keyLeft(self)
+                self.createSetup()
+
+        def keyRight(self):
+                ConfigListScreen.keyRight(self)
+                self.createSetup()
+
+        def save(self):
                 self.RefreshNameServerUsed()
                 iNetwork.clearNameservers()
                 for nameserver in self.nameserverEntries:
