@@ -34,17 +34,17 @@ class Time(Setup):
 		}, prio=0, description=_("Time Setup Actions"))
 		self.selectionChanged()
 
-	def checkNtpDateRootFile(self):
+	def checkTimeSyncRootFile(self):
 		if config.ntp.timesync.value != "dvb":
-			if not islink("/etc/network/if-up.d/ntpdate-sync") and not fileContains("/var/spool/cron/root", "ntpdate-sync"):
-				Console().ePopen("ln -s /usr/bin/ntpdate-sync /etc/network/if-up.d/ntpdate-sync;echo '30 * * * * /usr/bin/ntpdate-sync silent' >>/var/spool/cron/root")
+			if not islink("/etc/network/if-up.d/timesync") and not fileContains("/var/spool/cron/root", "timesync"):
+				Console().ePopen("ln -s /usr/bin/timesync /etc/network/if-up.d/timesync;echo '30 * * * * /usr/bin/timesync silent' >>/var/spool/cron/root")
 		else:
-			if islink("/etc/network/if-up.d/ntpdate-sync") and fileContains("/var/spool/cron/root", "ntpdate-sync"):
-				Console().ePopen("sed -i '/ntpdate-sync/d' /var/spool/cron/root;unlink /etc/network/if-up.d/ntpdate-sync")
+			if islink("/etc/network/if-up.d/timesync") and fileContains("/var/spool/cron/root", "timesync"):
+				Console().ePopen("sed -i '/timesync/d' /var/spool/cron/root;unlink /etc/network/if-up.d/timesync")
 
 	def keySave(self):
 		Setup.keySave(self)
-		self.checkNtpDateRootFile()
+		self.checkTimeSyncRootFile()
 
 	def selectionChanged(self):
 		if Setup.getCurrentItem(self) in (config.timezone.area, config.timezone.val):
@@ -227,9 +227,11 @@ class TimeWizard(ConfigListScreen, Screen, Rc):
 			config.usage.time.long.save()
 		self.list.append((_("Time synchronization method"), config.ntp.timesync))
 		config.ntp.timesync.save()
-		if config.ntp.timesync.value != "dvb":
-			self.list.append((_("NTP Hostname"), config.ntp.server))
-			config.ntp.server.save()
+		if config.ntp.timesync.value != "dvb":			
+			self.list.append((_("RFC 5905 hostname (SNTP - Simple Network Time Protocol)"), config.ntp.sntpserver))
+			config.ntp.sntpserver.save()
+			self.list.append((_("RFC 868 hostname (rdate - Remote Date)"), config.ntp.rdateserver))
+			config.ntp.rdateserver.save()
 		config.timezone.val.save()
 		config.timezone.area.save()
 		self["config"].list = self.list
@@ -263,9 +265,17 @@ class TimeWizard(ConfigListScreen, Screen, Rc):
 			self.updateTimeList()
 			self["text"].setText(_("Your local time has been set successfully. Settings has been saved.\n\nPress \"OK\" to continue wizard."))
 
+	def checkTimeSyncRootFile(self):
+		if config.ntp.timesync.value != "dvb":
+			if not islink("/etc/network/if-up.d/timesync") and not fileContains("/var/spool/cron/root", "timesync"):
+				Console().ePopen("ln -s /usr/bin/timesync /etc/network/if-up.d/timesync;echo '30 * * * * /usr/bin/timesync silent' >>/var/spool/cron/root")
+		else:
+			if islink("/etc/network/if-up.d/timesync") and fileContains("/var/spool/cron/root", "timesync"):
+				Console().ePopen("sed -i '/timesync/d' /var/spool/cron/root;unlink /etc/network/if-up.d/timesync")
+
 	def red(self):
 		self.close()
 
 	def yellow(self):
 		self.useGeolocation()
-		Time.checkNtpDateRootFile(self)
+		self.checkTimeSyncRootFile()

@@ -1453,10 +1453,11 @@ def InitUsageConfig():
 	config.ntp.timesync = ConfigSelection(default="ntp", choices=[
 		("auto", _("Auto")),
 		("dvb", _("Transponder time")),
-		("ntp", _("Internet time (NTP)"))
+		("ntp", _("Internet time"))
 	])
 	config.ntp.timesync.addNotifier(timesyncChanged)
-	config.ntp.server = ConfigText("pool.ntp.org", fixed_size=False)
+	config.ntp.sntpserver = ConfigText("pool.ntp.org", fixed_size=False)
+	config.ntp.rdateserver = ConfigText("time.nist.gov", fixed_size=False)
 
 def updateChoices(sel, choices):
 	if choices:
