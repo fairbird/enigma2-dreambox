@@ -99,5 +99,5 @@ class BhStreamInfo(Poll, Converter, object):
 	boolean = property(getBoolean)
 
 	def changed(self, what):
-		if what[0] == self.CHANGED_SPECIFIC and what[1] == iPlayableService.evUpdatedInfo or what[0] == self.CHANGED_POLL:
+		if what[0] == self.CHANGED_SPECIFIC and what[1] == iPlayableService.evUpdatedInfo or what[0] == self.CHANGED_ALL:
 			Converter.changed(self, what)
