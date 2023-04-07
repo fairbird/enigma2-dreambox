@@ -16,7 +16,7 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 #<widget source="session.CurrentService" render="Label" position="1356,284" size="488,34" zPosition="2" font="Regular;30" halign="center" foregroundColor="red" backgroundColor="transpBlack" transparent="1">
-#	<convert type="ArBoxInfo">Boxtype</convert>
+#	<convert type="BoxInfo">Boxtype</convert>
 #</widget>
 
 from Components.Converter.Poll import Poll
