@@ -348,8 +348,11 @@ class TryQuitMainloop(MessageBox):
 					if SystemInfo["HasHDMI-CEC"] and config.hdmicec.enabled.value and config.hdmicec.control_tv_standby.value and config.hdmicec.next_boxes_detect.value:
 						import Components.HdmiCec
 						Components.HdmiCec.hdmi_cec.secondBoxActive()
+						if not hasattr(self, "quitScreen"):
+							self.quitScreen = self.session.instantiateDialog(QuitMainloopScreen)
+							self.quitScreen.show()
 						self.delay = eTimer()
-						self.delay.timeout.callback.append(self.quitMainloop)
+						self.delay.timeout.callback.append(self.quitMainloopDelay)
 						self.delay.start(1500, True)
 						return
 			elif not inStandby:
@@ -358,6 +361,10 @@ class TryQuitMainloop(MessageBox):
 			self.quitMainloop()
 		else:
 			MessageBox.close(self, True)
+
+	def quitMainloopDelay(self):
+		self.session.nav.stopService()
+		quitMainloop(self.retval)
 
 	def quitMainloop(self):
 		self.session.nav.stopService()
