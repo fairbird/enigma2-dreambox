@@ -340,3 +340,4 @@ SystemInfo["FrontpanelLEDBrightnessControl"] = fileExists("/proc/stb/fp/led_brig
 SystemInfo["FrontpanelLEDColorControl"] = fileExists("/proc/stb/fp/led_color")
 SystemInfo["FrontpanelLEDFadeControl"] = fileExists("/proc/stb/fp/led_fade")
 SystemInfo["FCCactive"] = False
+SystemInfo["Autoresolution_proc_videomode"] = model in ("gbue4k", "gbquad4k") and "/proc/stb/video/videomode_50hz" or "/proc/stb/video/videomode"
