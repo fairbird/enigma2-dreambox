@@ -17,7 +17,7 @@ from Components.Label import Label
 from Components.ScrollLabel import ScrollLabel
 from Components.config import config, ConfigBoolean, configfile
 from Screens.LanguageSelection import LanguageWizard
-from enigma import eConsoleAppContainer, eTimer, eActionMap, quitMainloop
+from enigma import eConsoleAppContainer, eTimer, eActionMap
 
 import os
 
@@ -78,17 +78,12 @@ class AutoRestoreWizard(MessageBox):
 
 	def close(self, value):
 		if value:
-			if os.path.isfile("/etc/.doNotAutoInstall"):
-				os.unlink("/etc/.doNotAutoInstall")
-				MessageBox.close(self, 43)
-			else:
-				# restore network config first, we need it to autoinstall
-				Console().ePopen('/etc/init.d/settings-restore.sh network')
-				self.session.open(AutoInstall)
-		MessageBox.close(self)
+			MessageBox.close(self, 43)
+		else:
+			MessageBox.close(self)
 
 
-class AutoInstall(Screen):
+class AutoInstallWizard(Screen):
 	skin = """<screen name="AutoInstall" position="fill" flags="wfNoBorder">
 		<panel position="left" size="5%,*"/>
 		<panel position="right" size="5%,*"/>
@@ -179,13 +174,14 @@ class AutoInstall(Screen):
 			self.container.dataAvail.remove(self.dataAvail)
 		self.container = None
 		self.logfile.close()
-		quitMainloop(43)
-
+		os.remove("/etc/.doAutoinstall")
+		self.close(44)
 
 if not os.path.isfile("/etc/installed"):
 	from Components.Console import Console
 	Console().ePopen("opkg list_installed | cut -d ' ' -f 1 > /etc/installed;chmod 444 /etc/installed")
 
+wizardManager.registerWizard(AutoInstallWizard, os.path.isfile("/etc/.doAutoinstall"), priority=0)
 wizardManager.registerWizard(AutoRestoreWizard, config.misc.languageselected.value and config.misc.firstrun.value and checkForAvailableAutoBackup(), priority=0)
 wizardManager.registerWizard(LanguageWizard, config.misc.languageselected.value, priority=10)
 wizardManager.registerWizard(TimeWizard, config.misc.firstrun.value, priority=20)
