@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: enigma2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-10-14 09:11+0200\n"
-"POT-Creation-Date: 2023-01-14 14:37+0100\n"
+"POT-Creation-Date: 2023-04-16 18:05+0200\n"
 "Last-Translator: RAED - Fairbirb <rrrr53@hotmail.com>\n"
 "Language-Team: \n"
 "Language: ar\n"
@@ -303,6 +303,10 @@ msgstr "%s\n"
 msgid "%s %d.%d"
 msgstr ""
 
+#, fuzzy, python-format
+msgid "%s (files)"
+msgstr "(ملفات) %s"
+
 #, python-format
 msgid "%s KSymb/s"
 msgstr ""
@@ -310,6 +314,10 @@ msgstr ""
 #, python-format
 msgid "%s MHz"
 msgstr "%s ميجاهيرتز"
+
+#, fuzzy, python-format
+msgid "%s connected successfully."
+msgstr "تم تغيير الرقم السري بنجاح."
 
 #, python-format
 msgid "%s imported from fallback tuner"
@@ -343,6 +351,10 @@ msgstr "(تنقل)"
 #, fuzzy, python-format
 msgid "(activated +%d min)"
 msgstr "(تفعيلها +%d دقيقة)"
+
+#, fuzzy
+msgid "(current)"
+msgstr "الوقت الحالي"
 
 msgid "(empty)"
 msgstr "(فارغ)"
@@ -613,9 +625,6 @@ msgstr "تفعيل البث الهجين [المفتاح الأحمر]"
 msgid "Activate Picture in Picture"
 msgstr "تفعيل صورة داخل صورة"
 
-msgid "Activate current configuration"
-msgstr "تنشيط التشكيل الحالي"
-
 msgid "Activate network settings"
 msgstr "تفعيل إعدادات الشبكة"
 
@@ -636,9 +645,6 @@ msgstr "إضافة"
 
 msgid "Add a mark"
 msgstr "أضف علامه"
-
-msgid "Add a nameserver entry"
-msgstr "إضافة أسم الخادم المدخل"
 
 msgid "Add a new title"
 msgstr "إضافة عنوان جديد"
@@ -1008,6 +1014,13 @@ msgstr "في البداية"
 msgid "At end"
 msgstr "في النهاية"
 
+msgid ""
+"Attention - forced loading recovery image!\n"
+"Create an empty STARTUP_RECOVERY file at the root of your HDD/USB drive and hold the Power button for more than 12 seconds for reboot receiver!"
+msgstr ""
+"انتباه - تحميل صورة الاسترداد القسري!\n"
+"قم بإنشاء ملف STARTUP RECOVERY فارغ في جذر محرك الأقراص الثابتة / محرك أقراص USB واضغط باستمرار على زر الطاقة لأكثر من 12 ثانية لإعادة تشغيل جهاز الاستقبال!"
+
 msgid "Attention, this is repeated timer!\n"
 msgstr "انتباه ، هذا مؤقت متكرر!\n"
 
@@ -1028,9 +1041,6 @@ msgstr "تعريف الصوت"
 #, python-format
 msgid "Audio PID%s, codec & lang"
 msgstr "كود و لغة,PID%s صوت"
-
-msgid "Audio PID, codec & lang"
-msgstr "كود و لغة,PID صوت"
 
 msgid "Audio auto volume level"
 msgstr "مستوي الصوت التلقائي"
@@ -1225,6 +1235,9 @@ msgstr "بربادوس"
 msgid "Basic PID info"
 msgstr "الأساسية PID معلومات"
 
+msgid "Basic info"
+msgstr "معلومات أساسية"
+
 msgid "Basque"
 msgstr "الباسكي"
 
@@ -1311,6 +1324,10 @@ msgstr "تعزيز الأخضر"
 
 msgid "Boot to Android image"
 msgstr "الإقلاع إلى صورة الأندرويد"
+
+#, python-format
+msgid "Boot to Recovery image - slot0 %s"
+msgstr "%s التمهيد لاسترداد الصورة - الفتحة 0"
 
 msgid "Boot to Recovery menu"
 msgstr "الإقلاع إلى قائمة الإستعادة"
@@ -1740,6 +1757,10 @@ msgstr "معدل ترميز الضغط العالي"
 msgid "Code rate LP"
 msgstr "معدل ترميز الضغط المنخفض"
 
+#, python-format
+msgid "Codec & lang%s"
+msgstr "%sترميز و لغة"
+
 msgid "Collection name"
 msgstr "اسم المجموعة"
 
@@ -1884,9 +1905,6 @@ msgstr "إعدادات الترجمة الفرعية يجب تبديل بين و
 
 msgid "Configure interface"
 msgstr "تكوين الواجهه"
-
-msgid "Configure nameservers"
-msgstr "تكوين أسم الخادم"
 
 msgid "Configure on which devices the background delete option should be used."
 msgstr "تهيئة الأجهزة التي يجب استخدام خيار حذف الخلفية لها."
@@ -2443,6 +2461,10 @@ msgstr "الإفتراضي"
 msgid "Default Services Scanner"
 msgstr "المكان الافتراضي للفيلم"
 
+#, python-format
+msgid "Default duration: %d mins"
+msgstr "دقيقة %d :المدة الافتراضية"
+
 msgid "Default movie location"
 msgstr "المكان الافتراضي للفيلم"
 
@@ -2976,9 +2998,6 @@ msgstr "الإكوادور"
 msgid "Edit"
 msgstr "تعديل"
 
-msgid "Edit DNS"
-msgstr "تعديل أسم النطاق"
-
 msgid "Edit alternatives"
 msgstr "تعديل البديل"
 
@@ -3044,6 +3063,9 @@ msgstr "تفعيل بقوة خمسة فولت للهوائي النشط"
 
 msgid "Enable EIT EPG"
 msgstr "تمكين جدول معلومات الحدث في دليل البرامج الإلكتروني"
+
+msgid "Enable Kexec MultiBoot"
+msgstr "Kexec MultiBoot تفعيل"
 
 msgid "Enable HDMI-CEC"
 msgstr "تمكين كيبل عالي الوضوح"
@@ -3205,8 +3227,8 @@ msgstr "أدخل الرقم السري"
 msgid "Enter URL"
 msgstr "أعاده إدخال الرقم السري"
 
-msgid "Enter an URL where alternative images could be listed for FlashImage"
-msgstr "حيث يمكن إدراج الصور البديلة لـصورة الفلاش الداخلية URL أدخل عنوان"
+msgid "Enter an URL where alternative images could be listed for FlashImage. Enter text 'all' for automatic access of many images."
+msgstr "حيث يمكن إدراج الصور البديلة لـصورة الفلاش الداخلية. أدخل النص 'الكل' للوصول التلقائي إلى العديد من الصور URL أدخل عنوان"
 
 msgid "Enter if you are in the east or west hemisphere."
 msgstr "ادخل إذا كنت في الشرق أو نصف الكره الغربي."
@@ -3398,9 +3420,6 @@ msgstr "الخروج من قائمة الأفلام"
 msgid "Exit movie player?"
 msgstr "الخروج من مشغل الأفلام؟"
 
-msgid "Exit nameserver configuration"
-msgstr "الخروج من إعدادات أسم الخادم"
-
 msgid "Exit network interface list"
 msgstr "الخروج من قائمة واجهة الشبكة"
 
@@ -3433,6 +3452,9 @@ msgstr "برنامج تشغيلى متقدم"
 
 msgid "Extended Software Plugin"
 msgstr "تمديد البرنامج المساعد"
+
+msgid "Extended info"
+msgstr "معلومات موسعة"
 
 msgid "Extended network setup plugin..."
 msgstr "...تمديد البرنامج المساعد لإعداد الشبكة"
@@ -4587,6 +4609,23 @@ msgstr "كينيا"
 msgid "Kernel version: "
 msgstr "إصدار جديد:"
 
+msgid "Kexec MultiBoot Initialisation - will reboot after 10 seconds."
+msgstr "ستتم إعادة التشغيل بعد 10 ثوانٍ .Kexec MultiBoot تهية"
+
+msgid ""
+"Kexec MultiBoot Initialisation in progress!\n"
+"\n"
+"Will reboot after restoring any eMMC slots.\n"
+"This can take from 1 -> 5 minutes per slot."
+msgstr ""
+"عملية تهيئة Kexec MultiBoot قيد التقدم!\n"
+"\n"
+"ستتم إعادة التشغيل بعد استعادة أي فتحات eMMC.\n"
+"يمكن أن يستغرق هذا من 1 -> 5 دقائق لكل فترة."
+
+msgid "Kexec MultiBoot Manager"
+msgstr "Kexec MultiBoot مدير"
+
 msgid "Key Events"
 msgstr "الأحداث الرئيسية"
 
@@ -5229,16 +5268,6 @@ msgstr "الاسم"
 msgid "Nameserver"
 msgstr "اسم الخادم"
 
-#, python-format
-msgid "Nameserver %d"
-msgstr "%d اسم الخادم"
-
-msgid "Nameserver settings"
-msgstr "إعدادات اسم الخادم"
-
-msgid "Nameserver setup"
-msgstr "إعدادات اسم الخادم"
-
 msgid "Namespace & Orbital pos."
 msgstr "مساحة الاسم و الإتجاه المداري"
 
@@ -5672,6 +5701,12 @@ msgstr "تعطيل المؤقت"
 msgid "Orbital position"
 msgstr "الموقع المداري"
 
+msgid "Order by modes"
+msgstr "ترتيب حسب الأوضاع"
+
+msgid "Order by slots"
+msgstr "ترتيب حسب الفتحات"
+
 msgid "Ordinary"
 msgstr "العادي"
 
@@ -5786,6 +5821,12 @@ msgstr "إظهار خدمات الرقابة الأبوية"
 
 msgid "Parental control setup"
 msgstr "الرقابة الأبوية"
+
+msgid "Partial"
+msgstr "جزئي"
+
+msgid "Partial EPG"
+msgstr "دليل برنامح يومي جزئي"
 
 msgid "Password"
 msgstr "كلمة المرور"
@@ -5910,19 +5951,6 @@ msgstr "من فضلك قم بتغيير وقت إنتهاء التسجيل"
 
 msgid "Please choose an extension..."
 msgstr "من فضلك أختار من الملحقات..."
-
-msgid "Please configure or verify your Nameservers by filling out the required values.\n"
-"When you are ready press OK to continue."
-msgstr "من فضلك فم بتكوين أو تأكد من أسم الخادم بوضع القيم المطلوبه.\n"
-"عندما تكون مستعد أضغط موافق للاستمرار."
-
-msgid "Please configure the fallback tuner setup"
-msgstr "ضبط مؤالف التراجع"
-
-msgid "Please configure your internet connection by filling out the required values.\n"
-"When you are ready press OK to continue."
-msgstr "من فضلك قم بتكوين الإتصال بالانترنت بملأ القيم المطلوبه \n"
-"عندما تكون مستعد أضغط موافق للاستمرار."
 
 msgid "Please connect your receiver to the internet"
 msgstr "الرجاء توصيل جهاز الاستقبال الخاص بك على شبكة الإنترنت"
@@ -6268,6 +6296,19 @@ msgstr ".للتبديل إلى قائمة الميزات 'CH +/-' اضغط عل�
 msgid "Press 'OK' for remove item or < > for change order or 'CH+/-' for toggle to list of features."
 msgstr ".للتبديل إلى قائمة الميزات 'CH +/-' اضغط على 'موافق' لإزالة العنصر أو <> لتغيير الترتيب أو"
 
+msgid ""
+"Press Green key to enable MultiBoot!\n"
+"\n"
+"Will reboot within 10 seconds,\n"
+"unless you have eMMC slots to restore.\n"
+"Restoring eMMC slots can take from 1 -> 5 minutes per slot."
+msgstr ""
+"اضغط على المفتاح الأخضر لتمكين MultiBoot!\n"
+"\n"
+"ستتم إعادة التمهيد في غضون 10 ثوانٍ ،\n"
+"ما لم يكن لديك فتحات eMMC لاستعادتها.\n"
+"يمكن أن تستغرق استعادة فتحات eMMC من 1 -> 5 دقائق لكل فتحة."
+
 msgid "Press INFO on your remote control for additional information."
 msgstr "اضغط مفتاح المعلومات من ريموت التحكم عن بعد للخيارات الإضافية."
 
@@ -6489,6 +6530,14 @@ msgstr "هل تريد فعلا الخروج السريع من مقدم الخد�
 msgid "Really perform a manufacturer reset now?"
 msgstr "حماية إعادة تعيين ضبط مصنع الشاشة"
 
+#, python-format
+msgid ""
+"Really permanently delete MultiBoot files?\n"
+"%s"
+msgstr ""
+"هل ترغب حقًا في حذف ملفات MultiBoot نهائيًا؟\n"
+"%s"
+
 msgid "Really reboot now?"
 msgstr "هل تريد فعلا إعادة التشغيل الان ؟"
 
@@ -6636,9 +6685,6 @@ msgstr "حذف"
 msgid "Remove a mark"
 msgstr "حذف علامه"
 
-msgid "Remove a nameserver entry"
-msgstr "حذف أسم الخادم المدخل"
-
 msgid "Remove all alternatives"
 msgstr "حذف كل البدائل"
 
@@ -6668,6 +6714,9 @@ msgstr "حذف الدليل"
 
 msgid "Remove entry"
 msgstr "حذف الباقة"
+
+msgid "Remove forever"
+msgstr "إزالة إلى الأبد"
 
 msgid "Remove from parental protection"
 msgstr "حذف من الرقابة الأبوية"
@@ -8366,6 +8415,9 @@ msgstr "بدء التسجيل الفوري"
 msgid "Start offline decode"
 msgstr "تشغيل فتح التشفير بدون إتصال"
 
+msgid "Start recording current event"
+msgstr "إضافة مؤقت تلقائي للحدث الحالي"
+
 msgid "Start recording?"
 msgstr "أبـدأ التسجيل؟"
 
@@ -8497,6 +8549,9 @@ msgstr "إيقاف إستخدام القناة المختارة بعد التش�
 
 msgid "Stopped"
 msgstr "توقفت"
+
+msgid "Storage device not available or not initialized."
+msgstr ".جهاز التخزين غير متوفر أو غير مهيأ"
 
 msgid "Store at index"
 msgstr "تخزين الفهرس"
@@ -9554,6 +9609,9 @@ msgstr "الأوكرانية"
 
 msgid "Unable to backup settings as the AutoBackup plugin is missing, do you want to continue?"
 msgstr "غير قادر على الاحتفاظ بنسخة احتياطية من الإعدادات لأن المكون الإضافي للنسخ الاحتياطي التلقائي مفقود ، هل تريد المتابعة؟"
+
+msgid "Unable to complete - Kexec Multiboot files missing!"
+msgstr "مفقودة Kexec Multiboot غير قادر على إكمال - ملفات"
 
 msgid "Unable to create the required directories on the media (e.g. USB stick or Harddisk) - Please verify media and try again!"
 msgstr "!تعذر إنشاء الدلائل المطلوبة على الوسائط (على سبيل المثال ، ذاكرة الفلاش أو القرص الصلب) - يرجى التحقق من الوسائط والمحاولة مرة أخرى"
@@ -11363,9 +11421,6 @@ msgstr "الذهاب الى وضع الاستعداد العميق"
 msgid "only from standby"
 msgstr "الذهاب لوضع الاستعداد"
 
-msgid "open nameserver configuration"
-msgstr "فتح تكوين أسم الخادم"
-
 msgid "original"
 msgstr "الأصلي"
 
@@ -11627,6 +11682,10 @@ msgstr "الوقت تبديل، والفصل، والصوت، معلومات ا�
 
 msgid "top"
 msgstr "أعلى"
+
+#, python-format
+msgid "total conflict (%d)"
+msgstr "(%d) التعارض الكلي"
 
 msgid "tourism/travel"
 msgstr "السياحة/السفر"
