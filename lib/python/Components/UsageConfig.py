@@ -1439,8 +1439,6 @@ def InitUsageConfig():
 	config.logmanager.additionalinfo = NoSave(ConfigText(default=""))
 	config.logmanager.sentfiles = ConfigLocations(default='')
 
-	config.misc.useNTPminutes = ConfigSelection(default="30", choices=[("30", "30" + " " + _("minutes")), ("60", _("Hour")), ("1440", _("Once per day"))])
-
 	config.ntp = ConfigSubsection()
 
 	def timesyncChanged(configElement):
