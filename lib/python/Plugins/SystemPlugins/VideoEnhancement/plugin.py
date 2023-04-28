@@ -54,7 +54,7 @@ class VideoEnhancementSetup(ConfigListScreen, Screen):
 		self["key_yellow"] = StaticText(_("Last config"))
 		self["key_blue"] = StaticText(_("Default"))
 
-		if not self.SelectionChanged in self["config"].onSelectionChanged:
+		if self.SelectionChanged not in self["config"].onSelectionChanged:
 			self["config"].onSelectionChanged.append(self.SelectionChanged)
 		self.rememberOldSettings()
 		self.changedEntry()
@@ -298,7 +298,7 @@ class VideoEnhancementPreview(ConfigListScreen, Screen):
 		self["config"].list = self.list
 		self["config"].l.setSeperation(self.seperation)
 		self["config"].l.setList(self.list)
-		if not self.selectionChanged in self["config"].onSelectionChanged:
+		if self.selectionChanged not in self["config"].onSelectionChanged:
 			self["config"].onSelectionChanged.append(self.selectionChanged)
 		self.selectionChanged()
 
@@ -372,5 +372,5 @@ def startSetup(menuid):
 def Plugins(**kwargs):
 	list = []
 	if config.usage.setup_level.index >= 2 and os.path.exists("/proc/stb/vmpeg/0/pep_apply"):
-		list.append(PluginDescriptor(name=_("Video enhancement setup"), description=_("Advanced video enhancement setup"), where=PluginDescriptor.WHERE_MENU, needsRestart=False, fnc=startSetup))
-	return list
+		return PluginDescriptor(name=_("Video enhancement setup"), description=_("Advanced video enhancement setup"), where=PluginDescriptor.WHERE_MENU, needsRestart=False, fnc=startSetup)
+	return []

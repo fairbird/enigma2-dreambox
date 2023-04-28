@@ -16,6 +16,18 @@ from enigma import getDesktop
 config.av.edid_override = ConfigYesNo(default=True)
 chipsetstring = about.getChipSetString()
 
+axis = {"480i": "0 0 719 479",
+		"480p": "0 0 719 479",
+		"576i": "0 0 719 575",
+		"576p": "0 0 719 575",
+		"720p": "0 0 1279 719",
+		"1080i": "0 0 1919 1079",
+		"1080p": "0 0 1919 1079",
+		"2160p30": "0 0 3839 2159",
+		"2160p": "0 0 3839 2159",
+		"smpte": "0 0 4095 2159"}
+
+
 class VideoHardware:
         rates = {} # high-level, use selectable modes.
 
@@ -118,8 +130,8 @@ class VideoHardware:
         if SystemInfo["Has2160p"]:
                 modes["DVI"] = ["720p", "1080p", "2160p", "1080i", "576p", "480p", "576i", "480i"]
         if HardwareInfo().get_device_name() in ("one", "two"):
-                modes["HDMI"] = ["720p", "1080p", "2160p", "1080i", "576p", "576i", "480p", "480i"]
-                widescreen_modes = {"720p", "1080p", "1080i", "2160p"}
+                modes["HDMI"] = ["720p", "1080p", "smpte", "2160p30", "2160p", "1080i", "576p", "576i", "480p", "480i"]
+                widescreen_modes = {"720p", "1080p", "1080i", "2160p", "smpte"}
         else:
                 modes["DVI"] = ["720p", "1080p", "2160p", "2160p30", "1080i", "576p", "480p", "576i", "480i"]
 
@@ -144,7 +156,10 @@ class VideoHardware:
                                                 ret = (16, 10)
                         elif is_auto:
                                 try:
-                                        aspect_str = open("/proc/stb/vmpeg/0/aspect", "r").read()
+                                	if HardwareInfo().get_device_name() in ("one", "two"):
+                                		aspect_str = open("/sys/class/video/screen_mode", "r").read()
+                                	else:
+                                        	aspect_str = open("/proc/stb/vmpeg/0/aspect", "r").read()
                                         if aspect_str == "1": # 4:3
                                                 ret = (4, 3)
                                 except IOError:
@@ -197,7 +212,7 @@ class VideoHardware:
                                 modes = f.read()[:-1]
                                 f.close()
                         except OSError:
-                                print("[Videomode] Read /proc/stb/video/videomode_choices failed.")
+                                print("[AVSwitch] couldn't read available videomodes.")
                                 self.modes_available = []
                                 return
                         self.modes_available = modes.split(' ')
@@ -271,26 +286,48 @@ class VideoHardware:
                                 mode_24 = mode_50
 
                 if HardwareInfo().get_device_name() in ("one", "two"):
-                        #open('/sys/class/display/mode', 'w').write('1080p50hz')
-                        amlmode = mode + rate.lower()
-                        try:
-                                open('/sys/class/display/mode', 'w').write(amlmode)
-                        except:
-                                print("[Videomode] Write to /sys/class/display/mode failed!")
-                        try:
-                                open('/sys/class/ppmgr/ppscaler', 'w').write('1')
-                        except:
-                                print("[Videomode] Write to /sys/class/ppmgr/ppscaler failed!")
-                        try:
-                                open('/sys/class/ppmgr/ppscaler', 'w').write('0')
-                        except:
-                                print("[Videomode] Write to /sys/class/ppmgr/ppscaler failed!")
-                        size_width = getDesktop(0).size().width()
-                        if size_width >= 1920:
-                                Console().ePopen('fbset -fb /dev/fb0 -g 1920 1080 1920 3240 32')
-                        else:
-                                Console().ePopen('fbset -fb /dev/fb0 -g 1280 720 1280 2160 32')
-                        return
+                        amlmode = list(modes.values())[0]
+			oldamlmode = self.getAMLMode()
+			f = open("/sys/class/display/mode", "w")
+			f.write(amlmode)
+			f.close()
+			print("[AVSwitch] Amlogic setting videomode to mode: %s" % amlmode)
+			f = open("/etc/u-boot.scr.d/000_hdmimode.scr", "w")
+			f.write("setenv hdmimode %s" % amlmode)
+			f.close()
+			f = open("/etc/u-boot.scr.d/000_outputmode.scr", "w")
+			f.write("setenv outputmode %s" % amlmode)
+			f.close()
+			os.system("update-autoexec")
+			f = open("/sys/class/ppmgr/ppscaler", "w")
+			f.write("1")
+			f.close()
+			f = open("/sys/class/ppmgr/ppscaler", "w")
+			f.write("0")
+			f.close()
+			f = open("/sys/class/video/axis", "w")
+			f.write(axis[mode])
+			f.close()
+			f = open("/sys/class/graphics/fb0/stride", "r")
+			stride = f.read().strip()
+			f.close()
+			limits = [int(x) for x in axis[mode].split()]
+			config.osd.dst_left = ConfigSelectionNumber(default=limits[0], stepwidth=1, min=limits[0] - 255, max=limits[0] + 255, wraparound=False)
+			config.osd.dst_top = ConfigSelectionNumber(default=limits[1], stepwidth=1, min=limits[1] - 255, max=limits[1] + 255, wraparound=False)
+			config.osd.dst_width = ConfigSelectionNumber(default=limits[2], stepwidth=1, min=limits[2] - 255, max=limits[2] + 255, wraparound=False)
+			config.osd.dst_height = ConfigSelectionNumber(default=limits[3], stepwidth=1, min=limits[3] - 255, max=limits[3] + 255, wraparound=False)
+
+			if oldamlmode != amlmode:
+				config.osd.dst_width.setValue(limits[0])
+				config.osd.dst_height.setValue(limits[1])
+				config.osd.dst_left.setValue(limits[2])
+				config.osd.dst_top.setValue(limits[3])
+				config.osd.dst_left.save()
+				config.osd.dst_width.save()
+				config.osd.dst_top.save()
+				config.osd.dst_height.save()
+			print("[AVSwitch] Framebuffer mode:%s  stride:%s axis:%s" % (getDesktop(0).size().width(), stride, axis[mode]))
+			return
 
                 try:
                         print("[Videomode] Write to /proc/stb/video/videomode_50hz")
@@ -331,6 +368,17 @@ class VideoHardware:
                 if mode in config.av.videorate:
                         config.av.videorate[mode].value = rate
                         config.av.videorate[mode].save()
+
+	def getAMLMode(self):
+		f = open("/sys/class/display/mode", "r")
+		currentmode = f.read().strip()
+		f.close()
+		return currentmode[:-4]
+
+	def getWindowsAxis(self):
+		port = config.av.videoport.value
+		mode = config.av.videomode[port].value
+		return axis[mode]
 
         def isPortAvailable(self, port):
                 # fixme

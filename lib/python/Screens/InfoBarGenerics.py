@@ -38,7 +38,7 @@ from Screens.UnhandledKey import UnhandledKey
 from ServiceReference import ServiceReference, isPlayableForCur
 
 from Tools.ASCIItranslit import legacyEncode
-from Tools.Directories import fileExists, getRecordingFilename, moveFiles
+from Tools.Directories import fileExists, getRecordingFilename, moveFiles, fileWriteLine
 from Tools.Notifications import AddPopup, AddNotificationWithCallback, current_notifications, lock, notificationAdded, notifications, RemovePopup
 from Tools.HardwareInfo import HardwareInfo
 
@@ -3159,13 +3159,21 @@ class InfoBarResolutionSelection:
 
 	def resolutionSelection(self):
 		try:
-			print("[InfoBarGenerics] Read /proc/stb/vmpeg/0/xres")
-			xresString = open("/proc/stb/vmpeg/0/xres", "r").read()
+			if HardwareInfo().get_device_model() in ("one", "two"):
+				print("[InfoBarGenerics] Read /sys/class/video/frame_width")
+				xresString = open("/sys/class/video/frame_width", "r").read()
+			else:
+				print("[InfoBarGenerics] Read /proc/stb/vmpeg/0/xres")
+				xresString = open("/proc/stb/vmpeg/0/xres", "r").read()
 		except:
 			print("[InfoBarGenerics] Error open /proc/stb/vmpeg/0/xres!")
 		try:
-			print("[InfoBarGenerics] Read /proc/stb/vmpeg/0/yres")
-			yresString = open("/proc/stb/vmpeg/0/yres", "r").read()
+			if HardwareInfo().get_device_model() in ("one", "two"):
+				print("[InfoBarGenerics] Read /proc/stb/vmpeg/0/yres")
+				yresString = open("/sys/class/video/frame_height", "r").read()
+			else:
+				print("[InfoBarGenerics] Read /proc/stb/vmpeg/0/yres")
+				yresString = open("/proc/stb/vmpeg/0/yres", "r").read()
 		except:
 			print("[InfoBarGenerics] Error open /proc/stb/vmpeg/0/yres!")
 		if brand == "azbox":
@@ -3173,8 +3181,12 @@ class InfoBarResolutionSelection:
 			fpsString = '50000'
 		else:
 			try:
-				print("[InfoBarGenerics] Read /proc/stb/vmpeg/0/framerate")
-				fpsString = open("/proc/stb/vmpeg/0/framerate", "r").read()
+				if HardwareInfo().get_device_model() in ("one", "two"):
+					print("[InfoBarGenerics] Read /proc/stb/vmpeg/0/frame_rate")
+					fpsString = open("/proc/stb/vmpeg/0/frame_rate", "r").read()
+				else:
+					print("[InfoBarGenerics] Read /proc/stb/vmpeg/0/framerate")
+					fpsString = open("/proc/stb/vmpeg/0/framerate", "r").read()
 			except:
 				print("[InfoBarGenerics] Error open /proc/stb/vmpeg/0/framerate!")
 				print("[InfoBarGenerics] Set fpsString to 50000 like azbox to avoid further problems!")
@@ -3210,8 +3222,12 @@ class InfoBarResolutionSelection:
 		keys = ["green", "yellow", "blue", "", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
 
 		if os.path.exists("/proc/stb/video/videomode"):
-			print("[InfoBarGenerics] Read /proc/stb/video/videomode")
-			mode = open("/proc/stb/video/videomode").read()[:-1]
+			if HardwareInfo().get_device_model() in ("one", "two"):
+				print("[InfoBarGenerics] Read /sys/class/display/mode")
+				mode = open("/sys/class/display/mode").read()[:-1]
+			else:
+				print("[InfoBarGenerics] Read /proc/stb/video/videomode")
+				mode = open("/proc/stb/video/videomode").read()[:-1]
 		print(mode)
 		for x in range(len(tlist)):
 			if tlist[x][1] == mode:
@@ -3225,8 +3241,16 @@ class InfoBarResolutionSelection:
 				if Resolution[1] == "exit" or Resolution[1] == "" or Resolution[1] == "auto":
 					self.ExGreen_toggleGreen()
 				if Resolution[1] != "auto":
-					print("[InfoBarGenerics] Write to /proc/stb/video/videomode")
-					open("/proc/stb/video/videomode", "w").write(Resolution[1])
+					if HardwareInfo().get_device_model() in ("one", "two"):
+						if fileWriteLine("/sys/class/display/mode", Resolution[1], source=MODULE_NAME):
+							print("[InfoBarGenerics] New video mode is %s." % Resolution[1])
+						else:
+							print("[InfoBarGenerics] Error: Unable to set new video mode of %s!" % Resolution[1])
+					else:
+						if fileWriteLine("/proc/stb/video/videomode", Resolution[1], source=MODULE_NAME):
+							print("[InfoBarGenerics] New video mode is %s." % Resolution[1])
+						else:
+							print("[InfoBarGenerics] Error: Unable to set new video mode of %s!" % Resolution[1])
 					#from enigma import gMainDC
 					#gMainDC.getInstance().setResolution(-1, -1)
 					self.ExGreen_doHide()

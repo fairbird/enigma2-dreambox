@@ -4,11 +4,13 @@ from struct import pack, unpack
 from time import localtime, time, timezone
 from Tools.HardwareInfo import HardwareInfo
 
-
 def getFPVersion():
 	ret = None
 	try:
-		ret = open("/proc/stb/fp/version", "r").read()
+		if HardwareInfo().get_device_model() in ('dm7080', 'dm820', 'dm520', 'dm525', 'dm900', 'dm920'):
+			ret = open("/proc/stb/fp/version", "r").read()
+		elif HardwareInfo().get_device_model() in ('one', 'two'):
+			ret = open("/proc/stb/fp/fp_version", "r").read()
 	except IOError:
 		try:
 			fp = open("/dev/dbox/fp0")
