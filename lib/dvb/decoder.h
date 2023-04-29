@@ -198,6 +198,8 @@ public:
 	int getVideoFrameRate();
 	int getVideoAspect();
 	int getVideoGamma();
+	static RESULT setHwPCMDelay(int delay);
+	static RESULT setHwAC3Delay(int delay);
 
 	enum
 	{
@@ -215,8 +217,6 @@ public:
 	RESULT fccSetPids(int fe_id, int vpid, int vtype, int pcrpid);
 	RESULT fccGetFD();
 	RESULT fccFreeFD();
-	static RESULT setHwPCMDelay(int delay);
-	static RESULT setHwAC3Delay(int delay);
 };
 
 #endif
