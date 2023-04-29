@@ -207,6 +207,12 @@ void eDVBAudio::flush()
 		else
 			eDebugNoNewLine("ok\n");
 	}
+#ifdef DREAMNEXTGEN
+	if (m_fd_demux >= 0)
+	{	
+		m_TsPaser->flush();
+	}
+#endif
 }
 
 void eDVBAudio::freeze()
@@ -222,7 +228,7 @@ void eDVBAudio::freeze()
 #ifdef DREAMNEXTGEN
 	if (m_fd_demux >= 0)
 	{	
-		m_TsPaser->flush();
+		m_TsPaser->freeze();
 	}
 #endif
 }
@@ -1550,11 +1556,12 @@ int eTSMPEGDecoder::getVideoWidth()
 int eTSMPEGDecoder::getVideoHeight()
 {
 #ifdef DREAMNEXTGEN
-	int m_progressive = -1;
-	CFile::parseInt(&m_progressive, "/proc/stb/vmpeg/0/progressive");
-	if (m_progressive == 2)
+	int m_height = -1;
+	CFile::parseInt(&m_height, "/sys/class/video/frame_height");
+	//eDebug("[eTSMPEGDecoder] m_height - %d", m_height);
+	if (!m_height)
 		return -1;
-	return m_progressive;
+	return m_height;
 #else
 	if (m_video)
 		return m_video->getHeight();
@@ -1580,12 +1587,9 @@ int eTSMPEGDecoder::getVideoProgressive()
 int eTSMPEGDecoder::getVideoFrameRate()
 {
 #ifdef DREAMNEXTGEN
-	int m_aspect = -1;
-	CFile::parseIntHex(&m_aspect, "/sys/class/video/frame_aspect_ratio"); //0x90 (16:9) 
-	//eDebug("[eTSMPEGDecoder] m_aspect - %d", m_aspect);
-	if (!m_aspect)
-		return -1;
-	return m_aspect == 1 ? 2 : 3;
+	int m_framerate = -1;
+	CFile::parseInt(&m_framerate, "/proc/stb/vmpeg/0/frame_rate");
+	return m_framerate;
 #else
 	if (m_video)
 		return m_video->getFrameRate();
@@ -1595,9 +1599,18 @@ int eTSMPEGDecoder::getVideoFrameRate()
 
 int eTSMPEGDecoder::getVideoAspect()
 {
+#ifdef DREAMNEXTGEN
+	int m_aspect = -1;
+	CFile::parseIntHex(&m_aspect, "/sys/class/video/frame_aspect_ratio"); //0x90 (16:9) 
+	//eDebug("[eTSMPEGDecoder] m_aspect - %d", m_aspect);
+	if (!m_aspect)
+		return -1;
+	return m_aspect == 1 ? 2 : 3;
+#else
 	if (m_video)
 		return m_video->getAspect();
 	return -1;
+#endif
 }
 
 int eTSMPEGDecoder::getVideoGamma()
@@ -1609,16 +1622,16 @@ int eTSMPEGDecoder::getVideoGamma()
 	return -1;
 }
 
-#define FCC_SET_VPID 100
-#define FCC_SET_APID 101
-#define FCC_SET_PCRPID 102
-#define FCC_SET_VCODEC 103
-#define FCC_SET_ACODEC 104
-#define FCC_SET_FRONTEND_ID 105
-#define FCC_START 106
-#define FCC_STOP 107
-#define FCC_DECODER_START 108
-#define FCC_DECODER_STOP 109
+#define FCC_SET_VPID 100 // NOSONAR
+#define FCC_SET_APID 101 // NOSONAR
+#define FCC_SET_PCRPID 102 // NOSONAR
+#define FCC_SET_VCODEC 103 // NOSONAR
+#define FCC_SET_ACODEC 104 // NOSONAR
+#define FCC_SET_FRONTEND_ID 105 // NOSONAR
+#define FCC_START 106 // NOSONAR
+#define FCC_STOP 107 // NOSONAR
+#define FCC_DECODER_START 108 // NOSONAR
+#define FCC_DECODER_STOP 109 // NOSONAR
 
 RESULT eTSMPEGDecoder::prepareFCC(int fe_id, int vpid, int vtype, int pcrpid)
 {
