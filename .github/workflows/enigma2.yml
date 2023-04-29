@@ -2,9 +2,9 @@ name: Enigma2 Python3
 
 on:
   push:
-    branches: [ develop ]
+    branches: [ dreamone/two ]
   pull_request:
-    branches: [ develop ]
+    branches: [ dreamone/two ]
 
 jobs:
   build:
