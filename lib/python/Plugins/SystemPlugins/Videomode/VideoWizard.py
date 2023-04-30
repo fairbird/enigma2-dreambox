@@ -12,6 +12,26 @@ from Tools.HardwareInfo import HardwareInfo
 
 config.misc.showtestcard = ConfigBoolean(default=False)
 
+def sortkey(name):
+	if name[0] == "2160p":
+		return 1
+	elif name[0] == "2160p30":
+		return 2
+	elif name[0] == "1080p":
+		return 3
+	elif name[0] == "720p":
+		return 4
+	elif name[0] == "1080i":
+		return 5
+	elif name[0] == "smpte":
+		return 20
+	elif name[0] == "multi":
+		return 1
+	elif name[0] == "auto":
+		return 2
+	else:
+		return 6
+
 
 class VideoWizardSummary(WizardSummary):
 	def __init__(self, session, parent):
@@ -155,12 +175,12 @@ class VideoWizard(WizardLanguage, Rc):
 			if mode[0] == querymode:
 				for rate in mode[1]:
 					if self.port == "DVI-PC":
-						print("[VideoWizard] rate:", rate)
+						#print("[VideoWizard] rate:", rate)
 						if rate == "640x480":
 							list.insert(0, (rate, rate))
 							continue
 					list.append((rate, rate))
-		return list
+		return sorted(list, key=sortkey)
 
 	def rateSelectionMade(self, index):
 		print("[VideoWizard] rateSelectionMade:", index)
