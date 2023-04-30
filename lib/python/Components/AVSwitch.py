@@ -76,6 +76,13 @@ class AVSwitch:
 			value = 1 # auto
 		eAVSwitch.getInstance().setWSS(value)
 
+	def getWindowsAxis(self):
+		port = config.av.videoport.value
+		mode = config.av.videomode[port].value
+		return axis[mode]
+
+iAVSwitch = AVSwitch()
+
 
 def InitAVSwitch():
 	config.av = ConfigSubsection()
@@ -157,8 +164,6 @@ def InitAVSwitch():
 	config.av.generalAC3delay = ConfigSelectionNumber(-1000, 1000, 5, default=0)
 	config.av.generalPCMdelay = ConfigSelectionNumber(-1000, 1000, 5, default=0)
 	config.av.vcrswitch = ConfigEnableDisable(default=False)
-
-	iAVSwitch = AVSwitch()
 
 	def setColorFormat(configElement):
 		map = {"cvbs": 0, "rgb": 1, "svideo": 2, "yuv": 3}
