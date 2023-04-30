@@ -139,7 +139,7 @@ const uint32_t DtsSampleRateTable[16] =
 typedef uint64_t pts_t;
 #endif
 
-class eTsParser: public eThread, public eDVBVideo
+class eTsParser: public eThread
 {
     pes_demux m_pes_demux;
 
