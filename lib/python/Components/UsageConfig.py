@@ -9,10 +9,10 @@ from Components.NimManager import nimmanager
 from Components.Renderer.FrontpanelLed import ledPatterns, PATTERN_ON, PATTERN_OFF, PATTERN_BLINK
 from Components.ServiceList import refreshServiceList
 from Components.SystemInfo import SystemInfo
+from Components.AVSwitch import iAVSwitch
 from os.path import exists, isfile, join as pathjoin, normpath
 import os, time, locale, skin
 from boxbranding import getDisplayType
-from Plugins.SystemPlugins.Videomode.VideoHardware import video_hw
 
 displaytype = getDisplayType()
 
