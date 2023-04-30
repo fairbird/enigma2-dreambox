@@ -1,5 +1,6 @@
 from Screens.Screen import Screen
 from Components.ActionMap import ActionMap
+from Components.AVSwitch import iAVSwitch
 from Components.config import config, configfile
 from Components.ConfigList import ConfigListScreen
 from Components.SystemInfo import SystemInfo
