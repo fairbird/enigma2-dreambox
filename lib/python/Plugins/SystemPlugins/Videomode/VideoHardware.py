@@ -1,4 +1,4 @@
-from Components.config import config, ConfigSelection, ConfigSubDict, ConfigYesNo
+from Components.config import config, ConfigSelection, ConfigSubDict, ConfigYesNo, ConfigSelectionNumber
 from Components.SystemInfo import SystemInfo
 from Tools.CList import CList
 from Tools.HardwareInfo import HardwareInfo
