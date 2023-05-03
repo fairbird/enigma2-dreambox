@@ -1,4 +1,5 @@
-from Components.config import config, ConfigSelection, ConfigSubDict, ConfigYesNo
+#from Components.config import config, ConfigSelection, ConfigSubDict, ConfigYesNo
+from Components.config import config, ConfigSlider, ConfigSelection, ConfigSubDict, ConfigYesNo, ConfigEnableDisable, ConfigOnOff, ConfigSubsection, ConfigBoolean, ConfigSelectionNumber, ConfigNothing, NoSave  # storm - some config are required
 from Components.SystemInfo import SystemInfo
 from Tools.CList import CList
 from Tools.HardwareInfo import HardwareInfo
@@ -303,7 +304,7 @@ class VideoHardware:
                         if force == 50:
                                 mode_24 = mode_50
 
-                if HardwareInfo().get_device_name() in ("one", "two"):
+                if HardwareInfo().get_device_name() in ("one", "two"): # storm - this part should be here
                         amlmode = list(modes.values())[0]
                         oldamlmode = self.getAMLMode()
                         f = open("/sys/class/display/mode", "w")

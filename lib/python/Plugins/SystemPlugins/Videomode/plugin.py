@@ -2,7 +2,7 @@ from Screens.Screen import Screen
 from Plugins.Plugin import PluginDescriptor
 from Components.SystemInfo import SystemInfo
 from Components.ConfigList import ConfigListScreen
-from Components.config import config, ConfigBoolean, ConfigNothing
+from Components.config import config, ConfigBoolean, ConfigNothing, getConfigListEntry # storm -getConfigListEntry is required
 from Components.Label import Label
 from Components.Sources.StaticText import StaticText
 
@@ -164,7 +164,7 @@ class VideoSetup(ConfigListScreen, Screen):
 			self.list.append((_("OSD transparency"), config.av.osd_alpha, _("Configure the transparency of the OSD.")))
 			self.list.append((_("Teletext base visibility"), config.osd.alpha_teletext, _("Base transparency for teletext, more options available within teletext screen.")))
 		if SystemInfo["CanChangeOsdPlaneAlpha"]:
-			self.list.append(getConfigListEntry(_("OSD plane transparency"), config.av.osd_planealpha, _("Configure the transparency of the OSD.")))
+			self.list.append((_("OSD plane transparency"), config.av.osd_planealpha, _("Configure the transparency of the OSD.")))
 
 		if not isinstance(config.av.scaler_sharpness, ConfigNothing):
 			self.list.append((_("Scaler sharpness"), config.av.scaler_sharpness, _("Configure the sharpness of the video scaling.")))
