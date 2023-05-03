@@ -1,6 +1,6 @@
 from Screens.Screen import Screen
 from Components.ActionMap import ActionMap
-from Components.config import config, configfile, ConfigSelectionNumber
+from Components.config import config, configfile, ConfigSelectionNumber, getConfigListEntry # storm -getConfigListEntry is required
 from Components.ConfigList import ConfigListScreen
 from Components.SystemInfo import SystemInfo
 from Components.Sources.StaticText import StaticText
@@ -10,6 +10,7 @@ from Tools.Directories import fileExists
 from enigma import getDesktop
 from os import access, R_OK
 from Tools.HardwareInfo import HardwareInfo
+from Plugins.SystemPlugins.Videomode.VideoHardware import VideoHardware # storm - needed
 
 def getFilePath(setting):
 	if HardwareInfo().get_device_model() not in ('dreamone', 'dreamtwo'):
@@ -94,7 +95,7 @@ def InitOsd():
 			print('[UserInterfacePositioner] Setting OSD plane alpha:%s' % str(configElement.value))
 			config.av.osd_alpha.setValue(configElement.value)
 			with open("/sys/class/graphics/fb0/osd_plane_alpha", "w") as fd:
-				fd.write(hex(configElement.value))
+				fd.write(hex(int(configElement.value))) # @storm -here int() is required, because of the integer
 	config.osd.alpha.addNotifier(setOSDPlaneAlpha)
 
 	def set3DMode(configElement):

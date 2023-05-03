@@ -1,4 +1,5 @@
-from Components.config import config, ConfigSelection, ConfigSubDict, ConfigYesNo
+#from Components.config import config, ConfigSelection, ConfigSubDict, ConfigYesNo
+from Components.config import config, ConfigSlider, ConfigSelection, ConfigSubDict, ConfigYesNo, ConfigEnableDisable, ConfigOnOff, ConfigSubsection, ConfigBoolean, ConfigSelectionNumber, ConfigNothing, NoSave  # storm - some config are required
 from Components.SystemInfo import SystemInfo
 from Tools.CList import CList
 from Tools.HardwareInfo import HardwareInfo
@@ -302,6 +303,50 @@ class VideoHardware:
                         mode_24 = mode_60
                         if force == 50:
                                 mode_24 = mode_50
+
+                if HardwareInfo().get_device_name() in ("one", "two"): # storm - this part should be here
+                        amlmode = list(modes.values())[0]
+                        oldamlmode = self.getAMLMode()
+                        f = open("/sys/class/display/mode", "w")
+                        f.write(amlmode)
+                        f.close()
+                        print("[AVSwitch] Amlogic setting videomode to mode: %s" % amlmode)
+                        f = open("/etc/u-boot.scr.d/000_hdmimode.scr", "w")
+                        f.write("setenv hdmimode %s" % amlmode)
+                        f.close()
+                        f = open("/etc/u-boot.scr.d/000_outputmode.scr", "w")
+                        f.write("setenv outputmode %s" % amlmode)
+                        f.close()
+                        os.system("update-autoexec")
+                        f = open("/sys/class/ppmgr/ppscaler", "w")
+                        f.write("1")
+                        f.close()
+                        f = open("/sys/class/ppmgr/ppscaler", "w")
+                        f.write("0")
+                        f.close()
+                        f = open("/sys/class/video/axis", "w")
+                        f.write(axis[mode])
+                        f.close()
+                        f = open("/sys/class/graphics/fb0/stride", "r")
+                        stride = f.read().strip()
+                        f.close()
+                        limits = [int(x) for x in axis[mode].split()]
+                        config.osd.dst_left = ConfigSelectionNumber(default=limits[0], stepwidth=1, min=limits[0] - 255, max=limits[0] + 255, wraparound=False)
+                        config.osd.dst_top = ConfigSelectionNumber(default=limits[1], stepwidth=1, min=limits[1] - 255, max=limits[1] + 255, wraparound=False)
+                        config.osd.dst_width = ConfigSelectionNumber(default=limits[2], stepwidth=1, min=limits[2] - 255, max=limits[2] + 255, wraparound=False)
+                        config.osd.dst_height = ConfigSelectionNumber(default=limits[3], stepwidth=1, min=limits[3] - 255, max=limits[3] + 255, wraparound=False)
+
+                        if oldamlmode != amlmode:
+                                config.osd.dst_width.setValue(limits[0])
+                                config.osd.dst_height.setValue(limits[1])
+                                config.osd.dst_left.setValue(limits[2])
+                                config.osd.dst_top.setValue(limits[3])
+                                config.osd.dst_left.save()
+                                config.osd.dst_width.save()
+                                config.osd.dst_top.save()
+                                config.osd.dst_height.save()
+                        print("[AVSwitch] Framebuffer mode:%s  stride:%s axis:%s" % (getDesktop(0).size().width(), stride, axis[mode]))
+                        return
 
                 try:
                         print("[Videomode] Write to /proc/stb/video/videomode_50hz")
