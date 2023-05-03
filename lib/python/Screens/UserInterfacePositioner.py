@@ -1,6 +1,6 @@
 from Screens.Screen import Screen
 from Components.ActionMap import ActionMap
-from Components.config import config, configfile, ConfigSelectionNumber, getConfigListEntry # storm -getConfigListEntry is required
+from Components.config import config, configfile, ConfigSelectionNumber
 from Components.ConfigList import ConfigListScreen
 from Components.SystemInfo import SystemInfo
 from Components.Sources.StaticText import StaticText
@@ -311,10 +311,10 @@ class UserInterfacePositioner2(Screen, ConfigListScreen):
 			self.list.append((_("Move Up/Down"), config.osd.dst_top, _("Use the Left/Right buttons on your remote to move the user interface up/down")))
 			self.list.append((_("Height"), config.osd.dst_height, _("Use the Left/Right buttons on your remote to adjust the size of the user interface. Left button decreases the size, Right increases the size.")))
 		if SystemInfo["CanChangeOsdPositionAML"]:
-			self.list.append(getConfigListEntry(_("Left"), config.osd.dst_left, _("Use the Left/Right buttons on your remote to move the user interface left")))
-			self.list.append(getConfigListEntry(_("Right"), config.osd.dst_width, _("Use the Left/Right buttons on your remote to move the user interface right")))
-			self.list.append(getConfigListEntry(_("Top"), config.osd.dst_top, _("Use the Left/Right buttons on your remote to move the user interface top")))
-			self.list.append(getConfigListEntry(_("Bottom"), config.osd.dst_height, _("Use the Left/Right buttons on your remote to move the user interface bottom")))
+			self.list.append((_("Left"), config.osd.dst_left, _("Use the Left/Right buttons on your remote to move the user interface left")))
+			self.list.append((_("Right"), config.osd.dst_width, _("Use the Left/Right buttons on your remote to move the user interface right")))
+			self.list.append((_("Top"), config.osd.dst_top, _("Use the Left/Right buttons on your remote to move the user interface top")))
+			self.list.append((_("Bottom"), config.osd.dst_height, _("Use the Left/Right buttons on your remote to move the user interface bottom")))
 		self["config"].list = self.list
 		self["config"].l.setList(self.list)
 
