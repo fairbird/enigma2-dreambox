@@ -2,7 +2,6 @@ from Screens.Screen import Screen
 from Plugins.Plugin import PluginDescriptor
 from Components.SystemInfo import SystemInfo
 from Components.ConfigList import ConfigListScreen
-from Components.config import config, ConfigBoolean, ConfigNothing, getConfigListEntry # storm -getConfigListEntry is required
 from Components.Label import Label
 from Components.Sources.StaticText import StaticText
 
