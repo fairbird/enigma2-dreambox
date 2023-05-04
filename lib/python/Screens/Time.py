@@ -216,17 +216,18 @@ class TimeWizard(ConfigListScreen, Screen, Rc):
 		self.list = []
 		self.list.append((_("Time zone area"), config.timezone.area))
 		self.list.append((_("Time zone"), config.timezone.val))
+		self.list.append((_("Time synchronization method"), config.misc.SyncTimeUsing))
+		self.list.append((_("pool.ntp.org"), config.misc.NTPserver))
+		self.list.append((_("Sync NTP every (minutes)"), config.misc.useNTPminutes))
 		if config.usage.date.enabled.value:
 			self.list.append((_("Date style"), config.usage.date.dayfull))
 			config.usage.date.dayfull.save()
 		if config.usage.time.enabled.value:
 			self.list.append((_("Time style"), config.usage.time.long))
 			config.usage.time.long.save()
-		self.list.append((_("Time synchronization method"), config.misc.SyncTimeUsing))
+		config.misc.NTPserver.save()
+		config.misc.useNTPminutes.save()
 		config.misc.SyncTimeUsing.save()
-		if config.misc.SyncTimeUsing != "0":			
-			self.list.append((_("pool.ntp.org"), config.misc.NTPserver))
-			config.misc.NTPserver.save()
 		config.timezone.val.save()
 		config.timezone.area.save()
 		self["config"].list = self.list
