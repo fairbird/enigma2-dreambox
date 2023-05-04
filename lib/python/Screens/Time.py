@@ -89,6 +89,8 @@ class TimeWizard(ConfigListScreen, Screen, Rc):
 		<screen name="TimeWizard" position="center,60" size="1280,720" resolution="1280,720">
 			<widget name="text" position="30,10" size="1000,47" font="Regular;20" transparent="1" valign="center" />
 			<widget name="config" position="212,95" size="944,430" enableWrapAround="1" entryFont="Regular;25" valueFont="Regular;25" itemHeight="35" scrollbarMode="showOnDemand" />
+			<eLabel position="234,710" zPosition="2" size="234,2" foregroundColor="#00ff2525" backgroundColor="#00ff2525"/>
+			<eLabel position="519,710" zPosition="2" size="234,2" foregroundColor="#00bab329" backgroundColor="#00bab329"/>
 			<widget source="key_red" render="Label" objectTypes="key_red,StaticText" position="234,670" size="180,40" backgroundColor="key_red" conditional="key_red" font="Regular;20" foregroundColor="key_text" halign="center" valign="center">
 				<convert type="ConditionalShowHide" />
 			</widget>
@@ -139,6 +141,8 @@ class TimeWizard(ConfigListScreen, Screen, Rc):
 			<widget source="key_red" render="Label" objectTypes="key_red,StaticText" position="113,935" size="250,45" backgroundColor="key_red" conditional="key_red" font="Regular;30" foregroundColor="key_text" halign="center" valign="center">
 				<convert type="ConditionalShowHide" />
 			</widget>
+			<eLabel position="113,977" zPosition="2" size="250,4" foregroundColor="#00ff2525" backgroundColor="#00ff2525"/>
+			<eLabel position="385,977" zPosition="2" size="250,4" foregroundColor="#00bab329" backgroundColor="#00bab329"/>
 			<widget source="key_yellow" render="Label" objectTypes="key_yellow,StaticText" position="385,937" size="250,45" backgroundColor="key_yellow" conditional="key_yellow" font="Regular;35" foregroundColor="key_text" halign="center" valign="center">
 				<convert type="ConditionalShowHide" />
 			</widget>
