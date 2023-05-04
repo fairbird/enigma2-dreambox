@@ -616,6 +616,10 @@ import keymapparser
 keymapparser.readKeymap(config.usage.keymap.value)
 keymapparser.readKeymap(config.usage.keytrans.value)
 
+profile("Init:NTPSync")
+from Components.NetworkTime import ntpSyncPoller
+ntpSyncPoller.startTimer()
+
 profile("Network")
 import Components.Network
 Components.Network.waitForNetwork()
