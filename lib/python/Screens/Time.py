@@ -25,15 +25,18 @@ def isHD():
 class Time(Setup):
 	def __init__(self, session):
 		Setup.__init__(self, session=session, setup="Time")
-		self.addSaveNotifier(self.updateNetworkTime)
 		self["key_yellow"] = StaticText("")
-		self["geolocationActions"] = HelpableActionMap(self, "ColorActions", {
-			"yellow": (self.useGeolocation, _("Use geolocation to set the current time zone location"))
+		self["geolocationActions"] = HelpableActionMap(self, ["ColorActions"], {
+			"yellow": (self.useGeolocation, _("Use geolocation to set the current time zone location")),
+			"green": (self.keySave, _("Save and update Network Time")),
 		}, prio=0, description=_("Time Setup Actions"))
+		self.NTPserver = config.misc.NTPserver.value
+		self.SyncTimeUsing = config.misc.SyncTimeUsing.value
+		self.useNTPminutes = config.misc.useNTPminutes.value
 		self.selectionChanged()
 
 	def updateNetworkTime(self):
-		if config.misc.SyncTimeUsing.isChanged() or config.misc.NTPserver.isChanged() or config.misc.useNTPminutes.isChanged():
+		if not self.NTPserver == config.misc.NTPserver.value or not self.SyncTimeUsing == config.misc.SyncTimeUsing.value or not self.useNTPminutes == config.misc.useNTPminutes.value:
 			ntpSyncPoller.timeCheck()
 
 	def selectionChanged(self):
@@ -74,6 +77,10 @@ class Time(Setup):
 
 	def yellow(self):  # Invoked from the Wizard.
 		self.useGeolocation()
+
+	def keySave(self):
+		Setup.keySave(self)
+		self.updateNetworkTime()
 
 
 class TimeWizard(ConfigListScreen, Screen, Rc):
