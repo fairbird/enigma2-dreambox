@@ -1443,23 +1443,7 @@ def InitUsageConfig():
 	config.logmanager.additionalinfo = NoSave(ConfigText(default=""))
 	config.logmanager.sentfiles = ConfigLocations(default='')
 
-	config.ntp = ConfigSubsection()
-
-	def timesyncChanged(configElement):
-		if configElement.value == "dvb" or not GetIPsFromNetworkInterfaces():
-			eDVBLocalTimeHandler.getInstance().setUseDVBTime(True)
-			eEPGCache.getInstance().timeUpdated()
-		else:
-			eDVBLocalTimeHandler.getInstance().setUseDVBTime(False)
-			eEPGCache.getInstance().timeUpdated()
-	config.ntp.timesync = ConfigSelection(default="ntp", choices=[
-		("auto", _("Auto")),
-		("dvb", _("Transponder time")),
-		("ntp", _("Internet time"))
-	])
-	config.ntp.timesync.addNotifier(timesyncChanged)
-	config.ntp.sntpserver = ConfigText("pool.ntp.org", fixed_size=False)
-	config.ntp.rdateserver = ConfigText("time.nist.gov", fixed_size=False)
+	config.misc.useNTPminutes = ConfigSelection(default="30", choices=[("30", _("%d Minutes") % 30), ("60", _("%d Hour") % 1), ("1440", _("%d Hours") % 24)])
 
 def updateChoices(sel, choices):
 	if choices:

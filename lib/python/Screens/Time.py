@@ -1,18 +1,16 @@
-# -*- coding: utf-8 -*-
 from Components.ActionMap import ActionMap, HelpableActionMap
-from os.path import islink
-from Components.Console import Console
 from Components.config import config
 from Components.ConfigList import ConfigListScreen
+from Components.NetworkTime import ntpSyncPoller
+from Components.Sources.StaticText import StaticText
+from Screens.Setup import Setup
+from Tools.Geolocation import geolocation
 from Components.Label import Label
 from Components.Pixmap import Pixmap
 from Screens.MessageBox import MessageBox
-from Components.Sources.StaticText import StaticText
-from Screens.Setup import Setup
 from Screens.Screen import Screen
 from Screens.HelpMenu import Rc
 from Tools.Directories import fileContains
-from Tools.Geolocation import geolocation
 from enigma import getDesktop
 
 def getDesktopSize():
@@ -27,24 +25,16 @@ def isHD():
 class Time(Setup):
 	def __init__(self, session):
 		Setup.__init__(self, session=session, setup="Time")
+		self.addSaveNotifier(self.updateNetworkTime)
 		self["key_yellow"] = StaticText("")
-		self["geolocationActions"] = HelpableActionMap(self, ["ColorActions"], {
-			"yellow": (self.useGeolocation, _("Use geolocation to set the current time zone location")),
-			"green": self.keySave
+		self["geolocationActions"] = HelpableActionMap(self, "ColorActions", {
+			"yellow": (self.useGeolocation, _("Use geolocation to set the current time zone location"))
 		}, prio=0, description=_("Time Setup Actions"))
 		self.selectionChanged()
 
-	def checkTimeSyncRootFile(self):
-		if config.ntp.timesync.value != "dvb":
-			if not islink("/etc/network/if-up.d/timesync") and not fileContains("/var/spool/cron/root", "timesync"):
-				Console().ePopen("ln -s /usr/bin/timesync /etc/network/if-up.d/timesync;echo '30 * * * * /usr/bin/timesync silent' >>/var/spool/cron/root")
-		else:
-			if islink("/etc/network/if-up.d/timesync") and fileContains("/var/spool/cron/root", "timesync"):
-				Console().ePopen("sed -i '/timesync/d' /var/spool/cron/root;unlink /etc/network/if-up.d/timesync")
-
-	def keySave(self):
-		Setup.keySave(self)
-		self.checkTimeSyncRootFile()
+	def updateNetworkTime(self):
+		if config.misc.SyncTimeUsing.isChanged() or config.misc.NTPserver.isChanged() or config.misc.useNTPminutes.isChanged():
+			ntpSyncPoller.timeCheck()
 
 	def selectionChanged(self):
 		if Setup.getCurrentItem(self) in (config.timezone.area, config.timezone.val):
@@ -81,6 +71,9 @@ class Time(Setup):
 				valItem[1].changed()
 			self["config"].invalidate(valItem)
 			self.session.open(MessageBox, 'Geolocation has been used to set the time zone.', MessageBox.TYPE_INFO, timeout=3)
+
+	def yellow(self):  # Invoked from the Wizard.
+		self.useGeolocation()
 
 
 class TimeWizard(ConfigListScreen, Screen, Rc):
@@ -138,11 +131,11 @@ class TimeWizard(ConfigListScreen, Screen, Rc):
 		<screen name="TimeWizard" position="center,center" size="1746,994" resolution="1920,1080" flags="wfNoBorder">
 			<widget name="text" position="10,10" size="1619,40" font="Regular;35" transparent="1" valign="center" />
 			<widget name="config" position="253,221" size="1446,512" font="Regular;30" itemHeight="40" />
+			<eLabel position="113,977" zPosition="2" size="250,4" foregroundColor="#00ff2525" backgroundColor="#00ff2525"/>
+			<eLabel position="385,977" zPosition="2" size="250,4" foregroundColor="#00bab329" backgroundColor="#00bab329"/>
 			<widget source="key_red" render="Label" objectTypes="key_red,StaticText" position="113,935" size="250,45" backgroundColor="key_red" conditional="key_red" font="Regular;30" foregroundColor="key_text" halign="center" valign="center">
 				<convert type="ConditionalShowHide" />
 			</widget>
-			<eLabel position="113,977" zPosition="2" size="250,4" foregroundColor="#00ff2525" backgroundColor="#00ff2525"/>
-			<eLabel position="385,977" zPosition="2" size="250,4" foregroundColor="#00bab329" backgroundColor="#00bab329"/>
 			<widget source="key_yellow" render="Label" objectTypes="key_yellow,StaticText" position="385,937" size="250,45" backgroundColor="key_yellow" conditional="key_yellow" font="Regular;35" foregroundColor="key_text" halign="center" valign="center">
 				<convert type="ConditionalShowHide" />
 			</widget>
@@ -229,13 +222,11 @@ class TimeWizard(ConfigListScreen, Screen, Rc):
 		if config.usage.time.enabled.value:
 			self.list.append((_("Time style"), config.usage.time.long))
 			config.usage.time.long.save()
-		self.list.append((_("Time synchronization method"), config.ntp.timesync))
-		config.ntp.timesync.save()
-		if config.ntp.timesync.value != "dvb":			
-			self.list.append((_("RFC 5905 hostname (SNTP - Simple Network Time Protocol)"), config.ntp.sntpserver))
-			config.ntp.sntpserver.save()
-			self.list.append((_("RFC 868 hostname (rdate - Remote Date)"), config.ntp.rdateserver))
-			config.ntp.rdateserver.save()
+		self.list.append((_("Time synchronization method"), config.misc.SyncTimeUsing))
+		config.misc.SyncTimeUsing.save()
+		if config.misc.SyncTimeUsing != "0":			
+			self.list.append((_("pool.ntp.org"), config.misc.NTPserver))
+			config.misc.NTPserver.save()
 		config.timezone.val.save()
 		config.timezone.area.save()
 		self["config"].list = self.list
@@ -269,17 +260,8 @@ class TimeWizard(ConfigListScreen, Screen, Rc):
 			self.updateTimeList()
 			self["text"].setText(_("Your local time has been set successfully. Settings has been saved.\n\nPress \"OK\" to continue wizard."))
 
-	def checkTimeSyncRootFile(self):
-		if config.ntp.timesync.value != "dvb":
-			if not islink("/etc/network/if-up.d/timesync") and not fileContains("/var/spool/cron/root", "timesync"):
-				Console().ePopen("ln -s /usr/bin/timesync /etc/network/if-up.d/timesync;echo '30 * * * * /usr/bin/timesync silent' >>/var/spool/cron/root")
-		else:
-			if islink("/etc/network/if-up.d/timesync") and fileContains("/var/spool/cron/root", "timesync"):
-				Console().ePopen("sed -i '/timesync/d' /var/spool/cron/root;unlink /etc/network/if-up.d/timesync")
-
 	def red(self):
 		self.close()
 
 	def yellow(self):
 		self.useGeolocation()
-		self.checkTimeSyncRootFile()

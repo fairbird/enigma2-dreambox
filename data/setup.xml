@@ -205,12 +205,12 @@
 	</setup>
 	<setup key="Time" title="Time Setup">
 		<item level="0" text="Time zone area" description="Select your time zone area or region.">config.timezone.area</item>
-		<item level="0" text="Time zone" description="Select the time zone within the area or region.">config.timezone.val</item>
+		<item level="0" text="Time zone" description="Select the time zone within the area or region.">config.timezone.val</item>		
+		<item level="0" text="Sync time using" description="Synchronize system time using transponder or Internet.">config.misc.SyncTimeUsing</item>
+		<item level="0" text="NTP server" conditional="config.misc.SyncTimeUsing.value == '1'" description="Configure your NTP server.">config.misc.NTPserver</item>
+		<item level="0" text="Sync NTP every (minutes)" conditional="config.misc.SyncTimeUsing.value == '1'" description="Setup network time synchronization interval.">config.misc.useNTPminutes</item>
 		<item level="0" text="Date style" description="Choose the display formatting style for dates. 'D' / 'DD' is the date and 'M' / 'MM' is the month in digits.  ('DD' and 'MM' have leading zeros for single digit values.) The screen display will be based on your choice but can be influenced by the skin." requires="config.usage.date.enabled">config.usage.date.dayfull</item>
-		<item level="0" text="Time style" description="Choose the display formatting style for times. 'H' / 'HH' is the hour for a 24 hour clock, 'h' / 'hh' is the hour for a 12 hour clock, 'mm' is the minutes and 'ss' is the seconds.  ('HH' and 'hh' have leading zeros for single digit values.) The screen display will be based on your choice but can be influenced by the skin." requires="config.usage.time.enabled">config.usage.time.long</item>		
-		<item level="1" text="Time synchronization method" description="Select how you want your receiver to keep the correct time, either from the DVB transponder, or from the internet. Or use Auto, which will favour using internet, but will fall back to transponder time when no internet connection is available.">config.ntp.timesync</item>
-		<item level="1" text="RFC 5905 hostname (SNTP - Simple Network Time Protocol)" conditional="config.ntp.timesync.value != 'dvb'" description="The hostname or the IP address of the RFC 5905 server to synchronise the time with.">config.ntp.sntpserver</item>
-		<item level="1" text="RFC 868 hostname (rdate - Remote Date)" conditional="config.ntp.timesync.value != 'dvb'" description="The hostname or the IP address of the RFC 868 server to synchronise the time with.">config.ntp.rdateserver</item>
+		<item level="0" text="Time style" description="Choose the display formatting style for times. 'H' / 'HH' is the hour for a 24 hour clock, 'h' / 'hh' is the hour for a 12 hour clock, 'mm' is the minutes and 'ss' is the seconds.  ('HH' and 'hh' have leading zeros for single digit values.) The screen display will be based on your choice but can be influenced by the skin." requires="config.usage.time.enabled">config.usage.time.long</item>
 	</setup>
 	<setup key="DNS" title="DNS Settings">
 		<item level="0" text="DNS data source" description="Select the source of the default DNS settings.">config.usage.dns</item>
