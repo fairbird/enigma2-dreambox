@@ -1051,6 +1051,8 @@ def InitUsageConfig():
 	])
 	config.crash.gstdot = ConfigYesNo(default=False)
 
+	config.crash.coredump = ConfigYesNo(default=False)
+
 	def updateDebugPath(configElement):
 		debugPath = config.crash.debugPath.value
 		try:

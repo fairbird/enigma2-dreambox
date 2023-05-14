@@ -138,6 +138,10 @@ void bsodFatal(const char *component)
 	if (bsodhandled) {
 		if (component) {
 			sleep(1);
+			/*
+			*  We need to use a signal that generate core dump.
+			*/
+			if (eConfigManager::getConfigBoolValue("config.crash.coredump", false)) raise(SIGTRAP);
 			raise(SIGKILL);
 		}
 		return;
