@@ -1,4 +1,3 @@
-#from Components.config import config, ConfigSelection, ConfigSubDict, ConfigYesNo
 from Components.config import config, ConfigSlider, ConfigSelection, ConfigSubDict, ConfigYesNo, ConfigEnableDisable, ConfigOnOff, ConfigSubsection, ConfigBoolean, ConfigSelectionNumber, ConfigNothing, NoSave  # storm - some config are required
 from Components.SystemInfo import SystemInfo
 from Tools.CList import CList
@@ -77,10 +76,17 @@ class VideoHardware:
                 "60Hz": {60: "2160p60"},
                 "multi": {50: "2160p50", 60: "2160p60"},
                 "auto": {50: "2160p50", 60: "2160p60", 24: "2160p24"}}
+
         if HardwareInfo().get_device_name() in ("dm900", "dm920"):
-                rates["2160p"] = {"50Hz": {50: "2160p50"}, "60Hz": {60: "2160p60"}, "multi": {50: "2160p50", 60: "2160p60"}, "auto": {50: "2160p50", 60: "2160p60", 24: "2160p24"}}
+                rates["2160p"] = {"50Hz": {50: "2160p50"},
+                	"60Hz": {60: "2160p60"},
+                	"multi": {50: "2160p50", 60: "2160p60"}, 
+                	"auto": {50: "2160p50", 60: "2160p60", 24: "2160p24"}}
         else:
-                rates["2160p"] = {"50Hz": {50: "2160p50"}, "60Hz": {60: "2160p"}, "multi": {50: "2160p50", 60: "2160p"}, "auto": {50: "2160p50", 60: "2160p", 24: "2160p24"}}
+                rates["2160p"] = {"50Hz": {50:
+                	"2160p50"}, "60Hz": {60:
+                	"2160p"}, "multi": {50: "2160p50", 60: "2160p"},
+                	"auto": {50: "2160p50", 60: "2160p", 24: "2160p24"}}
 
         rates["smpte"] = {"50Hz": {50: "smpte50hz"},
                 "60Hz": {60: "smpte60hz"},
@@ -107,30 +113,38 @@ class VideoHardware:
 
         if HardwareInfo().get_device_name() in ("one", "two"):
                 rates["480i"] = {"60hz": {60: "480i60hz"}}
+
                 rates["576i"] = {"50hz": {50: "576i50hz"}}
+
                 rates["480p"] = {"60hz": {60: "480p60hz"}}
+
                 rates["576p"] = {"50hz": {50: "576p50hz"}}
+
                 rates["720p"] = {"50hz": {50: "720p50hz"},
-                                                                "60hz": {60: "720p60hz"},
-                                                                "auto": {60: "720p60hz"}}
+			"60hz": {60: "720p60hz"},
+			"auto": {60: "720p60hz"}}
+
                 rates["1080i"] = {"50hz": {50: "1080i50hz"},
-                                                                "60hz": {60: "1080i60hz"},
-                                                                "auto": {60: "1080i60hz"}}
+			"60hz": {60: "1080i60hz"},
+			"auto": {60: "1080i60hz"}}
+
                 rates["1080p"] = {"50hz": {50: "1080p50hz"},
-                                                                "60hz": {60: "1080p60hz"},
-                                                                "30hz": {30: "1080p30hz"},
-                                                                "25hz": {25: "1080p25hz"},
-                                                                "24hz": {24: "1080p24hz"},
-                                                                "auto": {60: "1080p60hz"}}
+			"60hz": {60: "1080p60hz"},
+			"30hz": {30: "1080p30hz"},
+			"25hz": {25: "1080p25hz"},
+			"24hz": {24: "1080p24hz"},
+			"auto": {60: "1080p60hz"}}
+
                 rates["2160p"] = {"50hz": {50: "2160p50hz"},
-                                                                "60hz": {60: "2160p60hz"},
-                                                                "30hz": {30: "2160p30hz"},
-                                                                "25hz": {25: "2160p25hz"},
-                                                                "24hz": {24: "2160p24hz"},
-                                                                "auto": {60: "2160p60hz"}}
+			"60hz": {60: "2160p60hz"},
+			"30hz": {30: "2160p30hz"},
+			"25hz": {25: "2160p25hz"},
+			"24hz": {24: "2160p24hz"},
+			"auto": {60: "2160p60hz"}}
+
                 rates["2160p30"] = {"25hz": {50: "2160p25hz"},
-                                                                "30hz": {60: "2160p30hz"},
-                                                                "auto": {60: "2160p30hz"}}
+			"30hz": {60: "2160p30hz"},
+			"auto": {60: "2160p30hz"}}
 
         if SystemInfo["HasScart"]:
                 modes["Scart"] = ["PAL", "NTSC", "Multi"]
@@ -145,8 +159,6 @@ class VideoHardware:
                 widescreen_modes = {"720p", "1080p", "1080i", "2160p", "smpte"}
         else:
                 modes["DVI"] = ["720p", "1080p", "2160p", "2160p30", "1080i", "576p", "480p", "576i", "480i"]
-
-        modes["DVI-PC"] = ["PC"]
 
         def getOutputAspect(self):
                 ret = (16, 9)
