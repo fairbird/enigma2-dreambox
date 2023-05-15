@@ -492,7 +492,7 @@ def runScreenTest():
 
 	screensToRun.append((100, InfoBar.InfoBar))
 
-#	screensToRun.sort(key=lambda x: x[0])
+	screensToRun.sort(key=lambda x: x[0])
 
 	enigma.ePythonConfigQuery.setQueryFunc(configfile.getResolvedKey)
 
