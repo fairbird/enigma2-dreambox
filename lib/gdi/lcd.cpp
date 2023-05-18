@@ -12,6 +12,15 @@
 #include <lib/base/estring.h>
 #endif
 #include <lib/gdi/glcddc.h>
+
+const char *OLED_PROC_1 = "/proc/stb/lcd/oled_brightness"; //  NOSONAR
+const char *OLED_PROC_2 = "/proc/stb/fp/oled_brightness";  //  NOSONAR
+
+const char *VFD_scroll_delay_proc = "/proc/stb/lcd/scroll_delay"; //  NOSONAR
+const char *VFD_initial_scroll_delay_proc = "/proc/stb/lcd/initial_scroll_delay"; //  NOSONAR
+const char *VFD_final_scroll_delay_proc = "/proc/stb/lcd/final_scroll_delay"; //  NOSONAR
+const char *VFD_scroll_repeats_proc = "/proc/stb/lcd/scroll_repeats"; //  NOSONAR
+
 #ifdef DM9X0_LCD
 #define LCD_DM9X0_Y_OFFSET 4
 #endif
