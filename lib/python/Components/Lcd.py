@@ -593,7 +593,7 @@ def InitLcd():
 			config.usage.vfd_scroll_repeats.addNotifier(scroll_repeats, immediate_feedback=False)
 		else:
 			config.usage.vfd_scroll_repeats = ConfigNothing()
-		VFD_scroll_delay = SystemInfo["VFD_scroll_delay"
+		VFD_scroll_delay = SystemInfo["VFD_scroll_delay"]
 		if VFD_scroll_delay:
 			def scroll_delay(configElement):
 				eDBoxLCD.getInstance().set_VFD_scroll_delay(int(configElement.value))
