@@ -49,9 +49,5 @@ SUBDIRS += grautec8000
 endif
 
 if HAVE_TEXTLCD
-if HAVE_7SEGMENT
-SUBDIRS += 7segment
-else
 SUBDIRS += displaytext
-endif
 endif
