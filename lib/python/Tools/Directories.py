@@ -1,21 +1,20 @@
 # -*- coding: utf-8 -*-
-import errno
-from inspect import stack
-import os
-from os import F_OK, R_OK, W_OK, access, chmod, listdir, makedirs, mkdir, readlink, rename, rmdir, sep, stat, statvfs, symlink, utime, walk
-from os.path import basename, dirname, exists, getsize, isdir, isfile, islink, join as pathjoin, normpath, splitext
-from enigma import eEnv, getDesktop, eGetEnigmaDebugLvl
 from errno import ENOENT, EXDEV
+from os import F_OK, R_OK, W_OK, access, chmod, link, listdir, makedirs, mkdir, readlink, remove, rename, rmdir, sep, stat, statvfs, symlink, utime, walk, popen
+from os.path import basename, dirname, exists, getsize, isdir, isfile, islink, join as pathjoin, normpath, splitext
 from re import compile
 from stat import S_IMODE
+from sys import _getframe as getframe
 from unicodedata import normalize
+from tempfile import mkstemp
 from xml.etree.cElementTree import Element, ParseError, fromstring, parse
+
+from enigma import eEnv, getDesktop, eGetEnigmaDebugLvl
 
 DEFAULT_MODULE_NAME = __name__.split(".")[-1]
 
 forceDebug = eGetEnigmaDebugLvl() > 4
 pathExists = exists
-isMount = os.path.ismount  # Only used in OpenATV /lib/python/Plugins/SystemPlugins/NFIFlash/downloader.py.
 
 SCOPE_HOME = 0  # DEBUG: Not currently used in Enigma2.
 SCOPE_TRANSPONDERDATA = 1
@@ -92,7 +91,7 @@ scopePlugins = defaultPaths[SCOPE_PLUGINS][0]
 
 
 def addInList(*paths):
-	return [path for path in paths if os.path.isdir(path)]
+	return [path for path in paths if isdir(path)]
 
 
 skinResolveList = []
@@ -153,7 +152,7 @@ def resolveFilename(scope, base="", path_prefix=None):
 			skin = dirname(config.skin.primary_skin.value)
 			path = pathjoin(path, skin)
 		elif scope in (SCOPE_CURRENT_PLUGIN_ABSOLUTE, SCOPE_CURRENT_PLUGIN_RELATIVE):
-			callingCode = normpath(stack()[1][1])
+			callingCode = normpath(getframe()[1][1])
 			plugins = normpath(defaultPaths[SCOPE_PLUGINS][0])
 			path = None
 			if comparePath(plugins, callingCode):
@@ -166,13 +165,13 @@ def resolveFilename(scope, base="", path_prefix=None):
 		if not skinResolveList:
 			# This import must be here as this module finds the config file as part of the config initialisation.
 			from Components.config import config
-			skin = os.path.dirname(config.skin.primary_skin.value)
+			skin = dirname(config.skin.primary_skin.value)
 			skinResolveList = addInList(
-					os.path.join(defaultPaths[SCOPE_CONFIG][0], skin),
-					os.path.join(defaultPaths[SCOPE_CONFIG][0], "skin_common"),
+					pathjoin(defaultPaths[SCOPE_CONFIG][0], skin),
+					pathjoin(defaultPaths[SCOPE_CONFIG][0], "skin_common"),
 					defaultPaths[SCOPE_CONFIG][0],
-					os.path.join(defaultPaths[SCOPE_SKIN][0], skin),
-					os.path.join(defaultPaths[SCOPE_SKIN][0], "skin_default"),
+					pathjoin(defaultPaths[SCOPE_SKIN][0], skin),
+					pathjoin(defaultPaths[SCOPE_SKIN][0], "skin_default"),
 					defaultPaths[SCOPE_SKIN][0]
 				)
 		file = itemExists(skinResolveList, base)
@@ -184,15 +183,15 @@ def resolveFilename(scope, base="", path_prefix=None):
 			# This import must be here as this module finds the config file as part of the config initialisation.
 			from Components.config import config
 			if hasattr(config.skin, "display_skin"):
-				skin = os.path.dirname(config.skin.display_skin.value)
+				skin = dirname(config.skin.display_skin.value)
 			else:
 				skin = ""
 			lcdskinResolveList = addInList(
-					os.path.join(defaultPaths[SCOPE_CONFIG][0], "display", skin),
-					os.path.join(defaultPaths[SCOPE_CONFIG][0], "display", "skin_common"),
+					pathjoin(defaultPaths[SCOPE_CONFIG][0], "display", skin),
+					pathjoin(defaultPaths[SCOPE_CONFIG][0], "display", "skin_common"),
 					defaultPaths[SCOPE_CONFIG][0],
-					os.path.join(defaultPaths[SCOPE_LCDSKIN][0], skin),
-					os.path.join(defaultPaths[SCOPE_LCDSKIN][0], "skin_default"),
+					pathjoin(defaultPaths[SCOPE_LCDSKIN][0], skin),
+					pathjoin(defaultPaths[SCOPE_LCDSKIN][0], "skin_default"),
 					defaultPaths[SCOPE_LCDSKIN][0]
 				)
 		file = itemExists(lcdskinResolveList, base)
@@ -203,27 +202,27 @@ def resolveFilename(scope, base="", path_prefix=None):
 		if not fontsResolveList:
 			# This import must be here as this module finds the config file as part of the config initialisation.
 			from Components.config import config
-			skin = os.path.dirname(config.skin.primary_skin.value)
-			display = os.path.dirname(config.skin.display_skin.value) if hasattr(config.skin, "display_skin") else None
+			skin = dirname(config.skin.primary_skin.value)
+			display = dirname(config.skin.display_skin.value) if hasattr(config.skin, "display_skin") else None
 			fontsResolveList = addInList(
-					os.path.join(defaultPaths[SCOPE_CONFIG][0], "fonts"),
-					os.path.join(defaultPaths[SCOPE_CONFIG][0], skin, "fonts"),
-					os.path.join(defaultPaths[SCOPE_CONFIG][0], skin)
+					pathjoin(defaultPaths[SCOPE_CONFIG][0], "fonts"),
+					pathjoin(defaultPaths[SCOPE_CONFIG][0], skin, "fonts"),
+					pathjoin(defaultPaths[SCOPE_CONFIG][0], skin)
 				)
 			if display:
-				fontsResolveList += addInList(os.path.join(defaultPaths[SCOPE_CONFIG][0], "display", display))
+				fontsResolveList += addInList(pathjoin(defaultPaths[SCOPE_CONFIG][0], "display", display))
 			fontsResolveList += addInList(
-					os.path.join(defaultPaths[SCOPE_CONFIG][0], "skin_common"),
+					pathjoin(defaultPaths[SCOPE_CONFIG][0], "skin_common"),
 					defaultPaths[SCOPE_CONFIG][0],
-					os.path.join(defaultPaths[SCOPE_SKIN][0], skin, "fonts"),
-					os.path.join(defaultPaths[SCOPE_SKIN][0], skin),
-					os.path.join(defaultPaths[SCOPE_SKIN][0], "skin_default", "fonts"),
-					os.path.join(defaultPaths[SCOPE_SKIN][0], "skin_default")
+					pathjoin(defaultPaths[SCOPE_SKIN][0], skin, "fonts"),
+					pathjoin(defaultPaths[SCOPE_SKIN][0], skin),
+					pathjoin(defaultPaths[SCOPE_SKIN][0], "skin_default", "fonts"),
+					pathjoin(defaultPaths[SCOPE_SKIN][0], "skin_default")
 				)
 			if display:
-				fontsResolveList += addInList(os.path.join(defaultPaths[SCOPE_LCDSKIN][0], display))
+				fontsResolveList += addInList(pathjoin(defaultPaths[SCOPE_LCDSKIN][0], display))
 			fontsResolveList += addInList(
-					os.path.join(defaultPaths[SCOPE_LCDSKIN][0], "skin_default"),
+					pathjoin(defaultPaths[SCOPE_LCDSKIN][0], "skin_default"),
 					defaultPaths[SCOPE_FONTS][0]
 				)
 		for item in fontsResolveList:
@@ -236,7 +235,7 @@ def resolveFilename(scope, base="", path_prefix=None):
 		if pathExists(file):
 			path = file
 	elif scope in (SCOPE_CURRENT_PLUGIN_ABSOLUTE, SCOPE_CURRENT_PLUGIN_RELATIVE):
-		callingCode = normpath(stack()[1][1])
+		callingCode = normpath(getframe()[1][1])
 		plugins = normpath(defaultPaths[SCOPE_PLUGINS][0])
 		path = None
 		if comparePath(plugins, callingCode):
@@ -389,15 +388,15 @@ def fileReadLine(filename, default=None, source=DEFAULT_MODULE_NAME, debug=False
 	line = None
 	try:
 		with open(filename, "r") as fd:
-			line = fd.read().strip()
+			line = fd.read().strip().replace("\0", "")
 		msg = "Read"
 	except (IOError, OSError) as err:
 		if err.errno != ENOENT:  # ENOENT - No such file or directory.
-			print("[%s] Error %d: Unable to read a line from file '%s'! (%s)" % (source, err.errno, filename, err.strerror))
+			print("[%s] Error %d: Unable to read a line from file '%s'!  (%s)" % (source, err.errno, filename, err.strerror))
 		line = default
 		msg = "Default"
 	if debug or forceDebug:
-		print("[%s] Line %d: %s '%s' from file '%s'." % (source, stack()[1][0].f_lineno, msg, line, filename))
+		print("[%s] Line %d: %s '%s' from file '%s'." % (source, getframe(1).f_lineno, msg, line, filename))
 	return line
 
 
@@ -408,12 +407,18 @@ def fileWriteLine(filename, line, source=DEFAULT_MODULE_NAME, debug=False):
 		msg = "Wrote"
 		result = 1
 	except (IOError, OSError) as err:
-		print("[%s] Error %d: Unable to write a line to file '%s'! (%s)" % (source, err.errno, filename, err.strerror))
+		print("[%s] Error %d: Unable to write a line to file '%s'!  (%s)" % (source, err.errno, filename, err.strerror))
 		msg = "Failed to write"
 		result = 0
 	if debug or forceDebug:
-		print("[%s] Line %d: %s '%s' to file '%s'." % (source, stack()[1][0].f_lineno, msg, line, filename))
+		print("[%s] Line %d: %s '%s' to file '%s'." % (source, getframe(1).f_lineno, msg, line, filename))
 	return result
+
+
+def fileUpdateLine(filename, conditionValue, replacementValue, create=False, source=DEFAULT_MODULE_NAME, debug=False):
+	line = fileReadLine(filename, default="", source=source, debug=debug)
+	create = False if conditionValue and not line.startswith(conditionValue) else create
+	return fileWriteLine(filename, replacementValue, source=source, debug=debug) if create or (conditionValue and line.startswith(conditionValue)) else 0
 
 
 def fileReadLines(filename, default=None, source=DEFAULT_MODULE_NAME, debug=False):
@@ -422,14 +427,32 @@ def fileReadLines(filename, default=None, source=DEFAULT_MODULE_NAME, debug=Fals
 		with open(filename, "r") as fd:
 			lines = fd.read().splitlines()
 		msg = "Read"
-	except (IOError, OSError) as err:
-		if err.errno != ENOENT:  # ENOENT - No such file or directory.
-			print("[%s] Error %d: Unable to read lines from file '%s'! (%s)" % (source, err.errno, filename, err.strerror))
+	except (IOError, OSError, UnicodeDecodeError) as err:
+		print("UnicodeDecodeError: %s %s" % (err, filename))
+		if not UnicodeDecodeError and err.errno != ENOENT:  # ENOENT - No such file or directory.
+			print("[%s] Error %d: Unable to read lines from file '%s'!  (%s)" % (source, err.errno, filename, err.strerror))
 		lines = default
 		msg = "Default"
 	if debug or forceDebug:
 		length = len(lines) if lines else 0
-		print("[%s] Line %d: %s %d lines from file '%s'." % (source, stack()[1][0].f_lineno, msg, length, filename))
+		print("[%s] Line %d: %s %d lines from file '%s'." % (source, getframe(1).f_lineno, msg, length, filename))
+	return lines
+
+
+def fileReadLinesISO(filename, default=None, source=DEFAULT_MODULE_NAME, debug=False):
+	lines = None
+	try:
+		with open(filename, "r", encoding="ISO 8859-1") as fd:
+			lines = fd.read().splitlines()
+		msg = "Read"
+	except (IOError, OSError, UnicodeDecodeError) as err:
+		if not UnicodeDecodeError and err.errno != ENOENT:  # ENOENT - No such file or directory.
+			print("[%s] Error %d: Unable to read lines from file '%s'!  (%s)" % (source, err.errno, filename, err.strerror))
+		lines = default
+		msg = "Default"
+	if debug or forceDebug:
+		length = len(lines) if lines else 0
+		print("[%s] Line %d: %s %d lines from file '%s'." % (source, getframe(1).f_lineno, msg, length, filename))
 	return lines
 
 
@@ -438,23 +461,23 @@ def fileWriteLines(filename, lines, source=DEFAULT_MODULE_NAME, debug=False):
 		with open(filename, "w") as fd:
 			if isinstance(lines, list):
 				lines.append("")
-				lines = "\n".join(lines)
+				lines = "\n".pathjoin(lines)
 			fd.write(lines)
 		msg = "Wrote"
 		result = 1
 	except (IOError, OSError) as err:
-		print("[%s] Error %d: Unable to write %d lines to file '%s'! (%s)" % (source, err.errno, len(lines), filename, err.strerror))
+		print("[%s] Error %d: Unable to write %d lines to file '%s'!  (%s)" % (source, err.errno, len(lines), filename, err.strerror))
 		msg = "Failed to write"
 		result = 0
 	if debug or forceDebug:
-		print("[%s] Line %d: %s %d lines to file '%s'." % (source, stack()[1][0].f_lineno, msg, len(lines), filename))
+		print("[%s] Line %d: %s %d lines to file '%s'." % (source, getframe(1).f_lineno, msg, len(lines), filename))
 	return result
 
 
 def fileReadXML(filename, default=None, source=DEFAULT_MODULE_NAME, debug=False):
 	dom = None
 	try:
-		with open(filename, "r") as fd:  # This open gets around a possible file handle leak in Python's XML parser.
+		with open(filename, "r", encoding="UTF-8") as fd:  # This open gets around a possible file handle leak in Python's XML parser.
 			try:
 				dom = parse(fd).getroot()
 				msg = "Read"
@@ -486,7 +509,8 @@ def fileReadXML(filename, default=None, source=DEFAULT_MODULE_NAME, debug=False)
 		else:
 			msg = "Failed to read"
 	if debug or forceDebug:
-		print("[%s] Line %d: %s from XML file '%s'." % (source, stack()[1][0].f_lineno, msg, filename))
+		length = len(dom) if dom else 0
+		print("[%s] %s Lines=%d from XML '%s'." % (source, msg, length, filename))
 	return dom
 
 
@@ -506,14 +530,14 @@ def getRecordingFilename(basename, dirname=None):
 	filename = filename[:247]
 	if dirname is not None:
 		if not dirname.startswith("/"):
-			dirname = os.path.join(defaultRecordingLocation(), dirname)
+			dirname = pathjoin(defaultRecordingLocation(), dirname)
 	else:
 		dirname = defaultRecordingLocation()
-	filename = os.path.join(dirname, filename)
+	filename = pathjoin(dirname, filename)
 	path = filename
 	i = 1
 	while True:
-		if not os.path.isfile(path + ".ts"):
+		if not isfile(path + ".ts"):
 			return path
 		path += "_%03d" % i
 		i += 1
@@ -723,9 +747,9 @@ def sanitizeFilename(filename):
 		"COM6", "COM7", "COM8", "COM9", "LPT1", "LPT2", "LPT3", "LPT4", "LPT5",
 		"LPT6", "LPT7", "LPT8", "LPT9",
 	]  # Reserved words on Windows
-	filename = "".join(c for c in filename if c not in blacklist)
+	filename = "".pathjoin(c for c in filename if c not in blacklist)
 	# Remove all charcters below code point 32
-	filename = "".join(c for c in filename if 31 < ord(c))
+	filename = "".pathjoin(c for c in filename if 31 < ord(c))
 	filename = normalize("NFKD", filename)
 	filename = filename.rstrip(". ")  # Windows does not allow these at end
 	filename = filename.strip()
