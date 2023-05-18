@@ -8,10 +8,11 @@
 #include <lib/gdi/esize.h>
 #include <lib/base/init.h>
 #include <lib/base/init_num.h>
-#ifdef HAVE_TEXTLCD
+#if defined(HAVE_TEXTLCD)
 #include <lib/base/estring.h>
 #endif
 #include <lib/gdi/glcddc.h>
+#include <lib/base/cfile.h>
 
 const char *OLED_PROC_1 = "/proc/stb/lcd/oled_brightness"; //  NOSONAR
 const char *OLED_PROC_2 = "/proc/stb/fp/oled_brightness";  //  NOSONAR
@@ -137,7 +138,7 @@ void eLCD::set_VFD_scroll_repeats(int delay)
 	CFile::writeInt(VFD_scroll_repeats_proc, delay);
 }
 
-#ifdef HAVE_TEXTLCD
+#if defined(HAVE_TEXTLCD)
 void eLCD::renderText(ePoint start, const char *text)
 {
 	if (lcdfd >= 0 && start.y() < 5)
