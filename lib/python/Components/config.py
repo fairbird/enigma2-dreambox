@@ -614,7 +614,7 @@ class ConfigSequence(ConfigElement):
 		# assert isinstance(default[0], int), "list must contain numbers"
 		# assert len(default) == len(limits), "length must match"
 
-		self.marked_pos = 0
+		self.markedPos = 0
 		self.seperator = seperator
 		self.limits = limits
 		self.censor_char = censor_char
@@ -641,23 +641,23 @@ class ConfigSequence(ConfigElement):
 
 			num += 1
 
-		if self.marked_pos >= max_pos:
+		if self.markedPos >= max_pos:
 			if self.endNotifier:
 				for x in self.endNotifier:
 					x(self)
-			self.marked_pos = max_pos - 1
+			self.markedPos = max_pos - 1
 
-		if self.marked_pos < 0:
-			self.marked_pos = 0
+		if self.markedPos < 0:
+			self.markedPos = 0
 
 	def validatePos(self):
-		if self.marked_pos < 0:
-			self.marked_pos = 0
+		if self.markedPos < 0:
+			self.markedPos = 0
 
 		total_len = sum([len(str(x[1])) for x in self.limits])
 
-		if self.marked_pos >= total_len:
-			self.marked_pos = total_len - 1
+		if self.markedPos >= total_len:
+			self.markedPos = total_len - 1
 
 	def addEndNotifier(self, notifier):
 		if self.endNotifier is None:
@@ -666,15 +666,15 @@ class ConfigSequence(ConfigElement):
 
 	def handleKey(self, key, callback=None):
 		if key == ACTIONKEY_FIRST:
-			self.marked_pos = 0
+			self.markedPos = 0
 		elif key == ACTIONKEY_LEFT:
-			if self.marked_pos > 0:
-				self.marked_pos -= 1
+			if self.markedPos > 0:
+				self.markedPos -= 1
 		elif key == ACTIONKEY_RIGHT:
-			if self.marked_pos < self.total_len:
-				self.marked_pos += 1
+			if self.markedPos < self.total_len:
+				self.markedPos += 1
 		elif key == ACTIONKEY_LAST:
-			self.marked_pos = self.total_len
+			self.markedPos = self.total_len
 		elif key in ACTIONKEY_NUMBERS or key == ACTIONKEY_ASCII:
 			# prev = self._value
 			if key == ACTIONKEY_ASCII:
@@ -690,17 +690,17 @@ class ConfigSequence(ConfigElement):
 			for x in self.block_len:
 				pos += self.block_len[blockNumber]
 				block_len_total.append(pos)
-				if pos - 1 >= self.marked_pos:
+				if pos - 1 >= self.markedPos:
 					pass
 				else:
 					blockNumber += 1
 			number_len = len(str(self.limits[blockNumber][1]))  # Length of number block.
-			posinblock = self.marked_pos - block_len_total[blockNumber]  # Position in the block.
+			posinblock = self.markedPos - block_len_total[blockNumber]  # Position in the block.
 			oldvalue = abs(self._value[blockNumber])  # We are using abs() in order to allow change negative values like default -1.
 			olddec = oldvalue % 10 ** (number_len - posinblock) - (oldvalue % 10 ** (number_len - posinblock - 1))
 			newvalue = oldvalue - olddec + (10 ** (number_len - posinblock - 1) * number)
 			self._value[blockNumber] = newvalue
-			self.marked_pos += 1
+			self.markedPos += 1
 			self.validate()
 			# if self._value != prev:
 			self.changed()
@@ -709,7 +709,7 @@ class ConfigSequence(ConfigElement):
 
 	def genText(self):
 		value = ""
-		mPos = self.marked_pos
+		mPos = self.markedPos
 		num = 0
 		for i in self._value:
 			if value:		# fixme no heading separator possible
@@ -768,24 +768,24 @@ class ConfigIP(ConfigSequence):
 
 	def handleKey(self, key):
 		if key == ACTIONKEY_FIRST:
-			self.marked_pos = 0
+			self.markedPos = 0
 			self.overwrite = True
 		elif key == ACTIONKEY_LEFT:
-			if self.marked_pos > 0:
-				self.marked_pos -= 1
+			if self.markedPos > 0:
+				self.markedPos -= 1
 			self.overwrite = True
 		elif key == ACTIONKEY_RIGHT:
-			if self.marked_pos < len(self.limits) - 1:
-				self.marked_pos += 1
+			if self.markedPos < len(self.limits) - 1:
+				self.markedPos += 1
 			self.overwrite = True
 		elif key == ACTIONKEY_LAST:
-			self.marked_pos = len(self.limits) - 1
+			self.markedPos = len(self.limits) - 1
 			self.overwrite = True
 		elif key in (ACTIONKEY_DELETE, ACTIONKEY_BACKSPACE):
-			self._value[self.marked_pos] = 0
+			self._value[self.markedPos] = 0
 			self.overwrite = True
 		elif key == ACTIONKEY_ERASE:
-			self.marked_pos = 0
+			self.markedPos = 0
 			self._value = [0, 0, 0, 0]
 			self.overwrite = True
 		elif key in ACTIONKEY_NUMBERS or key == ACTIONKEY_ASCII:
@@ -798,17 +798,17 @@ class ConfigIP(ConfigSequence):
 				number = getKeyNumber(key)
 			prev = self._value[:]
 			if self.overwrite:
-				self._value[self.marked_pos] = number
+				self._value[self.markedPos] = number
 				self.overwrite = False
 			else:
-				newValue = (self._value[self.marked_pos] * 10) + number
-				if self.auto_jump and newValue > self.limits[self.marked_pos][1] and self.marked_pos < len(self.limits) - 1:
+				newValue = (self._value[self.markedPos] * 10) + number
+				if self.auto_jump and newValue > self.limits[self.markedPos][1] and self.markedPos < len(self.limits) - 1:
 					self.handleKey(ACTIONKEY_RIGHT)
 					self.handleKey(key)
 					return
 				else:
-					self._value[self.marked_pos] = newValue
-			if len(str(self._value[self.marked_pos])) >= self.block_len[self.marked_pos]:
+					self._value[self.markedPos] = newValue
+			if len(str(self._value[self.markedPos])) >= self.block_len[self.markedPos]:
 				self.handleKey(ACTIONKEY_RIGHT)
 			self.validate()
 			if self._value != prev:
@@ -817,8 +817,8 @@ class ConfigIP(ConfigSequence):
 	def genText(self):
 		value = self.seperator.join([str(x) for x in self._value])
 		block_len = [len(str(x)) for x in self._value]
-		leftPos = sum(block_len[:self.marked_pos]) + self.marked_pos
-		rightPos = sum(block_len[:self.marked_pos + 1]) + self.marked_pos
+		leftPos = sum(block_len[:self.markedPos]) + self.markedPos
+		rightPos = sum(block_len[:self.markedPos + 1]) + self.markedPos
 		mBlock = list(range(leftPos, rightPos))
 		return (value, mBlock)
 
@@ -909,21 +909,21 @@ class ConfigClock(ConfigSequence):
 					pmadjust = 12
 				if hour == 0:  # 12AM & 12PM map to 12.
 					hour = 12
-				if self.marked_pos == 0 and digit >= 2:  # Only 0, 1 allowed (12 hour clock).
+				if self.markedPos == 0 and digit >= 2:  # Only 0, 1 allowed (12 hour clock).
 					return
-				if self.marked_pos == 1 and hour > 9 and digit >= 3:  # Only 10, 11, 12 allowed.
+				if self.markedPos == 1 and hour > 9 and digit >= 3:  # Only 10, 11, 12 allowed.
 					return
-				if self.marked_pos == 1 and hour < 10 and digit == 0:  # Only 01, 02, ..., 09 allowed.
+				if self.markedPos == 1 and hour < 10 and digit == 0:  # Only 01, 02, ..., 09 allowed.
 					return
 			else:
-				if self.marked_pos == 0 and digit >= 3:  # Only 0, 1, 2 allowed (24 hour clock).
+				if self.markedPos == 0 and digit >= 3:  # Only 0, 1, 2 allowed (24 hour clock).
 					return
-				if self.marked_pos == 1 and hour > 19 and digit >= 4:  # Only 20, 21, 22, 23 allowed.
+				if self.markedPos == 1 and hour > 19 and digit >= 4:  # Only 20, 21, 22, 23 allowed.
 					return
-			if self.marked_pos == 2 and digit >= 6:  # Only 0, 1, ..., 5 allowed (tens digit of minutes).
+			if self.markedPos == 2 and digit >= 6:  # Only 0, 1, ..., 5 allowed (tens digit of minutes).
 				return
 			value = bytearray(b"%02d%02d" % (hour, self._value[1]))  # Must be ASCII!
-			value[self.marked_pos] = digit + ord(b"0")
+			value[self.markedPos] = digit + ord(b"0")
 			hour = int(value[:2])
 			minute = int(value[2:])
 			if config.usage.time.wide.value:
@@ -936,14 +936,14 @@ class ConfigClock(ConfigSequence):
 				hour = 20
 			self._value[0] = hour
 			self._value[1] = minute
-			self.marked_pos += 1
+			self.markedPos += 1
 			self.validate()
 			self.changed()
 		else:
 			ConfigSequence.handleKey(self, key)
 
 	def genText(self):
-		mPos = self.marked_pos
+		mPos = self.markedPos
 		if mPos >= 2:
 			mPos += 1  # Skip over the separator
 		newtime = list(self.t)
@@ -1022,7 +1022,7 @@ class ConfigText(ConfigElement, NumericalTextInput):
 		ConfigElement.__init__(self)
 		NumericalTextInput.__init__(self, nextFunc=self.nextFunc, handleTimeout=False)
 
-		self.marked_pos = 0
+		self.markedPos = 0
 		self.allmarked = (default != "")
 		self.fixed_size = fixed_size
 		self.visible_width = visible_width
@@ -1034,21 +1034,21 @@ class ConfigText(ConfigElement, NumericalTextInput):
 	def validateMarker(self):
 		textlen = len(self.text)
 		if self.fixed_size:
-			if self.marked_pos > textlen - 1:
-				self.marked_pos = textlen - 1
+			if self.markedPos > textlen - 1:
+				self.markedPos = textlen - 1
 		else:
-			if self.marked_pos > textlen:
-				self.marked_pos = textlen
-		if self.marked_pos < 0:
-			self.marked_pos = 0
+			if self.markedPos > textlen:
+				self.markedPos = textlen
+		if self.markedPos < 0:
+			self.markedPos = 0
 		if self.visible_width:
-			if self.marked_pos < self.offset:
-				self.offset = self.marked_pos
-			if self.marked_pos >= self.offset + self.visible_width:
-				if self.marked_pos == textlen:
-					self.offset = self.marked_pos - self.visible_width
+			if self.markedPos < self.offset:
+				self.offset = self.markedPos
+			if self.markedPos >= self.offset + self.visible_width:
+				if self.markedPos == textlen:
+					self.offset = self.markedPos - self.visible_width
 				else:
-					self.offset = self.marked_pos - self.visible_width + 1
+					self.offset = self.markedPos - self.visible_width + 1
 			if self.offset > 0 and self.offset + self.visible_width > textlen:
 				self.offset = max(0, len - self.visible_width)
 
@@ -1073,50 +1073,50 @@ class ConfigText(ConfigElement, NumericalTextInput):
 			self.text = " " * len(self.text)
 		else:
 			self.text = ""
-		self.marked_pos = 0
+		self.markedPos = 0
 
 	def handleKey(self, key):  # This will not change anything on the value itself so we can handle it here in GUI element.
 		if key == ACTIONKEY_FIRST:
 			self.timeout()
 			self.allmarked = False
-			self.marked_pos = 0
+			self.markedPos = 0
 		elif key == ACTIONKEY_LEFT:
 			self.timeout()
 			if self.allmarked:
-				self.marked_pos = len(self.text)
+				self.markedPos = len(self.text)
 				self.allmarked = False
 			else:
-				self.marked_pos -= 1
+				self.markedPos -= 1
 		elif key == ACTIONKEY_RIGHT:
 			self.timeout()
 			if self.allmarked:
-				self.marked_pos = 0
+				self.markedPos = 0
 				self.allmarked = False
 			else:
-				self.marked_pos += 1
+				self.markedPos += 1
 		elif key == ACTIONKEY_LAST:
 			self.timeout()
 			self.allmarked = False
-			self.marked_pos = len(self.text)
+			self.markedPos = len(self.text)
 		elif key == ACTIONKEY_BACKSPACE:
 			self.timeout()
 			if self.allmarked:
 				self.deleteAllChars()
 				self.allmarked = False
-			elif self.marked_pos > 0:
-				self.deleteChar(self.marked_pos - 1)
+			elif self.markedPos > 0:
+				self.deleteChar(self.markedPos - 1)
 				if not self.fixed_size and self.offset > 0:
 					self.offset -= 1
-				self.marked_pos -= 1
+				self.markedPos -= 1
 		elif key == ACTIONKEY_DELETE:
 			self.timeout()
 			if self.allmarked:
 				self.deleteAllChars()
 				self.allmarked = False
 			else:
-				self.deleteChar(self.marked_pos)
+				self.deleteChar(self.markedPos)
 				if self.fixed_size and self.overwrite:
-					self.marked_pos += 1
+					self.markedPos += 1
 		elif key == ACTIONKEY_ERASE:
 			self.timeout()
 			self.deleteAllChars()
@@ -1130,15 +1130,15 @@ class ConfigText(ConfigElement, NumericalTextInput):
 				if self.allmarked:
 					self.deleteAllChars()
 					self.allmarked = False
-				self.insertChar(newChar, self.marked_pos, False)
-				self.marked_pos += 1
+				self.insertChar(newChar, self.markedPos, False)
+				self.markedPos += 1
 		elif key in ACTIONKEY_NUMBERS:
 			owr = self.lastKey == getKeyNumber(key)
 			newChar = self.getKey(getKeyNumber(key))
 			if self.allmarked:
 				self.deleteAllChars()
 				self.allmarked = False
-			self.insertChar(newChar, self.marked_pos, owr)
+			self.insertChar(newChar, self.markedPos, owr)
 			if self.help_window:
 				self.help_window.update(self)
 			return
@@ -1154,7 +1154,7 @@ class ConfigText(ConfigElement, NumericalTextInput):
 		self.changed()
 
 	def nextFunc(self):
-		self.marked_pos += 1
+		self.markedPos += 1
 		self.validateMarker()
 		self.changed()
 
@@ -1175,13 +1175,13 @@ class ConfigText(ConfigElement, NumericalTextInput):
 			if self.allmarked:
 				mark = list(range(0, min(self.visible_width, len(self.text))))
 			else:
-				mark = [self.marked_pos - self.offset]
+				mark = [self.markedPos - self.offset]
 			return ("mtext"[1 - selected:], self.text[self.offset:self.offset + self.visible_width] + " ", mark)
 		else:
 			if self.allmarked:
 				mark = list(range(0, len(self.text)))
 			else:
-				mark = [self.marked_pos]
+				mark = [self.markedPos]
 			return ("mtext"[1 - selected:], self.text + " ", mark)
 
 	def onSelect(self, session):
@@ -1192,7 +1192,7 @@ class ConfigText(ConfigElement, NumericalTextInput):
 			self.help_window.show()
 
 	def onDeselect(self, session):
-		self.marked_pos = 0
+		self.markedPos = 0
 		self.offset = 0
 		if self.help_window:
 			session.deleteDialog(self.help_window)
@@ -1292,14 +1292,14 @@ class ConfigNumber(ConfigText):
 		return strv != sv
 
 	def conform(self):
-		pos = len(self.text) - self.marked_pos
+		pos = len(self.text) - self.markedPos
 		self.text = self.text.lstrip("0")
 		if self.text == "":
 			self.text = "0"
 		if pos > len(self.text):
-			self.marked_pos = 0
+			self.markedPos = 0
 		else:
-			self.marked_pos = len(self.text) - pos
+			self.markedPos = len(self.text) - pos
 
 	def handleKey(self, key):
 		if key in ACTIONKEY_NUMBERS or key == ACTIONKEY_ASCII:
@@ -1313,8 +1313,8 @@ class ConfigNumber(ConfigText):
 			if self.allmarked:
 				self.deleteAllChars()
 				self.allmarked = False
-			self.insertChar(newChar, self.marked_pos, False)
-			self.marked_pos += 1
+			self.insertChar(newChar, self.markedPos, False)
+			self.markedPos += 1
 			self.validateMarker()
 		else:
 			ConfigText.handleKey(self, key)
@@ -1324,7 +1324,7 @@ class ConfigNumber(ConfigText):
 		self.allmarked = (self.value != "")
 
 	def onDeselect(self, session):
-		self.marked_pos = 0
+		self.markedPos = 0
 		self.offset = 0
 		if not self.last_value == self.value:
 			self.changedFinal()
@@ -2065,7 +2065,7 @@ cec_limits = [(0, 15), (0, 15), (0, 15), (0, 15)]
 class ConfigCECAddress(ConfigSequence):
 	def __init__(self, default, auto_jump=False):
 		ConfigSequence.__init__(self, seperator=".", limits=cec_limits, default=default)
-		self.marked_pos = 0
+		self.marked_block = 0
 		self.overwrite = True
 		self.auto_jump = auto_jump
 
