@@ -498,7 +498,7 @@ class Wizard(Screen):
 		self.condition = True
 		exec(self.wizard[self.currStep]["condition"])
 		if not self.condition:
-			print("keys*******************:", self.wizard[self.currStep].keys())
+			#print("keys*******************:", self.wizard[self.currStep].keys())
 			if "laststep" in self.wizard[self.currStep]: # exit wizard, if condition of laststep doesn't hold
 				self.markDone()
 				self.exit()
