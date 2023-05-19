@@ -118,8 +118,8 @@ class LCD:
 				else:
 					if self.dimBrightness is not None and self.currBrightness > self.dimBrightness and self.dimDelay is not None and self.dimDelay > 0:
 						self.autoDimDownLCDTimer.startLongTimer(self.dimDelay)
-		except:
-			pass
+		except IndexError as e:
+			print("[LCD] autoDimUpLCD error : %s" % e)
 
 	def setBright(self, value):
 		value *= 255
