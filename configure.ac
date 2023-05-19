@@ -442,7 +442,6 @@ data/Makefile
 data/fonts/Makefile
 data/countries/Makefile
 data/display/Makefile
-data/display/7segment/Makefile
 data/display/display/Makefile
 data/display/display96/Makefile
 data/display/display128/Makefile
