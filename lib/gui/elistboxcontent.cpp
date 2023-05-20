@@ -1,8 +1,12 @@
 #include <lib/gui/elistbox.h>
 #include <lib/gui/elistboxcontent.h>
+#include <lib/gdi/epoint.h>
 #include <lib/gdi/font.h>
 #include <lib/python/python.h>
 #include <lib/gdi/epng.h>
+#include <Python.h>
+using namespace std;
+
 /*
     The basic idea is to have an interface which gives all relevant list
     processing functions, and can be used by the listbox to browse trough
@@ -52,7 +56,7 @@ int iListboxContent::currentCursorSelectable()
 DEFINE_REF(eListboxPythonStringContent);
 
 eListboxPythonStringContent::eListboxPythonStringContent()
-	:m_cursor(0), m_saved_cursor(0), m_itemheight(25), m_itemwidth(25), m_orientation(1)
+	:m_cursor(0), m_saved_cursor(0), m_saved_cursor_top(0), m_itemheight(25)
 {
 }
 
@@ -126,6 +130,16 @@ void eListboxPythonStringContent::cursorRestore()
 	m_cursor = m_saved_cursor;
 }
 
+void eListboxPythonStringContent::cursorSaveTop(int top)
+{
+	m_saved_cursor_top = top;
+}
+
+int eListboxPythonStringContent::cursorRestoreTop()
+{
+	return m_saved_cursor_top;
+}
+
 int eListboxPythonStringContent::size()
 {
 	if (!m_list)
@@ -177,7 +191,9 @@ void eListboxPythonStringContent::paint(gPainter &painter, eWindowStyle &style, 
 				painter.setForegroundColor(local_style->m_foreground_color);
 		}
 	}
-	if (!fnt) fnt = new gFont("Regular", 20);
+	if (!fnt) {
+		style.getFont(eWindowStyle::fontListbox, fnt);
+	}
 	bool isverticallb = m_listbox && m_listbox->getOrientation() == 1;
 	/* if we have no transparent background */
 	if (!local_style || !local_style->m_transparent_background)
@@ -257,6 +273,9 @@ void eListboxPythonStringContent::paint(gPainter &painter, eWindowStyle &style, 
 			if (local_style)
 			{
 				text_offset += local_style->m_text_offset;
+//VTI workaround
+				if (local_style->m_use_vti_workaround)
+					text_offset += local_style->m_text_offset;
 
 				if (local_style->m_valign == eListboxStyle::alignTop)
 					flags |= gPainter::RT_VALIGN_TOP;
@@ -375,7 +394,7 @@ void eListboxPythonConfigContent::paint(gPainter &painter, eWindowStyle &style, 
 		border_size = local_style->m_border_size;
 		border_color = local_style->m_border_color;
 		fnt = local_style->m_font;
-		fnt2 = local_style->m_secondfont;
+		fnt2 = local_style->m_valuefont;
 		if (selected)
 		{
 			/* if we have a local background color set, use that. */
@@ -397,9 +416,9 @@ void eListboxPythonConfigContent::paint(gPainter &painter, eWindowStyle &style, 
 	}
 
 	if (!fnt)
-		fnt = new gFont("Regular", 20);
+		style.getFont(eWindowStyle::fontEntry, fnt);
 	if (!fnt2)
-		fnt2 = new gFont(fnt->family, fnt->pointSize - fnt->pointSize/5);
+		style.getFont(eWindowStyle::fontValue, fnt2);
 
 	if (!local_style || !local_style->m_transparent_background)
 		/* if we have no transparent background */
@@ -902,7 +921,6 @@ void eListboxPythonMultiContent::paint(gPainter &painter, eWindowStyle &style, c
 
 		if (!items)
 		{
-			PyErr_Print();
 			eDebug("[eListboxPythonMultiContent] error getting item %d", m_cursor);
 			goto error_out;
 		}
@@ -1014,10 +1032,10 @@ void eListboxPythonMultiContent::paint(gPainter &painter, eWindowStyle &style, c
 					continue;
 
 				const char *string = (PyUnicode_Check(pstring)) ? PyUnicode_AsUTF8(pstring) : "<not-a-string>";
-				int x = PyLong_AsLong(px) + offset.x();
-				int y = PyLong_AsLong(py) + offset.y();
-				int width = PyLong_AsLong(pwidth);
-				int height = PyLong_AsLong(pheight);
+				int x = PyInt_AsLong(px) + offset.x();
+				int y = PyInt_AsLong(py) + offset.y();
+				int width = PyInt_AsLong(pwidth);
+				int height = PyInt_AsLong(pheight);
 				int flags = PyLong_AsLong(pflags);
 				int fnt = PyLong_AsLong(pfnt);
 				int bwidth = pborderWidth ? PyLong_AsLong(pborderWidth) : 0;
@@ -1135,11 +1153,11 @@ void eListboxPythonMultiContent::paint(gPainter &painter, eWindowStyle &style, c
 						pbackColorSelected=ePyObject();
 				}
 
-				int x = PyLong_AsLong(px) + offset.x();
-				int y = PyLong_AsLong(py) + offset.y();
-				int width = PyLong_AsLong(pwidth);
-				int height = PyLong_AsLong(pheight);
-				int filled = PyLong_AsLong(pfilled_perc);
+				int x = PyInt_AsLong(px) + offset.x();
+				int y = PyInt_AsLong(py) + offset.y();
+				int width = PyInt_AsLong(pwidth);
+				int height = PyInt_AsLong(pheight);
+				int filled = PyInt_AsLong(pfilled_perc);
 
 				if ((filled < 0) && data) /* if the string is in a negative number, it refers to the 'data' list. */
 					filled = PyLong_AsLong(PyTuple_GetItem(data, -filled));

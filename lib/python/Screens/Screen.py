@@ -1,4 +1,4 @@
-from enigma import eRCInput, eTimer, eWindow  # , getDesktop
+from enigma import eRCInput, eTimer, eWindow , getDesktop
 
 from skin import GUI_SKIN_ID, applyAllAttributes
 from Components.config import config
@@ -7,10 +7,10 @@ from Components.Sources.Source import Source
 from Components.Sources.StaticText import StaticText
 from Tools.CList import CList
 
+
 # The lines marked DEBUG: are proposals for further fixes or improvements.
 # Other commented out code is historic and should probably be deleted if it is not going to be used.
-
-
+#
 class Screen(dict):
 	NO_SUSPEND, SUSPEND_STOPS, SUSPEND_PAUSES = range(3)
 	ALLOW_SUSPEND = NO_SUSPEND
@@ -141,6 +141,12 @@ class Screen(dict):
 			if isinstance(val, GUIComponent) or isinstance(val, Source):
 				val.onHide()
 
+	def isAlreadyShown(self):  # Already shown is false until the screen is really shown (after creation).
+		return self.already_shown
+
+	def isStandAlone(self):  # Stand alone screens (for example web screens) don't care about having or not having focus.
+		return self.stand_alone
+
 	def getScreenPath(self):
 		return self.screenPath
 
@@ -218,15 +224,14 @@ class Screen(dict):
 		self.__callLaterTimer.start(0, True)
 
 	def applySkin(self):
-		# DEBUG: baseRes = (getDesktop(GUI_SKIN_ID).size().width(), getDesktop(GUI_SKIN_ID).size().height())
-		baseRes = (720, 576)  # FIXME: A skin might have set another resolution, which should be the base res.
+		bounds = (getDesktop(GUI_SKIN_ID).size().width(), getDesktop(GUI_SKIN_ID).size().height())
+		resolution = bounds
 		zPosition = 0
 		for (key, value) in self.skinAttributes:
-			if key == "baseResolution":
-				baseRes = tuple([int(x) for x in value.split(",")])
+			if key == "resolution":
+				resolution = tuple([int(x.strip()) for x in value.split(",")])
 			elif key == "zPosition":
 				zPosition = int(value)
-		self.scale = ((baseRes[0], baseRes[0]), (baseRes[1], baseRes[1]))
 		if not self.instance:
 			self.instance = eWindow(self.desktop, zPosition)
 		if "title" not in self.skinAttributes and self.screenTitle:
@@ -235,7 +240,7 @@ class Screen(dict):
 			for attribute in self.skinAttributes:
 				if attribute[0] == "title":
 					self.setTitle(_(attribute[1]))
-		self.skinAttributes.sort(key=lambda a: {"position": 1}.get(a[0], 0))  # We need to make sure that certain attributes come last.
+		self.scale = ((bounds[0], resolution[0]), (bounds[1], resolution[1]))
 		applyAllAttributes(self.instance, self.desktop, self.skinAttributes, self.scale)
 		self.createGUIScreen(self.instance, self.desktop)
 
