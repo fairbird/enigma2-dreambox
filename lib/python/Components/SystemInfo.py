@@ -15,10 +15,9 @@ SystemInfo = {}
 class BoxInformation:  # To maintain data integrity class variables should not be accessed from outside of this class!
 	def __init__(self):
 		self.immutableList = []
-		self.procList = []
 		self.boxInfo = {}
-		self.enigmaList = []
-		self.enigmaInfo = {}
+		self.enigmaInfoList = []
+		self.enigmaConfList = []
 		lines = fileReadLines(pathjoin(resolveFilename(SCOPE_LIBDIR), "enigma.info"), source=MODULE_NAME)
 		if lines:
 			modified = self.checkChecksum(lines)
@@ -35,14 +34,15 @@ class BoxInformation:  # To maintain data integrity class variables should not b
 					item, value = [x.strip() for x in line.split("=", 1)]
 					if item:
 						self.immutableList.append(item)
-						self.procList.append(item)
+						self.enigmaInfoList.append(item)
 						self.boxInfo[item] = self.processValue(value)
-			self.procList = sorted(self.procList)
+			self.enigmaInfoList = sorted(self.enigmaInfoList)
 			print("[SystemInfo] Enigma information file data loaded into BoxInfo.")
 		else:
 			print("[SystemInfo] ERROR: Enigma information file is not available!  The system is unlikely to boot or operate correctly.")
-		lines = fileReadLines(pathjoin(resolveFilename(SCOPE_LIBDIR), "enigma.conf"), source=MODULE_NAME)
-		if lines:
+		filename = isfile(resolveFilename(SCOPE_LIBDIR, "enigma.conf"))
+		if filename:
+			lines = fileReadLines(pathjoin(resolveFilename(SCOPE_LIBDIR), "enigma.conf"), source=MODULE_NAME)
 			print("[SystemInfo] Enigma config override file available and data loaded into BoxInfo.")
 			self.boxInfo["overrideactive"] = True
 			for line in lines:
@@ -51,11 +51,11 @@ class BoxInformation:  # To maintain data integrity class variables should not b
 				if "=" in line:
 					item, value = [x.strip() for x in line.split("=", 1)]
 					if item:
-						self.enigmaList.append(item)
-						self.enigmaInfo[item] = self.processValue(value)
+						self.enigmaConfList.append(item)
 						if item in self.boxInfo:
 							print("[SystemInfo] Note: Enigma information value '%s' with value '%s' being overridden to '%s'." % (item, self.boxInfo[item], value))
-			self.enigmaList = sorted(self.enigmaList)
+						self.boxInfo[item] = self.processValue(value)
+			self.enigmaConfList = sorted(self.enigmaConfList)
 		else:
 			self.boxInfo["overrideactive"] = False
 
@@ -68,14 +68,14 @@ class BoxInformation:  # To maintain data integrity class variables should not b
 			else:
 				data.append(line)
 		data.append("")
-		result = md5(bytearray("\n".join(data), "UTF-8", errors="ignore")).hexdigest()
+		result = md5(bytearray("\n".join(data), "UTF-8", errors="ignore")).hexdigest()  # NOSONAR
 		return value != result
 
 	def processValue(self, value):
 		valueTest = value.upper() if value else ""
 		if value is None:
 			pass
-		elif value.startswith("\"") or value.startswith("'") and value.endswith(value[0]):
+		elif (value.startswith("\"") or value.startswith("'")) and value.endswith(value[0]):
 			value = value[1:-1]
 		elif value.startswith("(") and value.endswith(")"):
 			data = []
@@ -89,11 +89,11 @@ class BoxInformation:  # To maintain data integrity class variables should not b
 			value = list(data)
 		elif valueTest == "NONE":
 			value = None
-		elif valueTest in ("FALSE", "NO", "OFF", "DISABLED"):
+		elif valueTest in ("FALSE", "NO", "OFF", "DISABLED", "DISABLE"):
 			value = False
-		elif valueTest in ("TRUE", "YES", "ON", "ENABLED"):
+		elif valueTest in ("TRUE", "YES", "ON", "ENABLED", "ENABLE"):
 			value = True
-		elif value.isdigit() or (value[0:1] == "-" and value[1:].isdigit()):
+		elif value.isdigit() or ((value[0:1] == "-" or value[0:1] == "+") and value[1:].isdigit()):
 			value = int(value)
 		elif valueTest.startswith("0X"):
 			try:
@@ -117,19 +117,17 @@ class BoxInformation:  # To maintain data integrity class variables should not b
 				pass
 		return value
 
-	def getProcList(self):
-		return self.procList
+	def getEnigmaInfoList(self):
+		return self.enigmaInfoList
 
-	def getEnigmaList(self):
-		return self.enigmaList
+	def getEnigmaConfList(self):
+		return self.enigmaConfList
 
 	def getItemsList(self):
 		return sorted(list(self.boxInfo.keys()))
 
 	def getItem(self, item, default=None):
-		if item in self.enigmaList:
-			value = self.enigmaInfo[item]
-		elif item in self.boxInfo:
+		if item in self.boxInfo:
 			value = self.boxInfo[item]
 		elif item in SystemInfo:
 			value = SystemInfo[item]
@@ -138,7 +136,7 @@ class BoxInformation:  # To maintain data integrity class variables should not b
 		return value
 
 	def setItem(self, item, value, immutable=False):
-		if item in self.immutableList or item in self.procList:
+		if item in self.immutableList:
 			print("[BoxInfo] Error: Item '%s' is immutable and can not be %s!" % (item, "changed" if item in self.boxInfo else "added"))
 			return False
 		if immutable:
@@ -148,7 +146,7 @@ class BoxInformation:  # To maintain data integrity class variables should not b
 		return True
 
 	def deleteItem(self, item):
-		if item in self.immutableListor or item in self.procList:
+		if item in self.immutableList:
 			print("[BoxInfo] Error: Item '%s' is immutable and can not be deleted!" % item)
 		elif item in self.boxInfo:
 			del self.boxInfo[item]
@@ -158,12 +156,26 @@ class BoxInformation:  # To maintain data integrity class variables should not b
 
 BoxInfo = BoxInformation()
 
+ARCHITECTURE = BoxInfo.getItem("architecture")
+BRAND = BoxInfo.getItem("brand")
+MODEL = BoxInfo.getItem("model")
+SOC_FAMILY = BoxInfo.getItem("socfamily")
+DISPLAYTYPE = BoxInfo.getItem("displaytype")
+MTDROOTFS = BoxInfo.getItem("mtdrootfs")
+DISPLAYMODEL = BoxInfo.getItem("displaymodel")
+DISPLAYBRAND = BoxInfo.getItem("displaybrand")
+MACHINEBUILD = MODEL
+
 from Tools.Multiboot import getMultibootStartupDevice, getMultibootslots  # This import needs to be here to avoid a SystemInfo load loop!
 
 # Parse the boot commandline.
 #
 cmdline = fileReadLine("/proc/cmdline", source=MODULE_NAME)
 cmdline = {k: v.strip('"') for k, v in findall(r'(\S+)=(".*?"|\S+)', cmdline)}
+
+
+def getBoxDisplayName():  # This function returns a tuple like ("BRANDNAME", "BOXNAME")
+	return (DISPLAYBRAND, DISPLAYMODEL)
 
 
 def getNumVideoDecoders():
