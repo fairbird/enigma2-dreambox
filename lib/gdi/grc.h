@@ -64,6 +64,13 @@ struct gOpcode
 		shutdown,
 
 		setCompositing,
+		sendShow,
+		sendHide,
+#ifdef USE_LIBVUGLES2
+		sendShowItem,
+		setFlush,
+		setView,
+#endif
 	} opcode;
 
 	gDC *dc;
@@ -86,6 +93,9 @@ struct gOpcode
 			int flags;
 			int border;
 			gRGB bordercolor;
+			int markedpos;
+			int scrollpos;
+			int *offset;
 		} *renderText;
 
 		struct prenderPara
@@ -144,6 +154,30 @@ struct gOpcode
 		} *setOffset;
 
 		gCompositingData *setCompositing;
+
+		struct psetShowHideInfo
+		{
+			ePoint point;
+			eSize size;
+		} *setShowHideInfo;
+#ifdef USE_LIBVUGLES2
+		struct psetShowItemInfo
+		{
+			long dir;
+			ePoint point;
+			eSize size;
+		} *setShowItemInfo;
+		
+		struct psetFlush
+		{
+			bool enable;
+		} *setFlush;
+		
+		struct psetViewInfo
+		{
+			eSize size;
+		} *setViewInfo;
+#endif
 	} parm;
 };
 
@@ -237,7 +271,7 @@ public:
 
 		RT_WRAP = 64
 	};
-	void renderText(const eRect &position, const std::string &string, int flags=0, gRGB bordercolor=gRGB(), int border=0);
+	void renderText(const eRect &position, const std::string &string, int flags=0, gRGB bordercolor=gRGB(), int border=0, int markedpos=-1, int *offset=0);
 
 	void renderPara(eTextPara *para, ePoint offset=ePoint(0, 0));
 
@@ -283,6 +317,13 @@ public:
 	void setCompositing(gCompositingData *comp);
 
 	void flush();
+	void sendShow(ePoint point, eSize size);
+	void sendHide(ePoint point, eSize size);
+#ifdef USE_LIBVUGLES2
+	void sendShowItem(long dir, ePoint point, eSize size);
+	void setFlush(bool val);
+	void setView(eSize size);
+#endif
 };
 
 class gDC: public iObject
