@@ -20,9 +20,9 @@ gRC *gRC::instance=0;
 
 gRC::gRC(): rp(0), wp(0)
 #ifdef SYNC_PAINT
-,m_notify_pump(eApp, 0, "gRC")
+,m_notify_pump(eApp, 0)
 #else
-,m_notify_pump(eApp, 1, "gRC")
+,m_notify_pump(eApp, 1)
 #endif
 ,m_spinner_enabled(0), m_spinneronoff(1), m_prev_idle_count(0)
 {
