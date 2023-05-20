@@ -12,23 +12,17 @@
 typedef FTC_ImageCache FTC_Image_Cache;
 typedef FTC_ImageTypeRec FTC_Image_Desc;
 typedef FTC_SBitCache FTC_SBit_Cache;
-
-#ifdef HAVE_FREETYPE2
-typedef FT_UInt GlyphIndex;
-#else
-typedef FT_ULong GlyphIndex;
-#endif
-
-#include <string>
 #include <vector>
-#include <list>
-#include <set>
 
 #include <lib/gdi/fb.h>
 #include <lib/gdi/esize.h>
 #include <lib/gdi/epoint.h>
 #include <lib/gdi/erect.h>
+#include <string>
+#include <list>
 #include <lib/base/object.h>
+
+#include <set>
 
 class FontRenderClass;
 class Font;
@@ -37,7 +31,6 @@ class gFont;
 struct gRGB;
 
 #endif
-
 class fontRenderClass
 {
 #ifndef SWIG
@@ -61,10 +54,8 @@ class fontRenderClass
 	int strokerRadius;
 
 	int getFaceProperties(const std::string &face, FTC_FaceID &id, int &renderflags);
-
-    FT_Error getGlyphBitmap(FTC_Image_Desc *font, GlyphIndex glyph_index, FTC_SBit *sbit);
-    FT_Error getGlyphImage(FTC_Image_Desc *font, GlyphIndex glyph_index, FT_Glyph *glyph, FT_Glyph *borderglyph, int bordersize);
-
+	FT_Error getGlyphBitmap(FTC_Image_Desc *font, FT_UInt glyph_index, FTC_SBit *sbit);
+	FT_Error getGlyphImage(FTC_Image_Desc *font, FT_UInt glyph_index, FT_Glyph *glyph, FT_Glyph *borderglyph, int bordersize);
 	static fontRenderClass *instance;
 #else
 	fontRenderClass();
@@ -98,6 +89,8 @@ public:
 #define GS_HYPHEN   32
 #define GS_COLORCHANGE 64
 #define GS_LF 128
+#define GS_FIXED 256
+#define GS_MAYBREAK 512
 #define GS_CANBREAK (GS_ISSPACE|GS_SOFTHYPHEN|GS_HYPHEN)
 
 struct pGlyph
@@ -105,8 +98,7 @@ struct pGlyph
 	int x, y, w;
 	unsigned long newcolor;
 	ePtr<Font> font;
-	GlyphIndex glyph_index;
-
+	FT_UInt glyph_index;
 	int flags;
 	eRect bbox;
 	FT_Glyph image, borderimage;
@@ -141,10 +133,12 @@ class eTextPara: public iObject
 	std::list<int> lineOffsets;
 	std::list<int> lineChars;
 	int charCount;
+	int lineCount;
 	int totalheight;
 	int bboxValid;
 	eRect boundBox;
 	bool doTopBottomReordering;
+	int m_offset;
 
 	int appendGlyph(Font *current_font, FT_Face current_face, FT_UInt glyphIndex, int flags, int rflags, int border, bool last,
 			bool activate_newcolor, unsigned long newcolor);
@@ -156,7 +150,7 @@ public:
 		: current_font(0), replacement_font(0), fallback_font(0),
 		current_face(0), replacement_face(0), fallback_face(0),
 		area(area), cursor(start), maximum(0, 0), left(start.x()), charCount(0), totalheight(0),
-		bboxValid(0), doTopBottomReordering(false)
+		bboxValid(0), doTopBottomReordering(false), m_offset(0)
 	{
 	}
 	virtual ~eTextPara();
@@ -167,9 +161,10 @@ public:
 	static void setFallbackFont(std::string font) { fallback_facename=font; }
 
 	void setFont(const gFont *font);
-	int renderString(const char *string, int flags=0, int border=0);
+	int renderString(const char *string, int flags=0, int border=0, int markedpos=-1);
 
 	void clear();
+	int getLineCount(void) const { return lineCount; }
 
 	void blit(gDC &dc, const ePoint &offset, const gRGB &background, const gRGB &foreground, bool border = false);
 
@@ -178,7 +173,15 @@ public:
 		dirLeft, dirRight, dirCenter, dirBlock, dirCenterIfFits, dirBidi
 	};
 
-	void realign(int dir);
+	void setTextOffset(int offset)
+	{
+		m_offset = offset;
+	}
+	void realign(int dir, int markedpos=-1, int scrollpos=0);
+	int getTextOffset()
+	{
+		return m_offset;
+	}
 
 	const eRect & getBoundBox()
 	{
@@ -222,8 +225,8 @@ public:
 	FTC_ScalerRec scaler;
 	FTC_Image_Desc font;
 	fontRenderClass *renderer;
-	FT_Error getGlyphBitmap(FT_ULong glyph_index, FTC_SBit *sbit);
-	FT_Error getGlyphImage(FT_ULong glyph_index, FT_Glyph *glyph, FT_Glyph *borderglyph, int bordersize);
+	FT_Error getGlyphBitmap(FT_UInt glyph_index, FTC_SBit *sbit);
+	FT_Error getGlyphImage(FT_UInt glyph_index, FT_Glyph *glyph, FT_Glyph *borderglyph, int bordersize);
 	FT_Face face;
 	FT_Size size;
 
