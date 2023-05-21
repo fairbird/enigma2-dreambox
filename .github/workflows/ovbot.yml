@@ -1,0 +1,28 @@
+name: ovbot
+
+on:
+  push:
+    branches: [ skin ]
+
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+
+    steps:
+
+      - uses: actions/checkout@v2
+        with:
+          ref: 'develop'
+
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.11'
+
+      - name: Build python 3.11
+        run: |
+          sudo apt-get -q update
+          sudo apt-get install dos2unix
+          pip install --upgrade pip autopep8 future 2to3
+          ./CI/build.sh

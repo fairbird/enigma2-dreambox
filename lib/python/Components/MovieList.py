@@ -11,7 +11,6 @@ from Tools.LoadPixmap import LoadPixmap
 from Tools.Directories import SCOPE_CURRENT_SKIN, resolveFilename
 from Screens.LocationBox import defaultInhibitDirs
 import NavigationInstance
-from skin import parseScale
 
 from enigma import eListboxPythonMultiContent, eListbox, gFont, iServiceInformation, RT_HALIGN_LEFT, RT_HALIGN_RIGHT, eServiceReference, eServiceCenter, eTimer, RT_VALIGN_CENTER
 
@@ -273,73 +272,73 @@ class MovieList(GUIComponent):
 			self.fontName = value
 
 		def fontSizesOriginal(value):
-			self.fontSizesOriginal = list(map(parseScale, value.split(",")))
+			self.fontSizesOriginal = list(map(int, value.split(",")))
 			if len(self.fontSizesOriginal) != 3:
 				warningWrongSkinParameter(attrib)
 
 		def fontSizesCompact(value):
-			self.fontSizesCompact = list(map(parseScale, value.split(",")))
+			self.fontSizesCompact = list(map(int, value.split(",")))
 			if len(self.fontSizesCompact) != 2:
 				warningWrongSkinParameter(attrib)
 
 		def fontSizesMinimal(value):
-			self.fontSizesMinimal = list(map(parseScale, value.split(",")))
+			self.fontSizesMinimal = list(map(int, value.split(",")))
 			if len(self.fontSizesMinimal) != 2:
 				warningWrongSkinParameter(attrib)
 
 		def itemHeights(value):
-			self.itemHeights = list(map(parseScale, value.split(",")))
+			self.itemHeights = list(map(int, value.split(",")))
 			if len(self.itemHeights) != 3:
 				warningWrongSkinParameter(attrib)
 
 		def pbarShift(value):
-			self.pbarShift = parseScale(value)
+			self.pbarShift = int(value)
 
 		def pbarHeight(value):
-			self.pbarHeight = parseScale(value)
+			self.pbarHeight = int(value)
 
 		def pbarLargeWidth(value):
-			self.pbarLargeWidth = parseScale(value)
+			self.pbarLargeWidth = int(value)
 
 		def partIconeShiftMinimal(value):
-			self.partIconeShiftMinimal = parseScale(value)
+			self.partIconeShiftMinimal = int(value)
 
 		def partIconeShiftCompact(value):
-			self.partIconeShiftCompact = parseScale(value)
+			self.partIconeShiftCompact = int(value)
 
 		def partIconeShiftOriginal(value):
-			self.partIconeShiftOriginal = parseScale(value)
+			self.partIconeShiftOriginal = int(value)
 
 		def spaceIconeText(value):
-			self.spaceIconeText = parseScale(value)
+			self.spaceIconeText = int(value)
 
 		def iconsWidth(value):
-			self.iconsWidth = parseScale(value)
+			self.iconsWidth = int(value)
 
 		def trashShift(value):
-			self.trashShift = parseScale(value)
+			self.trashShift = int(value)
 
 		def dirShift(value):
-			self.dirShift = parseScale(value)
+			self.dirShift = int(value)
 
 		def spaceRight(value):
-			self.spaceRight = parseScale(value)
+			self.spaceRight = int(value)
 
 		def columnsOriginal(value):
-			self.columnsOriginal = list(map(parseScale, value.split(",")))
+			self.columnsOriginal = list(map(int, value.split(",")))
 			if len(self.columnsOriginal) != 2:
 				warningWrongSkinParameter(attrib)
 
 		def columnsCompactDescription(value):
-			self.columnsCompactDescription = list(map(parseScale, value.split(",")))
+			self.columnsCompactDescription = list(map(int, value.split(",")))
 			if len(self.columnsCompactDescription) != 3:
 				warningWrongSkinParameter(attrib)
 
 		def compactColumn(value):
-			self.compactColumn = parseScale(value)
+			self.compactColumn = int(value)
 
 		def treeDescription(value):
-			self.treeDescription = parseScale(value)
+			self.treeDescription = int(value)
 		for (attrib, value) in self.skinAttributes[:]:
 			try:
 				locals().get(attrib)(value)
