@@ -1,4 +1,4 @@
-Enigma2 [![License: GPL v2](https://img.shields.io/badge/License-GPL%20v2-blue.svg)](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html) [![enigma2](https://github.com/fairbird/enigma2-dreambox/actions/workflows/enigma2.yml/badge.svg)](https://github.com/fairbird/enigma2-dreambox/actions/workflows/enigma2.yml) [![ovbot](https://github.com/fairbird/enigma2-dreambox/actions/workflows/ovbot.yml/badge.svg)](https://github.com/fairbird/enigma2-dreambox/actions/workflows/ovbot.yml)
+Enigma2 [![License: GPL v2](https://img.shields.io/badge/License-GPL%20v2-blue.svg)](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html) [![enigma2](https://github.com/fairbird/enigma2-dreambox/actions/workflows/enigma2.yml/badge.svg)](https://github.com/fairbird/enigma2-dreambox/actions/workflows/enigma2.yml)
 =======
 # Depend on Python3
 
