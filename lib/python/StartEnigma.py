@@ -32,6 +32,11 @@ config.misc.plugin_style = ConfigSelection(default="normallstyle", choices=[
 	("newstyle5", _("New Style 5")),
 	("newstyle6", _("New Style 6"))])
 
+# New VirtualkeyBoard Style
+config.misc.virtualkeyBoardstyle = ConfigSelection(default="new", choices=[
+	("new", _("New style")),
+	("e2", _("Enigma2 default"))])
+
 profile("SimpleSummary")
 from Screens import InfoBar
 from Screens.SimpleSummary import SimpleSummary
