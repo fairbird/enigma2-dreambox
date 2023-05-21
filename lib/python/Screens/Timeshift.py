@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from os import link, remove, stat
 from os.path import isdir, join as pathjoin, splitext
 from tempfile import NamedTemporaryFile

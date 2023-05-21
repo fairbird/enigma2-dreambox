@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from Screens.Screen import Screen
 from Screens.MessageBox import MessageBox
 from Screens.ChoiceBox import ChoiceBox
@@ -659,12 +660,12 @@ class oscInfo(Screen, OscamInfo):
 		button_width = int(sizeH / 4)
 		for k, v in enumerate(["red", "green", "yellow", "blue"]):
 			xpos = k * button_width
-			self.skin += """<ePixmap name="%s" position="%d,%d" size="40,40" pixmap="buttons/key_%s.png" zPosition="1" transparent="1" alphatest="blend" />""" % (v, xpos, ypos, v)
-			self.skin += """<widget source="key_%s" render="Label" position="%d,%d" size="%d,%d" font="Regular;26" zPosition="1" valign="center" transparent="1" />""" % (v, xpos + 50, ypos, button_width, 27)
+			self.skin += """<ePixmap name="%s" position="%d,%d" size="40,40" pixmap="buttons/key_%s.png" zPosition="1" transparent="1" alphaTest="blend" />""" % (v, xpos, ypos, v)
+			self.skin += """<widget source="key_%s" render="Label" position="%d,%d" size="%d,%d" font="Regular;26" zPosition="1" verticalAlignment="center" transparent="1" />""" % (v, xpos + 50, ypos, button_width, 27)
 		if f == 1.5:
-		    self.skin += """<ePixmap name="divh" position="10,55" size="%d,2" pixmap="div-h-fhd.png" transparent="1" alphatest="blend" />""" % sizeH
+		    self.skin += """<ePixmap name="divh" position="10,55" size="%d,2" pixmap="div-h-fhd.png" transparent="1" alphaTest="blend" />""" % sizeH
 		else:
-		    self.skin += """<ePixmap name="divh" position="10,55" size="%d,2" pixmap="div-h.png" transparent="1" alphatest="blend" />""" % sizeH
+		    self.skin += """<ePixmap name="divh" position="10,55" size="%d,2" pixmap="div-h.png" transparent="1" alphaTest="blend" />""" % sizeH
 		self.skin += """<widget name="output" position="10,65" size="%d,%d" zPosition="1" scrollbarMode="showOnDemand" />""" % (self.sizeLH, ysize - 80)
 		self.skin += """</screen>"""
 		Screen.__init__(self, session)
@@ -959,8 +960,7 @@ class oscEntitlements(Screen, OscamInfo):
 		self.close()
 
 	def buildList(self, data):
-		caids = list(data.keys())
-		caids.sort()
+		caids = sorted(data.keys())
 		outlist = []
 		res = [("Caid", _("System"), "1", "2", "3", "4", "5", "Total", _("Reshare"), "")]
 		for i in caids:
@@ -1101,8 +1101,7 @@ class oscReaderStats(Screen, OscamInfo):
 		self.close()
 
 	def buildList(self, data):
-		caids = list(data.keys())
-		caids.sort()
+		caids = sorted(data.keys())
 		outlist = []
 		res = [("Caid", "System", "1", "2", "3", "4", "5", "Total", "Reshare", "")]
 		for i in caids:
@@ -1213,8 +1212,8 @@ class OscamInfoConfigScreen(ConfigListScreen, Screen):
 			self.skin += """<widget name="config" font="Regular;30" itemHeight="50" backgroundColor="black" foregroundColor="white" scrollbarMode="showOnDemand" enableWrapAround="1" position="center,center" size="960,540" transparent="1" />"""
 			self.skin += """<widget name="status" render="Label" font="Regular;30" itemHeight="50" scrollbarMode="showOnDemand" enableWrapAround="1" position="50,50" size="960,540" transparent="1" />"""
 			self.skin += """<eLabel backgroundColor="white" name="" position="0,450" size="960,2" zPosition="-9" />"""
-			self.skin += """<ePixmap alphatest="blend" pixmap="buttons/key_red.png" position="60,475" size="40,40" />"""
-			self.skin += """<ePixmap alphatest="blend" pixmap="buttons/key_green.png" position="255,475" size="40,40" />"""
+			self.skin += """<ePixmap alphaTest="blend" pixmap="buttons/key_red.png" position="60,475" size="40,40" />"""
+			self.skin += """<ePixmap alphaTest="blend" pixmap="buttons/key_green.png" position="255,475" size="40,40" />"""
 			self.skin += """<widget source="key_red" render="Label" font="Regular;28" position="120,480" size="270,40" transparent="1" zPosition="1" />"""
 			self.skin += """<widget source="key_green" render="Label" font="Regular;28" position="315,480" size="270,40" transparent="1" zPosition="1" />"""
 		else:
@@ -1222,8 +1221,8 @@ class OscamInfoConfigScreen(ConfigListScreen, Screen):
 			self.skin += """<widget name="config" font="Regular;20" itemHeight="50" foregroundColor="white" scrollbarMode="showOnDemand" enableWrapAround="1" position="center,center" size="640,400" transparent="1" />"""
 			self.skin += """<widget name="status" render="Label" font="Regular;20" itemHeight="30" scrollbarMode="showOnDemand" enableWrapAround="1" position="33,33" size="640,360" transparent="1" />"""
 			self.skin += """<eLabel backgroundColor="white" name="" position="0,350" size="640,2" zPosition="-9" />"""
-			self.skin += """<ePixmap alphatest="blend" pixmap="buttons/key_red.png" position="40,365" size="35,35" />"""
-			self.skin += """<ePixmap alphatest="blend" pixmap="buttons/key_green.png" position="180,365" size="35,35" />"""
+			self.skin += """<ePixmap alphaTest="blend" pixmap="buttons/key_red.png" position="40,365" size="35,35" />"""
+			self.skin += """<ePixmap alphaTest="blend" pixmap="buttons/key_green.png" position="180,365" size="35,35" />"""
 			self.skin += """<widget source="key_red" render="Label" font="Regular;18" position="80,367" size="180,35" transparent="1" zPosition="1" />"""
 			self.skin += """<widget source="key_green" render="Label" font="Regular;18" position="220,367" size="220,35" transparent="1" zPosition="1" />"""
 		self.skin += """</screen>"""

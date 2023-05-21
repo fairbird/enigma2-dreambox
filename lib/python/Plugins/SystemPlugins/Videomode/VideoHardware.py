@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from Components.config import config, ConfigSlider, ConfigSelection, ConfigSubDict, ConfigYesNo, ConfigEnableDisable, ConfigOnOff, ConfigSubsection, ConfigBoolean, ConfigSelectionNumber, ConfigNothing, NoSave  # storm - some config are required
 from Components.SystemInfo import SystemInfo
 from Tools.CList import CList

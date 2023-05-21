@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from Screens.MessageBox import MessageBox
 from enigma import eStreamServer
 

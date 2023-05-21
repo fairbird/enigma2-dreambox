@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from Components.MenuList import MenuList
 from Screens.Screen import Screen
 from Components.ActionMap import ActionMap

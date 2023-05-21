@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from Components.Sensors import sensors
 
 from enigma import eTimer

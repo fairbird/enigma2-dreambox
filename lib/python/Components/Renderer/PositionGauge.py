@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from Components.Renderer.Renderer import Renderer
 from enigma import ePositionGauge
 

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from Screens.Screen import Screen
 from Components.config import config, ConfigClock, ConfigDateTime
 from Components.ActionMap import NumberActionMap

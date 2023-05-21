@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from Components.Sources.Source import Source
 from enigma import eServiceCenter, eServiceReference
 

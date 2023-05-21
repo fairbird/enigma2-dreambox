@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from Components.GUIComponent import GUIComponent
 from Tools.FuzzyDate import FuzzyTime
 from ServiceReference import ServiceReference

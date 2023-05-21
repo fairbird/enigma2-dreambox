@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import xml.sax
 from Tools.Directories import crawlDirectory, resolveFilename, SCOPE_CONFIG, SCOPE_SKIN, copyfile, copytree
 from Components.Console import Console

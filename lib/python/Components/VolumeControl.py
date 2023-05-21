@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from enigma import eDVBVolumecontrol, eTimer
 from Tools.Profile import profile
 from Screens.Volume import Volume

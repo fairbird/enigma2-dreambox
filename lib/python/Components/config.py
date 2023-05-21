@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from enigma import getPrevAsciiCode
 from Tools.NumericalTextInput import NumericalTextInput
 from Tools.Directories import resolveFilename, SCOPE_CONFIG, fileExists

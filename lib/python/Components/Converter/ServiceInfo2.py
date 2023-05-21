@@ -1,4 +1,3 @@
-#!/usr/bin/python
 # -*- coding: utf-8 -*-
 from Components.Converter.Poll import Poll
 from Components.Converter.Converter import Converter

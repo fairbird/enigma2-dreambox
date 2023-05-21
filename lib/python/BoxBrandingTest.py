@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import boxbranding
 print("getMachineBuild=%s<" % boxbranding.getMachineBuild())
 print("getMachineMake=%s<" % boxbranding.getMachineMake())

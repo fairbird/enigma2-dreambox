@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from Components.Pixmap import MovingPixmap, MultiPixmap
 from Tools.Directories import resolveFilename, SCOPE_SKIN
 from xml.etree.ElementTree import ElementTree

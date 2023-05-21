@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import os
 from enigma import eConsoleAppContainer
 from Components.Harddisk import harddiskmanager

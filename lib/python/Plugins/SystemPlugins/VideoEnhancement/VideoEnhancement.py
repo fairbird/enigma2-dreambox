@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from Components.config import config, ConfigSubsection, ConfigSlider, ConfigSelection, ConfigBoolean, ConfigNothing, NoSave
 import os
 

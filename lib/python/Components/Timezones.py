@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from errno import ENOENT
 from os import environ, path, symlink, unlink, walk
 from os.path import exists, isfile, join as pathjoin, realpath

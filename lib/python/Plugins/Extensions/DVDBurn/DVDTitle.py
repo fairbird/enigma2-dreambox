@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from Components.config import config, ConfigSubsection, ConfigSubList, ConfigInteger, ConfigText, ConfigSelection
 from . import TitleCutter
 

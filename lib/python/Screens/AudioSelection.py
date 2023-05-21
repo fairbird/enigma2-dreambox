@@ -497,8 +497,8 @@ class SubtitleSelection(AudioSelection):
 class QuickSubtitlesConfigMenu(ConfigListScreen, Screen):
 	skin = """
 	<screen position="50,50" size="480,305" title="Subtitle settings" backgroundColor="#7f000000" flags="wfNoBorder">
-		<widget name="config" position="5,5" size="470,275" font="Regular;18" zPosition="1" transparent="1" selectionPixmap="buttons/sel.png" valign="center" />
-		<widget name="videofps" position="5,280" size="470,20" backgroundColor="secondBG" transparent="1" zPosition="1" font="Regular;16" valign="center" halign="left" foregroundColor="blue"/>
+		<widget name="config" position="5,5" size="470,275" font="Regular;18" zPosition="1" transparent="1" selectionPixmap="buttons/sel.png" verticalAlignment="center" />
+		<widget name="videofps" position="5,280" size="470,20" backgroundColor="secondBG" transparent="1" zPosition="1" font="Regular;16" verticalAlignment="center" horizontalAlignment="left" foregroundColor="blue"/>
 	</screen>"""
 
 	FLAG_CENTER_DVB_SUBS = 2048

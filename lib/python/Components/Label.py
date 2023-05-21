@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from Components.GUIComponent import GUIComponent
 from Components.VariableText import VariableText
 from skin import parseColor

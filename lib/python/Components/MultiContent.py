@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from enigma import RT_HALIGN_LEFT, RT_VALIGN_TOP, eListboxPythonMultiContent
 
 from skin import parseColor

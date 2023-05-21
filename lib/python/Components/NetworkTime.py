@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from time import ctime, time
 
 from enigma import eTimer, eDVBLocalTimeHandler, eEPGCache

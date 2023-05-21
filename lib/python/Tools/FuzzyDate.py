@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from Components.config import config
 from time import localtime, time, strftime
 

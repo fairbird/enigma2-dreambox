@@ -1,4 +1,3 @@
-#!/usr/bin/python
 # -*- coding: utf-8 -*-
 from Components.Pixmap import Pixmap
 from Components.Renderer.Renderer import Renderer

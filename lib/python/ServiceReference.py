@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from enigma import eServiceReference, eServiceCenter, getBestPlayableServiceReference
 import NavigationInstance
 

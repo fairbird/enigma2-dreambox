@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import os, re, random, netifaces
 from Screens.Screen import Screen
 from Screens.Setup import Setup
@@ -352,12 +353,12 @@ class NetworkMacSetup(Screen, ConfigListScreen, HelpableScreen):
                         <eLabel position="238,547" size="200,4" foregroundColor="#00389416" backgroundColor="#00389416" zPosition="1"/>
                         <eLabel position="456,547" size="200,4" foregroundColor="#00bab329" backgroundColor="#00bab329" zPosition="1"/>
                         <eLabel position="675,547" size="200,4" foregroundColor="#00ff2525" backgroundColor="#000080ff" zPosition="1"/>
-                        <widget source="key_red" render="Label" position="20,506" zPosition="1" size="200,40" font="Regular;28" halign="center" valign="center" transparent="1" />
-                        <widget source="key_green" render="Label" position="238,506" zPosition="1" size="200,40" font="Regular;28" halign="center" valign="center" transparent="1" />
-                        <widget source="key_yellow" render="Label" position="456,506" zPosition="1" size="200,40" font="Regular;28" halign="center" valign="center" transparent="1" />
-                        <widget source="key_blue" render="Label" position="660,506" zPosition="1" size="230,40" font="Regular;28" halign="center" valign="center" transparent="1" />
+                        <widget source="key_red" render="Label" position="20,506" zPosition="1" size="200,40" font="Regular;28" horizontalAlignment="center" verticalAlignment="center" transparent="1" />
+                        <widget source="key_green" render="Label" position="238,506" zPosition="1" size="200,40" font="Regular;28" horizontalAlignment="center" verticalAlignment="center" transparent="1" />
+                        <widget source="key_yellow" render="Label" position="456,506" zPosition="1" size="200,40" font="Regular;28" horizontalAlignment="center" verticalAlignment="center" transparent="1" />
+                        <widget source="key_blue" render="Label" position="660,506" zPosition="1" size="230,40" font="Regular;28" horizontalAlignment="center" verticalAlignment="center" transparent="1" />
                         <widget name="config" itemHeight="45" font="Regular;33" position="10,50" size="890,308" scrollbarMode="showOnDemand" />
-                        <!--widget source="introduction" render="Label" position="48,390" size="803,67" zPosition="10" font="Regular;30" halign="center" valign="center" transparent="1" foregroundColor="#00ff2525" /-->
+                        <!--widget source="introduction" render="Label" position="48,390" size="803,67" zPosition="10" font="Regular;30" horizontalAlignment="center" verticalAlignment="center" transparent="1" foregroundColor="#00ff2525" /-->
                 </screen>"""
     else:
                 skin = """
@@ -366,12 +367,12 @@ class NetworkMacSetup(Screen, ConfigListScreen, HelpableScreen):
                         <eLabel position="200,385" size="150,2" foregroundColor="#00389416" backgroundColor="#00389416" zPosition="1"/>
                         <eLabel position="374,385" size="150,4" foregroundColor="#00bab329" backgroundColor="#00bab329" zPosition="1"/>
                         <eLabel position="545,385" size="150,4" foregroundColor="#00ff2525" backgroundColor="#000080ff" zPosition="1"/>
-                        <widget source="key_red" render="Label" position="25,345" zPosition="1" size="150,40" font="Regular;22" halign="center" valign="center" transparent="1" />
-                        <widget source="key_green" render="Label" position="200,345" zPosition="1" size="150,40" font="Regular;22" halign="center" valign="center" transparent="1" />
-                        <widget source="key_yellow" render="Label" position="374,345" zPosition="1" size="150,40" font="Regular;22" halign="center" valign="center" transparent="1" />
-                        <widget source="key_blue" render="Label" position="535,345" zPosition="1" size="170,40" font="Regular;22" halign="center" valign="center" transparent="1" />
+                        <widget source="key_red" render="Label" position="25,345" zPosition="1" size="150,40" font="Regular;22" horizontalAlignment="center" verticalAlignment="center" transparent="1" />
+                        <widget source="key_green" render="Label" position="200,345" zPosition="1" size="150,40" font="Regular;22" horizontalAlignment="center" verticalAlignment="center" transparent="1" />
+                        <widget source="key_yellow" render="Label" position="374,345" zPosition="1" size="150,40" font="Regular;22" horizontalAlignment="center" verticalAlignment="center" transparent="1" />
+                        <widget source="key_blue" render="Label" position="535,345" zPosition="1" size="170,40" font="Regular;22" horizontalAlignment="center" verticalAlignment="center" transparent="1" />
                         <widget name="config" position="10,50" size="700,235" scrollbarMode="showOnDemand" />
-                        <!--widget source="introduction" render="Label" position="80,200" size="560,50" zPosition="10" font="Regular;21" halign="center" valign="center" transparent="1" foregroundColor="#00ff2525"/-->
+                        <!--widget source="introduction" render="Label" position="80,200" size="560,50" zPosition="10" font="Regular;21" horizontalAlignment="center" verticalAlignment="center" transparent="1" foregroundColor="#00ff2525"/-->
                 </screen>"""
 
     def __init__(self, session):

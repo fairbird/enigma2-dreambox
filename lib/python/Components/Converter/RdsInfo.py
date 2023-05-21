@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from enigma import iRdsDecoder, iPlayableService
 from Components.Converter.Converter import Converter
 from Components.Element import cached

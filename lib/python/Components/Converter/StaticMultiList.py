@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from enigma import eListboxPythonMultiContent
 from Components.Converter.StringList import StringList
 

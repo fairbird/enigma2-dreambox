@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from Screens.Screen import Screen
 from xml.etree.cElementTree import parse
 from Screens.MessageBox import MessageBox

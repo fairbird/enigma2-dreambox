@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from enigma import eServiceCenter, eServiceReference
 from Components.config import config
 from ServiceReference import isPlayableForCur

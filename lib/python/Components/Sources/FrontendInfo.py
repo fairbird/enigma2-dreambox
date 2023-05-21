@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from enigma import iPlayableService, eDVBResourceManager, eDVBSatelliteEquipmentControl
 from Components.Sources.Source import Source
 from Components.PerServiceDisplay import PerServiceBase

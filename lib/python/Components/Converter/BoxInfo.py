@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#<widget source="session.CurrentService" render="Label" position="1356,284" size="488,34" zPosition="2" font="Regular;30" halign="center" foregroundColor="red" backgroundColor="transpBlack" transparent="1">
+#<widget source="session.CurrentService" render="Label" position="1356,284" size="488,34" zPosition="2" font="Regular;30" horizontalAlignment="center" foregroundColor="red" backgroundColor="transpBlack" transparent="1">
 #	<convert type="BoxInfo">Boxtype</convert>
 #</widget>
 

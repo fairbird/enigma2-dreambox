@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from os import listdir, mkdir, rename
 from os.path import exists
 from time import sleep
@@ -34,26 +35,26 @@ class CronTimers(Screen):
 		skin = '''
 			<screen name="CronTimers" position="center,center" size="570,460" title="Cron Manager">
 				<eLabel backgroundColor="background" position="0,0" size="570,460" zPosition="-1" />
-				<widget source="title" render="Label" position="10,5" size="280,35" valign="center" font="Enigma;30" halign="center" />
+				<widget source="title" render="Label" position="10,5" size="280,35" verticalAlignment="center" font="Enigma;30" horizontalAlignment="center" />
 				<eLabel backgroundColor="darkgrey" position="0,430" size="560,2" zPosition="1"/>
-				<widget source="global.CurrentTime" render="Label" position="500,435" size="55,22" font="Enigma;18" halign="right" transparent="1" valign="center" zPosition="3">
+				<widget source="global.CurrentTime" render="Label" position="500,435" size="55,22" font="Enigma;18" horizontalAlignment="right" transparent="1" verticalAlignment="center" zPosition="3">
 					<convert type="ClockToText">Default</convert>
 				</widget>
-				<ePixmap pixmap="skin_default/buttons/red.png" position="0,0" size="140,40" alphatest="on" />
-				<widget source="key_red" render="Label" font="Regular;20" halign="center" position="-2,1" size="140,40" transparent="1" valign="center" zPosition="10" />
-				<ePixmap pixmap="skin_default/buttons/green.png" position="140,0" size="140,40" alphatest="on" />
-				<widget source="key_green" render="Label" font="Regular;20" halign="center" position="140,0" size="140,40" transparent="1" valign="center" zPosition="10" />
-				<ePixmap pixmap="skin_default/buttons/yellow.png" position="280,0" size="140,40" alphatest="on" />
-				<widget source="key_yellow" render="Label" font="Regular;20" halign="center" position="280,1" size="140,40" transparent="1" valign="center" zPosition="10" />
-				<ePixmap pixmap="skin_default/buttons/blue.png" position="420,0" size="140,40" alphatest="on" />
-				<widget source="key_blue" render="Label" font="Regular;20" halign="center" position="420,0" size="140,40" transparent="1" valign="center" zPosition="10" />
-				<widget name="lab1" position="10,100" size="100,24" font="Regular;20" valign="center" transparent="0" />
-				<widget name="labdisabled" position="110,100" size="100,24" font="Regular;20" valign="center" halign="center" backgroundColor="red" zPosition="1" />
-				<widget name="labactive" position="110,100" size="100,24" font="Regular;20" valign="center" halign="center" backgroundColor="green" zPosition="2" />
-				<widget name="lab2" position="290,100" size="150,24" font="Regular;20" valign="center" transparent="0" />
-				<widget name="labstop" position="440,100" size="100,24" font="Regular;20" valign="center" halign="center" backgroundColor="red" zPosition="1" />
-				<widget name="labrun" position="440,100" size="100,24" font="Regular;20" valign="center" halign="center" backgroundColor="green" zPosition="2"/>
-				<widget source="list" render="Listbox" position="10,140" size="540,280" scrollbarSliderBorderWidth="1" scrollbarWidth="10" transparent="1" >
+				<ePixmap pixmap="skin_default/buttons/red.png" position="0,0" size="140,40" alphaTest="on" />
+				<widget source="key_red" render="Label" font="Regular;20" horizontalAlignment="center" position="-2,1" size="140,40" transparent="1" verticalAlignment="center" zPosition="10" />
+				<ePixmap pixmap="skin_default/buttons/green.png" position="140,0" size="140,40" alphaTest="on" />
+				<widget source="key_green" render="Label" font="Regular;20" horizontalAlignment="center" position="140,0" size="140,40" transparent="1" verticalAlignment="center" zPosition="10" />
+				<ePixmap pixmap="skin_default/buttons/yellow.png" position="280,0" size="140,40" alphaTest="on" />
+				<widget source="key_yellow" render="Label" font="Regular;20" horizontalAlignment="center" position="280,1" size="140,40" transparent="1" verticalAlignment="center" zPosition="10" />
+				<ePixmap pixmap="skin_default/buttons/blue.png" position="420,0" size="140,40" alphaTest="on" />
+				<widget source="key_blue" render="Label" font="Regular;20" horizontalAlignment="center" position="420,0" size="140,40" transparent="1" verticalAlignment="center" zPosition="10" />
+				<widget name="lab1" position="10,100" size="100,24" font="Regular;20" verticalAlignment="center" transparent="0" />
+				<widget name="labdisabled" position="110,100" size="100,24" font="Regular;20" verticalAlignment="center" horizontalAlignment="center" backgroundColor="red" zPosition="1" />
+				<widget name="labactive" position="110,100" size="100,24" font="Regular;20" verticalAlignment="center" horizontalAlignment="center" backgroundColor="green" zPosition="2" />
+				<widget name="lab2" position="290,100" size="150,24" font="Regular;20" verticalAlignment="center" transparent="0" />
+				<widget name="labstop" position="440,100" size="100,24" font="Regular;20" verticalAlignment="center" horizontalAlignment="center" backgroundColor="red" zPosition="1" />
+				<widget name="labrun" position="440,100" size="100,24" font="Regular;20" verticalAlignment="center" horizontalAlignment="center" backgroundColor="green" zPosition="2"/>
+				<widget source="list" render="Listbox" position="10,140" size="540,280" scrollbarBorderWidth="1" scrollbarWidth="10" transparent="1" >
 					<convert type="TemplatedMultiContent">
 						{"template": 
 							[
@@ -64,32 +65,32 @@ class CronTimers(Screen):
 						}
 					</convert>
 				</widget>
-				<widget name="key" position="5,56" size="544,25" font="Regular;20" halign="center" transparent="1" valign="center" backgroundColor="background" />
+				<widget name="key" position="5,56" size="544,25" font="Regular;20" horizontalAlignment="center" transparent="1" verticalAlignment="center" backgroundColor="background" />
 			</screen>'''
 	else:
 		skin = '''
 			<screen name="CronTimers" position="center,center" size="990,840" title="Cron Manager">
 				<eLabel backgroundColor="background" position="0,0" size="990,840" zPosition="-1" />
-				<widget source="title" render="Label" position="10,5" size="700,45" valign="center" font="Enigma;35" halign="center" />
+				<widget source="title" render="Label" position="10,5" size="700,45" verticalAlignment="center" font="Enigma;35" horizontalAlignment="center" />
 				<eLabel backgroundColor="darkgrey" position="0,788" size="990,2" zPosition="1"/>
-				<widget source="global.CurrentTime" render="Label" position="910,795" size="80,45" font="Enigma;28" halign="right" transparent="1" valign="center" zPosition="3">
+				<widget source="global.CurrentTime" render="Label" position="910,795" size="80,45" font="Enigma;28" horizontalAlignment="right" transparent="1" verticalAlignment="center" zPosition="3">
 					<convert type="ClockToText">Default</convert>
 				</widget>
-				<ePixmap pixmap="skin_default/buttons/red.png" position="0,0" size="209,40" alphatest="on" />
-				<widget source="key_red" render="Label" font="Regular;28" halign="center" position="0,0" size="209,40" transparent="1" valign="center" zPosition="10" />
-				<ePixmap pixmap="skin_default/buttons/green.png" position="260,0" size="209,40" alphatest="on" />
-				<widget source="key_green" render="Label" font="Regular;28" halign="center" position="260,0" size="209,40" transparent="1" valign="center" zPosition="10" />
-				<ePixmap pixmap="skin_default/buttons/yellow.png" position="520,0" size="209,40" alphatest="on" />
-				<widget source="key_yellow" render="Label" font="Regular;28" halign="center" position="520,1" size="209,40" transparent="1" valign="center" zPosition="10" />
-				<ePixmap pixmap="skin_default/buttons/blue.png" position="781,0" size="209,40" alphatest="on" />
-				<widget source="key_blue" render="Label" font="Regular;28" halign="center" position="781,0" size="209,40" transparent="1" valign="center" zPosition="10" />
-				<widget name="lab1" position="10,150" size="200,40" font="Regular;28" valign="center" transparent="0" />
-				<widget name="labdisabled" position="215,150" size="150,40" font="Regular;28" valign="center" halign="center" backgroundColor="red" zPosition="1" />
-				<widget name="labactive" position="215,150" size="150,40" font="Regular;28" valign="center" halign="center" backgroundColor="green" zPosition="2" />
-				<widget name="lab2" position="575,150" size="200,40" font="Regular;28" valign="center" transparent="0" />
-				<widget name="labstop" position="780,150" size="150,40" font="Regular;28" valign="center" halign="center" backgroundColor="red" zPosition="1" />
-				<widget name="labrun" position="780,150" size="150,40" font="Regular;28" valign="center" halign="center" backgroundColor="green" zPosition="2"/>
-				<widget source="list" render="Listbox" position="10,205" size="967,558" scrollbarSliderBorderWidth="1" scrollbarWidth="10" transparent="1" >
+				<ePixmap pixmap="skin_default/buttons/red.png" position="0,0" size="209,40" alphaTest="on" />
+				<widget source="key_red" render="Label" font="Regular;28" horizontalAlignment="center" position="0,0" size="209,40" transparent="1" verticalAlignment="center" zPosition="10" />
+				<ePixmap pixmap="skin_default/buttons/green.png" position="260,0" size="209,40" alphaTest="on" />
+				<widget source="key_green" render="Label" font="Regular;28" horizontalAlignment="center" position="260,0" size="209,40" transparent="1" verticalAlignment="center" zPosition="10" />
+				<ePixmap pixmap="skin_default/buttons/yellow.png" position="520,0" size="209,40" alphaTest="on" />
+				<widget source="key_yellow" render="Label" font="Regular;28" horizontalAlignment="center" position="520,1" size="209,40" transparent="1" verticalAlignment="center" zPosition="10" />
+				<ePixmap pixmap="skin_default/buttons/blue.png" position="781,0" size="209,40" alphaTest="on" />
+				<widget source="key_blue" render="Label" font="Regular;28" horizontalAlignment="center" position="781,0" size="209,40" transparent="1" verticalAlignment="center" zPosition="10" />
+				<widget name="lab1" position="10,150" size="200,40" font="Regular;28" verticalAlignment="center" transparent="0" />
+				<widget name="labdisabled" position="215,150" size="150,40" font="Regular;28" verticalAlignment="center" horizontalAlignment="center" backgroundColor="red" zPosition="1" />
+				<widget name="labactive" position="215,150" size="150,40" font="Regular;28" verticalAlignment="center" horizontalAlignment="center" backgroundColor="green" zPosition="2" />
+				<widget name="lab2" position="575,150" size="200,40" font="Regular;28" verticalAlignment="center" transparent="0" />
+				<widget name="labstop" position="780,150" size="150,40" font="Regular;28" verticalAlignment="center" horizontalAlignment="center" backgroundColor="red" zPosition="1" />
+				<widget name="labrun" position="780,150" size="150,40" font="Regular;28" verticalAlignment="center" horizontalAlignment="center" backgroundColor="green" zPosition="2"/>
+				<widget source="list" render="Listbox" position="10,205" size="967,558" scrollbarBorderWidth="1" scrollbarWidth="10" transparent="1" >
 					<convert type="TemplatedMultiContent">
 						{"template": 
 							[
@@ -100,7 +101,7 @@ class CronTimers(Screen):
 						}
 					</convert>
 				</widget>
-				<widget name="key" position="5,70" size="981,45" font="Regular;28" halign="center" transparent="1" valign="center" backgroundColor="background" />
+				<widget name="key" position="5,70" size="981,45" font="Regular;28" horizontalAlignment="center" transparent="1" verticalAlignment="center" backgroundColor="background" />
 			</screen>'''
 
 	def __init__(self, session):

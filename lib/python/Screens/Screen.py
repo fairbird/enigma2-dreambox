@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from enigma import eRCInput, eTimer, eWindow , getDesktop
 
 from skin import GUI_SKIN_ID, applyAllAttributes
@@ -295,10 +296,10 @@ class Screen(dict):
 class ScreenSummary(Screen):
 	skin = """
 	<screen position="fill" flags="wfNoBorder">
-		<widget source="global.CurrentTime" render="Label" position="0,0" size="e,20" font="Regular;16" halign="center" valign="center">
+		<widget source="global.CurrentTime" render="Label" position="0,0" size="e,20" font="Regular;16" horizontalAlignment="center" verticalAlignment="center">
 			<convert type="ClockToText">WithSeconds</convert>
 		</widget>
-		<widget source="Title" render="Label" position="0,25" size="e,45" font="Regular;18" halign="center" valign="center" />
+		<widget source="Title" render="Label" position="0,25" size="e,45" font="Regular;18" horizontalAlignment="center" verticalAlignment="center" />
 	</screen>"""
 
 	def __init__(self, session, parent):

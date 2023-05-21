@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import bisect
 from time import sleep
 from struct import unpack, Struct
@@ -151,7 +152,7 @@ class CutListEditor(Screen, InfoBarBase, InfoBarSeek, InfoBarCueSheetSupport, He
 	skin = """
 	<screen name="CutListEditor" position="fill" flags="wfNoBorder">
 		<panel name="BasicTemplate"/>
-		<eLabel text="Cutlist editor" position="30,7" size="1830,75" backgroundColor="secondBG" transparent="1" zPosition="1" font="Regular;36" valign="center" halign="left"/>
+		<eLabel text="Cutlist editor" position="30,7" size="1830,75" backgroundColor="secondBG" transparent="1" zPosition="1" font="Regular;36" verticalAlignment="center" horizontalAlignment="left"/>
 		<widget source="cutlist" render="Listbox" position="30,100" size="570,912" backgroundColor="black" zPosition="3" transparent="1" scrollbarMode="showOnDemand">
 			<convert type="TemplatedMultiContent">
 				{"template": [
@@ -164,18 +165,18 @@ class CutListEditor(Screen, InfoBarBase, InfoBarSeek, InfoBarCueSheetSupport, He
 			</convert>
 		</widget>
 		<widget name="Video" position="630,105" backgroundColor="transparent" size="1260,709" zPosition="1"/>
-		<widget source="session.CurrentService" render="Label" position="630,825" size="1260,45" font="Regular;37" backgroundColor="black" zPosition="1" transparent="1" valign="center" halign="center">
+		<widget source="session.CurrentService" render="Label" position="630,825" size="1260,45" font="Regular;37" backgroundColor="black" zPosition="1" transparent="1" verticalAlignment="center" horizontalAlignment="center">
 			<convert type="ServiceName">Name</convert>
 		</widget>
-		<widget source="session.CurrentService" render="Label" position="630,900" size="1260,45" font="Regular;37" backgroundColor="black" zPosition="1" transparent="1" valign="center" halign="center">
+		<widget source="session.CurrentService" render="Label" position="630,900" size="1260,45" font="Regular;37" backgroundColor="black" zPosition="1" transparent="1" verticalAlignment="center" horizontalAlignment="center">
 			<convert type="ServicePosition">Position,Detailed</convert>
 		</widget>
-		<widget name="SeekState" position="532,949" zPosition="1" size="150,37" halign="right" font="Regular;30" valign="center"/>
+		<widget name="SeekState" position="532,949" zPosition="1" size="150,37" horizontalAlignment="right" font="Regular;30" verticalAlignment="center"/>
 		<widget name="Timeline" position="690,952" size="1140,30" backgroundColor="#505555" pointer="position_arrow.png:4,11" foregroundColor="black"/>
-		<ePixmap pixmap="buttons/key_ok.png" position="80,950" size="52,38" alphatest="blend"/>
-		<eLabel text="Menu" position="150,950" size="370,38" backgroundColor="secondBG" font="Regular;34" halign="left" transparent="1" zPosition="1"/>
-		<ePixmap pixmap="buttons/key_0.png" position="280,950" size="52,38" alphatest="blend"/>
-		<eLabel text="Mark" position="350,950" size="370,38" backgroundColor="secondBG" font="Regular;34" halign="left" transparent="1" zPosition="1"/>
+		<ePixmap pixmap="buttons/key_ok.png" position="80,950" size="52,38" alphaTest="blend"/>
+		<eLabel text="Menu" position="150,950" size="370,38" backgroundColor="secondBG" font="Regular;34" horizontalAlignment="left" transparent="1" zPosition="1"/>
+		<ePixmap pixmap="buttons/key_0.png" position="280,950" size="52,38" alphaTest="blend"/>
+		<eLabel text="Mark" position="350,950" size="370,38" backgroundColor="secondBG" font="Regular;34" horizontalAlignment="left" transparent="1" zPosition="1"/>
 	</screen>"""
 
 	BACK_BACK = 0

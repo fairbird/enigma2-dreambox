@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import os
 from enigma import eEPGCache, getBestPlayableServiceReference, eStreamServer, eServiceReference, iRecordableService, quitMainloop, eActionMap, setPreferredTuner
 

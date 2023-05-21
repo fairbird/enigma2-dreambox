@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from Components.MenuList import MenuList
 from Tools.Directories import resolveFilename, SCOPE_CURRENT_SKIN
 from enigma import eListboxPythonMultiContent, eListbox, gFont, RT_HALIGN_LEFT

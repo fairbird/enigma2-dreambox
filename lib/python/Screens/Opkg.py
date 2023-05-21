@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from Components.ActionMap import ActionMap
 from Components.Opkg import OpkgComponent
 from Components.Label import Label

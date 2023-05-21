@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Converts hex colors to formatted strings,
 # suitable for embedding in python code.
 

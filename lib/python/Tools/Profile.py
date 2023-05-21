@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # the implementation here is a bit crappy.
 import time
 from Tools.Directories import resolveFilename, SCOPE_CONFIG

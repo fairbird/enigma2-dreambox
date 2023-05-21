@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from fcntl import ioctl
 from os import O_NONBLOCK, O_RDWR, close as osclose, listdir, open as osopen, write as oswrite
 from os.path import isdir, isfile

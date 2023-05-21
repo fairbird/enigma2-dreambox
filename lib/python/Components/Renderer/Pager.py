@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from Components.Renderer.Renderer import Renderer
 from Components.ActionMap import ActionMap
 from skin import parseColor, parseFont

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from os import listdir
 
 from Components.Console import Console

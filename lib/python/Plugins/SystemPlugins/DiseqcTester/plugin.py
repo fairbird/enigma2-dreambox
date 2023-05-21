@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from Screens.Satconfig import NimSelection
 from Screens.Screen import Screen
 from Screens.TextBox import TextBox
@@ -134,17 +135,17 @@ class DiseqcTester(Screen, TuneTest, ResultParser):
 					}
 				</convert>
 			</widget>
-			<widget name="Overall_progress" position="20,162" size="480,22" font="Regular;21" halign="center" transparent="1" />
+			<widget name="Overall_progress" position="20,162" size="480,22" font="Regular;21" horizontalAlignment="center" transparent="1" />
 			<widget source="overall_progress" render="Progress" position="20,192" size="480,20" borderWidth="2" backgroundColor="#254f7497" />
-			<widget name="Progress"  position="20,222" size="480,22" font="Regular;21" halign="center" transparent="1" />
+			<widget name="Progress"  position="20,222" size="480,22" font="Regular;21" horizontalAlignment="center" transparent="1" />
 			<widget source="sub_progress" render="Progress" position="20,252" size="480,20" borderWidth="2" backgroundColor="#254f7497" />
-			<widget name="Failed" position="20,282" size="140,22" font="Regular;21" halign="left" transparent="1" />
+			<widget name="Failed" position="20,282" size="140,22" font="Regular;21" horizontalAlignment="left" transparent="1" />
 			<widget source="failed_counter" render="Label" position="160,282" size="100,20" font="Regular;21" />
-			<widget name="Succeeded"  position="20,312" size="140,22" font="Regular;21" halign="left" transparent="1" />
+			<widget name="Succeeded"  position="20,312" size="140,22" font="Regular;21" horizontalAlignment="left" transparent="1" />
 			<widget source="succeeded_counter" render="Label" position="160,312" size="100,20" font="Regular;21" />
-			<widget name="With_errors" position="20,342" size="140,22" font="Regular;21" halign="left" transparent="1" />
+			<widget name="With_errors" position="20,342" size="140,22" font="Regular;21" horizontalAlignment="left" transparent="1" />
 			<widget source="witherrors_counter" render="Label" position="160,342" size="100,20" font="Regular;21" />
-			<widget name="Not_tested" position="20,372" size="140,22" font="Regular;21" halign="left" transparent="1" />
+			<widget name="Not_tested" position="20,372" size="140,22" font="Regular;21" horizontalAlignment="left" transparent="1" />
 			<widget source="untestable_counter" render="Label" position="160,372" size="100,20" font="Regular;21" />
 			<widget source="CmdText" render="Label" position="300,282" size="180,200" font="Regular;21" />
 		</screen>"""

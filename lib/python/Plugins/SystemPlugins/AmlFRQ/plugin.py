@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from Screens.Screen import Screen
 from Plugins.Plugin import PluginDescriptor
 from Components.Button import Button
@@ -94,44 +95,44 @@ class AmlFRQ(ConfigListScreen, Screen):
 		if DESKHEIGHT == 720:
 			self.skin = """
 			<screen  position="0,0" size="1280,720" title="CPU Frequency Setup" flags="wfNoBorder" backgroundColor="#25062748">
-			<widget source="Title" render="Label" position="140,93" size="1000,45" zPosition="2" halign="center" font="Regular; 24" backgroundColor="#25062748" transparent="1" valign="center" />
+			<widget source="Title" render="Label" position="140,93" size="1000,45" zPosition="2" horizontalAlignment="center" font="Regular; 24" backgroundColor="#25062748" transparent="1" verticalAlignment="center" />
 			<ePixmap name="" position="140,100" size="1000,546" pixmap="MetrixHD/ibts/background.png" zPosition="-10" />
 			<eLabel name="" position="156,151" size="855,432" zPosition="-5" />
 			<ePixmap pixmap="enigma2/icon/default.png" position="1044,189" size="60,46" zPosition="1" />
-			<eLabel name="" position="1028,290" size="96,33" font="Regular; 18" valign="center" halign="center" text="Exit" />
-			<ePixmap pixmap="MetrixHD/buttons/buttons.png" position="142,595" size="733,37" alphatest="blend" zPosition="100" />
+			<eLabel name="" position="1028,290" size="96,33" font="Regular; 18" verticalAlignment="center" horizontalAlignment="center" text="Exit" />
+			<ePixmap pixmap="MetrixHD/buttons/buttons.png" position="142,595" size="733,37" alphaTest="blend" zPosition="100" />
 
-			<widget name="key_red" position="156,595" size="236,37" zPosition="1" font="Regular; 18" halign="center" valign="center" backgroundColor="#9f1313" transparent="0" foregroundColor="#cccccc" />
-			<widget name="key_green" position="401,595" size="236,37" zPosition="1" font="Regular; 18" halign="center" valign="center" backgroundColor="#1f771f" transparent="0" foregroundColor="#cccccc" />
-			<widget name="key_yellow" position="646,595" size="236,37" zPosition="1" font="Regular; 18" halign="center" valign="center" backgroundColor="#a08500" transparent="0" foregroundColor="#cccccc" />
+			<widget name="key_red" position="156,595" size="236,37" zPosition="1" font="Regular; 18" horizontalAlignment="center" verticalAlignment="center" backgroundColor="#9f1313" transparent="0" foregroundColor="#cccccc" />
+			<widget name="key_green" position="401,595" size="236,37" zPosition="1" font="Regular; 18" horizontalAlignment="center" verticalAlignment="center" backgroundColor="#1f771f" transparent="0" foregroundColor="#cccccc" />
+			<widget name="key_yellow" position="646,595" size="236,37" zPosition="1" font="Regular; 18" horizontalAlignment="center" verticalAlignment="center" backgroundColor="#a08500" transparent="0" foregroundColor="#cccccc" />
 
-			<widget name="config" position="166,160" size="840,169" scrollbarMode="showOnDemand" font="Regular; 18" itemHeight="32" selectionPixmap="MetrixHD/SkinDesign/CoolNow.png" transparent="1" scrollbarSliderforegroundColor="#cccccc" scrollbarSliderBorderColor="#25062748" />
-			<widget name="tempc"  position="166,366"  size="486,33" font="Regular; 18" valign="center" halign="left" />
-			<widget name="voltc"  position="166,406"  size="486,33" font="Regular; 18" valign="center" halign="left" />
-			<widget name="frqc"   position="166,446"  size="486,33" font="Regular; 18" valign="center" halign="left" />
-			<widget name="frqc"   position="166,486"  size="486,33" font="Regular; 18" valign="center" halign="left" />
+			<widget name="config" position="166,160" size="840,169" scrollbarMode="showOnDemand" font="Regular; 18" itemHeight="32" selectionPixmap="MetrixHD/SkinDesign/CoolNow.png" transparent="1" scrollbarSliderforegroundColor="#cccccc" scrollbarBorderColor="#25062748" />
+			<widget name="tempc"  position="166,366"  size="486,33" font="Regular; 18" verticalAlignment="center" horizontalAlignment="left" />
+			<widget name="voltc"  position="166,406"  size="486,33" font="Regular; 18" verticalAlignment="center" horizontalAlignment="left" />
+			<widget name="frqc"   position="166,446"  size="486,33" font="Regular; 18" verticalAlignment="center" horizontalAlignment="left" />
+			<widget name="frqc"   position="166,486"  size="486,33" font="Regular; 18" verticalAlignment="center" horizontalAlignment="left" />
 
-			<eLabel name="" position="1028,248" size="96,33" font="Regular; 18" valign="center" halign="center" text="OK" />
+			<eLabel name="" position="1028,248" size="96,33" font="Regular; 18" verticalAlignment="center" horizontalAlignment="center" text="OK" />
 			</screen>"""
 		else:
 			self.skin = """
 			<screen  position="0,0" size="1920,1080" title="CPU Frequency Setup" flags="wfNoBorder" backgroundColor="#25062748">
-			<widget source="Title" render="Label" position="210,140" size="1500,68" zPosition="2" halign="center" font="Regular; 36" backgroundColor="#25062748" transparent="1" valign="center" />
+			<widget source="Title" render="Label" position="210,140" size="1500,68" zPosition="2" horizontalAlignment="center" font="Regular; 36" backgroundColor="#25062748" transparent="1" verticalAlignment="center" />
 			<ePixmap name="" position="210,150" size="1500,820" pixmap="MetrixHD/ibts/background.png" zPosition="-10" />
 			<eLabel name="" position="235,227" size="1283,648" zPosition="-5" />
 			<ePixmap pixmap="enigma2/icon/default.png" position="1567,284" size="90,70" zPosition="1" />
-			<eLabel name="" position="1542,435" size="145,50" font="Regular; 28" valign="center" halign="center" text="Exit" />
-			<ePixmap pixmap="MetrixHD/buttons/buttons.png" position="214,893" size="1100,56" alphatest="blend" zPosition="100" />
-			<widget name="key_red" position="235,893" size="354,56" zPosition="1" font="Regular; 28" halign="center" valign="center" backgroundColor="#9f1313" transparent="0" foregroundColor="#cccccc" />
-			<widget name="key_green" position="602,893" size="354,56" zPosition="1" font="Regular; 28" halign="center" valign="center" backgroundColor="#1f771f" transparent="0" foregroundColor="#cccccc" />
-			<widget name="key_yellow" position="969,893" size="354,56" zPosition="1" font="Regular; 28" halign="center" valign="center" backgroundColor="#a08500" transparent="0" foregroundColor="#cccccc" />
-			<widget name="config" position="250,240" size="1260,244" scrollbarMode="showOnDemand" font="Regular; 28" itemHeight="48" selectionPixmap="MetrixHD/SkinDesign/CoolNow.png" transparent="1" scrollbarSliderforegroundColor="#cccccc" scrollbarSliderBorderColor="#25062748" />
-			<widget name="tempc"  position="250,550"  size="680,50" font="Regular; 28" valign="center" halign="left" />
-			<widget name="voltc"  position="250,610"  size="680,50" font="Regular; 28" valign="center" halign="left" />
-			<widget name="frqc"   position="250,670"  size="680,50" font="Regular; 28" valign="center" halign="left" />
-			<widget name="frqc2"   position="250,730"  size="680,50" font="Regular; 28" valign="center" halign="left" />
+			<eLabel name="" position="1542,435" size="145,50" font="Regular; 28" verticalAlignment="center" horizontalAlignment="center" text="Exit" />
+			<ePixmap pixmap="MetrixHD/buttons/buttons.png" position="214,893" size="1100,56" alphaTest="blend" zPosition="100" />
+			<widget name="key_red" position="235,893" size="354,56" zPosition="1" font="Regular; 28" horizontalAlignment="center" verticalAlignment="center" backgroundColor="#9f1313" transparent="0" foregroundColor="#cccccc" />
+			<widget name="key_green" position="602,893" size="354,56" zPosition="1" font="Regular; 28" horizontalAlignment="center" verticalAlignment="center" backgroundColor="#1f771f" transparent="0" foregroundColor="#cccccc" />
+			<widget name="key_yellow" position="969,893" size="354,56" zPosition="1" font="Regular; 28" horizontalAlignment="center" verticalAlignment="center" backgroundColor="#a08500" transparent="0" foregroundColor="#cccccc" />
+			<widget name="config" position="250,240" size="1260,244" scrollbarMode="showOnDemand" font="Regular; 28" itemHeight="48" selectionPixmap="MetrixHD/SkinDesign/CoolNow.png" transparent="1" scrollbarSliderforegroundColor="#cccccc" scrollbarBorderColor="#25062748" />
+			<widget name="tempc"  position="250,550"  size="680,50" font="Regular; 28" verticalAlignment="center" horizontalAlignment="left" />
+			<widget name="voltc"  position="250,610"  size="680,50" font="Regular; 28" verticalAlignment="center" horizontalAlignment="left" />
+			<widget name="frqc"   position="250,670"  size="680,50" font="Regular; 28" verticalAlignment="center" horizontalAlignment="left" />
+			<widget name="frqc2"   position="250,730"  size="680,50" font="Regular; 28" verticalAlignment="center" horizontalAlignment="left" />
 
-			<eLabel name="" position="1542,372" size="145,50" font="Regular; 28" valign="center" halign="center" text="OK" />
+			<eLabel name="" position="1542,372" size="145,50" font="Regular; 28" verticalAlignment="center" horizontalAlignment="center" text="OK" />
 			</screen>"""
 
 		Screen.__init__(self, session)

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from Components.SystemInfo import SystemInfo
 from Components.Console import Console
 from Tools.Directories import fileHas, fileExists

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from xml.etree.ElementTree import parse
 from enigma import eDVBCIInterfaces, eDVBCI_UI, eEnv, eServiceCenter, eServiceReference, getBestPlayableServiceReference, iRecordableService
 from Components.SystemInfo import SystemInfo

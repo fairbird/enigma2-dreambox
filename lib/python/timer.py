@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from bisect import insort
 from time import time, localtime, mktime
 from enigma import eTimer

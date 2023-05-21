@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from os.path import isfile
 
 from enigma import ePixmap, eTimer

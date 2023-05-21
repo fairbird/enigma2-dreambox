@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from time import time
 
 from Components.PerServiceDisplay import PerServiceBase

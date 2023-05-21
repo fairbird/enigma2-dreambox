@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from enigma import eTimer, eDVBSatelliteEquipmentControl, eDVBResourceManager, eDVBDiseqcCommand, eDVBFrontendParametersSatellite, iDVBFrontend
 
 from Screens.Screen import Screen
@@ -1310,16 +1311,16 @@ class Diseqc:
 class PositionerSetupLog(Screen):
 	skin = """
 		<screen position="center,center" size="560,400" title="Positioner setup log" >
-			<ePixmap name="red"    position="0,0"   zPosition="2" size="140,40" pixmap="buttons/red.png" transparent="1" alphatest="on" />
-			<ePixmap name="green"  position="230,0" zPosition="2" size="140,40" pixmap="buttons/green.png" transparent="1" alphatest="on" />
-			<ePixmap name="blue"   position="420,0" zPosition="2" size="140,40" pixmap="buttons/blue.png" transparent="1" alphatest="on" />
+			<ePixmap name="red"    position="0,0"   zPosition="2" size="140,40" pixmap="buttons/red.png" transparent="1" alphaTest="on" />
+			<ePixmap name="green"  position="230,0" zPosition="2" size="140,40" pixmap="buttons/green.png" transparent="1" alphaTest="on" />
+			<ePixmap name="blue"   position="420,0" zPosition="2" size="140,40" pixmap="buttons/blue.png" transparent="1" alphaTest="on" />
 
-			<widget name="key_red" position="0,0" size="140,40" valign="center" halign="center" zPosition="4"  foregroundColor="white" font="Regular;20" transparent="1" shadowColor="background" shadowOffset="-2,-2" />
-			<widget name="key_green" position="230,0" size="140,40" halign="center" valign="center"  zPosition="4"  foregroundColor="white" font="Regular;20" transparent="1" shadowColor="background" shadowOffset="-2,-2" />
-			<widget name="key_blue" position="420,0" size="140,40" valign="center" halign="center" zPosition="4"  foregroundColor="white" font="Regular;20" transparent="1" shadowColor="background" shadowOffset="-2,-2" />
+			<widget name="key_red" position="0,0" size="140,40" verticalAlignment="center" horizontalAlignment="center" zPosition="4"  foregroundColor="white" font="Regular;20" transparent="1" shadowColor="background" shadowOffset="-2,-2" />
+			<widget name="key_green" position="230,0" size="140,40" horizontalAlignment="center" verticalAlignment="center"  zPosition="4"  foregroundColor="white" font="Regular;20" transparent="1" shadowColor="background" shadowOffset="-2,-2" />
+			<widget name="key_blue" position="420,0" size="140,40" verticalAlignment="center" horizontalAlignment="center" zPosition="4"  foregroundColor="white" font="Regular;20" transparent="1" shadowColor="background" shadowOffset="-2,-2" />
 
-			<ePixmap alphatest="on" pixmap="icons/clock.png" position="480,383" size="14,14" zPosition="3"/>
-			<widget font="Regular;18" halign="left" position="505,380" render="Label" size="55,20" source="global.CurrentTime" transparent="1" valign="center" zPosition="3">
+			<ePixmap alphaTest="on" pixmap="icons/clock.png" position="480,383" size="14,14" zPosition="3"/>
+			<widget font="Regular;18" horizontalAlignment="left" position="505,380" render="Label" size="55,20" source="global.CurrentTime" transparent="1" verticalAlignment="center" zPosition="3">
 				<convert type="ClockToText">Default</convert>
 			</widget>
 			<widget name="list" font="Regular;16" position="10,40" size="540,340" />
@@ -1370,12 +1371,12 @@ class PositionerSetupLog(Screen):
 class ONIDTSIDScreen(ConfigListScreen, Screen):
 	skin = """
 		<screen position="center,center" size="520,250" title="Tune">
-			<ePixmap pixmap="buttons/red.png" position="0,0" size="140,40" alphatest="on"/>
-			<ePixmap pixmap="buttons/green.png" position="140,0" size="140,40" alphatest="on"/>
-			<widget source="key_red" render="Label" position="0,0" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#9f1313" transparent="1"/>
-			<widget source="key_green" render="Label" position="140,0" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#1f771f" transparent="1"/>
+			<ePixmap pixmap="buttons/red.png" position="0,0" size="140,40" alphaTest="on"/>
+			<ePixmap pixmap="buttons/green.png" position="140,0" size="140,40" alphaTest="on"/>
+			<widget source="key_red" render="Label" position="0,0" zPosition="1" size="140,40" font="Regular;20" horizontalAlignment="center" verticalAlignment="center" backgroundColor="#9f1313" transparent="1"/>
+			<widget source="key_green" render="Label" position="140,0" zPosition="1" size="140,40" font="Regular;20" horizontalAlignment="center" verticalAlignment="center" backgroundColor="#1f771f" transparent="1"/>
 			<widget name="config" position="10,50" size="500,150" scrollbarMode="showOnDemand" />
-			<widget name="introduction" position="60,220" size="450,23" halign="left" font="Regular;20" />
+			<widget name="introduction" position="60,220" size="450,23" horizontalAlignment="left" font="Regular;20" />
 		</screen>"""
 
 	def __init__(self, session):
@@ -1420,12 +1421,12 @@ class ONIDTSIDScreen(ConfigListScreen, Screen):
 class TunerScreen(ConfigListScreen, Screen):
 	skin = """
 		<screen position="center,center" size="520,450" title="Tune">
-			<ePixmap pixmap="buttons/red.png" position="0,0" size="140,40" alphatest="on"/>
-			<ePixmap pixmap="buttons/green.png" position="140,0" size="140,40" alphatest="on"/>
-			<widget source="key_red" render="Label" position="0,0" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#9f1313" transparent="1"/>
-			<widget source="key_green" render="Label" position="140,0" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#1f771f" transparent="1"/>
+			<ePixmap pixmap="buttons/red.png" position="0,0" size="140,40" alphaTest="on"/>
+			<ePixmap pixmap="buttons/green.png" position="140,0" size="140,40" alphaTest="on"/>
+			<widget source="key_red" render="Label" position="0,0" zPosition="1" size="140,40" font="Regular;20" horizontalAlignment="center" verticalAlignment="center" backgroundColor="#9f1313" transparent="1"/>
+			<widget source="key_green" render="Label" position="140,0" zPosition="1" size="140,40" font="Regular;20" horizontalAlignment="center" verticalAlignment="center" backgroundColor="#1f771f" transparent="1"/>
 			<widget name="config" position="10,50" size="500,350" scrollbarMode="showOnDemand" />
-			<widget name="introduction" position="60,420" size="450,23" halign="left" font="Regular;20" />
+			<widget name="introduction" position="60,420" size="450,23" horizontalAlignment="left" font="Regular;20" />
 		</screen>"""
 
 	def __init__(self, session, feid, fe_data):

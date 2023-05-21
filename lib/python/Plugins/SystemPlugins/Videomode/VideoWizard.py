@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from Screens.Wizard import WizardSummary
 from Screens.WizardLanguage import WizardLanguage
 from Screens.HelpMenu import Rc
@@ -53,10 +54,10 @@ class VideoWizard(WizardLanguage, Rc):
 			<panel position="left" size="10,*" />
 			<panel position="right" size="10,*" />
 			<panel position="fill">
-				<widget name="text" position="top" size="*,270" font="Regular;23" valign="center" />
+				<widget name="text" position="top" size="*,270" font="Regular;23" verticalAlignment="center" />
 				<panel position="fill">
 					<panel position="left" size="150,*">
-						<widget name="portpic" position="top" zPosition="10" size="150,150" transparent="1" alphatest="on"/>
+						<widget name="portpic" position="top" zPosition="10" size="150,150" transparent="1" alphaTest="on"/>
 					</panel>
 					<panel position="fill" layout="stack">
 						<widget source="list" render="Listbox" position="fill" scrollbarMode="showOnDemand" >
