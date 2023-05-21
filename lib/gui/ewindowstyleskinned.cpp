@@ -21,6 +21,7 @@ eWindowStyleSkinned::eWindowStyleSkinned()
 	m_listboxfnt = new gFont("Regular", 20);
 	m_entryfnt = new gFont("Regular", 20);
 	m_valuefnt = new gFont(m_entryfnt->family, m_entryfnt->pointSize - m_entryfnt->pointSize/5);
+
 }
 
 void eWindowStyleSkinned::handleNewSize(eWindow *wnd, eSize &size, eSize &offset)
@@ -107,6 +108,7 @@ void eWindowStyleSkinned::setStyle(gPainter &painter, int what)
 		painter.setForegroundColor(m_color[colSliderBorder]);
 		break;
 	}
+
 }
 
 void eWindowStyleSkinned::drawFrame(gPainter &painter, const eRect &frame, int what)
@@ -114,18 +116,6 @@ void eWindowStyleSkinned::drawFrame(gPainter &painter, const eRect &frame, int w
 	int bs;
 	switch (what)
 	{
-	case fontListbox:
-		fnt = m_listboxfnt;
-		break;
-	case fontStatic:
-		fnt = m_labelfnt;
-		break;
-	case fontEntry:
-		fnt = m_entryfnt;
-		break;
-	case fontValue:
-		fnt = m_valuefnt;
-		break;
 	case frameButton:
 		bs = bsButton;
 		break;
@@ -243,8 +233,17 @@ RESULT eWindowStyleSkinned::getFont(int what, ePtr<gFont> &fnt)
 	fnt = 0;
 	switch (what)
 	{
+	case fontListbox:
+		fnt = m_listboxfnt;
+		break;
 	case fontStatic:
-		fnt = new gFont("Regular", 12);
+		fnt = m_labelfnt;
+		break;
+	case fontEntry:
+		fnt = m_entryfnt;
+		break;
+	case fontValue:
+		fnt = m_valuefnt;
 		break;
 	case fontButton:
 		fnt = new gFont("Regular", 20);

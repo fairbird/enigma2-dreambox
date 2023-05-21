@@ -70,7 +70,6 @@ public:
 		colWindowTitleForeground,
 		colWindowTitleBackground,
 
-
 		colScrollbarForeground,
 		colScrollbarBackground,
 		colScrollbarBorder,
@@ -90,7 +89,7 @@ public:
 	void setListboxFont(gFont *fnt);
 	void setEntryFont(gFont *fnt);
 	void setValueFont(gFont *fnt);
-
+	
 private:
 	struct borderSet
 	{
