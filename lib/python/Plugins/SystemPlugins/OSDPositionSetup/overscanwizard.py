@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from Screens.Screen import Screen
 from Components.ActionMap import ActionMap
 from Components.ConfigList import ConfigListScreen
@@ -12,18 +13,18 @@ class OverscanWizard(Screen, ConfigListScreen):
 	def __init__(self, session, timeOut=True):
 		if getDesktop(0).size().height() == 1080:
 			self.skin = """<screen position="fill" flags="wfNoBorder">
-				<ePixmap pixmap="overscan1920x1080.png" position="0,0" size="1920,1080" zPosition="3" alphatest="on"/>
+				<ePixmap pixmap="overscan1920x1080.png" position="0,0" size="1920,1080" zPosition="3" alphaTest="on"/>
 				<eLabel position="338,190" size="1244,698" zPosition="3"/>
 				<widget name="title" position="353,202" size="1224,50" font="Regular;40" foregroundColor="blue" zPosition="4"/>
-				<widget name="introduction" position="343,252" size="1234,623" halign="center" valign="center" font="Regular;30" zPosition="4"/>
+				<widget name="introduction" position="343,252" size="1234,623" horizontalAlignment="center" verticalAlignment="center" font="Regular;30" zPosition="4"/>
 				<widget name="config" position="343,662" size="1234,226" font="Regular;30" itemHeight="40" zPosition="4"/>
 			</screen>"""
 		else:
 			self.skin = """<screen position="fill"  flags="wfNoBorder">
-				<ePixmap pixmap="overscan1280x720.png" position="0,0" size="1280,720" zPosition="3" alphatest="on"/>
+				<ePixmap pixmap="overscan1280x720.png" position="0,0" size="1280,720" zPosition="3" alphaTest="on"/>
 				<eLabel position="235,131" size="810,457" zPosition="3"/>
 				<widget name="title" position="240,135" size="800,40" font="Regular;30" foregroundColor="blue" zPosition="4"/>
-				<widget name="introduction" position="240,175" size="800,623" halign="center" valign="center" font="Regular;18" zPosition="4"/>
+				<widget name="introduction" position="240,175" size="800,623" horizontalAlignment="center" verticalAlignment="center" font="Regular;18" zPosition="4"/>
 				<widget name="config" position="240,590" size="800,120" font="Regular;20" itemHeight="30" zPosition="4"/>
 			</screen>"""
 

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from Components.ActionMap import ActionMap
 from Components.config import config, ConfigSubsection, ConfigSelection
 from Components.ConfigList import ConfigListScreen

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from Screens.Screen import Screen
 from Components.GUIComponent import GUIComponent
 from Components.VariableText import VariableText

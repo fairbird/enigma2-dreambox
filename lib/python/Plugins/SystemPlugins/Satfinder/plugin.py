@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from enigma import eDVBResourceManager, eDVBFrontendParametersSatellite, eDVBFrontendParametersTerrestrial, eTimer
 
 from Screens.ScanSetup import ScanSetup, buildTerTransponder

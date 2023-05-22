@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from keyids import KEYIDS
 from Components.config import config
 from Components.RcModel import rc_model

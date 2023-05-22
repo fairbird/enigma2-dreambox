@@ -1,4 +1,4 @@
-# -*- coding: iso-8859-1 -*-
+# -*- coding: utf-8 -*-
 from Components.Console import Console
 from Components.About import about
 from Components.PackageInfo import PackageInfoHandler

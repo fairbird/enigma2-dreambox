@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from Screens.Screen import Screen
 from Screens.MessageBox import MessageBox
 from Components.config import config
@@ -17,7 +18,7 @@ from Tools.StbHardware import getFPVersion
 from enigma import eTimer, eLabel, eConsoleAppContainer, getDesktop, eGetEnigmaDebugLvl
 
 from Components.GUIComponent import GUIComponent
-from skin import applySkinFactor, parameters, parseScale
+from skin import parameters
 
 from time import strftime
 
@@ -358,14 +359,14 @@ class MemoryInfo(Screen):
 class MemoryInfoSkinParams(GUIComponent):
 	def __init__(self):
 		GUIComponent.__init__(self)
-		self.rows_in_column = applySkinFactor(25)
+		self.rows_in_column = 25
 
 	def applySkin(self, desktop, screen):
 		if self.skinAttributes is not None:
 			attribs = []
 			for (attrib, value) in self.skinAttributes:
 				if attrib == "rowsincolumn":
-					self.rows_in_column = parseScale(value)
+					self.rows_in_column = int(value)
 			self.skinAttributes = attribs
 		return GUIComponent.applySkin(self, desktop, screen)
 

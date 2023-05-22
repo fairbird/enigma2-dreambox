@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from Screens.Screen import Screen
 from Components.ConfigList import ConfigListScreen
 from Components.config import config, ConfigSubsection, ConfigInteger, ConfigSlider
@@ -13,10 +14,10 @@ class VideoClippingCoordinates(ConfigListScreen, Screen):
 	skin = """
 	<screen position="0,0" size="e,e" title="Video clipping setup" backgroundColor="transparent">
 		<widget name="config" position="c-175,c-75" size="350,150" foregroundColor="black" backgroundColor="transparent" />
-		<ePixmap pixmap="buttons/green.png" position="c-145,e-100" zPosition="0" size="140,40" alphatest="on" />
-		<ePixmap pixmap="buttons/red.png" position="c+5,e-100" zPosition="0" size="140,40" alphatest="on" />
-		<widget name="ok" position="c-145,e-100" size="140,40" valign="center" halign="center" zPosition="1" font="Regular;20" transparent="1" backgroundColor="green" />
-		<widget name="cancel" position="c+5,e-100" size="140,40" valign="center" halign="center" zPosition="1" font="Regular;20" transparent="1" backgroundColor="red" />
+		<ePixmap pixmap="buttons/green.png" position="c-145,e-100" zPosition="0" size="140,40" alphaTest="on" />
+		<ePixmap pixmap="buttons/red.png" position="c+5,e-100" zPosition="0" size="140,40" alphaTest="on" />
+		<widget name="ok" position="c-145,e-100" size="140,40" verticalAlignment="center" horizontalAlignment="center" zPosition="1" font="Regular;20" transparent="1" backgroundColor="green" />
+		<widget name="cancel" position="c+5,e-100" size="140,40" verticalAlignment="center" horizontalAlignment="center" zPosition="1" font="Regular;20" transparent="1" backgroundColor="red" />
 	</screen>"""
 
 	def __init__(self, session):

@@ -1,4 +1,5 @@
-from skin import applySkinFactor, parseColor, parseFont, parseScale
+# -*- coding: utf-8 -*-
+from skin import parseColor, parseFont
 from Components.config import config, ConfigClock, ConfigInteger, ConfigSubsection, ConfigYesNo, ConfigSelection, ConfigSelectionNumber
 from Components.Pixmap import Pixmap
 from Components.Button import Button
@@ -143,9 +144,9 @@ class EPGList(GUIComponent):
 		self.backColorNow = 0x505080
 		self.foreColorRec = 0xffffff
 		self.backColorRec = 0x805050
-		self.serviceFont = gFont("Regular", applySkinFactor(20))
+		self.serviceFont = gFont("Regular", 20)
 		self.entryFontName = "Regular"
-		self.entryFontSize = applySkinFactor(18)
+		self.entryFontSize = 18
 
 		self.listHeight = None
 		self.listWidth = None
@@ -157,7 +158,7 @@ class EPGList(GUIComponent):
 		self.eventBorderVerWidth = 1 # for png backgrounds only
 		self.eventBorderHorWidth = 1 # for png backgrounds only
 		self.eventNamePadding = 0
-		self.recIconSize = applySkinFactor(21)
+		self.recIconSize = 21
 		self.iconXPadding = 1
 		self.iconYPadding = 1
 
@@ -192,16 +193,16 @@ class EPGList(GUIComponent):
 			self.borderColor = parseColor(value).argb()
 
 		def EventBorderWidth(value): # for solid backgrounds only (we are limited to the same horizontal and vertical border width)
-			self.eventBorderWidth = parseScale(value)
+			self.eventBorderWidth = int(value)
 
 		def EventBorderHorWidth(value): # for png backgrounds only
-			self.eventBorderHorWidth = parseScale(value)
+			self.eventBorderHorWidth = int(value)
 
 		def EventBorderVerWidth(value): # for png backgrounds only
-			self.eventBorderVerWidth = parseScale(value)
+			self.eventBorderVerWidth = int(value)
 
 		def EventNamePadding(value):
-			self.eventNamePadding = parseScale(value)
+			self.eventNamePadding = int(value)
 
 		def ServiceFont(value):
 			self.serviceFont = parseFont(value, ((1, 1), (1, 1)))
@@ -228,25 +229,25 @@ class EPGList(GUIComponent):
 			self.borderColorService = parseColor(value).argb()
 
 		def ServiceBorderWidth(value): # for solid backgrounds only (we are limited to the same horizontal and vertical border width)
-			self.serviceBorderWidth = parseScale(value)
+			self.serviceBorderWidth = int(value)
 
 		def ServiceBorderHorWidth(value): # for png backgrounds only
-			self.serviceBorderHorWidth = parseScale(value)
+			self.serviceBorderHorWidth = int(value)
 
 		def ServiceBorderVerWidth(value): # for png backgrounds only
-			self.serviceBorderVerWidth = parseScale(value)
+			self.serviceBorderVerWidth = int(value)
 
 		def ServiceNamePadding(value):
-			self.serviceNamePadding = parseScale(value)
+			self.serviceNamePadding = int(value)
 
 		def RecIconSize(value):
-			self.recIconSize = parseScale(value)
+			self.recIconSize = int(value)
 
 		def IconXPadding(value):
-			self.iconXPadding = parseScale(value)
+			self.iconXPadding = int(value)
 
 		def IconYPadding(value):
-			self.iconYPadding = parseScale(value)
+			self.iconYPadding = int(value)
 		for (attrib, value) in list(self.skinAttributes):
 			try:
 				locals().get(attrib)(value)

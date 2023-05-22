@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from os.path import isfile, join as pathjoin
 
 from enigma import ePixmap, iServiceInformation

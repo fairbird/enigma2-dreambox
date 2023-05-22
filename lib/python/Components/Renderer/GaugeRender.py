@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from Components.VariableValue import VariableValue
 from Components.Renderer.Renderer import Renderer
 

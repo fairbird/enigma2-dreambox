@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import os
 from datasource import datasource
 from xml.dom import minidom

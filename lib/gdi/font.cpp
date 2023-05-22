@@ -65,7 +65,7 @@ static gLookup &getColor(const gPalette &pal, const gRGB &start, const gRGB &end
 	if (i != colorcache.end())
 		return i->second;
 	gLookup &n=colorcache.insert(std::pair<fntColorCacheKey,gLookup>(key,gLookup())).first->second;
-//	eDebug("[Font] Creating new font color cache entry %02x%02x%02x%02x .. %02x%02x%02x%02x.", start.a, start.r, start.g, start.b,
+//	eDebug("[Font] Creating new font color cache entry %02x%02x%02x%02x .. %02x%02x%02x%02x", start.a, start.r, start.g, start.b,
 //		end.a, end.r, end.g, end.b);
 	n.build(16, pal, start, end);
 //	eDebugNoNewLineStart("[Font] ");
@@ -100,7 +100,7 @@ FT_Error fontRenderClass::FTC_Face_Requester(FTC_FaceID	face_id, FT_Face* aface)
 	int error;
 	if ((error=FT_New_Face(library, font->filename.c_str(), 0, aface)))
 	{
-		eDebug("[Font] Failed: %m");
+		eDebug("[Font] Failed: %s", strerror(error));
 		return error;
 	}
 	FT_Select_Charmap(*aface, ft_encoding_unicode);
@@ -121,12 +121,12 @@ int fontRenderClass::getFaceProperties(const std::string &face, FTC_FaceID &id, 
 	return -1;
 }
 
-inline FT_Error fontRenderClass::getGlyphBitmap(FTC_Image_Desc *font, GlyphIndex glyph_index, FTC_SBit *sbit)
+inline FT_Error fontRenderClass::getGlyphBitmap(FTC_Image_Desc *font, FT_UInt glyph_index, FTC_SBit *sbit)
 {
 	return FTC_SBit_Cache_Lookup(sbitsCache, font, glyph_index, sbit);
 }
 
-inline FT_Error fontRenderClass::getGlyphImage(FTC_Image_Desc *font, GlyphIndex glyph_index, FT_Glyph *glyph, FT_Glyph *borderglyph, int bordersize)
+inline FT_Error fontRenderClass::getGlyphImage(FTC_Image_Desc *font, FT_UInt glyph_index, FT_Glyph *glyph, FT_Glyph *borderglyph, int bordersize)
 {
 	FT_Glyph image;
 	FT_Error err = FTC_ImageCache_Lookup(imageCache, font, glyph_index, &image, NULL);
@@ -155,6 +155,7 @@ inline FT_Error fontRenderClass::getGlyphImage(FTC_Image_Desc *font, GlyphIndex 
 std::string fontRenderClass::AddFont(const std::string &filename, const std::string &name, int scale, int renderflags)
 {
 	eDebugNoNewLineStart("[Font] Adding font '%s'", filename.c_str());
+	fflush(stdout);
 	int error;
 	FT_Face face;
 
@@ -195,9 +196,13 @@ fontRenderClass::fontRenderClass(): fb(fbClass::getInstance())
 		}
 	}
 	eDebug("[Font] Loading fonts.");
+	fflush(stdout);
 	font=0;
-
+#if HAVE_ARCH_ARM
+	int maxbytes=8*1024*1024;
+#else
 	int maxbytes=4*1024*1024;
+#endif
 	eDebug("[Font] Intializing font cache, using max. %dMB.", maxbytes/1024/1024);
 	fflush(stdout);
 	{
@@ -322,18 +327,18 @@ Font::Font(fontRenderClass *render, FTC_FaceID faceid, int isize, int tw, int re
 //	font.image_type |= ftc_image_flag_autohinted;
 }
 
-Font::~Font()
-{
-}
-
-inline FT_Error Font::getGlyphBitmap(GlyphIndex glyph_index, FTC_SBit *sbit)
+inline FT_Error Font::getGlyphBitmap(FT_UInt glyph_index, FTC_SBit *sbit)
 {
 	return renderer->getGlyphBitmap(&font, glyph_index, sbit);
 }
 
-inline FT_Error Font::getGlyphImage(GlyphIndex glyph_index, FT_Glyph *glyph, FT_Glyph *borderglyph, int bordersize)
+inline FT_Error Font::getGlyphImage(FT_UInt glyph_index, FT_Glyph *glyph, FT_Glyph *borderglyph, int bordersize)
 {
 	return renderer->getGlyphImage(&font, glyph_index, glyph, borderglyph, bordersize);
+}
+
+Font::~Font()
+{
 }
 
 DEFINE_REF(eTextPara);
@@ -423,22 +428,32 @@ int eTextPara::appendGlyph(Font *current_font, FT_Face current_face, FT_UInt gly
 
 	nx+=xadvance;
 
-	if ((rflags & RS_WRAP) && (nx >= area.right()))
+	if ((rflags & RS_WRAP) && (nx > area.right()))
 	{
-		int cnt = 0;
-		glyphString::reverse_iterator i(glyphs.rbegin());
+		int cnt = 0, maycnt = -1;
+		glyphString::reverse_iterator i(glyphs.rbegin()), mayi(glyphs.rend());
 			/* find first possibility (from end to begin) to break */
 		while (i != glyphs.rend())
 		{
 			if (i->flags&(GS_CANBREAK|GS_ISFIRST)) /* stop on either space/hyphen/shy or start of line (giving up) */
 				break;
+			if ((i->flags&GS_MAYBREAK) && maycnt == -1)
+			{
+				maycnt = cnt;
+				mayi = i;
+			}
 			cnt++;
 			++i;
+		}
+		if (maycnt != -1 && (i == glyphs.rend() || !(i->flags&GS_CANBREAK)))
+		{
+			cnt = maycnt;
+			i = mayi;
 		}
 
 			/* if ... */
 		if (i != glyphs.rend()  /* ... we found anything */
-			&& (i->flags&GS_CANBREAK) /* ...and this is a space/hyphen/soft-hyphen */
+			&& (i->flags&(GS_CANBREAK|GS_MAYBREAK)) /* ...and this is a space/hyphen/soft-hyphen */
 			&& (!(i->flags & GS_ISFIRST)) /* ...and this is not an start of line (line with just a single space/hyphen) */
 			&& cnt ) /* ... and there are actual non-space characters after this */
 		{
@@ -448,7 +463,7 @@ int eTextPara::appendGlyph(Font *current_font, FT_Face current_face, FT_UInt gly
 				i->flags &= ~GS_SOFTHYPHEN;
 				i->flags |= GS_HYPHEN;
 			}
-			--i; /* skip the space/hypen/softhyphen */
+			--i; /* skip the space/hyphen/softhyphen */
 			int linelength=cursor.x()-i->x;
 			i->flags|=GS_ISFIRST; /* make this a line start */
 			ePoint offset=ePoint(i->x, i->y);
@@ -483,7 +498,7 @@ int eTextPara::appendGlyph(Font *current_font, FT_Face current_face, FT_UInt gly
 		kern=delta.x>>6;
 	}
 
-	ng.bbox.setLeft(((flags&GS_ISFIRST)|cursor.x()) + left + xborder);
+	ng.bbox.setLeft(cursor.x() + left + xborder);
 	ng.bbox.setTop( cursor.y() - top );
 	ng.bbox.setHeight( height );
 
@@ -527,15 +542,15 @@ void eTextPara::calc_bbox()
 
 	glyphString::iterator i(glyphs.begin());
 
-	boundBox = i->bbox;
-	++i;
+	boundBox.setLeft(i->x);
+	boundBox.setRight(i->bbox.right());
 
-	for (; i != glyphs.end(); ++i)
+	while (++i != glyphs.end())
 	{
 		if (i->flags & (GS_ISSPACE|GS_SOFTHYPHEN))
 			continue;
-		if ( i->bbox.left() < boundBox.left() )
-			boundBox.setLeft( i->bbox.left() );
+		if ( i->x < boundBox.left() )
+			boundBox.setLeft( i->x );
 		if ( i->bbox.right() > boundBox.right() )
 			boundBox.setRight( i->bbox.right() );
 	}
@@ -567,6 +582,7 @@ void eTextPara::newLine(int flags)
 		maximum.setHeight(cursor.y());
 	previous=0;
 	totalheight += height;
+	lineCount++;
 }
 
 eTextPara::~eTextPara()
@@ -645,23 +661,21 @@ void eTextPara::setFont(Font *fnt, Font *replacement, Font *fallback)
 void
 shape (std::vector<unsigned long> &string, const std::vector<unsigned long> &text);
 
-int eTextPara::renderString(const char *string, int rflags, int border)
+int eTextPara::renderString(const char *string, int rflags, int border, int markedpos)
 {
 	singleLock s(ftlock);
 
 	if (!current_font)
-	{
-		eWarning("[eTextPara] renderString: No current_font!");
 		return -1;
-	}
-	if (!current_face)
+
+	if ((FTC_Manager_LookupFace(fontRenderClass::instance->cacheManager,
+				current_font->scaler.face_id,
+				&current_face) < 0) ||
+	    (FTC_Manager_LookupSize(fontRenderClass::instance->cacheManager,
+				&current_font->scaler,
+				&current_font->size) < 0))
 	{
-		eWarning("[eTextPara] renderString: No current_face!");
-		return -1;
-	}
-	if (!current_face->size)
-	{
-		eWarning("[eTextPara] renderString: No current_face->size!");
+		eDebug("[eTextPara] renderString: FTC_Manager_Lookup_Size current_font failed!");
 		return -1;
 	}
 
@@ -685,19 +699,9 @@ int eTextPara::renderString(const char *string, int rflags, int border)
 			}
 		}
 		totalheight = height >> 6;
+		lineCount = 1;
 		cursor=ePoint(area.x(), area.y()+(ascender>>6));
 		left=cursor.x();
-	}
-
-	if ((FTC_Manager_LookupFace(fontRenderClass::instance->cacheManager,
- 				    current_font->scaler.face_id,
- 				    &current_face) < 0) ||
-	    (FTC_Manager_LookupSize(fontRenderClass::instance->cacheManager,
-				    &current_font->scaler,
-				    &current_font->size) < 0))
-	{
-		eDebug("[eTextPara] renderString: FTC_Manager_Lookup_Size current_font failed!");
-		return -1;
 	}
 
 	std::vector<unsigned long> uc_string, uc_visual;
@@ -770,28 +774,23 @@ int eTextPara::renderString(const char *string, int rflags, int border)
 	unsigned long newcolor = 0;
 	bool activate_newcolor = false;
 	int nextflags = 0;
+	int pos = 0;
+	int markedlen = 0;
+	if (markedpos > 0xFFFF)
+	{
+		markedlen = markedpos >> 16;
+		markedpos &= 0xFFFF;
+	}
 
 	for (std::vector<unsigned long>::const_iterator i(uc_visual.begin());
 		i != uc_visual.end(); ++i)
 	{
 		int isprintable=1;
 		int flags = nextflags;
-		nextflags = 0;
 		unsigned long chr = *i;
 
 		if (!(rflags&RS_DIRECT))
 		{
-			/* detect linefeeds and set flag GS_LF for the last glyph in this line */
-			if ((i + 1) != uc_visual.end())
-			{
-				unsigned long c = *(i + 1);
-				if (c == '\n' || c == 0x8A || c == 0xE08A /* linefeed */
-					|| (c == '\\' && (i + 2) != uc_visual.end() && *(i + 2) == 'n')) /* escaped linefeed */
-				{
-					flags |= GS_LF;
-				}
-			}
-
 			switch (chr)
 			{
 			case '\\':
@@ -802,13 +801,13 @@ int eTextPara::renderString(const char *string, int rflags, int border)
 					switch (c)
 					{
 						case 'n':
-							i++;
+							++i;
 							goto newline;
 						case 't':
-							i++;
+							++i;
 							goto tab;
 						case 'r':
-							i++;
+							++i;
 							goto nprint;
 						case 'c':
 						{
@@ -838,6 +837,8 @@ int eTextPara::renderString(const char *string, int rflags, int border)
 tab:				isprintable=0;
 				cursor+=ePoint(current_font->tabwidth, 0);
 				cursor-=ePoint(cursor.x()%current_font->tabwidth, 0);
+				if (!(nextflags&GS_ISFIRST))
+					nextflags|=GS_FIXED;
 				break;
 			case 0x8A:
 			case 0xE08A:
@@ -845,6 +846,7 @@ tab:				isprintable=0;
 newline:			isprintable=0;
 				newLine(rflags);
 				nextflags|=GS_ISFIRST;
+				nextflags&=~GS_FIXED;
 				break;
 			case '\r':
 			case 0x86: case 0xE086:
@@ -859,6 +861,9 @@ nprint:				isprintable=0;
 			case '-':
 				flags |= GS_HYPHEN;
 				break;
+			case '/':
+				flags |= GS_MAYBREAK;
+				break;
 			case ' ':
 				flags|=GS_ISSPACE;
 			default:
@@ -867,6 +872,16 @@ nprint:				isprintable=0;
 		}
 		if (isprintable)
 		{
+			if (markedpos == -2 || markedpos == pos++)
+			{
+				flags |= GS_INVERT;
+				if (markedlen)
+				{
+					--markedlen;
+					++markedpos;
+				}
+			}
+
 			FT_UInt index = 0;
 
 				/* FIXME: our font doesn't seem to have a hyphen, so use hyphen-minus for it. */
@@ -895,7 +910,15 @@ nprint:				isprintable=0;
 			} else
 				appendGlyph(current_font, current_face, index, flags, rflags, border, i == uc_visual.end() - 1, activate_newcolor, newcolor);
 
-			activate_newcolor = false;
+			if (index)
+			{
+				nextflags = 0;
+				activate_newcolor = false;
+			}
+		} else if (nextflags&GS_ISFIRST && !glyphs.empty())
+		{
+			// Newline found, mark the last glyph with the newline flag
+			glyphs.back().flags |= GS_LF;
 		}
 	}
 	bboxValid=false;
@@ -1044,6 +1067,9 @@ void eTextPara::blit(gDC &dc, const ePoint &offset, const gRGB &background, cons
 					lookup16_invert[i]=lookup16_normal[i^0xF];
 			} else
 			{
+#if HAVE_HISIAPI
+				if (surface->bpp != 0)
+#endif
 				eWarning("[eTextPara] Can't render to %dbpp!", surface->bpp);
 				return;
 			}
@@ -1164,24 +1190,24 @@ void eTextPara::blit(gDC &dc, const ePoint &offset, const gRGB &background, cons
 					}
 					break;
 				case 2: // 16bit
-					{
-					int extra_buffer_stride = (buffer_stride >> 1) - sx;
-					__u16 *td = (__u16*)d;
-					for (int ay = 0; ay != sy; ay++)
-					{
-						int ax;
-						for (ax = 0; ax != sx; ax++)
-						{
-							int b = (*s++) >> 4;
+                                        {
+                                        int extra_buffer_stride = (buffer_stride >> 1) - sx;
+                                        __u16 *td = (__u16*)d;
+                                        for (int ay = 0; ay != sy; ay++)
+                                        {
+                                                int ax;
+                                                for (ax = 0; ax != sx; ax++)
+                                                {
+                                                        int b = (*s++) >> 4;
 							if (b)
 								*td = lookup16[b];
-							++td;
-						}
-						s += extra_source_stride;
-						td += extra_buffer_stride;
-					}
-					}
-					break;
+                                                        ++td;
+                                                }
+                                                s += extra_source_stride;
+                                                td += extra_buffer_stride;
+                                        }
+                                        }
+                                        break;
 				case 3: // 32bit
 					{
 					int extra_buffer_stride = (buffer_stride >> 2) - sx;
@@ -1207,36 +1233,102 @@ void eTextPara::blit(gDC &dc, const ePoint &offset, const gRGB &background, cons
 	}
 }
 
-void eTextPara::realign(int dir)	// der code hier ist ein wenig merkwuerdig.
+void eTextPara::realign(int dir, int markedpos, int scrollpos)	// der code hier ist ein wenig merkwuerdig.
 {
 	glyphString::iterator begin(glyphs.begin()), c(glyphs.begin()), end(glyphs.begin()), last;
-	if (dir==dirLeft || (dir==dirBidi && !doTopBottomReordering))
+	if ((dir==dirLeft || (dir==dirBidi && !doTopBottomReordering)) && markedpos < 0)
 		return;
 	while (c != glyphs.end())
 	{
 		int linelength=0;
+		int linespace=area.width();
 		int numspaces=0, num=0;
 		begin=end;
 
 		ASSERT( end != glyphs.end());
 
+		glyphString::iterator nonspace_end(begin);
+
 			// zeilenende suchen
 		do {
 			last=end;
 			++end;
+			if (!(last->flags&GS_ISSPACE) && (end == glyphs.end() || end->flags&(GS_ISSPACE|GS_ISFIRST)))
+				nonspace_end = end;
 		} while ((end != glyphs.end()) && (!(end->flags&GS_ISFIRST)));
 			// end zeigt jetzt auf begin der naechsten zeile
 
-		for (c=begin; c!=end; ++c)
+		for (c=begin; c!=nonspace_end; ++c)
 		{
-				// space am zeilenende skippen
-			if ((c==last) && (c->flags&GS_ISSPACE))
-				continue;
-
+			if (dir == dirBlock && c->flags&GS_FIXED)
+			{
+				numspaces=0;
+				num=0;
+				linespace=area.width()-c->x;
+				linelength=0;
+				begin = c;
+			}
 			if (c->flags&GS_ISSPACE)
 				numspaces++;
 			linelength+=c->w;
 			num++;
+		}
+		c = end;
+
+		// Ensure the marked position is visible.
+		bool offset_set = false;
+		if (markedpos >= 0)
+		{
+			if (linelength > area.width())
+			{
+				if (markedpos >= (int)glyphs.size())
+					markedpos = glyphs.size() - 1;
+				eRect bbox = glyphs[markedpos].bbox;
+				if (scrollpos == 50)
+				{
+					int mark_center = bbox.left() + bbox.width() / 2 - area.left();
+					int area_center = area.width() / 2;
+					// The mark is near the start, leave left aligned.
+					if (mark_center < area_center)
+						return;
+					// The mark is near the end, set right aligned.
+					if (mark_center > linelength - area_center)
+						dir = dirRight;
+					// Center on the mark.
+					else
+					{
+						dir = dirCenter;
+						m_offset = area_center - mark_center;
+						offset_set = true;
+					}
+				}
+				else
+				{
+					dir = dirRight;
+					offset_set = true;
+					int scroll_offset = area.width() * scrollpos / 100;
+					if (bbox.left() + m_offset < area.left() + scroll_offset)
+					{
+						m_offset = area.left() + scroll_offset - bbox.left();
+						// The mark is near the start, leave left aligned.
+						if (m_offset >= 0)
+						{
+							m_offset = 0;
+							return;
+						}
+					}
+					else if (bbox.right() + m_offset >= area.right() - scroll_offset)
+					{
+						m_offset = area.right() - scroll_offset - bbox.right();
+						// The mark is near the end, set right aligned.
+						if (m_offset < area.width() - linelength)
+							offset_set = false;
+					}
+					// else mark is visible, keep current offset
+				}
+			}
+			else if (dir == dirLeft || (dir == dirBidi && !doTopBottomReordering))
+				return;
 		}
 
 		switch (dir)
@@ -1252,13 +1344,16 @@ void eTextPara::realign(int dir)	// der code hier ist ein wenig merkwuerdig.
 		case dirCenter:
 		case dirBidi:
 		{
-			int offset=area.width()-linelength;
-			if (dir==dirCenter)
-				offset/=2;
+			if (!offset_set)
+			{
+				m_offset=area.width()-linelength;
+				if (dir==dirCenter)
+					m_offset/=2;
+			}
 			while (begin != end)
 			{
-				begin->bbox.moveBy(offset,0);
-				begin->x += offset;
+				begin->bbox.moveBy(m_offset,0);
+				begin->x += m_offset;
 				++begin;
 			}
 			break;
@@ -1283,9 +1378,10 @@ void eTextPara::realign(int dir)	// der code hier ist ein wenig merkwuerdig.
 				continue;
 			}
 
-			int off=(area.width()-linelength)*256/(numspaces?numspaces:(num-1));
+			int off=(linespace-linelength)*256/(numspaces?numspaces:(num-1));
 			int curoff=0;
-			while (begin != end)
+
+			while (begin != nonspace_end)
 			{
 				int doadd=0;
 				if (begin->flags & GS_ISSPACE)
@@ -1294,6 +1390,12 @@ void eTextPara::realign(int dir)	// der code hier ist ein wenig merkwuerdig.
 				begin->bbox.moveBy(curoff>>8,0);
 				if (doadd)
 					curoff+=off;
+				++begin;
+			}
+			curoff = (curoff+255) >> 8;
+			while (begin != end) {
+				begin->x+=curoff;
+				begin->bbox.moveBy(curoff,0);
 				++begin;
 			}
 			break;
@@ -1318,6 +1420,7 @@ void eTextPara::clear()
 	}
 	glyphs.clear();
 	totalheight = 0;
+	lineCount = 0;
 }
 
 eAutoInitP0<fontRenderClass> init_fontRenderClass(eAutoInitNumbers::graphic-1, "Font Render Class");

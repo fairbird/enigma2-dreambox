@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from Components.Harddisk import harddiskmanager
 from Components.Console import Console
 from Components.config import ConfigSubsection, ConfigYesNo, config, ConfigSelection, ConfigText, ConfigNumber, ConfigSet, ConfigLocations, ConfigSelectionNumber, ConfigClock, ConfigSlider, ConfigEnableDisable, ConfigSubDict, ConfigDictionarySet, ConfigInteger, ConfigIP, ConfigPassword, NoSave, ConfigBoolean

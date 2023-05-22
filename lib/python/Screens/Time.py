@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from Components.ActionMap import ActionMap, HelpableActionMap
 from Components.config import config
 from Components.ConfigList import ConfigListScreen
@@ -87,100 +88,100 @@ class TimeWizard(ConfigListScreen, Screen, Rc):
 	if isHD():
 		skin = """
 		<screen name="TimeWizard" position="center,60" size="1280,720" resolution="1280,720">
-			<widget name="text" position="30,10" size="1000,47" font="Regular;20" transparent="1" valign="center" />
+			<widget name="text" position="30,10" size="1000,47" font="Regular;20" transparent="1" verticalAlignment="center" />
 			<widget name="config" position="212,95" size="944,430" enableWrapAround="1" entryFont="Regular;25" valueFont="Regular;25" itemHeight="35" scrollbarMode="showOnDemand" />
 			<eLabel position="234,710" zPosition="2" size="234,2" foregroundColor="#00ff2525" backgroundColor="#00ff2525"/>
 			<eLabel position="519,710" zPosition="2" size="234,2" foregroundColor="#00bab329" backgroundColor="#00bab329"/>
-			<widget source="key_red" render="Label" objectTypes="key_red,StaticText" position="234,670" size="180,40" backgroundColor="key_red" conditional="key_red" font="Regular;20" foregroundColor="key_text" halign="center" valign="center">
+			<widget source="key_red" render="Label" objectTypes="key_red,StaticText" position="234,670" size="180,40" backgroundColor="key_red" conditional="key_red" font="Regular;20" foregroundColor="key_text" horizontalAlignment="center" verticalAlignment="center">
 				<convert type="ConditionalShowHide" />
 			</widget>
-			<widget source="key_yellow" render="Label" objectTypes="key_yellow,StaticText" position="519,670" size="180,40" backgroundColor="key_yellow" conditional="key_yellow" font="Regular;20" foregroundColor="key_text" halign="center" valign="center">
+			<widget source="key_yellow" render="Label" objectTypes="key_yellow,StaticText" position="519,670" size="180,40" backgroundColor="key_yellow" conditional="key_yellow" font="Regular;20" foregroundColor="key_text" horizontalAlignment="center" verticalAlignment="center">
 				<convert type="ConditionalShowHide" />
 			</widget>
-			<widget name="HelpWindow" position="0,0" size="0,0" alphatest="blend" conditional="HelpWindow" transparent="1" zPosition="+1" />
-			<widget name="rc" conditional="rc" alphatest="blend" position="24,95" size="163,524" />
-			<widget name="wizard" conditional="wizard" pixmap="picon_default.png" position="1044,582" size="220,132" alphatest="blend"/>
-			<widget name="indicatorU0" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphatest="blend" offset="11,11" zPosition="11" />
-			<widget name="indicatorU1" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphatest="blend" offset="11,11" zPosition="11" />
-			<widget name="indicatorU2" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphatest="blend" offset="11,11" zPosition="11" />
-			<widget name="indicatorU3" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphatest="blend" offset="11,11" zPosition="11" />
-			<widget name="indicatorU4" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphatest="blend" offset="11,11" zPosition="11" />
-			<widget name="indicatorU5" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphatest="blend" offset="11,11" zPosition="11" />
-			<widget name="indicatorU6" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphatest="blend" offset="11,11" zPosition="11" />
-			<widget name="indicatorU7" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphatest="blend" offset="11,11" zPosition="11" />
-			<widget name="indicatorU8" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphatest="blend" offset="11,11" zPosition="11" />
-			<widget name="indicatorU9" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphatest="blend" offset="11,11" zPosition="11" />
-			<widget name="indicatorU10" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphatest="blend" offset="11,11" zPosition="11" />
-			<widget name="indicatorU11" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphatest="blend" offset="11,11" zPosition="11" />
-			<widget name="indicatorU12" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphatest="blend" offset="11,11" zPosition="11" />
-			<widget name="indicatorU13" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphatest="blend" offset="11,11" zPosition="11" />
-			<widget name="indicatorU14" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphatest="blend" offset="11,11" zPosition="11" />
-			<widget name="indicatorU15" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphatest="blend" offset="11,11" zPosition="11" />
-			<widget name="indicatorL0" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphatest="blend" offset="11,11" zPosition="11" />
-			<widget name="indicatorL1" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphatest="blend" offset="11,11" zPosition="11" />
-			<widget name="indicatorL2" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphatest="blend" offset="11,11" zPosition="11" />
-			<widget name="indicatorL3" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphatest="blend" offset="11,11" zPosition="11" />
-			<widget name="indicatorL4" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphatest="blend" offset="11,11" zPosition="11" />
-			<widget name="indicatorL5" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphatest="blend" offset="11,11" zPosition="11" />
-			<widget name="indicatorL6" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphatest="blend" offset="11,11" zPosition="11" />
-			<widget name="indicatorL7" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphatest="blend" offset="11,11" zPosition="11" />
-			<widget name="indicatorL8" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphatest="blend" offset="11,11" zPosition="11" />
-			<widget name="indicatorL9" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphatest="blend" offset="11,11" zPosition="11" />
-			<widget name="indicatorL10" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphatest="blend" offset="11,11" zPosition="11" />
-			<widget name="indicatorL11" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphatest="blend" offset="11,11" zPosition="11" />
-			<widget name="indicatorL12" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphatest="blend" offset="11,11" zPosition="11" />
-			<widget name="indicatorL13" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphatest="blend" offset="11,11" zPosition="11" />
-			<widget name="indicatorL14" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphatest="blend" offset="11,11" zPosition="11" />
-			<widget name="indicatorL15" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphatest="blend" offset="11,11" zPosition="11" />
+			<widget name="HelpWindow" position="0,0" size="0,0" alphaTest="blend" conditional="HelpWindow" transparent="1" zPosition="+1" />
+			<widget name="rc" conditional="rc" alphaTest="blend" position="24,95" size="163,524" />
+			<widget name="wizard" conditional="wizard" pixmap="picon_default.png" position="1044,582" size="220,132" alphaTest="blend"/>
+			<widget name="indicatorU0" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphaTest="blend" offset="11,11" zPosition="11" />
+			<widget name="indicatorU1" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphaTest="blend" offset="11,11" zPosition="11" />
+			<widget name="indicatorU2" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphaTest="blend" offset="11,11" zPosition="11" />
+			<widget name="indicatorU3" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphaTest="blend" offset="11,11" zPosition="11" />
+			<widget name="indicatorU4" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphaTest="blend" offset="11,11" zPosition="11" />
+			<widget name="indicatorU5" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphaTest="blend" offset="11,11" zPosition="11" />
+			<widget name="indicatorU6" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphaTest="blend" offset="11,11" zPosition="11" />
+			<widget name="indicatorU7" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphaTest="blend" offset="11,11" zPosition="11" />
+			<widget name="indicatorU8" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphaTest="blend" offset="11,11" zPosition="11" />
+			<widget name="indicatorU9" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphaTest="blend" offset="11,11" zPosition="11" />
+			<widget name="indicatorU10" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphaTest="blend" offset="11,11" zPosition="11" />
+			<widget name="indicatorU11" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphaTest="blend" offset="11,11" zPosition="11" />
+			<widget name="indicatorU12" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphaTest="blend" offset="11,11" zPosition="11" />
+			<widget name="indicatorU13" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphaTest="blend" offset="11,11" zPosition="11" />
+			<widget name="indicatorU14" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphaTest="blend" offset="11,11" zPosition="11" />
+			<widget name="indicatorU15" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphaTest="blend" offset="11,11" zPosition="11" />
+			<widget name="indicatorL0" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphaTest="blend" offset="11,11" zPosition="11" />
+			<widget name="indicatorL1" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphaTest="blend" offset="11,11" zPosition="11" />
+			<widget name="indicatorL2" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphaTest="blend" offset="11,11" zPosition="11" />
+			<widget name="indicatorL3" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphaTest="blend" offset="11,11" zPosition="11" />
+			<widget name="indicatorL4" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphaTest="blend" offset="11,11" zPosition="11" />
+			<widget name="indicatorL5" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphaTest="blend" offset="11,11" zPosition="11" />
+			<widget name="indicatorL6" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphaTest="blend" offset="11,11" zPosition="11" />
+			<widget name="indicatorL7" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphaTest="blend" offset="11,11" zPosition="11" />
+			<widget name="indicatorL8" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphaTest="blend" offset="11,11" zPosition="11" />
+			<widget name="indicatorL9" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphaTest="blend" offset="11,11" zPosition="11" />
+			<widget name="indicatorL10" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphaTest="blend" offset="11,11" zPosition="11" />
+			<widget name="indicatorL11" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphaTest="blend" offset="11,11" zPosition="11" />
+			<widget name="indicatorL12" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphaTest="blend" offset="11,11" zPosition="11" />
+			<widget name="indicatorL13" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphaTest="blend" offset="11,11" zPosition="11" />
+			<widget name="indicatorL14" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphaTest="blend" offset="11,11" zPosition="11" />
+			<widget name="indicatorL15" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphaTest="blend" offset="11,11" zPosition="11" />
 		</screen>"""
 	else:
 		skin = """
 		<screen name="TimeWizard" position="center,center" size="1746,994" resolution="1920,1080" flags="wfNoBorder">
-			<widget name="text" position="10,10" size="1619,40" font="Regular;35" transparent="1" valign="center" />
+			<widget name="text" position="10,10" size="1619,40" font="Regular;35" transparent="1" verticalAlignment="center" />
 			<widget name="config" position="253,221" size="1446,512" font="Regular;30" itemHeight="40" />
 			<eLabel position="113,977" zPosition="2" size="250,4" foregroundColor="#00ff2525" backgroundColor="#00ff2525"/>
 			<eLabel position="385,977" zPosition="2" size="250,4" foregroundColor="#00bab329" backgroundColor="#00bab329"/>
-			<widget source="key_red" render="Label" objectTypes="key_red,StaticText" position="113,935" size="250,45" backgroundColor="key_red" conditional="key_red" font="Regular;30" foregroundColor="key_text" halign="center" valign="center">
+			<widget source="key_red" render="Label" objectTypes="key_red,StaticText" position="113,935" size="250,45" backgroundColor="key_red" conditional="key_red" font="Regular;30" foregroundColor="key_text" horizontalAlignment="center" verticalAlignment="center">
 				<convert type="ConditionalShowHide" />
 			</widget>
-			<widget source="key_yellow" render="Label" objectTypes="key_yellow,StaticText" position="385,937" size="250,45" backgroundColor="key_yellow" conditional="key_yellow" font="Regular;35" foregroundColor="key_text" halign="center" valign="center">
+			<widget source="key_yellow" render="Label" objectTypes="key_yellow,StaticText" position="385,937" size="250,45" backgroundColor="key_yellow" conditional="key_yellow" font="Regular;35" foregroundColor="key_text" horizontalAlignment="center" verticalAlignment="center">
 				<convert type="ConditionalShowHide" />
 			</widget>
-			<widget name="HelpWindow" position="0,0" size="0,0" alphatest="blend" conditional="HelpWindow" transparent="1" zPosition="+1" />
-			<widget name="rc" conditional="rc" alphatest="blend" position="10,165" size="214,675" />
-			<widget name="wizard" conditional="wizard" pixmap="picon_default.png" position="1515,857" size="220,132" alphatest="blend" />
-			<widget name="indicatorU0" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphatest="blend" offset="11,11" zPosition="11" />
-			<widget name="indicatorU1" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphatest="blend" offset="11,11" zPosition="11" />
-			<widget name="indicatorU2" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphatest="blend" offset="11,11" zPosition="11" />
-			<widget name="indicatorU3" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphatest="blend" offset="11,11" zPosition="11" />
-			<widget name="indicatorU4" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphatest="blend" offset="11,11" zPosition="11" />
-			<widget name="indicatorU5" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphatest="blend" offset="11,11" zPosition="11" />
-			<widget name="indicatorU6" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphatest="blend" offset="11,11" zPosition="11" />
-			<widget name="indicatorU7" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphatest="blend" offset="11,11" zPosition="11" />
-			<widget name="indicatorU8" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphatest="blend" offset="11,11" zPosition="11" />
-			<widget name="indicatorU9" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphatest="blend" offset="11,11" zPosition="11" />
-			<widget name="indicatorU10" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphatest="blend" offset="11,11" zPosition="11" />
-			<widget name="indicatorU11" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphatest="blend" offset="11,11" zPosition="11" />
-			<widget name="indicatorU12" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphatest="blend" offset="11,11" zPosition="11" />
-			<widget name="indicatorU13" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphatest="blend" offset="11,11" zPosition="11" />
-			<widget name="indicatorU14" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphatest="blend" offset="11,11" zPosition="11" />
-			<widget name="indicatorU15" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphatest="blend" offset="11,11" zPosition="11" />
-			<widget name="indicatorL0" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphatest="blend" offset="11,11" zPosition="11" />
-			<widget name="indicatorL1" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphatest="blend" offset="11,11" zPosition="11" />
-			<widget name="indicatorL2" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphatest="blend" offset="11,11" zPosition="11" />
-			<widget name="indicatorL3" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphatest="blend" offset="11,11" zPosition="11" />
-			<widget name="indicatorL4" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphatest="blend" offset="11,11" zPosition="11" />
-			<widget name="indicatorL5" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphatest="blend" offset="11,11" zPosition="11" />
-			<widget name="indicatorL6" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphatest="blend" offset="11,11" zPosition="11" />
-			<widget name="indicatorL7" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphatest="blend" offset="11,11" zPosition="11" />
-			<widget name="indicatorL8" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphatest="blend" offset="11,11" zPosition="11" />
-			<widget name="indicatorL9" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphatest="blend" offset="11,11" zPosition="11" />
-			<widget name="indicatorL10" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphatest="blend" offset="11,11" zPosition="11" />
-			<widget name="indicatorL11" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphatest="blend" offset="11,11" zPosition="11" />
-			<widget name="indicatorL12" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphatest="blend" offset="11,11" zPosition="11" />
-			<widget name="indicatorL13" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphatest="blend" offset="11,11" zPosition="11" />
-			<widget name="indicatorL14" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphatest="blend" offset="11,11" zPosition="11" />
-			<widget name="indicatorL15" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphatest="blend" offset="11,11" zPosition="11" />
+			<widget name="HelpWindow" position="0,0" size="0,0" alphaTest="blend" conditional="HelpWindow" transparent="1" zPosition="+1" />
+			<widget name="rc" conditional="rc" alphaTest="blend" position="10,165" size="214,675" />
+			<widget name="wizard" conditional="wizard" pixmap="picon_default.png" position="1515,857" size="220,132" alphaTest="blend" />
+			<widget name="indicatorU0" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphaTest="blend" offset="11,11" zPosition="11" />
+			<widget name="indicatorU1" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphaTest="blend" offset="11,11" zPosition="11" />
+			<widget name="indicatorU2" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphaTest="blend" offset="11,11" zPosition="11" />
+			<widget name="indicatorU3" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphaTest="blend" offset="11,11" zPosition="11" />
+			<widget name="indicatorU4" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphaTest="blend" offset="11,11" zPosition="11" />
+			<widget name="indicatorU5" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphaTest="blend" offset="11,11" zPosition="11" />
+			<widget name="indicatorU6" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphaTest="blend" offset="11,11" zPosition="11" />
+			<widget name="indicatorU7" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphaTest="blend" offset="11,11" zPosition="11" />
+			<widget name="indicatorU8" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphaTest="blend" offset="11,11" zPosition="11" />
+			<widget name="indicatorU9" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphaTest="blend" offset="11,11" zPosition="11" />
+			<widget name="indicatorU10" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphaTest="blend" offset="11,11" zPosition="11" />
+			<widget name="indicatorU11" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphaTest="blend" offset="11,11" zPosition="11" />
+			<widget name="indicatorU12" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphaTest="blend" offset="11,11" zPosition="11" />
+			<widget name="indicatorU13" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphaTest="blend" offset="11,11" zPosition="11" />
+			<widget name="indicatorU14" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphaTest="blend" offset="11,11" zPosition="11" />
+			<widget name="indicatorU15" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphaTest="blend" offset="11,11" zPosition="11" />
+			<widget name="indicatorL0" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphaTest="blend" offset="11,11" zPosition="11" />
+			<widget name="indicatorL1" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphaTest="blend" offset="11,11" zPosition="11" />
+			<widget name="indicatorL2" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphaTest="blend" offset="11,11" zPosition="11" />
+			<widget name="indicatorL3" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphaTest="blend" offset="11,11" zPosition="11" />
+			<widget name="indicatorL4" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphaTest="blend" offset="11,11" zPosition="11" />
+			<widget name="indicatorL5" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphaTest="blend" offset="11,11" zPosition="11" />
+			<widget name="indicatorL6" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphaTest="blend" offset="11,11" zPosition="11" />
+			<widget name="indicatorL7" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphaTest="blend" offset="11,11" zPosition="11" />
+			<widget name="indicatorL8" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphaTest="blend" offset="11,11" zPosition="11" />
+			<widget name="indicatorL9" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphaTest="blend" offset="11,11" zPosition="11" />
+			<widget name="indicatorL10" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphaTest="blend" offset="11,11" zPosition="11" />
+			<widget name="indicatorL11" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphaTest="blend" offset="11,11" zPosition="11" />
+			<widget name="indicatorL12" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphaTest="blend" offset="11,11" zPosition="11" />
+			<widget name="indicatorL13" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphaTest="blend" offset="11,11" zPosition="11" />
+			<widget name="indicatorL14" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphaTest="blend" offset="11,11" zPosition="11" />
+			<widget name="indicatorL15" pixmap="skin_default/yellow_circle23x23.png" position="0,0" size="23,23" alphaTest="blend" offset="11,11" zPosition="11" />
 		</screen>"""
 
 	def __init__(self, session):

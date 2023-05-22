@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from Components.Sources.Source import Source
 from Components.Element import cached
 from Components.SystemInfo import SystemInfo

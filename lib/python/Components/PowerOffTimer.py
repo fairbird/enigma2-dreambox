@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from RecordTimer import RecordTimerEntry
 from Screens.MessageBox import MessageBox
 from Screens import Standby

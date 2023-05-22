@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from Screens.Screen import Screen
 from Screens.MessageBox import MessageBox
 from Screens.HelpMenu import HelpableScreen
@@ -84,17 +85,17 @@ class FileBrowser(Screen, HelpableScreen):
 class ProjectSettings(ConfigListScreen, Screen):
 	skin = """
 		<screen name="ProjectSettings" position="center,center" size="560,440" title="Collection settings" >
-			<ePixmap pixmap="buttons/red.png" position="0,0" size="140,40" alphatest="on" />
-			<ePixmap pixmap="buttons/green.png" position="140,0" size="140,40" alphatest="on" />
-			<ePixmap pixmap="buttons/yellow.png" position="280,0" size="140,40" alphatest="on" />
-			<ePixmap pixmap="buttons/blue.png" position="420,0" size="140,40" alphatest="on" />
-			<widget source="key_red" render="Label" position="0,0" zPosition="1" size="140,40" font="Regular;19" halign="center" valign="center" backgroundColor="#9f1313" transparent="1" />
-			<widget source="key_green" render="Label" position="140,0" zPosition="1" size="140,40" font="Regular;19" halign="center" valign="center" backgroundColor="#1f771f" transparent="1" />
-			<widget source="key_yellow" render="Label" position="280,0" zPosition="1" size="140,40" font="Regular;19" halign="center" valign="center" backgroundColor="#a08500" transparent="1" />
-			<widget source="key_blue" render="Label" position="420,0" zPosition="1" size="140,40" font="Regular;19" halign="center" valign="center" backgroundColor="#18188b" transparent="1" />
+			<ePixmap pixmap="buttons/red.png" position="0,0" size="140,40" alphaTest="on" />
+			<ePixmap pixmap="buttons/green.png" position="140,0" size="140,40" alphaTest="on" />
+			<ePixmap pixmap="buttons/yellow.png" position="280,0" size="140,40" alphaTest="on" />
+			<ePixmap pixmap="buttons/blue.png" position="420,0" size="140,40" alphaTest="on" />
+			<widget source="key_red" render="Label" position="0,0" zPosition="1" size="140,40" font="Regular;19" horizontalAlignment="center" verticalAlignment="center" backgroundColor="#9f1313" transparent="1" />
+			<widget source="key_green" render="Label" position="140,0" zPosition="1" size="140,40" font="Regular;19" horizontalAlignment="center" verticalAlignment="center" backgroundColor="#1f771f" transparent="1" />
+			<widget source="key_yellow" render="Label" position="280,0" zPosition="1" size="140,40" font="Regular;19" horizontalAlignment="center" verticalAlignment="center" backgroundColor="#a08500" transparent="1" />
+			<widget source="key_blue" render="Label" position="420,0" zPosition="1" size="140,40" font="Regular;19" horizontalAlignment="center" verticalAlignment="center" backgroundColor="#18188b" transparent="1" />
 			<widget name="config" position="5,50" size="550,276" scrollbarMode="showOnDemand" />
 			<ePixmap pixmap="div-h.png" position="0,350" zPosition="1" size="560,2" />
-			<widget source="info" render="Label" position="10,360" size="550,80" font="Regular;18" halign="center" valign="center" />
+			<widget source="info" render="Label" position="10,360" size="550,80" font="Regular;18" horizontalAlignment="center" verticalAlignment="center" />
 		</screen>"""
 
 	def __init__(self, session, project=None):

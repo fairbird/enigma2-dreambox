@@ -1,6 +1,7 @@
+# -*- coding: utf-8 -*-
 from Components.Renderer.Renderer import Renderer
 from Components.ActionMap import ActionMap
-from skin import parseColor, parseFont, parseScale
+from skin import parseColor, parseFont
 import math
 
 from enigma import eListbox, gFont, eListboxPythonMultiContent, RT_WRAP, RT_VALIGN_TOP, RT_VALIGN_CENTER, RT_HALIGN_LEFT, RT_HALIGN_CENTER, RT_HALIGN_RIGHT, BT_SCALE, BT_ALPHABLEND, BT_KEEP_ASPECT_RATIO, BT_ALIGN_CENTER

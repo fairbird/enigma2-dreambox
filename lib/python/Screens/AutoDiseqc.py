@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from Screens.Screen import Screen
 from Components.ConfigList import ConfigListScreen
 from Components.ActionMap import ActionMap
@@ -11,11 +12,11 @@ from enigma import eDVBFrontendParametersSatellite, eDVBResourceManager, eTimer
 class AutoDiseqc(ConfigListScreen, Screen):
 	skin = """
 		<screen position="c-250,c-100" size="500,250" title=" ">
-			<widget source="statusbar" render="Label" position="10,5" zPosition="10" size="e-10,60" halign="center" valign="center" font="Regular;22" transparent="1" shadowColor="black" shadowOffset="-1,-1" />
-			<widget source="tunerstatusbar" render="Label" position="10,60" zPosition="10" size="e-10,30" halign="center" valign="center" font="Regular;22" transparent="1" shadowColor="black" shadowOffset="-1,-1" />
+			<widget source="statusbar" render="Label" position="10,5" zPosition="10" size="e-10,60" horizontalAlignment="center" verticalAlignment="center" font="Regular;22" transparent="1" shadowColor="black" shadowOffset="-1,-1" />
+			<widget source="tunerstatusbar" render="Label" position="10,60" zPosition="10" size="e-10,30" horizontalAlignment="center" verticalAlignment="center" font="Regular;22" transparent="1" shadowColor="black" shadowOffset="-1,-1" />
 			<widget name="config" position="10,100" size="e-10,100" scrollbarMode="showOnDemand" />
-			<ePixmap pixmap="buttons/red.png" position="c-140,e-45" size="140,40" alphatest="on" />
-			<widget source="key_red" render="Label" position="c-140,e-45" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#9f1313" transparent="1" />
+			<ePixmap pixmap="buttons/red.png" position="c-140,e-45" size="140,40" alphaTest="on" />
+			<widget source="key_red" render="Label" position="c-140,e-45" zPosition="1" size="140,40" font="Regular;20" horizontalAlignment="center" verticalAlignment="center" backgroundColor="#9f1313" transparent="1" />
 		</screen>"""
 
 	diseqc_ports = [

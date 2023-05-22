@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from enigma import getPrevAsciiCode
 from Screens.Screen import Screen
 from Screens.MessageBox import MessageBox

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from Screens.InfoBar import InfoBar
 from Screens.ChoiceBox import ChoiceBox
 from Screens.MessageBox import MessageBox

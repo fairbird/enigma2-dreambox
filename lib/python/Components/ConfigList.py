@@ -1,19 +1,20 @@
+# -*- coding: utf-8 -*-
 from Components.GUIComponent import GUIComponent
 from Components.config import KEY_LEFT, KEY_RIGHT, KEY_HOME, KEY_END, KEY_0, KEY_DELETE, KEY_BACKSPACE, KEY_OK, KEY_TOGGLEOW, KEY_ASCII, KEY_TIMEOUT, KEY_NUMBERS, ConfigElement
 from Components.ActionMap import NumberActionMap, ActionMap
 from enigma import eListbox, eListboxPythonConfigContent, eRCInput, eTimer
 from Screens.MessageBox import MessageBox
 from Screens.ChoiceBox import ChoiceBox
-from skin import applySkinFactor, parameters
+from skin import parameters
 
 
 class ConfigList(GUIComponent):
 	def __init__(self, list, session=None):
 		GUIComponent.__init__(self)
 		self.l = eListboxPythonConfigContent()
-		seperation = parameters.get("ConfigListSeperator", applySkinFactor(200))
+		seperation = parameters.get("ConfigListSeperator", 200)
 		self.l.setSeperation(seperation)
-		height, space = parameters.get("ConfigListSlider", applySkinFactor(17, 0))
+		height, space = parameters.get("ConfigListSlider", (17, 0))
 		self.l.setSlider(height, space)
 		self.timer = eTimer()
 		self.list = list

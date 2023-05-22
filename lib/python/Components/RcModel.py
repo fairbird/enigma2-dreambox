@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import os
 from Tools.HardwareInfo import HardwareInfo
 from Tools.Directories import SCOPE_SKIN, resolveFilename

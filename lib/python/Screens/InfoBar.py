@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from Tools.Profile import profile
 from enigma import eServiceReference
 

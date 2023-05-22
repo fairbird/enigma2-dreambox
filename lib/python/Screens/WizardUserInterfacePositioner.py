@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from Screens.HelpMenu import Rc
 from Screens.Screen import Screen
 from Screens.WizardLanguage import WizardLanguage

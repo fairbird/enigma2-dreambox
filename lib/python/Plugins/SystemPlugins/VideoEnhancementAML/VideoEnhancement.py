@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from os.path import exists
 from Components.config import config, ConfigSubsection, ConfigInteger, ConfigSlider, ConfigSelection, ConfigNothing, NoSave
 

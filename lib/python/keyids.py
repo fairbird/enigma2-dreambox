@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # The following KEYID numbers are currently unused:
 #
 # 199, 204, 228-237, 239, 241-255, 258-303, 316-350,

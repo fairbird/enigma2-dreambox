@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import sys
 import os
 from time import time
@@ -540,14 +541,13 @@ def runScreenTest():
 	from Screens.SleepTimerEdit import isNextWakeupTime
 	#get currentTime
 	nowTime = time()
-	wakeupList = [
+	wakeupList = sorted([
 		x for x in ((session.nav.RecordTimer.getNextRecordingTime(), 0),
 					(session.nav.RecordTimer.getNextZapTime(isWakeup=True), 1),
 					(plugins.getNextWakeupTime(), 2),
 					(isNextWakeupTime(), 3))
 		if x[0] != -1
-	]
-	wakeupList.sort()
+	])
 	if wakeupList:
 		from time import strftime
 		startTime = wakeupList[0]
@@ -579,9 +579,9 @@ def runScreenTest():
 	return 0
 
 
-profile("Init:skin")
-import skin
-skin.loadSkinData(enigma.getDesktop(0))
+profile("Skin")
+from skin import InitSkins
+InitSkins()
 
 profile("InputDevice")
 import Components.InputDevice

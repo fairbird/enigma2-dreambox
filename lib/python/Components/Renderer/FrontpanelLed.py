@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from Components.Element import Element
 
 # this is not a GUI renderer.

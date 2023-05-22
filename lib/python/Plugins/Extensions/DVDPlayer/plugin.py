@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import os
 from Tools.Directories import fileExists
 from Plugins.Plugin import PluginDescriptor

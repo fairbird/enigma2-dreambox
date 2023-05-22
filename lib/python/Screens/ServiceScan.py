@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from Screens.Screen import Screen
 import Screens.InfoBar
 from Components.ServiceScan import ServiceScan as CScan

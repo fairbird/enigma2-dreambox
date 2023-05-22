@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from hashlib import md5
 from os import R_OK, access
 from os.path import exists as fileAccess, isdir, isfile, join as pathjoin

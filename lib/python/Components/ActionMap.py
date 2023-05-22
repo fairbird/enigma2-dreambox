@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from enigma import eActionMap
 
 from Tools.KeyBindings import queryKeyBinding

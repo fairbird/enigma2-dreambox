@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from errno import ENOENT
 from os import _exit, listdir, remove, system
 from os.path import isdir, join as pathjoin

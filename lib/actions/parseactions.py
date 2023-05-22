@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # takes a header file, outputs action ids
 
 import tokenize

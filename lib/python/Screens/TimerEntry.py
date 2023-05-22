@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from Screens.Screen import Screen
 from Screens import ChannelSelection
 from ServiceReference import ServiceReference

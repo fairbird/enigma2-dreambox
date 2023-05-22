@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from Components.Task import Task, Job, DiskspacePrecondition, Condition, ToolExistsPrecondition
 from Components.Harddisk import harddiskmanager
 from Screens.MessageBox import MessageBox
