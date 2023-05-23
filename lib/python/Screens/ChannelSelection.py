@@ -302,7 +302,6 @@ class ChannelContextMenu(Screen):
 					append_when_current_valid(current, menu, (_("End alternatives edit"), self.bouquetMarkEnd), level=0)
 					append_when_current_valid(current, menu, (_("Abort alternatives edit"), self.bouquetMarkAbort), level=0)
 
-		menu.append(ChoiceEntryComponent("dummy", text=(_("Reload Services"), self.reloadServices)))
 		menu.append(ChoiceEntryComponent("menu", (_("Settings..."), self.openSetup)))
 		self["menu"] = ChoiceList(menu)
 
@@ -451,11 +450,6 @@ class ChannelContextMenu(Screen):
 		eDVBDB.getInstance().reloadBouquets()
 		eDVBDB.getInstance().reloadServicelist()
 		self.session.openWithCallback(self.close, MessageBox, _("The services/bouquets list is reloaded!"), MessageBox.TYPE_INFO, timeout=5)
-
-	def reloadServices(self):
-		eDVBDB.getInstance().reloadBouquets()
-		eDVBDB.getInstance().reloadServicelist()
-		self.session.openWithCallback(self.close, MessageBox, _("The service list is reloaded."), MessageBox.TYPE_INFO, timeout=5)
 
 	def showServiceInformations(self):
 		current = self.csel.getCurrentSelection()
