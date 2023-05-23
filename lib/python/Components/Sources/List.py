@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
-from Components.Sources.Source import Source
 from Components.Element import cached
+from Components.Sources.Source import Source
 
 
 class List(Source):
-	"""The datasource of a listbox. Currently, the format depends on the used converter. So
+	"""The data source of a listbox. Currently, the format depends on the used converter. So
 if you put a simple string list in here, you need to use a StringList converter, if you are
 using a "multi content list styled"-list, you need to use the StaticMultiList converter, and
 setup the "fonts".
@@ -12,44 +12,56 @@ setup the "fonts".
 This has been done so another converter could convert the list to a different format, for example
 to generate HTML."""
 
-	def __init__(self, list=[], enableWrapAround=False, item_height=25, fonts=[]):
+	# NOTE: The calling arguments enableWraparound, item_height and fonts are not
+	# used but remain here so that calling code does not need to be modified.
+	# The enableWrapAround function is correctly handled by the C++ code and the
+	# use of the enableWrapAround="1" attribute in the skin. Similarly the
+	# itemHeight and font specifications are handled by the skin.
+	#
+	def __init__(self, list=[], enableWrapAround=None, item_height=0, fonts=[]):
 		Source.__init__(self)
-		self.__list = list
+		self.listData = list
+		self.listStyle = "default"  # Style might be an optional string which can be used to define different visualizations in the skin.
 		self.onSelectionChanged = []
-		self.item_height = item_height
-		self.fonts = fonts
-		self.disable_callbacks = False
-		self.enableWrapAround = enableWrapAround
-		self.__style = "default" # style might be an optional string which can be used to define different visualisations in the skin
+		self.disableCallbacks = False
 
-	def setList(self, list):
-		self.__list = list
+	def getList(self):
+		return self.listData
+
+	def setList(self, listData):
+		self.listData = listData
 		self.changed((self.CHANGED_ALL,))
 
-	list = property(lambda self: self.__list, setList)
+	list = property(getList, setList)
 
-	def entry_changed(self, index):
-		if not self.disable_callbacks:
+	def updateList(self, listData):
+		"""Changes the list without changing the selection or emitting changed Events"""
+		maxIndex = len(listData) - 1
+		oldIndex = min(self.index, maxIndex)
+		self.disableCallbacks = True
+		self.setList(listData)
+		self.index = oldIndex
+		self.disableCallbacks = False
+
+	def entryChanged(self, index):
+		if not self.disableCallbacks:
 			self.downstream_elements.entry_changed(index)
 
-	def modifyEntry(self, index, data):
-		self.__list[index] = data
-		self.entry_changed(index)
+	def entry_changed(self, index):  # IanSav: Is this old name really required?
+		return self.entryChanged(index)
 
-	def count(self):
-		return len(self.__list)
+	def modifyEntry(self, index, data):
+		self.listData[index] = data
+		self.entryChanged(index)
 
 	def selectionChanged(self, index):
-		if self.disable_callbacks:
+		if self.disableCallbacks:
 			return
-
-		# update all non-master targets
-		for x in self.downstream_elements:
-			if x is not self.master:
-				x.index = index
-
-		for x in self.onSelectionChanged:
-			x()
+		for element in self.downstream_elements:  # Update all non-master targets.
+			if element is not self.master:
+				element.index = index
+		for callback in self.onSelectionChanged:
+			callback()
 
 	@cached
 	def getCurrent(self):
@@ -57,77 +69,143 @@ to generate HTML."""
 
 	current = property(getCurrent)
 
-	def setIndex(self, index):
+	@cached
+	def getCurrentIndex(self):
+		return self.master.index if self.master is not None else 0  # None - The 0 is a hack to avoid badly written code from crashing!
+
+	def setCurrentIndex(self, index):
 		if self.master is not None:
 			self.master.index = index
 			self.selectionChanged(index)
 
-	@cached
+	index = property(getCurrentIndex, setCurrentIndex)
+
+	# Old index method names.
+	#
+	def getSelectedIndex(self):
+		return self.getCurrentIndex()
+
 	def getIndex(self):
-		if self.master is not None:
-			return self.master.index
-		else:
-			return 0
+		return self.getCurrentIndex()
 
-	setCurrentIndex = setIndex
-
-	index = property(getIndex, setIndex)
-
-	def selectNext(self):
-		if self.getIndex() + 1 >= self.count():
-			if self.enableWrapAround:
-				self.index = 0
-		else:
-			self.index += 1
-		self.setIndex(self.index)
-
-	def selectPrevious(self):
-		if self.getIndex() - 1 < 0:
-			if self.enableWrapAround:
-				self.index = self.count() - 1
-		else:
-			self.index -= 1
-		self.setIndex(self.index)
+	def setIndex(self, index):
+		return self.setCurrentIndex(index)
 
 	@cached
 	def getStyle(self):
-		return self.__style
+		return self.listStyle
 
 	def setStyle(self, style):
-		if self.__style != style:
-			self.__style = style
+		if self.listStyle != style:
+			self.listStyle = style
 			self.changed((self.CHANGED_SPECIFIC, "style"))
 
 	style = property(getStyle, setStyle)
 
-	def updateList(self, list):
-		"""Changes the list without changing the selection or emitting changed Events"""
-		assert len(list) == len(self.__list)
-		old_index = self.index
-		self.disable_callbacks = True
-		self.list = list
-		self.index = old_index
-		self.disable_callbacks = False
+	def count(self):
+		return len(self.listData)
+
+	def enableAutoNavigation(self, value):
+		try:
+			instance = self.master.master.instance
+			instance.enableAutoNavigation(value)
+		except AttributeError:
+			return
+
+	def show(self):
+		try:
+			instance = self.master.master.instance
+			instance.show()
+		except AttributeError:
+			return
+
+	def hide(self):
+		try:
+			instance = self.master.master.instance
+			instance.hide()
+		except AttributeError:
+			return
+
+	def goTop(self):
+		try:
+			instance = self.master.master.instance
+			instance.goTop()
+		except AttributeError:
+			return
+
+	def goPageUp(self):
+		try:
+			instance = self.master.master.instance
+			instance.goPageUp()
+		except AttributeError:
+			return
+
+	def goLineUp(self):
+		try:
+			instance = self.master.master.instance
+			instance.goLineUp()
+		except AttributeError:
+			return
+
+	def goLeft(self):
+		try:
+			instance = self.master.master.instance
+			instance.goLeft()
+		except AttributeError:
+			return
+
+	def goRight(self):
+		try:
+			instance = self.master.master.instance
+			instance.goRight()
+		except AttributeError:
+			return
+
+	def goLineDown(self):
+		try:
+			instance = self.master.master.instance
+			instance.goLineDown()
+		except AttributeError:
+			return
+
+	def goPageDown(self):
+		try:
+			instance = self.master.master.instance
+			instance.goPageDown()
+		except AttributeError:
+			return
+
+	def goBottom(self):
+		try:
+			instance = self.master.master.instance
+			instance.goBottom()
+		except AttributeError:
+			return
+
+	# These hacks protect code that was modified to use the previous up/down hack!
+	#
+	def selectPrevious(self):
+		self.goLineUp()
+
+	def selectNext(self):
+		self.goLineDown()
+
+	# Old navigation method names.
+	#
+	def top(self):
+		self.goTop()
 
 	def pageUp(self):
-		try:
-			instance = self.master.master.instance
-			instance.moveSelection(instance.pageUp)
-		except AttributeError:
-			return
-
-	def pageDown(self):
-		try:
-			instance = self.master.master.instance
-			instance.moveSelection(instance.pageDown)
-		except AttributeError:
-			return
+		self.goPageUp()
 
 	def up(self):
-		self.selectPrevious()
+		self.goLineUp()
 
 	def down(self):
-		self.selectNext()
+		self.goLineDown()
 
-	def getSelectedIndex(self):
-		return self.getIndex()
+	def pageDown(self):
+		self.goPageDown()
+
+	def bottom(self):
+		self.goBottom()
