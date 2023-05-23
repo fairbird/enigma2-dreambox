@@ -47,7 +47,7 @@ to generate HTML."""
 		if not self.disableCallbacks:
 			self.downstream_elements.entry_changed(index)
 
-	def entry_changed(self, index):  # IanSav: Is this old name really required?
+	def entry_changed(self, index):  # Is this old name really required?
 		return self.entryChanged(index)
 
 	def modifyEntry(self, index, data):
@@ -81,7 +81,6 @@ to generate HTML."""
 	index = property(getCurrentIndex, setCurrentIndex)
 
 	# Old index method names.
-	#
 	def getSelectedIndex(self):
 		return self.getCurrentIndex()
 
