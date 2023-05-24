@@ -6,7 +6,7 @@ from enigma import ePixmap, eTimer
 from skin import domScreens, parsePixmap
 from Components.ConditionalWidget import ConditionalWidget
 from Components.GUIComponent import GUIComponent
-from Tools.Directories import SCOPE_CURRENT_LCDSKIN, SCOPE_CURRENT_SKIN, fileExists, resolveFilename
+from Tools.Directories import SCOPE_LCDSKIN, SCOPE_GUISKIN, fileExists, resolveFilename
 
 
 class Pixmap(GUIComponent):
@@ -153,24 +153,24 @@ class MultiPixmap(Pixmap):
 				if attrib == "pixmaps":
 					pixmaps = value.split(",")
 					for pix in pixmaps:
-						if fileExists(resolveFilename(SCOPE_CURRENT_SKIN, pix, path_prefix=skinPathPrefix)):
-							pngfile = resolveFilename(SCOPE_CURRENT_SKIN, pix, path_prefix=skinPathPrefix)
-						elif fileExists(resolveFilename(SCOPE_CURRENT_LCDSKIN, pix, path_prefix=skinPathPrefix)):
-							pngfile = resolveFilename(SCOPE_CURRENT_LCDSKIN, pix, path_prefix=skinPathPrefix)
+						if fileExists(resolveFilename(SCOPE_GUISKIN, pix, path_prefix=skinPathPrefix)):
+							pngfile = resolveFilename(SCOPE_GUISKIN, pix, path_prefix=skinPathPrefix)
+						elif fileExists(resolveFilename(SCOPE_LCDSKIN, pix, path_prefix=skinPathPrefix)):
+							pngfile = resolveFilename(SCOPE_LCDSKIN, pix, path_prefix=skinPathPrefix)
 						else:
 							pngfile = ""
 						if pngfile and isfile(pngfile):
 							self.pixmaps.append(parsePixmap(pngfile, desktop))
 					if not pixmap:
-						if fileExists(resolveFilename(SCOPE_CURRENT_SKIN, pixmaps[0], path_prefix=skinPathPrefix)):
-							pixmap = resolveFilename(SCOPE_CURRENT_SKIN, pixmaps[0], path_prefix=skinPathPrefix)
-						elif fileExists(resolveFilename(SCOPE_CURRENT_LCDSKIN, pixmaps[0], path_prefix=skinPathPrefix)):
-							pixmap = resolveFilename(SCOPE_CURRENT_LCDSKIN, pixmaps[0], path_prefix=skinPathPrefix)
+						if fileExists(resolveFilename(SCOPE_GUISKIN, pixmaps[0], path_prefix=skinPathPrefix)):
+							pixmap = resolveFilename(SCOPE_GUISKIN, pixmaps[0], path_prefix=skinPathPrefix)
+						elif fileExists(resolveFilename(SCOPE_LCDSKIN, pixmaps[0], path_prefix=skinPathPrefix)):
+							pixmap = resolveFilename(SCOPE_LCDSKIN, pixmaps[0], path_prefix=skinPathPrefix)
 				elif attrib == "pixmap":
-					if fileExists(resolveFilename(SCOPE_CURRENT_SKIN, value, path_prefix=skinPathPrefix)):
-						pixmap = resolveFilename(SCOPE_CURRENT_SKIN, value, path_prefix=skinPathPrefix)
-					elif fileExists(resolveFilename(SCOPE_CURRENT_LCDSKIN, value, path_prefix=skinPathPrefix)):
-						pixmap = resolveFilename(SCOPE_CURRENT_LCDSKIN, value, path_prefix=skinPathPrefix)
+					if fileExists(resolveFilename(SCOPE_GUISKIN, value, path_prefix=skinPathPrefix)):
+						pixmap = resolveFilename(SCOPE_GUISKIN, value, path_prefix=skinPathPrefix)
+					elif fileExists(resolveFilename(SCOPE_LCDSKIN, value, path_prefix=skinPathPrefix)):
+						pixmap = resolveFilename(SCOPE_LCDSKIN, value, path_prefix=skinPathPrefix)
 				else:
 					attribs.append((attrib, value))
 			if pixmap:
