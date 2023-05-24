@@ -1,11 +1,12 @@
 from glob import glob
-from os.path import dirname, isfile, join as pathjoin, splitext
+from os.path import dirname, basename, isfile, join as pathjoin, splitext
 from os import listdir, unlink
 from xml.etree.cElementTree import Element, ElementTree, fromstring
 
 from enigma import BT_ALPHABLEND, BT_ALPHATEST, BT_HALIGN_CENTER, BT_HALIGN_LEFT, BT_HALIGN_RIGHT, BT_KEEP_ASPECT_RATIO, BT_SCALE, BT_VALIGN_BOTTOM, BT_VALIGN_CENTER, BT_VALIGN_TOP, addFont, eLabel, eListbox, ePixmap, ePoint, eRect, eSize, eSlider, eSubtitleWidget, eWindow, eWindowStyleManager, eWindowStyleSkinned, getDesktop, gFont, getFontFaces, gMainDC, gRGB
 
 from Components.config import ConfigSubsection, ConfigText, config
+from Components.RcModel import rc_model
 from Components.SystemInfo import SystemInfo
 from Components.Sources.Source import ObsoleteSource
 from Tools.Directories import SCOPE_LCDSKIN, SCOPE_GUISKIN, SCOPE_FONTS, SCOPE_SKINS, pathExists, resolveFilename, fileReadXML
@@ -18,6 +19,7 @@ DEFAULT_SKIN = SystemInfo["HasFullHDSkinSupport"] and "PLi-FullNightHD/skin.xml"
 EMERGENCY_SKIN = "skin_default/skin.xml"
 EMERGENCY_NAME = "Stone II"
 DEFAULT_DISPLAY_SKIN = "skin_default/skin_display.xml"
+SKIN_DEFAULT = "skin_default/skin.xml"
 USER_SKIN = "skin_user.xml"
 USER_SKIN_TEMPLATE = "skin_user_%s.xml"
 SUBTITLE_SKIN = "skin_subtitles.xml"
@@ -51,11 +53,12 @@ isVTISkin = False  # Temporary flag to suppress errors in OpenATV.
 
 config.skin = ConfigSubsection()
 skin = resolveFilename(SCOPE_SKINS, DEFAULT_SKIN)
-if not isfile(skin):
-	print("[Skin] Error: Default skin '%s' is not readable or is not a file!  Using emergency skin." % skin)
-	DEFAULT_SKIN = EMERGENCY_SKIN
 config.skin.primary_skin = ConfigText(default=DEFAULT_SKIN)
 config.skin.display_skin = ConfigText(default=DEFAULT_DISPLAY_SKIN)
+if not isfile(skin):
+	print("[Skin] Error: Default skin '%s' is not readable or is not a file!  Using emergency skin." % skin)
+	DEFAULT_SKIN = SKIN_DEFAULT
+DEFAULT_SKIN = EMERGENCY_SKIN
 
 currentPrimarySkin = None
 currentDisplaySkin = None
@@ -499,6 +502,8 @@ def parsePixmap(path, desktop):
 	option = path.find("#")
 	if option != -1:
 		path = path[:option]
+	if basename(path) in ("rc.png", "rc0.png", "rc1.png", "rc2.png", "oldrc.png"):
+		path = rc_model.getRcImg()
 	if isfile(path):
 		pixmap = LoadPixmap(path, desktop=desktop)
 		if pixmap is None:
