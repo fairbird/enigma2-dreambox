@@ -15,6 +15,8 @@ public:
 	void setTitle(const std::string &string);
 	std::string getTitle() const;
 	eWidget *child() { return m_child; }
+	void show();
+	void hide();
 
 	enum {
 		wfNoBorder = 1
@@ -24,6 +26,7 @@ public:
 
 	void setFlag(int flags);
 	void clearFlag(int flags);
+	void setAnimationMode(int mode);
 protected:
 	enum eWindowEvents
 	{
@@ -35,6 +38,8 @@ private:
 	eWidget *m_child;
 	int m_flags;
 	eWidgetDesktop *m_desktop;
+	int m_animation_mode;
+	static int m_has_animation_mode;
 };
 
 #endif

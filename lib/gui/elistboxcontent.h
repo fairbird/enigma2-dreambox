@@ -37,7 +37,11 @@ protected:
 	int cursorRestoreLine();
 	int size();
 
+#if SIGCXX_MAJOR_VERSION == 3
 	RESULT connectItemChanged(const sigc::slot<void()> &itemChanged, ePtr<eConnection> &connection);
+#else
+	RESULT connectItemChanged(const sigc::slot0<void> &itemChanged, ePtr<eConnection> &connection);
+#endif
 
 	// void setOutputDevice ? (for allocating colors, ...) .. requires some work, though
 	void setSize(const eSize &size);
@@ -126,6 +130,7 @@ private:
 #define RT_VALIGN_CENTER 16
 #define RT_VALIGN_BOTTOM 32
 #define RT_WRAP 64
+#define RT_ELLIPSIS 128
 #define BT_ALPHATEST 1
 #define BT_ALPHABLEND 2
 #define BT_SCALE 4

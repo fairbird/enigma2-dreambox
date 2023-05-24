@@ -3,7 +3,7 @@ from RecordTimer import RecordTimerEntry
 from Screens.MessageBox import MessageBox
 from Screens import Standby
 from Tools.Notifications import AddNotificationWithID
-from Tools.Directories import mediafilesInUse
+from Tools.Directories import mediaFilesInUse
 from Components.config import config
 from Components.Task import job_manager
 from Components.Converter.ClientsStreaming import ClientsStreaming
@@ -93,7 +93,7 @@ class PowerOffTimerPoller:
 				if Standby.inStandby is None:
 					if not config.usage.poweroff_force.value:
 						try_poweroff = False
-				elif jobs or self.session.screen["TunerInfo"].tuner_use_mask or mediafilesInUse(self.session):
+				elif jobs or self.session.screen["TunerInfo"].tuner_use_mask or mediaFilesInUse(self.session):
 					try_poweroff = False
 			if try_poweroff:
 				if Standby.inStandby is None:
@@ -107,7 +107,7 @@ class PowerOffTimerPoller:
 					if self.session.nav.getClientsStreaming():
 						clients = ClientsStreaming("SHORT_ALL")
 						reason += clients.getText() + '\n'
-					if mediafilesInUse(self.session):
+					if mediaFilesInUse(self.session):
 						reason += _("A file from media is in use!") + '\n'
 					self.session.openWithCallback(self.doPowerOffAnswer, MessageBox, reason + _("Really shutdown now?"), type = MessageBox.TYPE_YESNO, timeout = 180)
 				else:

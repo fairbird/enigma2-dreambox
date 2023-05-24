@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-from Components.Renderer.Renderer import Renderer
-
 from enigma import ePixmap
+
+from Components.Renderer.Renderer import Renderer
 
 
 class Pixmap(Renderer):
