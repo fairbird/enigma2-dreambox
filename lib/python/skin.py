@@ -19,7 +19,6 @@ DEFAULT_SKIN = SystemInfo["HasFullHDSkinSupport"] and "PLi-FullNightHD/skin.xml"
 EMERGENCY_SKIN = "skin_default/skin.xml"
 EMERGENCY_NAME = "Stone II"
 DEFAULT_DISPLAY_SKIN = "skin_default/skin_display.xml"
-SKIN_DEFAULT = "skin_default/skin.xml"
 USER_SKIN = "skin_user.xml"
 USER_SKIN_TEMPLATE = "skin_user_%s.xml"
 SUBTITLE_SKIN = "skin_subtitles.xml"
@@ -53,12 +52,11 @@ isVTISkin = False  # Temporary flag to suppress errors in OpenATV.
 
 config.skin = ConfigSubsection()
 skin = resolveFilename(SCOPE_SKINS, DEFAULT_SKIN)
-config.skin.primary_skin = ConfigText(default=DEFAULT_SKIN)
-config.skin.display_skin = ConfigText(default=DEFAULT_DISPLAY_SKIN)
 if not isfile(skin):
 	print("[Skin] Error: Default skin '%s' is not readable or is not a file!  Using emergency skin." % skin)
-	DEFAULT_SKIN = SKIN_DEFAULT
-DEFAULT_SKIN = EMERGENCY_SKIN
+	DEFAULT_SKIN = EMERGENCY_SKIN
+config.skin.primary_skin = ConfigText(default=DEFAULT_SKIN)
+config.skin.display_skin = ConfigText(default=DEFAULT_DISPLAY_SKIN)
 
 currentPrimarySkin = None
 currentDisplaySkin = None
