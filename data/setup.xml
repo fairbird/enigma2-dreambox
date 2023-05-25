@@ -307,7 +307,7 @@
 		<item text="Contrast">config.osd.contrast</item>
 	</setup>
 	<setup key="FrontDisplay" title="Display Setup" requires="FrontpanelDisplay">
-		<item level="0" text="Use separate picon pack for front panel display" description="Use piconlcd directory for picons on color LCD">config.lcd.picon_pack</item>
+		<item level="0" text="Use separate picon pack for front panel display" requires="VFD_scroll_repeats" description="Use piconlcd directory for picons on color LCD">config.lcd.picon_pack</item>
 		<item level="0" text="Date style" description="Choose the front panel display formatting style for dates. 'D' / 'DD' is the date and 'M' / 'MM' is the month in digits.  ('DD' and 'MM' have leading zeros for single digit values.) The screen display will be based on your choice but can be influenced by the skin." requires="config.usage.date.enabled_display">config.usage.date.display</item>
 		<item level="0" text="Time style" description="Choose the front panel display formatting style for times. 'H' / 'HH' is the hour for a 24 hour clock, 'h' / 'hh' is the hour for a 12 hour clock, 'mm' is the minutes.  ('HH' and 'hh' have leading zeros for single digit values.) The front panel display will be based on your choice but can be influenced any applicable skin." requires="config.usage.time.enabled_display">config.usage.time.display</item>
 		<item level="1" requires="ConfigDisplay" text="Show Time Remaining/Elapsed" description="This option allows you choose how to display remaining time, or elapsed time, or both.">config.usage.swap_time_remaining_on_vfd</item>
