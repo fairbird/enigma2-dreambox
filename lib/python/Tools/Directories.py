@@ -712,10 +712,7 @@ def isPluginInstalled(pluginName, pluginFile="plugin", pluginType=None):
 	types = ["Extensions", "SystemPlugins"]
 	if pluginType:
 		types = [pluginType]
-	if PY2:
-		extensions = ["o", ""]
-	else:
-		extensions = ["c", ""]
+	extensions = ["c", ""]
 	for type in types:
 		for extension in extensions:
 			if isfile(pathjoin(scopePlugins, type, pluginName, "%s.py%s" % (pluginFile, extension))):
