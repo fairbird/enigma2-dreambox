@@ -53,21 +53,21 @@ vkeyboard_hdskin = '''<screen name="vkeyboard_hdskin" title="Virtual keyboard" p
 		<widget name="prompt" conditional="prompt" position="0,65" size="710,35" font="Regular;30" foregroundColor="#00ffff00" halign="center" transparent="1" noWrap="1"/>
 		<eLabel position="5,105" size="1010,49" zPosition="1" backgroundColor="#0066ccff" foregroundColor="#00ffffff"/>
 		<eLabel position="0,51" size="1020,2" backgroundColor="#0066ccff" zPosition="1"/>
-		<widget name="text" position="8,108" size="1004,43" foregroundColor="#00ffffff" zPosition="3" font="Regular;45" noWrap="1" valign="center" halign="right"/>
+		<widget name="text" position="8,108" size="1004,43" foregroundColor="#00ffffff" zPosition="3" font="Regular;45" noWrap="1" verticalAlignment="center" halign="right"/>
 		<widget name="list" position="30,160" itemHeight="65" size="970,330" selectionDisabled="1" transparent="1"/>
-		<widget name="mode" conditional="mode" position="0,10" size="200,25" noWrap="1" zPosition="1" valign="center" font="Regular;27" foregroundColor="#0000ff00" transparent="1"/>
+		<widget name="mode" conditional="mode" position="0,10" size="200,25" noWrap="1" zPosition="1" verticalAlignment="center" font="Regular;27" foregroundColor="#0000ff00" transparent="1"/>
 		<widget name="language" position="0,0" size="0,0" font="Regular;18" transparent="1"/>
 		<ePixmap pixmap="/usr/share/enigma2/VirtualKeyBoard_Icons/buttonsHD/key_red.png" position="8,512" size="35,35"/>
 		<ePixmap pixmap="/usr/share/enigma2/VirtualKeyBoard_Icons/buttonsHD/key_green.png" position="260,512" size="35,35"/>
 		<ePixmap pixmap="/usr/share/enigma2/VirtualKeyBoard_Icons/buttonsHD/key_yellow.png" position="508,512" size="35,35"/>
 		<ePixmap pixmap="/usr/share/enigma2/VirtualKeyBoard_Icons/buttonsHD/key_blue.png" position="763,512" size="35,35"/>
-		<widget source="key_red" render="Label" position="52,512" size="200,40" zPosition="1" valign="center" font="Regular;27" transparent="1"/>
-		<widget source="key_green" render="Label" position="305,512" size="200,40" zPosition="1" valign="center" font="Regular;27" transparent="1"/>
-		<widget source="key_yellow" render="Label" position="550,512" size="200,40" zPosition="1" valign="center" font="Regular;27" transparent="1"/>
-		<widget source="key_blue" render="Label" position="806,512" size="200,40" zPosition="1" valign="center" font="Regular;27" transparent="1"/>
+		<widget source="key_red" render="Label" position="52,512" size="200,40" zPosition="1" verticalAlignment="center" font="Regular;27" transparent="1"/>
+		<widget source="key_green" render="Label" position="305,512" size="200,40" zPosition="1" verticalAlignment="center" font="Regular;27" transparent="1"/>
+		<widget source="key_yellow" render="Label" position="550,512" size="200,40" zPosition="1" verticalAlignment="center" font="Regular;27" transparent="1"/>
+		<widget source="key_blue" render="Label" position="806,512" size="200,40" zPosition="1" verticalAlignment="center" font="Regular;27" transparent="1"/>
 		<eLabel position="center,500" size="1020,2" backgroundColor="#0066ccff" zPosition="-1"/>
 		<eLabel position="center,0" size="1020,500" backgroundColor="#20000000" zPosition="-2"/>
-		<widget name="locale" conditional="locale" position="715,05" size="300,150" valign="center" halign="center" font="Regular;20" foregroundColor="#00ffff00" transparent="1"/>
+		<widget name="locale" conditional="locale" position="715,05" size="300,150" verticalAlignment="center" halign="center" font="Regular;20" foregroundColor="#00ffff00" transparent="1"/>
 </screen>'''
 # <!-- FHD Skin -->
 vkeyboard_fhdskin = '''<screen name="vkeyboard_fhdskin" title="Virtual keyboard" position="center,center" size="1320,740" zPosition="99" backgroundColor="#16000000">
@@ -75,25 +75,25 @@ vkeyboard_fhdskin = '''<screen name="vkeyboard_fhdskin" title="Virtual keyboard"
 		<widget name="prompt" conditional="prompt" position="133,52" size="990,45" font="Regular;36" foregroundColor="#00ffff00" halign="center" transparent="1" noWrap="1"/>
 		<eLabel position="5,105" size="1310,69" zPosition="1" backgroundColor="#0066ccff" foregroundColor="#00ffffff"/>
 		<eLabel position="0,51" size="1320,2" backgroundColor="#0066ccff" zPosition="1"/>
-		<widget name="text" position="8,108" size="1304,63" foregroundColor="#00ffffff" zPosition="3" font="Regular;45" noWrap="1" valign="center" halign="right"/>
+		<widget name="text" position="8,108" size="1304,63" foregroundColor="#00ffffff" zPosition="3" font="Regular;45" noWrap="1" verticalAlignment="center" halign="right"/>
 		<widget name="list" position="2,200" size="970,450" font="Regular;42" itemHeight="68" selectionDisabled="1" transparent="1" />
-		<widget name="mode" conditional="mode" position="997,200" size="300,40" noWrap="1" zPosition="1" valign="center" font="Regular;27" foregroundColor="#0000ff00" transparent="1"/>
+		<widget name="mode" conditional="mode" position="997,200" size="300,40" noWrap="1" zPosition="1" verticalAlignment="center" font="Regular;27" foregroundColor="#0000ff00" transparent="1"/>
 		<widget name="language" position="0,0" size="0,0" font="Regular;18" transparent="1"/>
 		<ePixmap pixmap="/usr/share/enigma2/VirtualKeyBoard_Icons/buttonsFHD/key_red.png" position="18,672" size="35,35"/>
 		<ePixmap pixmap="/usr/share/enigma2/VirtualKeyBoard_Icons/buttonsFHD/key_green.png" position="318,672" size="35,35"/>
 		<ePixmap pixmap="/usr/share/enigma2/VirtualKeyBoard_Icons/buttonsFHD/key_yellow.png" position="618,672" size="35,35"/>
 		<ePixmap pixmap="/usr/share/enigma2/VirtualKeyBoard_Icons/buttonsFHD/key_blue.png" position="918,672" size="35,35"/>
-		<widget source="key_red" render="Label" position="63,655" size="250,70" zPosition="1" valign="center" font="Regular;27" transparent="1"/>
-		<widget source="key_green" render="Label" position="362,655" size="250,70" zPosition="1" valign="center" font="Regular;27" transparent="1"/>
-		<widget source="key_yellow" render="Label" position="663,655" size="250,70" zPosition="1" valign="center" font="Regular;27" transparent="1"/>
-		<widget source="key_blue" render="Label" position="964,655" size="250,70" zPosition="1" valign="center" font="Regular;27" transparent="1"/>
+		<widget source="key_red" render="Label" position="63,655" size="250,70" zPosition="1" verticalAlignment="center" font="Regular;27" transparent="1"/>
+		<widget source="key_green" render="Label" position="362,655" size="250,70" zPosition="1" verticalAlignment="center" font="Regular;27" transparent="1"/>
+		<widget source="key_yellow" render="Label" position="663,655" size="250,70" zPosition="1" verticalAlignment="center" font="Regular;27" transparent="1"/>
+		<widget source="key_blue" render="Label" position="964,655" size="250,70" zPosition="1" verticalAlignment="center" font="Regular;27" transparent="1"/>
 		<eLabel position="0,650" size="1320,2" backgroundColor="#0066ccff" zPosition="-1"/>
 		<eLabel position="0,0" size="1320,740" backgroundColor="#20000000" zPosition="-2"/>
 		<ePixmap pixmap="/usr/share/enigma2/VirtualKeyBoard_Icons/buttonsFHD/key_info.png" position="1090,485" size="103,35" zPosition="10" transparent="1" alphatest="blend"/>
 		<ePixmap pixmap="/usr/share/enigma2/VirtualKeyBoard_Icons/buttonsFHD/key_text.png" position="980,485" size="103,35" zPosition="10" transparent="1" alphatest="blend"/>
 		<ePixmap pixmap="/usr/share/enigma2/VirtualKeyBoard_Icons/buttonsFHD/key_exit.png" position="1200,485" size="103,35" zPosition="10" transparent="1" alphatest="blend"/>
 		<ePixmap position="26,63" size="103,35" zPosition="2" pixmap="/usr/share/enigma2/VirtualKeyBoard_Icons/buttonsFHD/key_board.png" transparent="1" alphatest="blend"/>
-		<widget name="locale" conditional="locale" position="980,262" size="330,200" valign="center" halign="center" font="Regular;27" foregroundColor="#00ffff00" transparent="1"/>
+		<widget name="locale" conditional="locale" position="980,262" size="330,200" verticalAlignment="center" halign="center" font="Regular;27" foregroundColor="#00ffff00" transparent="1"/>
 </screen>'''
 
 class VirtualKeyBoardList(MenuList):
