@@ -3,7 +3,7 @@
 
 #include <lib/gui/ewidget.h>
 
-class ePixmap : public eWidget
+class ePixmap: public eWidget
 {
 	int m_alphatest;
 	int m_scale;
@@ -15,9 +15,8 @@ public:
 	void setPixmap(ePtr<gPixmap> &pixmap);
 	void setPixmapFromFile(const char *filename);
 	void setAlphatest(int alphatest); /* 1 for alphatest, 2 for alphablend */
-	void setScale(int scale);		  // DEPRECATED
-	void setPixmapScale(int flags);
-	void setPixmapScaleFlags(int flags) { setPixmapScale(flags); } // DEPRECATED
+	void setScale(int scale);
+	void setPixmapScaleFlags(int flags);
 	void setBorderWidth(int pixel);
 	void setBorderColor(const gRGB &color);
 

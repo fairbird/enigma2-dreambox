@@ -4,7 +4,7 @@
 #include <lib/gui/ewidgetdesktop.h>
 
 ePixmap::ePixmap(eWidget *parent)
-	: eWidget(parent), m_alphatest(0), m_scale(0), m_have_border_color(false), m_border_width(0)
+	:eWidget(parent), m_alphatest(0), m_scale(0), m_have_border_color(false), m_border_width(0)
 {
 }
 
@@ -26,7 +26,7 @@ void ePixmap::setScale(int scale)
 	}
 }
 
-void ePixmap::setPixmapScale(int flags)
+void ePixmap::setPixmapScaleFlags(int flags)
 {
 	if (m_scale != flags)
 	{
