@@ -26,7 +26,7 @@ void ePixmap::setScale(int scale)
 	}
 }
 
-void ePixmap::setPixmapScaleFlags(int flags)
+void ePixmap::setPixmapScale(int flags)
 {
 	if (m_scale != flags)
 	{

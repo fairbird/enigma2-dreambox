@@ -15,8 +15,9 @@ public:
 	void setPixmap(ePtr<gPixmap> &pixmap);
 	void setPixmapFromFile(const char *filename);
 	void setAlphatest(int alphatest); /* 1 for alphatest, 2 for alphablend */
-	void setScale(int scale);
-	void setPixmapScaleFlags(int flags);
+	void setScale(int scale);		  // DEPRECATED
+	void setPixmapScale(int flags);
+	void setPixmapScaleFlags(int flags) { setPixmapScale(flags); } // DEPRECATED
 	void setBorderWidth(int pixel);
 	void setBorderColor(const gRGB &color);
 
