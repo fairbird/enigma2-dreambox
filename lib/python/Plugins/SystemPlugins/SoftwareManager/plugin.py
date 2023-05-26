@@ -1765,10 +1765,20 @@ def startSetup(menuid):
 	return []
 
 
+def sessionStart(reason, session): # starts AFTER the Enigma2 booting (For updatecheck)
+	if reason == 0:
+		print('PLUGINSTARTDEBUGLOG - sessionStart executed, reason == 0')
+		import Components.updatecheck
+		Components.updatecheck.AutoCheck(session)
+	if reason == 1:
+		print('PLUGINSTARTDEBUGLOG - sessionStart executed, reason == 1')
+
+
 def Plugins(path, **kwargs):
 	global plugin_path
 	plugin_path = path
 	list = [
+		PluginDescriptor(where = PluginDescriptor.WHERE_SESSIONSTART, fnc = sessionStart), # starts AFTER the Enigma2 booting (For updatecheck)
 		PluginDescriptor(name=_("Software management"), description=_("Manage your receiver's software"), where=PluginDescriptor.WHERE_MENU, needsRestart=False, fnc=startSetup)
 	]
 	if not config.plugins.softwaremanager.onSetupMenu.value and not config.plugins.softwaremanager.onBlueButton.value:
