@@ -10,6 +10,7 @@ from Components.NimManager import nimmanager
 from Components.Renderer.FrontpanelLed import ledPatterns, PATTERN_ON, PATTERN_OFF, PATTERN_BLINK
 from Components.ServiceList import refreshServiceList
 from Components.SystemInfo import SystemInfo
+from os import makedirs
 from os.path import exists, isfile, join as pathjoin, normpath
 import os, time, locale, skin
 from boxbranding import getDisplayType
@@ -1004,46 +1005,71 @@ def InitUsageConfig():
 	config.usage.keytrans = ConfigText(default=keytranslation)
 	config.usage.alternative_imagefeed = ConfigText(default="", fixed_size=False)
 
-	config.crash = ConfigSubsection()
-	#// handle python crashes
+	# This is already in StartEniga.py.
+	# config.crash = ConfigSubsection()
+
+	# Handle python crashes.
 	config.crash.bsodpython = ConfigYesNo(default=True)
 	config.crash.bsodpython_ready = NoSave(ConfigYesNo(default=False))
-	choicelist = [("0", _("never")), ("1", "1"), ("2", "2"), ("3", "3"), ("4", "4"), ("5", "5"), ("6", "6"), ("7", "7"), ("8", "8"), ("9", "9"), ("10", "10")]
-	config.crash.bsodhide = ConfigSelection(default="0", choices=choicelist)
-	config.crash.bsodmax = ConfigSelection(default="3", choices=choicelist)
-	#//
+	choiceList = [("0", _("Never"))] + [(str(x), str(x)) for x in range(1, 11)]
+	config.crash.bsodhide = ConfigSelection(default="0", choices=choiceList)
+	config.crash.bsodmax = ConfigSelection(default="3", choices=choiceList)
 
 	config.crash.enabledebug = ConfigYesNo(default=False)
 	config.crash.debugloglimit = ConfigSelectionNumber(min=1, max=10, stepwidth=1, default=4, wraparound=True)
 	config.crash.daysloglimit = ConfigSelectionNumber(min=1, max=30, stepwidth=1, default=8, wraparound=True)
-	config.crash.sizeloglimit = ConfigSelectionNumber(min=1, max=20, stepwidth=1, default=10, wraparound=True)
+	config.crash.sizeloglimit = ConfigSelectionNumber(min=1, max=250, stepwidth=1, default=10, wraparound=True)
 	config.crash.lastfulljobtrashtime = ConfigInteger(default=-1)
 
-	debugPath = [('/home/root/logs/', '/home/root/')]
-	for p in harddiskmanager.getMountedPartitions():
-		if exists(p.mountpoint):
-			d = normpath(p.mountpoint)
-			if p.mountpoint != '/':
-				debugPath.append((p.mountpoint + '/logs/', d))
-	config.crash.debugPath = ConfigSelection(default="/home/root/logs/", choices=debugPath)
-	if not exists("/home"):
-		os.mkdir("/home", 0o755)
-	if not exists("/home/root"):
-		os.mkdir("/home/root", 0o755)
+	# The config.crash.debugTimeFormat item is used to set ENIGMA_DEBUG_TIME environmental variable on enigma2 start from enigma2.sh.
+	config.crash.debugTimeFormat = ConfigSelection(default="2", choices=[
+		("0", _("None")),
+		("1", _("Boot time")),
+		("2", _("Local time")),
+		("3", _("Boot time and local time")),
+		("6", _("Local date/time")),
+		("7", _("Boot time and local date/time"))
+	])
+	config.crash.debugTimeFormat.save_forced = True
 
-	def updatedebugPath(configElement):
-		if not exists(config.crash.debugPath.value):
-			try:
-				os.mkdir(config.crash.debugPath.value, 0o755)
-			except:
-				print("Failed to create log path: %s" % config.crash.debugPath.value)
-	config.crash.debugPath.addNotifier(updatedebugPath, immediate_feedback=False)
+	config.crash.gstdebug = ConfigYesNo(default=False)
+	config.crash.gstdebugcategory = ConfigSelection(default="*", choices=[
+		("*", _("All")),
+		("*audio*", _("Audio")),
+		("*video*", _("Video"))
+	])
+	config.crash.gstdebuglevel = ConfigSelection(default="INFO", choices=[
+		"none",
+		"ERROR",
+		"WARNING",
+		"FIXME",
+		"INFO",
+		"DEBUG",
+		"LOG",
+		"TRACE",
+		"MEMDUMP"
+	])
+	config.crash.gstdot = ConfigYesNo(default=False)
+
+	def updateDebugPath(configElement):
+		debugPath = config.crash.debugPath.value
+		try:
+			makedirs(debugPath, 0o755, exist_ok=True)
+		except OSError as err:
+			print("[UsageConfig] Error %d: Unable to create log directory '%s'!  (%s)" % (err.errno, debugPath, err.strerror))
+
+	choiceList = [("/home/root/logs/", "/home/root/")]
+	for partition in harddiskmanager.getMountedPartitions():
+		if exists(partition.mountpoint) and partition.mountpoint != "/":
+			choiceList.append((pathjoin(partition.mountpoint, "logs", ""), normpath(partition.mountpoint)))
+	config.crash.debugPath = ConfigSelection(default="/home/root/logs/", choices=choiceList)
+	config.crash.debugPath.addNotifier(updateDebugPath, immediate_feedback=False)
 
 	crashlogheader = _("We are really sorry. Your receiver encountered "
-					 "a software problem, and needs to be restarted.\n"
-					 "Please send the logfile %senigma2_crash_xxxxxx.log to https://github.com/fairbird/enigma2.\n"
-					 "Your receiver restarts in 10 seconds!\n"
-					 "Component: enigma2") % config.crash.debugPath.value
+		"a software problem, and needs to be restarted.\n"
+		"Please send the logfile %senigma2_crash_xxxxxx.log to www.opena.tv.\n"
+		"Your receiver restarts in 10 seconds!\n"
+		"Component: enigma2") % config.crash.debugPath.value
 	config.crash.debug_text = ConfigText(default=crashlogheader, fixed_size=False)
 	config.crash.skin_error_crash = ConfigYesNo(default=True)
 

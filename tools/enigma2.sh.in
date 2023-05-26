@@ -16,6 +16,13 @@ fi
 
 LIBS=@libdir@/libopen.so.0.0.0
 
+# any debuglevel passed?
+if [ -z $ENIGMA_DEBUG_LVL ]; then
+	DEBUG_LVL=3
+else
+	DEBUG_LVL=$ENIGMA_DEBUG_LVL
+fi
+
 PLATFORMCHECK=`sed -En 's|^platform=(.+)$|\1|p' /usr/lib/enigma.info`
 
 if [ "${PLATFORMCHECK}" == "meson64" ]; then
@@ -71,22 +78,52 @@ while : ; do
 
 	# start enigma
 	sync
-	if [ "$(grep config.crash.enabledebug /etc/enigma2/settings)" == "config.crash.enabledebug=true" ]; then
-		RANDOMIZE1970=''
-		time=`date +%Y` ;
-		if [ "$time" = 1970 ]; then
-			RANDOMIZE1970="$(strings /dev/urandom | grep -o '[[:alnum:]]' | head -n 5 | tr -d '\n')"
-		fi
-		LOGFOLDER="/home/root/logs/"
-		if [ ! -d $LOGFOLDER ] ; then mkdir -p $LOGFOLDER; fi
-		if [ "$(grep config.crash.debugPath= /etc/enigma2/settings | sed 's/config.crash.debugPath=//g')" != "" -a -d "$(grep config.crash.debugPath= /etc/enigma2/settings | sed 's/config.crash.debugPath=//g')" ]; then
-			LOGFOLDER=$(grep config.crash.debugPath= /etc/enigma2/settings | sed 's/config.crash.debugPath=//g')
-		fi
-		LD_PRELOAD=$LIBS @bindir@/enigma2 --debug-no-color $VERBOSE &> ${LOGFOLDER}Enigma2-debug-$(date +%Y%m%d_%H-%M-%S)${RANDOMIZE1970}.log
-	else
-		LD_PRELOAD=$LIBS @bindir@/enigma2 $VERBOSE
+	# Randomize timestamp if clock is not set
+	RANDOMIZE1970=''
+	time=`date +%Y` ;
+	if [ "$time" = 1970 ]; then
+		RANDOMIZE1970="$(strings /dev/urandom | grep -o '[[:alnum:]]' | head -n 5 | tr -d '\n')"
 	fi
 
+	# Set time format used to prefix each line in the debug logs.
+	DEBUGTIME=`sed -En 's|^config\.crash\.debugTimeFormat=(.+)$|\1|p' "/etc/enigma2/settings"`
+	[ -n "${DEBUGTIME}" ] || DEBUGTIME="2"
+	DEBUG_TIME="${DEBUGTIME}"
+
+	# Create and set log folder
+	LOGFOLDER="/home/root/logs/"
+	if [ ! -d $LOGFOLDER ] ; then mkdir -p $LOGFOLDER; fi
+	if [ "$(grep config.crash.debugPath= /etc/enigma2/settings | sed 's/config.crash.debugPath=//g')" != "" -a -d "$(grep config.crash.debugPath= /etc/enigma2/settings | sed 's/config.crash.debugPath=//g')" ]; then
+		LOGFOLDER=$(grep config.crash.debugPath= /etc/enigma2/settings | sed 's/config.crash.debugPath=//g')
+	fi
+
+	# Enable and configure gstreamer debug log of category and level without color
+	if [ "$(grep -i config.crash.gstdebug=true /etc/enigma2/settings)" != "" ]; then
+		GSTDEBUGCATEGORY="*"
+		GSTDEBUGLEVEL="INFO"
+		if [ "$(grep config.crash.gstdebugcategory= /etc/enigma2/settings | sed 's/config.crash.gstdebugcategory=//g')" != "" ]; then
+			GSTDEBUGCATEGORY=$(grep config.crash.gstdebugcategory= /etc/enigma2/settings | sed 's/config.crash.gstdebugcategory=//g')
+		fi
+		if [ "$(grep config.crash.gstdebuglevel= /etc/enigma2/settings | sed 's/config.crash.gstdebuglevel=//g')" != "" ]; then
+			GSTDEBUGLEVEL=$(grep config.crash.gstdebuglevel= /etc/enigma2/settings | sed 's/config.crash.gstdebuglevel=//g')
+		fi
+		export GST_DEBUG_FILE="${LOGFOLDER}$(date +%Y%m%d-%H%M%S)-gstreamer-debug.log"
+		export GST_DEBUG="${GSTDEBUGCATEGORY}:${GSTDEBUGLEVEL}"
+		export GST_DEBUG_NO_COLOR="1"
+	fi
+
+	# Enable and set gstreamer directory for pipeline graphs that are not created if directory is not set
+	if [ "$(grep -i config.crash.gstdot=true /etc/enigma2/settings)" != "" ]; then
+		export GST_DEBUG_DUMP_DOT_DIR=${LOGFOLDER}
+	fi
+
+	# Start enigma2 with or without debug
+	if [ "$(grep -i config.crash.enabledebug=true /etc/enigma2/settings)" != "" ]; then
+		DEBUG_LVL='4'
+		LD_PRELOAD=$LIBS ENIGMA_DEBUG_LVL=$DEBUG_LVL ENIGMA_DEBUG_TIME="${DEBUG_TIME}" /usr/bin/enigma2 &> ${LOGFOLDER}$(date +%Y%m%d-%H%M%S)-enigma2-debug.log
+	else
+		LD_PRELOAD=$LIBS ENIGMA_DEBUG_LVL=$DEBUG_LVL ENIGMA_DEBUG_TIME="${DEBUG_TIME}" /usr/bin/enigma2
+	fi
 
 	# enigma2 exit codes:
 	#
