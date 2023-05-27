@@ -138,7 +138,7 @@ class TimeWizard(ConfigListScreen, Screen, Rc):
 		skin = """
 		<screen name="TimeWizard" position="center,center" size="1746,994" resolution="1920,1080" flags="wfNoBorder">
 			<widget name="text" position="10,10" size="1619,40" font="Regular;35" transparent="1" verticalAlignment="center" />
-			<widget name="config" position="253,221" size="1446,512" font="Regular;30" itemHeight="40" />
+			<widget name="config" position="253,221" size="1446,512" font="Regular;30" valueFont="Regular;30" itemHeight="40" />
 			<eLabel position="113,977" zPosition="2" size="250,4" foregroundColor="#00ff2525" backgroundColor="#00ff2525"/>
 			<eLabel position="385,977" zPosition="2" size="250,4" foregroundColor="#00bab329" backgroundColor="#00bab329"/>
 			<widget source="key_red" render="Label" objectTypes="key_red,StaticText" position="113,935" size="250,45" backgroundColor="key_red" conditional="key_red" font="Regular;30" foregroundColor="key_text" horizontalAlignment="center" verticalAlignment="center">
