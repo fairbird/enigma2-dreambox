@@ -106,9 +106,7 @@ int ePixmap::event(int event, void *data, void *data2)
 		if (m_pixmap)
 		{
 			int flags = 0;
-			if (m_alphatest == 1)
-				flags = gPainter::BT_ALPHATEST;
-			else if (m_alphatest == 2)
+			if (m_alphatest == 1 || m_alphatest == 2)
 				flags = gPainter::BT_ALPHABLEND;
 
 			flags |= m_scale;
