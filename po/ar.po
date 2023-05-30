@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: enigma2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-10-14 09:11+0200\n"
-"POT-Creation-Date: 2023-04-16 18:05+0200\n"
+"POT-Creation-Date: 2023-05-24 16:50+0200\n"
 "Last-Translator: RAED - Fairbirb <rrrr53@hotmail.com>\n"
 "Language-Team: \n"
 "Language: ar\n"
@@ -1526,8 +1526,8 @@ msgstr "لا يمكن تحديد"
 msgid "Cannot find any signal ..., aborting !"
 msgstr "لا يمكن العثور على أي إشارة ... ، جارٍ الإلغاء !"
 
-msgid "Cannot find images - please try later"
-msgstr "لا يمكن إيجاد الصورة - الرجاء المحاولة مرة أخرى لاحقاً"
+msgid "Cannot find images - please try later or select an alternate image"
+msgstr "لا يمكن العثور على الصور - يرجى المحاولة لاحقًا أو تحديد صورة بديلة"
 
 msgid "Cannot move files on a different disk or system to the trash can"
 msgstr "لا يمكن النقل إلى سلة المهملات"
@@ -2918,6 +2918,13 @@ msgid_plural "Done - Installed, updated or removed %d packages (%s)"
 msgstr[0] "أخطاء %d الحزم مع %d منتهي - مثبتة أو محدثة أو مُزالة"
 msgstr[1] "أخطاء %d الحزم مع %d منتهي - مثبتة أو محدثة أو مُزالة"
 
+#, python-format
+msgid ""
+"Download Successsful\n"
+"%s"
+msgstr "تم التنزيل بنجاح\n"
+"%s"
+
 msgid "Download plugins"
 msgstr "تحميل الإضافة"
 
@@ -3063,9 +3070,6 @@ msgstr "تفعيل بقوة خمسة فولت للهوائي النشط"
 
 msgid "Enable EIT EPG"
 msgstr "تمكين جدول معلومات الحدث في دليل البرامج الإلكتروني"
-
-msgid "Enable Kexec MultiBoot"
-msgstr "Kexec MultiBoot تفعيل"
 
 msgid "Enable HDMI-CEC"
 msgstr "تمكين كيبل عالي الوضوح"
@@ -4416,6 +4420,9 @@ msgstr "نسبه القفل الاوليه"
 msgid "Initialize"
 msgstr "تهيئه"
 
+msgid "Initialize Multiboot"
+msgstr "نسبه القفل الاوليه"
+
 msgid "Initializing storage device..."
 msgstr "تهيئه جهاز التخزين..."
 
@@ -5516,6 +5523,9 @@ msgstr "لا ، باستثناء مؤقت التنبيه"
 msgid "No, never"
 msgstr "لا,مطلقا"
 
+msgid "No, only download"
+msgstr "لا ، حمل فقط"
+
 msgid "None"
 msgstr "لاشيئ"
 
@@ -5718,6 +5728,9 @@ msgstr "الصوت الأصلي"
 
 msgid "Other"
 msgstr "أخرى"
+
+msgid "Other Images"
+msgstr "الصور الاخرى"
 
 msgid "Other Subtitles & lang"
 msgstr "إعدادات الترجمة"
@@ -6658,6 +6671,9 @@ msgstr "إعادة تحميل"
 msgid "Reload blacklists"
 msgstr "إعادة تحميل القوائم السوداء"
 
+msgid "Reload services/bouquets list"
+msgstr "إضافة القناة إلى الباقة"
+
 msgid "Reloading bouquets and services..."
 msgstr "إعادة تحميل الباقات و القنوات..."
 
@@ -7314,6 +7330,9 @@ msgstr "أختار معدل التحديث"
 
 msgid "Select Channel"
 msgstr "تحديد الكل"
+
+msgid "Select an image brand"
+msgstr "حدد نوع الصورة"
 
 msgid "Select Fast DiSEqC if your aerial system supports this. If you are unsure select 'no'."
 msgstr "أختر دايزك سريع إذا كان نظامك الهوائي يدعم ذلك. إذا كنت غير متأكد ، اختر 'لا'."
@@ -8971,6 +8990,9 @@ msgstr "تم كتابة النتائج إلى %s."
 
 msgid "The saved PIN was cleared."
 msgstr "تم مسح كلمة السر المحفوظة."
+
+msgid "The services/bouquets list is reloaded!"
+msgstr "تم إعادة تحميل قائمة الخدمات / الباقات!"
 
 msgid "The sleep timer has been activated."
 msgstr "تم تفعيل تكوين شبكة الانترنت الخاصة بك."

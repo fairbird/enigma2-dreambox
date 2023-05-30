@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: enigma2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-04-16 18:05+0200\n"
+"POT-Creation-Date: 2023-05-24 16:50+0200\n"
 "PO-Revision-Date: 2021-05-24 17:48+0300\n"
 "Last-Translator: Dimitrij <Dima-73@inbox.lv>\n"
 "Language-Team: openPLi Dimitrij\n"
@@ -333,9 +333,9 @@ msgstr ""
 msgid "%s %d.%d"
 msgstr "%s %d.%d"
 
-#, fuzzy, python-format
+#, python-format
 msgid "%s (files)"
-msgstr "%d файл"
+msgstr "%s (файлов)"
 
 #, python-format
 msgid "%s KSymb/s"
@@ -345,9 +345,8 @@ msgstr "%s KSymb/s"
 msgid "%s MHz"
 msgstr "%s MHz"
 
-#, fuzzy, python-format
 msgid "%s connected successfully."
-msgstr "PIN-код был успешно изменен."
+msgstr "%s успешно подключено."
 
 #, python-format
 msgid "%s imported from fallback tuner"
@@ -1590,8 +1589,8 @@ msgstr "Невозможно определить"
 msgid "Cannot find any signal ..., aborting !"
 msgstr "Не найден никакой сигнал ...,прерываем !"
 
-msgid "Cannot find images - please try later"
-msgstr "Нет найденых имиджей - пожалуйста, попробуйте позже."
+msgid "Cannot find images - please try later or select an alternate image"
+msgstr "Нет найденых имиджей - пожалуйста, попробуйте позже или выберите альтернативный имидж."
 
 msgid "Cannot move files on a different disk or system to the trash can"
 msgstr "Невозможно переместить файлы на различных дисках или в системе в корзину"
@@ -3024,6 +3023,13 @@ msgstr[0] "Выполнено - Установлен, обновлен или у
 msgstr[1] "Выполнено - Установлено, обновлено или удалено %d пакета (%s)"
 msgstr[2] "Выполнено - Установлено, обновлено или удалено %d пакетов (%s)"
 
+#, python-format
+msgid ""
+"Download Successsful\n"
+"%s"
+msgstr "Успешно загружено\n"
+"%s"
+
 msgid "Download plugins"
 msgstr "Загрузка плагинов"
 
@@ -3178,9 +3184,6 @@ msgstr "Включить EIT EPG"
 
 msgid "Enable HDMI-CEC"
 msgstr "Включить HDMI-CEC"
-
-msgid "Enable Kexec MultiBoot"
-msgstr "Активировать Vu+ мультибут"
 
 msgid "Enable MHW EPG"
 msgstr "Включить MHW EPG"
@@ -4553,6 +4556,9 @@ msgstr "Инициализация (форматирование)"
 msgid "Initialize"
 msgstr "Инициализация"
 
+msgid "Initialize Multiboot"
+msgstr "Мультибут - инициализация"
+
 msgid "Initializing storage device..."
 msgstr "Инициализация устройства хранения..."
 
@@ -5661,6 +5667,9 @@ msgstr "Нет, исключение таймер включения"
 msgid "No, never"
 msgstr "Нет, никогда"
 
+msgid "No, only download"
+msgstr "Нет, только загрузить"
+
 msgid "None"
 msgstr "Ничего"
 
@@ -5867,6 +5876,9 @@ msgstr "Оригинальное аудио"
 
 msgid "Other"
 msgstr "Другая"
+
+msgid "Other Images"
+msgstr "Другие имиджы"
 
 msgid "Other Subtitles & lang"
 msgstr "Другие субтитры & язык"
@@ -6468,7 +6480,6 @@ msgstr "Нажмите 'OK' для удаления записи или 'CH+/-' 
 msgid "Press 'OK' for remove item or < > for change order or 'CH+/-' for toggle to list of features."
 msgstr "Нажмите 'OK' для удаления записи или < > для изменения порядка или 'CH+/-' для переключения к списку функций."
 
-#, fuzzy
 msgid ""
 "Press Green key to enable MultiBoot!\n"
 "\n"
@@ -6476,7 +6487,7 @@ msgid ""
 "unless you have eMMC slots to restore.\n"
 "Restoring eMMC slots can take from 1 -> 5 minutes per slot."
 msgstr ""
-"Выполняется инициализация Vu+ мультибута!\n"
+"Нажмите зеленую кнопку для включения Vu+ мультибута!\n"
 "\n"
 "Перезагрузка начнется после восстановления любых слотов eMMC.\n"
 "Это может занять от 1 до 5 минут на каждый слот."
@@ -6833,6 +6844,9 @@ msgstr "Обновить"
 msgid "Reload blacklists"
 msgstr "Обновить черный список"
 
+msgid "Reload services/bouquets list"
+msgstr "Перезагрузка сервисов/фаворитов"
+
 msgid "Reloading bouquets and services..."
 msgstr "Обновление букетов и сервисов..."
 
@@ -6890,9 +6904,8 @@ msgstr "Удалить директорию"
 msgid "Remove entry"
 msgstr "Удалить выбранное"
 
-#, fuzzy
 msgid "Remove forever"
-msgstr "Удалить выбранное"
+msgstr "Удалить навсегда"
 
 msgid "Remove from parental protection"
 msgstr "Удалить из родительского контроля"
@@ -7530,6 +7543,9 @@ msgstr "Выберите действие для таймера '%s'."
 
 msgid "Select all"
 msgstr "Выбор всех"
+
+msgid "Select an image brand"
+msgstr "Выбор имиджа"
 
 msgid "Select audio track"
 msgstr "Выбор аудио дорожки"
@@ -9184,6 +9200,9 @@ msgstr "Результаты были записаны в %s"
 
 msgid "The saved PIN was cleared."
 msgstr "Сохраненный PIN-код был сброшен."
+
+msgid "The services/bouquets list is reloaded!"
+msgstr "Списки сервисов/фаворитов перезагружены!"
 
 msgid "The sleep timer has been activated."
 msgstr "Таймер сна был включен."
