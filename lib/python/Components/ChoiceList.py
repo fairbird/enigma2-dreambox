@@ -9,15 +9,14 @@ from Tools.LoadPixmap import LoadPixmap
 
 def ChoiceEntryComponent(key=None, text=None):
 	verticalAlignment = parseVerticalAlignment(parameters.get("ChoicelistVerticalAlignment", "top")) << 4  # This is a hack until other images fix their code.
-	if text is None:
-		text = ["--"]
+	text = ["--"] if text is None else text
 	res = [text]
 	if text[0] == "--":
-		x, y, w, h = parameters.get("ChoicelistDash", (0, 0, 800, 25))
-		res.append((eListboxPythonMultiContent.TYPE_TEXT, x, y, w, h, 0, RT_HALIGN_LEFT | verticalAlignment, "-" * 200))
+		x, y, w, h = parameters.get("ChoicelistDash", (0, 0, 1280, 25))
+		res.append((eListboxPythonMultiContent.TYPE_TEXT, x, y, w, h, 0, RT_HALIGN_LEFT | verticalAlignment, "\u2014" * 200))
 	else:
 		if key:
-			x, y, w, h = parameters.get("ChoicelistName", (45, 0, 800, 25))
+			x, y, w, h = parameters.get("ChoicelistName", (45, 0, 1235, 25))
 			res.append((eListboxPythonMultiContent.TYPE_TEXT, x, y, w, h, 0, RT_HALIGN_LEFT | verticalAlignment, text[0]))
 			if key in ("dummy", "none"):
 				png = None
@@ -39,7 +38,7 @@ def ChoiceEntryComponent(key=None, text=None):
 					x, y, w, h = parameters.get("ChoicelistIconExpanded", (5, 0, 35, 25))
 				res.append((eListboxPythonMultiContent.TYPE_PIXMAP_ALPHABLEND, x, y, w, h, png))
 		else:
-			x, y, w, h = parameters.get("ChoicelistNameSingle", (5, 0, 800, 25))
+			x, y, w, h = parameters.get("ChoicelistNameSingle", (5, 0, 1275, 25))
 			res.append((eListboxPythonMultiContent.TYPE_TEXT, x, y, w, h, 0, RT_HALIGN_LEFT | verticalAlignment, text[0]))
 	return res
 

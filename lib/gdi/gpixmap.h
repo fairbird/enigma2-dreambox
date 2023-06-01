@@ -15,11 +15,11 @@ struct gRGB
 	union {
 #if BYTE_ORDER == LITTLE_ENDIAN
 		struct {
-			uint8_t b, g, r, a;
+			unsigned char b, g, r, a;
 		};
 #else
 		struct {
-			uint8_t a, r, g, b;
+			unsigned char a, r, g, b;
 		};
 #endif
 		uint32_t value;
@@ -27,7 +27,7 @@ struct gRGB
 	gRGB(int r, int g, int b, int a=0): b(b), g(g), r(r), a(a)
 	{
 	}
-	gRGB(unsigned int val): value(val)
+	gRGB(uint32_t val): value(val)
 	{
 	}
 	gRGB(const gRGB& other): value(other.value)
@@ -35,7 +35,8 @@ struct gRGB
 	}
 	gRGB(const char *colorstring)
 	{
-		unsigned int val = 0;
+		uint32_t val = 0;
+
 		if (colorstring)
 		{
 			for (int i = 0; i < 8; i++)
@@ -59,21 +60,20 @@ struct gRGB
 	{
 	}
 
-	unsigned int argb() const
+	uint32_t argb() const
 	{
 		return value;
 	}
 
-	void set(unsigned int val)
+	void set(uint32_t val)
 	{
 		value = val;
 	}
 
-	void operator=(unsigned int val)
+	void operator=(uint32_t val)
 	{
 		value = val;
 	}
-	gRGB& operator=(const gRGB&) = default;
 	bool operator < (const gRGB &c) const
 	{
 		if (b < c.b)
@@ -100,9 +100,9 @@ struct gRGB
 	{
 		return c.value != value;
 	}
-	operator std::string () const
+	operator const std::string () const
 	{
-		unsigned int val = value;
+		uint32_t val = value;
 		std::string escapecolor = "\\c";
 		escapecolor.resize(10);
 		for (int i = 9; i >= 2; i--)
@@ -143,7 +143,8 @@ struct gPalette
 {
 	int start, colors;
 	gRGB *data;
-	unsigned long data_phys;
+	uint32_t data_phys;
+
 	gColor findColor(const gRGB rgb) const;
 	gPalette():	start(0), colors(0), data(0), data_phys(0) {}
 };
