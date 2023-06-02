@@ -124,6 +124,14 @@ dist_install_DATA = \
 	shuffle.png \
 	timer_done.svg  timer_prep.svg  timer_rep.svg   timer_zap.svg \
 	timer_off.svg   timer_rec.svg   timer_wait.svg   timer_autotimer.svg \
+	timer_done.png \
+	timer_prep.png \
+	timer_rep.png \
+	timer_zap.png \
+	timer_wait.png \
+	timer_off.png \
+	timer_rec.png \
+	timer_autotimer.png \
 	trashcan.png \
 	unlock.png \
 	unlockBouquet.png \
