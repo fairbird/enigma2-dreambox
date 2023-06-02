@@ -406,7 +406,7 @@ def getRecordingFilename(basename, dirname=None):
 	# but must not truncate in the middle of a multi-byte utf8 character!
 	# So convert the truncation to unicode and back, ignoring errors, the
 	# result will be valid utf8 and so xml parsing will be OK.
-	filename = ilename[:247]
+	filename = filename[:247]
 	if dirname is None:
 		dirname = defaultRecordingLocation()
 	else:
