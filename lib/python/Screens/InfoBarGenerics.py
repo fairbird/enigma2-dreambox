@@ -2685,7 +2685,7 @@ class InfoBarInstantRecord:
 		event = info["event"]
 
 		if limitEvent in ("event", "manualendtime", "manualduration"):
-			if event: 
+			if event:
 				end = info["end"]
 			else:
 				message = _("No event info found, recording indefinitely.")

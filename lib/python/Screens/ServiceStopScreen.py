@@ -74,4 +74,3 @@ class ServiceStopScreen:
 			self.__onClose()
 			self.oldref = self.oldAlternativeref = None
 			self.slot_number = -1
-
