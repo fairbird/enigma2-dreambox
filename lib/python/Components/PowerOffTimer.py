@@ -14,6 +14,7 @@ import math
 # format string ((Tool name, func status running))
 exceptionsExternalTools = []
 
+
 def isExternalToolsRunning():
 	for func in exceptionsExternalTools:
 		try:
@@ -24,6 +25,7 @@ def isExternalToolsRunning():
 		except Exception as e:
 			print("[PowerOffTimer] external tool status running error: ", e)
 	return False
+
 
 class PowerOffTimerPoller:
 	def __init__(self):
@@ -156,5 +158,6 @@ class PowerOffTimerPoller:
 					poweroff_time = int(mktime((now.tm_year, now.tm_mon, now.tm_mday, config.usage.poweroff_time[(current_day + i) % 7].value[0], config.usage.poweroff_time[(current_day + i) % 7].value[1], 0, now.tm_wday, now.tm_yday, now.tm_isdst)))
 					return i, poweroff_time, nextday_time
 		return -1, None, -1
+
 
 powerOffTimer = PowerOffTimerPoller()

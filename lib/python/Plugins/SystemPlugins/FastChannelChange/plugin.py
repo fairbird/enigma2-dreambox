@@ -28,13 +28,16 @@ config.plugins.fccsetup.extensions = ConfigYesNo(default=False)
 
 FccInstance = None
 
+
 def FCCChanged():
 	if FccInstance:
 		FccInstance.FCCSetupChanged()
 
+
 def checkSupportFCC():
 	global g_max_fcc
 	return bool(g_max_fcc)
+
 
 class FCCSupport:
 	def __init__(self, session):
@@ -449,6 +452,7 @@ class FCCSupport:
 		self.fccTimeoutWait = None
 		self.fccTimeoutTimer.stop()
 
+
 class FCCSetup(Screen, ConfigListScreen):
 	def __init__(self, session):
 		Screen.__init__(self, session)
@@ -536,19 +540,23 @@ class FCCSetup(Screen, ConfigListScreen):
 def addExtentions(session, **kwargs):
 	session.open(FCCSetup)
 
+
 def FCCSupportInit(reason, **kwargs):
 	if "session" in kwargs:
 		global FccInstance
 		FccInstance = FCCSupport(kwargs["session"])
 
+
 def FCCStart(session, **kwargs):
 	session.open(FCCSetup)
+
 
 def main(menuid, **kwargs):
 	if menuid == "scan":
 		return [(_("Fast Channel Change"), FCCStart, "FCCSetup", 5)]
 	else:
 		return []
+
 
 def Plugins(**kwargs):
 	list = []

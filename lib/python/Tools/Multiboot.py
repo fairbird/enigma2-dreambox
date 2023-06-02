@@ -7,6 +7,7 @@ import glob
 import tempfile
 import subprocess
 
+
 class tmp:
 	dir = None
 
@@ -115,6 +116,7 @@ def restoreImages():
 		Console().ePopen('umount %s' % tmp.dir)
 		if not os.path.ismount(tmp.dir):
 			os.rmdir(tmp.dir)
+
 
 def getUUIDtoSD(UUID): # returns None on failure
 	check = "/sbin/blkid"
