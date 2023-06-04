@@ -43,9 +43,10 @@ class ServiceInfo(Converter):
 	IS_HDR = 32
 	IS_HDR10 = 33
 	IS_HLG = 34
-	IS_VIDEO_MPEG2 = 35
-	IS_VIDEO_AVC = 36
-	IS_VIDEO_HEVC = 37
+	IS_HDHDR = 35
+	IS_VIDEO_MPEG2 = 36
+	IS_VIDEO_AVC = 37
+	IS_VIDEO_HEVC = 38
 
 	def __init__(self, type):
 		Converter.__init__(self, type)
@@ -88,6 +89,7 @@ class ServiceInfo(Converter):
 				"IsVideoMPEG2": (self.IS_VIDEO_MPEG2, (iPlayableService.evUpdatedInfo,)),
 				"IsVideoAVC": (self.IS_VIDEO_AVC, (iPlayableService.evUpdatedInfo,)),
 				"IsVideoHEVC": (self.IS_VIDEO_HEVC, (iPlayableService.evUpdatedInfo,)),
+				"IsHDHDR": (self.IS_HDHDR, (iPlayableService.evVideoSizeChanged, iPlayableService.evVideoGammaChanged,)),
 			}[type]
 		if self.type in (self.IS_SD, self.IS_HD, self.IS_SD_AND_WIDESCREEN, self.IS_SD_AND_NOT_WIDESCREEN, self.IS_4K, self.IS_1080, self.IS_720):
 			self.videoHeight = 0
@@ -159,6 +161,8 @@ class ServiceInfo(Converter):
 					return info.getInfo(iServiceInformation.sGamma) == 2
 				elif self.type == self.IS_HLG:
 					return info.getInfo(iServiceInformation.sGamma) == 3
+				elif self.type == self.IS_HDHDR:
+					return info.getInfo(iServiceInformation.sGamma) > 0
 				elif self.type == self.IS_WIDESCREEN:
 					return info.getInfo(iServiceInformation.sAspect) in WIDESCREEN
 				elif self.type == self.IS_NOT_WIDESCREEN:
