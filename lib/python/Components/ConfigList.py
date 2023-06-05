@@ -55,6 +55,10 @@ class ConfigList(GUIComponent):
 		if self.instance is not None:
 			self.instance.moveSelectionTo(index)
 
+	def enableAutoNavigation(self, enabled):
+		if self.instance:
+			self.instance.enableAutoNavigation(enabled)
+
 	def invalidateCurrent(self):
 		self.l.invalidateEntry(self.l.getCurrentSelectionIndex())
 
@@ -197,6 +201,9 @@ class ConfigListScreen:
 	def changedEntry(self):
 		for x in self.onChangedEntry:
 			x()
+
+	def noNativeKeys(self):
+		self["config"].enableAutoNavigation(False)
 
 	def handleInputHelpers(self):
 		if self["config"].getCurrent() is not None and self["config"].getCurrent()[1].__class__.__name__ in ('ConfigText', 'ConfigPassword'):
