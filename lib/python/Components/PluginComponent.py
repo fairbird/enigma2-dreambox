@@ -17,7 +17,7 @@ class PluginComponent:
 		self.pluginList = []
 		self.installedPluginList = []
 		self.setPluginPrefix("Plugins.")
-		self.warnings = []
+		self.pluginWarnings = []
 
 	def setPluginPrefix(self, prefix):
 		self.prefix = prefix
@@ -61,7 +61,7 @@ class PluginComponent:
 							# supress errors due to missing plugin.py* files (badly removed plugin)
 							for fn in ('plugin.py', 'plugin.pyc'):
 								if os.path.exists(os.path.join(path, fn)):
-									self.warnings.append((c + "/" + pluginname, str(exc)))
+									self.pluginWarnings.append((c + "/" + pluginname, str(exc)))
 									from traceback import print_exc
 									print_exc()
 									break
@@ -89,7 +89,7 @@ class PluginComponent:
 								keymapparser.readKeymap(keymap)
 							except Exception as exc:
 								print("keymap for plugin %s/%s failed to load: " % (c, pluginname), exc)
-								self.warnings.append((c + "/" + pluginname, str(exc)))
+								self.pluginWarnings.append((c + "/" + pluginname, str(exc)))
 
 		# build a diff between the old list of plugins and the new one
 		# internally, the "fnc" argument will be compared with __eq__
@@ -152,12 +152,12 @@ class PluginComponent:
 			self.removePlugin(p)
 
 	def getWarnings(self):
-		return self.warnings
+		return self.pluginWarnings
 
 	warnings = property(getWarnings)
 	
 	def resetWarnings(self):
-		self.warnings = []
+		self.pluginWarnings = []
 
 	def getNextWakeupTime(self):
 		wakeup = -1
