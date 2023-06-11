@@ -17,7 +17,7 @@ class PluginComponent:
 		self.pluginList = []
 		self.installedPluginList = []
 		self.setPluginPrefix("Plugins.")
-		self.resetWarnings()
+		self.warnings = []
 
 	def setPluginPrefix(self, prefix):
 		self.prefix = prefix
@@ -151,6 +151,11 @@ class PluginComponent:
 		for p in self.pluginList[:]:
 			self.removePlugin(p)
 
+	def getWarnings(self):
+		return self.warnings
+
+	warnings = property(getWarnings)
+	
 	def resetWarnings(self):
 		self.warnings = []
 
@@ -163,4 +168,5 @@ class PluginComponent:
 		return int(wakeup)
 
 
-plugins = PluginComponent()
+pluginComponent = PluginComponent()
+plugins = pluginComponent  # Retain the legacy name until all code is updated.
