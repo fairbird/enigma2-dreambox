@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: enigma2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-10-14 09:11+0200\n"
-"POT-Creation-Date: 2023-05-24 16:50+0200\n"
+"POT-Creation-Date: 2023-06-19 08:16+0200\n"
 "Last-Translator: RAED - Fairbirb <rrrr53@hotmail.com>\n"
 "Language-Team: \n"
 "Language: ar\n"
@@ -2185,11 +2185,11 @@ msgstr "متصل"
 msgid "Connect to a wireless network"
 msgstr "الاتصال بشبكة لاسلكية"
 
-msgid "Connected"
-msgstr "متصل"
-
 msgid "Connected satellites"
 msgstr "الأقمار الصناعية المتصلة"
+
+msgid "Connected through another tuner"
+msgstr ""
 
 msgid "Connected to"
 msgstr "متصل بـ"
