@@ -45,7 +45,7 @@ class Keyboard:
 
 	def getDefaultKeyboardMap(self):
 		# This is a code proposal to make the default keymap respond
-		# to the currently defined locale.  OpenATV initialises the
+		# to the currently defined locale.  OpenPLI initialises the
 		# keymap based on hardware manufacturer.  Making the
 		# selection based on language locale makes more sense.  There
 		# are other code changes coming that will allow this to happen.

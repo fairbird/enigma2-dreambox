@@ -47,7 +47,7 @@ resolutions = {}  # Dictionary of screen resolutions for each screen ID.
 scrollLabelStyle = {}  # Dictionary of scrollLabel widget defaults.
 constantWidgets = {}
 variables = {}
-isVTISkin = False  # Temporary flag to suppress errors in OpenATV.
+isVTISkin = False  # Temporary flag to suppress errors in OpenPLI.
 
 config.skin = ConfigSubsection()
 skin = resolveFilename(SCOPE_SKINS, DEFAULT_SKIN)
