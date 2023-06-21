@@ -1,4 +1,4 @@
-#include <lib/nav/pcore.h>
+#include <lib/nav/core.h>
 #include <lib/service/service.h>
 #include <lib/service/event.h>
 #include <lib/base/eerror.h>
