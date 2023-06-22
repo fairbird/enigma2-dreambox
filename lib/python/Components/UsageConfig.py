@@ -63,27 +63,78 @@ def InitUsageConfig():
 		refreshServiceList()
 	config.usage.alternative_number_mode.addNotifier(alternativeNumberModeChange)
 
-	config.usage.servicelist_twolines = ConfigSelection(default="0", choices=[("0", _("Single line mode")), ("1", _("Two lines")), ("2", _("Two lines and next event"))])
-	config.usage.servicelist_twolines.addNotifier(refreshServiceList)
-
 	config.usage.hide_number_markers = ConfigYesNo(default=True)
 	config.usage.hide_number_markers.addNotifier(refreshServiceList)
 
-	config.usage.servicetype_icon_mode = ConfigSelection(default="0", choices=[("0", _("None")), ("1", _("Left from servicename")), ("2", _("Right from servicename"))])
+	config.usage.servicetype_icon_mode = ConfigSelection(default="0", choices=[
+		("0", _("None")),
+		("1", _("Left from service name")),
+		("2", _("Right from service name"))
+	])
 	config.usage.servicetype_icon_mode.addNotifier(refreshServiceList)
-	config.usage.crypto_icon_mode = ConfigSelection(default="0", choices=[("0", _("None")), ("1", _("Left from servicename")), ("2", _("Right from servicename"))])
+	config.usage.crypto_icon_mode = ConfigSelection(default="0", choices=[
+		("0", _("None")),
+		("1", _("Left from service name")),
+		("2", _("Right from service name"))
+	])
 	config.usage.crypto_icon_mode.addNotifier(refreshServiceList)
-	config.usage.record_indicator_mode = ConfigSelection(default="0", choices=[("0", _("None")), ("1", _("Left from servicename")), ("2", _("Right from servicename")), ("3", _("Red colored"))])
+	config.usage.record_indicator_mode = ConfigSelection(default="3", choices=[
+		("0", _("None")),
+		("1", _("Left from service name")),
+		("2", _("Right from service name")),
+		("3", _("Red colored"))
+	])
 	config.usage.record_indicator_mode.addNotifier(refreshServiceList)
 
-	choicelist = [("-1", _("Disable"))]
-	for i in range(0, 1300, 100):
-		choicelist.append((str(i), ngettext("%d pixel wide", "%d pixels wide", i) % i))
-	config.usage.servicelist_column = ConfigSelection(default="-1", choices=choicelist)
+	# Just merge note, config.usage.servicelist_column was already there.
+	config.usage.servicelist_column = ConfigSelection(default="-1", choices=[("-1", _("Disable"))
+	] + [(str(x), ngettext("%d Pixel wide", "%d Pixels wide", x) % x) for x in range(100, 1325, 25)])
 	config.usage.servicelist_column.addNotifier(refreshServiceList)
+	# Two lines options.
+	config.usage.servicelist_twolines = ConfigYesNo(default=False)
+	config.usage.servicelist_twolines.addNotifier(refreshServiceList)
+	config.usage.serviceitems_per_page_twolines = ConfigSelectionNumber(default=12, stepwidth=1, min=4, max=20, wraparound=True)
+	config.usage.servicelist_servicenumber_valign = ConfigSelection(default="0", choices=[
+		("0", _("Centered")),
+		("1", _("Upper line"))
+	])
+	config.usage.servicelist_servicenumber_valign.addNotifier(refreshServiceList)
+	config.usage.servicelist_eventprogress_valign = ConfigSelection(default="0", choices=[
+		("0", _("Centered")),
+		("1", _("Upper line"))
+	])
+	config.usage.servicelist_eventprogress_valign.addNotifier(refreshServiceList)
+	config.usage.servicelist_eventprogress_view_mode = ConfigSelection(default="0_barright", choices=[
+		# Single.
+		("0_no", _("No")),
+		("0_barleft", _("Progress bar left")),
+		("0_barright", _("Progress bar right")),
+		("0_percleft", _("Percentage left")),
+		("0_percright", _("Percentage right")),
+		("0_minsleft", _("Remaining minutes left")),
+		("0_minsright", _("Remaining minutes right")),
+		# Bar value.
+		("1_barpercleft", _("Progress bar/Percentage left")),
+		("1_barpercright", _("Progress bar/Percentage right")),
+		("1_barminsleft", _("Progress bar/Remaining minutes left")),
+		("1_barminsright", _("Progress bar/Remaining minutes right")),
+		# Value bar.
+		("2_percbarleft", _("Percentage/Progress bar left")),
+		("2_percbarright", _("Percentage/Progress bar right")),
+		("2_minsbarleft", _("Remaining minutes/Progress bar left")),
+		("2_minsbarright", _("Remaining minutes/Progress bar right"))
+	])
+	config.usage.servicelist_eventprogress_view_mode.addNotifier(refreshServiceList)
+	#
 
 	config.usage.service_icon_enable = ConfigYesNo(default=False)
 	config.usage.service_icon_enable.addNotifier(refreshServiceList)
+	config.usage.servicelist_picon_downsize = ConfigSelectionNumber(default=-2, stepwidth=1, min=-10, max=0, wraparound=True)
+	config.usage.servicelist_picon_ratio = ConfigSelection(default="167", choices=[
+		("167", _("XPicon, ZZZPicon")),
+		("235", _("ZZPicon")),
+		("250", _("ZPicon"))
+	])
 	config.usage.servicelist_cursor_behavior = ConfigSelection(default="keep", choices=[
 		("standard", _("Standard")),
 		("keep", _("Keep service")),
@@ -394,12 +445,22 @@ def InitUsageConfig():
 
 	config.misc.disable_background_scan = ConfigYesNo(default=False)
 	config.misc.use_ci_assignment = ConfigYesNo(default=False)
-	config.usage.show_event_progress_in_servicelist = ConfigSelection(default='barright', choices=[
-		('barleft', _("Progress bar left")),
-		('barright', _("Progress bar right")),
-		('percleft', _("Percentage left")),
-		('percright', _("Percentage right")),
-		('no', _("no"))])
+
+	config.usage.servicenum_fontsize = ConfigSelectionNumber(default=0, stepwidth=1, min=-10, max=10, wraparound=True)
+	config.usage.servicename_fontsize = ConfigSelectionNumber(default=0, stepwidth=1, min=-10, max=10, wraparound=True)
+	config.usage.serviceinfo_fontsize = ConfigSelectionNumber(default=0, stepwidth=1, min=-10, max=10, wraparound=True)
+	config.usage.progressinfo_fontsize = ConfigSelectionNumber(default=0, stepwidth=1, min=-10, max=10, wraparound=True)
+	config.usage.serviceitems_per_page = ConfigSelectionNumber(default=18, stepwidth=1, min=8, max=40, wraparound=True)
+
+	config.usage.show_event_progress_in_servicelist = ConfigSelection(default="barright", choices=[
+		("barleft", _("Progress bar left")),
+		("barright", _("Progress bar right")),
+		("percleft", _("Percentage left")),
+		("percright", _("Percentage right")),
+		("minsleft", _("Remaining minutes left")),
+		("minsright", _("Remaining minutes right")),
+		("no", _("No"))
+	])
 	config.usage.show_channel_numbers_in_servicelist = ConfigYesNo(default=True)
 	config.usage.show_event_progress_in_servicelist.addNotifier(refreshServiceList)
 	config.usage.show_channel_numbers_in_servicelist.addNotifier(refreshServiceList)
