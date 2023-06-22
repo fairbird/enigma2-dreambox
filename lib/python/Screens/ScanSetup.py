@@ -1017,7 +1017,6 @@ class ScanSetup(ConfigListScreen, Screen, CableTransponderSearchSupport, Terrest
 						continue
 			nim_list.append((str(n.slot), n.friendly_full_description))
 
-			modes = [x[:5] for x in n.getTunerTypesEnabled()]
 			self.nim_type_dict[n.slot] = {"modes": modes,
 				"selection": ConfigSelection(choices=[(x, {"DVB-S": _("Satellite"), "DVB-T": _("Terrestrial"), "DVB-C": _("Cable"), "ATSC": "ATSC"}.get(x, "")) for x in modes])}
 			if ttype in modes:
