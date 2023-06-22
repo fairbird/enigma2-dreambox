@@ -1385,7 +1385,6 @@ class ChannelSelectionBase(Screen):
 				"keyLeft": self.keyLeft,
 				"keyRight": self.keyRight,
 				"keyRecord": self.keyRecord,
-				#"toggleTwoLines": self.toggleTwoLines,
 				"1": self.keyNumberGlobal,
 				"2": self.keyNumberGlobal,
 				"3": self.keyNumberGlobal,
@@ -1758,13 +1757,6 @@ class ChannelSelectionBase(Screen):
 		ref = self.getCurrentSelection()
 		if ref and not (ref.flags & (eServiceReference.isMarker | eServiceReference.isDirectory)):
 			Screens.InfoBar.InfoBar.instance.instantRecord(serviceRef=ref)
-
-	#def toggleTwoLines(self):
-	#	if config.usage.setup_level.index > 1 and not self.pathChangeDisabled and self.servicelist.mode == self.servicelist.MODE_FAVOURITES:
-	#		config.usage.servicelist_twolines.selectNext()
-	#		config.usage.servicelist_twolines.save()
-	#	else:
-	#		return 0
 
 	def showFavourites(self):
 		if not self.pathChangeDisabled:
