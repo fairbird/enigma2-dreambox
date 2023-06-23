@@ -14,6 +14,8 @@ from Screens.ChoiceBox import ChoiceBox
 from Tools.BoundFunction import boundFunction
 from Tools.Directories import createDir as directories_createDir, removeDir as directories_removeDir
 from Components.config import config
+from os import sep, stat, statvfs
+from os.path import isdir
 import os
 
 # Quickselect
@@ -31,7 +33,16 @@ from Components.MenuList import MenuList
 # Timer
 from enigma import eTimer
 
-defaultInhibitDirs = ["/bin", "/boot", "/dev", "/etc", "/lib", "/proc", "/sbin", "/sys", "/var"]
+
+DEFAULT_INHIBIT_DIRECTORIES = ("/bin", "/boot", "/dev", "/etc", "/home", "/lib", "/picon", "/piconlcd", "/proc", "/run", "/sbin", "/share", "/sys", "/tmp", "/usr", "/var")
+defaultInhibitDirs = list(DEFAULT_INHIBIT_DIRECTORIES)
+DEFAULT_INHIBIT_DEVICES = []
+for dir in DEFAULT_INHIBIT_DIRECTORIES + ("/", "/media"):
+	if isdir(dir):
+		device = stat(dir).st_dev
+		if device not in DEFAULT_INHIBIT_DEVICES:
+			DEFAULT_INHIBIT_DEVICES.append(device)
+DEFAULT_INHIBIT_DEVICES = tuple(DEFAULT_INHIBIT_DEVICES)
 
 
 class LocationBox(Screen, NumericalTextInput, HelpableScreen):

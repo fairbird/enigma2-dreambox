@@ -383,18 +383,28 @@ class ConfigSelection(ConfigElement):
 		self.default = self._value = self.last_value = default
 		self.graphic = graphic
 
-	def setChoices(self, choices, default=None):
+	def setSelectionList(self, choices, default=None):
+		value = self.value
 		self.choices = choicesList(choices)
-
 		if default is None:
 			default = self.choices.default()
 		self.default = default
-
 		if self.value not in self.choices:
 			self.value = default
+		if self.value != value:
+			self.changed()
+
+	def setChoices(self, choices, default=None):
+		return self.setSelectionList(choices, default=default)
 
 	def getChoices(self):
 		return self.choices.choices
+
+	def getDescriptions(self):
+		return self.description.__list__()
+
+	def getSelectionList(self):
+		return list(zip(self.choices.__list__(), self.description.__list__()))
 
 	def setValue(self, value):
 		if str(value) in map(str, self.choices):
