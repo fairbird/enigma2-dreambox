@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
+from __future__ import absolute_import
 from Components.Converter.Converter import Converter
 from Components.Element import cached
 from Components.Converter.Poll import Poll
 
 
-class VtiTempFan(Poll, Converter, object):
+class VtiTempFan(Poll, Converter):
 	TEMPINFO = 1
 	FANINFO = 2
 	ALL = 5
@@ -37,25 +38,23 @@ class VtiTempFan(Poll, Converter, object):
 		temp = ''
 		unit = ''
 		try:
-			print("[VtiTempFan] Read /proc/stb/sensors/temp0/value")
-			temp = open("/proc/stb/sensors/temp0/value", "rb").readline().strip()
-			print("[VtiTempFan] Read /proc/stb/sensors/temp0/unit")
-			unit = open("/proc/stb/sensors/temp0/unit", "rb").readline().strip()
-			tempinfo = 'TEMP: ' + str(temp) + ' \xc2\xb0' + str(unit)
-			return tempinfo
+			with open('/proc/stb/sensors/temp0/value', 'rb') as fd:
+				temp = fd.readline().strip()
+			with open('/proc/stb/sensors/temp0/unit', 'rb') as fd:
+				unit = fd.readline().strip()
+			return 'TEMP: %s %s%s' % (str(temp), u'\u00B0', str(unit))
 		except:
-			print("[VtiTempFan] Read /proc/stb/sensors/temp0/value failed.")
-			print("[VtiTempFan] Read /proc/stb/sensors/temp0/unit failed.")
+			pass
 
 	def fanfile(self):
 		fan = ''
 		try:
-			print("[VtiTempFan] Read /proc/stb/fp/fan_speed")
-			fan = open("/proc/stb/fp/fan_speed", "rb").readline().strip()
-			faninfo = 'FAN: ' + str(fan)
+			with open('/proc/stb/fp/fan_speed', 'rb') as fd:
+				fan = fd.readline().strip()
+			faninfo = 'FAN: %s' % (str(fan))
 			return faninfo
 		except:
-			print("[VtiTempFan] Read /proc/stb/fp/fan_speed failed.")
+			pass
 
 	def changed(self, what):
 		if what[0] == self.CHANGED_POLL:

@@ -98,6 +98,17 @@ def InitUsageConfig():
 
 	config.usage.multiepg_ask_bouquet = ConfigYesNo(default=False)
 
+	# ########  Workaround for VTI Skins   ##############
+	config.usage.picon_dir = ConfigDirectory(default="/usr/share/enigma2/picon")
+	config.usage.servicelist_picon_dir = ConfigDirectory(default="/usr/share/enigma2/picon")
+	config.usage.movielist_show_picon = ConfigYesNo(default=False)
+	config.usage.use_extended_pig = ConfigYesNo(default=False)
+	config.usage.use_extended_pig_channelselection = ConfigYesNo(default=False)
+	config.usage.servicelist_preview_mode = ConfigYesNo(default=False)
+	config.usage.numberzap_show_picon = ConfigYesNo(default=False)
+	config.usage.numberzap_show_servicename = ConfigYesNo(default=False)
+	# ####################################################
+
 	config.usage.quickzap_bouquet_change = ConfigYesNo(default=False)
 	config.usage.e1like_radio_mode = ConfigYesNo(default=True)
 	config.usage.e1like_radio_mode_last_play = ConfigYesNo(default=True)
