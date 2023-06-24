@@ -14,7 +14,7 @@ from Components.Sources.List import List
 from Components.Sources.StaticText import StaticText
 from Screens.HelpMenu import HelpableScreen
 from Screens.MessageBox import MessageBox
-from Screens.Screen import Screen
+from Screens.Screen import Screen, ScreenSummary
 from Screens.Standby import TryQuitMainloop, QUIT_RESTART
 from Tools.Directories import resolveFilename, SCOPE_GUISKIN, SCOPE_LCDSKIN, SCOPE_SKIN, fileReadXML
 
@@ -264,22 +264,34 @@ class LcdSkinSelector(SkinSelector):
 		self.xmlList = ["skin_display.xml", "skin_display_picon.xml", "skin_display_grautec.xml"]
 
 
-class SkinSelectorSummary(Screen):
+class SkinSelectorSummary(ScreenSummary):
+	skin = '''
+	<screen name="SkinSelectorSummary" position="0,0" size="400,240"> 
+		<widget source="Name" render="Label" position="0,30" size="400,100" font="FdLcD;35" halign="center" valign="center" zPosition="2"/>
+		<widget source="value" render="Label" position="0,140" size="400,100" font="FdLcD;35" halign="center" zPosition="2"/>
+	</screen>
+	'''
 	def __init__(self, session, parent):
-		Screen.__init__(self, session, parent=parent)
+		ScreenSummary.__init__(self, session, parent=parent)
+		self["entry"] = StaticText("")
+		self["value"] = StaticText("")
 		self["Name"] = StaticText("")
-		if hasattr(self.parent, "onChangedEntry"):
+		if self.addWatcher not in self.onShow:
 			self.onShow.append(self.addWatcher)
+		if self.removeWatcher not in self.onHide:
 			self.onHide.append(self.removeWatcher)
 
 	def addWatcher(self):
-		if hasattr(self.parent, "onChangedEntry"):
+		if self.selectionChanged not in self.parent.onChangedEntry:
 			self.parent.onChangedEntry.append(self.selectionChanged)
-			self.selectionChanged()
+		self.selectionChanged()
 
 	def removeWatcher(self):
-		if hasattr(self.parent, "onChangedEntry"):
+		if self.selectionChanged in self.parent.onChangedEntry:
 			self.parent.onChangedEntry.remove(self.selectionChanged)
 
 	def selectionChanged(self):
-		self["Name"].text = self.parent.getCurrentName()
+		currentEntry = self.parent["skins"].getCurrent()  # Label
+		self["entry"].setText(currentEntry[1])
+		self["value"].setText("%s   %s" % (currentEntry[5], currentEntry[2]) if currentEntry[5] and currentEntry[2] else currentEntry[5] or currentEntry[2])  # Resolution and/or Flag.
+		self["Name"].setText(self["entry"].getText())
