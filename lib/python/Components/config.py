@@ -1752,11 +1752,6 @@ class ConfigNothing(ConfigSelection):
 		ConfigSelection.__init__(self, choices=[("", "")])
 
 
-class ConfigDescription(ConfigSelection):
-	def __init__(self):
-		ConfigSelection.__init__(self, choices=[('', '<DUMMYENTRY>')])
-
-
 # until here, 'saved_value' always had to be a *string*.
 # now, in ConfigSubsection, and only there, saved_value
 # is a dict, essentially forming a tree.
