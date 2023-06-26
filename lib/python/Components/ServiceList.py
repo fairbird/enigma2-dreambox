@@ -1,15 +1,12 @@
-# -*- coding: utf-8 -*-
-from Components.GUIComponent import GUIComponent
-from skin import parseColor, parseFont
+from enigma import eListboxServiceContent, eListbox, eServiceCenter, eServiceReference, gFont, eRect, eSize
 
-from enigma import eListboxServiceContent, eListbox, eServiceCenter, eServiceReference, gFont, eRect
+from Components.config import config
+from Components.GUIComponent import GUIComponent
+from Components.Renderer.Picon import getPiconName
+from skin import parseColor, parseFont
+from Tools.Directories import resolveFilename, SCOPE_GUISKIN
 from Tools.LoadPixmap import LoadPixmap
 from Tools.TextBoundary import getTextBoundarySize
-
-from Tools.Directories import resolveFilename, SCOPE_CURRENT_SKIN
-
-from Components.Renderer.Picon import getPiconName
-from Components.config import config
 
 
 def refreshServiceList(configElement=None):
@@ -30,35 +27,50 @@ class ServiceList(GUIComponent):
 		GUIComponent.__init__(self)
 		self.l = eListboxServiceContent()
 
-		pic = LoadPixmap(cached=True, path=resolveFilename(SCOPE_CURRENT_SKIN, "icons/folder.png"))
+		pic = LoadPixmap(cached=True, path=resolveFilename(SCOPE_GUISKIN, "icons/folder.png"))
 		pic and self.l.setPixmap(self.l.picFolder, pic)
-		pic = LoadPixmap(resolveFilename(SCOPE_CURRENT_SKIN, "icons/marker.png"))
+
+		pic = LoadPixmap(resolveFilename(SCOPE_GUISKIN, "icons/marker.png"))
 		pic and self.l.setPixmap(self.l.picMarker, pic)
-		pic = LoadPixmap(resolveFilename(SCOPE_CURRENT_SKIN, "icons/ico_dvb_s-fs8.png"))
+
+		pic = LoadPixmap(resolveFilename(SCOPE_GUISKIN, "icons/ico_dvb_s-fs8.png"))
 		pic and self.l.setPixmap(self.l.picDVB_S, pic)
-		pic = LoadPixmap(resolveFilename(SCOPE_CURRENT_SKIN, "icons/ico_dvb_c-fs8.png"))
+
+		pic = LoadPixmap(resolveFilename(SCOPE_GUISKIN, "icons/ico_dvb_c-fs8.png"))
 		pic and self.l.setPixmap(self.l.picDVB_C, pic)
-		pic = LoadPixmap(resolveFilename(SCOPE_CURRENT_SKIN, "icons/ico_dvb_t-fs8.png"))
+
+		pic = LoadPixmap(resolveFilename(SCOPE_GUISKIN, "icons/ico_dvb_t-fs8.png"))
 		pic and self.l.setPixmap(self.l.picDVB_T, pic)
-		pic = LoadPixmap(resolveFilename(SCOPE_CURRENT_SKIN, "icons/ico_stream-fs8.png"))
+
+		pic = LoadPixmap(resolveFilename(SCOPE_GUISKIN, "icons/ico_stream-fs8.png"))
 		pic and self.l.setPixmap(self.l.picStream, pic)
-		pic = LoadPixmap(resolveFilename(SCOPE_CURRENT_SKIN, "icons/ico_service_group-fs8.png"))
+
+		pic = LoadPixmap(resolveFilename(SCOPE_GUISKIN, "icons/ico_service_group-fs8.png"))
 		pic and self.l.setPixmap(self.l.picServiceGroup, pic)
-		pic = LoadPixmap(resolveFilename(SCOPE_CURRENT_SKIN, "icons/icon_crypt.png"))
+
+		pic = LoadPixmap(resolveFilename(SCOPE_GUISKIN, "icons/icon_crypt.png"))
 		pic and self.l.setPixmap(self.l.picCrypto, pic)
-		pic = LoadPixmap(resolveFilename(SCOPE_CURRENT_SKIN, "icons/record.png"))
+
+		pic = LoadPixmap(resolveFilename(SCOPE_GUISKIN, "icons/record.png"))
 		pic and self.l.setPixmap(self.l.picRecord, pic)
 
 		self.root = None
 		self.mode = self.MODE_NORMAL
-		self.ItemHeight = 28
-		self.ServiceNameFont = parseFont("Regular;22", ((1, 1), (1, 1)))
-		self.ServiceInfoFont = parseFont("Regular;18", ((1, 1), (1, 1)))
-		self.ServiceNextInfoFont = parseFont("Regular;15", ((1, 1), (1, 1)))
-		self.ServiceNumberFont = parseFont("Regular;20", ((1, 1), (1, 1)))
+		self.listHeight = 0
+		self.listWidth = 0
+		self.ServiceNumberFontName = "Regular"
+		self.ServiceNumberFontSize = 20
+		self.ServiceNameFontName = "Regular"
+		self.ServiceNameFontSize = 22
+		self.ServiceInfoFontName = "Regular"
+		self.ServiceInfoFontSize = 18
+		self.progressInfoFontName = "Regular"
+		self.progressInfoFontSize = -1
 		self.progressBarWidth = 52
-		self.progressPercentWidth = 0
 		self.fieldMargins = 10
+		self.itemsDistances = 8
+		self.listMarginRight = 25  # scrollbar is fixed 20 + 5 Extra marge
+		self.listMarginLeft = 5
 
 		self.onSelectionChanged = []
 
@@ -81,20 +93,14 @@ class ServiceList(GUIComponent):
 		def foregroundColorEvent(value):
 			self.l.setColor(eListboxServiceContent.eventForeground, parseColor(value))
 
-		def foregroundColorNextEvent(value):
-			self.l.setColor(eListboxServiceContent.eventNextForeground, parseColor(value))
-
 		def colorServiceDescription(value):
-			self.l.setColor(eListboxServiceContent.eventForeground, parseColor(value))
+			self.l.setColor(eListboxServiceContent.serviceDescriptionColor, parseColor(value))
 
 		def foregroundColorEventSelected(value):
 			self.l.setColor(eListboxServiceContent.eventForegroundSelected, parseColor(value))
 
-		def foregroundColorEventNextSelected(value):
-			self.l.setColor(eListboxServiceContent.eventForegroundNextSelected, parseColor(value))
-
 		def colorServiceDescriptionSelected(value):
-			self.l.setColor(eListboxServiceContent.eventForegroundSelected, parseColor(value))
+			self.l.setColor(eListboxServiceContent.serviceDescriptionColorSelected, parseColor(value))
 
 		def foregroundColorEventborder(value):
 			self.l.setColor(eListboxServiceContent.eventborderForeground, parseColor(value))
@@ -117,6 +123,12 @@ class ServiceList(GUIComponent):
 		def colorServiceRecorded(value):
 			self.l.setColor(eListboxServiceContent.serviceRecorded, parseColor(value))
 
+		def colorServicePseudoRecorded(value):
+			self.l.setColor(eListboxServiceContent.servicePseudoRecorded, parseColor(value))
+
+		def colorServiceStreamed(value):
+			self.l.setColor(eListboxServiceContent.serviceStreamed, parseColor(value))
+
 		def colorFallbackItem(value):
 			self.l.setColor(eListboxServiceContent.serviceItemFallback, parseColor(value))
 
@@ -129,30 +141,38 @@ class ServiceList(GUIComponent):
 		def colorServiceDescriptionSelectedFallback(value):
 			self.l.setColor(eListboxServiceContent.eventForegroundSelectedFallback, parseColor(value))
 
-		def colorServiceNextDescriptionFallback(value):
-			self.l.setColor(eListboxServiceContent.eventNextForegroundFallback, parseColor(value))
+		def colorServiceRecording(value):
+			self.l.setColor(eListboxServiceContent.serviceRecordingColor, parseColor(value))
 
-		def colorServiceNextDescriptionSelectedFallback(value):
-			self.l.setColor(eListboxServiceContent.eventNextForegroundSelectedFallback, parseColor(value))
+		def colorServiceWithAdvertisment(value):
+			self.l.setColor(eListboxServiceContent.serviceAdvertismentColor, parseColor(value))
 
 		def picServiceEventProgressbar(value):
-			pic = LoadPixmap(resolveFilename(SCOPE_CURRENT_SKIN, value))
+			pic = LoadPixmap(resolveFilename(SCOPE_GUISKIN, value))
 			pic and self.l.setPixmap(self.l.picServiceEventProgressbar, pic)
 
 		def serviceItemHeight(value):
 			self.ItemHeight = int(value)
 
 		def serviceNameFont(value):
-			self.ServiceNameFont = parseFont(value, ((1, 1), (1, 1)))
+			font = parseFont(value, ((1, 1), (1, 1)))
+			self.ServiceNameFontName = font.family
+			self.ServiceNameFontSize = font.pointSize
 
 		def serviceInfoFont(value):
-			self.ServiceInfoFont = parseFont(value, ((1, 1), (1, 1)))
-			self.ServiceNextInfoFont = parseFont(value, ((5, 6), (1, 1)))
-		#def serviceNextInfoFont(value):
-		#	self.ServiceNextInfoFont = parseFont(value, ((1,1),(1,1)))
+			font = parseFont(value, ((1, 1), (1, 1)))
+			self.ServiceInfoFontName = font.family
+			self.ServiceInfoFontSize = font.pointSize
 
 		def serviceNumberFont(value):
-			self.ServiceNumberFont = parseFont(value, ((1, 1), (1, 1)))
+			font = parseFont(value, ((1, 1), (1, 1)))
+			self.ServiceNumberFontName = font.family
+			self.ServiceNumberFontSize = font.pointSize
+
+		def progressInfoFont(value):
+			font = parseFont(value, ((1, 1), (1, 1)))
+			self.progressInfoFontName = font.family
+			self.progressInfoFontSize = font.pointSize
 
 		def progressbarHeight(value):
 			self.l.setProgressbarHeight(int(value))
@@ -163,24 +183,34 @@ class ServiceList(GUIComponent):
 		def progressBarWidth(value):
 			self.progressBarWidth = int(value)
 
-		def progressPercentWidth(value):
-			self.progressPercentWidth = int(value)
-
 		def fieldMargins(value):
 			self.fieldMargins = int(value)
+
+		def listMarginRight(value):
+			self.listMarginRight = int(value)
+
+		def listMarginLeft(value):
+			self.listMarginLeft = int(value)
 
 		def nonplayableMargins(value):
 			self.l.setNonplayableMargins(int(value))
 
 		def itemsDistances(value):
-			self.l.setItemsDistances(int(value))
-		for (attrib, value) in list(self.skinAttributes):
-			try:
-				locals().get(attrib)(value)
-				self.skinAttributes.remove((attrib, value))
-			except:
-				pass
-		return GUIComponent.applySkin(self, desktop, parent)
+			self.itemsDistances = int(value)
+			self.l.setItemsDistances(self.itemsDistances)
+		if self.skinAttributes is not None:
+			for (attrib, value) in list(self.skinAttributes):
+				try:
+					locals().get(attrib)(value)
+					self.skinAttributes.remove((attrib, value))
+				except:
+					pass
+		rc = GUIComponent.applySkin(self, desktop, parent)
+		self.listHeight = self.instance.size().height()
+		self.listWidth = self.instance.size().width()
+		self.setItemsPerPage()
+		self.setFontsize()
+		return rc
 
 	def connectSelChanged(self, fnc):
 		if not fnc in self.onSelectionChanged:
@@ -264,6 +294,12 @@ class ServiceList(GUIComponent):
 	def moveDown(self):
 		self.instance.moveSelection(self.instance.moveDown)
 
+	def moveTop(self):
+		self.instance.moveSelection(self.instance.moveTop)
+
+	def moveEnd(self):
+		self.instance.moveSelection(self.instance.moveEnd)
+
 	def moveToChar(self, char):
 		# TODO fill with life
 		print("Next char: ")
@@ -274,7 +310,7 @@ class ServiceList(GUIComponent):
 				index = indexup
 
 		self.instance.moveSelectionTo(index)
-		print("Moving to character " + str(char))
+		print("Moving to character %s" % str(char))
 
 	def moveToNextMarker(self):
 		idx = self.l.getNextMarkerPos()
@@ -292,10 +328,33 @@ class ServiceList(GUIComponent):
 
 	GUI_WIDGET = eListbox
 
+	def setItemsPerPage(self):
+		if self.listHeight > 0:
+			itemHeight = self.listHeight // (int(config.usage.serviceitems_per_page_twolines.value) if config.usage.servicelist_twolines.value else int(config.usage.serviceitems_per_page.value))
+		else:
+			itemHeight = 28
+		self.ItemHeight = itemHeight
+		self.l.setItemHeight(itemHeight)
+		if self.listHeight:
+			self.instance.resize(eSize(self.listWidth, self.listHeight // itemHeight * itemHeight))
+
+	def setFontsize(self):
+		self.ServiceNumberFont = gFont(self.ServiceNumberFontName, int(self.ServiceNumberFontSize) + int(config.usage.servicenum_fontsize.value))
+		self.ServiceNameFont = gFont(self.ServiceNameFontName, int(self.ServiceNameFontSize) + int(config.usage.servicename_fontsize.value))
+		self.ServiceInfoFont = gFont(self.ServiceInfoFontName, int(self.ServiceInfoFontSize) + int(config.usage.serviceinfo_fontsize.value))
+		if self.progressInfoFontSize == -1:  # font in skin not defined
+			self.ProgressInfoFont = gFont(self.ServiceInfoFontName, int(self.ServiceInfoFontSize) + int(config.usage.progressinfo_fontsize.value))
+		else:
+			self.ProgressInfoFont = gFont(self.progressInfoFontName, int(self.progressInfoFontSize) + int(config.usage.progressinfo_fontsize.value))
+
+		self.l.setElementFont(self.l.celServiceName, self.ServiceNameFont)
+		self.l.setElementFont(self.l.celServiceNumber, self.ServiceNumberFont)
+		self.l.setElementFont(self.l.celServiceInfo, self.ServiceInfoFont)
+
 	def postWidgetCreate(self, instance):
-		instance.setWrapAround(True)
 		instance.setContent(self.l)
 		instance.selectionChanged.get().append(self.selectionChanged)
+		self.setFontsize()
 		self.setMode(self.mode)
 
 	def preWidgetRemove(self, instance):
@@ -372,71 +431,87 @@ class ServiceList(GUIComponent):
 		self.l.setCurrentMarked(state)
 
 	def setMode(self, mode):
-		two_lines_val = config.usage.servicelist_twolines.value
-		show_two_lines = int(two_lines_val) and mode == self.MODE_FAVOURITES
-		if config.usage.servicelist_number_of_services.value == "by skin":
-			ItemHeight = self.ItemHeight * (2 if show_two_lines else 1)
-			ServiceNameFont = self.ServiceNameFont
-			ServiceNumberFont = self.ServiceNumberFont
-			ServiceInfoFont = self.ServiceInfoFont
-			ServiceNextInfoFont = self.ServiceNextInfoFont
-		else:
-			ItemHeight = int(self.instance.size().height() / int(config.usage.servicelist_number_of_services.value)) * (2 if show_two_lines else 1)
-			FontFactor = ItemHeight * 100 / self.ItemHeight
-			ServiceNameFont = gFont(self.ServiceNameFont.family, int(self.ServiceNameFont.pointSize * FontFactor / (200 if show_two_lines else 100)))
-			ServiceNumberFont = gFont(self.ServiceNumberFont.family, int(self.ServiceNumberFont.pointSize * FontFactor / (200 if show_two_lines else 100)))
-			ServiceInfoFont = gFont(self.ServiceInfoFont.family, int(self.ServiceInfoFont.pointSize * FontFactor / (200 if show_two_lines else 100)))
-			ServiceNextInfoFont = gFont(self.ServiceNextInfoFont.family, int(self.ServiceNextInfoFont.pointSize * FontFactor / (200 if show_two_lines else 100)))
-
 		self.mode = mode
-		self.l.setItemHeight(ItemHeight)
+		self.setItemsPerPage()
+		self.l.setItemHeight(self.ItemHeight)
 		self.l.setVisualMode(eListboxServiceContent.visModeComplex)
+		self.l.setServicePiconDownsize(int(config.usage.servicelist_picon_downsize.value))
+		self.l.setServicePiconRatio(int(config.usage.servicelist_picon_ratio.value))
+
+		twoLines = config.usage.servicelist_twolines.value
+		self.l.setShowTwoLines(twoLines)
 
 		if config.usage.service_icon_enable.value:
 			self.l.setGetPiconNameFunc(getPiconName)
 		else:
 			self.l.setGetPiconNameFunc(None)
 
-		rowWidth = self.instance.size().width() - 30 #scrollbar is fixed 20 + 10 Extra marge
+		rowWidth = self.instance.size().width() - self.listMarginRight
 
 		if mode == self.MODE_NORMAL or not config.usage.show_channel_numbers_in_servicelist.value:
 			channelNumberWidth = 0
-			channelNumberSpace = 0
+			channelNumberSpace = self.listMarginLeft
 		else:
-			channelNumberWidth = config.usage.alternative_number_mode.value and getTextBoundarySize(self.instance, ServiceNumberFont, self.instance.size(), "0000").width() or getTextBoundarySize(self.instance, self.ServiceNumberFont, self.instance.size(), "00000").width()
-			channelNumberSpace = self.fieldMargins
+			channelNumberWidth = config.usage.alternative_number_mode.value and getTextBoundarySize(self.instance, self.ServiceNumberFont, self.instance.size(), "0" * int(config.usage.maxchannelnumlen.value)).width() or getTextBoundarySize(self.instance, self.ServiceNumberFont, self.instance.size(), "00000").width()
+			channelNumberSpace = self.fieldMargins + self.listMarginLeft
 
-		self.l.setElementPosition(self.l.celServiceNumber, eRect(0, 0, channelNumberWidth, ItemHeight))
+		numberHeight = self.ItemHeight // 2 if twoLines and config.usage.servicelist_servicenumber_valign.value == "1" else self.ItemHeight
+		self.l.setElementPosition(self.l.celServiceNumber, eRect(self.listMarginLeft, 0, channelNumberWidth, numberHeight))
 
-		progressWidth = self.progressBarWidth
-		if "perc" in config.usage.show_event_progress_in_servicelist.value:
-			progressWidth = self.progressPercentWidth or self.progressBarWidth
+		#progress view modes for two lines
+		#  0 - single, centered
+		# 10 - single, upper line
+		#  1 - dual, bar upper line, value lower line
+		#  2 - dual, value upper line, bar lower line
+		# 11 - dual, bar and value upper line
+		# 12 - dual, value and bar upper line
+		if twoLines:
+			viewMode, viewType = (config.usage.servicelist_eventprogress_valign.value + config.usage.servicelist_eventprogress_view_mode.value).split('_')
+			viewMode = int(viewMode)
+		else:
+			viewType = config.usage.show_event_progress_in_servicelist.value
+			viewMode = 0
 
-		if "left" in config.usage.show_event_progress_in_servicelist.value:
-			self.l.setElementPosition(self.l.celServiceEventProgressbar, eRect(channelNumberWidth + channelNumberSpace, 0, progressWidth, ItemHeight))
-			self.l.setElementPosition(self.l.celServiceName, eRect(channelNumberWidth + channelNumberSpace + progressWidth + self.fieldMargins, 0, rowWidth - (channelNumberWidth + channelNumberSpace + progressWidth + self.fieldMargins), ItemHeight))
-		elif "right" in config.usage.show_event_progress_in_servicelist.value:
-			self.l.setElementPosition(self.l.celServiceEventProgressbar, eRect(rowWidth - progressWidth, 0, progressWidth, ItemHeight))
-			self.l.setElementPosition(self.l.celServiceName, eRect(channelNumberWidth + channelNumberSpace, 0, rowWidth - (channelNumberWidth + channelNumberSpace + progressWidth + self.fieldMargins), ItemHeight))
+		self.l.setProgressViewMode(viewMode)
+
+		minuteUnit = _("min")
+		self.l.setProgressUnit(minuteUnit if "mins" in viewType else "%")
+
+		progressHeight = self.ItemHeight // 2 if viewMode else self.ItemHeight
+		progressTextWidth = getTextBoundarySize(self.instance, self.ProgressInfoFont, self.instance.size(), "+000 %s" % minuteUnit).width() if "mins" in viewType else getTextBoundarySize(self.instance, self.ProgressInfoFont, self.instance.size(), "100 %").width()
+		self.l.setProgressTextWidth(progressTextWidth)
+
+		if "bar" in viewType:
+			if viewMode and viewMode < 10:
+				progressWidth = max(self.progressBarWidth, progressTextWidth)
+			elif viewMode > 10:
+				progressWidth = self.progressBarWidth + progressTextWidth + self.itemsDistances
+			else:
+				progressWidth = self.progressBarWidth
+		else:
+			progressWidth = progressTextWidth
+
+		if "left" in viewType:
+			self.l.setElementPosition(self.l.celServiceEventProgressbar, eRect(channelNumberWidth + channelNumberSpace, 0, progressWidth, progressHeight))
+			self.l.setElementPosition(self.l.celServiceName, eRect(channelNumberWidth + channelNumberSpace + progressWidth + self.fieldMargins, 0, rowWidth - (channelNumberWidth + channelNumberSpace + progressWidth + self.fieldMargins), self.ItemHeight))
+		elif "right" in viewType:
+			self.l.setElementPosition(self.l.celServiceEventProgressbar, eRect(rowWidth - progressWidth, 0, progressWidth, progressHeight))
+			self.l.setElementPosition(self.l.celServiceName, eRect(channelNumberWidth + channelNumberSpace, 0, rowWidth - (channelNumberWidth + channelNumberSpace + progressWidth + self.fieldMargins), self.ItemHeight))
 		else:
 			self.l.setElementPosition(self.l.celServiceEventProgressbar, eRect(0, 0, 0, 0))
-			self.l.setElementPosition(self.l.celServiceName, eRect(channelNumberWidth + channelNumberSpace, 0, rowWidth - (channelNumberWidth + channelNumberSpace), ItemHeight))
+			self.l.setElementPosition(self.l.celServiceName, eRect(channelNumberWidth + channelNumberSpace, 0, rowWidth - (channelNumberWidth + channelNumberSpace), self.ItemHeight))
+		if "perc" in viewType or "mins" in viewType:
+			self.l.setElementFont(self.l.celServiceEventProgressbar, self.ProgressInfoFont)
 
-		self.l.setElementFont(self.l.celServiceName, ServiceNameFont)
-		self.l.setElementFont(self.l.celServiceNumber, ServiceNumberFont)
-		self.l.setElementFont(self.l.celServiceInfo, ServiceInfoFont)
-		if show_two_lines and two_lines_val == "2":
-			self.l.setElementFont(self.l.celServiceNextInfo, ServiceNextInfoFont)
-			nextTitle = _("NEXT") + ":  "
-			self.l.setNextTitle(nextTitle)
-		if "perc" in config.usage.show_event_progress_in_servicelist.value:
-			self.l.setElementFont(self.l.celServiceEventProgressbar, ServiceInfoFont)
-		self.l.setShowTwoLines(show_two_lines and int(two_lines_val) or 0)
+		self.l.setElementFont(self.l.celServiceName, self.ServiceNameFont)
+		self.l.setElementFont(self.l.celServiceNumber, self.ServiceNumberFont)
+		self.l.setElementFont(self.l.celServiceInfo, self.ServiceInfoFont)
+
 		self.l.setHideNumberMarker(config.usage.hide_number_markers.value)
 		self.l.setServiceTypeIconMode(int(config.usage.servicetype_icon_mode.value))
 		self.l.setCryptoIconMode(int(config.usage.crypto_icon_mode.value))
 		self.l.setRecordIndicatorMode(int(config.usage.record_indicator_mode.value))
-		self.l.setColumnWidth(-1 if show_two_lines else int(config.usage.servicelist_column.value))
+		self.l.setColumnWidth(-1 if twoLines else int(config.usage.servicelist_column.value))
 
 	def selectionEnabled(self, enabled):
 		if self.instance is not None:

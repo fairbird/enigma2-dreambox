@@ -1305,6 +1305,18 @@ class ChannelSelectionEdit:
 		self.session.openWithCallback(self.exitContext, ChannelContextMenu, self)
 
 	def exitContext(self, close=False):
+		l = self["list"]
+		l.setFontsize()
+		l.setItemsPerPage()
+		l.setMode("MODE_TV")
+		# l.setMode("MODE_TV") automatically sets "hide number marker" to
+		# the config.usage.hide_number_markers.value so when we are in "move mode"
+		# we need to force display of the markers here after l.setMode("MODE_TV")
+		# has run. If l.setMode("MODE_TV") were ever removed above,
+		# "self.servicelist.l.setHideNumberMarker(False)" could be moved
+		# directly to the "else" clause of "def toggleMoveMode".
+		if self.movemode:
+			self.servicelist.l.setHideNumberMarker(False)
 		if close:
 			self.cancel()
 
@@ -1373,7 +1385,6 @@ class ChannelSelectionBase(Screen):
 				"keyLeft": self.keyLeft,
 				"keyRight": self.keyRight,
 				"keyRecord": self.keyRecord,
-				"toggleTwoLines": self.toggleTwoLines,
 				"1": self.keyNumberGlobal,
 				"2": self.keyNumberGlobal,
 				"3": self.keyNumberGlobal,
@@ -1746,13 +1757,6 @@ class ChannelSelectionBase(Screen):
 		ref = self.getCurrentSelection()
 		if ref and not (ref.flags & (eServiceReference.isMarker | eServiceReference.isDirectory)):
 			Screens.InfoBar.InfoBar.instance.instantRecord(serviceRef=ref)
-
-	def toggleTwoLines(self):
-		if config.usage.setup_level.index > 1 and not self.pathChangeDisabled and self.servicelist.mode == self.servicelist.MODE_FAVOURITES:
-			config.usage.servicelist_twolines.selectNext()
-			config.usage.servicelist_twolines.save()
-		else:
-			return 0
 
 	def showFavourites(self):
 		if not self.pathChangeDisabled:
@@ -2294,14 +2298,14 @@ class ChannelSelection(ChannelSelectionBase, ChannelSelectionEdit, ChannelSelect
 			self.setHistoryPath()
 
 	def saveRoot(self):
-		path = ''
+		path = ""
 		for i in self.servicePath:
 			path += i.toString()
-			path += ';'
+			path += ";"
 		if path and path != self.lastroot.value:
-			if self.mode == MODE_RADIO and 'FROM BOUQUET "bouquets.tv"' in path:
+			if self.mode == MODE_RADIO and "FROM BOUQUET \"bouquets.tv\"" in path:
 				self.setModeTv()
-			elif self.mode == MODE_TV and 'FROM BOUQUET "bouquets.radio"' in path:
+			elif self.mode == MODE_TV and "FROM BOUQUET \"bouquets.radio\"" in path:
 				self.setModeRadio()
 			self.lastroot.value = path
 			self.lastroot.save()
