@@ -52,7 +52,7 @@ class SkinSelector(Screen, HelpableScreen):
 	]
 
 	def __init__(self, session, screenTitle=_("GUI Skin")):
-		Screen.__init__(self, session, mandatoryWidgets=["description", "skins"])
+		Screen.__init__(self, session, mandatoryWidgets=["skins"])
 		HelpableScreen.__init__(self)
 
 		element = domScreens.get("SkinSelector", (None, None))[0]
