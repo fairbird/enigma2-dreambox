@@ -193,12 +193,12 @@
 	</screen>
 
 	<screen name="MessageBox_summary" position="2,0" size="128,64">
-		<widget source="parent.Text" conditional="parent.Text" render="Label" position="top" size="100,52" font="FdLcD;11" horizontalAlignment="center" verticalAlignment="center" />
+		<widget source="parent.Text" render="Label" position="top" size="100,52" font="FdLcD;11" horizontalAlignment="center" verticalAlignment="center" />
 		<widget source="parent.selectedChoice" conditional="parent.selectedChoice" render="Label" position="bottom" size="100,14" font="FdLcD;14" horizontalAlignment="center" verticalAlignment="center" />
 	</screen>
 
 	<screen name="MessageBoxSimple_summary" position="2,0" size="128,64">
-		<widget source="parent.Text" conditional="parent.Text" render="Label" position="top" size="100,52" font="FdLcD;11" horizontalAlignment="center" verticalAlignment="center" />
+		<widget source="parent.Text" render="Label" position="top" size="100,52" font="FdLcD;11" horizontalAlignment="center" verticalAlignment="center" />
 		<widget source="parent.selectedChoice" conditional="parent.selectedChoice" render="Label" position="bottom" size="100,14" font="FdLcD;14" horizontalAlignment="center" verticalAlignment="center" />
 	</screen>
 	<screen name="EMCMoviePlayerSummary" position="0,0" size="96,64" >

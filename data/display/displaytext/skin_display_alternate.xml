@@ -130,11 +130,11 @@
 		<widget source="parent.summary_selection" conditional="parent.summary_selection" render="Label" position="0,0" size="126,64" font="Regular;11" noWrap="1" />
 	</screen>
 	<screen name="MessageBox_summary" position="0,0" size="132,64">
-		<widget source="parent.Text" conditional="parent.Text" render="Label" position="0,0" size="132,52" font="Regular;11" verticalAlignment="center" />
+		<widget source="parent.Text" render="Label" position="0,0" size="132,52" font="Regular;11" verticalAlignment="center" />
 		<widget source="parent.selectedChoice" conditional="parent.selectedChoice" render="Label" position="0,50" size="120,14" horizontalAlignment="left" noWrap="1"  />
 	</screen>
 	<screen name="MessageBoxSimple_summary" position="0,0" size="132,64">
-		<widget source="parent.Text" conditional="parent.Text" render="Label" position="0,0" size="132,52" font="Regular;11" verticalAlignment="center" />
+		<widget source="parent.Text" render="Label" position="0,0" size="132,52" font="Regular;11" verticalAlignment="center" />
 		<widget source="parent.selectedChoice" conditional="parent.selectedChoice" render="Label" position="0,50" size="120,14" horizontalAlignment="left" noWrap="1"  />
 	</screen>
 	<screen name="JobView_summary" position="0,0" size="132,64">

@@ -248,11 +248,11 @@
 		<widget source="parent.summary_list" render="Label" position="0,0" size="400,240" font="FdLcD;18" noWrap="1" />
 	</screen>
 	<screen name="MessageBox_summary" position="0,0" size="400,240">
-		<widget source="parent.Text" conditional="parent.Text" render="Label" position="0,0" size="400,240" font="FdLcD;24" horizontalAlignment="center" />
+		<widget source="parent.Text" render="Label" position="0,0" size="400,240" font="FdLcD;24" horizontalAlignment="center" />
 		<widget source="parent.selectedChoice" conditional="parent.selectedChoice" render="Label" position="0,135" size="400,28" font="FdLcD;26" horizontalAlignment="center" noWrap="1" />
 	</screen>
 	<screen name="MessageBoxSimple_summary" position="0,0" size="400,240">
-		<widget source="parent.Text" conditional="parent.Text" render="Label" position="0,0" size="400,240" font="FdLcD;24" horizontalAlignment="center" />
+		<widget source="parent.Text" render="Label" position="0,0" size="400,240" font="FdLcD;24" horizontalAlignment="center" />
 		<widget source="parent.selectedChoice" conditional="parent.selectedChoice" render="Label" position="0,135" size="400,28" font="FdLcD;26" horizontalAlignment="center" noWrap="1" />
 	</screen>
 	<screen name="AboutSummary" position="0,0" size="400,240">

@@ -385,7 +385,7 @@
 
 	<!-- MESSAGEBOX -->
 	<screen name="MessageBox_summary" position="0,0" size="800,480">
-		<widget source="parent.Text" conditional="parent.Text" render="Label" position="40,50" size="720,310" foregroundColor="white" font="FdLcD;70" horizontalAlignment="center" verticalAlignment="center" zPosition="2" />
+		<widget source="parent.Text" render="Label" position="40,50" size="720,310" foregroundColor="white" font="FdLcD;70" horizontalAlignment="center" verticalAlignment="center" zPosition="2" />
 		<widget source="parent.selectedChoice" conditional="parent.selectedChoice" render="Label" position="40,380" size="720,70" foregroundColor="white" font="FdLcDLight;60" horizontalAlignment="center" verticalAlignment="top" zPosition="2" />
 	</screen>
 	<screen name="MessageBoxSimple_summary" position="0,0" size="800,480">

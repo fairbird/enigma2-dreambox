@@ -252,11 +252,11 @@
 	</screen>
 
 	<screen name="MessageBox_summary" position="0,0" size="390,240">
-		<widget source="parent.Text" conditional="parent.Text" render="Label" position="0,0" size="390,240" font="FdLcD;24" horizontalAlignment="center" />
+		<widget source="parent.Text" render="Label" position="0,0" size="390,240" font="FdLcD;24" horizontalAlignment="center" />
 		<widget source="parent.selectedChoice" conditional="parent.selectedChoice" render="Label" position="0,135" size="390,28" font="FdLcD;26" horizontalAlignment="center" noWrap="1" />
 	</screen>
 	<screen name="MessageBoxSimple_summary" position="0,0" size="390,240">
-		<widget source="parent.Text" conditional="parent.Text" render="Label" position="0,0" size="390,240" font="FdLcD;24" horizontalAlignment="center" />
+		<widget source="parent.Text" render="Label" position="0,0" size="390,240" font="FdLcD;24" horizontalAlignment="center" />
 		<widget source="parent.selectedChoice" conditional="parent.selectedChoice" render="Label" position="0,135" size="390,28" font="FdLcD;26" horizontalAlignment="center" noWrap="1" />
 	</screen>
 
