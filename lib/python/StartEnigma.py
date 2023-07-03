@@ -478,6 +478,9 @@ from Screens.Ci import CiHandler
 profile("Load:VolumeControl")
 from Components.VolumeControl import VolumeControl
 
+profile("Load:Processing")
+from Screens.Processing import Processing
+
 profile("Load:StackTracePrinter")
 from Components.StackTrace import StackTracePrinter
 StackTracePrinterInst = StackTracePrinter()
@@ -529,6 +532,8 @@ def runScreenTest():
 
 	profile("Init:VolumeControl")
 	vol = VolumeControl(session)
+	profile("InitProcessing")
+	processing = Processing(session)
 	profile("Init:PowerKey")
 	power = PowerKey(session)
 
