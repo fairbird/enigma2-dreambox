@@ -87,15 +87,15 @@ class Time(Setup):
 class TimeWizard(ConfigListScreen, Screen, Rc):
 	if isHD():
 		skin = """
-		<screen name="TimeWizard" position="center,60" size="1280,720" resolution="1280,720">
+		<screen name="TimeWizard" position="0,0" size="1280,720" resolution="1280,720">
 			<widget name="text" position="30,10" size="1000,47" font="Regular;20" transparent="1" verticalAlignment="center" />
 			<widget name="config" position="212,95" size="944,430" enableWrapAround="1" entryFont="Regular;25" valueFont="Regular;25" itemHeight="35" scrollbarMode="showOnDemand" />
 			<eLabel position="234,710" zPosition="2" size="234,2" foregroundColor="#00ff2525" backgroundColor="#00ff2525"/>
 			<eLabel position="519,710" zPosition="2" size="234,2" foregroundColor="#00bab329" backgroundColor="#00bab329"/>
-			<widget source="key_red" render="Label" objectTypes="key_red,StaticText" position="234,670" size="180,40" backgroundColor="key_red" conditional="key_red" font="Regular;20" foregroundColor="key_text" horizontalAlignment="center" verticalAlignment="center">
+			<widget source="key_red" render="Label" objectTypes="key_red,StaticText" position="234,670" size="234,40" backgroundColor="key_red" conditional="key_red" font="Regular;20" foregroundColor="key_text" horizontalAlignment="center" verticalAlignment="center">
 				<convert type="ConditionalShowHide" />
 			</widget>
-			<widget source="key_yellow" render="Label" objectTypes="key_yellow,StaticText" position="519,670" size="180,40" backgroundColor="key_yellow" conditional="key_yellow" font="Regular;20" foregroundColor="key_text" horizontalAlignment="center" verticalAlignment="center">
+			<widget source="key_yellow" render="Label" objectTypes="key_yellow,StaticText" position="519,670" size="234,40" backgroundColor="key_yellow" conditional="key_yellow" font="Regular;20" foregroundColor="key_text" horizontalAlignment="center" verticalAlignment="center">
 				<convert type="ConditionalShowHide" />
 			</widget>
 			<widget name="HelpWindow" position="0,0" size="0,0" alphaTest="blend" conditional="HelpWindow" transparent="1" zPosition="+1" />
@@ -196,12 +196,9 @@ class TimeWizard(ConfigListScreen, Screen, Rc):
 		self["key_red"] = StaticText(_("Cancel"))
 		self["key_yellow"] = StaticText(_("Set local time"))
 		self["wizard"] = Pixmap()
-		self["lab1"] = StaticText(_("OpenVision"))
-		self["lab2"] = StaticText(_("Lets define enigma2 once more"))
-		self["lab3"] = StaticText(_("Report problems to:"))
-		self["lab4"] = StaticText(_("https://openvision.tech"))
-		self["lab5"] = StaticText(_("Sources are available at:"))
-		self["lab6"] = StaticText(_("https://github.com/OpenVisionE2"))
+		self["lab1"] = StaticText(_("Openpli"))
+		self["lab2"] = StaticText(_("Report problems to:"))
+		self["lab3"] = StaticText(_("https://github.com/fairbird"))
 		self["actions"] = ActionMap(["WizardActions", "ColorActions"], {
 			"yellow": self.yellow,
 			"ok": self.red,
