@@ -298,13 +298,17 @@ class NameserverSetup(ConfigListScreen, HelpableScreen, Screen):
                         self.list.append((_("DNS %d") % (i), x))
                         i += 1
 
+        def newConfig(self):
+                if self["config"].getCurrent() == self.ListDNSServers:
+                        self.createSetup()
+
         def keyLeft(self):
                 ConfigListScreen.keyLeft(self)
-                self.createSetup()
+                self.newConfig()
 
         def keyRight(self):
                 ConfigListScreen.keyRight(self)
-                self.createSetup()
+                self.newConfig()
 
         def save(self):
                 self.RefreshNameServerUsed()
