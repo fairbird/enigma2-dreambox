@@ -144,7 +144,7 @@ class Network:
 				for nameserver in self.nameservers:
 					fp.write("nameserver %d.%d.%d.%d\n" % tuple(nameserver))
 				fp.close()
-				if (os.path.isfile("/etc/enigma2/nameservers")):
+				if isfile("/etc/enigma2/nameservers"):
 					Console().ePopen('rm /etc/enigma2/nameservers')
 			else:
 				fp = open('/etc/enigma2/nameservers', 'w')
