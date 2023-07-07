@@ -310,7 +310,7 @@ def videoEnhancementSetupMain(session, **kwargs):
 
 
 def startSetup(menuid):
-	if menuid != "video_menu":
+	if menuid != "video":
 		return []
 	return [(_("Video enhancement setup"), videoEnhancementSetupMain, "videoenhancement_setup", 5)]
 
