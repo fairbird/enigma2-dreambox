@@ -167,7 +167,7 @@ class VideoSetup(ConfigListScreen, Screen):
 		if SystemInfo["CanChangeOsdPlaneAlpha"]:
 			self.list.append((_("OSD plane transparency"), config.av.osd_planealpha, _("Configure the transparency of the OSD.")))
 
-		if not isinstance(config.av.scaler_sharpness, ConfigNothing):
+		if not isinstance(config.av.scaler_sharpness, ConfigNothing) and not isPluginInstalled("VideoEnhancement"):
 			self.list.append((_("Scaler sharpness"), config.av.scaler_sharpness, _("Configure the sharpness of the video scaling.")))
 
 		self["config"].list = self.list
