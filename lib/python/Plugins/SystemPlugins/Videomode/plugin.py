@@ -6,6 +6,7 @@ from Components.ConfigList import ConfigListScreen
 from Components.config import config, ConfigBoolean, ConfigNothing
 from Components.Label import Label
 from Components.Sources.StaticText import StaticText
+from Tools.Directories import isPluginInstalled
 
 from Plugins.SystemPlugins.Videomode.VideoHardware import video_hw
 
