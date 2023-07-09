@@ -1375,25 +1375,30 @@ class ConfigDirectory(ConfigText):
 	def onSelect(self, session):
 		self.allmarked = (self.value != "")
 
-# a slider.
 
-
+# This is the control, and base class, for slider settings.
+#
 class ConfigSlider(ConfigElement):
 	def __init__(self, default=0, increment=1, limits=(0, 100)):
 		ConfigElement.__init__(self)
-		self.value = self.last_value = self.default = default
+		if not isinstance(default, int):
+			raise TypeError("[Config] Error: 'ConfigSlider' default must be an integer!")
+		if not isinstance(increment, int):
+			raise TypeError("[Config] Error: 'ConfigSlider' increment must be an integer!")
+		if not isinstance(limits[0], int):
+			raise TypeError("[Config] Error: 'ConfigSlider' minimum value must be an integer!")
+		if not isinstance(limits[1], int):
+			raise TypeError("[Config] Error: 'ConfigSlider' maximum value must be an integer!")
+		if limits[0] >= limits[1]:
+			raise ValueError("[Config] Error: 'ConfigSlider' minimum value must be less than maximum value!")
+		self.default = default
+		self.last_value = default
+		self.value = default
+		self.increment = increment
 		self.min = limits[0]
 		self.max = limits[1]
-		self.increment = increment
 
-	def checkValues(self):
-		if self.value < self.min:
-			self.value = self.min
-
-		if self.value > self.max:
-			self.value = self.max
-
-	def handleKey(self, key):
+	def handleKey(self, key, callback=None):
 		value = self.value
 		if key == ACTIONKEY_FIRST:
 			value = self.min
@@ -1412,18 +1417,17 @@ class ConfigSlider(ConfigElement):
 		if value != self.value:
 			self.value = value
 			self.changed()
+			if callable(callback):
+				callback()
 
 	def getText(self):
-		return "%d / %d" % (self.value, self.max)
+		return "%d / %d / %d" % (self.min, self.value, self.max)
 
 	def getMulti(self, selected):
-		self.checkValues()
-		return ("slider", self.value, self.max)
+		return ("slider", self.value, self.min, self.max)
 
-	def fromstring(self, value):
+	def fromString(self, value):
 		return int(value)
-
-# a satlist. in fact, it's a ConfigSelection.
 
 
 class ConfigSatlist(ConfigSelection):
