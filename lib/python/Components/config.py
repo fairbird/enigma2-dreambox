@@ -1246,15 +1246,15 @@ class ConfigSelectionNumber(ConfigSelection):
 		if default is None:
 			default = min
 		ConfigSelection.__init__(self, choices=[(x, (ngettext(units[0], units[1], x) % x if units and isinstance(units, (list, tuple)) else str(x))) for x in range(min, max + 1, stepwidth)], default=default)
-		self.wrapAround = wraparound
+		self.wraparound = wraparound
 
-	def handleKey(self, key, callback=None):
-		if not self.wrapAround:
+	def handleKey(self, key):
+		if not self.wraparound:
 			if key == ACTIONKEY_RIGHT and self.choices.index(self.value) == len(self.choices) - 1:
 				return
 			if key == ACTIONKEY_LEFT and self.choices.index(self.value) == 0:
 				return
-		ConfigSelection.handleKey(self, key, callback)
+		ConfigSelection.handleKey(self, key)
 
 
 class ConfigNumber(ConfigText):
