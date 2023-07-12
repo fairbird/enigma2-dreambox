@@ -17,7 +17,7 @@ class OverscanWizard(Screen, ConfigListScreen):
 				<eLabel position="338,190" size="1244,698" zPosition="3"/>
 				<widget name="title" position="353,202" size="1224,50" font="Regular;40" foregroundColor="blue" zPosition="4"/>
 				<widget name="introduction" position="343,252" size="1234,623" horizontalAlignment="center" verticalAlignment="center" font="Regular;30" zPosition="4"/>
-				<widget name="config" position="343,662" size="1234,226" font="Regular;30" itemHeight="40" zPosition="4"/>
+				<widget name="config" position="343,662" size="1234,226" font="Regular;30" valueFont="Regular;30" itemHeight="40" zPosition="4"/>
 			</screen>"""
 		else:
 			self.skin = """<screen position="fill"  flags="wfNoBorder">
