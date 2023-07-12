@@ -140,7 +140,7 @@ class UserInterfacePositioner2(Screen, ConfigListScreen):
 			<screen position="center,center" size="1920,1080" backgroundColor="#000000" title="OSD Adjustment" >
 
 				<widget name="text" position="300,165" zPosition="1" size="1320,180" font="Regular;32" horizontalAlignment="center" verticalAlignment="center" foregroundColor="yellow" backgroundColor="#1f771f" transparent="1" />
-				<widget name="config" position="225,375" zPosition="1" size="1470,315" itemHeight="45" font="Regular;30" transparent="1" />
+				<widget name="config" position="225,375" zPosition="1" size="1470,315" itemHeight="45" font="Regular;30" secondfont="Regular;30" transparent="1" />
 				<widget source="status" render="Label" position="300,713" zPosition="1" size="1320,120" font="Regular;32" horizontalAlignment="center" verticalAlignment="center" foregroundColor="yellow" backgroundColor="#1f771f" transparent="1" />
 
 				<eLabel backgroundColor="red" position="0,0" size="1920,1" zPosition="0" />
