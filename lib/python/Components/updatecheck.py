@@ -63,7 +63,7 @@ def logdata(label_name = '', data = None):
 
 def AutoCheck(session = None, **kwargs):
         global installerupdatecheck
-        logdata('kwargs', kwargs)
+        #logdata('kwargs', kwargs)
         installerupdatecheck = InstallerUpdateCheck(session)
         installerupdatecheck.configChange()
 
@@ -77,7 +77,7 @@ class InstallerUpdateCheck:
             self.timer = eTimer()
             self.timer.callback.append(self.checkForUpdate)
             config.updatecheck.check_update_notifier.addNotifier(self.configChange, initial_call=True)
-            logdata('config.updatecheck.check_update_on_boot.value', config.updatecheck.check_update_on_boot.value)
+            #logdata('config.updatecheck.check_update_on_boot.value', config.updatecheck.check_update_on_boot.value)
             if config.updatecheck.check_update_on_boot.value:
                 if connected_to_internet() == True:
                        cprinton('[CheckInetrnet] we are Online')
@@ -92,7 +92,7 @@ class InstallerUpdateCheck:
             self.startTimer()
 
         def startTimer(self):
-            logdata('config.updatecheck.check_update_notifier.value', config.updatecheck.check_update_notifier.value)
+            #logdata('config.updatecheck.check_update_notifier.value', config.updatecheck.check_update_notifier.value)
             self.value = int(config.updatecheck.check_update_notifier.value)
             if self.value > 0:
                 nextupdate = strftime('%c', localtime(time() + self.value))
@@ -102,7 +102,7 @@ class InstallerUpdateCheck:
                 cprintoff('[startTimer-UpdateCheck] is offline')
 
         def checkForUpdate(self):
-            logdata('checkForUpdate', 'started')
+            #logdata('checkForUpdate', 'started')
             self.upgradableListData = ''
             self.container = eConsoleAppContainer()
             self.container.appClosed.append(self.runFinished)
@@ -110,14 +110,14 @@ class InstallerUpdateCheck:
             self.container.execute('opkg update')
 
         def runFinished(self, retval):
-            logdata('runFinished', 'started')
+            #logdata('runFinished', 'started')
             self.container.dataAvail.append(self.dataAvail)
             self.container.appClosed.remove(self.runFinished)
             self.container.appClosed.append(self.upgradableListFinished)
             self.container.execute('opkg list_upgradable && opkg list_upgradable > %s' % opkg_ugradable_filename)
 
         def dataAvail(self, line):
-            logdata('line dataAvail', line)
+            #logdata('line dataAvail', line)
             if line.find(b'Read-only') == -1 and line.find(b'Permission denied') == -1 and line.find(b'HOLD') == -1 and line.find(b'PREFER') == -1:
                 self.upgradableListData += str(line)
 
@@ -138,7 +138,7 @@ class InstallerUpdateCheck:
             return count
 
         def upgradableListFinished(self, value):
-            logdata('value', value)
+            #logdata('value', value)
             self.total_packages = self.getOpkgUpgradale()
             if self.upgradableListData:
                 (cprint('[UpdateCheck] Updates available...'), self.upgradableListData)
@@ -149,7 +149,7 @@ class InstallerUpdateCheck:
             self.startTimer()
 
         def runUpgrade(self, result):
-            logdata('runUpgrade', result)
+            #logdata('runUpgrade', result)
             if result:
                 self.session.open(UpdatePlugin)
 
