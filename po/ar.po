@@ -2920,7 +2920,7 @@ msgstr[1] "أخطاء %d الحزم مع %d منتهي - مثبتة أو محد�
 
 #, python-format
 msgid ""
-"Download Successsful\n"
+"Download Successful\n"
 "%s"
 msgstr "تم التنزيل بنجاح\n"
 "%s"
