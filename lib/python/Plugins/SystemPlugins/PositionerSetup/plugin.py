@@ -73,9 +73,9 @@ class PositionerSetup(Screen):
 		self.feid = feid
 		self.oldref = None
 		log.open(self.LOG_SIZE)
-		if config.Nims[self.feid].dvbs.configMode.value == 'advanced':
+		if config.Nims[self.feid].configMode.value == 'advanced':
 			self.advanced = True
-			self.advancedconfig = config.Nims[self.feid].dvbs.advanced
+			self.advancedconfig = config.Nims[self.feid].advanced
 			self.advancedsats = self.advancedconfig.sat
 			self.availablesats = [x[0] for x in nimmanager.getRotorSatListForNim(self.feid)]
 		else:
@@ -278,7 +278,7 @@ class PositionerSetup(Screen):
 		self.printMsg("Using tuner %s" % chr(0x41 + self.feid))
 		if not self.advanced:
 			self.printMsg("Configuration mode: simple")
-			nim = config.Nims[self.feid].dvbs
+			nim = config.Nims[self.feid]
 			self.sitelon = nim.longitude.float
 			self.longitudeOrientation = nim.longitudeOrientation.value
 			self.sitelat = nim.latitude.float
