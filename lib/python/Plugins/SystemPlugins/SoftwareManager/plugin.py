@@ -25,7 +25,6 @@ from Components.SelectionList import SelectionList
 from Components.PluginComponent import plugins
 from Components.PackageInfo import PackageInfoHandler
 from Components.Language import language
-from Components.AVSwitch import AVSwitch
 from Tools.Directories import resolveFilename, SCOPE_PLUGINS, SCOPE_CURRENT_PLUGIN, SCOPE_CURRENT_SKIN, SCOPE_METADIR
 from Tools.LoadPixmap import LoadPixmap
 from Tools.NumericalTextInput import NumericalTextInput
@@ -1219,8 +1218,7 @@ class PluginDetails(Screen, PackageInfoHandler):
 		else:
 			filename = resolveFilename(SCOPE_CURRENT_PLUGIN, "SystemPlugins/SoftwareManager/noprev.png")
 
-		sc = AVSwitch().getFramebufferScale()
-		self.picload.setPara((self["screenshot"].instance.size().width(), self["screenshot"].instance.size().height(), sc[0], sc[1], False, 1, "#00000000"))
+		self.picload.setPara((self["screenshot"].instance.size().width(), self["screenshot"].instance.size().height(), 0, 1, False, 1, "#00000000"))
 		self.picload.startDecode(filename)
 
 		if self.statuspicinstance is not None:

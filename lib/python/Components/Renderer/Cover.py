@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from Components.Renderer.Renderer import Renderer
 from enigma import ePixmap, ePicLoad
-from Components.AVSwitch import AVSwitch
 from Components.Pixmap import Pixmap
 from Components.config import config
 from Components.Sources.ServiceEvent import ServiceEvent
@@ -54,15 +53,14 @@ class Cover(Renderer):
 					return
 				self.picname = picname
 				if picname != '' and os_path.exists(picname):
-					sc = AVSwitch().getFramebufferScale()
 					size = self.instance.size()
 					self.picload = ePicLoad()
 					self.picload.PictureData.get().append(self.showCoverCallback)
 					if self.picload:
 						self.picload.setPara((size.width(),
 						size.height(),
-						sc[0],
-						sc[1],
+						1,
+						1,
 						False,
 						1,
 						'#00000000'))
