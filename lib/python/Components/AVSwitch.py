@@ -2,6 +2,7 @@
 from Components.config import config, ConfigSlider, ConfigSelection, ConfigYesNo, ConfigEnableDisable, ConfigOnOff, ConfigSubsection, ConfigBoolean, ConfigSelectionNumber, ConfigNothing, NoSave
 from enigma import eAVSwitch, eDVBVolumecontrol, getDesktop
 from Components.SystemInfo import SystemInfo
+from Tools.Directories import fileWriteLine
 from Tools.HardwareInfo import HardwareInfo
 from os.path import isfile
 import os
@@ -387,18 +388,26 @@ def InitAVSwitch():
 		config.av.allow_10bit.addNotifier(setDisable10Bit)
 
 	if SystemInfo["HDMIAudioSource"]:
-		config.av.hdmi_audio_source = ConfigSelection(default="pcm", choices={
-			"pcm": _("PCM"),
-			"spdif": _("SPDIF")
-		})
+		if SystemInfo["AmlogicFamily"]:
+			choices = [
+				("0", _("PCM")),
+				("1", _("SPDIF")),
+				("2", _("Bluetooth"))
+			]
+			default = "0"
+		else:
+			choices = [
+				(pChoice("pcm")),
+				(pChoice("spdif"))
+			]
+			default = "pcm"
 
 		def setAudioSource(configElement):
-			try:
-				with open("/proc/stb/hdmi/audio_source", "w") as hdmi_audio_source:
-					hdmi_audio_source.write(configElement.value)
-					hdmi_audio_source.close()
-			except (IOError, OSError):
-				print("[AVSwitch] Write to /proc/stb/hdmi/audio_source failed!")
+			if SystemInfo["AmlogicFamily"]:
+				fileWriteLine("/sys/devices/virtual/amhdmitx/amhdmitx0/audio_source", configElement.value, source=MODULE_NAME)
+			else:
+				fileWriteLine("/proc/stb/hdmi/audio_source", configElement.value, source=MODULE_NAME)
+		config.av.hdmi_audio_source = ConfigSelection(choices=choices, default=default)
 		config.av.hdmi_audio_source.addNotifier(setAudioSource)
 	else:
 		config.av.hdmi_audio_source = ConfigNothing()
