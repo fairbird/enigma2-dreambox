@@ -3308,7 +3308,6 @@ std::string eDVBFrontend::getCapabilities()
 		case SYS_DVBC_ANNEX_C:	ss << " DVBC_ANNEX_C"; break;
 		case SYS_TURBO:		ss << " TURBO"; break;
 		case SYS_DTMB:		ss << " DTMB"; break;
-		case SYS_DVBC2:		ss << " DVBC2"; break;
 #else
 		case SYS_DMBTH:		ss << " DMBTH"; break;
 #endif
@@ -3316,7 +3315,6 @@ std::string eDVBFrontend::getCapabilities()
 		case SYS_DVBC_ANNEX_C:	ss << " DVBC_ANNEX_C"; break;
 		case SYS_TURBO:		ss << " TURBO"; break;
 		case SYS_DTMB:		ss << " DTMB"; break;
-		case SYS_DVBC2:		ss << " DVBC2"; break;
 #endif
 		case SYS_DVBT2:		ss << " DVBT2"; break;
 		}
