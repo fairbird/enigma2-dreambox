@@ -628,7 +628,9 @@ PyObject *eDVBServiceRecord::getCutList()
 
 void eDVBServiceRecord::saveCutlist()
 {
-	// Save cuts only when main file is accessible.
+	/* XXX: dupe of eDVBServicePlay::saveCuesheet, refactor plz */
+
+	/* save cuesheet only when main file is accessible. */
 	if (::access(m_filename.c_str(), R_OK) < 0)
 		return;
 
