@@ -1285,7 +1285,7 @@ class ConfigNumber(ConfigText):
 				if callable(callback):
 					callback()
 		else:
-			ConfigText.handleKey(self, key, callback)
+			ConfigText.handleKey(self, key)
 
 	def validateMarker(self):
 		pos = len(self.text) - self.markedPos
