@@ -102,6 +102,7 @@ is usually caused by not marking PSignals as immutable.
 #include <lib/components/file_eraser.h>
 #include <lib/components/tuxtxtapp.h>
 #include <lib/driver/avswitch.h>
+#include <lib/driver/avcontrol.h>
 #include <lib/driver/hdmi_cec.h>
 #include <lib/driver/rfmod.h>
 #include <lib/driver/misc_options.h>
@@ -183,7 +184,7 @@ typedef long time_t;
 %immutable eDVBCI_UI::ciStateChanged;
 %immutable eSocket_UI::socketStateChanged;
 %immutable eDVBResourceManager::frontendUseMaskChanged;
-%immutable eAVSwitch::vcr_sb_notifier;
+%immutable eAVControl::vcr_sb_notifier;
 %immutable eHdmiCEC::messageReceived;
 %immutable eHdmiCEC::addressChanged;
 %immutable ePythonMessagePump::recv_msg;
@@ -250,6 +251,7 @@ typedef long time_t;
 %include <lib/components/file_eraser.h>
 %include <lib/components/tuxtxtapp.h>
 %include <lib/driver/avswitch.h>
+%include <lib/driver/avcontrol.h>
 %include <lib/driver/hdmi_cec.h>
 %include <lib/driver/rfmod.h>
 %include <lib/driver/misc_options.h>

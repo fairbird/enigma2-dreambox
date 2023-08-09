@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # shamelessly copied from pliExpertInfo (Vali, Mirakels, Littlesat)
 
-from enigma import iServiceInformation, iPlayableService
+from enigma import eAVControl, iServiceInformation, iPlayableService
 from Components.Converter.Converter import Converter
 from Components.Element import cached
 from Components.config import config
@@ -9,7 +9,6 @@ from Tools.Transponder import ConvertToHumanReadable
 from Tools.GetEcmInfo import GetEcmInfo
 from Components.Converter.Poll import Poll
 from skin import parameters
-from os.path import isfile
 
 caid_data = (
 	("0x0100", "0x01ff", "Seca", "S", True),
@@ -160,61 +159,14 @@ class PliExtraInfo(Poll, Converter):
 		return ""
 
 	def createResolution(self, info):
-		xres = info.getInfo(iServiceInformation.sVideoWidth)
-		if not xres or xres == -1:
-			if isfile("/proc/stb/vmpeg/0/xres"):
-				print("[PliExtraInfo] Read /proc/stb/vmpeg/0/xres")
-				f = open("/proc/stb/vmpeg/0/xres", "r")
-				try:
-					xres = int(f.read(), 16)
-				except:
-					print("[PliExtraInfo] Read /proc/stb/vmpeg/0/xres failed.")
-			elif isfile("/sys/class/video/frame_width"):
-				print("[PliExtraInfo] Read /sys/class/video/frame_width")
-				f = open("/sys/class/video/frame_width", "r")
-				try:
-					xres = int(f.read())
-				except:
-					print("[PliExtraInfo] Read /sys/class/video/frame_width failed")
-		yres = info.getInfo(iServiceInformation.sVideoHeight)
-		if not yres:
-			if isfile("/proc/stb/vmpeg/0/yres"):
-				print("[PliExtraInfo] Read /proc/stb/vmpeg/0/yres")
-				f = open("/proc/stb/vmpeg/0/yres", "r")
-				try:
-					yres = int(f.read(), 16)
-				except:
-					print("[PliExtraInfo] Read /proc/stb/vmpeg/0/yres failed.")
-			elif isfile("/sys/class/video/frame_height"):
-				print("[PliExtraInfo] Read /sys/class/video/frame_height")
-				f = open("/sys/class/video/frame_height", "r")
-				try:
-					yres = int(f.read())
-				except:
-					print("[PliExtraInfo] Read /sys/class/video/frame_height failed")
-		mode = ("i", "p", " ")[info.getInfo(iServiceInformation.sProgressive)]
-		if not mode:
-			try:
-				print("[PliExtraInfo] Read /proc/stb/vmpeg/0/progressive")
-				mod = int(open("/proc/stb/vmpeg/0/progressive", "r").read())
-				if mod == 1:
-					mode = "p"
-				else:
-					mode = "i"
-			except:
-				print("[PliExtraInfo] Read /proc/stb/vmpeg/0/progressive failed.")
-		fps = (info.getInfo(iServiceInformation.sFrameRate) + 500) // 1000
-		if not fps or fps == -1:
-			try:
-				if isfile("/proc/stb/vmpeg/0/framerate"):
-					print("[PliExtraInfo] Read /proc/stb/vmpeg/0/framerate")
-					fps = (int(open("/proc/stb/vmpeg/0/framerate", "r").read()) + 500) // 1000
-				elif isfile("/proc/stb/vmpeg/0/fallback_framerate"):
-					print("[PliExtraInfo] Read /proc/stb/vmpeg/0/fallback_framerate")
-					fps = (int(open("/proc/stb/vmpeg/0/fallback_framerate", "r").read()) + 0) // 1000
-			except:
-				print("[PliExtraInfo] Read framerate failed.")
-		return "%sx%s%s%s" % (xres, yres, mode, fps)
+		avControl = eAVControl.getInstance()
+		video_rate = avControl.getFrameRate(0)
+		video_pol = "p" if avControl.getProgressive() else "i"
+		video_width = avControl.getResolutionX(0)
+		video_height = avControl.getResolutionY(0)
+		fps = str((video_rate + 500) / 1000)
+		gamma = ("SDR", "HDR", "HDR10", "HLG", "")[info.getInfo(iServiceInformation.sGamma)]
+		return str(video_width) + "x" + str(video_height) + video_pol + fps + addspace(gamma)
 
 	def createGamma(self, info):
 		return ("SDR", "HDR", "HDR10", "HLG", "")[info.getInfo(iServiceInformation.sGamma)]

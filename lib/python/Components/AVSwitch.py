@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from Components.config import config, ConfigSlider, ConfigSelection, ConfigYesNo, ConfigEnableDisable, ConfigOnOff, ConfigSubsection, ConfigBoolean, ConfigSelectionNumber, ConfigNothing, NoSave
-from enigma import eAVSwitch, eDVBVolumecontrol, getDesktop
+from enigma import eAVControl, eDVBVolumecontrol, getDesktop
 from Components.SystemInfo import SystemInfo
 from Tools.Directories import fileWriteLine
 from Tools.HardwareInfo import HardwareInfo
@@ -9,20 +9,39 @@ import os
 
 model = HardwareInfo().get_device_model()
 
+MODULE_NAME = __name__.split(".")[-1]
+
 
 class AVSwitch:
-	def setInput(self, input):
-		INPUT = {"ENCODER": 0, "SCART": 1, "AUX": 2}
-		eAVSwitch.getInstance().setInput(INPUT[input])
-
-	def setColorFormat(self, value):
-		eAVSwitch.getInstance().setColorFormat(value)
+	def setAspect(self, configElement):
+		eAVControl.getInstance().setAspect(configElement.value, 1)
 
 	def setAspectRatio(self, value):
-		eAVSwitch.getInstance().setAspectRatio(value)
+		if value < 100:
+			eAVControl.getInstance().setAspectRatio(value)
+		else:  # Aspect Switcher
+			value -= 100
+			offset = config.av.aspectswitch.offsets[str(value)].value
+			newheight = 576 - offset
+			newtop = offset // 2
+			if value:
+				newwidth = 720
+			else:
+				newtop = 0
+				newwidth = 0
+				newheight = 0
+
+			eAVControl.getInstance().setAspectRatio(2)  # 16:9
+			eAVControl.getInstance().setVideoSize(newtop, 0, newwidth, newheight)
+
+	def setColorFormat(self, value):
+		eAVControl.getInstance().setColorFormat(value)
+
+	def setInput(self, input):
+		eAVControl.getInstance().setInput(input, 1)
 
 	def setSystem(self, value):
-		eAVSwitch.getInstance().setVideomode(value)
+		eAVControl.getInstance().setVideoMode(model)
 
 	def getOutputAspect(self):
 		valstr = config.av.aspectratio.value
@@ -75,7 +94,7 @@ class AVSwitch:
 			value = 2 # auto(4:3_off)
 		else:
 			value = 1 # auto
-		eAVSwitch.getInstance().setWSS(value)
+		eAVControl.getInstance().setWSS(value)
 
 
 def InitAVSwitch():
@@ -177,15 +196,13 @@ def InitAVSwitch():
 		iAVSwitch.setAspectWSS()
 
 	# this will call the "setup-val" initial
-	config.av.colorformat.addNotifier(setColorFormat)
 	config.av.aspectratio.addNotifier(setAspectRatio)
 	config.av.tvsystem.addNotifier(setSystem)
 	config.av.wss.addNotifier(setWSS)
 
-	iAVSwitch.setInput("ENCODER") # init on startup
-	detected = eAVSwitch.getInstance().haveScartSwitch()
+	iAVSwitch.setInput("encoder") # init on startup
 
-	SystemInfo["ScartSwitch"] = eAVSwitch.getInstance().haveScartSwitch()
+	SystemInfo["ScartSwitch"] = eAVControl.getInstance().hasScartSwitch()
 
 	if SystemInfo["CanDownmixAC3"]:
 		choices = [

@@ -15,6 +15,7 @@ enigma.eTimer = eBaseImpl.eTimer
 enigma.eSocketNotifier = eBaseImpl.eSocketNotifier
 enigma.eConsoleAppContainer = eConsoleImpl.eConsoleAppContainer
 from Components.config import config, configfile, ConfigText, ConfigYesNo, ConfigInteger, ConfigSelection, ConfigSubsection, NoSave
+from Components.SystemInfo import SystemInfo
 
 from traceback import print_exc
 
@@ -450,26 +451,29 @@ from Screens.Scart import Scart
 
 class AutoScartControl:
 	def __init__(self, session):
-		self.force = False
-		self.current_vcr_sb = enigma.eAVSwitch.getInstance().getVCRSlowBlanking()
-		if self.current_vcr_sb and config.av.vcrswitch.value:
-			self.scartDialog = session.instantiateDialog(Scart, True)
-		else:
-			self.scartDialog = session.instantiateDialog(Scart, False)
-		config.av.vcrswitch.addNotifier(self.recheckVCRSb)
-		enigma.eAVSwitch.getInstance().vcr_sb_notifier.get().append(self.VCRSbChanged)
+		self.hasScart = SystemInfo["HasScart"]
+		if self.hasScart:
+			self.force = False
+			self.current_vcr_sb = enigma.eAVControl.getInstance().getVCRSlowBlanking()
+			if self.current_vcr_sb and config.av.vcrswitch.value:
+				self.scartDialog = session.instantiateDialog(Scart, True)
+			else:
+				self.scartDialog = session.instantiateDialog(Scart, False)
+			config.av.vcrswitch.addNotifier(self.recheckVCRSb)
+			enigma.eAVControl.getInstance().vcr_sb_notifier.get().append(self.VCRSbChanged)
 
 	def recheckVCRSb(self, configElement):
 		self.VCRSbChanged(self.current_vcr_sb)
 
 	def VCRSbChanged(self, value):
-		#print "vcr sb changed to", value
-		self.current_vcr_sb = value
-		if config.av.vcrswitch.value or value > 2:
-			if value:
-				self.scartDialog.showMessageBox()
-			else:
-				self.scartDialog.switchToTV()
+		if self.hasScart:
+			# print("[StartEnigma] VCR SB changed to '%s'." % value)
+			self.current_vcr_sb = value
+			if config.av.vcrswitch.value or value > 2:
+				if value:
+					self.scartDialog.showMessageBox()
+				else:
+					self.scartDialog.switchToTV()
 
 
 profile("Load:CI")
@@ -646,18 +650,7 @@ profile("LCD")
 import Components.Lcd
 Components.Lcd.InitLcd()
 
-from Tools.HardwareInfo import HardwareInfo
-if HardwareInfo().get_device_model() in ('dm7080', 'dm820', 'dm900', 'dm920'):
-	print("[StartEnigma] Read /proc/stb/hdmi-rx/0/hdmi_rx_monitor")
-	check = open("/proc/stb/hdmi-rx/0/hdmi_rx_monitor", "r").read()
-	if check.startswith("on"):
-		print("[StartEnigma] Write to /proc/stb/hdmi-rx/0/hdmi_rx_monitor")
-		open("/proc/stb/hdmi-rx/0/hdmi_rx_monitor", "w").write("off")
-	print("[StartEnigma] Read /proc/stb/audio/hdmi_rx_monitor")
-	checkaudio = open("/proc/stb/audio/hdmi_rx_monitor", "r").read()
-	if checkaudio.startswith("on"):
-		print("[StartEnigma] Write to /proc/stb/audio/hdmi_rx_monitor")
-		open("/proc/stb/audio/hdmi_rx_monitor", "w").write("off")
+enigma.eAVControl.getInstance().disableHDMIIn()
 
 profile("RFMod")
 import Components.RFmod
