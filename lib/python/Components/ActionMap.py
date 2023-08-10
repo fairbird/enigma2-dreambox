@@ -22,6 +22,9 @@ class ActionMap:
 		if unknown:
 			print("[ActionMap] Keymap(s) '%s' -> Undefined action(s) '%s'." % (", ".join(self.contexts), ", ".join(unknown)))
 
+	def getEnabled(self):
+		return self.enabled
+
 	def setEnabled(self, enabled):
 		self.enabled = enabled
 		self.checkBind()
