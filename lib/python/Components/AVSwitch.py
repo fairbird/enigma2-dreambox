@@ -97,6 +97,9 @@ class AVSwitch:
 		eAVControl.getInstance().setWSS(value)
 
 
+iAVSwitch = AVSwitch()
+
+
 def InitAVSwitch():
 	config.av = ConfigSubsection()
 	config.av.yuvenabled = ConfigBoolean(default=True)
@@ -177,8 +180,6 @@ def InitAVSwitch():
 	config.av.generalAC3delay = ConfigSelectionNumber(-1000, 1000, 5, default=0)
 	config.av.generalPCMdelay = ConfigSelectionNumber(-1000, 1000, 5, default=0)
 	config.av.vcrswitch = ConfigEnableDisable(default=False)
-
-	iAVSwitch = AVSwitch()
 
 	def setColorFormat(configElement):
 		map = {"cvbs": 0, "rgb": 1, "svideo": 2, "yuv": 3}
