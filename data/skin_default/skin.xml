@@ -1772,7 +1772,7 @@ except Exception as e:
 	</screen>
 	<!-- History Zap Selector -->
 	<screen name="HistoryZapSelector" position="25,center" size="550,490" flags="wfNoBorder">
-		<eLabel text="History Zap..." position="center,0" size="550,50" horizontalAlignment="center" font="Regular; 35" backgroundColor="background" foregroundColor="foreground" transparent="1" />
+		<eLabel text="History Zap Selector ..." position="center,0" size="550,50" horizontalAlignment="center" font="Regular; 35" backgroundColor="background" foregroundColor="foreground" transparent="1" />
 		<eLabel position="30,50" zPosition="0" size="490,1" backgroundColor="background" />
 		<eLabel position="9,0" zPosition="-2" size="532,490" backgroundColor="transpBlack" />
 		<widget source="menu" render="Listbox" position="0,60" size="550,420" scrollbarMode="showNever" backgroundColor="background" foregroundColor="foreground" foregroundColorSelected="yellow" transparent="1">
@@ -1782,6 +1782,7 @@ except Exception as e:
 						MultiContentEntryText(pos = (150, 2), size = (370, 25), font = 1, flags = RT_HALIGN_LEFT | RT_VALIGN_TOP, text = 2), # Servicename
 						MultiContentEntryText(pos = (150, 24), size = (370, 22), font = 2, flags = RT_HALIGN_LEFT | RT_VALIGN_CENTER | RT_WRAP, text = 3), # Eventname
 						MultiContentEntryText(pos = (150, 46), size = (370, 21), font = 3, flags = RT_HALIGN_LEFT, text = 5), # Eventtime
+						MultiContentEntryText(pos = (400, 2), size = (600, 65), font = 3, flags = RT_HALIGN_LEFT | RT_WRAP, text = 4), # Event Discription
 						MultiContentEntryPixmapAlphaBlend(pos=(30, 9), size=(85, 51), png=6, flags = BT_SCALE) # picon
 					],
 				 "fonts": [gFont("Regular",22), gFont("Regular",22), gFont("Regular",20), gFont("Regular",18)],

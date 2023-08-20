@@ -44,9 +44,11 @@ from Plugins.Plugin import PluginDescriptor
 from Components.PluginComponent import plugins
 from Screens.ChoiceBox import ChoiceBox
 from Screens.EventView import EventViewEPGSelect
+from Screens.HelpMenu import HelpableScreen
 import os
-from time import time, localtime
+from time import time, localtime, strftime
 from Components.Sources.List import List
+from Components.Sources.StaticText import StaticText
 from Components.Renderer.Picon import getPiconName
 profile("ChannelSelection.py after imports")
 
@@ -2289,27 +2291,34 @@ class ChannelSelection(ChannelSelectionBase, ChannelSelectionEdit, ChannelSelect
 		return False
 
 	def historyZap(self, direction):
-		hlen = len(self.history)
-		if hlen < 1: return
-		mark = self.history_pos
-		selpos = self.history_pos + direction
-		if selpos < 0: selpos = 0
-		if selpos > hlen-1: selpos = hlen-1
-		serviceHandler = eServiceCenter.getInstance()
-		historylist = [ ]
-		for x in self.history:
-			info = serviceHandler.info(x[-1])
-			if info: historylist.append((info.getName(x[-1]), x[-1]))
-		self.session.openWithCallback(self.historyMenuClosed, HistoryZapSelector, historylist, selpos, mark, invert_items=True, redirect_buttons=True, wrap_around=True)
+		count = len(self.history)
+		if count > 0:
+			# markedItem = self.history_pos
+			selectedItem = self.history_pos + direction
+			if selectedItem < 0:
+				selectedItem = 0
+			elif selectedItem > count - 1:
+				selectedItem = count - 1
+			# serviceHandler = eServiceCenter.getInstance()
+			# historyInfoList = []
+			# for item in self.history:
+			# 	# info = serviceHandler.info(item[-1])
+			# 	# if info:
+			# 	# 	historyInfoList.append((info.getName(item[-1]), item[-1]))
+			# 	historyList.append(item[-1])
+			# self.session.openWithCallback(self.historyMenuClosed, HistoryZapSelector, historyList, selectedItem, mark, invert_items=True, redirect_buttons=True, wrap_around=True)
+			self.session.openWithCallback(self.historyMenuClosed, HistoryZapSelector, [x[-1] for x in self.history], markedItem=self.history_pos, selectedItem=selectedItem)
 
 	def historyMenuClosed(self, retval):
-		if not retval: return
+		if not retval:
+			return
 		hlen = len(self.history)
 		pos = 0
 		for x in self.history:
-			if x[-1] == retval: break
+			if x[-1] == retval:
+				break
 			pos += 1
-		self.delhistpoint = pos+1
+		self.delhistpoint = pos + 1
 		if pos < hlen and pos != self.history_pos:
 			tmp = self.history[pos]
 			# self.history.append(tmp)
@@ -2729,103 +2738,88 @@ class SimpleChannelSelection(ChannelSelectionBase, SelectionEventInfo):
 	def getMutableList(self, root=None):
 		return None
 
-class HistoryZapSelector(Screen):
-	def __init__(self, session, items=None, sel_item=0, mark_item=0, invert_items=False, redirect_buttons=False, wrap_around=True):
-		if not items: items = []
+
+class HistoryZapSelector(Screen, HelpableScreen):
+	def __init__(self, session, historyItems, markedItem=0, selectedItem=0):
 		Screen.__init__(self, session)
-		self.redirectButton = redirect_buttons
-		self.invertItems = invert_items
-		if self.invertItems:
-			self.currentPos = len(items) - sel_item - 1
-		else:
-			self.currentPos = sel_item
-		self["actions"] = ActionMap(["OkCancelActions", "InfobarCueSheetActions"],
-			{
-				"ok": self.okbuttonClick,
-				"cancel": self.cancelClick,
-				"jumpPreviousMark": self.prev,
-				"jumpNextMark": self.next,
-				"toggleMark": self.okbuttonClick,
-			})
-		self.setTitle(_("History zap..."))
-		self.list = []
-		cnt = 0
+		HelpableScreen.__init__(self)
+		self.setTitle(_("History Zap"))
+		print("[ChannelSelection] HistoryZapSelector DEBUG: Setting title='%s'." % self.getTitle())
+		self["key_red"] = StaticText(_("Cancel"))
+		self["key_green"] = StaticText(_("Select"))
+		self["actions"] = HelpableActionMap(self, ["SelectCancelActions"], {
+			"cancel": (self.keyCancel, _("Cancel the service zap")),
+			"select": (self.keySelect, _("Select the currently highlighted service"))
+		}, prio=0, description=_("History Zap Actions"))
+		self["navigationActions"] = HelpableActionMap(self, ["NavigationActions"], {
+			"top": (self.keyTop, _("Move to the first line / screen")),
+			"pageUp": (self.keyPageUp, _("Move up a screen")),
+			"up": (self.keyUp, _("Move up a line")),
+			"down": (self.keyDown, _("Move down a line")),
+			"pageDown": (self.keyPageDown, _("Move down a screen")),
+			"bottom": (self.keyBottom, _("Move to the last line / screen"))
+		}, prio=0, description=_("History Zap Navigation Actions"))
 		serviceHandler = eServiceCenter.getInstance()
-		for x in items:
-
-			info = serviceHandler.info(x[-1])
+		historyList = []
+		for index, historyItem in enumerate(historyItems):
+			info = serviceHandler.info(historyItem)
 			if info:
-				serviceName = info.getName(x[-1])
-				if serviceName is None:
-					serviceName = ""
+				serviceName = info.getName(historyItem) or ""
 				eventName = ""
-				descriptionName = ""
-				durationTime = ""
-				# if config.plugins.SetupZapSelector.event.value != "0":
-				event = info.getEvent(x[-1])
+				eventDescription = ""
+				eventDuration = ""
+				event = info.getEvent(historyItem)
 				if event:
-					eventName = event.getEventName()
-					if eventName is None:
-						eventName = ""
-					else:
-						eventName = eventName.replace('(18+)', '').replace('18+', '').replace('(16+)', '').replace('16+', '').replace('(12+)', '').replace('12+', '').replace('(7+)', '').replace('7+', '').replace('(6+)', '').replace('6+', '').replace('(0+)', '').replace('0+', '')
-					# if config.plugins.SetupZapSelector.event.value == "2":
-					descriptionName = event.getShortDescription()
-					if descriptionName is None or descriptionName == "":
-						descriptionName = event.getExtendedDescription()
-						if descriptionName is None:
-							descriptionName = ""
-					# if config.plugins.SetupZapSelector.duration.value:
+					eventName = event.getEventName() or ""
+					# eventName = eventName.replace("(18+)", "").replace("18+", "").replace("(16+)", "").replace("16+", "").replace("(12+)", "").replace("12+", "").replace("(7+)", "").replace("7+", "").replace("(6+)", "").replace("6+", "").replace("(0+)", "").replace("0+", "")  # TODO: What are all these string replacements doing?
+					eventDescription = event.getShortDescription()
+					if not eventDescription:
+						eventDescription = event.getExtendedDescription() or ""
 					begin = event.getBeginTime()
-					if begin is not None:
+					if begin:
 						end = begin + event.getDuration()
-						remaining = (end - int(time())) / 60
-						prefix = ""
-						if remaining > 0:
-							prefix = "+"
-						local_begin = localtime(begin)
-						local_end = localtime(end)
-						durationTime = _("%02d.%02d - %02d.%02d (%s%d min)") % (local_begin[3],local_begin[4],local_end[3],local_end[4],prefix, remaining)
-
-			png = ""
-			picon = getPiconName(str(ServiceReference(x[1])))
-			if picon != "":
-				png = loadPNG(picon)
-			if self.invertItems:
-				self.list.insert(0, (x[1], cnt == mark_item and "»" or "", x[0], eventName, descriptionName, durationTime, png))
-			else:
-				self.list.append((x[1], cnt == mark_item and "»" or "", x[0], eventName, descriptionName, durationTime, png))
-			cnt += 1
-		self["menu"] = List(self.list, enableWrapAround=wrap_around)
-		self.onShown.append(self.__onShown)
-
-	def __onShown(self):
-		self["menu"].index = self.currentPos
-
-	def prev(self):
-		if self.redirectButton:
-			self.down()
+						remaining = (end - int(time())) // 60
+						prefix = "+" if remaining > 0 else ""
+						localBegin = localtime(begin)
+						localEnd = localtime(end)
+						eventDuration = _("%s  -  %s    (%s%d Min)") % (strftime(config.usage.time.short.value, localBegin), strftime(config.usage.time.short.value, localEnd), prefix, remaining)
+			servicePicon = getPiconName(str(ServiceReference(historyItem)))
+			servicePicon = loadPNG(servicePicon) if servicePicon else ""
+			# List entries: ("", ServiceMarked, ServiceName, EventName, EventDescription, EventDuration, ServicePicon, ServiceReference)
+			historyList.append(("", index == markedItem and "\u00BB" or "", serviceName, eventName, eventDescription, eventDuration, servicePicon, historyItem))
+		if True:  # Newest first.
+			historyList.reverse()
+			self.selectedItem = len(historyList) - selectedItem - 1
 		else:
-			self.up()
+			self.selectedItem = selectedItem
+		self["menu"] = List(historyList)
+		self.onLayoutFinish.append(self.layoutFinished)
 
-	def next(self):
-		if self.redirectButton:
-			self.up()
-		else:
-			self.down()
+	def layoutFinished(self):
+		self["menu"].enableAutoNavigation(False)
+		self["menu"].setIndex(self.selectedItem)
 
-	def up(self):
-		self["menu"].selectPrevious()
+	def keyCancel(self):
+		self.close(None)  # Send None to tell the calling code that the selection was canceled.
 
-	def down(self):
-		self["menu"].selectNext()
+	def keySelect(self):
+		current = self["menu"].getCurrent()
+		self.close(current and current[7])  # Send the selected ServiceReference to the calling code.
 
-	def getCurrent(self):
-		cur = self["menu"].current
-		return cur and cur[0]
+	def keyTop(self):
+		self["menu"].goTop()
 
-	def okbuttonClick(self):
-		self.close(self.getCurrent())
+	def keyPageUp(self):
+		self["menu"].goPageUp()
 
-	def cancelClick(self):
-		self.close(None)
+	def keyUp(self):
+		self["menu"].goLineUp()
+
+	def keyDown(self):
+		self["menu"].goLineDown()
+
+	def keyPageDown(self):
+		self["menu"].goPageDown()
+
+	def keyBottom(self):
+		self["menu"].goBottom()
