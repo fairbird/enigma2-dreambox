@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from enigma import eAVControl
 from Components.config import config, ConfigSlider, ConfigSelection, ConfigSubDict, ConfigYesNo, ConfigEnableDisable, ConfigOnOff, ConfigSubsection, ConfigBoolean, ConfigSelectionNumber, ConfigNothing, NoSave  # storm - some config are required
-from Components.SystemInfo import SystemInfo
+from Components.SystemInfo import SystemInfo, BoxInfo
 from Tools.CList import CList
 from Tools.HardwareInfo import HardwareInfo
 from Components.About import about
