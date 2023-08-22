@@ -115,8 +115,6 @@ class VideoHardware:
                 "640x480": {60: "640x480"}
         }
 
-        modes = {}  # a list of (high-level) modes for a certain port.
-
         if HardwareInfo().get_device_name() in ("one", "two"):
                 rates["480i"] = {"60hz": {60: "480i60hz"}}
 
@@ -159,11 +157,19 @@ class VideoHardware:
         if SystemInfo["HasYPbPr"]:
                 modes["YPbPr"] = ["720p", "1080i", "576p", "480p", "576i", "480i"]
         if SystemInfo["Has2160p"]:
-                modes["DVI"] = ["720p", "1080p", "2160p", "1080i", "576p", "480p", "576i", "480i"]
+                modes["HDMI"] = ["720p", "1080p", "2160p", "1080i", "576p", "480p", "576i", "480i"]
         if HardwareInfo().get_device_name() in ("one", "two"):
                 modes["HDMI"] = ["720p", "1080p", "smpte", "2160p30", "2160p", "1080i", "576p", "576i", "480p", "480i"]
         else:
-                modes["DVI"] = ["720p", "1080p", "2160p", "2160p30", "1080i", "576p", "480p", "576i", "480i"]
+                modes["HDMI"] = ["720p", "1080p", "2160p", "2160p30", "1080i", "576p", "480p", "576i", "480i"]
+
+        widescreen_modes = tuple([x for x in modes["HDMI"] if x not in ("576p", "576i", "480p", "480i")])
+
+        ASPECT_SWITCH_MSG = (_("16/9 reset to normal"),
+        		"1.85:1 %s" % _("Letterbox"),
+        		"2.00:1 %s" % _("Letterbox"),
+        		"2.21:1 %s" % _("Letterbox"),
+        		"2.35:1 %s" % _("Letterbox"))
 
         def getOutputAspect(self):
                 ret = (16, 9)
@@ -208,14 +214,6 @@ class VideoHardware:
                 self.readAvailableModes()
                 self.is24hzAvailable()
                 self.readPreferredModes()
-
-                widescreen_modes = tuple([x for x in modes["HDMI"] if x not in ("576p", "576i", "480p", "480i")])
-
-                ASPECT_SWITCH_MSG = (_("16/9 reset to normal"),
-                                "1.85:1 %s" % _("Letterbox"),
-                                "2.00:1 %s" % _("Letterbox"),
-                                "2.21:1 %s" % _("Letterbox"),
-                                "2.35:1 %s" % _("Letterbox"))
 
                 if "DVI-PC" in self.modes and not self.getModeList("DVI-PC"):
                         print("[VideoHardware] remove DVI-PC because of not existing modes")
@@ -282,9 +280,9 @@ class VideoHardware:
                 portlist = self.getPortList()
                 for port in portlist:
                         descr = port
-                        if descr == 'HDMI' and has_dvi:
+                        if descr == 'HDMI' and SystemInfo["DreamBoxDVI"]:
                                 descr = 'DVI'
-                        if descr == 'HDMI-PC' and has_dvi:
+                        if descr == 'HDMI-PC' and SystemInfo["DreamBoxDVI"]:
                                 descr = 'DVI-PC'
                         if descr == "Scart" and has_rca and not has_scart:
                                 descr = "RCA"

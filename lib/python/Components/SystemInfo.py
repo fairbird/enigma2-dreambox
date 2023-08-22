@@ -291,6 +291,7 @@ SystemInfo["HasHdrType"] = fileCheck("/proc/stb/video/hdmi_hdrtype")
 SystemInfo["HasScaler_sharpness"] = pathExists("/proc/stb/vmpeg/0/pep_scaler_sharpness")
 SystemInfo["VFDSymbol"] = getHaveVFDSymbol() == "True"
 SystemInfo["DreamBoxAudio"] = model in ("dm7080", "dm800", "dm900", "dm920", "one", "two")
+SystemInfo["DreamBoxDVI"] = model in ("dm8000", "dm800")
 SystemInfo["HasHDMIin"] = model in ("dm7080", "dm820")
 SystemInfo["HasHDMIinFHD"] = model in ("dm900", "dm920", "one", "two")
 SystemInfo["HDMIin"] = SystemInfo["HasHDMIin"] or SystemInfo["HasHDMIinFHD"]
