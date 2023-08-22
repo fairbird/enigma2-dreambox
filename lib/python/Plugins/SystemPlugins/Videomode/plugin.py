@@ -87,7 +87,7 @@ class VideoSetup(ConfigListScreen, Screen):
 		elif config.av.aspect.value == "4_3":
 			self.list.append((_("Display 16:9 content as"), config.av.policy_169, _("When the content has an aspect ratio of 16:9, choose whether to scale/stretch the picture.")))
 
-		if config.av.videoport.value == "DVI":
+		if config.av.videoport.value == "HDMI":
 			if level >= 1:
 				self.list.append((_("Allow unsupported modes"), config.av.edid_override, _("When selected this allows video modes to be selected even if they are not reported as supported.")))
 				if SystemInfo["HasBypassEdidChecking"]:
