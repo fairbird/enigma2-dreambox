@@ -220,7 +220,7 @@ class Network:
 				callback(True)
 
 	def loadNameserverConfig(self):
-		ipRegexp = "[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}"
+		ipRegexp = r"[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}"
 		nameserverPattern = re.compile("nameserver +" + ipRegexp)
 		ipPattern = re.compile(ipRegexp)
 

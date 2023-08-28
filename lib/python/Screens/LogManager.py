@@ -32,8 +32,8 @@ from email.utils import formatdate
 
 _session = None
 
-CRASH_LOG_PATTERN = "^.*-enigma\d?-crash\.log$"
-DEBUG_LOG_PATTERN = "^.*-enigma\d?-debug\.log$"
+CRASH_LOG_PATTERN = r"^.*-enigma\d?-crash\.log$"
+DEBUG_LOG_PATTERN = r"^.*-enigma\d?-debug\.log$"
 
 def get_size(start_path=None):
 	total_size = 0
