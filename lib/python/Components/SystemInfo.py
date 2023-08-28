@@ -32,7 +32,7 @@ class BoxInformation:  # To maintain data integrity class variables should not b
 				if line.startswith("#") or line.strip() == "":
 					continue
 				if "=" in line:
-					item, value = [x.strip() for x in line.split("=", 1)]
+					item, value = (x.strip() for x in line.split("=", 1))
 					if item:
 						self.immutableList.append(item)
 						self.enigmaInfoList.append(item)
@@ -50,7 +50,7 @@ class BoxInformation:  # To maintain data integrity class variables should not b
 				if line.startswith("#") or line.strip() == "":
 					continue
 				if "=" in line:
-					item, value = [x.strip() for x in line.split("=", 1)]
+					item, value = (x.strip() for x in line.split("=", 1))
 					if item:
 						self.enigmaConfList.append(item)
 						if item in self.boxInfo:
@@ -65,7 +65,7 @@ class BoxInformation:  # To maintain data integrity class variables should not b
 		data = []
 		for line in lines:
 			if line.startswith("checksum"):
-				item, value = [x.strip() for x in line.split("=", 1)]
+				item, value = (x.strip() for x in line.split("=", 1))
 			else:
 				data.append(line)
 		data.append("")
