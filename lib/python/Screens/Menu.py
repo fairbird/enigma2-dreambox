@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from Screens.Screen import Screen
-from xml.etree.cElementTree import parse
+from xml.etree.ElementTree import parse
 from Screens.MessageBox import MessageBox
 from Screens.ParentalControlSetup import ProtectedScreen
 from Components.Sources.List import List

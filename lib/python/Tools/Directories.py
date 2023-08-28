@@ -9,7 +9,7 @@ from traceback import print_exc
 from sys import _getframe as getframe
 from unicodedata import normalize
 from tempfile import mkstemp
-from xml.etree.cElementTree import Element, ParseError, fromstring, parse
+from xml.etree.ElementTree import Element, ParseError, fromstring, parse
 
 from enigma import eEnv, getDesktop, eGetEnigmaDebugLvl
 
@@ -347,7 +347,7 @@ def fileReadXML(filename, default=None, source=DEFAULT_MODULE_NAME, debug=False)
 		if default and isinstance(default, str):
 			dom = fromstring(default)
 			msg = "Default (XML)"
-		elif default and isinstance(default, type(Element(None))):  # This handles a bug in Python 2 where the Element object is *not* a class type in cElementTree!!!
+		elif default and isinstance(default, type(Element(None))):  # This handles a bug in Python 2 where the Element object is *not* a class type in ElementTree!!!
 			dom = default
 			msg = "Default (DOM)"
 		else:
