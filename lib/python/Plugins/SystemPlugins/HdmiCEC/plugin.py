@@ -127,7 +127,7 @@ def main(session, **kwargs):
 
 def startSetup(menuid):
 	# only show in the menu when set to intermediate or higher
-	if menuid == "video" and config.av.videoport.value == "DVI" and config.usage.setup_level.index >= 1:
+	if menuid == "video" and config.av.videoport.value == "HDMI" and config.usage.setup_level.index >= 1:
 		return [(_("HDMI-CEC setup"), main, "hdmi_cec_setup", 0)]
 	return []
 

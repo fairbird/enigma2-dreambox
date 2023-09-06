@@ -309,7 +309,7 @@ class VideoHardware:
         def isModeAvailable(self, port, mode, rate):  # Check if a high-level mode with a given rate is available.
                 rate = self.rates[mode][rate]
                 for mode in rate.values():
-                        if port == "DVI":
+                        if port == "HDMI":
                                 if mode not in self.readAvailableModes():
                                         return False
                         elif mode not in self.modes_preferred:
@@ -317,7 +317,7 @@ class VideoHardware:
                 return True
 
         def isPortUsed(self, port):
-                if port == "DVI":
+                if port == "HDMI":
                         self.readPreferredModes()
                         return len(self.modes_preferred) != 0
                 else:

@@ -102,7 +102,7 @@ class VideoWizard(WizardLanguage, Rc):
 		for port in self.hw.getPortList():
 			if self.hw.isPortUsed(port):
 				descr = port
-				if descr == 'DVI' and has_hdmi:
+				if descr == 'HDMI' and has_hdmi:
 					descr = 'HDMI'
 				if port != "DVI-PC":
 					list.append((descr, port))
@@ -122,7 +122,7 @@ class VideoWizard(WizardLanguage, Rc):
 		self.inputSelect(self.selection)
 		if self["portpic"].instance is not None:
 			picname = self.selection
-			if picname == 'DVI' and has_hdmi:
+			if picname == 'HDMI' and has_hdmi:
 				picname = "HDMI"
 			self["portpic"].instance.setPixmapFromFile(resolveFilename(SCOPE_PLUGINS, "SystemPlugins/Videomode/" + picname + ".png"))
 
@@ -156,7 +156,7 @@ class VideoWizard(WizardLanguage, Rc):
 	def modeSelect(self, mode):
 		ratesList = self.listRates(mode)
 		print("[VideoWizard] ratesList:", ratesList)
-		if self.port == "DVI" and mode in ("720p", "1080i", "1080p", "2160p", "2160p30"):
+		if self.port == "HDMI" and mode in ("720p", "1080i", "1080p", "2160p", "2160p30"):
 			if SystemInfo["Has24hz"]:
 				self.rate = "auto"
 				self.hw.setMode(port=self.port, mode=mode, rate="auto")
@@ -207,9 +207,9 @@ class VideoWizard(WizardLanguage, Rc):
 	def keyNumberGlobal(self, number):
 		if number in (1, 2, 3):
 			if number == 1:
-				self.hw.saveMode("DVI", "720p", "multi")
+				self.hw.saveMode("HDMI", "720p", "multi")
 			elif number == 2:
-				self.hw.saveMode("DVI", "1080i", "multi")
+				self.hw.saveMode("HDMI", "1080i", "multi")
 			elif number == 3:
 				self.hw.saveMode("Scart", "Multi", "multi")
 			self.hw.setConfiguredMode()
