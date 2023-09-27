@@ -40,11 +40,9 @@ class VideoHardware:
 
         modes = {}  # a list of (high-level) modes for a certain port.
 
-        rates["PAL"] = {"50Hz": {50: "pal"},
-                "60Hz": {60: "pal60"},
-                "multi": {50: "pal", 60: "pal60"}}
-
+        rates["PAL"] = {"50Hz": {50: "pal"}, "60Hz": {60: "pal60"}, "multi": {50: "pal", 60: "pal60"}}
         rates["NTSC"] = {"60Hz": {60: "ntsc"}}
+        rates["Multi"] = {"multi": {50: "pal", 60: "ntsc"}}
 
         rates["Multi"] = {"multi": {50: "pal", 60: "ntsc"}}
 
@@ -81,27 +79,34 @@ class VideoHardware:
                 "multi": {50: "2160p50", 60: "2160p60"},
                 "auto": {50: "2160p50", 60: "2160p60", 24: "2160p24"}}
 
-        if HardwareInfo().get_device_name() in ("dm900", "dm920"):
-                rates["2160p"] = {"50Hz": {50: "2160p50"},
-                        "60Hz": {60: "2160p60"},
-                        "multi": {50: "2160p50", 60: "2160p60"}, 
-                        "auto": {50: "2160p50", 60: "2160p60", 24: "2160p24"}}
-        else:
-                rates["2160p"] = {"50Hz": {50:
-                        "2160p50"}, "60Hz": {60:
-                        "2160p"}, "multi": {50: "2160p50", 60: "2160p"},
-                        "auto": {50: "2160p50", 60: "2160p", 24: "2160p24"}}
+        if HardwareInfo().get_device_name() in ("one", "two"):
+                rates["480i"] = {"60Hz": {60: "480i60hz"}}
+                rates["576i"] = {"50Hz": {50: "576i50hz"}}
+                rates["480p"] = {"60Hz": {60: "480p60hz"}}
+                rates["576p"] = {"50Hz": {50: "576p50hz"}}
+                rates["720p"] = {"50Hz": {50: "720p50hz"}, "60Hz": {60: "720p60hz"}, "auto": {60: "720p60hz"}}
+                rates["1080i"] = {"50Hz": {50: "1080i50hz"}, "60Hz": {60: "1080i60hz"}, "auto": {60: "1080i60hz"}}
+                rates["1080p"] = {"50Hz": {50: "1080p50hz"}, "60Hz": {60: "1080p60hz"}, "30Hz": {30: "1080p30hz"}, "25Hz": {25: "1080p25hz"}, "24Hz": {24: "1080p24hz"}, "auto": {60: "1080p60hz"}}
+                rates["2160p"] = {"50Hz": {50: "2160p50hz"}, "60Hz": {60: "2160p60hz"}, "30Hz": {30: "2160p30hz"}, "25Hz": {25: "2160p25hz"}, "24Hz": {24: "2160p24hz"}, "auto": {60: "2160p60hz"}}
+                rates["2160p30"] = {"25Hz": {50: "2160p25hz"}, "30Hz": {60: "2160p30hz"}, "auto": {60: "2160p30hz"}}
 
-        rates["smpte"] = {"50Hz": {50: "smpte50hz"},
-                "60Hz": {60: "smpte60hz"},
-                "30Hz": {30: "smpte30hz"},
-                "25Hz": {25: "smpte25hz"},
-                "24Hz": {24: "smpte24hz"},
-                "auto": {60: "smpte60hz"}}
+                rates["smpte"] = {"50Hz": {50: "smpte50hz"}, "60Hz": {60: "smpte60hz"}, "30Hz": {30: "smpte30hz"}, "25Hz": {25: "smpte25hz"}, "24Hz": {24: "smpte24hz"}, "auto": {60: "smpte60hz"}}
+        else:
+                rates["480i"] = {"60Hz": {60: "480i"}}
+                rates["576i"] = {"50Hz": {50: "576i"}}
+                rates["480p"] = {"60Hz": {60: "480p"}}
+                rates["576p"] = {"50Hz": {50: "576p"}}
+                rates["720p"] = {"50Hz": {50: "720p50"}, "60Hz": {60: "720p"}, "multi": {50: "720p50", 60: "720p"}, "auto": {50: "720p50", 60: "720p", 24: "720p24"}}
+                rates["1080i"] = {"50Hz": {50: "1080i50"}, "60Hz": {60: "1080i"}, "multi": {50: "1080i50", 60: "1080i"}, "auto": {50: "1080i50", 60: "1080i", 24: "1080i24"}}
+                rates["1080p"] = {"23Hz": {23: "1080p23"}, "24Hz": {24: "1080p24"}, "25Hz": {25: "1080p25"}, "29Hz": {29: "1080p29"}, "30Hz": {30: "1080p30"}, "50Hz": {50: "1080p50"}, "59Hz": {59: "1080p59"}, "60Hz": {60: "1080p"}, "multi": {50: "1080p50", 60: "1080p"}, "auto": {50: "1080p50", 60: "1080p", 24: "1080p24"}}
+                if HardwareInfo().get_device_name() in ("dm900", "dm920"):
+                        rates["2160p"] = {"50Hz": {50: "2160p50"}, "60Hz": {60: "2160p60"}, "multi": {50: "2160p50", 60: "2160p60"}, "auto": {50: "2160p50", 60: "2160p60", 24: "2160p24"}}
+                else:
+                        rates["2160p"] = {"50Hz": {50: "2160p50"}, "60Hz": {60: "2160p"}, "multi": {50: "2160p50", 60: "2160p"}, "auto": {50: "2160p50", 60: "2160p", 24: "2160p24"}}
 
         rates["PC"] = {
-                "1024x768": {60: "1024x768"}, # not possible on DM7025
-                "800x600": {60: "800x600"},  # also not possible
+                "1024x768": {60: "1024x768"},
+                "800x600": {60: "800x600"},
                 "720x480": {60: "720x480"},
                 "720x576": {60: "720x576"},
                 "1280x720": {60: "1280x720"},
@@ -115,41 +120,6 @@ class VideoHardware:
                 "640x480": {60: "640x480"}
         }
 
-        if HardwareInfo().get_device_name() in ("one", "two"):
-                rates["480i"] = {"60hz": {60: "480i60hz"}}
-
-                rates["576i"] = {"50hz": {50: "576i50hz"}}
-
-                rates["480p"] = {"60hz": {60: "480p60hz"}}
-
-                rates["576p"] = {"50hz": {50: "576p50hz"}}
-
-                rates["720p"] = {"50hz": {50: "720p50hz"},
-                        "60hz": {60: "720p60hz"},
-                        "auto": {60: "720p60hz"}}
-
-                rates["1080i"] = {"50hz": {50: "1080i50hz"},
-                        "60hz": {60: "1080i60hz"},
-                        "auto": {60: "1080i60hz"}}
-
-                rates["1080p"] = {"50hz": {50: "1080p50hz"},
-                        "60hz": {60: "1080p60hz"},
-                        "30hz": {30: "1080p30hz"},
-                        "25hz": {25: "1080p25hz"},
-                        "24hz": {24: "1080p24hz"},
-                        "auto": {60: "1080p60hz"}}
-
-                rates["2160p"] = {"50hz": {50: "2160p50hz"},
-                        "60hz": {60: "2160p60hz"},
-                        "30hz": {30: "2160p30hz"},
-                        "25hz": {25: "2160p25hz"},
-                        "24hz": {24: "2160p24hz"},
-                        "auto": {60: "2160p60hz"}}
-
-                rates["2160p30"] = {"25hz": {50: "2160p25hz"},
-                        "30hz": {60: "2160p30hz"},
-                        "auto": {60: "2160p30hz"}}
-
         if SystemInfo["HasScart"]:
                 modes["Scart"] = ["PAL", "NTSC", "Multi"]
         if SystemInfo["HasComposite"] and HardwareInfo().get_device_name() in ("dm7020hd", "dm7020hdv2", "dm8000"):
@@ -162,6 +132,8 @@ class VideoHardware:
                 modes["HDMI"] = ["720p", "1080p", "smpte", "2160p30", "2160p", "1080i", "576p", "576i", "480p", "480i"]
         else:
                 modes["HDMI"] = ["720p", "1080p", "2160p", "2160p30", "1080i", "576p", "480p", "576i", "480i"]
+
+        modes["HDMI-PC"] = ["PC"]
 
         widescreen_modes = tuple([x for x in modes["HDMI"] if x not in ("576p", "576i", "480p", "480i")])
 
@@ -547,3 +519,4 @@ class VideoHardware:
 
 video_hw = VideoHardware()
 video_hw.setConfiguredMode()
+
