@@ -23,6 +23,7 @@ struct Cfilepara
 	int oy;
 	std::string picinfo;
 	bool callback;
+	bool transparent;
 
 	Cfilepara(const char *mfile, int mid, std::string size):
 		file(strdup(mfile)),
@@ -32,7 +33,8 @@ struct Cfilepara
 		bits(24),
 		id(mid),
 		picinfo(mfile),
-		callback(true)
+		callback(true),
+		transparent(true)
 	{
 		picinfo += "\n" + size + "\n";
 	}

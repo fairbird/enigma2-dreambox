@@ -285,10 +285,9 @@ static unsigned char *bmp_load(const char *file,  int *x, int *y)
 
 //---------------------------------------------------------------------
 
-static void png_load(Cfilepara* filepara, int background, bool forceRGB=false)
+static void png_load(Cfilepara *filepara, int background, bool forceRGB=false)
 {
 	png_uint_32 width, height;
-	unsigned int i;
 	int bit_depth, color_type, interlace_type;
 	png_byte *fbptr;
 	CFile fh(filepara->file, "rb");
@@ -316,7 +315,19 @@ static void png_load(Cfilepara* filepara, int background, bool forceRGB=false)
 	png_read_info(png_ptr, info_ptr);
 	png_get_IHDR(png_ptr, info_ptr, &width, &height, &bit_depth, &color_type, &interlace_type, NULL, NULL);
 
-	if (!forceRGB && (color_type == PNG_COLOR_TYPE_GRAY || color_type & PNG_COLOR_MASK_PALETTE))
+	if (color_type == PNG_COLOR_TYPE_RGBA || color_type == PNG_COLOR_TYPE_GA)
+		filepara->transparent = true;
+	else
+	{
+		png_bytep trans_alpha = NULL;
+		int num_trans = 0;
+		png_color_16p trans_color = NULL;
+
+		png_get_tRNS(png_ptr, info_ptr, &trans_alpha, &num_trans, &trans_color);
+		filepara->transparent = (trans_alpha != NULL);
+	}
+
+	if ((bit_depth <= 8) && (color_type == PNG_COLOR_TYPE_GRAY || color_type & PNG_COLOR_MASK_PALETTE))
 	{
 		if (bit_depth < 8)
 		{
@@ -346,18 +357,18 @@ static void png_load(Cfilepara* filepara, int background, bool forceRGB=false)
 			filepara->palette_size = num_palette;
 			if (num_palette)
 				filepara->palette = new gRGB[num_palette];
-			for (int i=0; i<num_palette; i++)
+			for (unsigned int i = 0; i < num_palette; i++)
 			{
-				filepara->palette[i].a=0;
-				filepara->palette[i].r=palette[i].red;
-				filepara->palette[i].g=palette[i].green;
-				filepara->palette[i].b=palette[i].blue;
+				filepara->palette[i].a = 0;
+				filepara->palette[i].r = palette[i].red;
+				filepara->palette[i].g = palette[i].green;
+				filepara->palette[i].b = palette[i].blue;
 			}
 			if (png_get_valid(png_ptr, info_ptr, PNG_INFO_tRNS))
 			{
 				png_byte *trans;
 				png_get_tRNS(png_ptr, info_ptr, &trans, &num_palette, 0);
-				for (int i=0; i<num_palette; i++)
+				for (unsigned int i = 0; i < num_palette; i++)
 					filepara->palette[i].a=255-trans[i];
 			}
 		}
@@ -396,10 +407,10 @@ static void png_load(Cfilepara* filepara, int background, bool forceRGB=false)
 		filepara->pic_buffer = pic_buffer;
 
 		int number_passes = png_set_interlace_handling(png_ptr);
-		for(int pass = 0; pass < number_passes; pass++)
+		for (int pass = 0; pass < number_passes; pass++)
 		{
 			fbptr = (png_byte *)pic_buffer;
-			for (i = 0; i < height; i++, fbptr += width * 3)
+			for (unsigned int i = 0; i < height; i++, fbptr += width)
 				png_read_row(png_ptr, fbptr, NULL);
 		}
 		png_read_end(png_ptr, info_ptr);
@@ -796,9 +807,9 @@ void ePicLoad::decodePic()
 	{
 		case F_PNG:	png_load(m_filepara, m_conf.background);
 				break;
-		case F_JPEG:	m_filepara->pic_buffer = jpeg_load(m_filepara->file, &m_filepara->ox, &m_filepara->oy, m_filepara->max_x, m_filepara->max_y);
+		case F_JPEG:	m_filepara->pic_buffer = jpeg_load(m_filepara->file, &m_filepara->ox, &m_filepara->oy, m_filepara->max_x, m_filepara->max_y);	m_filepara->transparent = false;
 				break;
-		case F_BMP:	m_filepara->pic_buffer = bmp_load(m_filepara->file, &m_filepara->ox, &m_filepara->oy);
+		case F_BMP:	m_filepara->pic_buffer = bmp_load(m_filepara->file, &m_filepara->ox, &m_filepara->oy);	m_filepara->transparent = false;
 				break;
 		case F_GIF:	gif_load(m_filepara);
 				break;
@@ -1158,6 +1169,7 @@ int ePicLoad::getData(ePtr<gPixmap> &result)
 	unsigned char *tmp_buffer = ((unsigned char *)(surface->data));
 	unsigned char *origin = m_filepara->pic_buffer;
 	if (m_filepara->bits == 8) {
+		surface->transparent = m_filepara->transparent;
 		surface->clut.data = m_filepara->palette;
 		surface->clut.colors = m_filepara->palette_size;
 		m_filepara->palette = NULL; // transfer ownership
