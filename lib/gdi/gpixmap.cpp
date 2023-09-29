@@ -2162,8 +2162,8 @@ void gPixmap::blit(const gPixmap &src, const eRect &_pos, const gRegion &clip, i
 				else if (flag & blitAlphaBlend)
 				{
 					int width = area.width();
-					gRGB *src = (gRGB*)srcptr;
-					gRGB *dst = (gRGB*)dstptr;
+					gRGB *src = (gRGB *)srcptr;
+					gRGB *dst = (gRGB *)dstptr;
 					while (width--)
 					{
 						dst->alpha_blend(*src++);
