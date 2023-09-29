@@ -2309,6 +2309,7 @@ class ExtensionsList(ChoiceBox):
 			if x[0][0] != text:  # Update text if changed
 				x[0] = (text, *x[0][1:])
 				x[1] = x[1][:7] + (text,)
+				self.summarylist[idx] = (self.summarylist[idx][0], text)
 				updated = True
 			elif not x[0][1][2]():  # Remove job if not active
 				updated = True
@@ -2400,7 +2401,6 @@ class InfoBarExtensions:
 					extensionsList.remove(extension)
 		clist.extend([(x[0](), x) for x in extensionsList])
 		clist and self.session.openWithCallback(self.extensionCallback, ExtensionsList, clist=clist, keys=keys, refresh_list="refresh" in self.extensionKeys)
-
 
 	def extensionCallback(self, answer):
 		if answer is not None:
