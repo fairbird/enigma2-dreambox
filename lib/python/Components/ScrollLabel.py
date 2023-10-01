@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from enigma import eLabel, eListbox, ePoint, eSize, eSlider, eWidget, fontRenderClass
 
-from skin import applyAllAttributes, parseBoolean, parseHorizontalAlignment, parseInteger, parseScrollbarMode, parseScrollbarScroll, scrollLabelStyle
+from skin import applyAllAttributes, parseBoolean, parseHorizontalAlignment, parseGradient, parseInteger, parseRadius, parseScrollbarMode, parseScrollbarScroll, scrollLabelStyle
 from Components.GUIComponent import GUIComponent
 
 
@@ -55,6 +55,8 @@ class ScrollLabel(GUIComponent):
 		sliderScroll = scrollLabelStyle["scrollbarScroll"]
 		sliderOffset = scrollLabelStyle["scrollbarOffset"]
 		sliderWidth = scrollLabelStyle["scrollbarWidth"]
+		scrollbarRadius = scrollLabelStyle["scrollbarRadius"]
+		scrollbarGradient = None
 		if self.skinAttributes:
 			sliderProperties = (
 				"scrollbarBorderColor",
@@ -107,6 +109,10 @@ class ScrollLabel(GUIComponent):
 						sliderOffset = parseInteger(value, eListbox.DefaultScrollBarOffset)
 					elif attribute == "scrollbarWidth":
 						sliderWidth = parseInteger(value, eListbox.DefaultScrollBarWidth)
+					elif attribute == "scrollbarRadius":
+						scrollbarRadius = parseRadius(value)
+					elif attribute == "scrollbarGradient":
+						scrollbarGradient = parseGradient(value)
 					else:
 						leftLabelAttributes.append((attribute, value))
 						rightLabelAttributes.append((attribute, value))
@@ -153,6 +159,11 @@ class ScrollLabel(GUIComponent):
 		self.slider.setOrientation(eSlider.orVertical)
 		self.slider.setRange(0, 1000)
 		self.slider.setBorderWidth(sliderBorderWidth)
+		self.slider.setRadius(*scrollbarRadius)
+		if scrollbarGradient:
+			scrollbarGradient = scrollbarGradient + (True,)  # Add fullColor
+			self.slider.setForegroundGradient(*scrollbarGradient)
+
 		self.sliderMode = sliderMode
 		self.sliderScroll = lineHeight if sliderScroll else self.pageHeight
 		self.setText(self.msgText)
