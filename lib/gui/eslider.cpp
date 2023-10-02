@@ -135,6 +135,7 @@ int eSlider::event(int event, void *data, void *data2)
 			{
 				painter.setBackgroundColor(m_have_background_color ? m_background_color : gRGB(0, 0, 0));
 				painter.drawRectangle(eRect(ePoint(0, 0), size()));
+			}
 		}
 
 		style->setStyle(painter, m_scrollbar ? eWindowStyle::styleScollbar : eWindowStyle::styleSlider);
@@ -179,14 +180,13 @@ int eSlider::event(int event, void *data, void *data2)
 		}
 		else
 		{
-
 			if (cornerRadius)
 				painter.setRadius(cornerRadius, getCornerRadiusEdges());
 			painter.blitScale(m_pixmap, eRect(ePoint(0, 0), s), m_currently_filled.extends, isTransparent() ? gPainter::BT_ALPHATEST : 0);
 		}
 
 		// Border
-		if(drawborder)
+		if (drawborder)
 		{
 
 			if (m_have_border_color)
