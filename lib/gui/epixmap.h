@@ -3,7 +3,7 @@
 
 #include <lib/gui/ewidget.h>
 
-class ePixmap: public eWidget
+class ePixmap : public eWidget
 {
 	int m_alphatest;
 	int m_scale;
