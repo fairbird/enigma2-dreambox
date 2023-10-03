@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: enigma2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-10-14 09:11+0200\n"
+"POT-Creation-Date: 2023-10-02 14:05+0100\n"
 "POT-Creation-Date: 2023-06-19 08:16+0200\n"
 "Last-Translator: RAED - Fairbirb <rrrr53@hotmail.com>\n"
 "Language-Team: \n"
@@ -1412,6 +1412,9 @@ msgstr ""
 
 msgid "CI (Common Interface) Setup"
 msgstr "ضبط الكامة الداخلية (واجهة المستخدم)"
+
+msgid "CI Boot Delay"
+msgstr "مدة تأخير قنوات الكامة الداخلية"
 
 msgid "CI assignment"
 msgstr "مهمة واجهة المستخدم"
@@ -11110,6 +11113,12 @@ msgstr "الخروج من قائمه إعداد الشبكة"
 msgid "experimental film/video"
 msgstr "فيلم تجريبي/فيديو"
 
+msgid "extra high"
+msgstr "عالية واسع"
+
+msgid "extra wide"
+msgstr "عريض واسع"
+
 msgid "failed"
 msgstr "فشل"
 
@@ -11190,6 +11199,9 @@ msgstr "طول"
 
 msgid "help..."
 msgstr "...مساعدة"
+
+msgid "high"
+msgstr "عالي"
 
 msgid "horizontal"
 msgstr "أفقي"

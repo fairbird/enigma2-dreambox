@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: enigma2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-06-19 08:16+0200\n"
+"POT-Creation-Date: 2023-10-02 14:05+0100\n"
 "PO-Revision-Date: 2014-11-12 00:49+0200\n"
 "Last-Translator: Taapat <taapat@gmail.com>\n"
 "Language-Team: Taapat <taapat@gmail.com>\n"
@@ -1475,6 +1475,9 @@ msgstr "Kan%s"
 
 msgid "CI (Common Interface) Setup"
 msgstr "Common interfeiss"
+
+msgid "CI Boot Delay"
+msgstr "CI aizture startējot"
 
 msgid "CI assignment"
 msgstr "CI piešķiršana"
@@ -6844,9 +6847,8 @@ msgstr "Pārlādēt"
 msgid "Reload blacklists"
 msgstr "Pārlādēt melno sarakstu"
 
-#, fuzzy
 msgid "Reload services/bouquets list"
-msgstr "Pievienot kanālu buķetei"
+msgstr "Atjaunot sarakstu"
 
 msgid "Reloading bouquets and services..."
 msgstr "Pārlādē buķetes un kanālus..."
@@ -11383,6 +11385,9 @@ msgstr "iziet no tīkla adaptera iestatīšanas izvēlnes"
 msgid "experimental film/video"
 msgstr "eksperimentālās filmas/video"
 
+msgid "extra high"
+msgstr "ļoti augsts"
+
 msgid "extra wide"
 msgstr "ļoti plašs"
 
@@ -11466,6 +11471,9 @@ msgstr "augstums"
 
 msgid "help..."
 msgstr "palīdzība..."
+
+msgid "high"
+msgstr "augsts"
 
 msgid "horizontal"
 msgstr "horizontālā"

@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: enigma2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-06-19 08:16+0200\n"
-"PO-Revision-Date: 2023-06-19 08:17+0200\n"
+"POT-Creation-Date: 2023-10-02 14:05+0100\n"
+"PO-Revision-Date: 2023-10-03 15:10+0200\n"
 "Last-Translator: Pr2\n"
 "Language-Team: french\n"
 "Language: fr\n"
@@ -11,7 +11,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n!=1);\n"
-"X-Generator: Poedit 3.3.1\n"
+"X-Generator: Poedit 3.4\n"
 
 msgid ""
 "\n"
@@ -1460,6 +1460,9 @@ msgstr "CH%s"
 
 msgid "CI (Common Interface) Setup"
 msgstr "Configuration CI (Interface Commune)"
+
+msgid "CI Boot Delay"
+msgstr "CI délai au démarrage"
 
 msgid "CI assignment"
 msgstr "Assignation CI"
@@ -8992,7 +8995,7 @@ msgstr ""
 "\n"
 "Support: https://www.openpli.org/\n"
 "Traducteur: Pr2\n"
-"Dernière MÀJ: 14-01-2023"
+"Dernière MÀJ: 03-10-2023"
 
 msgid "TS file is too large for ISO9660 level 1!"
 msgstr "Fichier TS trop grand pour le niveau 1 ISO9660!"
@@ -11372,6 +11375,9 @@ msgstr "Quitter menu réglages adaptateur réseau"
 msgid "experimental film/video"
 msgstr "Film expérimental/Vidéo"
 
+msgid "extra high"
+msgstr "très élevé"
+
 msgid "extra wide"
 msgstr "extra large"
 
@@ -11455,6 +11461,9 @@ msgstr "Hauteur"
 
 msgid "help..."
 msgstr "Aide..."
+
+msgid "high"
+msgstr "élevé"
 
 msgid "horizontal"
 msgstr "Horizontale"
