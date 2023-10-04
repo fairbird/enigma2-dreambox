@@ -2,6 +2,7 @@
 import skin
 
 from enigma import ePoint, eSize
+from Components.config import config
 
 
 class GUIComponent:
@@ -10,9 +11,9 @@ class GUIComponent:
 	def __init__(self):
 		self.instance = None
 		self.onVisibilityChange = []
-		self.__visible = False
-		self.visible = True
-		self.skinAttributes = []
+		self.__visible = 0
+		self.visible = 1
+		self.skinAttributes = None
 		self.deprecationInfo = None
 
 	def execBegin(self):
@@ -35,10 +36,19 @@ class GUIComponent:
 		if not self.visible:
 			self.instance.hide()
 
-		if self.skinAttributes:
-			skin.applyAllAttributes(self.instance, desktop, self.skinAttributes, parent.scale)
-			return True
-		return False
+		if self.skinAttributes is None:
+			return False
+
+		#//workaround for values from attributes the not be set
+		#
+		#The order of some attributes is crucial if they are applied. Also, an attribute may be responsible that another does not take effect and occurs at different skins.
+		#It was noticed at 'scrollbarSliderBorderWidth' and 'scrollbarSliderForegroundColor'.
+		#
+		if config.skin.primary_skin.value.split('/')[0] not in ('DMConcinnity-HD'):
+			self.skinAttributes.sort()
+		#//
+		skin.applyAllAttributes(self.instance, desktop, self.skinAttributes, parent.scale)
+		return True
 
 	def move(self, x, y=None):
 		# we assume, that x is already an ePoint
@@ -59,18 +69,20 @@ class GUIComponent:
 		self.instance.setZPosition(z)
 
 	def show(self):
-		if not self.__visible:
-			self.__visible = True
-			if self.instance:
-				self.instance.show()
+		old = self.__visible
+		self.__visible = 1
+		if self.instance is not None:
+			self.instance.show()
+		if old != self.__visible:
 			for fnc in self.onVisibilityChange:
 				fnc(True)
 
 	def hide(self):
-		if self.__visible:
-			self.__visible = False
-			if self.instance:
-				self.instance.hide()
+		old = self.__visible
+		self.__visible = 0
+		if self.instance is not None:
+			self.instance.hide()
+		if old != self.__visible:
 			for fnc in self.onVisibilityChange:
 				fnc(False)
 
@@ -90,7 +102,7 @@ class GUIComponent:
 
 	def getPosition(self):
 		p = self.instance.position()
-		return (p.x(), p.y())
+		return p.x(), p.y()
 
 	def getWidth(self):
 		return self.width
@@ -98,7 +110,7 @@ class GUIComponent:
 	def getHeight(self):
 		return self.height
 
-	position = property(getPosition, setPosition)
+	position = property(getPosition)
 
 	# default implementation for only one widget per component
 	# feel free to override!
