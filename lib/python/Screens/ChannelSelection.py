@@ -2747,9 +2747,11 @@ class HistoryZapSelector(Screen, HelpableScreen):
 		print("[ChannelSelection] HistoryZapSelector DEBUG: Setting title='%s'." % self.getTitle())
 		self["key_red"] = StaticText(_("Cancel"))
 		self["key_green"] = StaticText(_("Select"))
-		self["actions"] = HelpableActionMap(self, ["SelectCancelActions"], {
+		self["actions"] = HelpableActionMap(self, ["SelectCancelActions", "InfobarCueSheetActions"], {
 			"cancel": (self.keyCancel, _("Cancel the service zap")),
-			"select": (self.keySelect, _("Select the currently highlighted service"))
+			"select": (self.keySelect, _("Select the currently highlighted service")),
+			"jumpPreviousMark": (self.keyTop, _("Move to the first line / screen")),
+			"jumpNextMark": (self.keyBottom, _("Move to the last line / screen"))
 		}, prio=0, description=_("History Zap Actions"))
 		self["navigationActions"] = HelpableActionMap(self, ["NavigationActions"], {
 			"top": (self.keyTop, _("Move to the first line / screen")),
