@@ -339,6 +339,7 @@ class Menu(Screen, ProtectedScreen):
 			t_history.reset()
 		self["title"] = StaticText(title)
 		self.setTitle(title)
+		self.loadMenuImage()
 
 		self.menu_title = title
 		self["thistory"] = StaticText(t_history.thistory)
@@ -393,6 +394,8 @@ class Menu(Screen, ProtectedScreen):
 		self.nextNumberTimer.callback.append(self.okbuttonClick)
 		if len(self.list) == 1:
 			self.onExecBegin.append(self.__onExecBegin)
+		if self.layoutFinished not in self.onLayoutFinish:
+			self.onLayoutFinish.append(self.layoutFinished)
 
 	def openTestA(self):
 		self.session.open(AnimMain, self.list, self.menu_title)
@@ -405,6 +408,19 @@ class Menu(Screen, ProtectedScreen):
 	def __onExecBegin(self):
 		self.onExecBegin.remove(self.__onExecBegin)
 		self.okbuttonClick()
+
+	def layoutFinished(self):
+		if self.menuImage:
+			self["menuimage"].instance.setPixmap(self.menuImage)
+
+	def loadMenuImage(self):
+		self.menuImage = None
+		if menus and self.menuID:
+			menuImage = menus.get(self.menuID, menus.get("default", ""))
+			if menuImage:
+				self.menuImage = LoadPixmap(resolveFilename(SCOPE_GUISKIN, menuImage))
+				if self.menuImage:
+					self["menuimage"] = Pixmap()
 
 	def showHelp(self):
 		if config.usage.menu_show_numbers.value not in ("menu&plugins", "menu"):
