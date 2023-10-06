@@ -50,31 +50,6 @@ def default_skin():
 		if not "config.skin.primary_skin" in line:
 			return default_skin
 
-def MenuEntryPixmap(entryID, png_cache, lastMenuID):
-	if nomainmenupath:
-		return None
-	png = png_cache.get(entryID, None)
-	if png is None:
-		pngPath = resolveFilename(SCOPE_CURRENT_SKIN, "mainmenu/" + entryID + ".png")
-		pos = config.skin.primary_skin.value.rfind("/")
-		if pos > -1:
-			current_skin = config.skin.primary_skin.value[:pos + 1]
-		else:
-			current_skin = ""
-		if current_skin in pngPath and current_skin or not current_skin:
-			png = LoadPixmap(pngPath, cached=True)
-		if png is None:
-			if lastMenuID is not None:
-				png = png_cache.get(lastMenuID, None)
-			png_cache[entryID] = png
-	if png is None:
-		png = png_cache.get("missing", None)
-		if png is None:
-			png = LoadPixmap(resolveFilename(SCOPE_CURRENT_SKIN, "mainmenu/missing.png"), cached=True)
-			png_cache["missing"] = png
-	return png
-
-
 def MenuEntryName(name):
 	def splitUpperCase(name, maxlen):
 		for c in range(len(name), 0, -1):
