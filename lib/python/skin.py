@@ -1263,9 +1263,9 @@ def loadSingleSkinData(desktop, screenID, domSkin, pathSkin, scope=SCOPE_GUISKIN
 			else:
 				skinError(f"Tag 'parameter' needs a name and value, got name='{name}' and size='{value}'")
 	for tag in domSkin.findall("menus"):
-		for setup in tag.findall("menu"):
-			key = setup.attrib.get("key")
-			image = setup.attrib.get("image")
+		for menu in tag.findall("menu"):
+			key = menu.attrib.get("key")
+			image = menu.attrib.get("image")
 			if key and image:
 				menus[key] = image
 				# print(f"[Skin] DEBUG: Menu key='{key}', image='{image}'.")
