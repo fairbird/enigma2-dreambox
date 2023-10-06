@@ -11,9 +11,9 @@ class GUIComponent:
 	def __init__(self):
 		self.instance = None
 		self.onVisibilityChange = []
-		self.__visible = 0
-		self.visible = 1
-		self.skinAttributes = None
+		self.__visible = False
+		self.visible = True
+		self.skinAttributes = []
 		self.deprecationInfo = None
 
 	def execBegin(self):
@@ -69,20 +69,18 @@ class GUIComponent:
 		self.instance.setZPosition(z)
 
 	def show(self):
-		old = self.__visible
-		self.__visible = 1
-		if self.instance is not None:
-			self.instance.show()
-		if old != self.__visible:
+		if not self.__visible:
+			self.__visible = True
+			if self.instance:
+				self.instance.show()
 			for fnc in self.onVisibilityChange:
 				fnc(True)
 
 	def hide(self):
-		old = self.__visible
-		self.__visible = 0
-		if self.instance is not None:
-			self.instance.hide()
-		if old != self.__visible:
+		if self.__visible:
+			self.__visible = False
+			if self.instance:
+				self.instance.hide()
 			for fnc in self.onVisibilityChange:
 				fnc(False)
 
@@ -102,7 +100,7 @@ class GUIComponent:
 
 	def getPosition(self):
 		p = self.instance.position()
-		return p.x(), p.y()
+		return (p.x(), p.y())
 
 	def getWidth(self):
 		return self.width
@@ -110,7 +108,7 @@ class GUIComponent:
 	def getHeight(self):
 		return self.height
 
-	position = property(getPosition)
+	position = property(getPosition, setPosition)
 
 	# default implementation for only one widget per component
 	# feel free to override!
