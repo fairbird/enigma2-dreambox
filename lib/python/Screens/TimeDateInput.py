@@ -39,7 +39,7 @@ class TimeDateInput(ConfigListScreen, Screen):
 		if conf_date:
 			self.save_mask |= 2
 		else:
-			conf_date = ConfigDateTime(default=time.time(), formatstring=config.usage.date.full.value, increment=86400)
+			conf_date = ConfigDateTime(default=time.time(), formatstring=config.usage.date.dayfull.value, increment=86400)
 		self.timeinput_date = conf_date
 		self.timeinput_time = conf_time
 
