@@ -13,7 +13,7 @@ from Components.SystemInfo import SystemInfo
 from Tools.BoundFunction import boundFunction
 from skin import parameters, menus, menuicons
 from Plugins.Plugin import PluginDescriptor
-from Tools.Directories import resolveFilename, SCOPE_SKIN, SCOPE_CURRENT_SKIN, SCOPE_GUISKIN
+from Tools.Directories import resolveFilename, SCOPE_SKIN, SCOPE_CURRENT_SKIN, SCOPE_GUISKIN, SCOPE_SKINS
 from Components.Button import Button
 from Tools.LoadPixmap import LoadPixmap
 from Components.Pixmap import Pixmap
