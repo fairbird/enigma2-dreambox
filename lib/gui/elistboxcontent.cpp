@@ -290,7 +290,7 @@ void eListboxPythonStringContent::paint(gPainter &painter, eWindowStyle &style, 
 		{
 			painter.clear();
 		}
-
+		
 	}
 	// Draw frame here so to be under the content
 	if (selected && (!local_style || !local_style->m_selection) && (!local_style || !local_style->is_set.border))
@@ -1229,7 +1229,7 @@ void eListboxPythonMultiContent::paint(gPainter &painter, eWindowStyle &style, c
 				eRect rect(x + bwidth, y + bwidth, width - bwidth * 2, height - bwidth * 2);
 				painter.clip(rect);
 				{
-					if(cornerRadius && cornerEdges)
+					if(cornerRadius && cornerEdges) 
 					{
 						painter.setRadius(cornerRadius, cornerEdges);
 						if(selected && !pbackColorSelected)
@@ -1238,7 +1238,7 @@ void eListboxPythonMultiContent::paint(gPainter &painter, eWindowStyle &style, c
 						painter.setBackgroundColor(gRGB(color));
 						painter.drawRectangle(rect);
 					}
-					else
+					else 
 					{
 						gRegion rc(rect);
 						bool mustClear = (selected && pbackColorSelected) || (!selected && pbackColor);
@@ -1444,7 +1444,7 @@ void eListboxPythonMultiContent::paint(gPainter &painter, eWindowStyle &style, c
 						  pfilled_perc = PyTuple_GET_ITEM(item, 5),
 						  ppixmap, pborderWidth, pforeColor, pforeColorSelected, pbackColor, pbackColorSelected,
 						  pstartColor, pendColor, pstartColorSelected, pendColorSelected;
-
+					  
 				int idx = 6;
 				if (type == TYPE_PROGRESS)
 				{
@@ -1632,7 +1632,7 @@ void eListboxPythonMultiContent::paint(gPainter &painter, eWindowStyle &style, c
 				{
 					if (radius)
 						painter.setRadius(radius, edges);
-
+					
 					if(pstartColor)
 					{
 						if (selected && !pstartColorSelected)
