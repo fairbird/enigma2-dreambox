@@ -66,6 +66,7 @@ class eFixedMessagePump: public sigc::trackable, FD
 #ifdef HAVE_OLDE2_API
 	int m_pipe[2];
 #endif
+	const char *name;
 	void do_recv(int)
 	{
 #ifdef HAVE_OLDE2_API
@@ -102,9 +103,12 @@ public:
 		char byte = 0;
 		writeAll(m_pipe[1], &byte, sizeof(byte));
 	}
-	eFixedMessagePump(eMainloop *context, int mt)
+	eFixedMessagePump(eMainloop *context, int mt, const char *name) : name(name)
 	{
-		pipe(m_pipe);
+		if (pipe(m_pipe) == -1)
+		{
+			eDebug("[eFixedMessagePump<%s>] failed to create pipe (%m)", name);
+		}
 		sn = eSocketNotifier::create(context, m_pipe[0], eSocketNotifier::Read, false);
 		CONNECT(sn->activated, eFixedMessagePump<T>::do_recv);
 		sn->start();
@@ -152,7 +156,7 @@ public:
 	{
 		static const uint64_t data = 1;
 		if (::write(m_fd, &data, sizeof(data)) < 0)
-			eFatal("[eFixedMessagePump] write error %m");
+			eFatal("[eFixedMessagePump<%s>] write error %m", name);
 	}
 public:
 	sigc::signal<void(const T&)> recv_msg;
@@ -164,8 +168,9 @@ public:
 		}
 		trigger_event();
 	}
-	eFixedMessagePump(eMainloop *context, int mt):
+	eFixedMessagePump(eMainloop *context, int mt, const char *name):
 		FD(eventfd(0, EFD_CLOEXEC)),
+		name(name),
 		sn(eSocketNotifier::create(context, m_fd, eSocketNotifier::Read, false))
 	{
 		CONNECT(sn->activated, eFixedMessagePump<T>::do_recv);

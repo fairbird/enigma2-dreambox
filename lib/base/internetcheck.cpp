@@ -151,8 +151,8 @@ eInternetCheck::eInternetCheck():
 	m_callback(false),
 	m_result(-1),
 	m_threadrunning(false),
-	msg_thread(this,1),
-	msg_main(eApp,1)
+	msg_thread(this,1,"eInternetCheck_thread"),
+	msg_main(eApp,1,"eInternetCheck_main")
 {
 	CONNECT(msg_thread.recv_msg, eInternetCheck::gotMessage);
 	CONNECT(msg_main.recv_msg, eInternetCheck::gotMessage);

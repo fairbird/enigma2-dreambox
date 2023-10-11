@@ -26,14 +26,14 @@ gRC *gRC::instance = 0;
 
 gRC::gRC() : rp(0), wp(0)
 #ifdef SYNC_PAINT
-			 ,
-			 m_notify_pump(eApp, 0)
+	,
+	m_notify_pump(eApp, 0, "gRC")
 #else
-			 ,
-			 m_notify_pump(eApp, 1)
+	,
+	m_notify_pump(eApp, 1, "gRC")
 #endif
-			 ,
-			 m_spinner_enabled(0), m_spinneronoff(1), m_prev_idle_count(0) // NOSONAR
+	,
+	m_spinner_enabled(0), m_spinneronoff(1), m_prev_idle_count(0) // NOSONAR
 {
 	ASSERT(!instance);
 	instance = this;
