@@ -147,6 +147,7 @@ resumePointCacheLast = int(time())
 
 class whitelist:
 	vbi = []
+	streamrelay = []
 
 
 def reload_whitelist_vbi():
@@ -154,6 +155,12 @@ def reload_whitelist_vbi():
 
 
 reload_whitelist_vbi()
+
+def reload_streamrelay():
+	whitelist.streamrelay = [line.strip() for line in open('/etc/enigma2/whitelist_streamrelay', 'r').readlines()] if os.path.isfile('/etc/enigma2/whitelist_streamrelay') else []
+
+
+reload_streamrelay()
 
 
 class subservice:
@@ -541,6 +548,9 @@ class InfoBarShowHide(InfoBarScreenSaver):
 					return ".hidevbi." in servicepath.lower()
 		return service and service.toString() in whitelist.vbi
 
+	def checkStreamrelay(self, service=None):
+		return (service or self.session.nav.getCurrentlyPlayingServiceReference()) and service.toString() in whitelist.streamrelay
+
 	def showHideVBI(self):
 		if self.checkHideVBI():
 			self.hideVBILineScreen.show()
@@ -558,6 +568,15 @@ class InfoBarShowHide(InfoBarScreenSaver):
 			open('/etc/enigma2/whitelist_vbi', 'w').write('\n'.join(whitelist.vbi))
 			self.showHideVBI()
 
+	def ToggleStreamrelay(self, service=None):
+		service = service or self.session.nav.getCurrentlyPlayingServiceReference()
+		if service:
+			service = service.toString()
+			if service in whitelist.streamrelay:
+				whitelist.streamrelay.remove(service)
+			else:
+				whitelist.streamrelay.append(service)
+			open('/etc/enigma2/whitelist_streamrelay', 'w').write('\n'.join(whitelist.streamrelay))
 
 class BufferIndicator(Screen):
 	def __init__(self, session):
