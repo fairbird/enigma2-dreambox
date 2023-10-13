@@ -574,7 +574,7 @@ void eListboxPythonServiceContent::setBuildArgs(int selected)
 
 	m_pArgs = PyTuple_New(2);
 	PyTuple_SET_ITEM(m_pArgs, 0, NEW_eServiceReference(ref));
-	PyTuple_SET_ITEM(m_pArgs, 1, PyInt_FromLong(status));
+	PyTuple_SET_ITEM(m_pArgs, 1, PyLong_FromLong(status));
 }
 
 void eListboxPythonServiceContent::refresh()
