@@ -1055,6 +1055,8 @@ def InitUsageConfig():
 	choicelist = [("no", _("no")), ("nothing", _("omit")), ("space", _("space")), ("dot", ". "), ("dash", " - "), ("asterisk", " * "), ("hashtag", " # ")]
 	config.epg.replace_newlines = ConfigSelection(default="no", choices=choicelist)
 
+	config.misc.usegstplaybin3 = ConfigYesNo(default=False)
+
 	def correctInvalidEPGDataChange(configElement):
 		eServiceEvent.setUTF8CorrectMode(int(configElement.value))
 	config.epg.correct_invalid_epgdata = ConfigSelection(default="1", choices=[("0", _("Disabled")), ("1", _("Enabled")), ("2", _("Debug"))])
