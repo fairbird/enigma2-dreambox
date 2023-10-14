@@ -521,7 +521,7 @@ class MoviePlayer(InfoBarBase, InfoBarShowHide, InfoBarMenu, InfoBarSeek, InfoBa
 		if service is not None:
 			self.cur_service = service
 			self.is_closing = False
-			self.
+			self.session.nav.playService(service)
 			self.returning = False
 		elif self.returning:
 			self.close()
