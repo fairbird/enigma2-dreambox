@@ -834,7 +834,8 @@ class ConfigIP(ConfigSequence):
 		(value, mBlock) = self.genText()
 		return ("mtext"[1 - selected:], value, mBlock) if self.enabled else ("text", value)
 
-	def getHTML(self, id):
+	def getHTML(self, id=0):
+		# I do not know why id is here but it is used in the sources renderer and I'm afraid we should keep it for compatibily. It is not used here but I give at a default value
 		# we definitely don't want leading zeros
 		return '.'.join(["%d" % d for d in self.value])
 
