@@ -1100,7 +1100,7 @@ int eListboxPythonMultiContent::getMaxItemTextWidth()
 
 					if (pfnt) {
 						int fnt_i = PyLong_AsLong(pfnt);
-						if (m_font.find(fnt_i) != m_font.end()) fnt = m_font[fnt_i];
+						if (m_fonts.find(fnt_i) != m_fonts.end()) fnt = m_font[fnt_i];
 					}
 
 								/* don't do anything if we have 'None' as string */
