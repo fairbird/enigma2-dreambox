@@ -47,14 +47,14 @@ def ChoiceEntryComponent(key=None, text=None):
 				iconKeyConfigName = "ChoicelistButtonIcon"
 				png = LoadPixmap(resolveFilename(SCOPE_GUISKIN, "buttons/key_%s.png" % key))
 			if png:
-				x, y, w, h = parameters.get(iconKeyConfigName, (5, 0, 35, 25))
+				x, y, w, h = parameters.get(iconKeyConfigName, (5, 5, 35, 35))
 				if key == "verticalline" and "ChoicelistIconVerticalline" in parameters:
-					x, y, w, h = parameters.get("ChoicelistIconVerticalline", (5, 0, 35, 25))
+					x, y, w, h = parameters.get("ChoicelistIconVerticalline", (5, 5, 35, 35))
 				if key == "expanded" and "ChoicelistIconExpanded" in parameters:
-					x, y, w, h = parameters.get("ChoicelistIconExpanded", (5, 0, 35, 25))
+					x, y, w, h = parameters.get("ChoicelistIconExpanded", (5, 5, 35, 35))
 				res.append((eListboxPythonMultiContent.TYPE_PIXMAP_ALPHABLEND, x, y, w, h, png))
 		else:
-			x, y, w, h = parameters.get("ChoicelistNameSingle", (5, 0, 1275, 25))
+			x, y, w, h = parameters.get("ChoicelistNameSingle", (5, 5, 1275, 35))
 			res.append((eListboxPythonMultiContent.TYPE_TEXT, x, y, w, h, 0, RT_HALIGN_LEFT | verticalAlignment, text[0]))
 	return res
 
