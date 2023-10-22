@@ -1027,7 +1027,7 @@ int eListboxPythonMultiContent::getMaxItemTextWidth()
 		local_style = m_listbox->getLocalStyle();
 	if (local_style) {
 		fnt = local_style->m_font;
-		m_text_offset = local_style->m_text_offset.x();
+//		m_text_offset = local_style->m_text_offset.x();
 	}
 	if (!fnt) fnt = new gFont("Regular", 20);
 
