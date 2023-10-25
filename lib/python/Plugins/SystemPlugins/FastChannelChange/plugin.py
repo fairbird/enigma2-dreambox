@@ -251,6 +251,8 @@ class FCCSupport:
 		elif int(sref.getData(0)) in (2, 10): # is RADIO?
 			playable = False
 
+		playable = playable and not streamrelay.checkService(sref)
+
 		return playable
 
 	def getZapUpDownList(self):

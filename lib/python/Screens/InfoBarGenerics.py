@@ -37,7 +37,7 @@ from Screens.UnhandledKey import UnhandledKey
 from ServiceReference import ServiceReference, isPlayableForCur
 
 from Tools.ASCIItranslit import legacyEncode
-from Tools.Directories import fileExists, fileReadLines, fileReadLinesISO, getRecordingFilename, moveFiles
+from Tools.Directories import fileExists, fileReadLines, fileWriteLines, fileReadLinesISO, getRecordingFilename, moveFiles
 from keyids import KEYFLAGS, KEYIDS, KEYIDNAMES
 from Tools.Notifications import AddPopup, AddNotificationWithCallback, current_notifications, lock, notificationAdded, notifications, RemovePopup
 from Tools.HardwareInfo import HardwareInfo
@@ -147,7 +147,6 @@ resumePointCacheLast = int(time())
 
 class whitelist:
 	vbi = []
-	streamrelay = []
 
 
 def reload_whitelist_vbi():
@@ -156,28 +155,9 @@ def reload_whitelist_vbi():
 
 reload_whitelist_vbi()
 
-def reload_streamrelay():
-	whitelist.streamrelay = [line.strip() for line in open('/etc/enigma2/whitelist_streamrelay', 'r').readlines()] if os.path.isfile('/etc/enigma2/whitelist_streamrelay') else []
-
-
-reload_streamrelay()
-
 
 class subservice:
 	groupslist = None
-
-
-def streamrelayChecker(playref):
-	playrefstring = playref.toString()
-	if '%3a//' not in playrefstring and playrefstring in whitelist.streamrelay:
-		url = "http://%s:%s/" % (config.misc.softcam_streamrelay_url.getHTML(), config.misc.softcam_streamrelay_port.value)
-		if "127.0.0.1" in url:
-				playrefmod = ":".join([("%x" % (int(x[1], 16) + 1)).upper() if x[0] == 6 else x[1] for x in enumerate(playrefstring.split(':'))])
-		else:
-				playrefmod = playrefstring
-		playref = eServiceReference("%s%s%s:%s" % (playrefmod, url.replace(":", "%3a"), playrefstring.replace(":", "%3a"), ServiceReference(playref).getServiceName()))
-		print("[Whitelist_StreamRelay] Play service via streamrelay as it is whitelisted as such", playref.toString())
-	return playref
 
 
 def reload_subservice_groupslist(force=False):
@@ -229,6 +209,50 @@ def getActiveSubservicesForCurrentChannel(service):
 
 def hasActiveSubservicesForCurrentChannel(service):
 	return bool(getActiveSubservicesForCurrentChannel(service))
+
+
+class InfoBarStreamRelay:
+
+	FILENAME = "/etc/enigma2/whitelist_streamrelay"
+
+	def __init__(self) -> None:
+		self.streamRelay = fileReadLines(self.FILENAME, source=self.__class__.__name__)
+
+	def check(self, nav, service):
+		return (service or nav.getCurrentlyPlayingServiceReference()) and service.toString() in self.streamRelay
+
+	def write(self):
+		fileWriteLines(self.FILENAME, self.streamRelay, source=self.__class__.__name__)
+
+	def toggle(self, nav, service):
+		service = service or nav.getCurrentlyPlayingServiceReference()
+		if service:
+			servicestring = service.toString()
+			if servicestring in self.streamRelay:
+				self.streamRelay.remove(servicestring)
+			else:
+				self.streamRelay.append(servicestring)
+				if nav.getCurrentlyPlayingServiceReference() == service:
+					nav.restartService()
+			self.write()
+
+	def streamrelayChecker(self, playref):
+		playrefstring = playref.toString()
+		if "%3a//" not in playrefstring and playrefstring in self.streamRelay:
+			url = f'http://{".".join("%d" % d for d in config.misc.softcam_streamrelay_url.value)}:{config.misc.softcam_streamrelay_port.value}/'
+			if "127.0.0.1" in url:
+				playrefmod = ":".join([("%x" % (int(x[1], 16) + 1)).upper() if x[0] == 6 else x[1] for x in enumerate(playrefstring.split(':'))])
+			else:
+				playrefmod = playrefstring
+			playref = eServiceReference("%s%s%s:%s" % (playrefmod, url.replace(":", "%3a"), playrefstring.replace(":", "%3a"), ServiceReference(playref).getServiceName()))
+			print(f"[{self.__class__.__name__} Play service {playref.toString()} via streamrelay")
+		return playref
+
+	def checkService(self, service):
+		return service and service.toString() in self.streamRelay
+
+
+streamrelay = InfoBarStreamRelay()
 
 
 class InfoBarDish:
@@ -561,9 +585,6 @@ class InfoBarShowHide(InfoBarScreenSaver):
 					return ".hidevbi." in servicepath.lower()
 		return service and service.toString() in whitelist.vbi
 
-	def checkStreamrelay(self, service=None):
-		return (service or self.session.nav.getCurrentlyPlayingServiceReference()) and service.toString() in whitelist.streamrelay
-
 	def showHideVBI(self):
 		if self.checkHideVBI():
 			self.hideVBILineScreen.show()
@@ -581,17 +602,12 @@ class InfoBarShowHide(InfoBarScreenSaver):
 			open('/etc/enigma2/whitelist_vbi', 'w').write('\n'.join(whitelist.vbi))
 			self.showHideVBI()
 
+	def checkStreamrelay(self, service=None):
+		return streamrelay.check(self.session.nav, service)
+
 	def ToggleStreamrelay(self, service=None):
-		service = service or self.session.nav.getCurrentlyPlayingServiceReference()
-		if service:
-			servicestring = service.toString()
-			if servicestring in whitelist.streamrelay:
-				whitelist.streamrelay.remove(servicestring)
-			else:
-				whitelist.streamrelay.append(servicestring)
-				if self.session.nav.getCurrentlyPlayingServiceReference() == service:
-					self.session.nav.restartService()
-			open('/etc/enigma2/whitelist_streamrelay', 'w').write('\n'.join(whitelist.streamrelay))
+		streamrelay.toggle(self.session.nav, service)
+
 
 class BufferIndicator(Screen):
 	def __init__(self, session):

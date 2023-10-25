@@ -15,7 +15,7 @@ import NavigationInstance
 from ServiceReference import ServiceReference, isPlayableForCur
 from Screens.InfoBar import InfoBar
 from Components.Sources.StreamService import StreamServiceList
-from Screens.InfoBarGenerics import streamrelayChecker
+from Screens.InfoBarGenerics import streamrelay
 
 # TODO: remove pNavgation, eNavigation and rewrite this stuff in python.
 
@@ -95,10 +95,7 @@ class Navigation:
 		for x in self.record_event:
 			x(rec_service, event)
 
-	def restartService(self):
-		self.playService(self.currentlyPlayingServiceOrGroup, forceRestart=True)
-
-	def playService(self, ref, checkParentalControl=True, forceRestart=False, adjust=True):
+	def playService(self, ref, checkParentalControl=True, forceRestart=False, adjust=True, ignoreStreamRelay=False):
 		session = None
 		startPlayingServiceOrGroup = None
 		count = isinstance(adjust, list) and len(adjust) or 0
@@ -120,7 +117,7 @@ class Navigation:
 		if not checkParentalControl or parentalControl.isServicePlayable(ref, boundFunction(self.playService, checkParentalControl=False, forceRestart=forceRestart, adjust=(count > 1 and [0, session] or adjust)), session=session):
 			if ref.flags & eServiceReference.isGroup:
 				oldref = self.currentlyPlayingServiceReference or eServiceReference()
-				playref = getBestPlayableServiceReference(ref, oldref)
+				playref = getBestPlayableServiceReference(ref, oldref) if ignoreStreamRelay else streamrelay.streamrelayChecker(getBestPlayableServiceReference(ref, oldref))
 				if playref and config.misc.use_ci_assignment.value and not isPlayableForCur(playref):
 					alternative_ci_ref = ResolveCiAlternative(ref, playref)
 					if alternative_ci_ref:
@@ -139,7 +136,7 @@ class Navigation:
 							print("[Navigation] Failed to start: ", alternativeref.toString())
 							self.currentlyPlayingServiceReference = None
 							self.currentlyPlayingServiceOrGroup = None
-							if oldref and "://" in oldref.getPath():
+							if oldref and ("://" in oldref.getPath() or streamrelay.checkService(oldref)):
 								print("[Navigation] Streaming was active -> try again") # use timer to give the streamserver the time to deallocate the tuner
 								self.retryServicePlayTimer = eTimer()
 								self.retryServicePlayTimer.callback.append(boundFunction(self.playService, ref, checkParentalControl, forceRestart, adjust))
@@ -160,7 +157,8 @@ class Navigation:
 					return 0
 				self.pnav.stopService()
 				self.currentlyPlayingServiceReference = playref
-				playref = streamrelayChecker(playref)
+				if not ignoreStreamRelay:
+					playref = streamrelay.streamrelayChecker(playref)
 				self.currentlyPlayingServiceOrGroup = ref
 				if startPlayingServiceOrGroup and startPlayingServiceOrGroup.flags & eServiceReference.isGroup and not ref.flags & eServiceReference.isGroup:
 					self.currentlyPlayingServiceOrGroup = startPlayingServiceOrGroup
@@ -198,7 +196,7 @@ class Navigation:
 					print("[Navigation] Failed to start: ", playref.toString())
 					self.currentlyPlayingServiceReference = None
 					self.currentlyPlayingServiceOrGroup = None
-					if oldref and "://" in oldref.getPath():
+					if oldref and ("://" in oldref.getPath() or streamrelay.checkService(oldref)):
 						print("[Navigation] Streaming was active -> try again") # use timer to give the streamserver the time to deallocate the tuner
 						self.retryServicePlayTimer = eTimer()
 						self.retryServicePlayTimer.callback.append(boundFunction(self.playService, ref, checkParentalControl, forceRestart, adjust))
@@ -225,11 +223,15 @@ class Navigation:
 		if ref:
 			if ref.flags & eServiceReference.isGroup:
 				ref = getBestPlayableServiceReference(ref, eServiceReference(), simulate)
-			ref = streamrelayChecker(ref)
+			if type != (pNavigation.isPseudoRecording | pNavigation.isFromEPGrefresh):
+				ref = streamrelay.streamrelayChecker(ref)
 			service = ref and self.pnav and self.pnav.recordService(ref, simulate)
 			if service is None:
 				print("[Navigation] record returned non-zero")
 		return service
+
+	def restartService(self):
+		self.playService(self.currentlyPlayingServiceOrGroup, forceRestart=True)
 
 	def stopRecordService(self, service):
 		ret = -1
