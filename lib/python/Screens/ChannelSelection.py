@@ -244,6 +244,7 @@ class ChannelContextMenu(Screen):
 					if haveBouquets:
 						if not self.inBouquet and not "PROVIDERS" in current_sel_path:
 							append_when_current_valid(current, menu, (_("Copy to bouquets"), self.copyCurrentToBouquetList), level=0)
+							append_when_current_valid(current, menu, (_("Copy To Stream Relay"), self.copyCurrentToStreamRelay), level=0)
 					if ("flags == %d" % (FLAG_SERVICE_NEW_FOUND)) in current_sel_path:
 						append_when_current_valid(current, menu, (_("Remove all new found flags"), self.removeAllNewFoundFlags), level=0)
 				if self.inBouquet:
@@ -584,6 +585,10 @@ class ChannelContextMenu(Screen):
 
 	def copyCurrentToBouquetList(self):
 		self.csel.copyCurrentToBouquetList()
+		self.close()
+
+	def copyCurrentToStreamRelay(self):
+		self.csel.copyCurrentToStreamRelay()
 		self.close()
 
 	def showHDMIInInputBox(self):
@@ -1093,6 +1098,12 @@ class ChannelSelectionEdit:
 		serviceHandler = eServiceCenter.getInstance()
 		services = serviceHandler.list(provider.ref)
 		self.addBouquet(providerName, services and services.getContent('R', True))
+
+	def copyCurrentToStreamRelay(self):
+		provider = ServiceReference(self.getCurrentSelection())
+		serviceHandler = eServiceCenter.getInstance()
+		services = serviceHandler.list(provider.ref)
+		Screens.InfoBar.InfoBar.instance.ToggleStreamrelay(services and services.getContent("R", True))
 
 	def removeAlternativeServices(self):
 		cur_service = ServiceReference(self.getCurrentSelection())
