@@ -13,6 +13,7 @@ from enigma import iPlayableService, eTimer, eServiceReference, iRecordableServi
 import os
 import glob
 from enigma import eFCCServiceManager
+from Screens.InfoBarGenerics import streamrelay
 
 g_max_fcc = len(glob.glob('/dev/fcc?'))
 g_default_fcc = (g_max_fcc) > 5 and 5 or g_max_fcc
