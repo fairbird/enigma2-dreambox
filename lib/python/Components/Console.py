@@ -2,7 +2,6 @@
 from os import waitpid
 
 from enigma import eConsoleAppContainer
-import six
 
 
 class ConsoleItem:
@@ -82,7 +81,6 @@ class Console(object):
 	def eBatchCB(self, data, retVal, extraArg):
 		(cmds, callback, extraArgs) = extraArg
 		if self.debug:
-			data = six.ensure_str(data)
 			print("[Console] eBatch DEBUG: retVal=%s, cmds left=%d, data:\n%s" % (retVal, len(cmds), data))
 		if cmds:
 			cmd = cmds.pop(0)
