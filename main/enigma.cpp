@@ -199,16 +199,17 @@ int main(int argc, char **argv)
 
 	// set pythonpath if unset
 	setenv("PYTHONPATH", eEnv::resolve("${libdir}/enigma2/python").c_str(), 0);
-	printf("PYTHONPATH: %s\n", getenv("PYTHONPATH"));
-	printf("DVB_API_VERSION %d DVB_API_VERSION_MINOR %d\n", DVB_API_VERSION, DVB_API_VERSION_MINOR);
 
 	// get enigma2 debug level settings
 	debugLvl = getenv("ENIGMA_DEBUG_LVL") ? atoi(getenv("ENIGMA_DEBUG_LVL")) : 4;
 	if (debugLvl < 0)
 		debugLvl = 0;
-	printf("ENIGMA_DEBUG_LVL=%d\n", debugLvl);
 	if (getenv("ENIGMA_DEBUG_TIME"))
 		setDebugTime(atoi(getenv("ENIGMA_DEBUG_TIME")) != 0);
+
+	eLog(0, "[Enigma] Python path is '%s'.", getenv("PYTHONPATH"));
+	eLog(0, "[Enigma] DVB API version %d, DVB API version minor %d.", DVB_API_VERSION, DVB_API_VERSION_MINOR);
+	eLog(0, "[Enigma] Enigma debug level %d.", debugLvl);
 
 	ePython python;
 	eMain main;
