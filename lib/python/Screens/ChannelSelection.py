@@ -2768,17 +2768,15 @@ class HistoryZapSelector(Screen, HelpableScreen):
 		self["key_green"] = StaticText(_("Select"))
 		self["actions"] = HelpableActionMap(self, ["SelectCancelActions", "InfobarCueSheetActions"], {
 			"cancel": (self.keyCancel, _("Cancel the service zap")),
-			"select": (self.keySelect, _("Select the currently highlighted service")),
-			"jumpPreviousMark": (self.keyTop, _("Move to the first line / screen")),
-			"jumpNextMark": (self.keyBottom, _("Move to the last line / screen"))
+			"select": (self.keySelect, _("Select the currently highlighted service"))
 		}, prio=0, description=_("History Zap Actions"))
 		self["navigationActions"] = HelpableActionMap(self, ["NavigationActions"], {
-			"top": (self.keyTop, _("Move to the first line / screen")),
+			"right": (self.keyTop, _("Move to the first line / screen")),
 			"pageUp": (self.keyPageUp, _("Move up a screen")),
 			"up": (self.keyUp, _("Move up a line")),
 			"down": (self.keyDown, _("Move down a line")),
 			"pageDown": (self.keyPageDown, _("Move down a screen")),
-			"bottom": (self.keyBottom, _("Move to the last line / screen"))
+			"left": (self.keyBottom, _("Move to the last line / screen"))
 		}, prio=0, description=_("History Zap Navigation Actions"))
 		serviceHandler = eServiceCenter.getInstance()
 		historyList = []
