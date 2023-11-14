@@ -818,3 +818,9 @@ def InitAVSwitch():
 				print("[AVSwitch] Write to /sys/class/graphics/fb0/osd_plane_alpha failed!")
 		config.av.osd_planealpha = ConfigSlider(default=255, limits=(0, 255))
 		config.av.osd_planealpha.addNotifier(setOSDPlaneAlpha)
+
+	config.av.force = ConfigSelection(default=None, choices=[
+		(None, _("Do not force")),
+		("50", _("Force 50Hz")),
+		("60", _("Force 60Hz"))
+	])
