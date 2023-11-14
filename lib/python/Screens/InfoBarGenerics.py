@@ -3290,7 +3290,7 @@ class InfoBarAspectSelection:
 			if aspectList[item][1] == aspect:
 				selection = item
 				break
-		self.session.openWithCallback(self.aspectSelected, ChoiceBox, text=_("Please select an aspect ratio..."), list=tlist, selection=selection, keys=keys)
+		self.session.openWithCallback(self.aspectSelected, ChoiceBox, title=_("Please select an aspect ratio..."), list=aspectList, selection=selection, keys=keys)
 
 	def aspectSelected(self, aspect):
 		if not aspect is None:
