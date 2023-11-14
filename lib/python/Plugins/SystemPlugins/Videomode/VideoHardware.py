@@ -13,12 +13,16 @@ from enigma import getDesktop
 
 MODULE_NAME = __name__.split(".")[-1]
 
+has_yuv = BoxInfo.getItem("yuv")
+has_rca = BoxInfo.getItem("rca")
+has_avjack = BoxInfo.getItem("avjack")
+
 # The "VideoHardware" is the interface to /proc/stb/video.
 # It generates hotplug events, and gives you the list of
 # available and preferred modes, as well as handling the currently
 # selected mode. No other strict checking is done.
 
-config.av.edid_override = ConfigYesNo(default=True)
+config.av.edid_override = ConfigYesNo(default=False)
 chipsetstring = about.getChipSetString()
 
 
@@ -101,6 +105,15 @@ class VideoHardware:
 
         modes["HDMI-PC"] = ["PC"]
 
+        if has_yuv:
+                modes["YPbPr"] = modes["HDMI"]
+
+        if "YPbPr" in modes and not has_yuv:
+                del modes["YPbPr"]
+
+        if "Scart" in modes and not SystemInfo["HasScart"] and not has_rca and not has_avjack:
+                del modes["Scart"]
+
         widescreen_modes = tuple([x for x in modes["HDMI"] if x not in ("576p", "576i", "480p", "480i")])
 
         ASPECT_SWITCH_MSG = (_("16/9 reset to normal"),
@@ -152,12 +165,12 @@ class VideoHardware:
                 self.is24hzAvailable()
                 self.readPreferredModes()
 
-                if "DVI-PC" in self.modes and not self.getModeList("DVI-PC"):
-                        print("[VideoHardware] remove DVI-PC because of not existing modes")
-                        del self.modes["DVI-PC"]
-                if "Scart" in self.modes and not self.getModeList("Scart"):
-                        print("[VideoHardware] remove Scart because of not existing modes")
-                        del self.modes["Scart"]
+                #if "DVI-PC" in self.modes and not self.getModeList("DVI-PC"):
+                #        print("[VideoHardware] remove DVI-PC because of not existing modes")
+                #        del self.modes["DVI-PC"]
+                #if "Scart" in self.modes and not self.getModeList("Scart"):
+                #        print("[VideoHardware] remove Scart because of not existing modes")
+                #        del self.modes["Scart"]
 
                 self.createConfig()
 
@@ -222,9 +235,9 @@ class VideoHardware:
                                 descr = 'DVI'
                         if descr == 'HDMI-PC' and SystemInfo["DreamBoxDVI"]:
                                 descr = 'DVI-PC'
-                        if descr == "Scart" and has_rca and not has_scart:
+                        if descr == "Scart" and has_rca and not SystemInfo["HasScart"]:
                                 descr = "RCA"
-                        if descr == "Scart" and has_avjack and not has_scart:
+                        if descr == "Scart" and has_avjack and not SystemInfo["HasScart"]:
                                 descr = "Jack"
                         lst.append((port, descr))
 
@@ -244,14 +257,14 @@ class VideoHardware:
         def isPortAvailable(self, port):  # Fix me!
                 return True
 
-        def isModeAvailable(self, port, mode, rate):  # Check if a high-level mode with a given rate is available.
+        def isModeAvailable(self, port, mode, rate, availableModes):  # Check if a high-level mode with a given rate is available.
                 rate = self.rates[mode][rate]
                 for mode in rate.values():
-                        if port == "HDMI":
-                                if mode not in self.readAvailableModes():
-                                        return False
-                        elif mode not in self.modes_preferred:
-                                return False
+                	if port == "HDMI":
+                		if mode not in availableModes:
+                			return False
+                	elif mode not in self.modes_preferred:
+                		return False
                 return True
 
         def isPortUsed(self, port):
@@ -266,8 +279,9 @@ class VideoHardware:
 
         def getModeList(self, port):  # Get a list with all modes, with all rates, for a given port.
                 results = []
+                availableModes = self.readAvailableModes()
                 for mode in self.modes[port]:
-                        rates = [rate for rate in self.rates[mode] if self.isModeAvailable(port, mode, rate)]  # List all rates which are completely valid.
+                        rates = [rate for rate in self.rates[mode] if self.isModeAvailable(port, mode, rate, availableModes)]  # List all rates which are completely valid.
                         if len(rates):  # If at least one rate is OK then add this mode.
                                 results.append((mode, rates))
                 return results
