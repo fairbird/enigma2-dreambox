@@ -165,12 +165,10 @@ class VideoHardware:
                 self.is24hzAvailable()
                 self.readPreferredModes()
 
-                #if "DVI-PC" in self.modes and not self.getModeList("DVI-PC"):
-                #        print("[VideoHardware] remove DVI-PC because of not existing modes")
-                #        del self.modes["DVI-PC"]
-                #if "Scart" in self.modes and not self.getModeList("Scart"):
-                #        print("[VideoHardware] remove Scart because of not existing modes")
-                #        del self.modes["Scart"]
+                if "YPbPr" in self.modes and not has_yuv:
+                        del self.modes["YPbPr"]
+                if "Scart" in self.modes and not has_scart and not has_rca and not has_avjack:
+                        del self.modes["Scart"]
 
                 self.createConfig()
 
@@ -260,11 +258,11 @@ class VideoHardware:
         def isModeAvailable(self, port, mode, rate, availableModes):  # Check if a high-level mode with a given rate is available.
                 rate = self.rates[mode][rate]
                 for mode in rate.values():
-                	if port == "HDMI":
-                		if mode not in availableModes:
-                			return False
-                	elif mode not in self.modes_preferred:
-                		return False
+                        if port == "HDMI":
+                                if mode not in availableModes:
+                                        return False
+                        elif mode not in self.modes_preferred:
+                                return False
                 return True
 
         def isPortUsed(self, port):
@@ -531,5 +529,6 @@ class VideoHardware:
 
 video_hw = VideoHardware()
 video_hw.setConfiguredMode()
+
 
 
