@@ -322,7 +322,6 @@ class VideoHardware:
                         mode_59 = mode_50
                 if mode_60 is None or force == 50:
                         mode_60 = mode_50
-
                 if mode_23 is None or force:
                         mode_23 = mode_60
                         if force == 50:
@@ -376,36 +375,17 @@ class VideoHardware:
                         stride = fileReadLine("/sys/class/graphics/fb0/stride", default="", source=MODULE_NAME)
                         print("[AVSwitch] Framebuffer mode:%s  stride:%s axis:%s" % (getDesktop(0).size().width(), stride, self.axis[mode]))
 
-                try:
-                        open("/proc/stb/video/videomode_50hz", "w").write(mode_50)
-                        open("/proc/stb/video/videomode_60hz", "w").write(mode_60)
-                except IOError:
-                        print("[VideoHardware] Write to /proc/stb/video/videomode_50hz failed.")
-                        print("[VideoHardware] Write to /proc/stb/video/videomode_60hz failed.")
-                        if isfile("/proc/stb/video/videomode"):
+                success = fileWriteLine("/proc/stb/video/videomode_50hz", mode_50, source=MODULE_NAME)
+                if success:
+                        success = fileWriteLine("/proc/stb/video/videomode_60hz", mode_60, source=MODULE_NAME)
+                if not success:  # Fallback if no possibility to setup 50/60 hz mode
                                 try:
-                                        # fallback if no possibility to setup 50 hz mode
-                                        open("/proc/stb/video/videomode", "w").write(mode_50)
-                                except IOError:
-                                        print("[VideoHardware] Write to /proc/stb/video/videomode failed!")
-                        elif isfile("/sys/class/display/mode"):
-                                try:
-                                        # fallback if no possibility to setup 50 hz mode
-                                        open("/sys/class/display/mode", "w").write(mode_50)
-                                except IOError:
-                                        print("[VideoHardware] Write to /sys/class/display/mode failed!")
-
-                try:
-                        open("/etc/videomode", "w").write(mode_50) # use 50Hz mode (if available) for booting
-                except IOError:
-                        print("[VideoHardware] writing initial videomode to /etc/videomode failed.")
+                                        fileWriteLine("/proc/stb/video/videomode", mode_50, source=MODULE_NAME)
+                                except:
+                                        fileWriteLine("/sys/class/display/mode", mode_50, source=MODULE_NAME)
 
                 if SystemInfo["Has24hz"] and mode_24 is not None:
-                        try:
-                                print("[VideoHardware] Write to /proc/stb/video/videomode_24hz")
-                                open("/proc/stb/video/videomode_24hz", "w").write(mode_24)
-                        except IOError:
-                                print("[VideoHardware] Write to /proc/stb/video/videomode_24hz failed.")
+                        fileWriteLine("/proc/stb/video/videomode_24hz", mode_24, source=MODULE_NAME)
 
                 self.updateAspect(None)
 
@@ -529,6 +509,7 @@ class VideoHardware:
 
 video_hw = VideoHardware()
 video_hw.setConfiguredMode()
+
 
 
 
