@@ -122,17 +122,16 @@ def resolveFilename(scope, base="", path_prefix=None):
 	path = base
 
 	def itemExists(resolveList, base):
-		# Disable png / svg interchange code for now.  SVG files are very CPU intensive.
-		# baseList = [base]
-		# if base.endswith(".png"):
-		# 	baseList.append("%s%s" % (base[:-3], "svg"))
-		# elif base.endswith(".svg"):
-		# 	baseList.append("%s%s" % (base[:-3], "png"))
+		baseList = [base]
+		if base.endswith(".png"):
+			baseList.append("%s%s" % (base[:-3], "svg"))
+		elif base.endswith(".svg"):
+			baseList.append("%s%s" % (base[:-3], "png"))
 		for item in resolveList:
-			# for base in baseList:
-			file = pathjoin(item, base)
-			if pathExists(file):
-				return file
+			for base in baseList:
+				file = pathjoin(item, base)
+				if pathExists(file):
+					return file
 		return base
 
 	if base == "":  # If base is "" then set path to the scope.  Otherwise use the scope to resolve the base filename.
@@ -158,7 +157,6 @@ def resolveFilename(scope, base="", path_prefix=None):
 			pathjoin(scopeConfig, "skin_common"),
 			scopeConfig,  # Can we deprecate top level of SCOPE_CONFIG directory to allow a clean up?
 			pathjoin(scopeGUISkin, skin),
-			pathjoin(scopeGUISkin, "skin_fallback_%d" % getDesktop(0).size().height()),
 			pathjoin(scopeGUISkin, "skin_default"),
 			scopeGUISkin  # Can we deprecate top level of SCOPE_GUISKIN directory to allow a clean up?
 		]
@@ -171,7 +169,6 @@ def resolveFilename(scope, base="", path_prefix=None):
 			pathjoin(scopeConfig, "display", "skin_common"),
 			scopeConfig,  # Can we deprecate top level of SCOPE_CONFIG directory to allow a clean up?
 			pathjoin(scopeLCDSkin, skin),
-			pathjoin(scopeLCDSkin, "skin_fallback_%s" % getDesktop(1).size().height()),
 			pathjoin(scopeLCDSkin, "skin_default"),
 			scopeLCDSkin  # Can we deprecate top level of SCOPE_LCDSKIN directory to allow a clean up?
 		]
