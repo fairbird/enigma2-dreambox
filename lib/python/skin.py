@@ -557,9 +557,9 @@ def parseParameter(value):
 		return colors[value].argb()
 	elif value.find(";") != -1:  # Font.
 		(font, size) = (x.strip() for x in value.split(";", 1))
-		return [font, int(size)]
+		return [font, parseScale2(size)]
 	else:  # Integer.
-		return int(value)
+		return parseScale2(value)
 
 
 def parsePixmap(path, desktop):
@@ -619,6 +619,20 @@ def parseValuePair(value, scale, object=None, desktop=None, size=None):
 	yValue = parseCoordinate(yValue, parentsize.height(), size and size.height() or 0, None, scale[1])
 	# print(f"[Skin] parseValuePair DEBUG: Scaled pair X {x} -> {xValue}, Y {y} -> {yValue}.")
 	return (xValue, yValue)
+
+
+def parseScale2(s):
+	orig = s
+	try:
+		val = int(s)
+	except ValueError:
+		try:
+			s = s.replace("f", str(getSkinFactor()))
+			val = int(eval(s))
+		except Exception as err:
+			print("[Skin] %s '%s': size formula '%s', processed to '%s', cannot be evaluated!" % (type(err).__name__, err, orig, s))
+			val = 0
+	return val
 
 
 def parseScale(value):
