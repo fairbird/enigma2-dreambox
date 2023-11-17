@@ -1,7 +1,8 @@
-# -*- coding: utf-8 -*-
 from Components.Addons.GUIAddon import GUIAddon
 
 from enigma import eListbox, eListboxPythonMultiContent, BT_ALIGN_CENTER, eSize
+
+from skin import parseScale
 
 from Components.MultiContent import MultiContentEntryPixmapAlphaBlend
 
@@ -144,9 +145,9 @@ class Pager(GUIAddon):
 				if pic:
 					self.picDotCurPage = pic
 			elif attrib == "itemHeight":
-				self.l.setItemHeight(int(value))
+				self.l.setItemHeight(parseScale(value))
 			elif attrib == "spacing":
-				self.spacing = int(value)
+				self.spacing = parseScale(value)
 			elif attrib == "showIcons":
 				self.showIcons = value
 			else:
