@@ -1688,7 +1688,9 @@ def readSkin(screen, skin, names, desktop):
 		# widgets (source->renderer).
 		widgetName = widget.attrib.get("name")
 		widgetSource = widget.attrib.get("source")
-		if widgetName is None and widgetSource is None:
+		wconnection = widget.attrib.get("connection")
+		wclass = widget.attrib.get("addon")
+		if widgetName is None and widgetSource is None and wclass is None:
 			raise SkinError("The widget has no name and no source")
 			return
 		if widgetName:
@@ -1726,7 +1728,10 @@ def readSkin(screen, skin, names, desktop):
 				raise SkinError(f"The source '{widgetSource}' was not found in screen '{myName}'")
 			widgetRenderer = widget.attrib.get("render")
 			if not widgetRenderer:
-				raise SkinError(f"For source '{widgetSource}' a renderer must be defined with a 'render=' attribute")
+				if widgetSource:
+					raise SkinError(f"For source '%s' a renderer must be defined with a 'render=' attribute" % widgetSource)
+				elif wconnection:
+					raise SkinError(f"For connection '%s' a renderer must be defined with a 'render=' attribute" % wconnection)
 			for converter in widget.findall("convert"):
 				converterType = converter.get("type")
 				assert converterType, "[Skin] The 'convert' tag needs a 'type' attribute!"
@@ -1757,6 +1762,27 @@ def readSkin(screen, skin, names, desktop):
 			attributes = renderer.skinAttributes = []
 			collectAttributes(attributes, widget, context, skinPath, ignore=("render", "source"))
 			screen.renderer.append(renderer)
+		elif wclass:
+			try:
+				addonClass = my_import(".".join(("Components", "Addons", wclass))).__dict__.get(wclass)
+			except ImportError:
+				raise SkinError("GUI Addon '%s' not found" % wclass)
+
+			if not wconnection:
+				raise SkinError("The widget is from addon type: %s , but no connection is specified." % wclass)
+
+			i = 0
+			wclassname_base = name + "_" + wclass + "_" + wconnection + "_"
+			while wclassname_base + str(i) in usedComponents:
+				i += 1
+			wclassname = wclassname_base + str(i)
+
+			usedComponents.add(wclassname)
+
+			screen[wclassname] = addonClass() #init the addon
+			screen[wclassname].connectRelatedElement(wconnection, screen) #connect it to related ellement
+			attributes = screen[wclassname].skinAttributes = []
+			collectAttributes(attributes, widget, context, skinPath, ignore=("addon",))
 
 	def processApplet(widget, context):
 		try:
