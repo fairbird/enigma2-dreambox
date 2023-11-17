@@ -2,7 +2,7 @@ from Components.Addons.GUIAddon import GUIAddon
 
 from enigma import eListbox, eListboxPythonMultiContent, BT_ALIGN_CENTER, RT_VALIGN_CENTER, RT_HALIGN_LEFT, eSize, getDesktop, gFont
 
-from skin import parseScale, parseColor, parseFont, applySkinFactor
+from skin import parseScale, parseColor, parseFont
 
 from Components.MultiContent import MultiContentEntryPixmapAlphaBlend
 from Components.Label import Label
@@ -20,8 +20,8 @@ class ColorButtonsSequence(GUIAddon):
 		self.l.setBuildFunc(self.buildEntry)
 		self.l.setItemHeight(35)
 		self.l.setItemWidth(35)
-		self.spacingButtons = applySkinFactor(40)
-		self.spacingPixmapText = applySkinFactor(10)
+		self.spacingButtons = 40
+		self.spacingPixmapText = 10
 		self.layoutStyle = "fixed"
 		self.colorIndicatorStyle = "pixmap"
 		self.orientations = {"orHorizontal": eListbox.orHorizontal, "orVertical": eListbox.orVertical}
