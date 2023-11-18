@@ -20,3 +20,10 @@ class Converter(Element):
 		else:
 			str = str + " " + self.separator + " " + part #here add space around separator since skin engine strips all spaces around parameters
 		return str
+
+	def appendToStringWithSeparator(self, str, part):
+		if str == "":
+			str = part
+		else:
+			str = str + "  " + self.separator + "  " + part
+		return str
