@@ -3,9 +3,6 @@
 #include <lib/gui/eslider.h>
 #include <lib/actions/action.h>
 #include <lib/base/nconfig.h>
-#ifdef USE_LIBVUGLES2
-#include "vuplus_gles.h"
-#endif
 
 eRect eListbox::defaultPadding = eRect(1, 1, 1, 1);
 int eListbox::defaultScrollBarWidth = eListbox::DefaultScrollBarWidth;
@@ -570,16 +567,6 @@ int eListbox::event(int event, void *data, void *data2)
 				}
 				else if (m_orientation == orVertical)
 					m_content->paint(painter, *style, ePoint(posx + xOffset, posy + yOffset), sel);
-
-#ifdef USE_LIBVUGLES2
-				if (sel && m_orientation == orVertical)
-				{
-					ePoint pos = getAbsolutePosition();
-					painter.sendShowItem(m_dir, ePoint(pos.x() + xOffset, pos.y() + posy + yOffset), eSize(m_scrollbar && m_scrollbar->isVisible() ? size().width() - m_scrollbar->size().width() : size().width(), m_itemheight));
-					gles_set_animation_listbox_current(pos.x() + xOffset, pos.y() + posy + yOffset, m_scrollbar && m_scrollbar->isVisible() ? size().width() - m_scrollbar->size().width() : size().width(), m_itemheight);
-					m_dir = justCheck;
-				}
-#endif
 			}
 
 			m_content->cursorMove(+1);
@@ -1313,9 +1300,6 @@ void eListbox::moveSelection(int dir)
 	if (indexChanged)
 		dir -= 100;
 
-#ifdef USE_LIBVUGLES2
-	m_dir = dir;
-#endif
 	switch (dir)
 	{
 	case moveFirst:

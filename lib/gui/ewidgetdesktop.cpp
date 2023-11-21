@@ -529,10 +529,6 @@ void eWidgetDesktop::resize(eSize size)
 {
 	m_screen.m_dirty_region = gRegion(eRect(ePoint(0, 0), size));
 	m_screen.m_screen_size = size;
-#ifdef USE_LIBVUGLES2
-	gPainter painter(m_screen.m_dc);
-	painter.setView(size);
-#endif
 }
 
 void eWidgetDesktop::sendShow(ePoint point, eSize size)
