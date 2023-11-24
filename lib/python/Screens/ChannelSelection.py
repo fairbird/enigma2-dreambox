@@ -90,6 +90,19 @@ class BouquetSelector(Screen):
 		self.close(False)
 
 
+def getStreamRelayRef(sref):
+	try:
+		if "http" in sref:
+			icamport = config.misc.softcam_streamrelay_port.value
+			icamip = ".".join("%d" % d for d in config.misc.softcam_streamrelay_url.value)
+			icam = f"http%3a//{icamip}%3a{icamport}/"
+			if icam in sref:
+				return sref.split(icam)[1].split(":")[0].replace("%3a", ":")
+	except Exception:
+		pass
+	return sref
+
+
 class SilentBouquetSelector:
 	def __init__(self, bouquets, enableWrapAround=False, current=0):
 		self.bouquets = [b[1] for b in bouquets]
@@ -2039,6 +2052,7 @@ class ChannelSelection(ChannelSelectionBase, ChannelSelectionEdit, ChannelSelect
 				info = service.info()
 				if info:
 					refstr = info.getInfoString(iServiceInformation.sServiceref)
+					refstr = getStreamRelayRef(refstr)
 					self.servicelist.setPlayableIgnoreService(eServiceReference(refstr))
 
 	def __evServiceEnd(self):
