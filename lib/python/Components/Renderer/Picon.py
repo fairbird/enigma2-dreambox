@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import os
 import re
+import unicodedata
 from Components.Renderer.Renderer import Renderer
 from enigma import ePixmap, ePicLoad, eServiceCenter, eServiceReference, iServiceInformation
 from Tools.Alternatives import GetWithAlternative
@@ -95,7 +96,8 @@ def getPiconName(serviceRef):
 		fields[2] = '1'
 		pngname = findPicon('_'.join(fields))
 	if not pngname: # picon by channel name
-		name = sanitizeFilename(ServiceReference(serviceRef).getServiceName())
+		name = ServiceReference(serviceRef).getServiceName()
+		name = unicodedata.normalize('NFKD', str(name)).encode('ASCII', 'ignore').decode('ASCII', 'ignore')
 		name = re.sub('[^a-z0-9]', '', name.replace('&', 'and').replace('+', 'plus').replace('*', 'star').lower())
 		if name:
 			pngname = findPicon(name)
