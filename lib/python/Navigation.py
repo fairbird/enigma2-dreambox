@@ -39,6 +39,7 @@ class Navigation:
 		self.currentlyPlayingServiceReference = None
 		self.currentlyPlayingServiceOrGroup = None
 		self.currentlyPlayingService = None
+		self.currentServiceStreaming = False
 		self.RecordTimer = RecordTimer.RecordTimer()
 		self.__wasTimerWakeup = getFPWasTimerWakeup()
 		self.__isRestartUI = config.misc.RestartUI.value
@@ -159,6 +160,7 @@ class Navigation:
 				self.currentlyPlayingServiceReference = playref
 				if not ignoreStreamRelay:
 					playref = streamrelay.streamrelayChecker(playref)
+				print("[Navigation] playref", playref.toString())
 				self.currentlyPlayingServiceOrGroup = ref
 				if startPlayingServiceOrGroup and startPlayingServiceOrGroup.flags & eServiceReference.isGroup and not ref.flags & eServiceReference.isGroup:
 					self.currentlyPlayingServiceOrGroup = startPlayingServiceOrGroup
@@ -192,7 +194,15 @@ class Navigation:
 								if config.usage.frontend_priority_dvbs.value != config.usage.frontend_priority.value:
 									setPreferredTuner(int(config.usage.frontend_priority_dvbs.value))
 									setPriorityFrontend = True
-				if self.pnav.playService(playref):
+				if self.currentServiceStreaming and not ignoreStreamRelay:
+					self.currentServiceStreaming = False
+					self.currentlyPlayingServiceReference = None
+					self.currentlyPlayingServiceOrGroup = None
+					print("[Navigation] Streamrelay was active -> delay the zap till tuner is freed")
+					self.retryServicePlayTimer = eTimer()
+					self.retryServicePlayTimer.callback.append(boundFunction(self.playService, ref, checkParentalControl, forceRestart, adjust, True))
+					self.retryServicePlayTimer.start(100, True)
+				elif self.pnav.playService(playref):
 					print("[Navigation] Failed to start: ", playref.toString())
 					self.currentlyPlayingServiceReference = None
 					self.currentlyPlayingServiceOrGroup = None
@@ -201,6 +211,8 @@ class Navigation:
 						self.retryServicePlayTimer = eTimer()
 						self.retryServicePlayTimer.callback.append(boundFunction(self.playService, ref, checkParentalControl, forceRestart, adjust))
 						self.retryServicePlayTimer.start(500, True)
+				if playref.toString().find("127.0.0.1") > -1 and not self.currentServiceStreaming:
+					self.currentServiceStreaming = True
 				if setPriorityFrontend:
 					setPreferredTuner(int(config.usage.frontend_priority.value))
 				return 0
