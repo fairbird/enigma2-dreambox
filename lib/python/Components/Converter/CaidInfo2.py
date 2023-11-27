@@ -52,6 +52,7 @@ class CaidInfo2(Poll, Converter, object):
 	SHORT = 35
 	IS_FTA = 36
 	IS_CRYPTED = 37
+	CRYPT3 = 38
 	my_interval = 1000
 
 
@@ -76,6 +77,8 @@ class CaidInfo2(Poll, Converter, object):
 			self.type = self.CRYPT
 		elif type == "CryptInfo2":
 			self.type = self.CRYPT2
+		elif type == "CryptInfo3":
+			self.type = self.CRYPT3
 		elif type == "BetaCrypt":
 			self.type = self.BETA
 		elif type == "ConaxCrypt":
@@ -164,6 +167,7 @@ class CaidInfo2(Poll, Converter, object):
 			"18": "NAG",
 			"09": "NDS",
 			"0B": "CON",
+			"0E": "PV",
 			"0D": "CRW",
 			"27": "EXS",
 			"7B": "DRE",
@@ -338,9 +342,21 @@ class CaidInfo2(Poll, Converter, object):
 						caid = "%0.4X" % int(ecm_info.get("caid", ""), 16)
 						return "%s" % self.systemTxtCaids.get(caid[:2])
 					except:
-						return 'nondecode'
+						return '----'
 				else:
-					return 'nondecode'
+					return 'FTA'
+			if self.type == self.CRYPT3:
+				self.poll_interval = self.my_interval
+				self.poll_enabled = True
+				ecm_info = self.ecmfile()
+				if pathExists("/tmp/ecm.info"):
+					try:
+						caid = "%0.4X" % int(ecm_info.get("caid", ""),16)
+						return "%s" % self.systemCaids.get(caid[:2])
+					except:
+						return '----'
+				else:
+					return 'FTA'
 		if service:
 			info = service and service.info()
 			if info:
@@ -536,6 +552,7 @@ class CaidInfo2(Poll, Converter, object):
 								info["source"] = "net"
 								it_tmp = item[1].strip().split(" ")
 								info["ecm time"] = "%s msec" % it_tmp[0]
+								info["reader"] = it_tmp[-1].strip('R0[').strip(']')
 								y = it_tmp[-1].find('[')
 								if y != -1:
 									info["server"] = it_tmp[-1][:y]
@@ -546,6 +563,7 @@ class CaidInfo2(Poll, Converter, object):
 								if y != -1:
 									info["server"] = it_tmp[-1].split("(")[-1].split(":")[0]
 									info["port"] = it_tmp[-1].split("(")[-1].split(":")[-1].rstrip(")")
+									info["reader"] = it_tmp[-2]
 								elif y == -1:
 									item[0] = "source"
 									item[1] = "sci"
