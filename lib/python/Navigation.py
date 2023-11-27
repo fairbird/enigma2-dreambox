@@ -211,8 +211,9 @@ class Navigation:
 						self.retryServicePlayTimer = eTimer()
 						self.retryServicePlayTimer.callback.append(boundFunction(self.playService, ref, checkParentalControl, forceRestart, adjust))
 						self.retryServicePlayTimer.start(500, True)
-				if playref.toString().find("127.0.0.1") > -1 and not self.currentServiceStreaming:
-					self.currentServiceStreaming = True
+# This needs to be improved.
+#				if playref.toString().find("127.0.0.1") > -1 and not self.currentServiceStreaming:
+#					self.currentServiceStreaming = True
 				if setPriorityFrontend:
 					setPreferredTuner(int(config.usage.frontend_priority.value))
 				return 0
