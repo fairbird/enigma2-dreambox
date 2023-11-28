@@ -190,7 +190,7 @@ class PictureInPicture(Screen):
 		if service is None:
 			return False
 		from Screens.InfoBarGenerics import streamrelay
-		ref = streamrelay.streamrelayChecker(self.resolveAlternatePipService(service))
+		ref, isStreamRelay = streamrelay.streamrelayChecker(self.resolveAlternatePipService(service))
 		if ref:
 			if SystemInfo["CanNotDoSimultaneousTranscodeAndPIP"] and StreamServiceList:
 				self.pipservice = None
