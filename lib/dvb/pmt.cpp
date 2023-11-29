@@ -825,6 +825,7 @@ int eDVBServicePMTHandler::getChannel(eUsePtr<iDVBChannel> &channel)
 					if (channelid == alternativeChannelID)
 					{
 						m_sr_channel = i->m_channel;
+						res_mgr->feStateChanged();
 						break;
 					}
 				}
