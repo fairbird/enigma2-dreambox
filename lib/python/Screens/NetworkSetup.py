@@ -239,7 +239,7 @@ class NameserverSetup(ConfigListScreen, HelpableScreen, Screen):
                 strdns = str(self.backupNameserverList)
                 dhcp_router = str([list(x[1]) for x in self.getNetworkRoutes()]).replace("[[", "[").replace("]]", "]").replace(",", ".").replace("].", "]")
                 dns = strdns.replace("[[", "[").replace("]]", "]").replace(",", ".").replace("].", "]")
-                if config.usage.dns.value not in ("google", "quad9security", "quad9nosecurity", "cloudflare", "opendns", "opendns-2"):
+                if config.usage.dns.value not in ("google", "quad9security", "quad9nosecurity", "cloudflare", "NordVPN", "opendns", "opendns-2"):
                         if dhcp_router != dns:
                                 config.usage.dns.default = "staticip"
                                 config.usage.dns.value = config.usage.dns.default
@@ -255,6 +255,8 @@ class NameserverSetup(ConfigListScreen, HelpableScreen, Screen):
                                 servername = _("Quad9 Security")
                         elif "9. 9. 9. 10" in dns:
                                 servername = _("Quad9 No Security")
+                        elif "103. 86. 96. 100" in dns:
+                                servername = _("NordVPN")
                         elif "222. 222" in dns:
                                 servername = _("OpenDNS")
                         elif "220. 222" in dns:
@@ -280,6 +282,8 @@ class NameserverSetup(ConfigListScreen, HelpableScreen, Screen):
                         self.nameserverEntries = [NoSave(ConfigIP(default=[9, 9, 9, 9])), NoSave(ConfigIP(default=[149, 112, 112, 112]))]
                 elif config.usage.dns.value == 'quad9nosecurity':
                         self.nameserverEntries = [NoSave(ConfigIP(default=[9, 9, 9, 10])), NoSave(ConfigIP(default=[149, 112, 112, 10]))]
+                elif config.usage.dns.value == 'NordVPN':
+                        self.nameserverEntries = [NoSave(ConfigIP(default=[103, 86, 96, 100])), NoSave(ConfigIP(default=[103, 86, 99, 100]))]
                 elif config.usage.dns.value == 'opendns':
                         self.nameserverEntries = [NoSave(ConfigIP(default=[208, 67, 222, 222])), NoSave(ConfigIP(default=[208, 67, 220, 220]))]
                 elif config.usage.dns.value == 'opendns-2':
