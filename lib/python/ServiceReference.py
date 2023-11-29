@@ -44,6 +44,10 @@ def getPlayingref(ref):
 	playingref = None
 	if NavigationInstance.instance:
 		playingref = NavigationInstance.instance.getCurrentlyPlayingServiceReference()
+		if playingref:
+			from Screens.InfoBarGenerics import streamrelay  # needs here to prevent cycle import
+			if streamrelay.checkService(playingref):
+				playingref.setAlternativeUrl(playingref.toString())
 	if not playingref:
 		playingref = eServiceReference()
 	return playingref
