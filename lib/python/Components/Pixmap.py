@@ -144,11 +144,9 @@ class MovingPixmap(Pixmap):
 class MultiPixmap(Pixmap):
 	def __init__(self):
 		Pixmap.__init__(self)
-		self.pixmapfiles = []
-		self.pixmaps = {}
+		self.pixmaps = []
 
 	def applySkin(self, desktop, screen):
-		self.desktop = desktop
 		if self.skinAttributes is not None:
 			myScreen, path = domScreens.get(screen.__class__.__name__, (None, None))
 			skinPathPrefix = getattr(screen, "skin_path", path)
@@ -165,8 +163,7 @@ class MultiPixmap(Pixmap):
 						else:
 							pngfile = ""
 						if pngfile and isfile(pngfile):
-							self.pixmapfiles.append(parsePixmap(pngfile))
-							#self.pixmaps.append(parsePixmap(pngfile, desktop))
+							self.pixmaps.append(parsePixmap(pngfile, desktop))
 					if not pixmap:
 						if fileExists(resolveFilename(SCOPE_GUISKIN, pixmaps[0], path_prefix=skinPathPrefix)):
 							pixmap = resolveFilename(SCOPE_GUISKIN, pixmaps[0], path_prefix=skinPathPrefix)
@@ -186,11 +183,7 @@ class MultiPixmap(Pixmap):
 
 	def setPixmapNum(self, index):
 		if self.instance:
-			if len(self.pixmapfiles) > index:
-				if not self.pixmaps:
-					(self.width, self.height) = self.getSize()
-				if index not in self.pixmaps:
-					self.pixmaps[index] = loadPixmap(self.pixmapfiles[index], self.desktop, self.width, self.height)
+			if len(self.pixmaps) > index:
 				self.instance.setPixmap(self.pixmaps[index])
 			else:
 				print("[Pixmap] setPixmapNum(%d) failed!  Defined pixmaps: %s." % (index, str(self.pixmaps)))
