@@ -35,6 +35,7 @@ def InitUsageConfig():
 		("dhcp-router", _("DHCP Router")),
 		("staticip", _("Static IP Router")),
 		("google", _("Google DNS")),
+		("NordVPN", _("NordVPN")),
 		("quad9security", _("Quad9 Security")),
 		("quad9nosecurity", _("Quad9 No Security")),
 		("cloudflare", _("Cloudflare")),
