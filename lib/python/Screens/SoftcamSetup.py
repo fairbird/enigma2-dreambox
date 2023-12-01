@@ -3,8 +3,9 @@ from Screens.Screen import Screen
 from Screens.MessageBox import MessageBox
 from Components.ConfigList import ConfigListScreen
 from Components.ActionMap import ActionMap
-from Components.config import ConfigSelection, ConfigAction
+from Components.config import config, ConfigNothing, ConfigAction, ConfigSelection, NoSave
 from Components.ScrollLabel import ScrollLabel
+from Screens.InfoBarGenerics import streamrelay
 from Tools.Directories import resolveFilename, SCOPE_PLUGINS
 from Tools.GetEcmInfo import GetEcmInfo
 from Components.Sources.StaticText import StaticText
@@ -184,4 +185,83 @@ class SoftcamSetup(Screen, ConfigListScreen):
 			self.close()
 
 	def cancel(self):
+		self.close()
+
+
+class StreamRelaySetup(Setup):
+	def __init__(self, session):
+		self.serviceitems = []
+		self.services = streamrelay.data.copy()
+		Setup.__init__(self, session=session, setup="StreamRelay")
+		self["key_yellow"] = StaticText()
+		self["key_blue"] = StaticText()
+		self["addActions"] = HelpableActionMap(self, ["ColorActions"], {
+			"yellow": (self.keyAddService, _("Play service with Stream Relay"))
+		}, prio=0, description=_("Stream Relay Setup Actions"))
+		self["removeActions"] = HelpableActionMap(self, ["ColorActions"], {
+			"blue": (self.keyRemoveService, _("Play service without Stream Relay"))
+		}, prio=0, description=_("Stream Relay Setup Actions"))
+		self["removeActions"].setEnabled(False)
+
+	def layoutFinished(self):
+		Setup.layoutFinished(self)
+		self.createItems()
+
+	def createItems(self):
+		self.serviceitems = []
+		if self.services:
+			self.serviceitems.append(("**************************",))
+		for serviceref in self.services:
+			service = ServiceReference(serviceref)
+			self.serviceitems.append((service.getServiceName() or "N/A", NoSave(ConfigNothing()), serviceref))
+		self.createSetup()
+
+	def createSetup(self):  # NOSONAR silence S2638
+		Setup.createSetup(self, appendItems=self.serviceitems)
+
+	def selectionChanged(self):
+		self.updateButtons()
+		Setup.selectionChanged(self)
+
+	def updateButtons(self):
+		if self.services and isinstance(self.getCurrentItem(), ConfigNothing):
+			self["removeActions"].setEnabled(True)
+			self["key_blue"].setText(_("Remove"))
+		else:
+			self["removeActions"].setEnabled(False)
+			self["key_blue"].setText("")
+		self["key_yellow"].setText(_("Add service"))
+
+	def keySelect(self):
+		if not isinstance(self.getCurrentItem(), ConfigNothing):
+			Setup.keySelect(self)
+
+	def keyMenu(self):
+		if not isinstance(self.getCurrentItem(), ConfigNothing):
+			Setup.keyMenu(self)
+
+	def keyRemoveService(self):
+		currentItem = self.getCurrentItem()
+		if currentItem:
+			serviceref = self["config"].getCurrent()[2]
+			self.services.remove(serviceref)
+			index = self["config"].getCurrentIndex()
+			self.createItems()
+			self["config"].setCurrentIndex(index)
+
+	def keyAddService(self):
+		def keyAddServiceCallback(*result):
+			if result:
+				service = ServiceReference(result[0])
+				serviceref = str(service)
+				if serviceref not in self.services:
+					self.services.append(serviceref)
+					self.createItems()
+					self["config"].setCurrentIndex(2)
+
+		from Screens.ChannelSelection import SimpleChannelSelection  # This must be here to avoid a boot loop!
+		self.session.openWithCallback(keyAddServiceCallback, SimpleChannelSelection, _("Select"), currentBouquet=True)
+
+	def keySave(self):
+		streamrelay.data = self.services
 		self.close()
