@@ -215,7 +215,10 @@ class InfoBarStreamRelay:
 
 	FILENAME = "/etc/enigma2/whitelist_streamrelay"
 
-	def __init__(self) -> None:
+	def __init__(self):
+		self.reload()
+
+	def reload(self):
 		self.streamRelay = fileReadLines(self.FILENAME, default=[], source=self.__class__.__name__)
 
 	def check(self, nav, service):
