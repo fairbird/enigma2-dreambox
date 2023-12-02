@@ -2,9 +2,10 @@
 from Screens.Screen import Screen
 from Screens.MessageBox import MessageBox
 from Components.ConfigList import ConfigListScreen
-from Components.ActionMap import ActionMap
+from Components.ActionMap import ActionMap, HelpableActionMap
 from Components.config import config, ConfigNothing, ConfigAction, ConfigSelection, NoSave
 from Components.ScrollLabel import ScrollLabel
+from Screens.Setup import Setup
 from Screens.InfoBarGenerics import streamrelay
 from Tools.Directories import resolveFilename, SCOPE_PLUGINS
 from Tools.GetEcmInfo import GetEcmInfo
