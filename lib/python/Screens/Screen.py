@@ -51,7 +51,6 @@ class Screen(dict):
 		self.screenPath = ""  # This is the current screen path without the title.
 		self.screenTitle = ""  # This is the current screen title without the path.
 		self.handledWidgets = []
-		self.availableLabels = []
 
 	def __repr__(self):
 		return str(type(self))
@@ -127,9 +126,6 @@ class Screen(dict):
 		# DEBUG: self.alreadyShown = True
 		self.already_shown = True
 		self.instance.show()
-		if self["ScreenPath"].text and "ScreenPath" not in self.availableLabels:
-			self["Title"].text = "%s %s" % (self["ScreenPath"].text, self["Title"].text) if self["ScreenPath"].text else self["Title"].text
-			self["ScreenPath"].text = ""
 		for x in self.onShow:
 			x()
 		for val in list(self.values()) + self.renderer:
@@ -252,9 +248,6 @@ class Screen(dict):
 
 	def createGUIScreen(self, parent, desktop, updateonly=False):
 		for val in self.renderer:
-			label_name = val.label_name
-			if label_name:
-				self.availableLabels.append(label_name)
 			if isinstance(val, GUIComponent):
 				if not updateonly:
 					val.GUIcreate(parent)
