@@ -17,7 +17,7 @@ public:
 	int start(const char *serviceref, int fd);
 	int stop();
 
-private:
+protected:
 	enum { stateIdle, statePrepared, stateRecording };
 	int m_state, m_want_record;
 	bool m_stream_ecm, m_stream_eit, m_stream_ait;
