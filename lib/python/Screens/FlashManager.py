@@ -63,7 +63,7 @@ class FlashManager(Screen, HelpableScreen):
 		Screen.__init__(self, session)
 		HelpableScreen.__init__(self)
 		self.skinName = ["FlashManager", "FlashOnline"]
-		self.imageFeed = "openATV"
+		self.imageFeed = "openPLI"
 		self.setTitle(_("Flash Manager - %s Images") % self.imageFeed)
 		self.imagesList = {}
 		self.expanded = []
@@ -127,8 +127,8 @@ class FlashManager(Screen, HelpableScreen):
 					print("[FlashManager] getImagesList Error: Unable to extract file list from Zip file '%s'!" % file)
 
 		def getImagesListCallback(retVal=None):  # The retVal argument absorbs the unwanted return value from MessageBox.
-			if self.imageFeed != "openATV":
-				self.keyDistributionCallback("openATV")  # No images can be found for the selected distribution so go back to the openATV default.
+			if self.imageFeed != "openPLI":
+				self.keyDistributionCallback("openPLI")  # No images can be found for the selected distribution so go back to the openPLI default.
 
 		machinebuild = BoxInfo.getItem("machinebuild")
 		model = BoxInfo.getItem("model")
@@ -148,7 +148,7 @@ class FlashManager(Screen, HelpableScreen):
 				print("[FlashManager] getImagesList Error: Unable to load json data from URL '%s'!" % feedURL)
 				self.imagesList = {}
 			searchFolders = []
-			# Get all folders of /media/ and /media/net/ and only if openATV
+			# Get all folders of /media/ and /media/net/ and only if openPLI
 			if not index:
 				for media in ["/media/%s" % x for x in listdir("/media")] + (["/media/net/%s" % x for x in listdir("/media/net")] if isdir("/media/net") else []):
 					# print("[FlashManager] getImagesList DEBUG: media='%s'." % media)
@@ -255,7 +255,7 @@ class FlashManager(Screen, HelpableScreen):
 	def keyDistributionCallback(self, distribution):
 		if distribution:
 			self.imageFeed = distribution
-			# TRANSLATORS: The variable is the name of a distribution.  E.g. "openATV".
+			# TRANSLATORS: The variable is the name of a distribution.  E.g. "openPLI".
 			self.setTitle(_("Flash Manager - %s Images") % self.imageFeed)
 			self.imagesList = {}
 			self.expanded = []
