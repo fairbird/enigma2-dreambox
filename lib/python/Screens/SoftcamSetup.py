@@ -189,7 +189,28 @@ class SoftcamSetup(Screen, ConfigListScreen):
 		self.close()
 
 
-class StreamRelaySetup(Setup):
+class CamSetupHelper:
+	def getOrbPos(self, sref):
+		orbpos = 0
+		orbposText = ""
+		try:
+			orbpos = int(sref.split(":")[6], 16) >> 16
+			if 1 <= orbpos <= 3600:
+				if orbpos > 1800:  # West.
+					orbpos = 3600 - orbpos
+					direction = _("W")
+				else:
+					direction = _("E")
+				orbposText = "%d.%d %s%s" % (orbpos / 10, orbpos % 10, "\u00B0", direction)
+		except:
+			pass
+		return orbpos, orbposText
+
+	def sortService(self, item):
+		return (item[3], item[0].lower() if item and item[0] and ord(item[0].lower()[0]) in range(97, 123) else f"zzzzz{item[0].lower()}")
+
+
+class StreamRelaySetup(Setup, CamSetupHelper):
 	def __init__(self, session):
 		self.serviceitems = []
 		self.services = streamrelay.data.copy()
@@ -210,11 +231,13 @@ class StreamRelaySetup(Setup):
 
 	def createItems(self):
 		self.serviceitems = []
-		if self.services:
-			self.serviceitems.append(("**************************",))
 		for serviceref in self.services:
 			service = ServiceReference(serviceref)
-			self.serviceitems.append((service.getServiceName() or "N/A", NoSave(ConfigNothing()), serviceref))
+			orbPos, orbPosText = self.getOrbPos(serviceref)
+			self.serviceitems.append((f"{service and service.getServiceName() or serviceref} / {orbPosText}", NoSave(ConfigNothing()), serviceref, orbPos))
+		if self.serviceitems:
+			self.serviceitems.sort(key=self.sortService)
+			self.serviceitems.insert(0, ("**************************",))
 		self.createSetup()
 
 	def createSetup(self):  # NOSONAR silence S2638
@@ -254,15 +277,17 @@ class StreamRelaySetup(Setup):
 		def keyAddServiceCallback(*result):
 			if result:
 				service = ServiceReference(result[0])
-				serviceref = str(service)
+				serviceref = service.ref.toCompareString()
 				if serviceref not in self.services:
 					self.services.append(serviceref)
 					self.createItems()
 					self["config"].setCurrentIndex(2)
 
 		from Screens.ChannelSelection import SimpleChannelSelection  # This must be here to avoid a boot loop!
-		self.session.openWithCallback(keyAddServiceCallback, SimpleChannelSelection, _("Select"), currentBouquet=True)
+		self.session.openWithCallback(keyAddServiceCallback, SimpleChannelSelection, _("Select"), currentBouquet=False)
 
 	def keySave(self):
+		if streamrelay.data != self.services:
+			streamrelay.data = self.services
 		streamrelay.data = self.services
-		self.close()
+		Setup.keySave(self)
