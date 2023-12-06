@@ -550,19 +550,6 @@ class FlashImage(Screen, HelpableScreen):
 					else:
 						if exists(path):
 							unlink(path)
-				if restoreSettings:
-					if config.plugins.softwaremanager.restoremode.value is not None:
-						try:
-							for fileName in ["slow", "fast", "turbo"]:
-								path = join(rootFolder, fileName)
-								if fileName == config.plugins.softwaremanager.restoremode.value:
-									if not exists(path):
-										open(path, "w").close()
-								else:
-									if exists(path):
-										unlink(path)
-						except OSError as err:
-							print("[FlashManager] postFlashActionCallback Error %d: Failed to create restore mode flag file '%s'!  (%s)" % (err.errno, path, err.strerror))
 				self.startDownload()
 			else:
 				self.keyCancel()
