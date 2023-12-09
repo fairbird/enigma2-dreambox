@@ -1,21 +1,21 @@
 # -*- coding: utf-8 -*-
 from Components.Renderer.Renderer import Renderer
 from enigma import ePixmap
-from Tools.Directories import fileExists, SCOPE_CURRENT_SKIN, resolveFilename
-
+from Tools.Directories import fileExists, SCOPE_GUISKIN, resolveFilename
+from Tools.LoadPixmap import LoadPixmap
 
 class AudioIcon(Renderer):
-	searchPaths = (resolveFilename(SCOPE_CURRENT_SKIN), '/usr/share/enigma2/skin_default/')
-
 	def __init__(self):
 		Renderer.__init__(self)
 		self.size = None
-		self.nameAudioCache = {}
+		self.width = 51
+		self.height = 30
+		self.nameAudioCache = { }
 		self.pngname = ""
 		self.path = ""
 
 	def applySkin(self, desktop, parent):
-		attribs = []
+		attribs = [ ]
 		for (attrib, value) in self.skinAttributes:
 			if attrib == "path":
 				self.path = value
@@ -24,10 +24,12 @@ class AudioIcon(Renderer):
 				else:
 					self.path = value + "/"
 			else:
-				attribs.append((attrib, value))
+				attribs.append((attrib,value))
 			if attrib == "size":
 				value = value.split(',')
 				if len(value) == 2:
+					self.width = int(value[0])
+					self.height = int(value[1])
 					self.size = value[0] + "x" + value[1]
 		self.skinAttributes = attribs
 		return Renderer.applySkin(self, desktop, parent)
@@ -49,16 +51,13 @@ class AudioIcon(Renderer):
 			else:
 				self.instance.show()
 			if pngname != "" and self.pngname != pngname:
-				self.instance.setPixmapFromFile(pngname)
+				is_svg = pngname.endswith(".svg")
+				png = LoadPixmap(pngname, width=self.width, height=0 if is_svg else self.height)
+				self.instance.setPixmap(png)
 				self.pngname = pngname
 
 	def findAudioIcon(self, audioName):
-		if self.path.startswith("/"):
-			pngname = self.path + audioName + ".png"
-			if fileExists(pngname):
-				return pngname
-		for path in self.searchPaths:
-			pngname = path + self.path + audioName + ".png"
-			if fileExists(pngname):
-				return pngname
+		pngname =  resolveFilename(SCOPE_GUISKIN, self.path + audioName + ".svg") 
+		if fileExists(pngname):
+			return pngname
 		return ""
