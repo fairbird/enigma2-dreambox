@@ -149,6 +149,7 @@ class TimerEditList(Screen):
 						t.disable()
 				if timer_changed:
 					self.session.nav.RecordTimer.timeChanged(t)
+					self.session.nav.RecordTimer.saveTimer()
 			self.refill()
 
 	def runningEventCallback(self, t, result):
@@ -163,6 +164,7 @@ class TimerEditList(Screen):
 				findNextRunningEvent = True
 				t.disable()
 			self.session.nav.RecordTimer.timeChanged(t)
+			self.session.nav.RecordTimer.saveTimer()
 			t.findRunningEvent = findNextRunningEvent
 			self.refill()
 
