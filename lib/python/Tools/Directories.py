@@ -740,9 +740,9 @@ def sanitizeFilename(filename):
 		"COM6", "COM7", "COM8", "COM9", "LPT1", "LPT2", "LPT3", "LPT4", "LPT5",
 		"LPT6", "LPT7", "LPT8", "LPT9",
 	]  # Reserved words on Windows
-	filename = "".pathjoin(c for c in filename if c not in blacklist)
+	filename = "".join(c for c in filename if c not in blacklist)
 	# Remove all charcters below code point 32
-	filename = "".pathjoin(c for c in filename if 31 < ord(c))
+	filename = "".join(c for c in filename if 31 < ord(c))
 	filename = normalize("NFKD", filename)
 	filename = filename.rstrip(". ")  # Windows does not allow these at end
 	filename = filename.strip()
