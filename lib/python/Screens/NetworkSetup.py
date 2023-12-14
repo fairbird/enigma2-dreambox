@@ -624,8 +624,9 @@ class AdapterSetup(ConfigListScreen, HelpableScreen, Screen):
                 self.weplist = None
                 self.wsconfig = None
                 self.default = None
+		self.ws = None
 
-                if iNetwork.isWirelessInterface(self.iface):
+		if iNetwork.isWirelessInterface(self.iface) and hasattr(config.plugins, "wlan"):
                         from Plugins.SystemPlugins.WirelessLan.Wlan import wpaSupplicant
                         self.ws = wpaSupplicant()
                         self.encryptionlist = []
@@ -781,7 +782,8 @@ class AdapterSetup(ConfigListScreen, HelpableScreen, Screen):
 
                         if self.extended is not None and self.configStrings is not None:
                                 iNetwork.setAdapterAttribute(self.iface, "configStrings", self.configStrings(self.iface))
-                                self.ws.writeConfig(self.iface)
+				if self.ws:
+					self.ws.writeConfig(self.iface)
 
                         if not self.activateInterfaceEntry.value:
                                 iNetwork.deactivateInterface(self.iface, self.deactivateInterfaceCB)
