@@ -2556,7 +2556,7 @@ msgid "Delay in miliseconds between scrolling characters on display."
 msgstr ".التأخير بالمللي ثانية بين تمرير الأحرف على الشاشة"
 
 msgid "Delay when closing a stream relay service before reallocating the tuner for another service. Using '0' is only recommended for boxes with multiple satellite tuners."
-msgstr "تأخير عند إغلاق خدمة ترحيل البث قبل تحديد موقع الموالف لخدمة أخرى. يوصى باستخدام "0" فقط للصناديق التي تحتوي على موالفات أقمار صناعية متعددة."
+msgstr "تأخير عند إغلاق خدمة ترحيل البث قبل تحديد موقع الموالف لخدمة أخرى. يوصى باستخدام '0' فقط للصناديق التي تحتوي على موالفات أقمار صناعية متعددة."
 
 msgid "Delete"
 msgstr "حذف"
