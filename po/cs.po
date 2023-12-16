@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: OpenPLi enigma2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-11-08 16:10+0100\n"
+"POT-Creation-Date: 2023-12-16 09:57+0100\n"
 "PO-Revision-Date: \n"
 "Last-Translator: IMS <ims@openpli.org>\n"
 "Language-Team: PLi <ims@openpli.org>\n"
@@ -12,7 +12,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
-"X-Generator: Poedit 3.4\n"
+"X-Generator: Poedit 3.4.1\n"
 
 #
 msgid ""
@@ -181,6 +181,10 @@ msgstr "%a %e/%m"
 #. TRANSLATORS: long date representation short dayname daynum short monthname hour:minute in strftime() format! See 'man strftime'
 msgid "%a %e/%m  %-H:%M"
 msgstr "%a %e/%m  %-H:%M"
+
+#, python-format
+msgid "%d"
+msgstr ""
 
 #, python-format
 msgid "%d MB"
@@ -1195,9 +1199,6 @@ msgstr "umění/kultura (bez hudby)"
 
 msgid "Aruba"
 msgstr "Aruba"
-
-msgid "As defined by the skin"
-msgstr "Definováno skinem"
 
 #
 msgid "Ask user"
@@ -2227,17 +2228,20 @@ msgid "Configure how the fan should operate"
 msgstr "Nastavuje režim práce ventilátoru."
 
 #
-msgid "Configure if and how crypto icons will be shown in the channel selection list."
+#, fuzzy
+msgid "Configure if and how crypto icons will be shown in the channel selection list (left alignment only available in single line mode)."
 msgstr "Nastavuje zda a jak budou zobrazovány ikony kódovaných programů v přehledech kanálů."
 
 msgid "Configure if and how long the latest service in Picture in Picture mode will be remembered."
 msgstr "Nastavuje zda a jak dlouho bude zapamatován poslední program v PiP."
 
-msgid "Configure if and how service type icons will be shown in the channel selection list."
+#, fuzzy
+msgid "Configure if and how service type icons will be shown in the channel selection list (left alignment only available in single line mode)."
 msgstr "Nastavuje zda a jak budou zobrazovány ikony typu programu v seznamu kanálů."
 
 #
-msgid "Configure if and how the record indicator will be shown in the channel selection list."
+#, fuzzy
+msgid "Configure if and how the record indicator will be shown in the channel selection list (left alignment only available in single line mode)."
 msgstr "Nastavuje zda a jak bude zobrazovat indikaci nahrávaného kanálu v seznamu kanálů."
 
 #
@@ -2995,6 +2999,9 @@ msgstr "Zpoždění v milisekundách před začátkem přetáčení textu na dis
 msgid "Delay in miliseconds between scrolling characters on display."
 msgstr "Zpoždění v milisekundách mezi přetáčením znaků na displeji."
 
+msgid "Delay when closing a stream relay service before reallocating the tuner for another service. Using '0' is only recommended for boxes with multiple satellite tuners."
+msgstr ""
+
 #
 msgid "Delete"
 msgstr "Smazat"
@@ -3064,14 +3071,12 @@ msgid "Descramble sending http streams"
 msgstr "Dekódovat odesílané http streamy"
 
 #
-#, fuzzy
 msgid "Descramble service via streamrelay port"
-msgstr "Dekódovat přijímané http streamy"
+msgstr "Dekódovat program pomocí streamrelay portu"
 
 #
-#, fuzzy
 msgid "Descramble service via streamrelay url"
-msgstr "Dekódovat přijímané http streamy"
+msgstr "Dekódovat program pomocí streamrelay url"
 
 #
 msgid "Description"
@@ -3698,6 +3703,14 @@ msgstr "Povolit automatický fastscan"
 msgid "Enable auto fastscan for %s"
 msgstr "Povolit automatický fastscan pro %s"
 
+msgid "Enable blink functionality for some areas like record icon."
+msgstr ""
+
+#
+#, fuzzy
+msgid "Enable blinking"
+msgstr "Povolit Virgin EPG"
+
 #
 msgid "Enable bluetooth audio"
 msgstr "Povolit bluetooth audio"
@@ -4303,7 +4316,7 @@ msgid "Fast"
 msgstr "Rychle"
 
 msgid "Fast Channel Change"
-msgstr "Fast Channel Change"
+msgstr "Rychlá změna kanálu"
 
 msgid "Fast Channel Change Setup"
 msgstr "Fast Channel Change Nastavení"
@@ -5731,6 +5744,9 @@ msgstr "Lucembursky"
 msgid "MB"
 msgstr "MB"
 
+msgid "MENU"
+msgstr ""
+
 msgid "MHz"
 msgstr "MHz"
 
@@ -6797,8 +6813,15 @@ msgstr "PMT PID"
 msgid "PPanel"
 msgstr "PPanel"
 
+msgid "PREVIOUS"
+msgstr ""
+
 msgid "PULSe 4K(mini)"
 msgstr "PULSe 4K(mini)"
+
+#, fuzzy
+msgid "PVR"
+msgstr "OVR"
 
 #
 msgid "Package list update"
@@ -7003,10 +7026,10 @@ msgid "Play recorded movies..."
 msgstr "Přehrát nahrané pořady..."
 
 msgid "Play service with streamrelay"
-msgstr ""
+msgstr "Přehrát program pomocí streamrelay"
 
 msgid "Play service without streamrelay"
-msgstr ""
+msgstr "Přehrát službu bez streamrelay"
 
 #
 msgid "Please add titles to the compilation."
@@ -7677,6 +7700,10 @@ msgstr "Python frontend pro /tmp/mmi.socket"
 
 msgid "Python version: "
 msgstr "Python: "
+
+#, fuzzy
+msgid "Pythonscript"
+msgstr "Skript"
 
 msgid "Qatar"
 msgstr "Katar"
@@ -9043,6 +9070,11 @@ msgid "Service info - tuner setting values"
 msgstr "Informace o programu - hodnoty nastavení tuneru"
 
 #
+#, fuzzy
+msgid "Service info font size"
+msgstr "Info o programu"
+
+#
 msgid ""
 "Service invalid!\n"
 "(Timeout reading PMT)"
@@ -9053,6 +9085,10 @@ msgstr ""
 msgid "Service name"
 msgstr "Název programu"
 
+#, fuzzy
+msgid "Service name font size"
+msgstr "Název programu"
+
 #
 msgid ""
 "Service not found!\n"
@@ -9060,6 +9096,10 @@ msgid ""
 msgstr ""
 "Služba nebyla nalezena!\n"
 "(SID nebyl nalezen v PAT)"
+
+#, fuzzy
+msgid "Service number font size"
+msgstr "Velikost textu"
 
 msgid "Service reference"
 msgstr "Service reference"
@@ -9160,7 +9200,8 @@ msgid "Set the port of the OpenWebif from your fallback tuner"
 msgstr "Nastavte port pro OpenWebIf z Vašeho záložního tuneru."
 
 #
-msgid "Set the type of the progress indication in the channel selection screen."
+#, fuzzy
+msgid "Set the type of the progress indication in the channel selection screen (right alignment only available in single line mode)."
 msgstr "Nastavuje typ průběhů pořadů ve výběru programů."
 
 msgid "Set time window to 1 hour"
@@ -9306,6 +9347,9 @@ msgstr "Zobrazovat informace o kódování v infobaru"
 
 msgid "Show detailed event info"
 msgstr "Zobrazit detailní informace o události"
+
+msgid "Show disabled timers (local only)"
+msgstr ""
 
 #
 msgid "Show event details"
@@ -9586,10 +9630,6 @@ msgstr "Jeden"
 #
 msgid "Single EPG"
 msgstr "EPG programu"
-
-#
-msgid "Single line mode"
-msgstr "Jednořádkový mód"
 
 #
 msgid "Single satellite"
@@ -10122,6 +10162,10 @@ msgstr "Uložená pozice"
 msgid "Stream"
 msgstr "Stream"
 
+#, fuzzy
+msgid "Stream Relay delay"
+msgstr "Zpoždění přetáčení"
+
 msgid "Stream request"
 msgstr "Požadavek streamu"
 
@@ -10380,7 +10424,7 @@ msgstr ""
 "Pro případné korekce můžete kontaktovat autora\n"
 "na výše uvedené adrese.\n"
 "\n"
-"®2.10.2023"
+"®9.11.2023"
 
 #
 msgid "TS file is too large for ISO9660 level 1!"
@@ -10488,7 +10532,7 @@ msgid "The DVD standard doesn't support H.264 (HDTV) video streams. Do you want 
 msgstr "DVD standard nepodporuje H.264 (HDTV) video streamy. Chcete místo toho vytvořit speciální formát data DVD (které ale nepůjde přehrát ve stolních DVD přehrávačích)?"
 
 msgid "The IP address from the streamrelay server that is used to descramble services that can only be encrypted via streamrelay"
-msgstr ""
+msgstr "IP adresa ze serveru streamrelay používaná k dešifrování služeb, které lze šifrovat pouze prostřednictvím streamrelay."
 
 msgid "The PIN code has been changed successfully."
 msgstr "PIN kód byl úspěšně změněn."
@@ -10586,7 +10630,7 @@ msgid "The path %s already exists."
 msgstr "Cesta %s již existuje."
 
 msgid "The port from the streamrelay server that is used to descramble services that can only be encrypted via streamrelay"
-msgstr ""
+msgstr "Port ze serveru streamrelay používající se k dešifrování služeb, které lze šifrovat pouze pomocí streamrelay."
 
 #, python-format
 msgid "The results have been written to %s"
@@ -10678,6 +10722,9 @@ msgstr ""
 #
 msgid "This DVD RW medium is already formatted - reformatting will erase all content on the disc."
 msgstr "DVD RW médium je již naformátováno - nové formátování smaže veškerý obsah na tomto DVD."
+
+msgid "This allows you to change the font size relative to skin size, so 1 increases by 1 point size, and -1 decreases by 1 point size"
+msgstr ""
 
 msgid "This bouquet is protected by a parental control PIN"
 msgstr "Tento přehled je chráněn rodičovským PINem"
@@ -11289,13 +11336,6 @@ msgid "Two"
 msgstr "Dva"
 
 #
-msgid "Two lines"
-msgstr "Dva řádky"
-
-msgid "Two lines and next event"
-msgstr "Dva řádky a další událost"
-
-#
 msgid "Type"
 msgstr "Typ"
 
@@ -11577,6 +11617,11 @@ msgstr "Použít původní pozici teletextu"
 #
 msgid "Use power measurement"
 msgstr "Použít měření proudu"
+
+#
+#, fuzzy
+msgid "Use skin default"
+msgstr "Výchozí"
 
 #
 msgid "Use the network wizard to configure selected network adapter"
@@ -13257,6 +13302,11 @@ msgid "menu"
 msgstr "menu"
 
 #
+#, fuzzy
+msgid "min"
+msgstr " min"
+
+#
 msgid "mins"
 msgstr "minut"
 
@@ -13757,6 +13807,15 @@ msgstr "turistika/cestování"
 msgid "true"
 msgstr "ano"
 
+#
+#, fuzzy
+msgid "two lines"
+msgstr "Dva řádky"
+
+#, fuzzy
+msgid "two lines+next event"
+msgstr "Dva řádky a další událost"
+
 msgid "type"
 msgstr "typ"
 
@@ -13911,4 +13970,10 @@ msgid "zapped"
 msgstr "přepnutý"
 
 msgid "®"
+msgstr ""
+
+msgid "°E"
+msgstr ""
+
+msgid "°W"
 msgstr ""
