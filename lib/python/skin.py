@@ -932,6 +932,9 @@ class AttributeParser:
 		self.horizontalAlignment(value)
 		# attribDeprecationWarning("halign", "horizontalAlignment")
 
+	def headerFont(self, value):
+		self.guiObject.setHeaderFont(parseFont(value, self.scaleTuple))
+
 	def horizontalAlignment(self, value):
 		self.guiObject.setHAlign(parseHorizontalAlignment(value))
 
