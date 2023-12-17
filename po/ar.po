@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: enigma2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-02 14:05+0100\n"
-"POT-Creation-Date: 2023-11-08 16:10+0100\n"
+"POT-Creation-Date: 2023-12-17 11:25+0100\n"
 "Last-Translator: RAED - Fairbirb <rrrr53@hotmail.com>\n"
 "Language-Team: \n"
 "Language: ar\n"
@@ -159,10 +159,6 @@ msgstr "%a %d/%m"
 #. TRANSLATORS: long date representation short dayname daynum short monthname hour:minute in strftime() format! See 'man strftime'
 msgid "%a %e/%m  %-H:%M"
 msgstr "%a %e/%m  %-H:%M"
-
-#, python-format
-msgid "%d"
-msgstr ""
 
 #, python-format
 msgid "%d MB"
@@ -9656,6 +9652,14 @@ msgstr "توفالو"
 msgid "Two"
 msgstr "اثنين"
 
+#, fuzzy
+msgid "Two lines"
+msgstr "سطرين"
+
+#, fuzzy
+msgid "Two lines and next event"
+msgstr "الانتقال إلى الحدث التالي"
+
 msgid "Type"
 msgstr "النوع"
 
@@ -11794,14 +11798,6 @@ msgstr "السياحة/السفر"
 
 msgid "true"
 msgstr "صحيح"
-
-#, fuzzy
-msgid "two lines"
-msgstr "سطرين"
-
-#, fuzzy
-msgid "two lines+next event"
-msgstr "الانتقال إلى الحدث التالي"
 
 msgid "type"
 msgstr "نوع"
