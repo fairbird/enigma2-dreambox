@@ -383,7 +383,11 @@ eDVBUsbAdapter::eDVBUsbAdapter(int nr)
 	while (vtunerFd < 0)
 	{
 		snprintf(filename, sizeof(filename), "/dev/misc/vtuner%d", vtunerid);
-		if (::access(filename, F_OK) < 0) break;
+		if (::access(filename, F_OK) < 0)
+		{
+			eDebug("[eDVBUsbAdapter] '%s' not found -> stop here!", filename);
+			break;
+		}
 		vtunerFd = open(filename, O_RDWR | O_CLOEXEC);
 		if (vtunerFd < 0)
 		{
