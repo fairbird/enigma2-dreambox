@@ -4,6 +4,7 @@ from Components.Element import cached
 from Components.config import config
 from Components.NimManager import nimmanager
 from skin import parameters
+import NavigationInstance
 
 
 class FrontendInfo(Converter):
@@ -16,6 +17,7 @@ class FrontendInfo(Converter):
 	TUNER_TYPE = 6
 	STRING = 7
 	USE_TUNERS_STRING = 8
+	REC_TUNER = 9
 
 	def __init__(self, type):
 		Converter.__init__(self, type)
@@ -39,6 +41,9 @@ class FrontendInfo(Converter):
 			self.show_all_non_link_tuners = True if len(type) <= 3 else type[3] == "True"
 		elif type == "USE_TUNERS_STRING":
 			self.type = self.USE_TUNERS_STRING
+		elif type.split("_")[0] == "REC":
+			self.type = self.REC_TUNER
+			self.tunernum = int(type.split("_")[1])
 		else:
 			self.type = self.LOCK
 
@@ -101,13 +106,24 @@ class FrontendInfo(Converter):
 
 	@cached
 	def getBool(self):
-		assert self.type in (self.LOCK, self.BER, self.SNR, self.SNRdB, self.AGC, self.STRING, self.USE_TUNERS_STRING), "the boolean output of FrontendInfo can only be used for lock, BER, SNR, SNRdB, AGC, STRING, or  USE_TUNERS_STRING"
+		assert self.type in (self.LOCK, self.BER, self.REC_TUNER, self.SNR, self.SNRdB, self.AGC, self.STRING, self.USE_TUNERS_STRING), "the boolean output of FrontendInfo can only be used for lock, BER, SNR, SNRdB, AGC, STRING, USE_TUNERS_STRING or Tuner-Rec""
 		swapsnr = config.usage.swap_snr_on_osd.value
 		if self.type == self.LOCK:
 			lock = self.source.lock
 			if lock is None:
 				lock = False
 			return lock
+		elif self.type == self.REC_TUNER:
+			for timer in NavigationInstance.instance.RecordTimer.timer_list:
+				if timer.isRunning() and not timer.justplay:
+					service = timer.record_service
+					feinfo = service and service.frontendInfo()
+					data = feinfo and feinfo.getFrontendData()
+					if data:
+						tuner = data.get('tuner_number', -1)
+						if tuner is not None and tuner > -1 and tuner == self.tunernum:
+							return True
+			return False
 		elif self.type == self.BER:
 			return self.source.ber is not None
 		elif (self.type == self.SNR and not swapsnr) or (self.type == self.SNRdB and swapsnr):
