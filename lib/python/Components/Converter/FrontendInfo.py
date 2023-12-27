@@ -106,7 +106,7 @@ class FrontendInfo(Converter):
 
 	@cached
 	def getBool(self):
-		assert self.type in (self.LOCK, self.BER, self.REC_TUNER, self.SNR, self.SNRdB, self.AGC, self.STRING, self.USE_TUNERS_STRING), "the boolean output of FrontendInfo can only be used for lock, BER, SNR, SNRdB, AGC, STRING, USE_TUNERS_STRING or Tuner-Rec""
+		assert self.type in (self.LOCK, self.BER, self.REC_TUNER, self.SNR, self.SNRdB, self.AGC, self.STRING, self.USE_TUNERS_STRING), "the boolean output of FrontendInfo can only be used for lock, BER, SNR, SNRdB, AGC, STRING, USE_TUNERS_STRING or Tuner-Rec"
 		swapsnr = config.usage.swap_snr_on_osd.value
 		if self.type == self.LOCK:
 			lock = self.source.lock
