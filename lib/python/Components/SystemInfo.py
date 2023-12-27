@@ -210,7 +210,7 @@ def getRCFile(ext):
 	return filename
 
 
-model = BoxInfo.getItem("machine")
+model = BoxInfo.getItem("machine", default="unknown")
 
 BoxInfo.setItem("RCImage", getRCFile("png"))
 BoxInfo.setItem("RCMapping", getRCFile("xml"))
