@@ -3,7 +3,7 @@ import os
 import time
 import re
 from Tools.HardwareInfo import HardwareInfo
-from Components.SystemInfo import SystemInfo
+from Components.SystemInfo import SystemInfo, BoxInfo
 from sys import maxsize, modules, version_info
 from Tools.Directories import fileReadLine
 from subprocess import PIPE, Popen
@@ -33,14 +33,12 @@ def getFlashDateString():
 	return _("unknown")
 
 
+def returndate(date):
+	return "%s-%s-%s" % (date[:4], date[4:6], date[6:8])
+
+
 def getBuildDateString():
-	try:
-		if os.path.isfile('/etc/version'):
-			version = open("/etc/version", "r").read()
-			return "%s-%s-%s" % (version[:4], version[4:6], version[6:8])
-	except:
-		pass
-	return _("unknown")
+	return returndate(BoxInfo.getItem("compiledate"))
 
 
 def getUpdateDateString():
@@ -48,7 +46,7 @@ def getUpdateDateString():
 		from glob import glob
 		driver = [x.split("-")[-2] for x in open(glob("/var/lib/opkg/info/*-dvb-modules-*.control")[0], "r") if x.startswith("Version:")][0]
 		if build.isdigit():
-			return "%s-%s-%s" % (build[:4], build[4:6], build[6:])
+			return returndate(build)
 	except:
 		pass
 	return _("unknown")
@@ -56,9 +54,14 @@ def getUpdateDateString():
 
 def getEnigmaVersionString():
 	import enigma
-	enigma_version = enigma.getEnigmaVersionString()
+	enigma_version = enigma.getEnigmaVersionString().title()
 	if '-(no branch)' in enigma_version:
 		enigma_version = enigma_version[:-12]
+	enigma_version = enigma_version.rsplit("-", enigma_version.count("-") - 2)
+	if len(enigma_version) == 3:
+		enigma_version = enigma_version[0] + " (" + enigma_version[2] + "-" + enigma_version[1] + ")"
+	else:
+		enigma_version = enigma_version[0] + " (" + enigma_version[1] + ")"
 	return enigma_version
 
 
@@ -81,10 +84,7 @@ def getffmpegVersionString():
 
 
 def getKernelVersionString():
-	try:
-		return open("/proc/version", "r").read().split(' ', 4)[2].split('-', 2)[0]
-	except:
-		return _("unknown")
+	return BoxInfo.getItem("kernel")
 
 
 def getHardwareTypeString():
@@ -92,11 +92,7 @@ def getHardwareTypeString():
 
 
 def getImageTypeString():
-	try:
-		image_type = open("/etc/issue").readlines()[-2].strip()[:-6]
-		return image_type.capitalize().replace("develop", "Nightly Build")
-	except:
-		return _("undefined")
+	return BoxInfo.getItem("oe").title()
 
 
 def getCPUInfoString():
