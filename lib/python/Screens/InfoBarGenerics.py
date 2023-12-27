@@ -3334,6 +3334,7 @@ class InfoBarResolutionSelection:
 		pass
 
 	def resolutionSelection(self):
+		amlogic = HardwareInfo().get_device_model() in ("one", "two")
 		avControl = eAVControl.getInstance()
 		fps = float(avControl.getFrameRate(50000)) / 1000.0
 		yRes = avControl.getResolutionY(0)
@@ -3343,17 +3344,18 @@ class InfoBarResolutionSelection:
 		resList.append((_("Auto(not available)"), "auto"))
 		resList.append((_("Video: ") + "%dx%d@%gHz" % (xRes, yRes, fps), ""))
 		resList.append(("--", ""))
-		# Do we need a new sorting with this way here or should we disable some choices?
-		videoModes = iAVSwitch.readPreferredModes(readOnly=True)
-		videoModes = [x.replace("pal ", "").replace("ntsc ", "") for x in videoModes]  # Do we need this?
-		for videoMode in videoModes:
-			video = videoMode
-			if videoMode.endswith("23"):
-				video = "%s.976" % videoMode
-			if videoMode[-1].isdigit():
-				video = "%sHz" % videoMode
-			resList.append((video, videoMode))
-		videoMode = avControl.getVideoMode("Unknown")
+		if fileExists("/proc/stb/video/videomode_choices"):
+			videoModes = fileReadLines("/proc/stb/video/videomode_choices", "", source=MODULE_NAME)
+			videoModes = [x.replace("pal ", "").replace("ntsc ", "") for x in videoModes]  # Do we need this?
+			for videoMode in videoModes:
+				video = videoMode
+				if videoMode.endswith("23"):
+					video = "%s.976" % videoMode
+				if videoMode[-1].isdigit():
+					video = "%sHz" % videoMode
+				resList.append((video, videoMode))
+		file = "/sys/class/display/mode" if amlogic else "/proc/stb/video/videomode"
+		videoMode = fileReadLines(file, default="Unknown", source=MODULE_NAME)
 		keys = ["green", "yellow", "blue", "", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
 		selection = 0
 		for index, item in enumerate(resList):
@@ -3370,7 +3372,13 @@ class InfoBarResolutionSelection:
 				if videoMode[1] == "exit" or videoMode[1] == "" or videoMode[1] == "auto":
 					self.ExGreen_toggleGreen()
 				if videoMode[1] != "auto":
-					iAVSwitch.setVideoModeDirect(videoMode[1])
+					file = "/sys/class/display/mode" if amlogic else "/proc/stb/video/videomode"
+					if fileWriteLines(file, videoMode[1], source=MODULE_NAME):
+						print("[InfoBarGenerics] New video mode is '%s'." % videoMode[1])
+					else:
+						print("[InfoBarGenerics] Error: Unable to set new video mode of '%s'!" % videoMode[1])
+					# from enigma import gMainDC
+					# gMainDC.getInstance().setResolution(-1, -1)
 					self.ExGreen_doHide()
 		else:
 			self.ExGreen_doHide()
