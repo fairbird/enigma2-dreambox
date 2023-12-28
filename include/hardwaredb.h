@@ -1,9 +1,38 @@
+/*
+Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License
+Copyright (c) 2023 openATV, jbleyel
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+1. Non-Commercial Use: You may not use the Software or any derivative works
+   for commercial purposes without obtaining explicit permission from the
+   copyright holder.
+2. Share Alike: If you distribute or publicly perform the Software or any
+   derivative works, you must do so under the same license terms, and you
+   must make the source code of any derivative works available to the
+   public.
+3. Attribution: You must give appropriate credit to the original author(s)
+   of the Software by including a prominent notice in your derivative works.
+THE SOFTWARE IS PROVIDED "AS IS," WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE, AND NONINFRINGEMENT. IN NO EVENT SHALL
+THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES, OR
+OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT, OR OTHERWISE,
+ARISING FROM, OUT OF, OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+OTHER DEALINGS IN THE SOFTWARE.
+For more details about the CC BY-NC-SA 4.0 License, please visit:
+https://creativecommons.org/licenses/by-nc-sa/4.0/
+*/
+
 #ifndef __hardwaredb_h
 #define __hardwaredb_h
 #include <string>
 #include <unordered_map>
 
-static std::unordered_map<std::string,std::string> HardwareDB {
+static std::unordered_map<std::string, std::string> HardwareDB{
 
 #ifdef HWDREAMONE
 	{"/devices/platform/ff500000.dwc3/xhci-hcd.0.auto/usb1", "USB 2.0 (Back, inner)"},
@@ -86,7 +115,7 @@ static std::unordered_map<std::string,std::string> HardwareDB {
 	{"/devices/rdb.4/f0471000.xhci_v2/usb2/2-0:1.0/port2/", "Back USB"}
 #elif HWDM800SE
 	{"/devices/pci0000:01/0000:01:00.0/host0/target0:0:0/0:0:0:0", "SATA"},
-	{"/devices/pci0000:01/0000:01:00.0/host1/target1:0:0/1:0:0:0", "eSATA"}
+	{"/devices/pci0000:01/0000:01:00.0/host1/target1:0:0/1:0:0:0", "eSATA"},
 	{"/devices/platform/brcm-ehci.0/usb1/1-2/1-2:1.0", "Upper USB"},
 	{"/devices/platform/brcm-ehci.0/usb1/1-1/1-1:1.0", "Lower USB"}
 #elif HWDM500HD
@@ -94,7 +123,7 @@ static std::unordered_map<std::string,std::string> HardwareDB {
 	{"/devices/pci0000:01/0000:01:00.0/host0/target0:0:0/0:0:0:0", "eSATA"}
 #elif HWDM800SEV2
 	{"/devices/pci0000:01/0000:01:00.0/host0/target0:0:0/0:0:0:0", "SATA"},
-	{"/devices/pci0000:01/0000:01:00.0/host1/target1:0:0/1:0:0:0", "eSATA"}
+	{"/devices/pci0000:01/0000:01:00.0/host1/target1:0:0/1:0:0:0", "eSATA"},
 	{"/devices/platform/brcm-ehci.0/usb1/1-2/1-2:1.0", "Upper USB"},
 	{"/devices/platform/brcm-ehci.0/usb1/1-1/1-1:1.0", "Lower USB"}
 #elif HWDM500HDV2
