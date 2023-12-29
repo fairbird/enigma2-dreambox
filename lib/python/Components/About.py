@@ -34,6 +34,7 @@ def getFlashDateString():
 
 
 def returndate(date):
+	date = str(date)
 	return "%s-%s-%s" % (date[:4], date[4:6], date[6:8])
 
 
