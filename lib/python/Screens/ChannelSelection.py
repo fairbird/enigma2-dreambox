@@ -1813,6 +1813,10 @@ class ChannelSelectionBase(Screen):
 					if currentRoot is None or currentRoot != self.bouquet_root:
 						self.clearPath()
 						self.enterPath(self.bouquet_root)
+						if not config.usage.multibouquet.value:
+							playingref = self.session.nav.getCurrentlyPlayingServiceOrGroup()
+							if playingref:
+								self.setCurrentSelectionAlternative(playingref)
 
 	def keyNumber0(self, number):
 		if len(self.servicePath) > 1 and not self.selectionNumber:
@@ -1945,7 +1949,7 @@ class ChannelSelectionBase(Screen):
 					op = int(playingref.toString().split(':')[6][:-4] or "0", 16)
 					refstr = '1:7:0:0:0:0:0:0:0:0:(provider == \"%s\") && (satellitePosition == %s) && %s ORDER BY name:%s' % (provider, op, self.service_types[self.service_types.rfind(':') + 1:], provider)
 					self.setCurrentSelection(eServiceReference(refstr))
-		elif not self.isBasePathEqual(self.bouquet_root) or self.bouquet_mark_edit == EDIT_ALTERNATIVES:
+		elif not self.isBasePathEqual(self.bouquet_root) or self.bouquet_mark_edit == EDIT_ALTERNATIVES or (self.startRoot and self.startRoot != ref):
 			if playingref:
 				self.setCurrentSelectionAlternative(playingref)
 
