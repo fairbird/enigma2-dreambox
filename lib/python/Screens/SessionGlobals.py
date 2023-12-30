@@ -11,8 +11,10 @@ from Components.Sources.RecordState import RecordState
 from Components.Converter.Combine import Combine
 from Components.Renderer.FrontpanelLed import FrontpanelLed
 from Components.config import config
-from Components.SystemInfo import SystemInfo
-from Tools.HardwareInfo import HardwareInfo
+from Components.SystemInfo import SystemInfo, BoxInfo
+
+
+MODEL = BoxInfo.getItem("model", default="unknown")
 
 
 class SessionGlobals(Screen):
@@ -92,10 +94,10 @@ class SessionGlobals(Screen):
 		if nr_leds == 1:
 			FrontpanelLed(which=0, boolean=False, patterns=[PATTERN_OFF, PATTERN_BLINK, PATTERN_OFF, PATTERN_BLINK]).connect(combine)
 		elif nr_leds == 2:
-			if HardwareInfo().get_device_name() in ("dm520"):
+			if MODEL in ("dm520"):
 				FrontpanelLed(which=0, boolean=False, patterns=[PATTERN_ON, PATTERN_BLINK, PATTERN_OFF, PATTERN_BLINK]).connect(combine)
 				FrontpanelLed(which=1, boolean=False, patterns=[PATTERN_OFF, PATTERN_OFF, PATTERN_OFF, PATTERN_OFF]).connect(combine)
-			elif HardwareInfo().get_device_name() in ("dm900", "dm920"):
+			elif MODEL in ("dm900", "dm920"):
 				FrontpanelLed(which=0, boolean=False, patterns=[NormalLed0, RecLed0, StandbyLed0, RecstdbyLed0]).connect(combine)
 				FrontpanelLed(which=1, boolean=False, patterns=[NormalLed1, RecLed1, StandbyLed1, RecstdbyLed1]).connect(combine)
 			else:

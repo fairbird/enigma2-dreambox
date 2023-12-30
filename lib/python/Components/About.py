@@ -11,6 +11,9 @@ from subprocess import PIPE, Popen
 MODULE_NAME = __name__.split(".")[-1]
 
 
+MODEL = BoxInfo.getItem("model", default="unknown")
+
+
 def getVersionString():
 	return getImageVersionString()
 
@@ -153,15 +156,15 @@ def getCPUInfoString():
 
 
 def getChipSetString():
-	if HardwareInfo().get_device_name() in ('dm7080', 'dm820'):
+	if MODEL in ('dm7080', 'dm820'):
 		return "7435"
-	elif HardwareInfo().get_device_name() in ('dm520', 'dm525'):
+	elif MODEL in ('dm520', 'dm525'):
 		return "73625"
-	elif HardwareInfo().get_device_name() in ('dm900', 'dm920', 'et13000', 'sf5008'):
+	elif MODEL in ('dm900', 'dm920', 'et13000', 'sf5008'):
 		return "7252S"
-	elif HardwareInfo().get_device_name() in ('hd51', 'vs1500', 'h7'):
+	elif MODEL in ('hd51', 'vs1500', 'h7'):
 		return "7251S"
-	elif HardwareInfo().get_device_name() in ('alien5',):
+	elif MODEL in ('alien5',):
 		return "S905D"
 	else:
 		chipset = fileReadLine("/proc/stb/info/chipset", source=MODULE_NAME)

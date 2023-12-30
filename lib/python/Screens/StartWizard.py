@@ -5,7 +5,7 @@ from Screens.MessageBox import MessageBox
 from Screens.WizardLanguage import WizardLanguage
 from Screens.Time import TimeWizard
 from Screens.HelpMenu import Rc
-from Tools.HardwareInfo import HardwareInfo
+from Components.SystemInfo import BoxInfo
 try:
 	from Plugins.SystemPlugins.OSDPositionSetup.overscanwizard import OverscanWizard
 except:
@@ -28,6 +28,9 @@ config.misc.languageselected = ConfigBoolean(default=True)
 config.misc.do_overscanwizard = ConfigBoolean(default=OverscanWizard and config.skin.primary_skin.value == "PLi-FullNightHD/skin.xml")
 
 
+MODEL = BoxInfo.getItem("model", default="unknown")
+
+
 class StartWizard(WizardLanguage, Rc):
 	def __init__(self, session, silent=True, showSteps=False, neededTag=None):
 		self.xmlfile = ["startwizard.xml"]
@@ -37,7 +40,7 @@ class StartWizard(WizardLanguage, Rc):
 
 	def markDone(self):
 		# setup remote control, all stb have same settings except dm8000 which uses a different settings
-		if HardwareInfo().get_device_name() == 'dm8000':
+		if MODEL in ("dm8000"):
 			config.misc.rcused.value = 0
 		else:
 			config.misc.rcused.value = 1
