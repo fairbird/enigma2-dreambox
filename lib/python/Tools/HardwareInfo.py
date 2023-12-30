@@ -41,7 +41,7 @@ class HardwareInfo:
 		self.device_brandname = str(BoxInfo.getItem("displaybrand"))
 
 		# standard values
-		self.device_model = self.machine_name = BoxInfo.getItem("model", default="unknown")
+		self.device_model = self.machine_name = str(BoxInfo.getItem("model", default="unknown"))
 		self.device_hw = str(BoxInfo.getItem("displaymodel"))
 
 		if self.device_revision:
