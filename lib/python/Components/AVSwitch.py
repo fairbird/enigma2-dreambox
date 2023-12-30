@@ -1,13 +1,12 @@
 # -*- coding: utf-8 -*-
 from Components.config import config, ConfigSlider, ConfigSelection, ConfigYesNo, ConfigEnableDisable, ConfigOnOff, ConfigSubsection, ConfigBoolean, ConfigSelectionNumber, ConfigNothing, NoSave
 from enigma import eAVControl, eDVBVolumecontrol, getDesktop
-from Components.SystemInfo import SystemInfo
+from Components.SystemInfo import SystemInfo, BoxInfo
 from Tools.Directories import fileWriteLine
-from Tools.HardwareInfo import HardwareInfo
 from os.path import isfile
 import os
 
-model = HardwareInfo().get_device_model()
+MODEL = BoxInfo.getItem("model", default="unknown")
 
 MODULE_NAME = __name__.split(".")[-1]
 
@@ -41,7 +40,7 @@ class AVSwitch:
 		eAVControl.getInstance().setInput(input, 1)
 
 	def setSystem(self, value):
-		eAVControl.getInstance().setVideoMode(model)
+		eAVControl.getInstance().setVideoMode(MODEL)
 
 	def getOutputAspect(self):
 		valstr = config.av.aspectratio.value
@@ -230,7 +229,7 @@ def InitAVSwitch():
 			]
 			default = "Edid(Auto)"
 		else:
-			if model in ("dm900", "dm920"):
+			if MODEL in ("dm900", "dm920"):
 				choices = [
 					("Edid(Auto)", _("Auto")),
 					("Hdmi_Rgb", _("RGB")),
@@ -542,7 +541,7 @@ def InitAVSwitch():
 		config.av.downmix_dts.addNotifier(setDTSDownmix)
 
 	if SystemInfo["CanDTSHD"]:
-		if model not in ("dm7080", "dm820"):
+		if MODEL not in ("dm7080", "dm820"):
 			choices = [
 				("downmix", _("Downmix")),
 				("force_dts", _("Convert to DTS")),

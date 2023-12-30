@@ -7,12 +7,14 @@ from twisted.internet import threads
 from enigma import eActionMap, eDBoxLCD, eTimer
 
 from Components.config import ConfigNothing, ConfigSelection, ConfigSlider, ConfigSubsection, ConfigYesNo, config
-from Components.SystemInfo import SystemInfo
-from Tools.HardwareInfo import HardwareInfo
+from Components.SystemInfo import SystemInfo, BoxInfo
 from Screens.InfoBar import InfoBar
 from Screens.Screen import Screen
 from Screens.Standby import inTryQuitMainloop
 from Tools.Directories import fileReadLine, fileWriteLine
+
+
+MODEL = BoxInfo.getItem("model", default="unknown")
 
 
 class dummyScreen(Screen):
@@ -503,7 +505,7 @@ def InitLcd():
 		], default="on")
 		if isfile("/proc/stb/fp/power4x7suspend"):
 			config.lcd.power4x7suspend.addNotifier(setPower4x7Suspend)
-		if HardwareInfo().get_device_model() in ('dm900', 'dm920'):
+		if MODEL in ("dm900", "dm920"):
 			standby_default = 4
 		else:
 			standby_default = 1

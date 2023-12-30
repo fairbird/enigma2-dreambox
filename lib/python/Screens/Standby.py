@@ -10,7 +10,7 @@ from Components.config import config
 from Components.AVSwitch import AVSwitch
 from Components.Console import Console
 from Components.ImportChannels import ImportChannels
-from Components.SystemInfo import SystemInfo
+from Components.SystemInfo import SystemInfo, BoxInfo
 from Components.Sources.StreamService import StreamServiceList
 from Components.Task import job_manager
 from Tools.Directories import mediaFilesInUse
@@ -18,7 +18,6 @@ from Tools.Notifications import AddNotification
 from time import time, localtime
 from GlobalActions import globalActionMap
 from enigma import eDVBVolumecontrol, eTimer, eDVBLocalTimeHandler, eServiceReference, eStreamServer, quitMainloop, iRecordableService
-from Tools.HardwareInfo import HardwareInfo
 
 inStandby = None
 infoBarInstance = None
@@ -34,7 +33,7 @@ QUIT_RRECVERY_MODE = 16
 QUIT_UPGRADE_PROGRAM = 42
 QUIT_IMAGE_RESTORE = 43
 
-getBoxDisplayName = HardwareInfo().get_device_model()
+getBoxDisplayName = BoxInfo.getItem("model", default="unknown")
 
 def isInfoBarInstance():
 	global infoBarInstance

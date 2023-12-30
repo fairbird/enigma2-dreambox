@@ -3,14 +3,18 @@ from os import path
 from fcntl import ioctl
 from struct import pack, unpack
 from time import localtime, time, timezone
-from Tools.HardwareInfo import HardwareInfo
+from Components.SystemInfo import BoxInfo
+
+
+MODEL = BoxInfo.getItem("model", default="unknown")
+
 
 def getFPVersion():
 	ret = None
 	try:
-		if HardwareInfo().get_device_model() in ('dm7080', 'dm820', 'dm520', 'dm525', 'dm900', 'dm920'):
+		if MODEL in ("dm7080", "dm820", "dm520", "dm525", "dm900", "dm920"):
 			ret = open("/proc/stb/fp/version", "r").read()
-		elif HardwareInfo().get_device_model() in ('one', 'two'):
+		elif MODEL in ("dreamone", "dreamtwo"):
 			ret = open("/proc/stb/fp/fp_version", "r").read()
 	except IOError:
 		try:

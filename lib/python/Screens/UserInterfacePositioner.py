@@ -3,18 +3,21 @@ from Screens.Screen import Screen
 from Components.ActionMap import ActionMap
 from Components.config import config, configfile, ConfigSelectionNumber
 from Components.ConfigList import ConfigListScreen
-from Components.SystemInfo import SystemInfo
+from Components.SystemInfo import SystemInfo, BoxInfo
 from Components.Sources.StaticText import StaticText
 from Components.Pixmap import Pixmap
 from Components.Label import Label
 from Tools.Directories import fileExists
 from enigma import getDesktop
 from os import access, R_OK
-from Tools.HardwareInfo import HardwareInfo
 from Plugins.SystemPlugins.Videomode.VideoHardware import VideoHardware # storm - needed
 
+
+MODEL = BoxInfo.getItem("model", default="unknown")
+
+
 def getFilePath(setting):
-	if HardwareInfo().get_device_model() not in ('dreamone', 'dreamtwo'):
+	if MODEL not in ("dreamone", "dreamtwo"):
 		return "/proc/stb/vmpeg/0/dst_%s" % (setting)
 
 

@@ -11,7 +11,7 @@ from Components.ServiceEventTracker import ServiceEventTracker
 from Components.Sources.ServiceEvent import ServiceEvent
 from Components.Sources.Boolean import Boolean
 from Components.config import config, ConfigBoolean, ConfigClock
-from Components.SystemInfo import SystemInfo
+from Components.SystemInfo import SystemInfo, BoxInfo
 from Components.UsageConfig import preferredInstantRecordPath, defaultMoviePath
 from Components.VolumeControl import VolumeControl
 from Components.Sources.StaticText import StaticText
@@ -40,7 +40,6 @@ from Tools.ASCIItranslit import legacyEncode
 from Tools.Directories import fileExists, fileReadLines, fileWriteLines, fileReadLinesISO, getRecordingFilename, moveFiles
 from keyids import KEYFLAGS, KEYIDS, KEYIDNAMES
 from Tools.Notifications import AddPopup, AddNotificationWithCallback, current_notifications, lock, notificationAdded, notifications, RemovePopup
-from Tools.HardwareInfo import HardwareInfo
 
 from keyids import KEYFLAGS, KEYIDS, KEYIDNAMES
 
@@ -63,7 +62,7 @@ iAVSwitch = AVSwitch()
 # hack alert!
 from Screens.Menu import MainMenu, mdom
 
-model = HardwareInfo().get_device_model()
+MODEL = BoxInfo.getItem("model", default="unknown")
 
 MODULE_NAME = __name__.split(".")[-1]
 
@@ -3334,7 +3333,7 @@ class InfoBarResolutionSelection:
 		pass
 
 	def resolutionSelection(self):
-		amlogic = HardwareInfo().get_device_model() in ("one", "two")
+		amlogic = MODEL in ("dreamone", "dreamtwo")
 		avControl = eAVControl.getInstance()
 		fps = float(avControl.getFrameRate(50000)) / 1000.0
 		yRes = avControl.getResolutionY(0)
@@ -3366,7 +3365,7 @@ class InfoBarResolutionSelection:
 		self.session.openWithCallback(self.resolutionSelected, ChoiceBox, title=_("Please select a resolution..."), list=resList, keys=keys, selection=selection)
 
 	def resolutionSelected(self, videoMode):
-		amlogic = HardwareInfo().get_device_model() in ("one", "two")
+		amlogic = MODEL in ("dreamone", "dreamtwo")
 		if videoMode is not None:
 			if isinstance(videoMode[1], str):
 				if videoMode[1] == "exit" or videoMode[1] == "" or videoMode[1] == "auto":
