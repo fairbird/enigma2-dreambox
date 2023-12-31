@@ -38,11 +38,11 @@ class HardwareInfo:
 			pass
 
 		# Brandname ... bit odd, but history prevails
-		self.device_brandname = str(BoxInfo.getItem("displaybrand"))
+		self.device_brandname = BoxInfo.getItem("displaybrand")
 
 		# standard values
-		self.device_model = self.machine_name = str(BoxInfo.getItem("model", default="unknown"))
-		self.device_hw = str(BoxInfo.getItem("displaymodel"))
+		self.device_model = self.machine_name = BoxInfo.getItem("model")
+		self.device_hw = BoxInfo.getItem("displaymodel")
 
 		if self.device_revision:
 			self.device_string = "%s (%s-%s)" % (self.device_hw, self.device_revision, self.device_version)
@@ -51,7 +51,7 @@ class HardwareInfo:
 		else:
 			self.device_string = self.device_hw
 
-		self.device_hdmi = str(BoxInfo.getItem('hdmi'))
+		self.device_hdmi = BoxInfo.getItem('hdmi')
 
 	def get_device_name(self):
 		return hw_info.device_name
