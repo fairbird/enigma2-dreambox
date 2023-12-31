@@ -1,114 +1,98 @@
 # -*- coding: utf-8 -*-
-from Screens.Screen import Screen
-from Components.ActionMap import ActionMap
-from Components.config import config, configfile, ConfigSelectionNumber
-from Components.ConfigList import ConfigListScreen
-from Components.SystemInfo import SystemInfo, BoxInfo
-from Components.Sources.StaticText import StaticText
-from Components.Pixmap import Pixmap
-from Components.Label import Label
-from Tools.Directories import fileExists
-from enigma import getDesktop
 from os import access, R_OK
-from Plugins.SystemPlugins.Videomode.VideoHardware import VideoHardware # storm - needed
+from os.path import exists
+from enigma import getDesktop
 
+from Components.ActionMap import ActionMap
+from Components.AVSwitch import iAVSwitch
+from Components.config import config, configfile, getConfigListEntry
+from Components.ConfigList import ConfigListScreen
+from Components.Label import Label
+from Components.SystemInfo import BoxInfo
+from Components.Sources.StaticText import StaticText
+from Screens.MessageBox import MessageBox
+from Screens.Screen import Screen
+from Screens.Setup import SetupSummary
+from Tools.Directories import fileWriteLine
 
-MODEL = BoxInfo.getItem("model", default="unknown")
+MODULE_NAME = __name__.split(".")[-1]
 
-
-def getFilePath(setting):
-	if MODEL not in ("dreamone", "dreamtwo"):
-		return "/proc/stb/vmpeg/0/dst_%s" % (setting)
-
-
-def setPositionParameter(parameter, configElement):
-	try:
-		f = open(getFilePath(parameter), "w")
-		f.write('%08X\n' % int(configElement.value))
-		f.close()
-	except OSError:
-		pass
-	if fileExists(getFilePath("apply")):
-		f = open(getFilePath("apply"), "w")
-		f.write('1')
-		f.close()
-
-
-def setPositionParameterAML():
-	with open("/sys/class/graphics/fb0/window_axis", "w") as fd:
-		fd.write('%s %s %s %s' % (config.osd.dst_left.value, config.osd.dst_top.value, config.osd.dst_width.value, config.osd.dst_height.value))
-	with open("/sys/class/graphics/fb0/free_scale", "w") as fd:
-		fd.write("0x10001")
+BRAND = BoxInfo.getItem("brand")
 
 
 def InitOsd():
 
-	SystemInfo["CanChange3DOsd"] = access('/proc/stb/fb/3dmode', R_OK) and True or False
-	SystemInfo["CanChangeOsdAlpha"] = access('/proc/stb/video/alpha', R_OK) and True or False
-	SystemInfo["CanChangeOsdPlaneAlpha"] = access('/sys/class/graphics/fb0/osd_plane_alpha', R_OK) and True or False
-	SystemInfo["CanChangeOsdPosition"] = access('/proc/stb/fb/dst_left', R_OK) and True or False
-	SystemInfo["CanChangeOsdPositionAML"] = access('/sys/class/graphics/fb0/free_scale', R_OK) and True or False
-	SystemInfo["OsdSetup"] = SystemInfo["CanChangeOsdPosition"]
-	if SystemInfo["CanChangeOsdAlpha"] == True or SystemInfo["CanChangeOsdPlaneAlpha"] == True or SystemInfo["CanChangeOsdPosition"] == True or SystemInfo["CanChangeOsdPositionAML"] == True:
-		SystemInfo["OsdMenu"] = True
+	BoxInfo.setItem("CanChange3DOsd", access("/proc/stb/fb/3dmode", R_OK))
+	BoxInfo.setItem("CanChangeOsdAlpha", access("/proc/stb/video/alpha", R_OK))
+	BoxInfo.setItem("CanChangeOsdPlaneAlpha", access("/sys/class/graphics/fb0/osd_plane_alpha", R_OK))
+	BoxInfo.setItem("CanChangeOsdPosition", access("/proc/stb/fb/dst_left", R_OK))
+	BoxInfo.setItem("CanChangeOsdPositionAML", access("/sys/class/graphics/fb0/free_scale", R_OK))
+	BoxInfo.setItem("OsdSetup", BoxInfo.getItem("CanChangeOsdPosition"))
+	if BoxInfo.getItem("CanChangeOsdAlpha") is True or BoxInfo.getItem("CanChangeOsdPosition") is True or BoxInfo.getItem("CanChangeOsdPositionAML") is True or BoxInfo.getItem("CanChangeOsdPlaneAlpha") is True:
+		BoxInfo.setItem("OsdMenu", True)
 	else:
-		SystemInfo["OsdMenu"] = False
+		BoxInfo.setItem("OsdMenu", False)
 
-	SystemInfo["CanChangeOsdPosition"] = True
+	if BRAND == "fulan":
+		BoxInfo.setItem("CanChangeOsdPosition", False)
+		BoxInfo.setItem("CanChange3DOsd", False)
+
+	if BoxInfo.getItem("CanChangeOsdPosition"):
+		def setPositionParameter(parameter, configElement):
+			fileWriteLine("/proc/stb/fb/dst_%s" % parameter, "%08X\n" % configElement.value, source=MODULE_NAME)
+			fileName = "/proc/stb/fb/dst_apply"
+			if exists(fileName):
+				fileWriteLine(fileName, "1", source=MODULE_NAME)
+	elif BoxInfo.getItem("CanChangeOsdPositionAML"):
+		def setPositionParameter(parameter, configElement):
+			value = "%s %s %s %s" % (config.osd.dst_left.value, config.osd.dst_top.value, config.osd.dst_width.value, config.osd.dst_height.value)
+			fileWriteLine("/sys/class/graphics/fb0/window_axis", value, source=MODULE_NAME)
+			fileWriteLine("/sys/class/graphics/fb0/free_scale", "0x10001", source=MODULE_NAME)
+
+	else:
+		def setPositionParameter(parameter, configElement):
+			# dummy else case
+			pass
 
 	def setOSDLeft(configElement):
-		if SystemInfo["CanChangeOsdPosition"]:
-			setPositionParameter("left", configElement)
-		if SystemInfo["CanChangeOsdPositionAML"]:
-			setPositionParameterAML()
+		setPositionParameter("left", configElement)
 	config.osd.dst_left.addNotifier(setOSDLeft)
 
 	def setOSDWidth(configElement):
-		if SystemInfo["CanChangeOsdPosition"]:
-			setPositionParameter("width", configElement)
-		if SystemInfo["CanChangeOsdPositionAML"]:
-			setPositionParameterAML()
+		setPositionParameter("width", configElement)
 	config.osd.dst_width.addNotifier(setOSDWidth)
 
 	def setOSDTop(configElement):
-		if SystemInfo["CanChangeOsdPosition"]:
-			setPositionParameter("top", configElement)
-		if SystemInfo["CanChangeOsdPositionAML"]:
-			setPositionParameterAML()
+		setPositionParameter("top", configElement)
 	config.osd.dst_top.addNotifier(setOSDTop)
 
 	def setOSDHeight(configElement):
-		if SystemInfo["CanChangeOsdPosition"]:
-			setPositionParameter("height", configElement)
-		if SystemInfo["CanChangeOsdPositionAML"]:
-			setPositionParameterAML()
+		setPositionParameter("height", configElement)
 	config.osd.dst_height.addNotifier(setOSDHeight)
 
-	print('[UserInterfacePositioner] Setting OSD position: %s %s %s %s' % (config.osd.dst_left.value, config.osd.dst_width.value, config.osd.dst_top.value, config.osd.dst_height.value))
+	print("[UserInterfacePositioner] Setting OSD position: %s %s %s %s" % (config.osd.dst_left.value, config.osd.dst_width.value, config.osd.dst_top.value, config.osd.dst_height.value))
 
 	def setOSDAlpha(configElement):
-		if SystemInfo["CanChangeOsdAlpha"]:
-			print('[UserInterfacePositioner] Setting OSD alpha:%s' % str(configElement.value))
+		if BoxInfo.getItem("CanChangeOsdAlpha"):
+			print("[UserInterfacePositioner] Setting OSD alpha:%s" % str(configElement.value))
 			config.av.osd_alpha.setValue(configElement.value)
-			with open("/proc/stb/video/alpha", "w") as fd:
-				fd.write(str(configElement.value))
+			fileWriteLine("/proc/stb/video/alpha", str(configElement.value), source=MODULE_NAME)
 	config.osd.alpha.addNotifier(setOSDAlpha)
 
 	def setOSDPlaneAlpha(configElement):
-		if SystemInfo["CanChangeOsdPlaneAlpha"]:
-			print('[UserInterfacePositioner] Setting OSD plane alpha:%s' % str(configElement.value))
+		if BoxInfo.getItem("CanChangeOsdPlaneAlpha"):
+			print("[UserInterfacePositioner] Setting OSD plane alpha:%s" % str(configElement.value))
 			config.av.osd_alpha.setValue(configElement.value)
-			with open("/sys/class/graphics/fb0/osd_plane_alpha", "w") as fd:
-				fd.write(hex(int(configElement.value))) # @storm -here int() is required, because of the integer
+			fileWriteLine("/sys/class/graphics/fb0/osd_plane_alpha", hex(configElement.value), source=MODULE_NAME)
 	config.osd.alpha.addNotifier(setOSDPlaneAlpha)
 
 	def set3DMode(configElement):
-		if SystemInfo["CanChange3DOsd"]:
+		if BoxInfo.getItem("CanChange3DOsd"):
 			value = configElement.value
-			print('[UserInterfacePositioner] Setting 3D mode: %s' % str(value))
+			print("[UserInterfacePositioner] Setting 3D mode: %s" % str(value))
 			try:
-				if SystemInfo["CanUse3DModeChoices"]:
-					f = open("/proc/stb/fb/3dmode_choices", "r")
+				if BoxInfo.getItem("CanUse3DModeChoices"):
+					f = open("/proc/stb/fb/3dmode_choices")
 					choices = f.readlines()[0].split()
 					f.close()
 					if value not in choices:
@@ -118,22 +102,15 @@ def InitOsd():
 							value = "tab"
 						elif value == "auto":
 							value = "off"
-				f = open("/proc/stb/fb/3dmode", "w")
-				f.write(value)
-				f.close()
+				fileWriteLine("/proc/stb/fb/3dmode", value, source=MODULE_NAME)
 			except OSError:
 				pass
 	config.osd.threeDmode.addNotifier(set3DMode)
 
 	def set3DZnorm(configElement):
-		if SystemInfo["CanChange3DOsd"]:
-			print('[UserInterfacePositioner] Setting 3D depth: %s' % str(configElement.value))
-			try:
-				f = open("/proc/stb/fb/znorm", "w")
-				f.write('%d' % int(configElement.value))
-				f.close()
-			except OSError:
-				pass
+		if BoxInfo.getItem("CanChange3DOsd"):
+			print("[UserInterfacePositioner] Setting 3D depth: %s" % str(configElement.value))
+			fileWriteLine("/proc/stb/fb/znorm", "%d" % int(configElement.value), source=MODULE_NAME)
 	config.osd.threeDznorm.addNotifier(set3DZnorm)
 
 
@@ -142,9 +119,9 @@ class UserInterfacePositioner2(Screen, ConfigListScreen):
 		skin = """
 			<screen position="center,center" size="1920,1080" backgroundColor="#000000" title="OSD Adjustment" >
 
-				<widget name="text" position="300,165" zPosition="1" size="1320,180" font="Regular;32" horizontalAlignment="center" verticalAlignment="center" foregroundColor="yellow" backgroundColor="#1f771f" transparent="1" />
-				<widget name="config" position="225,375" zPosition="1" size="1470,315" itemHeight="45" font="Regular;30" secondfont="Regular;30" transparent="1" />
-				<widget source="status" render="Label" position="300,713" zPosition="1" size="1320,120" font="Regular;32" horizontalAlignment="center" verticalAlignment="center" foregroundColor="yellow" backgroundColor="#1f771f" transparent="1" />
+				<widget name="text" position="300,165" zPosition="1" size="1320,180" font="Regular;32" halign="center" valign="center" foregroundColor="yellow" backgroundColor="#1f771f" transparent="1" />
+				<widget name="config" position="225,375" zPosition="1" size="1470,315" itemHeight="45" font="Regular;30" transparent="1" />
+				<widget source="status" render="Label" position="300,713" zPosition="1" size="1320,120" font="Regular;32" halign="center" valign="center" foregroundColor="yellow" backgroundColor="#1f771f" transparent="1" />
 
 				<eLabel backgroundColor="red" position="0,0" size="1920,1" zPosition="0" />
 				<eLabel backgroundColor="red" position="0,1079" size="1920,1" zPosition="0" />
@@ -167,19 +144,19 @@ class UserInterfacePositioner2(Screen, ConfigListScreen):
 				<eLabel backgroundColor="green" position="665,941" size="210,5" zPosition="0" />
 				<eLabel backgroundColor="yellow" position="1046,941" size="210,5" zPosition="0" />
 				<eLabel backgroundColor="blue" position="1427,941" size="210,5" zPosition="0" />
-				<widget source="key_red" render="Label" position="284,908" zPosition="1" size="210,33" font="Regular;27" horizontalAlignment="center" verticalAlignment="center" backgroundColor="#1f771f" transparent="1" />
-				<widget source="key_green" render="Label" position="665,908" zPosition="1" size="210,33" font="Regular;27" horizontalAlignment="center" verticalAlignment="center" backgroundColor="#1f771f" transparent="1" />
-				<widget source="key_yellow" render="Label" position="1046,908" zPosition="1" size="210,33" font="Regular;27" horizontalAlignment="center" verticalAlignment="center" backgroundColor="#1f771f" transparent="1" />
-				<widget source="key_blue" render="Label" position="1427,908" zPosition="1" size="210,33" font="Regular;27" horizontalAlignment="center" verticalAlignment="center" backgroundColor="#1f771f" transparent="1" />
+				<widget source="key_red" render="Label" position="284,908" zPosition="1" size="210,33" font="Regular;27" halign="center" valign="center" backgroundColor="#1f771f" transparent="1" />
+				<widget source="key_green" render="Label" position="665,908" zPosition="1" size="210,33" font="Regular;27" halign="center" valign="center" backgroundColor="#1f771f" transparent="1" />
+				<widget source="key_yellow" render="Label" position="1046,908" zPosition="1" size="210,33" font="Regular;27" halign="center" valign="center" backgroundColor="#1f771f" transparent="1" />
+				<widget source="key_blue" render="Label" position="1427,908" zPosition="1" size="210,33" font="Regular;27" halign="center" valign="center" backgroundColor="#1f771f" transparent="1" />
 
 			</screen>"""
 	elif (getDesktop(0).size().width() == 1280):
 		skin = """
 			<screen position="center,center" size="1280,720" backgroundColor="#000000" title="OSD Adjustment" >
 
-				<widget name="text" position="200,110" zPosition="1" size="880,120" font="Regular;21" horizontalAlignment="center" verticalAlignment="center" foregroundColor="yellow" backgroundColor="#1f771f" transparent="1" />
+				<widget name="text" position="200,110" zPosition="1" size="880,120" font="Regular;21" halign="center" valign="center" foregroundColor="yellow" backgroundColor="#1f771f" transparent="1" />
 				<widget name="config" position="150,250" zPosition="1" size="980,210" itemHeight="30" font="Regular;20" transparent="1" />
-				<widget source="status" render="Label" position="200,475" zPosition="1" size="880,80" font="Regular;21" horizontalAlignment="center" verticalAlignment="center" foregroundColor="yellow" backgroundColor="#1f771f" transparent="1" />
+				<widget source="status" render="Label" position="200,475" zPosition="1" size="880,80" font="Regular;21" halign="center" valign="center" foregroundColor="yellow" backgroundColor="#1f771f" transparent="1" />
 
 				<eLabel backgroundColor="red" position="0,0" size="1280,1" zPosition="0" />
 				<eLabel backgroundColor="red" position="0,719" size="1280,1" zPosition="0" />
@@ -202,10 +179,10 @@ class UserInterfacePositioner2(Screen, ConfigListScreen):
 				<eLabel backgroundColor="green" position="443,627" size="140,3" zPosition="0" />
 				<eLabel backgroundColor="yellow" position="697,627" size="140,3" zPosition="0" />
 				<eLabel backgroundColor="blue" position="951,627" size="140,3" zPosition="0" />
-				<widget source="key_red" render="Label" position="189,605" zPosition="1" size="140,22" font="Regular;18" horizontalAlignment="center" verticalAlignment="center" backgroundColor="#1f771f" transparent="1" />
-				<widget source="key_green" render="Label" position="443,605" zPosition="1" size="140,22" font="Regular;18" horizontalAlignment="center" verticalAlignment="center" backgroundColor="#1f771f" transparent="1" />
-				<widget source="key_yellow" render="Label" position="697,605" zPosition="1" size="140,22" font="Regular;18" horizontalAlignment="center" verticalAlignment="center" backgroundColor="#1f771f" transparent="1" />
-				<widget source="key_blue" render="Label" position="951,605" zPosition="1" size="140,22" font="Regular;18" horizontalAlignment="center" verticalAlignment="center" backgroundColor="#1f771f" transparent="1" />
+				<widget source="key_red" render="Label" position="189,605" zPosition="1" size="140,22" font="Regular;18" halign="center" valign="center" backgroundColor="#1f771f" transparent="1" />
+				<widget source="key_green" render="Label" position="443,605" zPosition="1" size="140,22" font="Regular;18" halign="center" valign="center" backgroundColor="#1f771f" transparent="1" />
+				<widget source="key_yellow" render="Label" position="697,605" zPosition="1" size="140,22" font="Regular;18" halign="center" valign="center" backgroundColor="#1f771f" transparent="1" />
+				<widget source="key_blue" render="Label" position="951,605" zPosition="1" size="140,22" font="Regular;18" halign="center" valign="center" backgroundColor="#1f771f" transparent="1" />
 
 			</screen>"""
 
@@ -213,9 +190,9 @@ class UserInterfacePositioner2(Screen, ConfigListScreen):
 		skin = """
 			<screen position="center,center" size="1024,576" backgroundColor="#000000" title="OSD Adjustment" >
 
-				<widget name="text"  position="200,180" zPosition="1" size="624,100" font="Regular;21" horizontalAlignment="center" verticalAlignment="center" foregroundColor="yellow" backgroundColor="#1f771f" transparent="1" />
-				<widget name="config" position="100,180" zPosition="1" size="824,50" font="Regular;24" horizontalAlignment="center" verticalAlignment="center" transparent="1" />
-				<widget source="status" render="Label" position="200,450" zPosition="1" size="624,80" font="Regular;21" horizontalAlignment="center" verticalAlignment="center" foregroundColor="yellow" backgroundColor="#1f771f" transparent="1" />
+				<widget name="text"  position="200,180" zPosition="1" size="624,100" font="Regular;21" halign="center" valign="center" foregroundColor="yellow" backgroundColor="#1f771f" transparent="1" />
+				<widget name="config" position="100,180" zPosition="1" size="824,50" font="Regular;24" halign="center" valign="center" transparent="1" />
+				<widget source="status" render="Label" position="200,450" zPosition="1" size="624,80" font="Regular;21" halign="center" valign="center" foregroundColor="yellow" backgroundColor="#1f771f" transparent="1" />
 
 				<eLabel backgroundColor="red" position="0,0" size="1024,1" zPosition="0" />
 				<eLabel backgroundColor="red" position="0,575" size="1024,1" zPosition="0" />
@@ -238,19 +215,19 @@ class UserInterfacePositioner2(Screen, ConfigListScreen):
 				<eLabel backgroundColor="green" position="341,477" size="140,3" zPosition="0" />
 				<eLabel backgroundColor="yellow" position="544,477" size="140,3" zPosition="0" />
 				<eLabel backgroundColor="blue" position="747,477" size="140,3" zPosition="0" />
-				<widget source="key_red" render="Label" position="138,455" zPosition="1" size="140,22" font="Regular;18" horizontalAlignment="center" verticalAlignment="center" backgroundColor="#1f771f" transparent="1" />
-				<widget source="key_green" render="Label" position="341,455" zPosition="1" size="140,22" font="Regular;18" horizontalAlignment="center" verticalAlignment="center" backgroundColor="#1f771f" transparent="1" />
-				<widget source="key_yellow" render="Label" position="544,455" zPosition="1" size="140,22" font="Regular;18" horizontalAlignment="center" verticalAlignment="center" backgroundColor="#1f771f" transparent="1" />
-				<widget source="key_blue" render="Label" position="747,455" zPosition="1" size="140,22" font="Regular;18" horizontalAlignment="center" verticalAlignment="center" backgroundColor="#1f771f" transparent="1" />
+				<widget source="key_red" render="Label" position="138,455" zPosition="1" size="140,22" font="Regular;18" halign="center" valign="center" backgroundColor="#1f771f" transparent="1" />
+				<widget source="key_green" render="Label" position="341,455" zPosition="1" size="140,22" font="Regular;18" halign="center" valign="center" backgroundColor="#1f771f" transparent="1" />
+				<widget source="key_yellow" render="Label" position="544,455" zPosition="1" size="140,22" font="Regular;18" halign="center" valign="center" backgroundColor="#1f771f" transparent="1" />
+				<widget source="key_blue" render="Label" position="747,455" zPosition="1" size="140,22" font="Regular;18" halign="center" valign="center" backgroundColor="#1f771f" transparent="1" />
 			</screen>"""
 
 	else:
 		skin = """
 			<screen position="center,center" size="720,576" backgroundColor="#000000" title="OSD Adjustment" >
 
-				<widget source="text" render="Label" position="75,80" zPosition="1" size="570,100" font="Regular;21" horizontalAlignment="center" verticalAlignment="center" foregroundColor="yellow" backgroundColor="#1f771f" transparent="1" />
-				<widget source="config" render="Label" position="75,180" zPosition="1" size="570,50" font="Regular;21" horizontalAlignment="center" verticalAlignment="center" transparent="1" />
-				<widget source="status" render="Label" position="75,450" zPosition="1" size="570,80" font="Regular;21" horizontalAlignment="center" verticalAlignment="center" foregroundColor="yellow" backgroundColor="#1f771f" transparent="1" />
+				<widget source="text" render="Label" position="75,80" zPosition="1" size="570,100" font="Regular;21" halign="center" valign="center" foregroundColor="yellow" backgroundColor="#1f771f" transparent="1" />
+				<widget source="config" render="Label" position="75,180" zPosition="1" size="570,50" font="Regular;21" halign="center" valign="center" transparent="1" />
+				<widget source="status" render="Label" position="75,450" zPosition="1" size="570,80" font="Regular;21" halign="center" valign="center" foregroundColor="yellow" backgroundColor="#1f771f" transparent="1" />
 
 				<eLabel backgroundColor="red" position="0,0" size="720,1" zPosition="0" />
 				<eLabel backgroundColor="red" position="0,575" size="720,1" zPosition="0" />
@@ -273,10 +250,10 @@ class UserInterfacePositioner2(Screen, ConfigListScreen):
 				<eLabel backgroundColor="green" position="220,477" size="140,3" zPosition="0" />
 				<eLabel backgroundColor="yellow" position="360,477" size="140,3" zPosition="0" />
 				<eLabel backgroundColor="blue" position="500,477" size="140,3" zPosition="0" />
-				<widget source="key_red" render="Label" position="80,455" zPosition="1" size="140,22" font="Regular;18" horizontalAlignment="center" verticalAlignment="center" backgroundColor="#1f771f" transparent="1" />
-				<widget source="key_green" render="Label" position="220,455" zPosition="1" size="140,22" font="Regular;18" horizontalAlignment="center" verticalAlignment="center" backgroundColor="#1f771f" transparent="1" />
-				<widget source="key_yellow" render="Label" position="360,455" zPosition="1" size="140,22" font="Regular;18" horizontalAlignment="center" verticalAlignment="center" backgroundColor="#1f771f" transparent="1" />
-				<widget source="key_blue" render="Label" position="500,455" zPosition="1" size="140,22" font="Regular;18" horizontalAlignment="center" verticalAlignment="center" backgroundColor="#1f771f" transparent="1" />
+				<widget source="key_red" render="Label" position="80,455" zPosition="1" size="140,22" font="Regular;18" halign="center" valign="center" backgroundColor="#1f771f" transparent="1" />
+				<widget source="key_green" render="Label" position="220,455" zPosition="1" size="140,22" font="Regular;18" halign="center" valign="center" backgroundColor="#1f771f" transparent="1" />
+				<widget source="key_yellow" render="Label" position="360,455" zPosition="1" size="140,22" font="Regular;18" halign="center" valign="center" backgroundColor="#1f771f" transparent="1" />
+				<widget source="key_blue" render="Label" position="500,455" zPosition="1" size="140,22" font="Regular;18" halign="center" valign="center" backgroundColor="#1f771f" transparent="1" />
 
 			</screen>"""
 
@@ -305,25 +282,26 @@ class UserInterfacePositioner2(Screen, ConfigListScreen):
 		self.onChangedEntry = []
 		self.list = []
 		ConfigListScreen.__init__(self, self.list, session=session, on_change=self.changedEntry)
-		if SystemInfo["CanChangeOsdAlpha"] or SystemInfo["CanChangeOsdPlaneAlpha"]:
-			self.list.append((_("User interface visibility"), config.osd.alpha, _("This option lets you adjust the transparency of the user interface")))
-			self.list.append((_("Teletext base visibility"), config.osd.alpha_teletext, _("Base transparency for teletext, more options available within teletext screen.")))
-			self.list.append((_("Web browser base visibility"), config.osd.alpha_webbrowser, _("Base transparency for OpenOpera web browser")))
-		if SystemInfo["CanChangeOsdPosition"]:
-			self.list.append((_("Move Left/Right"), config.osd.dst_left, _("Use the Left/Right buttons on your remote to move the user interface left/right")))
-			self.list.append((_("Width"), config.osd.dst_width, _("Use the Left/Right buttons on your remote to adjust the size of the user interface. Left button decreases the size, Right increases the size.")))
-			self.list.append((_("Move Up/Down"), config.osd.dst_top, _("Use the Left/Right buttons on your remote to move the user interface up/down")))
-			self.list.append((_("Height"), config.osd.dst_height, _("Use the Left/Right buttons on your remote to adjust the size of the user interface. Left button decreases the size, Right increases the size.")))
-		if SystemInfo["CanChangeOsdPositionAML"]:
-			self.list.append((_("Left"), config.osd.dst_left, _("Use the Left/Right buttons on your remote to move the user interface left")))
-			self.list.append((_("Right"), config.osd.dst_width, _("Use the Left/Right buttons on your remote to move the user interface right")))
-			self.list.append((_("Top"), config.osd.dst_top, _("Use the Left/Right buttons on your remote to move the user interface top")))
-			self.list.append((_("Bottom"), config.osd.dst_height, _("Use the Left/Right buttons on your remote to move the user interface bottom")))
+		if BoxInfo.getItem("CanChangeOsdAlpha") or BoxInfo.getItem("CanChangeOsdPlaneAlpha"):
+			self.list.append(getConfigListEntry(_("User interface visibility"), config.osd.alpha, _("This option lets you adjust the transparency of the user interface")))
+			self.list.append(getConfigListEntry(_("Teletext base visibility"), config.osd.alpha_teletext, _("Base transparency for teletext, more options available within teletext screen.")))
+			self.list.append(getConfigListEntry(_("Web browser base visibility"), config.osd.alpha_webbrowser, _("Base transparency for OpenOpera web browser")))
+		if BoxInfo.getItem("CanChangeOsdPosition"):
+			self.list.append(getConfigListEntry(_("Move Left/Right"), config.osd.dst_left, _("Use the Left/Right buttons on your remote to move the user interface left/right")))
+			self.list.append(getConfigListEntry(_("Width"), config.osd.dst_width, _("Use the Left/Right buttons on your remote to adjust the size of the user interface. Left button decreases the size, Right increases the size.")))
+			self.list.append(getConfigListEntry(_("Move Up/Down"), config.osd.dst_top, _("Use the Left/Right buttons on your remote to move the user interface up/down")))
+			self.list.append(getConfigListEntry(_("Height"), config.osd.dst_height, _("Use the Left/Right buttons on your remote to adjust the size of the user interface. Left button decreases the size, Right increases the size.")))
+		if BoxInfo.getItem("CanChangeOsdPositionAML"):
+			self.list.append(getConfigListEntry(_("Left"), config.osd.dst_left, _("Use the Left/Right buttons on your remote to move the user interface left")))
+			self.list.append(getConfigListEntry(_("Right"), config.osd.dst_width, _("Use the Left/Right buttons on your remote to move the user interface right")))
+			self.list.append(getConfigListEntry(_("Top"), config.osd.dst_top, _("Use the Left/Right buttons on your remote to move the user interface top")))
+			self.list.append(getConfigListEntry(_("Bottom"), config.osd.dst_height, _("Use the Left/Right buttons on your remote to move the user interface bottom")))
+
 		self["config"].list = self.list
 		self["config"].l.setList(self.list)
 
 		self.onLayoutFinish.append(self.layoutFinished)
-		if not self.selectionChanged in self["config"].onSelectionChanged:
+		if self.selectionChanged not in self["config"].onSelectionChanged:
 			self["config"].onSelectionChanged.append(self.selectionChanged)
 		self.selectionChanged()
 
@@ -332,10 +310,9 @@ class UserInterfacePositioner2(Screen, ConfigListScreen):
 
 	def layoutFinished(self):
 		self.setTitle(_(self.setup_title))
-#		self.Console.ePopen('/usr/bin/showiframe /usr/share/enigma2/hd-testcard.mvi')
+#		self.Console.ePopen("/usr/bin/showiframe /usr/share/enigma2/hd-testcard.mvi")
 
 	def createSummary(self):
-		from Screens.Setup import SetupSummary
 		return SetupSummary
 
 	# for summary:
@@ -351,12 +328,12 @@ class UserInterfacePositioner2(Screen, ConfigListScreen):
 
 	def keyLeft(self):
 		ConfigListScreen.keyLeft(self)
-		if SystemInfo["CanChangeOsdPosition"]:
+		if BoxInfo.getItem("CanChangeOsdPosition"):
 			self.setPreviewPosition()
 
 	def keyRight(self):
 		ConfigListScreen.keyRight(self)
-		if SystemInfo["CanChangeOsdPosition"]:
+		if BoxInfo.getItem("CanChangeOsdPosition"):
 			self.setPreviewPosition()
 
 	def keyDefault(self):
@@ -364,54 +341,17 @@ class UserInterfacePositioner2(Screen, ConfigListScreen):
 		config.osd.alpha_teletext.setValue(255)
 		config.osd.alpha_webbrowser.setValue(255)
 
-		if SystemInfo["CanChangeOsdPosition"]:
+		if BoxInfo.getItem("CanChangeOsdPosition"):
 			config.osd.dst_width.setValue(720)
 			config.osd.dst_height.setValue(576)
 			config.osd.dst_left.setValue(0)
 			config.osd.dst_top.setValue(0)
-		elif SystemInfo["CanChangeOsdPositionAML"]:
-			amlmode = list(modes.values())[0]
-			oldamlmode = self.getAMLMode()
-			f = open("/sys/class/display/mode", "w")
-			f.write(amlmode)
-			f.close()
-			print("[AVSwitch] Amlogic setting videomode to mode: %s" % amlmode)
-			f = open("/etc/u-boot.scr.d/000_hdmimode.scr", "w")
-			f.write("setenv hdmimode %s" % amlmode)
-			f.close()
-			f = open("/etc/u-boot.scr.d/000_outputmode.scr", "w")
-			f.write("setenv outputmode %s" % amlmode)
-			f.close()
-			os.system("update-autoexec")
-			f = open("/sys/class/ppmgr/ppscaler", "w")
-			f.write("1")
-			f.close()
-			f = open("/sys/class/ppmgr/ppscaler", "w")
-			f.write("0")
-			f.close()
-			f = open("/sys/class/video/axis", "w")
-			f.write(axis[mode])
-			f.close()
-			f = open("/sys/class/graphics/fb0/stride", "r")
-			stride = f.read().strip()
-			f.close()
-			limits = [int(x) for x in axis[mode].split()]
-			config.osd.dst_left = ConfigSelectionNumber(default=limits[0], stepwidth=1, min=limits[0] - 255, max=limits[0] + 255, wraparound=False)
-			config.osd.dst_top = ConfigSelectionNumber(default=limits[1], stepwidth=1, min=limits[1] - 255, max=limits[1] + 255, wraparound=False)
-			config.osd.dst_width = ConfigSelectionNumber(default=limits[2], stepwidth=1, min=limits[2] - 255, max=limits[2] + 255, wraparound=False)
-			config.osd.dst_height = ConfigSelectionNumber(default=limits[3], stepwidth=1, min=limits[3] - 255, max=limits[3] + 255, wraparound=False)
-
-			if oldamlmode != amlmode:
-			        config.osd.dst_width.setValue(limits[0])
-			        config.osd.dst_height.setValue(limits[1])
-			        config.osd.dst_left.setValue(limits[2])
-			        config.osd.dst_top.setValue(limits[3])
-			        config.osd.dst_left.save()
-			        config.osd.dst_width.save()
-			        config.osd.dst_top.save()
-			        config.osd.dst_height.save()
-			print("[AVSwitch] Framebuffer mode:%s  stride:%s axis:%s" % (getDesktop(0).size().width(), stride, axis[mode]))
-			return
+		elif BoxInfo.getItem("CanChangeOsdPositionAML"):
+			limits = [int(x) for x in iAVSwitch.getWindowsAxis().split()]
+			config.osd.dst_left.setValue(limits[0])
+			config.osd.dst_top.setValue(limits[1])
+			config.osd.dst_width.setValue(limits[2])
+			config.osd.dst_height.setValue(limits[3])
 		self["config"].l.setList(self.list)
 
 	def setPreviewPosition(self):
@@ -432,7 +372,7 @@ class UserInterfacePositioner2(Screen, ConfigListScreen):
 		config.osd.dst_width.setValue(dst_width)
 		config.osd.dst_top.setValue(dst_top)
 		config.osd.dst_height.setValue(dst_height)
-		print('[UserInterfacePositioner] Setting OSD position: %s %s %s %s' % (config.osd.dst_left.value, config.osd.dst_width.value, config.osd.dst_top.value, config.osd.dst_height.value))
+		print("[UserInterfacePositioner] Setting OSD position: %s %s %s %s" % (config.osd.dst_left.value, config.osd.dst_width.value, config.osd.dst_top.value, config.osd.dst_height.value))
 
 	def saveAll(self):
 		for x in self["config"].list:
@@ -455,7 +395,6 @@ class UserInterfacePositioner2(Screen, ConfigListScreen):
 
 	def keyCancel(self):
 		if self["config"].isChanged():
-			from Screens.MessageBox import MessageBox
 			self.session.openWithCallback(self.cancelConfirm, MessageBox, _("Really close without saving settings?"), default=False)
 		else:
 			self.close()
@@ -491,21 +430,21 @@ class UserInterfacePositioner(Screen, ConfigListScreen):
 		self.onChangedEntry = []
 		self.list = []
 		ConfigListScreen.__init__(self, self.list, session=session, on_change=self.changedEntry)
-		if SystemInfo["CanChangeOsdAlpha"] == True:
-			self.list.append((_("User interface visibility"), config.osd.alpha, _("This option lets you adjust the transparency of the user interface")))
-			self.list.append((_("Teletext base visibility"), config.osd.alpha_teletext, _("Base transparency for teletext, more options available within teletext screen.")))
-			self.list.append((_("Web browser base visibility"), config.osd.alpha_webbrowser, _("Base transparency for OpenOpera web browser")))
-		if SystemInfo["CanChangeOsdPosition"] == True or SystemInfo["CanChangeOsdPositionAML"] == True:
-			self.list.append((_("Move Left/Right"), config.osd.dst_left, _("Use the Left/Right buttons on your remote to move the user interface left/right")))
-			self.list.append((_("Width"), config.osd.dst_width, _("Use the Left/Right buttons on your remote to adjust the size of the user interface. Left button decreases the size, Right increases the size.")))
-			self.list.append((_("Move Up/Down"), config.osd.dst_top, _("Use the Left/Right buttons on your remote to move the user interface up/down")))
-			self.list.append((_("Height"), config.osd.dst_height, _("Use the Left/Right buttons on your remote to adjust the size of the user interface. Left button decreases the size, Right increases the size.")))
+		if BoxInfo.getItem("CanChangeOsdAlpha") is True:
+			self.list.append(getConfigListEntry(_("User interface visibility"), config.osd.alpha, _("This option lets you adjust the transparency of the user interface")))
+			self.list.append(getConfigListEntry(_("Teletext base visibility"), config.osd.alpha_teletext, _("Base transparency for teletext, more options available within teletext screen.")))
+			self.list.append(getConfigListEntry(_("Web browser base visibility"), config.osd.alpha_webbrowser, _("Base transparency for OpenOpera web browser")))
+		if BoxInfo.getItem("CanChangeOsdPosition") is True or BoxInfo.getItem("CanChangeOsdPositionAML") is True:
+			self.list.append(getConfigListEntry(_("Move Left/Right"), config.osd.dst_left, _("Use the Left/Right buttons on your remote to move the user interface left/right")))
+			self.list.append(getConfigListEntry(_("Width"), config.osd.dst_width, _("Use the Left/Right buttons on your remote to adjust the size of the user interface. Left button decreases the size, Right increases the size.")))
+			self.list.append(getConfigListEntry(_("Move Up/Down"), config.osd.dst_top, _("Use the Left/Right buttons on your remote to move the user interface up/down")))
+			self.list.append(getConfigListEntry(_("Height"), config.osd.dst_height, _("Use the Left/Right buttons on your remote to adjust the size of the user interface. Left button decreases the size, Right increases the size.")))
 
 		self["config"].list = self.list
 		self["config"].l.setList(self.list)
 
 		self.onLayoutFinish.append(self.layoutFinished)
-		if not self.selectionChanged in self["config"].onSelectionChanged:
+		if self.selectionChanged not in self["config"].onSelectionChanged:
 			self["config"].onSelectionChanged.append(self.selectionChanged)
 		self.selectionChanged()
 
@@ -514,10 +453,9 @@ class UserInterfacePositioner(Screen, ConfigListScreen):
 
 	def layoutFinished(self):
 		self.setTitle(_(self.setup_title))
-#		self.Console.ePopen('/usr/bin/showiframe /usr/share/enigma2/hd-testcard.mvi')
+#		self.Console.ePopen("/usr/bin/showiframe /usr/share/enigma2/hd-testcard.mvi")
 
 	def createSummary(self):
-		from Screens.Setup import SetupSummary
 		return SetupSummary
 
 	# for summary:
@@ -533,12 +471,12 @@ class UserInterfacePositioner(Screen, ConfigListScreen):
 
 	def keyLeft(self):
 		ConfigListScreen.keyLeft(self)
-		if SystemInfo["CanChangeOsdPosition"]:
+		if BoxInfo.getItem("CanChangeOsdPosition"):
 			self.setPreviewPosition()
 
 	def keyRight(self):
 		ConfigListScreen.keyRight(self)
-		if SystemInfo["CanChangeOsdPosition"]:
+		if BoxInfo.getItem("CanChangeOsdPosition"):
 			self.setPreviewPosition()
 
 	def keyDefault(self):
@@ -546,54 +484,17 @@ class UserInterfacePositioner(Screen, ConfigListScreen):
 		config.osd.alpha_teletext.setValue(255)
 		config.osd.alpha_webbrowser.setValue(255)
 
-		if SystemInfo["CanChangeOsdPosition"]:
+		if BoxInfo.getItem("CanChangeOsdPosition"):
 			config.osd.dst_width.setValue(720)
 			config.osd.dst_height.setValue(576)
 			config.osd.dst_left.setValue(0)
 			config.osd.dst_top.setValue(0)
-		elif SystemInfo["CanChangeOsdPositionAML"]:
-			amlmode = list(modes.values())[0]
-			oldamlmode = self.getAMLMode()
-			f = open("/sys/class/display/mode", "w")
-			f.write(amlmode)
-			f.close()
-			print("[AVSwitch] Amlogic setting videomode to mode: %s" % amlmode)
-			f = open("/etc/u-boot.scr.d/000_hdmimode.scr", "w")
-			f.write("setenv hdmimode %s" % amlmode)
-			f.close()
-			f = open("/etc/u-boot.scr.d/000_outputmode.scr", "w")
-			f.write("setenv outputmode %s" % amlmode)
-			f.close()
-			os.system("update-autoexec")
-			f = open("/sys/class/ppmgr/ppscaler", "w")
-			f.write("1")
-			f.close()
-			f = open("/sys/class/ppmgr/ppscaler", "w")
-			f.write("0")
-			f.close()
-			f = open("/sys/class/video/axis", "w")
-			f.write(axis[mode])
-			f.close()
-			f = open("/sys/class/graphics/fb0/stride", "r")
-			stride = f.read().strip()
-			f.close()
-			limits = [int(x) for x in axis[mode].split()]
-			config.osd.dst_left = ConfigSelectionNumber(default=limits[0], stepwidth=1, min=limits[0] - 255, max=limits[0] + 255, wraparound=False)
-			config.osd.dst_top = ConfigSelectionNumber(default=limits[1], stepwidth=1, min=limits[1] - 255, max=limits[1] + 255, wraparound=False)
-			config.osd.dst_width = ConfigSelectionNumber(default=limits[2], stepwidth=1, min=limits[2] - 255, max=limits[2] + 255, wraparound=False)
-			config.osd.dst_height = ConfigSelectionNumber(default=limits[3], stepwidth=1, min=limits[3] - 255, max=limits[3] + 255, wraparound=False)
-
-			if oldamlmode != amlmode:
-			        config.osd.dst_width.setValue(limits[0])
-			        config.osd.dst_height.setValue(limits[1])
-			        config.osd.dst_left.setValue(limits[2])
-			        config.osd.dst_top.setValue(limits[3])
-			        config.osd.dst_left.save()
-			        config.osd.dst_width.save()
-			        config.osd.dst_top.save()
-			        config.osd.dst_height.save()
-			print("[AVSwitch] Framebuffer mode:%s  stride:%s axis:%s" % (getDesktop(0).size().width(), stride, axis[mode]))
-			return
+		elif BoxInfo.getItem("CanChangeOsdPositionAML"):
+			limits = iAVSwitch.getWindowsAxis().split()
+			config.osd.dst_left.setValue(limits[0])
+			config.osd.dst_top.setValue(limits[1])
+			config.osd.dst_width.setValue(limits[2])
+			config.osd.dst_height.setValue(limits[3])
 		self["config"].l.setList(self.list)
 
 	def setPreviewPosition(self):
@@ -614,7 +515,7 @@ class UserInterfacePositioner(Screen, ConfigListScreen):
 		config.osd.dst_width.setValue(dst_width)
 		config.osd.dst_top.setValue(dst_top)
 		config.osd.dst_height.setValue(dst_height)
-		print('[UserInterfacePositioner] Setting OSD position: %s %s %s %s' % (config.osd.dst_left.value, config.osd.dst_width.value, config.osd.dst_top.value, config.osd.dst_height.value))
+		print("[UserInterfacePositioner] Setting OSD position: %s %s %s %s" % (config.osd.dst_left.value, config.osd.dst_width.value, config.osd.dst_top.value, config.osd.dst_height.value))
 
 	def saveAll(self):
 		for x in self["config"].list:
@@ -637,7 +538,6 @@ class UserInterfacePositioner(Screen, ConfigListScreen):
 
 	def keyCancel(self):
 		if self["config"].isChanged():
-			from Screens.MessageBox import MessageBox
 			self.session.openWithCallback(self.cancelConfirm, MessageBox, _("Really close without saving settings?"), default=False)
 		else:
 			self.close()
@@ -649,88 +549,3 @@ class UserInterfacePositioner(Screen, ConfigListScreen):
 		config.osd.dst_height.save()
 		configfile.save()
 		self.close()
-
-# FIXME Can be removed
-
-
-class OSD3DSetupScreen(Screen, ConfigListScreen):
-	def __init__(self, session):
-		Screen.__init__(self, session)
-		self.setup_title = _("OSD 3D Settings")
-		self.skinName = "Setup"
-
-		self["HelpWindow"] = Pixmap()
-		self["HelpWindow"].hide()
-		self["status"] = StaticText()
-		self["footnote"] = StaticText()
-		self["description"] = StaticText()
-
-		self["key_red"] = StaticText(_("Cancel"))
-		self["key_green"] = StaticText(_("OK"))
-
-		self["actions"] = ActionMap(["SetupActions"],
-			{
-				"cancel": self.keyCancel,
-				"save": self.keySave,
-			}, -2)
-
-		self.onChangedEntry = []
-		self.list = []
-		ConfigListScreen.__init__(self, self.list, session=session, on_change=self.changedEntry)
-		self.list.append((_("3D Mode"), config.osd.threeDmode, _("This option lets you choose the 3D mode")))
-		self.list.append((_("Depth"), config.osd.threeDznorm, _("This option lets you adjust the 3D depth")))
-		self.list.append((_("Show in extensions list"), config.osd.show3dextensions, _("This option lets you show the option in the extension screen.")))
-		self["config"].list = self.list
-		self["config"].l.setList(self.list)
-
-		self.onLayoutFinish.append(self.layoutFinished)
-		if not self.selectionChanged in self["config"].onSelectionChanged:
-			self["config"].onSelectionChanged.append(self.selectionChanged)
-		self.selectionChanged()
-
-	def selectionChanged(self):
-		self["status"].setText(self["config"].getCurrent()[2])
-
-	def layoutFinished(self):
-		self.setTitle(_(self.setup_title))
-
-	def createSummary(self):
-		from Screens.Setup import SetupSummary
-		return SetupSummary
-
-	# for summary:
-	def changedEntry(self):
-		for x in self.onChangedEntry:
-			x()
-
-	def getCurrentEntry(self):
-		return self["config"].getCurrent()[0]
-
-	def getCurrentValue(self):
-		return str(self["config"].getCurrent()[1].getText())
-
-	def saveAll(self):
-		for x in self["config"].list:
-			x[1].save()
-		configfile.save()
-
-	# keySave and keyCancel are just provided in case you need them.
-	# you have to call them by yourself.
-	def keySave(self):
-		self.saveAll()
-		self.close()
-
-	def cancelConfirm(self, result):
-		if not result:
-			return
-
-		for x in self["config"].list:
-			x[1].cancel()
-		self.close()
-
-	def keyCancel(self):
-		if self["config"].isChanged():
-			from Screens.MessageBox import MessageBox
-			self.session.openWithCallback(self.cancelConfirm, MessageBox, _("Really close without saving settings?"))
-		else:
-			self.close()
