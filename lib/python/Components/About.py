@@ -10,7 +10,7 @@ from subprocess import PIPE, Popen
 
 MODULE_NAME = __name__.split(".")[-1]
 
-
+socfamily = BoxInfo.getItem("socfamily")
 MODEL = BoxInfo.getItem("model", default="unknown")
 
 
@@ -171,6 +171,28 @@ def getChipSetString():
 		if chipset is None:
 			return _("Undefined")
 		return str(chipset.lower().replace('\n', '').replace('bcm', '').replace('brcm', '').replace('sti', ''))
+
+
+def getCPUBrand():
+	if BoxInfo.getItem("AmlogicFamily"):
+		return _("Amlogic")
+	elif BoxInfo.getItem("HiSilicon"):
+		return _("HiSilicon")
+	elif socfamily.startswith("smp"):
+		return _("Sigma Designs")
+	elif socfamily.startswith("bcm") or BoxInfo.getItem("brand") == "rpi":
+		return _("Broadcom")
+	print("[About] No CPU brand?")
+	return _("Undefined")
+
+
+def getCPUArch():
+	if BoxInfo.getItem("ArchIsARM64"):
+		return _("ARM64")
+	elif BoxInfo.getItem("ArchIsARM"):
+		return _("ARM")
+	return _("Mipsel")
+
 
 def getDVBAPI():
 	if SystemInfo["OLDE2API"]:

@@ -32,6 +32,7 @@ from enigma import ePicLoad, eRCInput, getPrevAsciiCode, eEnv
 from twisted.web import client
 from Plugins.SystemPlugins.SoftwareManager.BackupRestore import BackupSelection, RestoreMenu, BackupScreen, RestoreScreen, getBackupPath, getBackupFilename
 from Plugins.SystemPlugins.SoftwareManager.SoftwareTools import iSoftwareTools
+from .ImageBackup import ImageBackup
 
 config.plugins.configurationbackup = ConfigSubsection()
 config.plugins.configurationbackup.backuplocation = ConfigText(default='/media/hdd/', visible_width=50, fixed_size=False)
@@ -74,6 +75,10 @@ def valid_cache(cache_file, cache_ttl):
 
 def load_cache(cache_file):
 	return pickle.load(open(cache_file, 'rb'))
+
+
+class ImageBackup(ImageBackup):
+	pass
 
 
 class UpdatePluginMenu(Screen):
@@ -120,6 +125,7 @@ class UpdatePluginMenu(Screen):
 			print("building menu entries")
 			self.list.append(("install-extensions", _("Manage extensions"), _("Manage extensions or plugins for your receiver.") + self.oktext, None))
 			self.list.append(("software-update", _("Software update"), _("Online update of your receiver software.") + self.oktext, None))
+			self.list.append(("backup-image", _("Backup Image"), _("Backup your running image to HDD or USB.") + self.oktext + "\n\n" + self.infotext, None))
 			self.list.append(("system-backup", _("Backup system settings"), _("Backup your receiver settings.") + self.oktext + "\n\n" + self.infotext, None))
 			self.list.append(("system-restore", _("Restore system settings"), _("Restore your receiver settings.") + self.oktext, None))
 			self.list.append(("opkg-install", _("Install local extension"), _("Scan for local extensions and install them.") + self.oktext, None))
@@ -245,6 +251,8 @@ class UpdatePluginMenu(Screen):
 					self.session.open(UpdatePlugin, self.skin_path)
 				elif (currentEntry == "install-extensions"):
 					self.session.open(PluginManager, self.skin_path)
+				elif (currentEntry == "backup-image"):
+					self.session.open(ImageBackup)
 				elif (currentEntry == "system-backup"):
 					self.session.openWithCallback(self.backupDone, BackupScreen, runBackup=True)
 				elif (currentEntry == "system-restore"):
