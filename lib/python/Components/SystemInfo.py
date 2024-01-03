@@ -331,7 +331,7 @@ SystemInfo["DreamBoxDVI"] = MODEL in ("dm8000", "dm800")
 SystemInfo["HasHDMIin"] = MODEL in ("dm7080", "dm820")
 SystemInfo["HasHDMIinFHD"] = MODEL in ("dm900", "dm920", "dreamone", "dreamtwo")
 SystemInfo["HDMIin"] = SystemInfo["HasHDMIin"] or SystemInfo["HasHDMIinFHD"]
-SystemInfo["HasHDMIinPiP"] = SystemInfo["HasHDMIin"] and BRAND != "dreambox"
+SystemInfo["HasHDMIinPiP"] = SystemInfo["HDMIin"] and BRAND != "dreambox"
 SystemInfo["HasHDMI-CEC"] = BoxInfo.getItem("hdmi") and fileExists(resolveFilename(SCOPE_PLUGINS, "SystemPlugins/HdmiCEC/plugin.pyc")) and (fileExists("/dev/cec0") or fileExists("/dev/hdmi_cec") or fileExists("/dev/misc/hdmi_cec0"))
 SystemInfo["HasYPbPr"] = MODEL in ("dm8000", "et5000", "et6000", "et6500", "et9000", "et9200", "et9500", "et10000", "formuler1", "mbtwinplus", "spycat", "vusolo", "vuduo", "vuduo2", "vuultimo")
 SystemInfo["HasScart"] = MODEL in ("dm8000", "et4000", "et6500", "et8000", "et9000", "et9200", "et9500", "et10000", "formuler1", "hd1100", "hd1200", "hd1265", "hd2400", "vusolo", "vusolo2", "vuduo", "vuduo2", "vuultimo", "vuuno", "xp1000")
