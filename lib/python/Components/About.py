@@ -3,7 +3,7 @@ import os
 import time
 import re
 from Tools.HardwareInfo import HardwareInfo
-from Components.SystemInfo import SystemInfo, BoxInfo
+from Components.SystemInfo import BoxInfo
 from sys import maxsize, modules, version_info
 from Tools.Directories import fileReadLine
 from subprocess import PIPE, Popen
@@ -195,7 +195,7 @@ def getCPUArch():
 
 
 def getDVBAPI():
-	if SystemInfo["OLDE2API"]:
+	if BoxInfo.getItem("OLDE2API"):
 		return _("Old") 
 	else:
 		return _("New")

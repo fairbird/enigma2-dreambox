@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from enigma import eAVControl
 from Components.config import config, ConfigSlider, ConfigSelection, ConfigSubDict, ConfigYesNo, ConfigEnableDisable, ConfigOnOff, ConfigSubsection, ConfigBoolean, ConfigSelectionNumber, ConfigNothing, NoSave  # storm - some config are required
-from Components.SystemInfo import SystemInfo, BoxInfo
+from Components.SystemInfo import BoxInfo
 from Tools.CList import CList
 from Components.About import about
 from Tools.Directories import fileExists, fileReadLine, fileWriteLine
@@ -90,13 +90,13 @@ class VideoHardware:
 
 	modes = {}  # a list of (high-level) modes for a certain port.
 
-	if SystemInfo["HasScart"]:
+	if BoxInfo.getItem("HasScart"):
 		modes["Scart"] = ["PAL", "NTSC", "Multi"]
-	if SystemInfo["HasComposite"] and MODEL in ("dm7020hd", "dm7020hdv2", "dm8000"):
+	if BoxInfo.getItem("HasComposite") and MODEL in ("dm7020hd", "dm7020hdv2", "dm8000"):
 		modes["RCA"] = ["576i", "PAL", "NTSC", "Multi"]
-	if SystemInfo["HasYPbPr"]:
+	if BoxInfo.getItem("HasYPbPr"):
 		modes["YPbPr"] = ["720p", "1080i", "576p", "480p", "576i", "480i"]
-	if SystemInfo["Has2160p"]:
+	if BoxInfo.getItem("Has2160p"):
 		modes["HDMI"] = ["720p", "1080p", "2160p", "1080i", "576p", "480p", "576i", "480i"]
 	if MODEL in ("dreamone", "dreamtwo"):
 		modes["HDMI"] = ["720p", "1080p", "smpte", "2160p30", "2160p", "1080i", "576p", "576i", "480p", "480i"]
@@ -111,7 +111,7 @@ class VideoHardware:
 	if "YPbPr" in modes and not has_yuv:
 		del modes["YPbPr"]
 
-	if "Scart" in modes and not SystemInfo["HasScart"] and not has_rca and not has_avjack:
+	if "Scart" in modes and not BoxInfo.getItem("HasScart") and not has_rca and not has_avjack:
 		del modes["Scart"]
 
 	widescreen_modes = tuple([x for x in modes["HDMI"] if x not in ("576p", "576i", "480p", "480i")])
@@ -229,13 +229,13 @@ class VideoHardware:
 		portlist = self.getPortList()
 		for port in portlist:
 			descr = port
-			if descr == 'HDMI' and SystemInfo["DreamBoxDVI"]:
+			if descr == 'HDMI' and BoxInfo.getItem("DreamBoxDVI"):
 				descr = 'DVI'
-			if descr == 'HDMI-PC' and SystemInfo["DreamBoxDVI"]:
+			if descr == 'HDMI-PC' and BoxInfo.getItem("DreamBoxDVI"):
 				descr = 'DVI-PC'
-			if descr == "Scart" and has_rca and not SystemInfo["HasScart"]:
+			if descr == "Scart" and has_rca and not BoxInfo.getItem("HasScart"):
 				descr = "RCA"
-			if descr == "Scart" and has_avjack and not SystemInfo["HasScart"]:
+			if descr == "Scart" and has_avjack and not BoxInfo.getItem("HasScart"):
 				descr = "Jack"
 			lst.append((port, descr))
 
@@ -246,7 +246,7 @@ class VideoHardware:
 			for (mode, rates) in modes:
 				ratelist = []
 				for rate in rates:
-					if rate == "auto" and not SystemInfo["Has24hz"]:
+					if rate == "auto" and not BoxInfo.getItem("Has24hz"):
 						continue
 					ratelist.append((rate, rate))
 				config.av.videorate[mode] = ConfigSelection(choices=ratelist)
@@ -384,7 +384,7 @@ class VideoHardware:
 				except:
 					fileWriteLine("/sys/class/display/mode", mode_50, source=MODULE_NAME)
 
-		if SystemInfo["Has24hz"] and mode_24 is not None:
+		if BoxInfo.getItem("Has24hz") and mode_24 is not None:
 			fileWriteLine("/proc/stb/video/videomode_24hz", mode_24, source=MODULE_NAME)
 
 		self.updateAspect(None)

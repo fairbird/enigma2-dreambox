@@ -11,7 +11,7 @@ from Components.Button import Button
 from Components.Pixmap import Pixmap
 from Components.Label import Label
 from Components.NimManager import nimmanager
-from Components.SystemInfo import SystemInfo
+from Components.SystemInfo import BoxInfo
 from Components.UsageConfig import defaultMoviePath
 from Screens.MovieSelection import getPreferredTagEditor
 from Screens.LocationBox import MovieLocationBox
@@ -120,7 +120,7 @@ class TimerEntry(ConfigListScreen, Screen):
 		self.timerentry_justplay = ConfigSelection(choices=[
 			("zap", _("zap")), ("record", _("record")), ("zap+record", _("zap and record"))],
 			default={0: "record", 1: "zap", 2: "zap+record"}[justplay + 2 * always_zap])
-		if SystemInfo["DeepstandbySupport"]:
+		if BoxInfo.getItem("DeepstandbySupport"):
 			shutdownString = _("go to deep standby")
 			choicelist = [("always", _("always")), ("from_standby", _("only from standby")), ("from_deep_standby", _("only from deep standby")), ("never", _("never"))]
 		else:
@@ -225,7 +225,7 @@ class TimerEntry(ConfigListScreen, Screen):
 		self.entryZapWakeup = (_("Wakeup receiver for start timer"), self.timerentry_zapwakeup)
 		if self.timerentry_justplay.value == "zap":
 			self.list.append(self.entryZapWakeup)
-			if SystemInfo["PIPAvailable"]:
+			if BoxInfo.getItem("PIPAvailable"):
 				self.list.append((_("Use as PiP if possible"), self.timerentry_pipzap))
 			self.list.append(self.entryShowEndTime)
 			self["key_blue"].setText(_("Wakeup type"))

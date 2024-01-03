@@ -7,7 +7,7 @@ from twisted.internet import threads
 from enigma import eActionMap, eDBoxLCD, eTimer
 
 from Components.config import ConfigNothing, ConfigSelection, ConfigSlider, ConfigSubsection, ConfigYesNo, config
-from Components.SystemInfo import SystemInfo, BoxInfo
+from Components.SystemInfo import BoxInfo
 from Screens.InfoBar import InfoBar
 from Screens.Screen import Screen
 from Screens.Standby import inTryQuitMainloop
@@ -183,8 +183,8 @@ class LCD:
 			print("[Lcd] setLCDMode='%s'." % value)
 			fileWriteLine("/proc/stb/lcd/show_symbols", value)
 		if config.lcd.mode.value == "0":
-			SystemInfo["SeekStatePlay"] = False
-			SystemInfo["StatePlayPause"] = False
+			BoxInfo.setItem("SeekStatePlay", False)
+			BoxInfo.setItem("StatePlayPause", False)
 			if isfile("/proc/stb/lcd/symbol_hdd"):
 				fileWriteLine("/proc/stb/lcd/symbol_hdd", "0")
 			if isfile("/proc/stb/lcd/symbol_hddprogress"):
@@ -266,13 +266,13 @@ def standbyCounterChanged(configElement):
 
 def InitLcd():
 	detected = eDBoxLCD.getInstance().detected()
-	SystemInfo["Display"] = detected
+	BoxInfo.setItem("Display", detected)
 	config.lcd = ConfigSubsection()
 	if isfile("/proc/stb/lcd/mode"):
 		can_lcdmodechecking = fileReadLine("/proc/stb/lcd/mode")
 	else:
 		can_lcdmodechecking = False
-	SystemInfo["LCDMiniTV"] = can_lcdmodechecking
+	BoxInfo.setItem("LCDMiniTV", can_lcdmodechecking)
 	if detected:
 		ilcd = LCD()
 		if can_lcdmodechecking:
@@ -516,7 +516,7 @@ def InitLcd():
 			config.lcd.contrast = ConfigNothing()
 		config.lcd.standby = ConfigSlider(default=standby_default, limits=(0, 10))
 		config.lcd.dimbright = ConfigSlider(default=standby_default, limits=(0, 10))
-		config.lcd.bright = ConfigSlider(default=SystemInfo["DefaultDisplayBrightness"], limits=(0, 10))
+		config.lcd.bright = ConfigSlider(default=BoxInfo.getItem("DefaultDisplayBrightness"), limits=(0, 10))
 		config.lcd.dimbright.addNotifier(setLCDdimbright)
 		config.lcd.dimbright.apply = lambda: setLCDdimbright(config.lcd.dimbright)
 		config.lcd.dimdelay = ConfigSelection(choices=[
@@ -546,7 +546,7 @@ def InitLcd():
 		config.lcd.picon_pack.addNotifier(PiconPackChanged)
 		config.lcd.flip = ConfigYesNo(default=False)
 		config.lcd.flip.addNotifier(setLCDflipped)
-		LcdLiveTV = SystemInfo["LcdLiveTV"]
+		LcdLiveTV = BoxInfo.getItem("LcdLiveTV")
 		if LcdLiveTV:
 			def lcdLiveTvChanged(configElement):
 				if "live_enable" in LcdLiveTV:
@@ -562,7 +562,7 @@ def InitLcd():
 			config.lcd.showTv = ConfigYesNo(default=False)
 			config.lcd.showTv.addNotifier(lcdLiveTvChanged)
 
-		if SystemInfo["LCDMiniTV"]:
+		if BoxInfo.getItem("LCDMiniTV"):
 			config.lcd.minitvmode = ConfigSelection(choices=[
 				("0", _("Normal")),
 				("1", _("MiniTV")),
@@ -579,7 +579,7 @@ def InitLcd():
 			config.lcd.minitvfps = ConfigSlider(default=30, limits=(0, 30))
 			config.lcd.minitvfps.addNotifier(setLCDminitvfps)
 
-		VFD_scroll_repeats = SystemInfo["VFD_scroll_repeats"]
+		VFD_scroll_repeats = BoxInfo.getItem("VFD_scroll_repeats")
 		if VFD_scroll_repeats:
 			def scroll_repeats(configElement):
 				eDBoxLCD.getInstance().set_VFD_scroll_repeats(int(configElement.value))
@@ -595,7 +595,7 @@ def InitLcd():
 			config.usage.vfd_scroll_repeats.addNotifier(scroll_repeats, immediate_feedback=False)
 		else:
 			config.usage.vfd_scroll_repeats = ConfigNothing()
-		VFD_scroll_delay = SystemInfo["VFD_scroll_delay"]
+		VFD_scroll_delay = BoxInfo.getItem("VFD_scroll_delay")
 		if VFD_scroll_delay:
 			def scroll_delay(configElement):
 				eDBoxLCD.getInstance().set_VFD_scroll_delay(int(configElement.value))
@@ -606,7 +606,7 @@ def InitLcd():
 		else:
 			config.lcd.hdd = ConfigNothing()
 			config.usage.vfd_scroll_delay = ConfigNothing()
-		VFD_initial_scroll_delay = SystemInfo["VFD_initial_scroll_delay"]
+		VFD_initial_scroll_delay = BoxInfo.getItem("VFD_initial_scroll_delay")
 		if VFD_initial_scroll_delay:
 			def initial_scroll_delay(configElement):
 				eDBoxLCD.getInstance().set_VFD_initial_scroll_delay(int(configElement.value))
@@ -622,7 +622,7 @@ def InitLcd():
 			config.usage.vfd_initial_scroll_delay.addNotifier(initial_scroll_delay, immediate_feedback=False)
 		else:
 			config.usage.vfd_initial_scroll_delay = ConfigNothing()
-		VFD_final_scroll_delay = SystemInfo["VFD_final_scroll_delay"]
+		VFD_final_scroll_delay = BoxInfo.getItem("VFD_final_scroll_delay")
 		if VFD_final_scroll_delay:
 			def final_scroll_delay(configElement):
 				eDBoxLCD.getInstance().set_VFD_final_scroll_delay(int(configElement.value))

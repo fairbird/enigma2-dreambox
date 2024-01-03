@@ -10,7 +10,7 @@ from enigma import eRCInput
 from keyids import KEYIDS, KEYIDNAMES
 from Components.config import ConfigSubsection, ConfigInteger, ConfigSelection, ConfigYesNo, ConfigText, ConfigSlider, config
 from Components.Console import Console
-from Components.SystemInfo import BoxInfo, SystemInfo
+from Components.SystemInfo import BoxInfo
 from Tools.Directories import SCOPE_KEYMAPS, SCOPE_SKIN, fileReadLine, fileWriteLine, fileReadLines, fileReadXML, resolveFilename, pathExists
 
 MODULE_NAME = __name__.split(".")[-1]
@@ -65,7 +65,7 @@ class InputDevices:
 		# include/uapi/asm-generic/ioctl.h
 		IOC_NRBITS = 8
 		IOC_TYPEBITS = 8
-		if SystemInfo["OLDE2API"]:
+		if BoxInfo.getItem("OLDE2API"):
 			IOC_SIZEBITS = 13
 		else:
 			IOC_SIZEBITS = 13 if "mips" in machine() else 14
