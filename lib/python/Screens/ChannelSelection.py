@@ -36,7 +36,7 @@ from Screens.Hotkey import InfoBarHotkey, hotkeyActionMap, hotkey
 profile("ChannelSelection.py 4")
 from Screens.PictureInPicture import PictureInPicture
 from Screens.RdsDisplay import RassInteractive
-from ServiceReference import ServiceReference, getStreamRelayRef, hdmiInServiceRef
+from ServiceReference import ServiceReference, getStreamRelayRef
 from Tools.BoundFunction import boundFunction
 from Tools.Notifications import RemovePopup
 from Tools.Alternatives import GetWithAlternative, CompareWithAlternatives
@@ -994,7 +994,7 @@ class ChannelSelectionEdit:
 	def addHDMIIn(self, name):
 		current = self.servicelist.getCurrent()
 		mutableList = self.getMutableList()
-		ref = hdmiInServiceRef()
+		ref = eServiceReference(str)
 		ref.setName(name)
 		if mutableList and current and current.valid():
 			if not mutableList.addService(ref, current):
