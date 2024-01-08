@@ -53,7 +53,7 @@ class BoxInformation:  # To maintain data integrity class variables should not b
 					if item:
 						self.enigmaConfList.append(item)
 						if item in self.boxInfo:
-							print("[SystemInfo] Note: Enigma information value '%s' with value '%s' being overridden to '%s'." % (item, self.boxInfo[item], value))
+							print(f"[SystemInfo] Note: Enigma information value '{item}' with value '{self.boxInfo[item]}' being overridden to '{value}'.")
 						self.boxInfo[item] = self.processValue(value)
 			self.enigmaConfList = sorted(self.enigmaConfList)
 		else:
@@ -135,7 +135,7 @@ class BoxInformation:  # To maintain data integrity class variables should not b
 
 	def setItem(self, item, value, immutable=False):
 		if item in self.immutableList:
-			print("[BoxInfo] Error: Item '%s' is immutable and can not be %s!" % (item, "changed" if item in self.boxInfo else "added"))
+			print(f"[BoxInfo] Error: Item '{item}' is immutable and can not be {'changed' if item in self.boxInfo else 'added'}!")
 			return False
 		if immutable:
 			self.immutableList.append(item)
@@ -145,12 +145,14 @@ class BoxInformation:  # To maintain data integrity class variables should not b
 
 	def deleteItem(self, item):
 		if item in self.immutableList:
-			print("[BoxInfo] Error: Item '%s' is immutable and can not be deleted!" % item)
+			print(f"[BoxInfo] Error: Item '{item}' is immutable and can not be deleted!")
 		elif item in self.boxInfo:
 			del self.boxInfo[item]
 			return True
 		return False
 
+	def setMutableItem(self, item, value):
+		self.boxInfo[item] = value
 
 BoxInfo = BoxInformation()
 
@@ -177,14 +179,14 @@ def getBoxDisplayName():  # This function returns a tuple like ("BRANDNAME", "BO
 
 def getNumVideoDecoders():
 	numVideoDecoders = 0
-	while fileExists("/dev/dvb/adapter0/video%d" % numVideoDecoders, "f"):
+	while fileExists(f"/dev/dvb/adapter0/video{numVideoDecoders}", "f"):
 		numVideoDecoders += 1
 	return numVideoDecoders
 
 
 def countFrontpanelLEDs():
 	numLeds = fileExists("/proc/stb/fp/led_set_pattern") and 1 or 0
-	while fileExists("/proc/stb/fp/led%d_pattern" % numLeds):
+	while fileExists(f"/proc/stb/fp/led{numLeds}_pattern"):
 		numLeds += 1
 	return numLeds
 
@@ -200,12 +202,42 @@ def getBootdevice():
 		dev = dev[:-1]
 	return dev
 
+
 def getRCFile(ext):
-	filename = resolveFilename(SCOPE_SKIN, pathjoin("rc_models", "%s.%s" % (BoxInfo.getItem("rcname"), ext)))
+	filename = resolveFilename(SCOPE_SKINS, pathjoin("hardware", f"{BoxInfo.getItem('rcname')}.{ext}"))
 	if not isfile(filename):
-		filename = resolveFilename(SCOPE_SKIN, pathjoin("rc_models", "dmm1.%s" % ext))
+		filename = resolveFilename(SCOPE_SKINS, pathjoin("hardware", f"dmm1.{ext}"))
 	return filename
 
+
+def getChipsetString():
+	if MODEL in ("dm7080", "dm820"):
+		chipset = "7435"
+	elif MODEL in ("dm520", "dm525"):
+		chipset = "73625"
+	elif MODEL in ("dm900", "dm920", "et13000"):
+		chipset = "7252S"
+	elif MODEL in ("hd51", "vs1500", "h7"):
+		chipset = "7251S"
+	elif MODEL in ("dreamone", "dreamonetwo", "dreamseven"):
+		chipset = "S922X"
+	else:
+		chipset = fileReadLine("/proc/stb/info/chipset", default=_("Undefined"), source=MODULE_NAME)
+		chipset = chipset.lower().replace("\n", "").replace("bcm", "").replace("brcm", "").replace("sti", "")
+	return chipset
+
+
+def getModuleLayout():
+	module = None
+	modulePath = BoxInfo.getItem("enigmamodule")
+	if modulePath:
+		process = Popen(("/sbin/modprobe", "--dump-modversions", modulePath), stdout=PIPE, stderr=PIPE, universal_newlines=True)
+		stdout, stderr = process.communicate()
+		if process.returncode == 0:
+			for detail in stdout.split("\n"):
+				if "module_layout" in detail:
+					module = detail.split("\t")[0]
+	return module
 
 def getBoxName():
 	box = MACHINEBUILD
@@ -223,7 +255,7 @@ def getBoxName():
 	elif box == "xp1000" and machinename == "sf8 hd":
 		box = "sf8"
 	elif box.startswith('et') and box not in ('et8000', 'et8500', 'et8500s', 'et10000'):
-		box = box[0:3] + 'x00'
+		box = f"{box[0:3]}x00"
 	elif box == "odinm9":
 		box = "maram9"
 	elif box.startswith('sf8008m'):
@@ -241,14 +273,18 @@ def getBoxName():
 	return box
 
 
+BoxInfo.setItem("DebugLevel", eGetEnigmaDebugLvl())
+BoxInfo.setItem("InDebugMode", eGetEnigmaDebugLvl() >= 4)
+BoxInfo.setItem("ModuleLayout", getModuleLayout())
+
 BoxInfo.setItem("BoxName", getBoxName())
 BoxInfo.setItem("RCImage", getRCFile("png"))
 BoxInfo.setItem("RCMapping", getRCFile("xml"))
+
 BoxInfo.setItem("canMultiBoot", MultiBoot.getBootSlots())
 BoxInfo.setItem("HasKexecMultiboot", fileHas("/proc/cmdline", "kexec=1"))
 BoxInfo.setItem("cankexec", BoxInfo.getItem("kexecmb") and fileExists("/usr/bin/kernel_auto.bin") and fileExists("/usr/bin/STARTUP.cpio.gz") and not BoxInfo.getItem("HasKexecMultiboot"))
 BoxInfo.setItem("HasSDmmc", MultiBoot.canMultiBoot() and "sd" in MultiBoot.getBootSlots()["2"] and "mmcblk" in MTDROOTFS)
-BoxInfo.setItem("InDebugMode", eGetEnigmaDebugLvl() >= 4)
 BoxInfo.setItem("HasSoftcamInstalled", hassoftcaminstalled())
 BoxInfo.setItem("NumVideoDecoders", getNumVideoDecoders())
 BoxInfo.setItem("PIPAvailable", BoxInfo.getItem("NumVideoDecoders") > 1)
@@ -385,14 +421,14 @@ BoxInfo.setItem("FrontpanelLEDFadeControl", fileExists("/proc/stb/fp/led_fade"))
 
 
 # dont't sort
-SystemInfo["SeekStatePlay"] = False
-SystemInfo["StatePlayPause"] = False
-SystemInfo["StandbyState"] = False
-SystemInfo["FastChannelChange"] = False
-SystemInfo["FCCactive"] = False
+BoxInfo.setMutableItem("SeekStatePlay", False)
+BoxInfo.setMutableItem("StatePlayPause", False)
+BoxInfo.setMutableItem("StandbyState", False)
+BoxInfo.setMutableItem("FastChannelChange", False)
+BoxInfo.setMutableItem("FCCactive", False)
 
-SystemInfo["CommonInterface"] = eDVBCIInterfaces.getInstance().getNumOfSlots()
-SystemInfo["CommonInterfaceCIDelay"] = fileCheck("/proc/stb/tsmux/rmx_delay")
+BoxInfo.setItem("CommonInterface", eDVBCIInterfaces.getInstance().getNumOfSlots())
+BoxInfo.setItem("CommonInterfaceCIDelay", fileCheck("/proc/stb/tsmux/rmx_delay"))
 for cislot in range(0, SystemInfo["CommonInterface"]):
-	SystemInfo["CI%dSupportsHighBitrates" % cislot] = fileCheck("/proc/stb/tsmux/ci%d_tsclk" % cislot)
-	SystemInfo["CI%dRelevantPidsRoutingSupport" % cislot] = fileCheck("/proc/stb/tsmux/ci%d_relevant_pids_routing" % cislot)
+	BoxInfo.setItem(f"CI{cislot}SupportsHighBitrates", fileCheck(f"/proc/stb/tsmux/ci{cislot}_tsclk"))
+	BoxInfo.setItem(f"CI{cislot}RelevantPidsRoutingSupport", fileCheck(f"/proc/stb/tsmux/ci{cislot}_relevant_pids_routing"))
