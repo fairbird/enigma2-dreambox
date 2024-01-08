@@ -349,6 +349,11 @@
 		<item text="Brightness">config.osd.bright</item>
 		<item text="Contrast">config.osd.contrast</item>
 	</setup>
+	<setup key="OSD3D" title="OSD 3D Settings" showOpenWebif="1">
+		<item level="0" text="3D Mode" description="This option lets you choose the 3D mode.">config.osd.threeDmode</item>
+		<item level="0" text="Depth" description="This option lets you adjust the 3D depth.">config.osd.threeDznorm</item>
+		<item level="0" text="Show in Extension Menu" description="This option lets you show the option in the Extension Menu screen.">config.osd.show3dextensions</item>
+	</setup>
 	<setup key="FrontDisplay" title="Display Setup" requires="FrontpanelDisplay">
 		<item level="0" text="Use separate picon pack for front panel display" description="Use piconlcd directory for picons on color LCD">config.lcd.picon_pack</item>
 		<item level="0" text="Date style" description="Choose the front panel display formatting style for dates. 'D' / 'DD' is the date and 'M' / 'MM' is the month in digits.  ('DD' and 'MM' have leading zeros for single digit values.) The screen display will be based on your choice but can be influenced by the skin." requires="config.usage.date.enabled_display">config.usage.date.display</item>
