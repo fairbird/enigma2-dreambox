@@ -6,11 +6,10 @@ from Screens.HelpMenu import Rc
 from Screens.Wizard import WizardSummary
 from Screens.WizardLanguage import WizardLanguage
 from Tools.Directories import SCOPE_PLUGINS, resolveFilename
+from Tools.HardwareInfo import HardwareInfo
 from Components.Sources.StaticText import StaticText
 from Components.Pixmap import Pixmap
 
-
-MODELBox = BoxInfo.getItem("model", default="unknown")
 has_dvi = BoxInfo.getItem("DreamBoxDVI")
 has_scart = BoxInfo.getItem("SCART")
 
@@ -135,7 +134,7 @@ class VideoWizard(WizardLanguage, Rc):
 	def modeSelect(self, mode):
 		rates = self.listRates(mode)
 		# print("[VideoWizard] modeSelect DEBUG: rates=%s." % rates)
-		if self.port == "HDMI" and mode in ("720p", "1080i", "1080p") and MODELBox not in ("dreamone", "dreamtwo"):
+		if self.port == "HDMI" and mode in ("720p", "1080i", "1080p") and HardwareInfo().get_device_name() not in ("one", "two"):
 			self.rate = "multi"
 			self.avSwitch.setMode(port=self.port, mode=mode, rate="multi")
 		else:
