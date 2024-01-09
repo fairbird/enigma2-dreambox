@@ -9,6 +9,7 @@ from Tools.Directories import fileExists, fileReadLine, fileWriteLine
 from Components.Console import Console
 from os.path import isfile
 import os
+from os import W_OK, access, system
 from enigma import getDesktop
 
 MODULE_NAME = __name__.split(".")[-1]
@@ -219,6 +220,11 @@ class VideoHardware:
 			self.last_modes_preferred = self.modes_preferred
 			self.on_hotplug("HDMI")  # must be HDMI
 
+	def getWindowsAxis(self):
+		port = config.av.videoport.value
+		mode = config.av.videomode[port].value
+		return self.axis[mode]
+
 	def createConfig(self, *args):
 		lst = []
 
@@ -343,16 +349,13 @@ class VideoHardware:
 			if force == 50:
 				mode_30 = mode_50
 
-		if HardwareInfo().get_device_name() in ("one", "two"): # storm - this part should be here
+		if BoxInfo.getItem("AmlogicFamily"): # storm - this part should be here
 			amlmode = list(modes.values())[0]
 			oldamlmode = fileReadLine("/sys/class/display/mode", default="", source=MODULE_NAME)
 			fileWriteLine("/sys/class/display/mode", amlmode, source=MODULE_NAME)
 			fileWriteLine("/etc/u-boot.scr.d/000_hdmimode.scr", "setenv hdmimode %s" % amlmode, source=MODULE_NAME)
 			fileWriteLine("/etc/u-boot.scr.d/000_outputmode.scr", "setenv outputmode %s" % amlmode, source=MODULE_NAME)
-			try:
-				Console().ePopen("update-autoexec")
-			except:
-				print("[VideoHardware] update-autoexec failed!")
+			system("update-autoexec")
 			fileWriteLine("/sys/class/ppmgr/ppscaler", "1", source=MODULE_NAME)
 			fileWriteLine("/sys/class/ppmgr/ppscaler", "0", source=MODULE_NAME)
 			fileWriteLine("/sys/class/video/axis", self.axis[mode], source=MODULE_NAME)
