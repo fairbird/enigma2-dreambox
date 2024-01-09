@@ -23,6 +23,7 @@ from traceback import print_exc
 #
 config.crash = ConfigSubsection()
 config.crash.debugScreens = ConfigYesNo(default=False)
+config.crash.debugMultiBoot = ConfigYesNo(default=False)
 config.crash.debugKeyboards = ConfigYesNo(default=False)
 config.crash.debugRemoteControls = ConfigYesNo(default=False)
 config.crash.debugDVBScan = ConfigYesNo(default=False)
