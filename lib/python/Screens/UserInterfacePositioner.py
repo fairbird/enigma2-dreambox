@@ -39,7 +39,7 @@ def InitOsd():
 				fileWriteLine(fileName, "1", source=MODULE_NAME)
 	elif BoxInfo.getItem("CanChangeOsdPositionAML"):
 		def setPositionParameter(parameter, configElement):
-			value = "%s %s %s %s" % (config.osd.dst_left.value, config.osd.dst_top.value, config.osd.dst_width.value, config.osd.dst_height.value)
+			value = "%s %s %s %s" % (config.plugins.OSDPositionSetup.dst_left.value, config.plugins.OSDPositionSetup.dst_top.value, config.plugins.OSDPositionSetup.dst_width.value, config.plugins.OSDPositionSetup.dst_height.value)
 			fileWriteLine("/sys/class/graphics/fb0/window_axis", value, source=MODULE_NAME)
 			fileWriteLine("/sys/class/graphics/fb0/free_scale", "0x10001", source=MODULE_NAME)
 
@@ -50,21 +50,21 @@ def InitOsd():
 
 	def setOSDLeft(configElement):
 		setPositionParameter("left", configElement)
-	config.osd.dst_left.addNotifier(setOSDLeft)
+	config.plugins.OSDPositionSetup.dst_left.addNotifier(setOSDLeft)
 
 	def setOSDWidth(configElement):
 		setPositionParameter("width", configElement)
-	config.osd.dst_width.addNotifier(setOSDWidth)
+	config.plugins.OSDPositionSetup.dst_width.addNotifier(setOSDWidth)
 
 	def setOSDTop(configElement):
 		setPositionParameter("top", configElement)
-	config.osd.dst_top.addNotifier(setOSDTop)
+	config.plugins.OSDPositionSetup.dst_top.addNotifier(setOSDTop)
 
 	def setOSDHeight(configElement):
 		setPositionParameter("height", configElement)
-	config.osd.dst_height.addNotifier(setOSDHeight)
+	config.plugins.OSDPositionSetup.dst_height.addNotifier(setOSDHeight)
 
-	print("[UserInterfacePositioner] Setting OSD position: %s %s %s %s" % (config.osd.dst_left.value, config.osd.dst_width.value, config.osd.dst_top.value, config.osd.dst_height.value))
+	print("[UserInterfacePositioner] Setting OSD position: %s %s %s %s" % (config.plugins.OSDPositionSetup.dst_left.value, config.plugins.OSDPositionSetup.dst_width.value, config.plugins.OSDPositionSetup.dst_top.value, config.plugins.OSDPositionSetup.dst_height.value))
 
 	def setOSDAlpha(configElement):
 		if BoxInfo.getItem("CanChangeOsdAlpha"):
@@ -281,15 +281,15 @@ class UserInterfacePositioner2(Screen, ConfigListScreen):
 			self.list.append(getConfigListEntry(_("Teletext base visibility"), config.osd.alpha_teletext, _("Base transparency for teletext, more options available within teletext screen.")))
 			self.list.append(getConfigListEntry(_("Web browser base visibility"), config.osd.alpha_webbrowser, _("Base transparency for OpenOpera web browser")))
 		if BoxInfo.getItem("CanChangeOsdPosition"):
-			self.list.append(getConfigListEntry(_("Move Left/Right"), config.osd.dst_left, _("Use the Left/Right buttons on your remote to move the user interface left/right")))
-			self.list.append(getConfigListEntry(_("Width"), config.osd.dst_width, _("Use the Left/Right buttons on your remote to adjust the size of the user interface. Left button decreases the size, Right increases the size.")))
-			self.list.append(getConfigListEntry(_("Move Up/Down"), config.osd.dst_top, _("Use the Left/Right buttons on your remote to move the user interface up/down")))
-			self.list.append(getConfigListEntry(_("Height"), config.osd.dst_height, _("Use the Left/Right buttons on your remote to adjust the size of the user interface. Left button decreases the size, Right increases the size.")))
+			self.list.append(getConfigListEntry(_("Move Left/Right"), config.plugins.OSDPositionSetup.dst_left, _("Use the Left/Right buttons on your remote to move the user interface left/right")))
+			self.list.append(getConfigListEntry(_("Width"), config.plugins.OSDPositionSetup.dst_width, _("Use the Left/Right buttons on your remote to adjust the size of the user interface. Left button decreases the size, Right increases the size.")))
+			self.list.append(getConfigListEntry(_("Move Up/Down"), config.plugins.OSDPositionSetup.dst_top, _("Use the Left/Right buttons on your remote to move the user interface up/down")))
+			self.list.append(getConfigListEntry(_("Height"), config.plugins.OSDPositionSetup.dst_height, _("Use the Left/Right buttons on your remote to adjust the size of the user interface. Left button decreases the size, Right increases the size.")))
 		if BoxInfo.getItem("CanChangeOsdPositionAML"):
-			self.list.append(getConfigListEntry(_("Left"), config.osd.dst_left, _("Use the Left/Right buttons on your remote to move the user interface left")))
-			self.list.append(getConfigListEntry(_("Right"), config.osd.dst_width, _("Use the Left/Right buttons on your remote to move the user interface right")))
-			self.list.append(getConfigListEntry(_("Top"), config.osd.dst_top, _("Use the Left/Right buttons on your remote to move the user interface top")))
-			self.list.append(getConfigListEntry(_("Bottom"), config.osd.dst_height, _("Use the Left/Right buttons on your remote to move the user interface bottom")))
+			self.list.append(getConfigListEntry(_("Left"), config.plugins.OSDPositionSetup.dst_left, _("Use the Left/Right buttons on your remote to move the user interface left")))
+			self.list.append(getConfigListEntry(_("Right"), config.plugins.OSDPositionSetup.dst_width, _("Use the Left/Right buttons on your remote to move the user interface right")))
+			self.list.append(getConfigListEntry(_("Top"), config.plugins.OSDPositionSetup.dst_top, _("Use the Left/Right buttons on your remote to move the user interface top")))
+			self.list.append(getConfigListEntry(_("Bottom"), config.plugins.OSDPositionSetup.dst_height, _("Use the Left/Right buttons on your remote to move the user interface bottom")))
 
 		self["config"].list = self.list
 		self["config"].l.setList(self.list)
@@ -336,17 +336,16 @@ class UserInterfacePositioner2(Screen, ConfigListScreen):
 		config.osd.alpha_webbrowser.setValue(255)
 
 		if BoxInfo.getItem("CanChangeOsdPosition"):
-			config.osd.dst_width.setValue(720)
-			config.osd.dst_height.setValue(576)
-			config.osd.dst_left.setValue(0)
-			config.osd.dst_top.setValue(0)
+			config.plugins.OSDPositionSetup.dst_width.setValue(720)
+			config.plugins.OSDPositionSetup.dst_height.setValue(576)
+			config.plugins.OSDPositionSetup.dst_left.setValue(0)
+			config.plugins.OSDPositionSetup.dst_top.setValue(0)
 		elif BoxInfo.getItem("CanChangeOsdPositionAML"):
-			from Plugins.SystemPlugins.Videomode.VideoHardware import video_hw
-			limits = [int(x) for x in video_hw.getWindowsAxis().split()]
-			config.osd.dst_left.setValue(limits[0])
-			config.osd.dst_top.setValue(limits[1])
-			config.osd.dst_width.setValue(limits[2])
-			config.osd.dst_height.setValue(limits[3])
+			limits = [int(x) for x in iAVSwitch.getWindowsAxis().split()]
+			config.plugins.OSDPositionSetup.dst_left.setValue(limits[0])
+			config.plugins.OSDPositionSetup.dst_top.setValue(limits[1])
+			config.plugins.OSDPositionSetup.dst_width.setValue(limits[2])
+			config.plugins.OSDPositionSetup.dst_height.setValue(limits[3])
 		self["config"].l.setList(self.list)
 
 	def setPreviewPosition(self):
@@ -354,20 +353,20 @@ class UserInterfacePositioner2(Screen, ConfigListScreen):
 		size_h = getDesktop(0).size().height()
 		dsk_w = int(float(size_w)) / float(720)
 		dsk_h = int(float(size_h)) / float(576)
-		dst_left = int(config.osd.dst_left.value)
-		dst_width = int(config.osd.dst_width.value)
-		dst_top = int(config.osd.dst_top.value)
-		dst_height = int(config.osd.dst_height.value)
+		dst_left = int(config.plugins.OSDPositionSetup.dst_left.value)
+		dst_width = int(config.plugins.OSDPositionSetup.dst_width.value)
+		dst_top = int(config.plugins.OSDPositionSetup.dst_top.value)
+		dst_height = int(config.plugins.OSDPositionSetup.dst_height.value)
 		while dst_width + (dst_left / float(dsk_w)) >= 720.5 or dst_width + dst_left > 720:
 			dst_width = int(dst_width) - 1
 		while dst_height + (dst_top / float(dsk_h)) >= 576.5 or dst_height + dst_top > 576:
 			dst_height = int(dst_height) - 1
 
-		config.osd.dst_left.setValue(dst_left)
-		config.osd.dst_width.setValue(dst_width)
-		config.osd.dst_top.setValue(dst_top)
-		config.osd.dst_height.setValue(dst_height)
-		print("[UserInterfacePositioner] Setting OSD position: %s %s %s %s" % (config.osd.dst_left.value, config.osd.dst_width.value, config.osd.dst_top.value, config.osd.dst_height.value))
+		config.plugins.OSDPositionSetup.dst_left.setValue(dst_left)
+		config.plugins.OSDPositionSetup.dst_width.setValue(dst_width)
+		config.plugins.OSDPositionSetup.dst_top.setValue(dst_top)
+		config.plugins.OSDPositionSetup.dst_height.setValue(dst_height)
+		print("[UserInterfacePositioner] Setting OSD position: %s %s %s %s" % (config.plugins.OSDPositionSetup.dst_left.value, config.plugins.OSDPositionSetup.dst_width.value, config.plugins.OSDPositionSetup.dst_top.value, config.plugins.OSDPositionSetup.dst_height.value))
 
 	def saveAll(self):
 		for x in self["config"].list:
@@ -395,10 +394,10 @@ class UserInterfacePositioner2(Screen, ConfigListScreen):
 			self.close()
 
 	def run(self):
-		config.osd.dst_left.save()
-		config.osd.dst_width.save()
-		config.osd.dst_top.save()
-		config.osd.dst_height.save()
+		config.plugins.OSDPositionSetup.dst_left.save()
+		config.plugins.OSDPositionSetup.dst_width.save()
+		config.plugins.OSDPositionSetup.dst_top.save()
+		config.plugins.OSDPositionSetup.dst_height.save()
 		configfile.save()
 		self.close()
 
@@ -430,10 +429,10 @@ class UserInterfacePositioner(Screen, ConfigListScreen):
 			self.list.append(getConfigListEntry(_("Teletext base visibility"), config.osd.alpha_teletext, _("Base transparency for teletext, more options available within teletext screen.")))
 			self.list.append(getConfigListEntry(_("Web browser base visibility"), config.osd.alpha_webbrowser, _("Base transparency for OpenOpera web browser")))
 		if BoxInfo.getItem("CanChangeOsdPosition") is True or BoxInfo.getItem("CanChangeOsdPositionAML") is True:
-			self.list.append(getConfigListEntry(_("Move Left/Right"), config.osd.dst_left, _("Use the Left/Right buttons on your remote to move the user interface left/right")))
-			self.list.append(getConfigListEntry(_("Width"), config.osd.dst_width, _("Use the Left/Right buttons on your remote to adjust the size of the user interface. Left button decreases the size, Right increases the size.")))
-			self.list.append(getConfigListEntry(_("Move Up/Down"), config.osd.dst_top, _("Use the Left/Right buttons on your remote to move the user interface up/down")))
-			self.list.append(getConfigListEntry(_("Height"), config.osd.dst_height, _("Use the Left/Right buttons on your remote to adjust the size of the user interface. Left button decreases the size, Right increases the size.")))
+			self.list.append(getConfigListEntry(_("Move Left/Right"), config.plugins.OSDPositionSetup.dst_left, _("Use the Left/Right buttons on your remote to move the user interface left/right")))
+			self.list.append(getConfigListEntry(_("Width"), config.plugins.OSDPositionSetup.dst_width, _("Use the Left/Right buttons on your remote to adjust the size of the user interface. Left button decreases the size, Right increases the size.")))
+			self.list.append(getConfigListEntry(_("Move Up/Down"), config.plugins.OSDPositionSetup.dst_top, _("Use the Left/Right buttons on your remote to move the user interface up/down")))
+			self.list.append(getConfigListEntry(_("Height"), config.plugins.OSDPositionSetup.dst_height, _("Use the Left/Right buttons on your remote to adjust the size of the user interface. Left button decreases the size, Right increases the size.")))
 
 		self["config"].list = self.list
 		self["config"].l.setList(self.list)
@@ -480,17 +479,54 @@ class UserInterfacePositioner(Screen, ConfigListScreen):
 		config.osd.alpha_webbrowser.setValue(255)
 
 		if BoxInfo.getItem("CanChangeOsdPosition"):
-			config.osd.dst_width.setValue(720)
-			config.osd.dst_height.setValue(576)
-			config.osd.dst_left.setValue(0)
-			config.osd.dst_top.setValue(0)
+			config.plugins.OSDPositionSetup.dst_width.setValue(720)
+			config.plugins.OSDPositionSetup.dst_height.setValue(576)
+			config.plugins.OSDPositionSetup.dst_left.setValue(0)
+			config.plugins.OSDPositionSetup.dst_top.setValue(0)
 		elif BoxInfo.getItem("CanChangeOsdPositionAML"):
-			from Plugins.SystemPlugins.Videomode.VideoHardware import video_hw
-			limits = [int(x) for x in video_hw.getWindowsAxis().split()]
-			config.osd.dst_left.setValue(limits[0])
-			config.osd.dst_top.setValue(limits[1])
-			config.osd.dst_width.setValue(limits[2])
-			config.osd.dst_height.setValue(limits[3])
+			amlmode = list(modes.values())[0]
+			oldamlmode = self.getAMLMode()
+			f = open("/sys/class/display/mode", "w")
+			f.write(amlmode)
+			f.close()
+			print("[AVSwitch] Amlogic setting videomode to mode: %s" % amlmode)
+			f = open("/etc/u-boot.scr.d/000_hdmimode.scr", "w")
+			f.write("setenv hdmimode %s" % amlmode)
+			f.close()
+			f = open("/etc/u-boot.scr.d/000_outputmode.scr", "w")
+			f.write("setenv outputmode %s" % amlmode)
+			f.close()
+			os.system("update-autoexec")
+			f = open("/sys/class/ppmgr/ppscaler", "w")
+			f.write("1")
+			f.close()
+			f = open("/sys/class/ppmgr/ppscaler", "w")
+			f.write("0")
+			f.close()
+			f = open("/sys/class/video/axis", "w")
+			f.write(axis[mode])
+			f.close()
+			f = open("/sys/class/graphics/fb0/stride", "r")
+			stride = f.read().strip()
+			f.close()
+			limits = [int(x) for x in axis[mode].split()]
+			config.plugins.OSDPositionSetup.dst_left = ConfigSelectionNumber(default=limits[0], stepwidth=1, min=limits[0] - 255, max=limits[0] + 255, wraparound=False)
+			config.plugins.OSDPositionSetup.dst_top = ConfigSelectionNumber(default=limits[1], stepwidth=1, min=limits[1] - 255, max=limits[1] + 255, wraparound=False)
+			config.plugins.OSDPositionSetup.dst_width = ConfigSelectionNumber(default=limits[2], stepwidth=1, min=limits[2] - 255, max=limits[2] + 255, wraparound=False)
+			config.plugins.OSDPositionSetup.dst_height = ConfigSelectionNumber(default=limits[3], stepwidth=1, min=limits[3] - 255, max=limits[3] + 255, wraparound=False)
+
+			if oldamlmode != amlmode:
+			        config.plugins.OSDPositionSetup.dst_width.setValue(limits[0])
+			        config.plugins.OSDPositionSetup.dst_height.setValue(limits[1])
+			        config.plugins.OSDPositionSetup.dst_left.setValue(limits[2])
+			        config.plugins.OSDPositionSetup.dst_top.setValue(limits[3])
+			        config.plugins.OSDPositionSetup.dst_left.save()
+			        config.plugins.OSDPositionSetup.dst_width.save()
+			        config.plugins.OSDPositionSetup.dst_top.save()
+			        config.plugins.OSDPositionSetup.dst_height.save()
+			print("[AVSwitch] Framebuffer mode:%s  stride:%s axis:%s" % (getDesktop(0).size().width(), stride, axis[mode]))
+			return
+
 		self["config"].l.setList(self.list)
 
 	def setPreviewPosition(self):
@@ -498,20 +534,20 @@ class UserInterfacePositioner(Screen, ConfigListScreen):
 		size_h = getDesktop(0).size().height()
 		dsk_w = int(float(size_w)) / float(720)
 		dsk_h = int(float(size_h)) / float(576)
-		dst_left = int(config.osd.dst_left.value)
-		dst_width = int(config.osd.dst_width.value)
-		dst_top = int(config.osd.dst_top.value)
-		dst_height = int(config.osd.dst_height.value)
+		dst_left = int(config.plugins.OSDPositionSetup.dst_left.value)
+		dst_width = int(config.plugins.OSDPositionSetup.dst_width.value)
+		dst_top = int(config.plugins.OSDPositionSetup.dst_top.value)
+		dst_height = int(config.plugins.OSDPositionSetup.dst_height.value)
 		while dst_width + (dst_left / float(dsk_w)) >= 720.5 or dst_width + dst_left > 720:
 			dst_width = int(dst_width) - 1
 		while dst_height + (dst_top / float(dsk_h)) >= 576.5 or dst_height + dst_top > 576:
 			dst_height = int(dst_height) - 1
 
-		config.osd.dst_left.setValue(dst_left)
-		config.osd.dst_width.setValue(dst_width)
-		config.osd.dst_top.setValue(dst_top)
-		config.osd.dst_height.setValue(dst_height)
-		print("[UserInterfacePositioner] Setting OSD position: %s %s %s %s" % (config.osd.dst_left.value, config.osd.dst_width.value, config.osd.dst_top.value, config.osd.dst_height.value))
+		config.plugins.OSDPositionSetup.dst_left.setValue(dst_left)
+		config.plugins.OSDPositionSetup.dst_width.setValue(dst_width)
+		config.plugins.OSDPositionSetup.dst_top.setValue(dst_top)
+		config.plugins.OSDPositionSetup.dst_height.setValue(dst_height)
+		print("[UserInterfacePositioner] Setting OSD position: %s %s %s %s" % (config.plugins.OSDPositionSetup.dst_left.value, config.plugins.OSDPositionSetup.dst_width.value, config.plugins.OSDPositionSetup.dst_top.value, config.plugins.OSDPositionSetup.dst_height.value))
 
 	def saveAll(self):
 		for x in self["config"].list:
@@ -539,9 +575,9 @@ class UserInterfacePositioner(Screen, ConfigListScreen):
 			self.close()
 
 	def run(self):
-		config.osd.dst_left.save()
-		config.osd.dst_width.save()
-		config.osd.dst_top.save()
-		config.osd.dst_height.save()
+		config.plugins.OSDPositionSetup.dst_left.save()
+		config.plugins.OSDPositionSetup.dst_width.save()
+		config.plugins.OSDPositionSetup.dst_top.save()
+		config.plugins.OSDPositionSetup.dst_height.save()
 		configfile.save()
 		self.close()

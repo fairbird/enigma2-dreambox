@@ -1,22 +1,21 @@
 # -*- coding: utf-8 -*-
 from enigma import eAVControl
-from Components.config import config, ConfigSlider, ConfigSelection, ConfigSubDict, ConfigYesNo, ConfigEnableDisable, ConfigOnOff, ConfigSubsection, ConfigBoolean, ConfigSelectionNumber, ConfigNothing, NoSave  # storm - some config are required
+from Components.config import config, ConfigSlider, ConfigSelection, ConfigSubDict, ConfigYesNo, ConfigEnableDisable, ConfigOnOff, ConfigSubsection, ConfigBoolean, ConfigNothing, NoSave  # storm - some config are required
 from Components.SystemInfo import BoxInfo
 from Tools.CList import CList
 from Components.About import about
 from Tools.Directories import fileExists, fileReadLine, fileWriteLine
-from Components.Console import Console
 from os.path import isfile
-from os import W_OK, access, system
-import os
-from enigma import getDesktop
 
 MODULE_NAME = __name__.split(".")[-1]
 
-MODEL = BoxInfo.getItem("model", default="unknown")
+model = BoxInfo.getItem("model")
+has_dvi = BoxInfo.getItem("DreamBoxDVI")
+has_scart = BoxInfo.getItem("HasScart")
 has_yuv = BoxInfo.getItem("yuv")
 has_rca = BoxInfo.getItem("rca")
 has_avjack = BoxInfo.getItem("avjack")
+chipsetstring = about.getChipSetString()
 
 # The "VideoHardware" is the interface to /proc/stb/video.
 # It generates hotplug events, and gives you the list of
@@ -24,7 +23,6 @@ has_avjack = BoxInfo.getItem("avjack")
 # selected mode. No other strict checking is done.
 
 config.av.edid_override = ConfigYesNo(default=False)
-chipsetstring = about.getChipSetString()
 
 
 class VideoHardware:
@@ -41,13 +39,12 @@ class VideoHardware:
 		"smpte": "0 0 4095 2159"
 	}
 
-	rates = {} # high-level, use selectable modes.
-
+	rates = {}  # High-level, use selectable modes.
 	rates["PAL"] = {"50Hz": {50: "pal"}, "60Hz": {60: "pal60"}, "multi": {50: "pal", 60: "pal60"}}
 	rates["NTSC"] = {"60Hz": {60: "ntsc"}}
 	rates["Multi"] = {"multi": {50: "pal", 60: "ntsc"}}
 
-	if MODEL in ("dreamone", "dreamtwo"):
+	if BoxInfo.getItem("AmlogicFamily"):
 		rates["480i"] = {"60Hz": {60: "480i60hz"}}
 		rates["576i"] = {"50Hz": {50: "576i50hz"}}
 		rates["480p"] = {"60Hz": {60: "480p60hz"}}
@@ -67,7 +64,7 @@ class VideoHardware:
 		rates["720p"] = {"50Hz": {50: "720p50"}, "60Hz": {60: "720p"}, "multi": {50: "720p50", 60: "720p"}, "auto": {50: "720p50", 60: "720p", 24: "720p24"}}
 		rates["1080i"] = {"50Hz": {50: "1080i50"}, "60Hz": {60: "1080i"}, "multi": {50: "1080i50", 60: "1080i"}, "auto": {50: "1080i50", 60: "1080i", 24: "1080i24"}}
 		rates["1080p"] = {"23Hz": {23: "1080p23"}, "24Hz": {24: "1080p24"}, "25Hz": {25: "1080p25"}, "29Hz": {29: "1080p29"}, "30Hz": {30: "1080p30"}, "50Hz": {50: "1080p50"}, "59Hz": {59: "1080p59"}, "60Hz": {60: "1080p"}, "multi": {50: "1080p50", 60: "1080p"}, "auto": {50: "1080p50", 60: "1080p", 24: "1080p24"}}
-		if MODEL in ("dm900", "dm920"):
+		if model in ("dm900", "dm920"):
 			rates["2160p"] = {"50Hz": {50: "2160p50"}, "60Hz": {60: "2160p60"}, "multi": {50: "2160p50", 60: "2160p60"}, "auto": {50: "2160p50", 60: "2160p60", 24: "2160p24"}}
 		else:
 			rates["2160p"] = {"50Hz": {50: "2160p50"}, "60Hz": {60: "2160p"}, "multi": {50: "2160p50", 60: "2160p"}, "auto": {50: "2160p50", 60: "2160p", 24: "2160p24"}}
@@ -75,7 +72,7 @@ class VideoHardware:
 
 	rates["PC"] = {
 		"1024x768": {60: "1024x768"},
-		"800x600": {60: "800x600"},
+		"800x600": {60: "800x600"},  # also not possible
 		"720x480": {60: "720x480"},
 		"720x576": {60: "720x576"},
 		"1280x720": {60: "1280x720"},
@@ -89,33 +86,41 @@ class VideoHardware:
 		"640x480": {60: "640x480"}
 	}
 
-	modes = {}  # a list of (high-level) modes for a certain port.
+	modes = {}  # A list of (high-level) modes for a certain port.
+	modes["Scart"] = [
+		"PAL",
+		"NTSC",
+		"Multi"
+	]
+	# modes["DVI-PC"] = [  # This mode does not exist.
+	# 	"PC"
+	# ]
 
 	if BoxInfo.getItem("HasScart"):
 		modes["Scart"] = ["PAL", "NTSC", "Multi"]
-	if BoxInfo.getItem("HasComposite") and MODEL in ("dm7020hd", "dm7020hdv2", "dm8000"):
+	if BoxInfo.getItem("HasComposite") and model in ("dm7020hd", "dm7020hdv2", "dm8000"):
 		modes["RCA"] = ["576i", "PAL", "NTSC", "Multi"]
 	if BoxInfo.getItem("HasYPbPr"):
 		modes["YPbPr"] = ["720p", "1080i", "576p", "480p", "576i", "480i"]
 	if BoxInfo.getItem("Has2160p"):
 		modes["HDMI"] = ["720p", "1080p", "2160p", "1080i", "576p", "480p", "576i", "480i"]
-	if MODEL in ("dreamone", "dreamtwo"):
+	if BoxInfo.getItem("AmlogicFamily"):
 		modes["HDMI"] = ["720p", "1080p", "smpte", "2160p30", "2160p", "1080i", "576p", "576i", "480p", "480i"]
 	else:
 		modes["HDMI"] = ["720p", "1080p", "2160p", "2160p30", "1080i", "576p", "480p", "576i", "480i"]
 
-	modes["HDMI-PC"] = ["PC"]
-
-	if has_yuv:
-		modes["YPbPr"] = modes["HDMI"]
-
-	if "YPbPr" in modes and not has_yuv:
+	modes["YPbPr"] = modes["HDMI"]
+	if BoxInfo.getItem("scartyuv", False):
+		modes["Scart-YPbPr"] = modes["HDMI"]
+	# if "DVI-PC" in modes and not getModeList("DVI-PC"):
+	# 	print "[AVSwitch] Remove DVI-PC because that mode does not exist."
+	# 	del modes["DVI-PC"]
+	if "YPbPr" in modes and not BoxInfo.getItem("yuv", False):
 		del modes["YPbPr"]
-
-	if "Scart" in modes and not BoxInfo.getItem("HasScart") and not has_rca and not has_avjack:
+	if "Scart" in modes and not BoxInfo.getItem("scart", False) and not BoxInfo.getItem("rca", False) and not BoxInfo.getItem("avjack", False):
 		del modes["Scart"]
 
-	widescreen_modes = tuple([x for x in modes["HDMI"] if x not in ("576p", "576i", "480p", "480i")])
+	widescreenModes = tuple([x for x in modes["HDMI"] if x not in ("576p", "576i", "480p", "480i")])
 
 	ASPECT_SWITCH_MSG = (_("16/9 reset to normal"),
 			"1.85:1 %s" % _("Letterbox"),
@@ -127,7 +132,7 @@ class VideoHardware:
 		ret = (16, 9)
 		port = config.av.videoport.value
 		if port not in config.av.videomode:
-			print("[VideoHardware] current port not available in getOutputAspect!!! force 16:9")
+			print("[VideoHardware] Current port not available in getOutputAspect!!! force 16:9")
 		else:
 			mode = config.av.videomode[port].value
 			force_widescreen = self.isWidescreenMode(port, mode)
@@ -235,13 +240,13 @@ class VideoHardware:
 		portlist = self.getPortList()
 		for port in portlist:
 			descr = port
-			if descr == 'HDMI' and BoxInfo.getItem("DreamBoxDVI"):
+			if descr == 'HDMI' and has_dvi:
 				descr = 'DVI'
-			if descr == 'HDMI-PC' and BoxInfo.getItem("DreamBoxDVI"):
+			if descr == 'HDMI-PC' and has_dvi:
 				descr = 'DVI-PC'
-			if descr == "Scart" and has_rca and not BoxInfo.getItem("HasScart"):
+			if descr == "Scart" and has_rca and not has_scart:
 				descr = "RCA"
-			if descr == "Scart" and has_avjack and not BoxInfo.getItem("HasScart"):
+			if descr == "Scart" and has_avjack and not has_scart:
 				descr = "Jack"
 			lst.append((port, descr))
 
@@ -328,6 +333,7 @@ class VideoHardware:
 			mode_59 = mode_50
 		if mode_60 is None or force == 50:
 			mode_60 = mode_50
+
 		if mode_23 is None or force:
 			mode_23 = mode_60
 			if force == 50:
@@ -350,33 +356,39 @@ class VideoHardware:
 				mode_30 = mode_50
 
 		if BoxInfo.getItem("AmlogicFamily"): # storm - this part should be here
+			from Components.Console import Console
+			from Components.config import ConfigSelectionNumber
+			from enigma import getDesktop
 			amlmode = list(modes.values())[0]
 			oldamlmode = fileReadLine("/sys/class/display/mode", default="", source=MODULE_NAME)
 			fileWriteLine("/sys/class/display/mode", amlmode, source=MODULE_NAME)
 			fileWriteLine("/etc/u-boot.scr.d/000_hdmimode.scr", "setenv hdmimode %s" % amlmode, source=MODULE_NAME)
 			fileWriteLine("/etc/u-boot.scr.d/000_outputmode.scr", "setenv outputmode %s" % amlmode, source=MODULE_NAME)
-			system("update-autoexec")
+			try:
+				Console().ePopen("update-autoexec")
+			except:
+				print("[VideoHardware] update-autoexec failed!")
 			fileWriteLine("/sys/class/ppmgr/ppscaler", "1", source=MODULE_NAME)
 			fileWriteLine("/sys/class/ppmgr/ppscaler", "0", source=MODULE_NAME)
 			fileWriteLine("/sys/class/video/axis", self.axis[mode], source=MODULE_NAME)
-			limits = [int(x) for x in self.axis[mode].split()]
-			config.osd.dst_left = ConfigSelectionNumber(default=limits[0], stepwidth=1, min=limits[0] - 255, max=limits[0] + 255, wraparound=False)
-			config.osd.dst_top = ConfigSelectionNumber(default=limits[1], stepwidth=1, min=limits[1] - 255, max=limits[1] + 255, wraparound=False)
-			config.osd.dst_width = ConfigSelectionNumber(default=limits[2], stepwidth=1, min=limits[2] - 255, max=limits[2] + 255, wraparound=False)
-			config.osd.dst_height = ConfigSelectionNumber(default=limits[3], stepwidth=1, min=limits[3] - 255, max=limits[3] + 255, wraparound=False)
+			limits = [int(x) for x in self.axis[mode].split()]			
+			config.plugins.OSDPositionSetup.dst_left = ConfigSelectionNumber(default=limits[0], stepwidth=1, min=limits[0] - 255, max=limits[0] + 255, wraparound=False)
+			config.plugins.OSDPositionSetup.dst_top = ConfigSelectionNumber(default=limits[1], stepwidth=1, min=limits[1] - 255, max=limits[1] + 255, wraparound=False)
+			config.plugins.OSDPositionSetup.dst_width = ConfigSelectionNumber(default=limits[2], stepwidth=1, min=limits[2] - 255, max=limits[2] + 255, wraparound=False)
+			config.plugins.OSDPositionSetup.dst_height = ConfigSelectionNumber(default=limits[3], stepwidth=1, min=limits[3] - 255, max=limits[3] + 255, wraparound=False)
 
 			if oldamlmode and oldamlmode != amlmode:
-				config.osd.dst_width.setValue(limits[0])
-				config.osd.dst_height.setValue(limits[1])
-				config.osd.dst_left.setValue(limits[2])
-				config.osd.dst_top.setValue(limits[3])
-				config.osd.dst_left.save()
-				config.osd.dst_width.save()
-				config.osd.dst_top.save()
-				config.osd.dst_height.save()
+				config.plugins.OSDPositionSetup.dst_width.setValue(limits[0])
+				config.plugins.OSDPositionSetup.dst_height.setValue(limits[1])
+				config.plugins.OSDPositionSetup.dst_left.setValue(limits[2])
+				config.plugins.OSDPositionSetup.dst_top.setValue(limits[3])
+				config.plugins.OSDPositionSetup.dst_left.save()
+				config.plugins.OSDPositionSetup.dst_width.save()
+				config.plugins.OSDPositionSetup.dst_top.save()
+				config.plugins.OSDPositionSetup.dst_height.save()
 
 			stride = fileReadLine("/sys/class/graphics/fb0/stride", default="", source=MODULE_NAME)
-			print("[AVSwitch] Framebuffer mode:%s  stride:%s axis:%s" % (getDesktop(0).size().width(), stride, self.axis[mode]))
+			print("[VideoHardware] Framebuffer mode:%s stride:%s axis:%s" % (getDesktop(0).size().width(), stride, self.axis[mode]))
 
 		success = fileWriteLine("/proc/stb/video/videomode_50hz", mode_50, source=MODULE_NAME)
 		if success:
@@ -410,64 +422,26 @@ class VideoHardware:
 		return currentmode[:-4]
 
 	def updateAspect(self, cfgelement):
-		# determine aspect = {any,4:3,16:9,16:10}
-		# determine policy = {bestfit,letterbox,panscan,nonlinear}
-
-		# based on;
-		#   config.av.videoport.value: current video output device
-		#     Scart:
-		#   config.av.aspect:
-		#     4_3:            use policy_169
-		#     16_9,16_10:     use policy_43
-		#     auto            always "bestfit"
-		#   config.av.policy_169
-		#     letterbox       use letterbox
-		#     panscan         use panscan
-		#     scale           use bestfit
-		#   config.av.policy_43
-		#     pillarbox       use panscan
-		#     panscan         use letterbox  ("panscan" is just a bad term, it's inverse-panscan)
-		#     nonlinear       use nonlinear
-		#     scale           use bestfit
-
 		port = config.av.videoport.value
 		if port not in config.av.videomode:
-			print("[VideoHardware] VideoHardware current port not available, not setting videomode")
+			print("[VideoHardware] Current port not available, not setting videomode")
 			return
 		mode = config.av.videomode[port].value
-
-		force_widescreen = self.isWidescreenMode(port, mode)
-
-		is_widescreen = force_widescreen or config.av.aspect.value in ("16_9", "16_10")
-		is_auto = config.av.aspect.value == "auto"
-		policy2 = "policy" # use main policy
-
-		if is_widescreen:
-			if force_widescreen:
-				aspect = "16:9"
-			else:
-				aspect = {"16_9": "16:9", "16_10": "16:10"}[config.av.aspect.value]
-			policy_choices = {"pillarbox": "panscan", "panscan": "letterbox", "nonlinear": "nonlinear", "scale": "bestfit", "full": "full", "auto": "auto"}
-			policy = policy_choices[config.av.policy_43.value]
-			policy2_choices = {"letterbox": "letterbox", "panscan": "panscan", "scale": "bestfit", "full": "full", "auto": "auto"}
-			policy2 = policy2_choices[config.av.policy_169.value]
-		elif is_auto:
-			aspect = "any"
-			if "auto" in config.av.policy_43.choices:
-				policy = "auto"
-			else:
-				policy = "bestfit"
-		else:
-			aspect = "4:3"
-			policy = {"letterbox": "letterbox", "panscan": "panscan", "scale": "bestfit", "full": "full", "auto": "auto"}[config.av.policy_169.value]
+		aspect = config.av.aspect.value
 
 		if not config.av.wss.value:
 			wss = "auto(4:3_off)"
 		else:
 			wss = "auto"
 
-		print("[VideoHardware] VideoHardware -> setting aspect, policy, policy2, wss", aspect, policy, policy2, wss)
-		if chipsetstring.startswith("meson-6") and MODEL not in ("dreamone", "dreamtwo"):
+		policy = config.av.policy_43.value
+		if hasattr(config.av, 'policy_169'):
+			policy2 = config.av.policy_169.value
+			print("[VideoHardware] -> setting aspect, policy, policy2, wss", aspect, policy, policy2, wss)
+		else:
+			print("[VideoHardware] -> setting aspect, policy, wss", aspect, policy, wss)
+
+		if chipsetstring.startswith("meson-6") and BoxInfo.getItem("AmlogicFamily"):
 			arw = "0"
 			if config.av.policy_43.value == "bestfit":
 				arw = "10"
@@ -479,7 +453,7 @@ class VideoHardware:
 				open("/sys/class/video/screen_mode", "w").write(arw)
 			except IOError:
 				print("[VideoHardware] Write to /sys/class/video/screen_mode failed.")
-		elif MODEL in ("dreamone", "dreamtwo"):
+		elif BoxInfo.getItem("AmlogicFamily"):
 			arw = "0"
 			if config.av.policy_43.value == "bestfit":
 				arw = "10"
@@ -492,22 +466,26 @@ class VideoHardware:
 			except IOError:
 				print("[VideoHardware] Write to /sys/class/video/screen_mode failed.")
 
-		try:
-			open("/proc/stb/video/aspect", "w").write(aspect)
-		except IOError:
-			print("[VideoHardware] Write to /proc/stb/video/aspect failed.")
-		try:
-			open("/proc/stb/video/policy", "w").write(policy)
-		except IOError:
-			print("[VideoHardware] Write to /proc/stb/video/policy failed.")
-		try:
-			open("/proc/stb/denc/0/wss", "w").write(wss)
-		except IOError:
-			print("[VideoHardware] Write to /proc/stb/denc/0/wss failed.")
-		try:
-			open("/proc/stb/video/policy2", "w").write(policy2)
-		except IOError:
-			print("[VideoHardware] Write to /proc/stb/video/policy2 failed.")
+		if isfile("/proc/stb/video/aspect"):
+			try:
+				open("/proc/stb/video/aspect", "w").write(aspect)
+			except IOError:
+				print("[VideoHardware] Write to /proc/stb/video/aspect failed!")
+		if isfile("/proc/stb/video/policy"):
+			try:
+				open("/proc/stb/video/policy", "w").write(policy)
+			except IOError:
+				print("[VideoHardware] Write to /proc/stb/video/policy failed!")
+		if isfile("/proc/stb/denc/0/wss"):
+			try:
+				open("/proc/stb/denc/0/wss", "w").write(wss)
+			except IOError:
+				print("[VideoHardware] Write to /proc/stb/denc/0/wss failed!")
+		if isfile("/proc/stb/video/policy2") and hasattr(config.av, 'policy_169'):
+			try:
+				open("/proc/stb/video/policy2", "w").write(policy2)
+			except IOError:
+				print("[VideoHardware] Write to /proc/stb/video/policy2 failed!")
 
 
 video_hw = VideoHardware()

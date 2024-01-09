@@ -7,7 +7,6 @@ from Components.config import config, ConfigBoolean, ConfigNothing
 from Components.Label import Label
 from Components.Sources.StaticText import StaticText
 from Tools.Directories import isPluginInstalled
-
 from Plugins.SystemPlugins.Videomode.VideoHardware import video_hw
 
 config.misc.videowizardenabled = ConfigBoolean(default=True)
@@ -28,7 +27,7 @@ class VideoSetup(ConfigListScreen, Screen):
 		self.onHide.append(self.stopHotplug)
 
 		self.list = []
-		ConfigListScreen.__init__(self, self.list, session=session, on_change=self.createSetup)
+		ConfigListScreen.__init__(self, self.list, session=session)
 
 		from Components.ActionMap import ActionMap
 		self["actions"] = ActionMap(["SetupActions", "MenuActions"],
@@ -36,6 +35,8 @@ class VideoSetup(ConfigListScreen, Screen):
 				"cancel": self.keyCancel,
 				"save": self.apply,
 				"menu": self.closeRecursive,
+				"left": self.keyLeft,
+				"right": self.keyRight
 			}, -2)
 
 		self["key_red"] = StaticText(_("Cancel"))
@@ -67,25 +68,13 @@ class VideoSetup(ConfigListScreen, Screen):
 			else:
 				self.list.append((_("Refresh rate"), config.av.videorate[config.av.videomode[config.av.videoport.value].value], _("Configure the refresh rate of the screen.")))
 
-		port = config.av.videoport.value
-		if port not in config.av.videomode:
-			mode = None
-		else:
-			mode = config.av.videomode[port].value
-
-		# some modes (720p, 1080i) are always widescreen. Don't let the user select something here, "auto" is not what he wants.
-		force_wide = self.hw.isWidescreenMode(port, mode)
-
-		if not force_wide:
-			self.list.append((_("Aspect ratio"), config.av.aspect, _("Configure the aspect ratio of the screen.")))
-
-		if force_wide or config.av.aspect.value in ("16_9", "16_10"):
-			self.list.extend((
-				(_("Display 4:3 content as"), config.av.policy_43, _("When the content has an aspect ratio of 4:3, choose whether to scale/stretch the picture.")),
-				(_("Display >16:9 content as"), config.av.policy_169, _("When the content has an aspect ratio of 16:9, choose whether to scale/stretch the picture."))
-			))
-		elif config.av.aspect.value == "4_3":
-			self.list.append((_("Display 16:9 content as"), config.av.policy_169, _("When the content has an aspect ratio of 16:9, choose whether to scale/stretch the picture.")))
+		self.list.append((_("Aspect ratio"), config.av.aspect, _("Configure the aspect ratio of the screen.")))
+		self.list.append((_("Display 4:3 content as"), config.av.policy_43, _("When the content has an aspect ratio of 4:3, choose whether to scale/stretch the picture.")))
+		try:
+			if hasattr(config.av, 'policy_169'):
+				self.list.append((_("Display 16:9 content as"), config.av.policy_169, _("When the content has an aspect ratio of 16:9, choose whether to scale/stretch the picture.")))
+		except:
+			pass
 
 		self.list.append((_("Force frame"), config.av.force, _("Allow forcing the frames per second.")))
 
@@ -93,7 +82,7 @@ class VideoSetup(ConfigListScreen, Screen):
 			if level >= 1:
 				self.list.append((_("Allow unsupported modes"), config.av.edid_override, _("When selected this allows video modes to be selected even if they are not reported as supported.")))
 				if BoxInfo.getItem("HasBypassEdidChecking"):
-					self.list.append((_("Bypass HDMI EDID checking"), config.av.bypassEdidChecking, _("Configure if the HDMI EDID checking should be bypassed as this might solve issue with some TVs.")))
+					self.list.append((_("Bypass HDMI EDID checking"), config.av.bypass_edid_checking, _("Configure if the HDMI EDID checking should be bypassed as this might solve issue with some TVs.")))
 				if BoxInfo.getItem("HasColorspace"):
 					self.list.append((_("HDMI Colorspace"), config.av.hdmicolorspace, _("This option allows you to configure the Colorspace from Auto to RGB")))
 				if BoxInfo.getItem("HasColordepth"):
@@ -116,7 +105,7 @@ class VideoSetup(ConfigListScreen, Screen):
 					self.list.append((_("Video sync mode"), config.av.sync_mode, _("This option allows you to use video sync mode.")))
 
 		if config.av.videoport.value == "Scart":
-			self.list.append((_("Color format"), config.av.colorformat, _("Configure which color format should be used on the SCART output.")))
+			self.list.append((_("Scart Color format"), config.av.colorformat, _("Configure which color format should be used on the SCART output.")))
 			if level >= 1:
 				self.list.append((_("WSS on 4:3"), config.av.wss, _("When enabled, content with an aspect ratio of 4:3 will be stretched to fit the screen.")))
 				if BoxInfo.getItem("ScartSwitch"):
@@ -146,7 +135,7 @@ class VideoSetup(ConfigListScreen, Screen):
 				(_("General AC3 delay"), config.av.generalAC3delay, _("Configure the general audio delay of Dolby Digital sound tracks.")),
 				(_("General PCM delay"), config.av.generalPCMdelay, _("Configure the general audio delay of stereo sound tracks."))
 			))
-			if BoxInfo.getItem("HasMultichannelPCM"):
+			if BoxInfo.getItem("CanPcmMultichannel"):
 				self.list.append((_("Multichannel PCM"), config.av.multichannel_pcm, _("Configure whether multi channel PCM sound should be enabled.")))
 			if BoxInfo.getItem("HasAutoVolume") or BoxInfo.getItem("HasAutoVolumeLevel"):
 				self.list.append((_("Audio auto volume level"), BoxInfo.getItem("HasAutoVolume") and config.av.autovolume or config.av.autovolumelevel, _("This option allows you can to set the auto volume level.")))
@@ -158,11 +147,12 @@ class VideoSetup(ConfigListScreen, Screen):
 				self.list.append((_("3D surround speaker position"), config.av.surround_3d_speaker, _("This option allows you to disable or change the virtuell loadspeaker position.")))
 				if BoxInfo.getItem("Has3DSurroundSoftLimiter") and config.av.surround_3d_speaker.value != "disabled":
 					self.list.append((_("3D surround softlimiter"), config.av.surround_softlimiter_3d, _("This option allows you to enable 3D surround softlimiter.")))
-
+			if BoxInfo.getItem("CanAudioDelay"):
+				self.list.append((_("General audio delay"), config.av.audiodelay, _("This option configures the general audio delay.")))
 			if BoxInfo.getItem("CanBTAudio"):
 				self.list.append((_("Enable BT audio"), config.av.btaudio, _("This option allows you to switch audio to BT speakers.")))
-				if BoxInfo.getItem("CanBTAudioDelay") and config.av.btaudio.value != "off":
-					self.list.append((_("General BT audio delay"), config.av.btaudiodelay, _("This option configures the general audio delay for BT speakers.")))
+			if BoxInfo.getItem("CanBTAudioDelay"):
+				self.list.append((_("General BT audio delay"), config.av.btaudiodelay, _("This option configures the general audio delay for BT speakers.")))
 
 		if BoxInfo.getItem("CanChangeOsdAlpha"):
 			self.list.append((_("OSD transparency"), config.av.osd_alpha, _("Configure the transparency of the OSD.")))
@@ -222,20 +212,20 @@ class VideomodeHotplug:
 		self.hw.on_hotplug.remove(self.hotplug)
 
 	def hotplug(self, what):
-		print("hotplug detected on port '%s'" % (what))
+		print("[Videomode] hotplug detected on port '%s'" % (what))
 		port = config.av.videoport.value
 		mode = config.av.videomode[port].value
 		rate = config.av.videorate[mode].value
 
 		if not self.hw.isModeAvailable(port, mode, rate):
-			print("mode %s/%s/%s went away!" % (port, mode, rate))
+			print("[Videomode] mode %s/%s/%s went away!" % (port, mode, rate))
 			modelist = self.hw.getModeList(port)
 			if not len(modelist):
-				print("sorry, no other mode is available (unplug?). Doing nothing.")
+				print("[Videomode] sorry, no other mode is available (unplug?). Doing nothing.")
 				return
 			mode = modelist[0][0]
 			rate = modelist[0][1]
-			print("setting %s/%s/%s" % (port, mode, rate))
+			print("[Videomode] setting %s/%s/%s" % (port, mode, rate))
 			self.hw.setMode(port, mode, rate)
 
 
