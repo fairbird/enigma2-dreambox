@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
 from enigma import eAVControl
 from Components.config import config, ConfigSlider, ConfigSelection, ConfigSubDict, ConfigYesNo, ConfigEnableDisable, ConfigOnOff, ConfigSubsection, ConfigBoolean, ConfigSelectionNumber, ConfigNothing, NoSave  # storm - some config are required
-from Components.SystemInfo import SystemInfo, BoxInfo
+from Components.SystemInfo import BoxInfo
 from Tools.CList import CList
-from Tools.HardwareInfo import HardwareInfo
 from Components.About import about
 from Tools.Directories import fileExists, fileReadLine, fileWriteLine
 from Components.Console import Console
 from os.path import isfile
-import os
 from os import W_OK, access, system
+import os
 from enigma import getDesktop
 
 MODULE_NAME = __name__.split(".")[-1]
 
+MODEL = BoxInfo.getItem("model", default="unknown")
 has_yuv = BoxInfo.getItem("yuv")
 has_rca = BoxInfo.getItem("rca")
 has_avjack = BoxInfo.getItem("avjack")
@@ -47,7 +47,7 @@ class VideoHardware:
 	rates["NTSC"] = {"60Hz": {60: "ntsc"}}
 	rates["Multi"] = {"multi": {50: "pal", 60: "ntsc"}}
 
-	if HardwareInfo().get_device_name() in ("one", "two"):
+	if MODEL in ("dreamone", "dreamtwo"):
 		rates["480i"] = {"60Hz": {60: "480i60hz"}}
 		rates["576i"] = {"50Hz": {50: "576i50hz"}}
 		rates["480p"] = {"60Hz": {60: "480p60hz"}}
@@ -67,7 +67,7 @@ class VideoHardware:
 		rates["720p"] = {"50Hz": {50: "720p50"}, "60Hz": {60: "720p"}, "multi": {50: "720p50", 60: "720p"}, "auto": {50: "720p50", 60: "720p", 24: "720p24"}}
 		rates["1080i"] = {"50Hz": {50: "1080i50"}, "60Hz": {60: "1080i"}, "multi": {50: "1080i50", 60: "1080i"}, "auto": {50: "1080i50", 60: "1080i", 24: "1080i24"}}
 		rates["1080p"] = {"23Hz": {23: "1080p23"}, "24Hz": {24: "1080p24"}, "25Hz": {25: "1080p25"}, "29Hz": {29: "1080p29"}, "30Hz": {30: "1080p30"}, "50Hz": {50: "1080p50"}, "59Hz": {59: "1080p59"}, "60Hz": {60: "1080p"}, "multi": {50: "1080p50", 60: "1080p"}, "auto": {50: "1080p50", 60: "1080p", 24: "1080p24"}}
-		if HardwareInfo().get_device_name() in ("dm900", "dm920"):
+		if MODEL in ("dm900", "dm920"):
 			rates["2160p"] = {"50Hz": {50: "2160p50"}, "60Hz": {60: "2160p60"}, "multi": {50: "2160p50", 60: "2160p60"}, "auto": {50: "2160p50", 60: "2160p60", 24: "2160p24"}}
 		else:
 			rates["2160p"] = {"50Hz": {50: "2160p50"}, "60Hz": {60: "2160p"}, "multi": {50: "2160p50", 60: "2160p"}, "auto": {50: "2160p50", 60: "2160p", 24: "2160p24"}}
@@ -91,15 +91,15 @@ class VideoHardware:
 
 	modes = {}  # a list of (high-level) modes for a certain port.
 
-	if SystemInfo["HasScart"]:
+	if BoxInfo.getItem("HasScart"):
 		modes["Scart"] = ["PAL", "NTSC", "Multi"]
-	if SystemInfo["HasComposite"] and HardwareInfo().get_device_name() in ("dm7020hd", "dm7020hdv2", "dm8000"):
+	if BoxInfo.getItem("HasComposite") and MODEL in ("dm7020hd", "dm7020hdv2", "dm8000"):
 		modes["RCA"] = ["576i", "PAL", "NTSC", "Multi"]
-	if SystemInfo["HasYPbPr"]:
+	if BoxInfo.getItem("HasYPbPr"):
 		modes["YPbPr"] = ["720p", "1080i", "576p", "480p", "576i", "480i"]
-	if SystemInfo["Has2160p"]:
+	if BoxInfo.getItem("Has2160p"):
 		modes["HDMI"] = ["720p", "1080p", "2160p", "1080i", "576p", "480p", "576i", "480i"]
-	if HardwareInfo().get_device_name() in ("one", "two"):
+	if MODEL in ("dreamone", "dreamtwo"):
 		modes["HDMI"] = ["720p", "1080p", "smpte", "2160p30", "2160p", "1080i", "576p", "576i", "480p", "480i"]
 	else:
 		modes["HDMI"] = ["720p", "1080p", "2160p", "2160p30", "1080i", "576p", "480p", "576i", "480i"]
@@ -112,7 +112,7 @@ class VideoHardware:
 	if "YPbPr" in modes and not has_yuv:
 		del modes["YPbPr"]
 
-	if "Scart" in modes and not SystemInfo["HasScart"] and not has_rca and not has_avjack:
+	if "Scart" in modes and not BoxInfo.getItem("HasScart") and not has_rca and not has_avjack:
 		del modes["Scart"]
 
 	widescreen_modes = tuple([x for x in modes["HDMI"] if x not in ("576p", "576i", "480p", "480i")])
@@ -235,13 +235,13 @@ class VideoHardware:
 		portlist = self.getPortList()
 		for port in portlist:
 			descr = port
-			if descr == 'HDMI' and SystemInfo["DreamBoxDVI"]:
+			if descr == 'HDMI' and BoxInfo.getItem("DreamBoxDVI"):
 				descr = 'DVI'
-			if descr == 'HDMI-PC' and SystemInfo["DreamBoxDVI"]:
+			if descr == 'HDMI-PC' and BoxInfo.getItem("DreamBoxDVI"):
 				descr = 'DVI-PC'
-			if descr == "Scart" and has_rca and not SystemInfo["HasScart"]:
+			if descr == "Scart" and has_rca and not BoxInfo.getItem("HasScart"):
 				descr = "RCA"
-			if descr == "Scart" and has_avjack and not SystemInfo["HasScart"]:
+			if descr == "Scart" and has_avjack and not BoxInfo.getItem("HasScart"):
 				descr = "Jack"
 			lst.append((port, descr))
 
@@ -252,7 +252,7 @@ class VideoHardware:
 			for (mode, rates) in modes:
 				ratelist = []
 				for rate in rates:
-					if rate == "auto" and not SystemInfo["Has24hz"]:
+					if rate == "auto" and not BoxInfo.getItem("Has24hz"):
 						continue
 					ratelist.append((rate, rate))
 				config.av.videorate[mode] = ConfigSelection(choices=ratelist)
@@ -387,7 +387,7 @@ class VideoHardware:
 				except:
 					fileWriteLine("/sys/class/display/mode", mode_50, source=MODULE_NAME)
 
-		if SystemInfo["Has24hz"] and mode_24 is not None:
+		if BoxInfo.getItem("Has24hz") and mode_24 is not None:
 			fileWriteLine("/proc/stb/video/videomode_24hz", mode_24, source=MODULE_NAME)
 
 		self.updateAspect(None)
@@ -467,7 +467,7 @@ class VideoHardware:
 			wss = "auto"
 
 		print("[VideoHardware] VideoHardware -> setting aspect, policy, policy2, wss", aspect, policy, policy2, wss)
-		if chipsetstring.startswith("meson-6") and HardwareInfo().get_device_name() not in ("one", "two"):
+		if chipsetstring.startswith("meson-6") and MODEL not in ("dreamone", "dreamtwo"):
 			arw = "0"
 			if config.av.policy_43.value == "bestfit":
 				arw = "10"
@@ -479,7 +479,7 @@ class VideoHardware:
 				open("/sys/class/video/screen_mode", "w").write(arw)
 			except IOError:
 				print("[VideoHardware] Write to /sys/class/video/screen_mode failed.")
-		elif HardwareInfo().get_device_name() in ("one", "two"):
+		elif MODEL in ("dreamone", "dreamtwo"):
 			arw = "0"
 			if config.av.policy_43.value == "bestfit":
 				arw = "10"
