@@ -485,48 +485,17 @@ class UserInterfacePositioner(Screen, ConfigListScreen):
 			config.plugins.OSDPositionSetup.dst_left.setValue(0)
 			config.plugins.OSDPositionSetup.dst_top.setValue(0)
 		elif BoxInfo.getItem("CanChangeOsdPositionAML"):
-			amlmode = list(modes.values())[0]
-			oldamlmode = self.getAMLMode()
-			f = open("/sys/class/display/mode", "w")
-			f.write(amlmode)
-			f.close()
-			print("[AVSwitch] Amlogic setting videomode to mode: %s" % amlmode)
-			f = open("/etc/u-boot.scr.d/000_hdmimode.scr", "w")
-			f.write("setenv hdmimode %s" % amlmode)
-			f.close()
-			f = open("/etc/u-boot.scr.d/000_outputmode.scr", "w")
-			f.write("setenv outputmode %s" % amlmode)
-			f.close()
-			os.system("update-autoexec")
-			f = open("/sys/class/ppmgr/ppscaler", "w")
-			f.write("1")
-			f.close()
-			f = open("/sys/class/ppmgr/ppscaler", "w")
-			f.write("0")
-			f.close()
-			f = open("/sys/class/video/axis", "w")
-			f.write(axis[mode])
-			f.close()
-			f = open("/sys/class/graphics/fb0/stride", "r")
-			stride = f.read().strip()
-			f.close()
-			limits = [int(x) for x in axis[mode].split()]
-			config.plugins.OSDPositionSetup.dst_left = ConfigSelectionNumber(default=limits[0], stepwidth=1, min=limits[0] - 255, max=limits[0] + 255, wraparound=False)
-			config.plugins.OSDPositionSetup.dst_top = ConfigSelectionNumber(default=limits[1], stepwidth=1, min=limits[1] - 255, max=limits[1] + 255, wraparound=False)
-			config.plugins.OSDPositionSetup.dst_width = ConfigSelectionNumber(default=limits[2], stepwidth=1, min=limits[2] - 255, max=limits[2] + 255, wraparound=False)
-			config.plugins.OSDPositionSetup.dst_height = ConfigSelectionNumber(default=limits[3], stepwidth=1, min=limits[3] - 255, max=limits[3] + 255, wraparound=False)
-
-			if oldamlmode != amlmode:
-			        config.plugins.OSDPositionSetup.dst_width.setValue(limits[0])
-			        config.plugins.OSDPositionSetup.dst_height.setValue(limits[1])
-			        config.plugins.OSDPositionSetup.dst_left.setValue(limits[2])
-			        config.plugins.OSDPositionSetup.dst_top.setValue(limits[3])
-			        config.plugins.OSDPositionSetup.dst_left.save()
-			        config.plugins.OSDPositionSetup.dst_width.save()
-			        config.plugins.OSDPositionSetup.dst_top.save()
-			        config.plugins.OSDPositionSetup.dst_height.save()
-			print("[AVSwitch] Framebuffer mode:%s  stride:%s axis:%s" % (getDesktop(0).size().width(), stride, axis[mode]))
-			return
+			config.plugins.OSDPositionSetup.dst_width.setValue(720)
+			config.plugins.OSDPositionSetup.dst_height.setValue(576)
+			config.plugins.OSDPositionSetup.dst_left.setValue(0)
+			config.plugins.OSDPositionSetup.dst_top.setValue(0)
+		elif BoxInfo.getItem("CanChangeOsdPositionAML"):
+			from Plugins.SystemPlugins.Videomode.VideoHardware import video_hw
+			limits = [int(x) for x in video_hw.getWindowsAxis().split()]
+			config.plugins.OSDPositionSetup.dst_left.setValue(limits[0])
+			config.plugins.OSDPositionSetup.dst_top.setValue(limits[1])
+			config.plugins.OSDPositionSetup.dst_width.setValue(limits[2])
+			config.plugins.OSDPositionSetup.dst_height.setValue(limits[3])
 
 		self["config"].l.setList(self.list)
 
