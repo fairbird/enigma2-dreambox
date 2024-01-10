@@ -1,57 +1,42 @@
 # -*- coding: utf-8 -*-
-from Tools.Directories import SCOPE_SKIN, resolveFilename
 from Components.SystemInfo import BoxInfo
+from Tools.Directories import fileReadLine
 
+MODULE_NAME = __name__.split(".")[-1]
 hw_info = None
+model = BoxInfo.getItem("model")
 
 
 class HardwareInfo:
-	device_name = "unavailable"
-	device_brandname = None
+	device_name = "Unavailable"
 	device_version = ""
 	device_revision = ""
-	device_hdmi = False
+	device_model = None
+	device_brandname = None
+	device_hdmi = True
 
 	def __init__(self):
 		global hw_info
 		if hw_info:
 			return
 		hw_info = self
-
-		print("[HardwareInfo] Scanning hardware info")
-		# Version
-		try:
-			self.device_version = open("/proc/stb/info/version").read().strip()
-		except:
-			pass
-
-		# Revision
-		try:
-			self.device_revision = open("/proc/stb/info/board_revision").read().strip()
-		except:
-			pass
-
-		# Name ... bit odd, but history prevails
-		try:
-			self.device_name = open("/proc/stb/info/model").read().strip()
-		except:
-			pass
-
-		# Brandname ... bit odd, but history prevails
-		self.device_brandname = BoxInfo.getItem("displaybrand")
-
-		# standard values
-		self.device_model = self.machine_name = BoxInfo.getItem("model")
-		self.device_hw = BoxInfo.getItem("displaymodel")
-
+		self.device_version = fileReadLine("/proc/stb/info/version", "", source=MODULE_NAME).strip()
+		self.device_revision = fileReadLine("/proc/stb/info/board_revision", "", source=MODULE_NAME).strip()
+		self.device_name = model
+		self.device_brandname = BoxInfo.getItem("brand")
+		self.device_model = model
+		self.device_model = self.device_model or self.device_name
+		self.device_hw = self.device_model
+		self.machine_name = self.device_model
 		if self.device_revision:
 			self.device_string = "%s (%s-%s)" % (self.device_hw, self.device_revision, self.device_version)
 		elif self.device_version:
 			self.device_string = "%s (%s)" % (self.device_hw, self.device_version)
 		else:
 			self.device_string = self.device_hw
-
-		self.device_hdmi = BoxInfo.getItem('hdmi')
+		if BoxInfo.getItem("DreamBoxDVI"):
+			self.device_hdmi = False  # Only dm800 and dm8000 do not have HDMI hardware.
+		print("[HardwareInfo] Detected: '%s'." % self.get_device_string())
 
 	def get_device_name(self):
 		return hw_info.device_name
