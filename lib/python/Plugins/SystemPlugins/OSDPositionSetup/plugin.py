@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from Screens.Screen import Screen
-from Components.config import config, ConfigSubsection, ConfigInteger
+from Components.config import config, ConfigSelectionNumber, ConfigSubsection, ConfigInteger
 from Components.SystemInfo import BoxInfo
 
 config.plugins.OSDPositionSetup = ConfigSubsection()
