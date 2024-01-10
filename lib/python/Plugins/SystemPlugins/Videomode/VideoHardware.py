@@ -109,7 +109,10 @@ class VideoHardware:
 	else:
 		modes["HDMI"] = ["720p", "1080p", "2160p", "2160p30", "1080i", "576p", "480p", "576i", "480i"]
 
+	modes["HDMI-PC"] = ["PC"]
+
 	modes["YPbPr"] = modes["HDMI"]
+
 	if BoxInfo.getItem("scartyuv", False):
 		modes["Scart-YPbPr"] = modes["HDMI"]
 	# if "DVI-PC" in modes and not getModeList("DVI-PC"):
@@ -120,7 +123,7 @@ class VideoHardware:
 	if "Scart" in modes and not BoxInfo.getItem("scart", False) and not BoxInfo.getItem("rca", False) and not BoxInfo.getItem("avjack", False):
 		del modes["Scart"]
 
-	widescreenModes = tuple([x for x in modes["HDMI"] if x not in ("576p", "576i", "480p", "480i")])
+	widescreen_modes = tuple([x for x in modes["HDMI"] if x not in ("576p", "576i", "480p", "480i")])
 
 	ASPECT_SWITCH_MSG = (_("16/9 reset to normal"),
 			"1.85:1 %s" % _("Letterbox"),
