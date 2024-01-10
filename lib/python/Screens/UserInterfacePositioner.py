@@ -341,7 +341,8 @@ class UserInterfacePositioner2(Screen, ConfigListScreen):
 			config.plugins.OSDPositionSetup.dst_left.setValue(0)
 			config.plugins.OSDPositionSetup.dst_top.setValue(0)
 		elif BoxInfo.getItem("CanChangeOsdPositionAML"):
-			limits = [int(x) for x in iAVSwitch.getWindowsAxis().split()]
+			from Plugins.SystemPlugins.Videomode.VideoHardware import video_hw
+			limits = [int(x) for x in video_hw.getWindowsAxis().split()]
 			config.plugins.OSDPositionSetup.dst_left.setValue(limits[0])
 			config.plugins.OSDPositionSetup.dst_top.setValue(limits[1])
 			config.plugins.OSDPositionSetup.dst_width.setValue(limits[2])
