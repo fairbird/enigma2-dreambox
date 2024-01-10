@@ -6,7 +6,6 @@ from Components.config import config, ConfigSlider, ConfigYesNo
 from Components.Label import Label
 from Plugins.SystemPlugins.OSDPositionSetup.plugin import setPosition, setConfiguredPosition
 from enigma import quitMainloop, eTimer, getDesktop
-import os
 
 
 class OverscanWizard(Screen, ConfigListScreen):
@@ -14,22 +13,22 @@ class OverscanWizard(Screen, ConfigListScreen):
 		if getDesktop(0).size().height() == 1080:
 			self.skin = """<screen position="fill" flags="wfNoBorder">
 				<ePixmap pixmap="overscan1920x1080.png" position="0,0" size="1920,1080" zPosition="3" alphaTest="on"/>
-				<eLabel position="338,190" size="1244,698" zPosition="3"/>
-				<widget name="title" position="353,202" size="1224,50" font="Regular;40" foregroundColor="blue" zPosition="4"/>
-				<widget name="introduction" position="343,252" size="1234,623" horizontalAlignment="center" verticalAlignment="center" font="Regular;30" zPosition="4"/>
-				<widget name="config" position="343,662" size="1234,226" font="Regular;30" valueFont="Regular;30" itemHeight="40" zPosition="4"/>
+				<widget name="title" position="380,212" size="1160,35" font="Regular;40" backgroundColor="black" foregroundColor="blue" horizontalAlignment="center" verticalAlignment="center" zPosition="4"/>
+				<widget name="introduction" position="380,247" size="1160,660" font="Regular;26" horizontalAlignment="center" verticalAlignment="center" backgroundColor="black" zPosition="4"/>
+				<widget name="config" position="380,867" size="1160,35" entryFont="Regular;30" valueFont="Regular;29" itemHeight="40" zPosition="4"/>
+				<widget name="HelpWindow" position="0,0" size="0,0" alphaTest="blend" conditional="HelpWindow" transparent="1" zPosition="+1"/>
 			</screen>"""
 		else:
-			self.skin = """<screen position="fill"  flags="wfNoBorder">
+			self.skin = """<screen position="fill" flags="wfNoBorder">
 				<ePixmap pixmap="overscan1280x720.png" position="0,0" size="1280,720" zPosition="3" alphaTest="on"/>
-				<eLabel position="235,131" size="810,457" zPosition="3"/>
-				<widget name="title" position="240,135" size="800,40" font="Regular;30" foregroundColor="blue" zPosition="4"/>
-				<widget name="introduction" position="240,175" size="800,623" horizontalAlignment="center" verticalAlignment="center" font="Regular;18" zPosition="4"/>
-				<widget name="config" position="240,590" size="800,120" font="Regular;20" itemHeight="30" zPosition="4"/>
+				<widget name="title" position="240,135" size="800,40" font="Regular;30" backgroundColor="black" foregroundColor="blue" horizontalAlignment="center" verticalAlignment="center" zPosition="4"/>
+				<widget name="introduction" position="240,175" size="800,440" font="Regular;18" backgroundColor="black" horizontalAlignment="center" verticalAlignment="center" zPosition="4"/>
+				<widget name="config" position="240,580" size="800,120" entryFont="Regular;20" valueFont="Regular;21" itemHeight="30" zPosition="4"/>
+				<widget name="HelpWindow" position="0,0" size="0,0" alphaTest="blend" conditional="HelpWindow" transparent="1" zPosition="+1"/>
 			</screen>"""
 
 		Screen.__init__(self, session)
-		self.setTitle(_("Overscan wizard"))
+		self["title"] = Label(_("Overscan wizard"))
 		self["introduction"] = Label()
 
 		self["actions"] = ActionMap(["SetupActions", "ColorActions", "MenuActions"],
@@ -38,6 +37,8 @@ class OverscanWizard(Screen, ConfigListScreen):
 			"green": self.keyGo,
 			"red": self.keyCancel,
 			"ok": self.keyGo,
+			"left": self.keyLeft,
+			"right": self.keyRight
 		}, -2)
 
 		self.step = 1
@@ -57,14 +58,14 @@ class OverscanWizard(Screen, ConfigListScreen):
 		from enigma import eSize, ePoint
 		if getDesktop(0).size().height() == 1080:
 			lenlist = len(self.list) * 40
-			self["config"].instance.move(ePoint(343, 873 - lenlist))
-			self["config"].instance.resize(eSize(1234, lenlist))
-			self["introduction"].instance.resize(eSize(1234, 623 - lenlist))
+			self["config"].instance.move(ePoint(380, 867 - lenlist))
+			self["config"].instance.resize(eSize(1160, lenlist))
+			self["introduction"].instance.resize(eSize(1160, 660 - lenlist))
 		else:
 			lenlist = len(self.list) * 30
 			self["config"].instance.move(ePoint(240, 580 - lenlist))
 			self["config"].instance.resize(eSize(800, lenlist))
-			self["introduction"].instance.resize(eSize(800, 405 - lenlist))
+			self["introduction"].instance.resize(eSize(800, 440 - lenlist))
 
 	def setScreen(self):
 		self.list = []
@@ -87,7 +88,7 @@ class OverscanWizard(Screen, ConfigListScreen):
 			self["introduction"].setText(_("It seems you did not see all the eight arrow heads. This means your TV "
 				"has overscan enabled, and is not configured properly.\n\n"
 				"Please refer to your TV's manual to find how you can disable overscan on your TV. Look for terms like 'Just fit', 'Full width', etc. "
-				"If you can't find it, ask other users at http://forums.openpli.org.\n\n"))
+				"If you can't find it, ask other users.\n\n"))
 			self.list.append((_("Did you see all eight arrow heads?"), self.yes_no))
 			self.yes_no.value = True
 			self.save_new_position = False
@@ -128,7 +129,7 @@ class OverscanWizard(Screen, ConfigListScreen):
 			config.skin.primary_skin.value = "PLi-HD/skin.xml"
 			config.save()
 			self["introduction"].setText(_("The user interface of the receiver will now restart to select the selected skin"))
-			quitMainloop(3)
+			quitMainloop(3) # Restart
 		self["config"].list = self.list
 		if self["config"].instance:
 			self.__layoutFinished()
@@ -150,10 +151,11 @@ class OverscanWizard(Screen, ConfigListScreen):
 			self.setPreviewPosition()
 
 	def keyGo(self):
+		from os.path import isfile
 		if self.step == 1:
 			self.step = self.yes_no.value and 5 or 2
 		elif self.step == 2:
-			self.step = self.yes_no.value and 5 or os.path.exists("/proc/stb/fb/dst_left") and 3 or 4
+			self.step = self.yes_no.value and 5 or isfile("/proc/stb/fb/dst_left") and 3 or 4
 		elif self.step == 3:
 			self.save_new_position = True
 			self.step = 5
