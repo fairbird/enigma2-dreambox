@@ -485,11 +485,6 @@ class UserInterfacePositioner(Screen, ConfigListScreen):
 			config.plugins.OSDPositionSetup.dst_left.setValue(0)
 			config.plugins.OSDPositionSetup.dst_top.setValue(0)
 		elif BoxInfo.getItem("CanChangeOsdPositionAML"):
-			config.plugins.OSDPositionSetup.dst_width.setValue(720)
-			config.plugins.OSDPositionSetup.dst_height.setValue(576)
-			config.plugins.OSDPositionSetup.dst_left.setValue(0)
-			config.plugins.OSDPositionSetup.dst_top.setValue(0)
-		elif BoxInfo.getItem("CanChangeOsdPositionAML"):
 			from Plugins.SystemPlugins.Videomode.VideoHardware import video_hw
 			limits = [int(x) for x in video_hw.getWindowsAxis().split()]
 			config.plugins.OSDPositionSetup.dst_left.setValue(limits[0])
