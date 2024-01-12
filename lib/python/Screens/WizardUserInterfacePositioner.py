@@ -1,17 +1,17 @@
 # -*- coding: utf-8 -*-
 from Screens.HelpMenu import Rc
 from Screens.Screen import Screen
-from Screens.WizardLanguage import WizardLanguage
+from Screens.Wizard import Wizard
 from Components.Pixmap import Pixmap
 from Components.Sources.Boolean import Boolean
 from Tools.Directories import resolveFilename, SCOPE_SKINS
 from Components.Console import Console
 
 
-class UserInterfacePositionerWizard(WizardLanguage, Rc):
+class UserInterfacePositionerWizard(Wizard, Rc):
 	def __init__(self, session, interface=None):
 		self.xmlfile = resolveFilename(SCOPE_SKINS, "userinterfacepositionerwizard.xml")
-		WizardLanguage.__init__(self, session, showSteps=False, showStepSlider=False)
+		Wizard.__init__(self, session, showSteps=False, showStepSlider=False)
 		Rc.__init__(self)
 		self.skinName = "StartWizard"
 		self.session = session
@@ -40,7 +40,7 @@ class UserInterfacePositionerWizard(WizardLanguage, Rc):
 		pass
 
 	def back(self):
-		WizardLanguage.back(self)
+		Wizard.back(self)
 
 	def __onClose(self):
 		self.Console.ePopen('/usr/bin/showiframe /usr/share/backdrop.mvi')
