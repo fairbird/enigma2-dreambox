@@ -551,7 +551,6 @@ def runScreenTest():
 	enigma.eProfileDone()
 	runReactor()
 
-	enigma.eProfileWrite("wakeup")
 	from time import time, strftime, localtime
 	from Tools.StbHardware import setFPWakeuptime, setRTCtime
 	from Screens.SleepTimerEdit import isNextWakeupTime
@@ -582,7 +581,6 @@ def runScreenTest():
 		config.misc.prev_wakeup_time.value = 0
 	config.misc.prev_wakeup_time.save()
 
-	enigma.eProfileWrite("stopService")
 	session.nav.stopService()
 	enigma.eProfileWrite("nav shutdown")
 	session.nav.shutdown()
