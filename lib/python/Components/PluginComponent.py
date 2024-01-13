@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 import os
+from enigma import eProfileWrite
 from bisect import insort
 from Tools.Directories import fileExists, resolveFilename, SCOPE_PLUGINS
 from Tools.Import import my_import
-from Tools.Profile import profile
 from Plugins.Plugin import PluginDescriptor
 import keymapparser
 
@@ -53,7 +53,7 @@ class PluginComponent:
 					continue
 				path = os.path.join(directory_category, pluginname)
 				if os.path.isdir(path):
-						profile('plugin ' + pluginname)
+						eProfileWrite('plugin ' + pluginname)
 						try:
 							plugin = my_import('.'.join(["Plugins", c, pluginname, "plugin"]))
 							plugins = plugin.Plugins(path=path)

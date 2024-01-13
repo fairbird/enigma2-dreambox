@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-from Tools.Profile import profile
-
 from Screens.Screen import Screen
 import Screens.InfoBar
 from Screens.ScreenSaver import InfoBarScreenSaver
@@ -10,21 +8,21 @@ from Components.ServiceList import ServiceList, refreshServiceList
 from Components.ActionMap import NumberActionMap, ActionMap, HelpableActionMap
 from Components.MenuList import MenuList
 from Components.ServiceEventTracker import ServiceEventTracker, InfoBarBase
-profile("ChannelSelection.py 1")
+from enigma import eServiceReference, eEPGCache, eServiceCenter, eRCInput, eTimer, eDVBDB, iPlayableService, iServiceInformation, getPrevAsciiCode, loadPNG, eProfileWrite
+eProfileWrite("ChannelSelection.py 1")
 from Screens.EpgSelection import EPGSelection
-from enigma import eServiceReference, eEPGCache, eServiceCenter, eRCInput, eTimer, eDVBDB, iPlayableService, iServiceInformation, getPrevAsciiCode, loadPNG
 from Components.config import config, configfile, ConfigSubsection, ConfigText, ConfigYesNo
 from Tools.NumericalTextInput import NumericalTextInput
-profile("ChannelSelection.py 2")
+eProfileWrite("ChannelSelection.py 2")
 from Components.NimManager import nimmanager
-profile("ChannelSelection.py 2.1")
+eProfileWrite("ChannelSelection.py 2.1")
 from Components.Sources.RdsDecoder import RdsDecoder
-profile("ChannelSelection.py 2.2")
+eProfileWrite("ChannelSelection.py 2.2")
 from Components.Sources.ServiceEvent import ServiceEvent
 from Components.Sources.Event import Event
-profile("ChannelSelection.py 2.3")
+eProfileWrite("ChannelSelection.py 2.3")
 from Components.Input import Input
-profile("ChannelSelection.py 3")
+eProfileWrite("ChannelSelection.py 3")
 from Components.ChoiceList import ChoiceList, ChoiceEntryComponent
 from Components.SystemInfo import BoxInfo
 from Components.Sources.StaticText import StaticText
@@ -33,7 +31,7 @@ from Screens.VirtualKeyBoard import VirtualKeyBoard
 from Screens.MessageBox import MessageBox
 from Screens.ServiceInfo import ServiceInfo
 from Screens.Hotkey import InfoBarHotkey, hotkeyActionMap, hotkey
-profile("ChannelSelection.py 4")
+eProfileWrite("ChannelSelection.py 4")
 from Screens.PictureInPicture import PictureInPicture
 from Screens.RdsDisplay import RassInteractive
 from ServiceReference import ServiceReference, getStreamRelayRef
@@ -51,7 +49,7 @@ from time import time, localtime, strftime
 from Components.Sources.List import List
 from Components.Sources.StaticText import StaticText
 from Components.Renderer.Picon import getPiconName
-profile("ChannelSelection.py after imports")
+eProfileWrite("ChannelSelection.py after imports")
 
 FLAG_SERVICE_NEW_FOUND = 64
 FLAG_IS_DEDICATED_3D = 128

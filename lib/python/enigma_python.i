@@ -43,6 +43,7 @@ is usually caused by not marking PSignals as immutable.
 #include <lib/base/message.h>
 #include <lib/base/e2avahi.h>
 #include <lib/base/internetcheck.h>
+#include <lib/base/profile.h>
 #include <lib/driver/rc.h>
 #include <lib/driver/rcinput_swig.h>
 #include <lib/service/event.h>
@@ -478,6 +479,21 @@ PyObject *getDeviceDB()
 		PutToDict(result, key.c_str(), value.c_str());
 	}
     return result;
+}
+%}
+
+void eProfileDone();
+%{
+void eProfileDone()
+{
+	eProfile::getInstance().close();
+}
+%}
+void eProfileWrite(const char*);
+%{
+void eProfileWrite(const char* checkPoint)
+{
+	eProfile::getInstance().write(checkPoint);
 }
 %}
 
