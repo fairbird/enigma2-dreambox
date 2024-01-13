@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
-from enigma import eAVControl
-from Components.config import config, ConfigSlider, ConfigSelection, ConfigSubDict, ConfigYesNo, ConfigEnableDisable, ConfigOnOff, ConfigSubsection, ConfigBoolean, ConfigNothing, NoSave  # storm - some config are required
+from enigma import eAVControl, getDesktop
+from Components.config import config, ConfigSlider, ConfigSelection, ConfigSubDict, ConfigYesNo, ConfigEnableDisable, ConfigOnOff, ConfigSubsection, ConfigSelectionNumber, ConfigBoolean, ConfigNothing, NoSave
 from Components.SystemInfo import BoxInfo
+from Components.Console import Console
 from Tools.CList import CList
 from Components.About import about
 from Tools.Directories import fileExists, fileReadLine, fileWriteLine
+from os import system
 from os.path import isfile
 
 MODULE_NAME = __name__.split(".")[-1]
