@@ -358,40 +358,35 @@ class VideoHardware:
 			if force == 50:
 				mode_30 = mode_50
 
-		if BoxInfo.getItem("AmlogicFamily"): # storm - this part should be here
-			from Components.Console import Console
-			from Components.config import ConfigSelectionNumber
-			from enigma import getDesktop
+		if BoxInfo.getItem("AmlogicFamily"):
 			amlmode = list(modes.values())[0]
 			oldamlmode = fileReadLine("/sys/class/display/mode", default="", source=MODULE_NAME)
 			fileWriteLine("/sys/class/display/mode", amlmode, source=MODULE_NAME)
+			print("[AVSwitch] Amlogic setting videomode to mode: %s" % amlmode)
 			fileWriteLine("/etc/u-boot.scr.d/000_hdmimode.scr", "setenv hdmimode %s" % amlmode, source=MODULE_NAME)
 			fileWriteLine("/etc/u-boot.scr.d/000_outputmode.scr", "setenv outputmode %s" % amlmode, source=MODULE_NAME)
-			try:
-				Console().ePopen("update-autoexec")
-			except:
-				print("[VideoHardware] update-autoexec failed!")
+			system("update-autoexec")
 			fileWriteLine("/sys/class/ppmgr/ppscaler", "1", source=MODULE_NAME)
 			fileWriteLine("/sys/class/ppmgr/ppscaler", "0", source=MODULE_NAME)
 			fileWriteLine("/sys/class/video/axis", self.axis[mode], source=MODULE_NAME)
-			limits = [int(x) for x in self.axis[mode].split()]			
-			config.plugins.OSDPositionSetup.dst_left = ConfigSelectionNumber(default=limits[0], stepwidth=1, min=limits[0] - 255, max=limits[0] + 255, wraparound=False)
-			config.plugins.OSDPositionSetup.dst_top = ConfigSelectionNumber(default=limits[1], stepwidth=1, min=limits[1] - 255, max=limits[1] + 255, wraparound=False)
-			config.plugins.OSDPositionSetup.dst_width = ConfigSelectionNumber(default=limits[2], stepwidth=1, min=limits[2] - 255, max=limits[2] + 255, wraparound=False)
-			config.plugins.OSDPositionSetup.dst_height = ConfigSelectionNumber(default=limits[3], stepwidth=1, min=limits[3] - 255, max=limits[3] + 255, wraparound=False)
-
-			if oldamlmode and oldamlmode != amlmode:
-				config.plugins.OSDPositionSetup.dst_width.setValue(limits[0])
-				config.plugins.OSDPositionSetup.dst_height.setValue(limits[1])
-				config.plugins.OSDPositionSetup.dst_left.setValue(limits[2])
-				config.plugins.OSDPositionSetup.dst_top.setValue(limits[3])
-				config.plugins.OSDPositionSetup.dst_left.save()
-				config.plugins.OSDPositionSetup.dst_width.save()
-				config.plugins.OSDPositionSetup.dst_top.save()
-				config.plugins.OSDPositionSetup.dst_height.save()
-
 			stride = fileReadLine("/sys/class/graphics/fb0/stride", default="", source=MODULE_NAME)
-			print("[VideoHardware] Framebuffer mode:%s stride:%s axis:%s" % (getDesktop(0).size().width(), stride, self.axis[mode]))
+			limits = [int(x) for x in self.axis[mode].split()]
+			config.osd.dst_left = ConfigSelectionNumber(default=limits[0], stepwidth=1, min=limits[0] - 255, max=limits[0] + 255, wraparound=False)
+			config.osd.dst_top = ConfigSelectionNumber(default=limits[1], stepwidth=1, min=limits[1] - 255, max=limits[1] + 255, wraparound=False)
+			config.osd.dst_width = ConfigSelectionNumber(default=limits[2], stepwidth=1, min=limits[2] - 255, max=limits[2] + 255, wraparound=False)
+			config.osd.dst_height = ConfigSelectionNumber(default=limits[3], stepwidth=1, min=limits[3] - 255, max=limits[3] + 255, wraparound=False)
+
+			if oldamlmode != amlmode:
+				config.osd.dst_width.setValue(limits[0])
+				config.osd.dst_height.setValue(limits[1])
+				config.osd.dst_left.setValue(limits[2])
+				config.osd.dst_top.setValue(limits[3])
+				config.osd.dst_left.save()
+				config.osd.dst_width.save()
+				config.osd.dst_top.save()
+				config.osd.dst_height.save()
+			print("[AVSwitch] Framebuffer mode:%s  stride:%s axis:%s" % (getDesktop(0).size().width(), stride, self.axis[mode]))
+			return
 
 		success = fileWriteLine("/proc/stb/video/videomode_50hz", mode_50, source=MODULE_NAME)
 		if success:
