@@ -22,4 +22,4 @@ class VtiImageVersion(VariableText, Renderer):
 
     def ATVImageVersion(self):
         atvversion = BoxInfo.getItem("imageversion")
-        return 'openATV Image Release v. %s' % atvversion
+        return 'openpli Image Release v. %s' % atvversion
