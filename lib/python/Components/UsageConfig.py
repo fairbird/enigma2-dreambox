@@ -1232,6 +1232,7 @@ def InitUsageConfig():
 		config.misc.zapmode.addNotifier(setZapmode, immediate_feedback=False)
 
 	config.usage.historymode = ConfigSelection(default='1', choices=[('0', _('Just zap')), ('1', _('Show menu'))])
+	config.usage.zapHistorySort = ConfigSelection(default=0, choices=[(0, _("Most recent first")),(1, _("Most recent last"))])
 
 	if not BoxInfo.getItem("ZapMode") and exists("/proc/stb/info/model"):
 		def setZapmodeDM(el):
