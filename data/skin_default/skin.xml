@@ -1778,15 +1778,15 @@ except Exception as e:
 		<widget source="menu" render="Listbox" position="0,60" size="550,420" scrollbarMode="showNever" backgroundColor="background" foregroundColor="foreground" foregroundColorSelected="yellow" transparent="1">
 			<convert type="TemplatedMultiContent">
 				{"template": [
-						MultiContentEntryText(pos = (128, 22), size = (10, 22), font = 1, flags = RT_HALIGN_CENTER | RT_VALIGN_CENTER, text = 1), # Current Service
-						MultiContentEntryText(pos = (150, 2), size = (370, 25), font = 1, flags = RT_HALIGN_LEFT | RT_VALIGN_TOP, text = 2), # Servicename
-						MultiContentEntryText(pos = (150, 24), size = (370, 22), font = 2, flags = RT_HALIGN_LEFT | RT_VALIGN_CENTER | RT_WRAP, text = 3), # Eventname
-						MultiContentEntryText(pos = (150, 46), size = (370, 21), font = 3, flags = RT_HALIGN_LEFT, text = 5), # Eventtime
-						MultiContentEntryText(pos = (400, 2), size = (600, 65), font = 3, flags = RT_HALIGN_LEFT | RT_WRAP, text = 4), # Event Discription
-						MultiContentEntryPixmapAlphaBlend(pos=(30, 9), size=(85, 51), png=6, flags = BT_SCALE) # picon
+						MultiContentEntryText(pos = (128, 22), size = (10, 25), font = 1, flags = RT_HALIGN_CENTER | RT_VALIGN_CENTER, text = 1), # Current Service
+						MultiContentEntryText(pos = (150, 2), size = (300, 25), font = 1, flags = RT_HALIGN_LEFT | RT_VALIGN_TOP, text = 2), # Servicename
+						MultiContentEntryText(pos = (150, 28), size = (300, 25), font = 3, flags = RT_HALIGN_LEFT, text = 5), # Eventtime
+						MultiContentEntryText(pos = (150, 55), size = (1300, 25), font = 2, flags = RT_HALIGN_LEFT | RT_VALIGN_CENTER | RT_WRAP, text = 3), # Eventname
+						MultiContentEntryText(pos = (500, 2), size = (950, 50), font = 3, flags = RT_HALIGN_LEFT | RT_WRAP, text = 4), # Event Discription
+						MultiContentEntryPixmapAlphaBlend(pos=(30, 15), size=(85, 51), png=6, flags = BT_SCALE) # picon
 					],
-				 "fonts": [gFont("Regular",22), gFont("Regular",22), gFont("Regular",20), gFont("Regular",18)],
-				 "itemHeight": 70
+				 "fonts": [gFont("Regular",26), gFont("Regular",26), gFont("Regular",24), gFont("Regular",24)],
+				 "itemHeight": 80
 				}
 			</convert>
 		</widget>
