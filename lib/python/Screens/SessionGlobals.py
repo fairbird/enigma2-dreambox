@@ -11,7 +11,7 @@ from Components.Sources.RecordState import RecordState
 from Components.Converter.Combine import Combine
 from Components.Renderer.FrontpanelLed import FrontpanelLed
 from Components.config import config
-from Components.SystemInfo import SystemInfo, BoxInfo
+from Components.SystemInfo import BoxInfo
 
 
 MODEL = BoxInfo.getItem("model", default="unknown")
@@ -89,7 +89,7 @@ class SessionGlobals(Screen):
 		if config.usage.frontledrecstdby_color.value == "4":
 			RecstdbyLed1 = PATTERN_BLINK
 
-		nr_leds = SystemInfo.get("NumFrontpanelLEDs", 0)
+		nr_leds = BoxInfo.getItem("NumFrontpanelLEDs", 0)
 
 		if nr_leds == 1:
 			FrontpanelLed(which=0, boolean=False, patterns=[PATTERN_OFF, PATTERN_BLINK, PATTERN_OFF, PATTERN_BLINK]).connect(combine)
