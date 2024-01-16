@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: enigma2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-02 14:05+0100\n"
-"POT-Creation-Date: 2023-12-17 11:25+0100\n"
+"POT-Creation-Date: 2024-01-16 17:53+0100\n"
 "Last-Translator: RAED - Fairbirb <rrrr53@hotmail.com>\n"
 "Language-Team: \n"
 "Language: ar\n"
@@ -1595,6 +1595,10 @@ msgstr "قناة"
 msgid "Channel Info"
 msgstr "معلومات القناة"
 
+#, fuzzy
+msgid "Channel Selection"
+msgstr "إختيار القناة"
+
 msgid "Channel context menu"
 msgstr "سياق صفحة قائمة القنوات"
 
@@ -3117,13 +3121,6 @@ msgstr "تمكين البحث السريع الآلي"
 #, python-format
 msgid "Enable auto fastscan for %s"
 msgstr "تفعيل البحث التلقائي السريع %s"
-
-msgid "Enable blink functionality for some areas like record icon."
-msgstr "تمكين وظيفة الوميض لبعض المناطق مثل رمز التسجيل."
-
-#, fuzzy
-msgid "Enable blinking"
-msgstr "تمكين الوميض"
 
 msgid "Enable bouquet edit"
 msgstr "تمكين تعديل الباقة"
@@ -5628,6 +5625,10 @@ msgstr "عدد الصفوف لعرض في الشاشة الصغيرة"
 
 msgid "Number or SMS style data entry"
 msgstr "إدخال بيانات نمط الرقم أو الرسائل القصيرة"
+
+#, fuzzy
+msgid "OE Version: "
+msgstr "إصدار جديد:"
 
 msgid "OK"
 msgstr "موافق"
@@ -8988,6 +8989,12 @@ msgid "The directory %s is not writable.\n"
 "Make sure you select a writable directory instead."
 msgstr "الدليل %s غير قابل للكتابة.\n"
 "تأكد من إختيار دليل يمكنك الكتابة فيه."
+
+msgid ""
+"The enigma.info file for the boxinformation is not available or the content is invalid.\n"
+"Press any key to continue?"
+msgstr "الملف enigma.info الخاص بمعلومات الصندوق غير متوفر أو المحتوى غير صالح.\n"
+"اضغط على أى زر للاستمرار؟"
 
 msgid "The following files were found..."
 msgstr "تم العثور على هذه الملفات..."
