@@ -3,7 +3,7 @@ from Screens.Console import Console
 from Screens.MessageBox import MessageBox
 
 import hashlib
-from distutils import spawn
+from setuptools._distutils import spawn
 
 
 class FSBLCheckerBase:
