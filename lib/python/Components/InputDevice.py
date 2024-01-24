@@ -220,7 +220,7 @@ class RemoteControl:
 		self.rcType = self.readRemoteControlType()
 		remotes = fileReadXML(resolveFilename(SCOPE_SKIN, "remotes.xml"), source=MODULE_NAME)
 		self.remotes = []
-		if remotes:
+		if remotes is not None:
 			for remote in sorted(remotes.findall("remote"), key=lambda remote: (remote.tag, remote.get("displayName"))):
 				model = remote.attrib.get("model")
 				rcType = remote.attrib.get("rcType")
@@ -248,7 +248,7 @@ class RemoteControl:
 		print("[InputDevice] Loading remote control '%s'." % filename)
 		rcs = fileReadXML(filename, source=MODULE_NAME)
 		rcButtons = {}
-		if rcs:
+		if rcs is not None:
 			rc = rcs.find("rc")
 			if rc:
 				logRemaps = []
