@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: enigma2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-02 14:05+0100\n"
-"POT-Creation-Date: 2024-01-16 17:53+0100\n"
+"POT-Creation-Date: 2024-01-26 16:56+0100\n"
 "Last-Translator: RAED - Fairbirb <rrrr53@hotmail.com>\n"
 "Language-Team: \n"
 "Language: ar\n"
@@ -5929,6 +5929,10 @@ msgstr "شاشة صندوقية"
 msgid "Pilot"
 msgstr "مساعد"
 
+#, fuzzy
+msgid "Pin Userbouquet"
+msgstr "باقات المستخدم"
+
 msgid "Pitcairn"
 msgstr "بيتكيرن"
 
@@ -9782,6 +9786,10 @@ msgstr "إلغاء تحديد خدمة قنوات ثلاثية الأبعاد ا
 msgid "Unmount"
 msgstr "الغاء الارتباط"
 
+#, fuzzy
+msgid "Unpin Userbouquet"
+msgstr "باقات المستخدم"
+
 msgid "Unsupported"
 msgstr "غير مدعم"
 
@@ -11265,6 +11273,9 @@ msgstr "انتزاع هذا الإطار كما نقطية"
 
 msgid "green"
 msgstr "أخضر"
+
+msgid "half an hour"
+msgstr ""
 
 msgid "handicraft"
 msgstr "الحرف اليدوية"
