@@ -7,6 +7,8 @@ from Tools.AVHelper import pChoice, readChoices
 from os.path import isfile
 import os
 
+iAVSwitch = None # will be initialized later, allows to import name 'iAVSwitch' from 'Components.AVSwitch'
+
 MODULE_NAME = __name__.split(".")[-1]
 
 model = BoxInfo.getItem("model")
