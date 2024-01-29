@@ -4,6 +4,10 @@ import Screens.InfoBar
 from Screens.ScreenSaver import InfoBarScreenSaver
 import Components.ParentalControl
 from Components.Button import Button
+from Components.ConfigList import ConfigListScreen
+from Components.Label import Label
+from Components.Sources.Boolean import Boolean
+from Components.Pixmap import Pixmap
 from Components.ServiceList import ServiceList, refreshServiceList
 from Components.ActionMap import NumberActionMap, ActionMap, HelpableActionMap
 from Components.MenuList import MenuList
@@ -11,7 +15,7 @@ from Components.ServiceEventTracker import ServiceEventTracker, InfoBarBase
 from enigma import eServiceReference, eEPGCache, eServiceCenter, eRCInput, eTimer, eDVBDB, iPlayableService, iServiceInformation, getPrevAsciiCode, loadPNG, eProfileWrite
 eProfileWrite("ChannelSelection.py 1")
 from Screens.EpgSelection import EPGSelection
-from Components.config import config, configfile, ConfigSubsection, ConfigText, ConfigYesNo
+from Components.config import config, configfile, ConfigSubsection, ConfigText, ConfigYesNo, ConfigSelection, ConfigText
 from Tools.NumericalTextInput import NumericalTextInput
 eProfileWrite("ChannelSelection.py 2")
 from Components.NimManager import nimmanager
@@ -54,6 +58,62 @@ eProfileWrite("ChannelSelection.py after imports")
 FLAG_SERVICE_NEW_FOUND = 64
 FLAG_IS_DEDICATED_3D = 128
 FLAG_CENTER_DVB_SUBS = 2048 #define in lib/dvb/idvb.h as dxNewFound = 64 and dxIsDedicated3D = 128
+
+
+class InsertService(ConfigListScreen, Screen):
+	def __init__(self, session):
+		Screen.__init__(self, session)
+		self.skinName = ["Setup"]
+		ConfigListScreen.__init__(self, [], session=session, on_change=self.changedEntry)
+
+		self["actions2"] = ActionMap(["SetupActions"],
+		{
+			"ok": self.run,
+			"cancel": boundFunction(self.close, None),
+			"save": self.run,
+		}, -2)
+
+		self["key_red"] = StaticText(_("Exit"))
+		self["key_green"] = StaticText(_("Save"))
+
+		self["description"] = Label("")
+		self["VKeyIcon"] = Boolean(False)
+		self["HelpWindow"] = Pixmap()
+		self["HelpWindow"].hide()
+
+		self.createConfig()
+		self.changedEntry()
+
+	def createConfig(self):
+		choices = []
+		if BoxInfo.getItem("HasHDMIin"):
+			choices = [("HDMI-in", _("HDMI-In"))]
+		choices.append(("IPTV stream", _("Enter URL")))
+		self.servicetype = ConfigSelection(choices=choices)
+		self.streamtype = ConfigSelection(["1", "4097", "5001", "5002"])
+		self.streamurl = ConfigText("http://some_url_to_stream")
+		self.servicename = ConfigText("default_name")
+
+	def createSetup(self):
+		self.list = []
+		if BoxInfo.getItem("HasHDMIin"):
+			self.list.append((_("Service Type"), self.servicetype, _("Select service type")))
+		if self.servicetype.value != "HDMI-in":
+			self.list.append((_("Stream Type"), self.streamtype, _("Select stream type")))
+			self.list.append((_("Stream URL"), self.streamurl, _("Select stream URL")))
+		self.list.append((_("Service Name"), self.servicename, _("Select service name")))
+		self["config"].list = self.list
+
+	def changedEntry(self):
+		if self.servicetype.value == "HDMI-in":
+			self.servicerefstring = '8192:0:1:0:0:0:0:0:0:0::%s' % self.servicename.value
+		else:
+			self.servicerefstring = '%s:0:1:0:0:0:0:0:0:0:%s:%s' % (self.streamtype.value, self.streamurl.value.replace(':', '%3a'), self.servicename.value)
+		Screen.setTitle(self, '%s [%s]' % (_("Insert Service"), self.servicerefstring))
+		self.createSetup()
+
+	def run(self):
+		self.close(eServiceReference(self.servicerefstring))
 
 
 class BouquetSelector(Screen):
@@ -250,6 +310,7 @@ class ChannelContextMenu(Screen):
 					if not inAlternativeList:
 						append_when_current_valid(current, menu, (_("Remove entry"), self.removeEntry), level=0, key="8")
 						self.removeFunction = self.removeCurrentService
+						append_when_current_valid(current, menu, (_("Insert entry"), self.insertEntry), level=0)
 				if current_root and ("flags == %d" % (FLAG_SERVICE_NEW_FOUND)) in current_root.getPath():
 					append_when_current_valid(current, menu, (_("Remove new found flag"), self.removeNewFoundFlag), level=0)
 			else:
@@ -383,6 +444,14 @@ class ChannelContextMenu(Screen):
 			name = name.replace('\xc2\x86', '').replace('\xc2\x87', '')
 			return name
 		return ""
+
+	def insertEntry(self):
+		self.session.openWithCallback(self.insertEntryCallback, InsertService)
+
+	def insertEntryCallback(self, answer):
+		if answer:
+			self.csel.insertService(answer)
+			self.close()
 
 	def removeEntry(self):
 		if self.removeFunction and self.csel.servicelist.getCurrent() and self.csel.servicelist.getCurrent().valid():
@@ -1004,6 +1073,17 @@ class ChannelSelectionEdit:
 			if not mutableList.addService(ref, current):
 				self.servicelist.addService(ref, True)
 				mutableList.flushChanges()
+
+	def insertService(self, serviceref):
+		currentIndex = self.servicelist.getCurrentIndex()
+		current = self.servicelist.getCurrent()
+		mutableList = self.getMutableList()
+		if mutableList and current and current.valid():
+			if not mutableList.addService(serviceref, current):
+				self.servicelist.addService(serviceref, True)
+				mutableList.flushChanges()
+				refreshServiceList()
+				self.servicelist.moveToIndex(currentIndex)
 
 	def addMarker(self, name):
 		current = self.servicelist.getCurrent()
