@@ -5,7 +5,7 @@ from enigma import getDesktop
 
 from Components.ActionMap import ActionMap
 from Components.AVSwitch import iAVSwitch
-from Components.config import config, configfile, getConfigListEntry
+from Components.config import config, configfile
 from Components.ConfigList import ConfigListScreen
 from Components.Label import Label
 from Components.SystemInfo import BoxInfo
@@ -277,19 +277,19 @@ class UserInterfacePositioner2(Screen, ConfigListScreen):
 		self.list = []
 		ConfigListScreen.__init__(self, self.list, session=session, on_change=self.changedEntry)
 		if BoxInfo.getItem("CanChangeOsdAlpha") or BoxInfo.getItem("CanChangeOsdPlaneAlpha"):
-			self.list.append(getConfigListEntry(_("User interface visibility"), config.osd.alpha, _("This option lets you adjust the transparency of the user interface")))
-			self.list.append(getConfigListEntry(_("Teletext base visibility"), config.osd.alpha_teletext, _("Base transparency for teletext, more options available within teletext screen.")))
-			self.list.append(getConfigListEntry(_("Web browser base visibility"), config.osd.alpha_webbrowser, _("Base transparency for OpenOpera web browser")))
+			self.list.append((_("User interface visibility"), config.osd.alpha, _("This option lets you adjust the transparency of the user interface")))
+			self.list.append((_("Teletext base visibility"), config.osd.alpha_teletext, _("Base transparency for teletext, more options available within teletext screen.")))
+			self.list.append((_("Web browser base visibility"), config.osd.alpha_webbrowser, _("Base transparency for OpenOpera web browser")))
 		if BoxInfo.getItem("CanChangeOsdPosition"):
-			self.list.append(getConfigListEntry(_("Move Left/Right"), config.osd.dst_left, _("Use the Left/Right buttons on your remote to move the user interface left/right")))
-			self.list.append(getConfigListEntry(_("Width"), config.osd.dst_width, _("Use the Left/Right buttons on your remote to adjust the size of the user interface. Left button decreases the size, Right increases the size.")))
-			self.list.append(getConfigListEntry(_("Move Up/Down"), config.osd.dst_top, _("Use the Left/Right buttons on your remote to move the user interface up/down")))
-			self.list.append(getConfigListEntry(_("Height"), config.osd.dst_height, _("Use the Left/Right buttons on your remote to adjust the size of the user interface. Left button decreases the size, Right increases the size.")))
+			self.list.append((_("Move Left/Right"), config.osd.dst_left, _("Use the Left/Right buttons on your remote to move the user interface left/right")))
+			self.list.append((_("Width"), config.osd.dst_width, _("Use the Left/Right buttons on your remote to adjust the size of the user interface. Left button decreases the size, Right increases the size.")))
+			self.list.append((_("Move Up/Down"), config.osd.dst_top, _("Use the Left/Right buttons on your remote to move the user interface up/down")))
+			self.list.append((_("Height"), config.osd.dst_height, _("Use the Left/Right buttons on your remote to adjust the size of the user interface. Left button decreases the size, Right increases the size.")))
 		if BoxInfo.getItem("CanChangeOsdPositionAML"):
-			self.list.append(getConfigListEntry(_("Left"), config.osd.dst_left, _("Use the Left/Right buttons on your remote to move the user interface left")))
-			self.list.append(getConfigListEntry(_("Right"), config.osd.dst_width, _("Use the Left/Right buttons on your remote to move the user interface right")))
-			self.list.append(getConfigListEntry(_("Top"), config.osd.dst_top, _("Use the Left/Right buttons on your remote to move the user interface top")))
-			self.list.append(getConfigListEntry(_("Bottom"), config.osd.dst_height, _("Use the Left/Right buttons on your remote to move the user interface bottom")))
+			self.list.append((_("Left"), config.osd.dst_left, _("Use the Left/Right buttons on your remote to move the user interface left")))
+			self.list.append((_("Right"), config.osd.dst_width, _("Use the Left/Right buttons on your remote to move the user interface right")))
+			self.list.append((_("Top"), config.osd.dst_top, _("Use the Left/Right buttons on your remote to move the user interface top")))
+			self.list.append((_("Bottom"), config.osd.dst_height, _("Use the Left/Right buttons on your remote to move the user interface bottom")))
 
 		self["config"].list = self.list
 		self["config"].l.setList(self.list)
@@ -426,14 +426,14 @@ class UserInterfacePositioner(Screen, ConfigListScreen):
 		self.list = []
 		ConfigListScreen.__init__(self, self.list, session=session, on_change=self.changedEntry)
 		if BoxInfo.getItem("CanChangeOsdAlpha") is True:
-			self.list.append(getConfigListEntry(_("User interface visibility"), config.osd.alpha, _("This option lets you adjust the transparency of the user interface")))
-			self.list.append(getConfigListEntry(_("Teletext base visibility"), config.osd.alpha_teletext, _("Base transparency for teletext, more options available within teletext screen.")))
-			self.list.append(getConfigListEntry(_("Web browser base visibility"), config.osd.alpha_webbrowser, _("Base transparency for OpenOpera web browser")))
+			self.list.append((_("User interface visibility"), config.osd.alpha, _("This option lets you adjust the transparency of the user interface")))
+			self.list.append((_("Teletext base visibility"), config.osd.alpha_teletext, _("Base transparency for teletext, more options available within teletext screen.")))
+			self.list.append((_("Web browser base visibility"), config.osd.alpha_webbrowser, _("Base transparency for OpenOpera web browser")))
 		if BoxInfo.getItem("CanChangeOsdPosition") is True or BoxInfo.getItem("CanChangeOsdPositionAML") is True:
-			self.list.append(getConfigListEntry(_("Move Left/Right"), config.osd.dst_left, _("Use the Left/Right buttons on your remote to move the user interface left/right")))
-			self.list.append(getConfigListEntry(_("Width"), config.osd.dst_width, _("Use the Left/Right buttons on your remote to adjust the size of the user interface. Left button decreases the size, Right increases the size.")))
-			self.list.append(getConfigListEntry(_("Move Up/Down"), config.osd.dst_top, _("Use the Left/Right buttons on your remote to move the user interface up/down")))
-			self.list.append(getConfigListEntry(_("Height"), config.osd.dst_height, _("Use the Left/Right buttons on your remote to adjust the size of the user interface. Left button decreases the size, Right increases the size.")))
+			self.list.append((_("Move Left/Right"), config.osd.dst_left, _("Use the Left/Right buttons on your remote to move the user interface left/right")))
+			self.list.append((_("Width"), config.osd.dst_width, _("Use the Left/Right buttons on your remote to adjust the size of the user interface. Left button decreases the size, Right increases the size.")))
+			self.list.append((_("Move Up/Down"), config.osd.dst_top, _("Use the Left/Right buttons on your remote to move the user interface up/down")))
+			self.list.append((_("Height"), config.osd.dst_height, _("Use the Left/Right buttons on your remote to adjust the size of the user interface. Left button decreases the size, Right increases the size.")))
 
 		self["config"].list = self.list
 		self["config"].l.setList(self.list)
