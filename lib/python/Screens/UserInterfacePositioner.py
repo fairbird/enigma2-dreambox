@@ -47,18 +47,16 @@ def setPositionParameterAML():
 
 def InitOsd():
 
-	BoxInfo.setItem("CanChange3DOsd", access("/proc/stb/fb/3dmode", R_OK)) and True or False
-	BoxInfo.setItem("CanChangeOsdAlpha", access("/proc/stb/video/alpha", R_OK)) and True or False
-	BoxInfo.setItem("CanChangeOsdPlaneAlpha", access("/sys/class/graphics/fb0/osd_plane_alpha", R_OK)) and True or False
-	BoxInfo.setItem("CanChangeOsdPosition", access("/proc/stb/fb/dst_left", R_OK)) and True or False
-	BoxInfo.setItem("CanChangeOsdPositionAML", access("/sys/class/graphics/fb0/free_scale", R_OK)) and True or False
+	BoxInfo.setItem("CanChange3DOsd", access("/proc/stb/fb/3dmode", R_OK))
+	BoxInfo.setItem("CanChangeOsdAlpha", access("/proc/stb/video/alpha", R_OK))
+	BoxInfo.setItem("CanChangeOsdPlaneAlpha", access("/sys/class/graphics/fb0/osd_plane_alpha", R_OK))
+	BoxInfo.setItem("CanChangeOsdPosition", access("/proc/stb/vmpeg/0/dst_left", R_OK))
+	BoxInfo.setItem("CanChangeOsdPositionAML", access("/sys/class/graphics/fb0/free_scale", R_OK))
 	BoxInfo.setItem("OsdSetup", BoxInfo.getItem("CanChangeOsdPosition"))
 	if BoxInfo.getItem("CanChangeOsdAlpha") is True or BoxInfo.getItem("CanChangeOsdPosition") is True or BoxInfo.getItem("CanChangeOsdPositionAML") is True or BoxInfo.getItem("CanChangeOsdPlaneAlpha") is True:
 		BoxInfo.setItem("OsdMenu", True)
 	else:
 		BoxInfo.setItem("OsdMenu", False)
-
-	BoxInfo.setItem("CanChangeOsdPosition", True)
 
 	def setOSDLeft(configElement):
 		if BoxInfo.getItem("CanChangeOsdPosition"):
