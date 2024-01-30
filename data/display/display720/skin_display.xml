@@ -31,7 +31,7 @@
 
 <!-- main-->
 	<screen name="InfoBarSummary" position="0,0" size="720,576">
-		<widget source="session.CurrentService" render="Label" position="15,21" size="675,70" foregroundColor="#e5b243" font="FdLcD; 60" zPosition="14">
+		<widget source="session.CurrentService" render="Label" position="15,21" size="675,70" foregroundColor="#e5b243" font="FdLcD; 60" horizontalAlignment="center" verticalAlignment="center" zPosition="14">
 			<convert type="ServiceName">Name</convert>
 		</widget>
 		<widget source="session.Event_Now" render="Label" position="14,189" foregroundColor="#dedede" size="675,192" font="FdLcDLight; 55">

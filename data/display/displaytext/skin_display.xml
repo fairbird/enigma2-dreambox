@@ -63,7 +63,7 @@
 
 <!-- movieplayer-->
 	<screen name="MovieSelectionSummary" position="0,0" size="132,64">
-		<widget source="parent.Service" render="Label" position="0,0" size="120,25" font="Regular;14">
+		<widget source="parent.Service" render="Label" position="0,0" size="120,25" font="Regular;14" horizontalAlignment="center" verticalAlignment="center">
 			<convert type="ServiceName">Name</convert>
 		</widget>
 	</screen>
@@ -157,7 +157,7 @@
 
 <!-- EMC  -->
 	<screen name="EMCSelection_summary" position="0,0" size="132,64">
-		<widget source="parent.Service" render="Label" position="0,0" size="132,64" font="Regular;18" >
+		<widget source="parent.Service" render="Label" position="0,0" size="132,64" font="Regular;18" horizontalAlignment="center" verticalAlignment="center" >
 			<convert type="ServiceName">Name</convert>
 		</widget>
 	</screen>
