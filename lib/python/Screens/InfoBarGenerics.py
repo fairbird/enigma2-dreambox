@@ -62,7 +62,7 @@ iAVSwitch = AVSwitch()
 # hack alert!
 from Screens.Menu import MainMenu, mdom
 
-MODEL = BoxInfo.getItem("model", default="unknown")
+MODEL = BoxInfo.getItem("model")
 
 MODULE_NAME = __name__.split(".")[-1]
 

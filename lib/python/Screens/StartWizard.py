@@ -28,7 +28,7 @@ config.misc.languageselected = ConfigBoolean(default=True)
 config.misc.do_overscanwizard = ConfigBoolean(default=OverscanWizard and config.skin.primary_skin.value == "PLi-FullNightHD/skin.xml")
 
 
-MODEL = BoxInfo.getItem("model", default="unknown")
+MODEL = BoxInfo.getItem("model")
 
 
 class StartWizard(WizardLanguage, Rc):

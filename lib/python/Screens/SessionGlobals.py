@@ -14,7 +14,7 @@ from Components.config import config
 from Components.SystemInfo import BoxInfo
 
 
-MODEL = BoxInfo.getItem("model", default="unknown")
+MODEL = BoxInfo.getItem("model")
 
 
 class SessionGlobals(Screen):

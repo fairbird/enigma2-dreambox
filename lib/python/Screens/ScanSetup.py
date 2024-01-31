@@ -15,7 +15,7 @@ from Screens.MessageBox import MessageBox
 from enigma import eTimer, eDVBFrontendParametersSatellite, eComponentScan, eDVBFrontendParametersTerrestrial, eDVBFrontendParametersCable, eConsoleAppContainer, eDVBResourceManager, eDVBFrontendParametersATSC
 
 
-MODEL = BoxInfo.getItem("model", default="unknown")
+MODEL = BoxInfo.getItem("model")
 
 
 def buildTerTransponder(frequency,

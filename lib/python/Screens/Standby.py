@@ -33,7 +33,7 @@ QUIT_RRECVERY_MODE = 16
 QUIT_UPGRADE_PROGRAM = 42
 QUIT_IMAGE_RESTORE = 43
 
-getBoxDisplayName = BoxInfo.getItem("model", default="unknown")
+getBoxDisplayName = BoxInfo.getItem("model")
 
 def isInfoBarInstance():
 	global infoBarInstance

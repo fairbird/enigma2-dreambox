@@ -14,7 +14,7 @@ from Screens.Standby import inTryQuitMainloop
 from Tools.Directories import fileReadLine, fileWriteLine
 
 
-MODEL = BoxInfo.getItem("model", default="unknown")
+MODEL = BoxInfo.getItem("model")
 
 
 class dummyScreen(Screen):

@@ -10,7 +10,7 @@ from Components.Sources.StaticText import StaticText
 from Components.Pixmap import Pixmap
 
 
-MODELBox = BoxInfo.getItem("model", default="unknown")
+MODELBox = BoxInfo.getItem("model")
 has_dvi = BoxInfo.getItem("DreamBoxDVI")
 has_scart = BoxInfo.getItem("SCART")
 

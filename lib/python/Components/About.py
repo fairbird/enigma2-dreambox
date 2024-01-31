@@ -11,7 +11,7 @@ from subprocess import PIPE, Popen
 MODULE_NAME = __name__.split(".")[-1]
 
 socfamily = BoxInfo.getItem("socfamily")
-MODEL = BoxInfo.getItem("model", default="unknown")
+MODEL = BoxInfo.getItem("model")
 
 
 def getVersionString():
