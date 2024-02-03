@@ -16,6 +16,27 @@ from Tools.Directories import fileReadLine, fileWriteLine
 
 MODEL = BoxInfo.getItem("model")
 
+colorsList = [
+	("0xff0000", _("Red")),
+	("0xff3333", _("Rose")),
+	("0xff5500", _("Orange")),
+	("0xdd9900", _("Yellow")),
+	("0x99dd00", _("Lime")),
+	("0x00ff00", _("Green")),
+	("0x00ff99", _("Aqua")),
+	("0x00bbff", _("Olympic blue")),
+	("0x0000ff", _("Blue")),
+	("0x6666ff", _("Azure")),
+	("0x9900ff", _("Purple")),
+	("0xff0066", _("Pink")),
+	("0xffffff", _("White")),
+]
+config.lcd = ConfigSubsection()
+config.lcd.ledblinkcontrolcolor = ConfigSelection(choices=colorsList, default="0xffffff")
+config.lcd.ledbrightnesscontrol = ConfigSlider(default=0xff, increment=25, limits=(0, 0xff))
+config.lcd.ledcolorcontrolcolor = ConfigSelection(choices=colorsList, default="0xffffff")
+config.lcd.ledfadecontrolcolor = ConfigSelection(choices=colorsList, default="0xffffff")
+
 
 class dummyScreen(Screen):
 	skin = """
@@ -267,7 +288,6 @@ def standbyCounterChanged(configElement):
 def InitLcd():
 	detected = eDBoxLCD.getInstance().detected()
 	BoxInfo.setItem("Display", detected)
-	config.lcd = ConfigSubsection()
 	if isfile("/proc/stb/lcd/mode"):
 		can_lcdmodechecking = fileReadLine("/proc/stb/lcd/mode")
 	else:
@@ -460,31 +480,12 @@ def InitLcd():
 		config.lcd.ledsuspendcolor = ConfigSelection(default="2", choices=colorchoices)
 		if isfile("/proc/stb/fp/ledsuspendledcolor"):
 			config.lcd.ledsuspendcolor.addNotifier(setLedSuspendColor)
-		colorsList = [
-			("0xff0000", _("Red")),
-			("0xff3333", _("Rose")),
-			("0xff5500", _("Orange")),
-			("0xdd9900", _("Yellow")),
-			("0x99dd00", _("Lime")),
-			("0x00ff00", _("Green")),
-			("0x00ff99", _("Aqua")),
-			("0x00bbff", _("Olympic blue")),
-			("0x0000ff", _("Blue")),
-			("0x6666ff", _("Azure")),
-			("0x9900ff", _("Purple")),
-			("0xff0066", _("Pink")),
-			("0xffffff", _("White")),
-		]
-		config.lcd.ledblinkcontrolcolor = ConfigSelection(choices=colorsList, default="0xffffff")
 		if isfile("/proc/stb/fp/led_blink"):
 			config.lcd.ledblinkcontrolcolor.addNotifier(setLedBlinkControlColor)
-		config.lcd.ledbrightnesscontrol = ConfigSlider(default=0xff, increment=25, limits=(0, 0xff))
 		if isfile("/proc/stb/fp/led_brightness"):
 			config.lcd.ledbrightnesscontrol.addNotifier(setLedBrightnessControl)
-		config.lcd.ledcolorcontrolcolor = ConfigSelection(choices=colorsList, default="0xffffff")
 		if isfile("/proc/stb/fp/led_color"):
 			config.lcd.ledcolorcontrolcolor.addNotifier(setLedColorControlColor)
-		config.lcd.ledfadecontrolcolor = ConfigSelection(choices=colorsList, default="0xffffff")
 		if isfile("/proc/stb/fp/led_fade"):
 			config.lcd.ledfadecontrolcolor.addNotifier(setLedFadeControlColor)
 		config.lcd.power4x7on = ConfigSelection(choices=[
