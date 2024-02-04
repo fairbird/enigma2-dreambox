@@ -48,6 +48,9 @@ def StdAudioDesc(description):
 		description = description.replace(orig, repl)
 	return description
 
+def getVideoHeight(info):
+	return info.getInfo(iServiceInformation.sVideoHeight)
+
 
 class ServiceInfo(Converter):
 	HAS_TELETEXT = 0
