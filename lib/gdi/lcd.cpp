@@ -56,7 +56,7 @@ void eLCD::setSize(int xres, int yres, int bpp)
 eLCD::~eLCD()
 {
 	if (_buffer)
-		delete [] _buffer;
+		delete[] _buffer;
 	instance = NULL;
 }
 
@@ -74,7 +74,7 @@ void eLCD::unlock()
 	locked = 0;
 }
 
-const char *eLCD::get_VFD_scroll_delay()
+const char *eLCD::get_VFD_scroll_delay() const
 {
 #if defined(HAVE_TEXTLCD)
 	return "";
@@ -83,7 +83,7 @@ const char *eLCD::get_VFD_scroll_delay()
 #endif
 }
 
-const char *eLCD::get_VFD_initial_scroll_delay()
+const char *eLCD::get_VFD_initial_scroll_delay() const
 {
 #if defined(HAVE_TEXTLCD)
 	return "";
@@ -92,7 +92,7 @@ const char *eLCD::get_VFD_initial_scroll_delay()
 #endif
 }
 
-const char *eLCD::get_VFD_final_scroll_delay()
+const char *eLCD::get_VFD_final_scroll_delay() const
 {
 #if defined(HAVE_TEXTLCD)
 	return "";
@@ -101,12 +101,12 @@ const char *eLCD::get_VFD_final_scroll_delay()
 #endif
 }
 
-const char *eLCD::get_VFD_scroll_repeats()
+const char *eLCD::get_VFD_scroll_repeats() const
 {
 	return (access(VFD_scroll_repeats_proc, W_OK) == 0) ? VFD_scroll_repeats_proc : "";
 }
 
-void eLCD::set_VFD_scroll_delay(int delay)
+void eLCD::set_VFD_scroll_delay(int delay) const
 {
 #ifdef LCD_SCROLL_HEX
 	CFile::writeIntHex(VFD_scroll_delay_proc, delay);
@@ -115,7 +115,7 @@ void eLCD::set_VFD_scroll_delay(int delay)
 #endif
 }
 
-void eLCD::set_VFD_initial_scroll_delay(int delay)
+void eLCD::set_VFD_initial_scroll_delay(int delay) const
 {
 #ifdef LCD_SCROLL_HEX
 	CFile::writeIntHex(VFD_initial_scroll_delay_proc, delay);
@@ -124,7 +124,7 @@ void eLCD::set_VFD_initial_scroll_delay(int delay)
 #endif
 }
 
-void eLCD::set_VFD_final_scroll_delay(int delay)
+void eLCD::set_VFD_final_scroll_delay(int delay) const
 {
 #ifdef LCD_SCROLL_HEX
 	CFile::writeIntHex(VFD_final_scroll_delay_proc, delay);
@@ -133,9 +133,14 @@ void eLCD::set_VFD_final_scroll_delay(int delay)
 #endif
 }
 
-void eLCD::set_VFD_scroll_repeats(int delay)
+void eLCD::set_VFD_scroll_repeats(int delay) const
 {
 	CFile::writeInt(VFD_scroll_repeats_proc, delay);
+}
+
+void eLCD::setLCDMode(int mode) const
+{
+	CFile::writeInt("/proc/stb/lcd/mode", mode);
 }
 
 #if defined(HAVE_TEXTLCD)
@@ -255,12 +260,12 @@ int eDBoxLCD::setLCDContrast(int contrast)
 {
 #ifndef NO_LCD
 	if (lcdfd < 0)
-		return(0);
+		return 0;
 #ifndef LCD_IOCTL_SRV
 #define LCDSET 0x1000
 #define LCD_IOCTL_SRV (10 | LCDSET)
 #endif
-	eTrace("[eDboxLCD] setLCDContrast %d", contrast);
+	eDebug("[eDboxLCD] setLCDContrast %d", contrast);
 
 	int fp;
 	if ((fp = open("/dev/dbox/fp0", O_RDWR)) < 0)
@@ -313,7 +318,7 @@ int eDBoxLCD::setLCDBrightness(int brightness)
 		close(fp);
 	}
 #endif
-	return(0);
+	return 0;
 }
 
 int eDBoxLCD::setLED(int value, int option)
@@ -433,6 +438,7 @@ void eDBoxLCD::update()
 #if !defined(HAVE_TEXTLCD)
 	if (lcdfd >= 0)
 	{
+		[[maybe_unused]] ssize_t ret; /* dummy value to store write return values */
 		if (lcd_type == 0 || lcd_type == 2)
 		{
 			unsigned char raw[132 * 8];
@@ -458,7 +464,7 @@ void eDBoxLCD::update()
 					}
 				}
 			}
-			write(lcdfd, raw, 132 * 8);
+			ret = write(lcdfd, raw, 132 * 8);
 		}
 		else if (lcd_type == 3)
 		{
@@ -483,7 +489,7 @@ void eDBoxLCD::update()
 						}
 					}
 				}
-				write(lcdfd, raw, _stride * height);
+				ret = write(lcdfd, raw, _stride * height);
 			}
 			else
 			{
@@ -497,7 +503,7 @@ void eDBoxLCD::update()
 					//                                             blue                         red                  green low                     green high
 					((unsigned int *)gb_buffer)[offset] = ((src >> 3) & 0x001F001F) | ((src << 3) & 0xF800F800) | ((src >> 8) & 0x00E000E0) | ((src << 8) & 0x07000700);
 				}
-				write(lcdfd, gb_buffer, _stride * res.height());
+				ret = write(lcdfd, gb_buffer, _stride * res.height());
 #elif defined(LCD_COLOR_BITORDER_RGB565)
 				// gggrrrrrbbbbbggg bit order from memory
 				// gggbbbbbrrrrrggg bit order to LCD
@@ -518,9 +524,9 @@ void eDBoxLCD::update()
 						gb_buffer[offset + 1] = (_buffer[offset + 1] & 0xE0) | ((_buffer[offset] >> 3) & 0x1F);
 					}
 				}
-				write(lcdfd, gb_buffer, _stride * res.height());
+				ret = write(lcdfd, gb_buffer, _stride * res.height());
 #else
-				write(lcdfd, _buffer, _stride * res.height());
+				ret = write(lcdfd, _buffer, _stride * res.height());
 #endif
 			}
 		}
@@ -551,7 +557,7 @@ void eDBoxLCD::update()
 					}
 				}
 			}
-			write(lcdfd, raw, 64 * 64);
+			ret = write(lcdfd, raw, 64 * 64);
 		}
 	}
 #endif
