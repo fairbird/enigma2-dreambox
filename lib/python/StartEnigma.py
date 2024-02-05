@@ -530,6 +530,11 @@ def runScreenTest():
 	enigma.eProfileWrite("Init:PowerKey")
 	power = PowerKey(session)
 
+	if BoxInfo.getItem("VFDSymbol"):
+#		profile("VFDSymbols")
+		from Components.VfdSymbols import SymbolsCheck
+		SymbolsCheck(session)
+
 	# we need session.scart to access it from within menu.xml
 	session.scart = AutoScartControl(session)
 
