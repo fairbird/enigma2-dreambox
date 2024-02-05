@@ -686,6 +686,33 @@ def InitLcd():
 		def doNothing():
 			pass
 
+		# For Dreamone only
+		def setLedBlinkControlColor(configElement):
+			fileWriteLine("/proc/stb/fp/led_blink", configElement.value)
+
+		def setLedBrightnessControl(configElement):
+			fileWriteLine("/proc/stb/fp/led_brightness", configElement.value)
+
+		def setLedColorControlColor(configElement):
+			fileWriteLine("/proc/stb/fp/led_color", configElement.value)
+
+		def setLedFadeControlColor(configElement):
+			fileWriteLine("/proc/stb/fp/led_fade", configElement.value)
+
+		if isfile("/proc/stb/fp/led_blink"):
+			config.lcd.ledblinkcontrolcolor.addNotifier(setLedBlinkControlColor)
+			print("led_blink ***************", config.lcd.ledblinkcontrolcolor.addNotifier(setLedBlinkControlColor))
+		if isfile("/proc/stb/fp/led_brightness"):
+			config.lcd.ledbrightnesscontrol.addNotifier(setLedBrightnessControl)
+			print("led_brightness ***************", config.lcd.ledbrightnesscontrol.addNotifier(setLedBrightnessControl))
+		if isfile("/proc/stb/fp/led_color"):
+			config.lcd.ledcolorcontrolcolor.addNotifier(setLedColorControlColor)
+			print("led_color ***************", config.lcd.ledcolorcontrolcolor.addNotifier(setLedColorControlColor))
+		if isfile("/proc/stb/fp/led_fade"):
+			config.lcd.ledfadecontrolcolor.addNotifier(setLedFadeControlColor)
+			print("led_fade ***************", config.lcd.ledfadecontrolcolor.addNotifier(setLedFadeControlColor))
+		## 
+
 		config.lcd.contrast = ConfigNothing()
 		config.lcd.bright = ConfigNothing()
 		config.lcd.standby = ConfigNothing()
