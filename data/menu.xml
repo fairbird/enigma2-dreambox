@@ -64,7 +64,6 @@
 						<item entryID="display_skin_selector" level="0" text="Skin Setup" weight="5" requires="Display"><screen module="SkinSelector" screen="LcdSkinSelector" /></item>
 						<item entryID="lcd_setup" level="1" text="LCD Setup" weight="10" requires="Display"><setup id="FrontDisplay" /></item>
 						<item entryID="led_setup" level="1" text="LED Setup" weight="15" requires="LEDControl"><setup id="LedDisplay" /></item>
-						<item entryID="led_setup" level="1" text="LED Setup" weight="16" requires="LEDColorControl"><setup id="LEDs" /></item>
 					</menu>
 				</menu>
 				<menu entryID="usage_setup" level="0" text="Log Manager" weight="2">
