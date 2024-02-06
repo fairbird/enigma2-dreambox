@@ -214,6 +214,9 @@ class Session:
 
 		self.screen = SessionGlobals(self)
 
+		from Components.FrontPanelLed import frontPanelLed
+		frontPanelLed.init(self)
+
 		for p in plugins.getPlugins(PluginDescriptor.WHERE_SESSIONSTART):
 			try:
 				p(reason=0, session=self)
@@ -544,7 +547,11 @@ def runScreenTest():
 
 	enigma.eProfileWrite("RunReactor")
 	enigma.eProfileDone()
+	from Components.FrontPanelLed import FrontPanelLed
 	runReactor()
+	session.shutdown = True
+	FrontPanelLed.shutdown()
+	print("[StartEnigma] Normal shutdown.")
 
 	from time import time, strftime, localtime
 	from Tools.StbHardware import setFPWakeuptime, setRTCtime
