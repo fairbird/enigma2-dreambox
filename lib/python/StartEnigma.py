@@ -17,6 +17,8 @@ from Components.SystemInfo import BoxInfo
 
 from traceback import print_exc
 
+MODEL = BoxInfo.getItem("model")
+
 # These entries should be moved back to UsageConfig.py when it is safe to bring UsageConfig init to this location in StartEnigma.py.
 #
 config.crash = ConfigSubsection()
@@ -213,6 +215,10 @@ class Session:
 		self.in_exec = False
 
 		self.screen = SessionGlobals(self)
+
+		if MODEL in ("dreamone", "dreamtwo"):
+			from Components.FrontPanelLed import frontPanelLed
+			frontPanelLed.init(self)
 
 		for p in plugins.getPlugins(PluginDescriptor.WHERE_SESSIONSTART):
 			try:
@@ -540,6 +546,11 @@ def runScreenTest():
 	enigma.eProfileWrite("RunReactor")
 	enigma.eProfileDone()
 	runReactor()
+	if MODEL in ("dreamone", "dreamtwo"):
+		from Components.FrontPanelLed import FrontPanelLed
+		session.shutdown = True
+		FrontPanelLed.shutdown()
+		print("[StartEnigma] Normal shutdown.")
 
 	from time import time, strftime, localtime
 	from Tools.StbHardware import setFPWakeuptime, setRTCtime

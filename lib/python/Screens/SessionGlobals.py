@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from Screens.Screen import Screen
+from Components.Sources.Clock import Clock
 from Components.Sources.CurrentService import CurrentService
 from Components.Sources.EventInfo import EventInfo
 from Components.Sources.FrontendStatus import FrontendStatus
@@ -9,18 +10,22 @@ from Components.Sources.TunerInfo import TunerInfo
 from Components.Sources.Boolean import Boolean
 from Components.Sources.RecordState import RecordState
 from Components.Converter.Combine import Combine
-from Components.Renderer.FrontpanelLed import FrontpanelLed
 from Components.config import config
 from Components.SystemInfo import BoxInfo
 
-
 MODEL = BoxInfo.getItem("model")
+
+if MODEL in ("dreamone", "dreamtwo"):
+	from Components.Renderer.FrontpanelLed2 import FrontpanelLed2
+else:
+	from Components.Renderer.FrontpanelLed import FrontpanelLed
 
 
 class SessionGlobals(Screen):
 	def __init__(self, session):
 		Screen.__init__(self, session)
 		self["CurrentService"] = CurrentService(session.nav)
+		self["CurrentTime"] = Clock()
 		self["Event_Now"] = EventInfo(session.nav, EventInfo.NOW)
 		self["Event_Next"] = EventInfo(session.nav, EventInfo.NEXT)
 		self["FrontendStatus"] = FrontendStatus(service_source=session.nav.getCurrentService)
@@ -89,10 +94,12 @@ class SessionGlobals(Screen):
 		if config.usage.frontledrecstdby_color.value == "4":
 			RecstdbyLed1 = PATTERN_BLINK
 
+		have_display = BoxInfo.getItem("FrontpanelDisplay", False)
+		have_touch_sensor = BoxInfo.getItem("HaveTouchSensor", False)
 		nr_leds = BoxInfo.getItem("NumFrontpanelLEDs", 0)
 
 		if nr_leds == 1:
-			FrontpanelLed(which=0, boolean=False, patterns=[PATTERN_OFF, PATTERN_BLINK, PATTERN_OFF, PATTERN_BLINK]).connect(combine)
+			FrontpanelLed(which=0, boolean=False, patterns=[PATTERN_OFF if have_display else PATTERN_ON, PATTERN_BLINK, PATTERN_OFF, PATTERN_BLINK]).connect(combine)
 		elif nr_leds == 2:
 			if MODEL in ("dm520"):
 				FrontpanelLed(which=0, boolean=False, patterns=[PATTERN_ON, PATTERN_BLINK, PATTERN_OFF, PATTERN_BLINK]).connect(combine)
