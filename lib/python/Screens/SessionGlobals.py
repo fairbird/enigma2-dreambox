@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from Screens.Screen import Screen
+from Components.Sources.Clock import Clock
 from Components.Sources.CurrentService import CurrentService
 from Components.Sources.EventInfo import EventInfo
 from Components.Sources.FrontendStatus import FrontendStatus
