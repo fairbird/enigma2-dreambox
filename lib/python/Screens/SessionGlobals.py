@@ -10,15 +10,12 @@ from Components.Sources.TunerInfo import TunerInfo
 from Components.Sources.Boolean import Boolean
 from Components.Sources.RecordState import RecordState
 from Components.Converter.Combine import Combine
+from Components.Renderer.FrontpanelLed import FrontpanelLed
 from Components.config import config
 from Components.SystemInfo import BoxInfo
 
-MODEL = BoxInfo.getItem("model")
 
-if MODEL in ("dreamone", "dreamtwo"):
-	from Components.Renderer.FrontpanelLed2 import FrontpanelLed2
-else:
-	from Components.Renderer.FrontpanelLed import FrontpanelLed
+MODEL = BoxInfo.getItem("model")
 
 
 class SessionGlobals(Screen):

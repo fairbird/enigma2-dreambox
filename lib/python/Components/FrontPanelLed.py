@@ -21,10 +21,10 @@ colors = [
 	("0xFFFFFF", _("white")),
 ]
 # running
-config.fp.led.default_color = ConfigSelection(colors, default="0xFFFFFF")
+config.fp.led.default_color = ConfigSelection(colors, default="0x00FF00")
 config.fp.led.default_brightness = ConfigSlider(default=0xff, increment=25, limits=(0, 0xff))
 # standby
-config.fp.led.standby_color = ConfigSelection(colors, default="0xFFFFFF")
+config.fp.led.standby_color = ConfigSelection(colors, default="0xFF0000")
 config.fp.led.standby_brightness = ConfigSlider(default=0x08, increment=8, limits=(0, 0xff))
 # shutdown
 config.fp.led.shutdown_color = ConfigSelection(colors, default="0xFF5500")
