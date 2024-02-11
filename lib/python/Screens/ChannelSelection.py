@@ -2083,6 +2083,7 @@ class ChannelSelection(ChannelSelectionBase, ChannelSelectionEdit, ChannelSelect
 				"ok": self.channelSelected,
 				"keyRadio": self.doRadioButton,
 				"keyTV": self.doTVButton,
+				"toggleTvRadio": self.toggleTVRadio,
 			})
 
 		self.__event_tracker = ServiceEventTracker(screen=self, eventmap={
@@ -2191,6 +2192,12 @@ class ChannelSelection(ChannelSelectionBase, ChannelSelectionEdit, ChannelSelect
 			config.servicelist.lastmode.value = "radio"
 			self.setRadioMode()
 			self.setMode()
+
+	def toggleTVRadio(self):
+		if self.mode == MODE_TV:
+			self.doRadioButton()
+		else:
+			self.doTVButton()
 
 	def __onCreate(self):
 		if config.usage.e1like_radio_mode.value:
@@ -2809,6 +2816,7 @@ class SimpleChannelSelection(ChannelSelectionBase, SelectionEventInfo):
 				"ok": self.channelSelected,
 				"keyRadio": self.setModeRadio,
 				"keyTV": self.setModeTv,
+				"toggleTvRadio": self.toggleTVRadio,
 			})
 		self.bouquet_mark_edit = OFF
 		if isinstance(title, str):
@@ -2854,6 +2862,12 @@ class SimpleChannelSelection(ChannelSelectionBase, SelectionEventInfo):
 	def setModeRadio(self):
 		self.setRadioMode()
 		self.showFavourites()
+
+	def toggleTVRadio(self):
+		if self.mode == MODE_TV :
+			self.setModeRadio()
+		else:
+			self.setModeTv()
 
 	def getMutableList(self, root=None):
 		return None
