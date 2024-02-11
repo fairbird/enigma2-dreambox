@@ -33,13 +33,13 @@ def InitOsd():
 
 	if BoxInfo.getItem("CanChangeOsdPosition"):
 		def setPositionParameter(parameter, configElement):
-			fileWriteLine("/proc/stb/fb/dst_%s" % parameter, "%08X\n" % configElement.value, source=MODULE_NAME)
+			fileWriteLine(f"/proc/stb/fb/dst_{parameter}", "%08X\n" % configElement.value, source=MODULE_NAME)
 			fileName = "/proc/stb/fb/dst_apply"
 			if exists(fileName):
 				fileWriteLine(fileName, "1", source=MODULE_NAME)
 	elif BoxInfo.getItem("CanChangeOsdPositionAML"):
 		def setPositionParameter(parameter, configElement):
-			value = "%s %s %s %s" % (config.osd.dst_left.value, config.osd.dst_top.value, config.osd.dst_width.value, config.osd.dst_height.value)
+			value = f"{config.osd.dst_left.value} {config.osd.dst_top.value} {config.osd.dst_width.value} {config.osd.dst_height.value}"
 			fileWriteLine("/sys/class/graphics/fb0/window_axis", value, source=MODULE_NAME)
 			fileWriteLine("/sys/class/graphics/fb0/free_scale", "0x10001", source=MODULE_NAME)
 
@@ -64,18 +64,18 @@ def InitOsd():
 		setPositionParameter("height", configElement)
 	config.osd.dst_height.addNotifier(setOSDHeight)
 
-	print("[UserInterfacePositioner] Setting OSD position: %s %s %s %s" % (config.osd.dst_left.value, config.osd.dst_width.value, config.osd.dst_top.value, config.osd.dst_height.value))
+	print(f"[UserInterfacePositioner] Setting OSD position: {config.osd.dst_left.value} {config.osd.dst_width.value} {config.osd.dst_top.value} {config.osd.dst_height.value}")
 
 	def setOSDAlpha(configElement):
 		if BoxInfo.getItem("CanChangeOsdAlpha"):
-			print("[UserInterfacePositioner] Setting OSD alpha:%s" % str(configElement.value))
+			print(f"[UserInterfacePositioner] Setting OSD alpha:{str(configElement.value)}")
 			config.av.osd_alpha.setValue(configElement.value)
 			fileWriteLine("/proc/stb/video/alpha", str(configElement.value), source=MODULE_NAME)
 	config.osd.alpha.addNotifier(setOSDAlpha)
 
 	def setOSDPlaneAlpha(configElement):
 		if BoxInfo.getItem("CanChangeOsdPlaneAlpha"):
-			print("[UserInterfacePositioner] Setting OSD plane alpha:%s" % str(configElement.value))
+			print(f"[UserInterfacePositioner] Setting OSD plane alpha:{str(configElement.value)}")
 			config.av.osd_alpha.setValue(configElement.value)
 			fileWriteLine("/sys/class/graphics/fb0/osd_plane_alpha", hex(configElement.value), source=MODULE_NAME)
 	config.osd.alpha.addNotifier(setOSDPlaneAlpha)
@@ -83,7 +83,7 @@ def InitOsd():
 	def set3DMode(configElement):
 		if BoxInfo.getItem("CanChange3DOsd"):
 			value = configElement.value
-			print("[UserInterfacePositioner] Setting 3D mode: %s" % str(value))
+			print(f"[UserInterfacePositioner] Setting 3D mode: {str(value)}")
 			try:
 				if BoxInfo.getItem("CanUse3DModeChoices"):
 					f = open("/proc/stb/fb/3dmode_choices")
@@ -103,8 +103,8 @@ def InitOsd():
 
 	def set3DZnorm(configElement):
 		if BoxInfo.getItem("CanChange3DOsd"):
-			print("[UserInterfacePositioner] Setting 3D depth: %s" % str(configElement.value))
-			fileWriteLine("/proc/stb/fb/znorm", "%d" % int(configElement.value), source=MODULE_NAME)
+			print(f"[UserInterfacePositioner] Setting 3D depth: {str(configElement.value)}")
+			fileWriteLine("/proc/stb/fb/znorm", str(int(configElement.value)), source=MODULE_NAME)
 	config.osd.threeDznorm.addNotifier(set3DZnorm)
 
 
@@ -367,7 +367,7 @@ class UserInterfacePositioner2(Screen, ConfigListScreen):
 		config.osd.dst_width.setValue(dst_width)
 		config.osd.dst_top.setValue(dst_top)
 		config.osd.dst_height.setValue(dst_height)
-		print("[UserInterfacePositioner] Setting OSD position: %s %s %s %s" % (config.osd.dst_left.value, config.osd.dst_width.value, config.osd.dst_top.value, config.osd.dst_height.value))
+		print(f"[UserInterfacePositioner] Setting OSD position: {config.osd.dst_left.value} {config.osd.dst_width.value} {config.osd.dst_top.value} {config.osd.dst_height.value}")
 
 	def saveAll(self):
 		for x in self["config"].list:
@@ -511,7 +511,7 @@ class UserInterfacePositioner(Screen, ConfigListScreen):
 		config.osd.dst_width.setValue(dst_width)
 		config.osd.dst_top.setValue(dst_top)
 		config.osd.dst_height.setValue(dst_height)
-		print("[UserInterfacePositioner] Setting OSD position: %s %s %s %s" % (config.osd.dst_left.value, config.osd.dst_width.value, config.osd.dst_top.value, config.osd.dst_height.value))
+		print(f"[UserInterfacePositioner] Setting OSD position: {config.osd.dst_left.value} {config.osd.dst_width.value} {config.osd.dst_top.value} {config.osd.dst_height.value}")
 
 	def saveAll(self):
 		for x in self["config"].list:
