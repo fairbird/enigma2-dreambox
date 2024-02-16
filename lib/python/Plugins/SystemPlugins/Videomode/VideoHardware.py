@@ -193,7 +193,7 @@ class VideoHardware:
 		config.av.aspect.addNotifier(self.updateAspect)
 		config.av.wss.addNotifier(self.updateAspect)
 		config.av.policy_43.addNotifier(self.updateAspect)
-		if hasattr(config.av, 'policy_169'):
+		if hasattr(config.av, "policy_169"):
 			config.av.policy_169.addNotifier(self.updateAspect)
 
 	def readAvailableModes(self):
@@ -245,10 +245,10 @@ class VideoHardware:
 		portlist = self.getPortList()
 		for port in portlist:
 			descr = port
-			if descr == 'HDMI' and has_dvi:
-				descr = 'DVI'
-			if descr == 'HDMI-PC' and has_dvi:
-				descr = 'DVI-PC'
+			if descr == "HDMI" and has_dvi:
+				descr = "DVI"
+			if descr == "HDMI-PC" and has_dvi:
+				descr = "DVI-PC"
 			if descr == "Scart" and has_rca and not has_scart:
 				descr = "RCA"
 			if descr == "Scart" and has_avjack and not has_scart:
@@ -266,7 +266,7 @@ class VideoHardware:
 						continue
 					ratelist.append((rate, rate))
 				config.av.videorate[mode] = ConfigSelection(choices=ratelist)
-		config.av.videoport = ConfigSelection(choices=lst)
+		config.av.videoport = ConfigSelection(default="HDMI", choices=lst)
 
 	def isPortAvailable(self, port):  # Fix me!
 		return True
@@ -435,7 +435,7 @@ class VideoHardware:
 			wss = "auto"
 
 		policy = config.av.policy_43.value
-		if hasattr(config.av, 'policy_169'):
+		if hasattr(config.av, "policy_169"):
 			policy2 = config.av.policy_169.value
 			print("[VideoHardware] -> setting aspect, policy, policy2, wss", aspect, policy, policy2, wss)
 		else:
@@ -481,7 +481,7 @@ class VideoHardware:
 				open("/proc/stb/denc/0/wss", "w").write(wss)
 			except IOError:
 				print("[VideoHardware] Write to /proc/stb/denc/0/wss failed!")
-		if isfile("/proc/stb/video/policy2") and hasattr(config.av, 'policy_169'):
+		if isfile("/proc/stb/video/policy2") and hasattr(config.av, "policy_169"):
 			try:
 				open("/proc/stb/video/policy2", "w").write(policy2)
 			except IOError:
