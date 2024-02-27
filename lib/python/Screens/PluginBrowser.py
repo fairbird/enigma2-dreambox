@@ -24,7 +24,7 @@ from Screens.MessageBox import MessageBox
 from Screens.ChoiceBox import ChoiceBox
 from Screens.Console import Console
 from Plugins.Plugin import PluginDescriptor
-from Tools.Directories import fileExists, resolveFilename, SCOPE_PLUGINS, SCOPE_CURRENT_SKIN
+from Tools.Directories import fileExists, fileReadLines, fileWriteLines, resolveFilename, SCOPE_PLUGINS, SCOPE_CURRENT_SKIN
 from Tools.LoadPixmap import LoadPixmap
 
 from skin import parseColor
@@ -51,7 +51,10 @@ config.pluginfilter.softcams = ConfigYesNo(default=True)
 config.pluginfilter.systemplugins = ConfigYesNo(default=True)
 config.pluginfilter.vix = ConfigYesNo(default=False)
 config.pluginfilter.weblinks = ConfigYesNo(default=True)
+config.pluginfilter.alternateGitHubDNS = ConfigYesNo(default=False)
 config.pluginfilter.userfeed = ConfigText(default="http://", fixed_size=False)
+
+MODULE_NAME = __name__.split(".")[-1]
 
 def CreateFeedConfig():
 	fileconf = "/etc/opkg/user-feed.conf"
@@ -1246,6 +1249,7 @@ class PluginFilter(ConfigListScreen, Screen):
 		self.list.append((_("security"), config.pluginfilter.security, _("This allows you to show security modules in downloads")))
 		self.list.append((_("kernel modules"), config.pluginfilter.kernel, _("This allows you to show kernel modules in downloads")))
 		self.list.append((_("userfeed"), config.pluginfilter.userfeed, _("This allows you to show userfeed modules in downloads")))
+		self.list.append((_("Use alternate GitHub DNS"), config.pluginfilter.alternateGitHubDNS, _("Select 'Yes' to to use alternate GitHub feed IP addresses. This can be helpful if you use a VPN and the normal feeds can't be accessed via the published DNS names")))
 
 		self["config"].list = self.list
 		self["config"].setList(self.list)
@@ -1272,6 +1276,7 @@ class PluginFilter(ConfigListScreen, Screen):
 		configfile.save()
 
 	def keySave(self):
+		self.swapGitHubDNS()
 		self.saveAll()
 		self.close()
 
@@ -1288,10 +1293,20 @@ class PluginFilter(ConfigListScreen, Screen):
 		else:
 			self.close()
 
+	def swapGitHubDNS(self):
+		if config.pluginfilter.alternateGitHubDNS.isChanged():
+			lines = fileReadLines("/etc/hosts", source=MODULE_NAME)
+			lines = [line for line in lines if "raw.githubusercontent.com" not in line]
+			if config.pluginfilter.alternateGitHubDNS.value:
+				lines += ["%s raw.githubusercontent.com" % ip for ip in ("185.199.108.133", "185.199.109.133", "185.199.110.133", "185.199.111.133", "2606:50c0:8000::154", "2606:50c0:8001::154", "2606:50c0:8002::154", "2606:50c0:8003::154")]
+			fileWriteLines("/etc/hosts", lines, source=MODULE_NAME)
+
+
 class PluginDownloadManager(PluginDownloadBrowser):
 	def __init__(self, session):
 		PluginDownloadBrowser.__init__(self, session=session, type=self.MANAGE)
 		self.skinName = ["PluginDownloadBrowser"]
+
 
 if config.misc.plugin_style.value == "newstyle1" or config.misc.plugin_style.value == "newstyle2" or config.misc.plugin_style.value == "newstyle3" or config.misc.plugin_style.value == "newstyle4" or config.misc.plugin_style.value == "newstyle5" or config.misc.plugin_style.value == "newstyle6":
 	PluginBrowser = PluginBrowserNew
