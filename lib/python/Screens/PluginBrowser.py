@@ -1207,6 +1207,7 @@ class PluginFilter(ConfigListScreen, Screen):
 		self.session = session
 		self.skinName = "Setup"
 		Screen.setTitle(self, _("Plugin Filter..."))
+		self["description"] = Label("")
 		self["HelpWindow"] = Pixmap()
 		self["HelpWindow"].hide()
 		self["status"] = StaticText()
@@ -1258,6 +1259,7 @@ class PluginFilter(ConfigListScreen, Screen):
 
 	def selectionChanged(self):
 		self["status"].setText(self["config"].getCurrent()[2])
+		self["description"].text = self.getCurrentDescription()
 
 	def changedEntry(self):
 		for x in self.onChangedEntry:
