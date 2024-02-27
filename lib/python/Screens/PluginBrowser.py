@@ -1250,7 +1250,7 @@ class PluginFilter(ConfigListScreen, Screen):
 		self.list.append((_("security"), config.pluginfilter.security, _("This allows you to show security modules in downloads")))
 		self.list.append((_("kernel modules"), config.pluginfilter.kernel, _("This allows you to show kernel modules in downloads")))
 		self.list.append((_("userfeed"), config.pluginfilter.userfeed, _("This allows you to show userfeed modules in downloads")))
-		self.list.append((_("Use alternate GitHub DNS"), config.pluginfilter.alternateGitHubDNS, _("Select 'Yes' to to use alternate GitHub feed IP addresses. This can be helpful if you use a VPN and the normal feeds can't be accessed via the published DNS names")))
+		self.list.append((_("Use alternate GitHub DNS"), config.pluginfilter.alternateGitHubDNS, _("Select 'Yes' to use alternate GitHub feed IP addresses. This can be helpful if you use a VPN and the normal feeds can't be accessed via the published DNS names")))
 
 		self["config"].list = self.list
 		self["config"].setList(self.list)
