@@ -740,7 +740,7 @@ class PluginBrowserNew(Screen):
 		self.plugins = []
 		self.current = 0
 		self.current_page = 0
-		if config.misc.plugin_style.value == "newstyle1":
+		if config.misc.plugin_style.value == "grid1":
 			self.backgroundPixmap = ""
 			self.backgroundColor = "#44000000"
 			self.foregroundColor = "#000080ff"
@@ -748,7 +748,7 @@ class PluginBrowserNew(Screen):
 			self.primaryColorLabel = "#DCE1E3"
 			self.secondaryColor = "#4e4e4e"
 			self.secondaryColorLabel = "#00000000"
-		elif config.misc.plugin_style.value == "newstyle2":
+		elif config.misc.plugin_style.value == "grid2":
 			self.backgroundPixmap = ""
 			self.backgroundColor = "#21292A"
 			self.foregroundColor = "#000080ff"
@@ -756,7 +756,7 @@ class PluginBrowserNew(Screen):
 			self.primaryColorLabel = "#DCE1E3"
 			self.secondaryColor = "#39474F"
 			self.secondaryColorLabel = "#00000000"
-		elif config.misc.plugin_style.value == "newstyle3":
+		elif config.misc.plugin_style.value == "grid3":
 			self.backgroundPixmap = ""
 			self.backgroundColor = "#44000000"
 			self.foregroundColor = "#000080ff"
@@ -764,7 +764,7 @@ class PluginBrowserNew(Screen):
 			self.primaryColorLabel = "#00ffffff"
 			self.secondaryColor = "#696969"
 			self.secondaryColorLabel = "#00000000"
-		elif config.misc.plugin_style.value == "newstyle4":
+		elif config.misc.plugin_style.value == "grid4":
 			if isFullHD():
 				self.backgroundPixmap = '<ePixmap position="0,0" size="1920,1080" pixmap="skin_default/style4.jpg" transparent="1" zPosition="-1" />'
 			else:
@@ -775,7 +775,7 @@ class PluginBrowserNew(Screen):
 			self.primaryColorLabel = "#00ffffff"
 			self.secondaryColor = "#1b3c85"
 			self.secondaryColorLabel = "#00ffc000"
-		elif config.misc.plugin_style.value == "newstyle5":
+		elif config.misc.plugin_style.value == "grid5":
 			if isFullHD():
 				self.backgroundPixmap = '<ePixmap position="0,0" size="1920,1080" pixmap="skin_default/style5.jpg" transparent="1" zPosition="-1" />'
 			else:
@@ -786,7 +786,7 @@ class PluginBrowserNew(Screen):
 			self.primaryColorLabel = "#00ffffff"
 			self.secondaryColor = "#1b3c85"
 			self.secondaryColorLabel = "#00ffc000"
-		elif config.misc.plugin_style.value == "newstyle6":
+		elif config.misc.plugin_style.value == "grid6":
 			if isFullHD():
 				self.backgroundPixmap = '<ePixmap position="0,0" size="1920,1080" pixmap="skin_default/style6.jpg" transparent="1" zPosition="-1" />'
 			else:
@@ -1310,5 +1310,5 @@ class PluginDownloadManager(PluginDownloadBrowser):
 		self.skinName = ["PluginDownloadBrowser"]
 
 
-if config.misc.plugin_style.value == "newstyle1" or config.misc.plugin_style.value == "newstyle2" or config.misc.plugin_style.value == "newstyle3" or config.misc.plugin_style.value == "newstyle4" or config.misc.plugin_style.value == "newstyle5" or config.misc.plugin_style.value == "newstyle6":
+if config.misc.plugin_style.value == "grid1" or config.misc.plugin_style.value == "grid2" or config.misc.plugin_style.value == "grid3" or config.misc.plugin_style.value == "grid4" or config.misc.plugin_style.value == "grid5" or config.misc.plugin_style.value == "grid6":
 	PluginBrowser = PluginBrowserNew
