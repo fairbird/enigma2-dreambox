@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: enigma2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-02 14:05+0100\n"
-"POT-Creation-Date: 2024-01-26 16:56+0100\n"
+"POT-Creation-Date: 2024-03-10 21:56+0100\n"
 "Last-Translator: RAED - Fairbirb <rrrr53@hotmail.com>\n"
 "Language-Team: \n"
 "Language: ar\n"
@@ -353,7 +353,7 @@ msgid "(activated +%d min)"
 msgstr "(تفعيلها +%d دقيقة)"
 
 #, fuzzy
-msgid "(current)"
+msgid "(current image)"
 msgstr "الوقت الحالي"
 
 msgid "(empty)"
@@ -4061,6 +4061,9 @@ msgstr "عنوان الأيبي"
 msgid "HDMI-CEC setup"
 msgstr "ضبط تكوين التحكم بكيبل عالي الوضوح"
 
+msgid "HDMI-In"
+msgstr ""
+
 msgid "HDR10 support"
 msgstr "دعم مشاركة الملفات على الشبكة المحلية"
 
@@ -4457,6 +4460,14 @@ msgstr "إدخال إعدادات الجهاز"
 
 msgid "Input devices"
 msgstr "الاجهزة المدخلة"
+
+#, fuzzy
+msgid "Insert Service"
+msgstr "إدخال القنوات"
+
+#, fuzzy
+msgid "Insert entry"
+msgstr "إدخال الوقت"
 
 msgid "Install"
 msgstr "تثبيت"
@@ -7384,6 +7395,10 @@ msgstr "أختر دايزك سريع إذا كان نظامك الهوائي ي�
 msgid "Select HDD"
 msgstr "تحديد"
 
+#, fuzzy
+msgid "Select Service"
+msgstr "أختار الفيلم"
+
 msgid "Select Softcam"
 msgstr "أختار الفتحة"
 
@@ -7493,7 +7508,15 @@ msgstr "أختار معدل التحديث"
 msgid "Select satellites"
 msgstr "اختيار الأقمار الصناعية"
 
+#, fuzzy
+msgid "Select service name"
+msgstr "أسم القناة"
+
 msgid "Select service to add..."
+msgstr "أختار القناة لإضافتها..."
+
+#, fuzzy
+msgid "Select service type"
 msgstr "أختار القناة لإضافتها..."
 
 msgid "Select slot"
@@ -7501,6 +7524,14 @@ msgstr "أختار الفتحة"
 
 msgid "Select sort method:"
 msgstr "حدد طريقه الفرز:"
+
+#, fuzzy
+msgid "Select stream URL"
+msgstr "أختار الفتحة"
+
+#, fuzzy
+msgid "Select stream type"
+msgstr "حدد الاجراء"
 
 msgid "Select target folder"
 msgstr "أختار المجلد المراد"
@@ -7671,6 +7702,12 @@ msgstr "القنوات و ومزودي القنوات"
 
 msgid "Service ID"
 msgstr "معرف القناة"
+
+msgid "Service Name"
+msgstr "أسم القناة"
+
+msgid "Service Type"
+msgstr "أسم القناة"
 
 msgid "Service belongs to a parental protected bouquet"
 msgstr "تمت إضافة القناة إلى الباقة المحددة."
@@ -8644,6 +8681,14 @@ msgstr "التدفق"
 #, fuzzy
 msgid "Stream Relay delay"
 msgstr "تأخير الدوران النهائي"
+
+#, fuzzy
+msgid "Stream Type"
+msgstr "التدفق"
+
+#, fuzzy
+msgid "Stream URL"
+msgstr "التدفق"
 
 msgid "Stream request"
 msgstr "طلب البث"
