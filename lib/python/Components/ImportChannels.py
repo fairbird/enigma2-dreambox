@@ -97,8 +97,7 @@ class ImportChannels:
 						content = map(lambda l: l.decode('utf-8', 'replace'), content)
 					except Exception as e:
 						print("[Import Channels] Exception: %s" % str(e))
-						self.ImportChannelsDone(False, _("ERROR downloading file /etc/enigma2/%s") % file)
-						return
+						continue
 				else:
 					with open('/etc/enigma2/%s' % file, 'r') as f:
 						content = f.readlines()
