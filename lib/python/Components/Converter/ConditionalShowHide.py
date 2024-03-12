@@ -1,78 +1,80 @@
-# -*- coding: utf-8 -*-
 from enigma import eTimer
+
 from Components.Converter.Converter import Converter
-from Components.config import config
 
 
 class ConditionalShowHide(Converter):
-	def __init__(self, argstr):
-		Converter.__init__(self, argstr)
-		args = argstr.split(',')
-		self.invert = "Invert" in args
-		self.blink = "Blink" in args and config.usage.enable_blinking.value
+	def __init__(self, tokens):
+		Converter.__init__(self, tokens)
+		tokenDictionary = {
+			"Blink": ("blink", True),
+			"Invert": ("invert", True)
+		}
+		self.blink = False
+		self.invert = False
+		self.blinkTime = 500
+		parse = ","
+		tokens.replace(";", parse)  # Some builds use ";" as a separator, most use ",".
+		tokens = [x.strip() for x in tokens.split(parse)]
+		for token in tokens:
+			if token.isdigit():
+				self.blinkTime = int(token)
+				continue
+			variable, value = tokenDictionary.get(token, (None, None))
+			if variable:
+				setattr(self, variable, value)
+			elif token:
+				print(f"[ConditionalShowHide] Error: Converter argument '{token}' is invalid!")
 		if self.blink:
-			self.blinktime = len(args) > 1 and args[1].isdigit() and int(args[1]) or 500
-			if len(args) == 3:
-				self.asymmetric = True
-				self.blinkhide = args[2].isdigit() and int(args[2]) or 500
-			else:
-				self.asymmetric = False
 			self.timer = eTimer()
-			self.timer.callback.append(self.blinkFunc)
+			self.timer.callback.append(self.blinker)
 		else:
 			self.timer = None
+		# print(f"[ConditionalShowHide] DEBUG: Converter init {tokens} result is blink={self.blink}, invert={self.invert}, blinkTime={self.blinkTime}.")
 
-	# Make ConditionalShowHide transparent to upstream attribute requests
-	def __getattr__(self, name):
+	def __getattr__(self, name):  # Make ConditionalShowHide transparent to upstream attribute requests.
 		return getattr(self.source, name)
 
-	def blinkFunc(self):
+	def blinker(self):
 		if self.blinking:
-			show = False
-			for x in self.downstream_elements:
-				x.visible = not x.visible
-				show = x.visible
-			if self.asymmetric:
-				self.timer.start(self.blinkhide if show else self.blinktime, True)
+			for element in self.downstream_elements:
+				element.visible = not element.visible
 
 	def startBlinking(self):
 		self.blinking = True
-		if self.asymmetric:
-			self.timer.start(self.blinktime, True)
-		else:
-			self.timer.start(self.blinktime)
+		self.timer.start(self.blinkTime)
 
 	def stopBlinking(self):
 		self.blinking = False
-		for x in self.downstream_elements:
-			if x.visible:
-				x.hide()
 		self.timer.stop()
+		for element in self.downstream_elements:
+			if element.visible:
+				element.hide()
 
 	def calcVisibility(self):
-		b = self.source.boolean
-		if b is None:
-			b = False
-		b ^= self.invert
-		return b
+		visibility = self.source.boolean
+		if visibility is None:
+			visibility = False
+		visibility ^= self.invert
+		return visibility
 
 	def changed(self, what):
-		vis = self.calcVisibility()
+		visibility = self.calcVisibility()
 		if self.blink:
-			if vis:
+			if visibility:
 				self.startBlinking()
 			else:
 				self.stopBlinking()
 		else:
-			for x in self.downstream_elements:
-				x.visible = vis
+			for element in self.downstream_elements:
+				element.visible = visibility
 		super(Converter, self).changed(what)
 
 	def connectDownstream(self, downstream):
 		Converter.connectDownstream(self, downstream)
-		vis = self.calcVisibility()
+		visibility = self.calcVisibility()
 		if self.blink:
-			if vis:
+			if visibility:
 				self.startBlinking()
 			else:
 				self.stopBlinking()
@@ -81,4 +83,4 @@ class ConditionalShowHide(Converter):
 
 	def destroy(self):
 		if self.timer:
-			self.timer.callback.remove(self.blinkFunc)
+			self.timer.callback.remove(self.blinker)
