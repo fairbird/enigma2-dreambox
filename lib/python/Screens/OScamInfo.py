@@ -398,14 +398,22 @@ class OscamInfo:
 
 
 class oscMenuList(MenuList):
-	def __init__(self, list, itemH=30):
+	def __init__(self, list):
 		MenuList.__init__(self, list, False, eListboxPythonMultiContent)
-		self.l.setItemHeight(int(itemH * f))
-		self.l.setFont(0, gFont("Regular", int(20 * f)))
-		self.l.setFont(1, gFont("Regular", int(18 * f)))
-		self.clientFont = gFont("Regular", int(16 * f))
-		self.l.setFont(2, self.clientFont)
-		self.l.setFont(3, gFont("Regular", int(12 * f)))
+		if f == 1.5:
+			self.l.setItemHeight(int(30 * f))
+			self.l.setFont(0, gFont("Regular", int(20 * f)))
+			self.l.setFont(1, gFont("Regular", int(18 * f)))
+			self.clientFont = gFont("Regular", int(16 * f))
+			self.l.setFont(2, self.clientFont)
+			self.l.setFont(3, gFont("Regular", int(12 * f)))
+		else:
+			self.l.setItemHeight(int(35 * f))
+			self.l.setFont(0, gFont("Regular", int(30 * f)))
+			self.l.setFont(1, gFont("Regular", int(25 * f)))
+			self.clientFont = gFont("Regular", int(25 * f))
+			self.l.setFont(2, self.clientFont)
+			self.l.setFont(3, gFont("Regular", int(25 * f)))
 
 
 class OscamInfoMenu(Screen):
@@ -597,10 +605,10 @@ class oscECMInfo(Screen, OscamInfo):
 		global f
 		if f == 1.5:
 			self.skin = """<screen position="center,center" size="960,540" title="%s ECM info">""" % NAMEBIN
-			self.skin += """<widget name="output" font="Regular; 30" itemHeight="50" scrollbarMode="showOnDemand" enableWrapAround="1" position="50,50" size="960,540" transparent="1" />"""
+			self.skin += """<widget name="output" font="Regular; 30" scrollbarMode="showOnDemand" enableWrapAround="1" position="50,50" size="960,540" transparent="1" />"""
 		else:
 			self.skin = """<screen position="center ,center" size="640,360" title="%s ECM info">""" % NAMEBIN
-			self.skin += """<widget name="output" font="Regular; 30" itemHeight="50" scrollbarMode="showOnDemand" enableWrapAround="1" position="33,33" size="640,360" transparent="1" />"""
+			self.skin += """<widget name="output" font="Regular; 30" scrollbarMode="showOnDemand" enableWrapAround="1" position="33,33" size="640,360" transparent="1" />"""
 		self.skin += """</screen>"""
 		self["output"] = oscMenuList([])
 		if config.oscaminfo.autoupdate.value:
@@ -634,7 +642,10 @@ class oscECMInfo(Screen, OscamInfo):
 		y = 0
 		for i in data:
 			out.append(self.buildListEntry(i))
-		self["output"].l.setItemHeight(int(30 * f))
+		if f == 1.5:
+			self["output"].l.setItemHeight(int(30 * f))
+		else:
+			self["output"].l.setItemHeight(int(35 * f))
 		self["output"].l.setList(out)
 		self["output"].selectionEnabled(False)
 
@@ -650,11 +661,12 @@ class oscInfo(Screen, OscamInfo):
 		self.webif_data = self.readXML(typ=self.what)
 		ypos = 10
 		if f == 1.5 or f == 3:
-			ysize = 800
+			ysize = 600
+			self.itemheight = 25
 		else:
-			ysize = 350
+			ysize = 900
+			self.itemheight = 35
 		self.rows = 12
-		self.itemheight = 25
 		self.sizeLH = sizeH
 		self.skin = """<screen position="center,center" size="%d, %d" title="Client Info" >""" % (sizeH, ysize)
 		button_width = int(sizeH / 4)
@@ -833,7 +845,10 @@ class oscInfo(Screen, OscamInfo):
 		else:
 			data = self.readXML(typ=self.what)
 		self.out = []
-		self.itemheight = 25
+		if f == 1.5:
+			self.itemheight = 25
+		else:
+			self.itemheight = 35
 		if not isinstance(data, str):
 			if self.what != "l":
 				heading = (self.HEAD[self.NAME], self.HEAD[self.PROT], self.HEAD[self.CAID_SRVID],
@@ -860,7 +875,10 @@ class oscInfo(Screen, OscamInfo):
 				self["key_green"].setText(_("Clients"))
 				self["key_yellow"].setText(_("Servers"))
 				self["key_blue"].setText("")
-				self.itemheight = 20
+				if f == 1.5:
+					self.itemheight = 20
+				else:
+					self.itemheight = 28
 		else:
 			self.errmsg = (data,)
 			if config.oscaminfo.autoupdate.value:
