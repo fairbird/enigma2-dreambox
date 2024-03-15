@@ -186,8 +186,11 @@ class ImportChannels:
 
 			print("[Import Channels] Removing old local files...")
 			for file in files:
-				print("[Import Channels] Removing %s..." % file)
-				os.remove(os.path.join("/etc/enigma2", file))
+#				print("[Import Channels] Removing %s..." % file)
+				try:
+					os.remove(os.path.join("/etc/enigma2", file))
+				except OSError:
+				    print("[Import Channels] File %s did not exist" % file)
 
 			print("[Import Channels] copying files...")
 			files = [x for x in os.listdir(self.tmp_dir)]
