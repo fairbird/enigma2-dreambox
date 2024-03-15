@@ -32,6 +32,7 @@ jobs:
     - name: install dev packages
       run: |
         sudo apt-get -q update
+        sudo apt remove -y libunwind-14-dev
         sudo apt-get install linux-libc-dev
         sudo apt-get install git
         sudo apt-get install build-essential
