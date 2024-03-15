@@ -190,7 +190,7 @@ class ImportChannels:
 				try:
 					os.remove(os.path.join("/etc/enigma2", file))
 				except OSError:
-				    print("[Import Channels] File %s did not exist" % file)
+					print("[Import Channels] File %s did not exist" % file)
 
 			print("[Import Channels] copying files...")
 			files = [x for x in os.listdir(self.tmp_dir)]
