@@ -8,11 +8,11 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     strategy:
       matrix:
-        gcc: [11]
-        python: ['3.10']
+        gcc: [13]
+        python: ['3.12']
     steps:
     - uses: actions/checkout@v3
     - name: Setup Python
@@ -32,12 +32,13 @@ jobs:
     - name: install dev packages
       run: |
         sudo apt-get -q update
+        sudo apt remove -y libunwind-14-dev
         sudo apt-get install linux-libc-dev
         sudo apt-get install git
         sudo apt-get install build-essential
         sudo apt-get install automake
         sudo apt-get install libtool
-        sudo apt-get install python-dev
+        sudo apt-get install python3-dev
         sudo apt-get install zlib1g-dev
         sudo apt-get install gettext
         sudo apt-get install swig
