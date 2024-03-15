@@ -17,6 +17,8 @@ from Tools.Notifications import AddNotificationWithID
 
 settingfiles = ('lamedb', 'bouquets.', 'userbouquet.', 'blacklist', 'whitelist', 'alternatives.')
 
+e2path = "/etc/enigma2"
+
 
 class ImportChannels:
 
@@ -93,13 +95,13 @@ class ImportChannels:
 			try:
 				if remote:
 					try:
-						content = self.getUrl("%s/file?file=/etc/enigma2/%s" % (self.url, quote(file))).readlines()
+						content = self.getUrl("%s/file?file=%s/%s" % (self.url, e2path, quote(file))).readlines()
 						content = map(lambda l: l.decode('utf-8', 'replace'), content)
 					except Exception as e:
 						print("[Import Channels] Exception: %s" % str(e))
 						continue
 				else:
-					with open('/etc/enigma2/%s' % file, 'r') as f:
+					with open('%s/%s' % (e2path, file), 'r') as f:
 						content = f.readlines()
 			except Exception as e:
 				# for the moment just log and ignore
@@ -173,11 +175,16 @@ class ImportChannels:
 			print("[Import Channels] enumerate remote files")
 			files = self.ImportGetFilelist(True, 'bouquets.tv', 'bouquets.radio')
 
+			print("[Import Channels] Enumerate remote support files")
+			for file in loads(self.getUrl("%s/file?dir=%s" % (self.url, e2path)).read())["files"]:
+				if os.path.basename(file).startswith(supportfiles):
+					files.append(file.replace(e2path, ''))
+
 			print("[Import Channels] fetch remote files")
 			for file in files:
 				print("[Import Channels] Downloading %s..." % file)
 				try:
-					open(os.path.join(self.tmp_dir, os.path.basename(file)), "wb").write(self.getUrl("%s/file?file=/etc/enigma2/%s" % (self.url, quote(file))).read())
+					open(os.path.join(self.tmp_dir, os.path.basename(file)), "wb").write(self.getUrl("%s/file?file=%s/%s" % (self.url, e2path, quote(file))).read())
 				except Exception as e:
 					print("[Import Channels] Exception: %s" % str(e))
 
@@ -188,7 +195,7 @@ class ImportChannels:
 			for file in files:
 #				print("[Import Channels] Removing %s..." % file)
 				try:
-					os.remove(os.path.join("/etc/enigma2", file))
+					os.remove(os.path.join(e2path, file))
 				except OSError:
 					print("[Import Channels] File %s did not exist" % file)
 
@@ -196,7 +203,7 @@ class ImportChannels:
 			files = [x for x in os.listdir(self.tmp_dir)]
 			for file in files:
 				print("[Import Channels] Moving %s..." % file)
-				shutil.move(os.path.join(self.tmp_dir, file), os.path.join("/etc/enigma2", file))
+				shutil.move(os.path.join(self.tmp_dir, file), os.path.join(e2path, file))
 
 		self.ImportChannelsDone(True, {"channels": _("Channels"), "epg": _("EPG"), "channels_epg": _("Channels and EPG")}[self.remote_fallback_import])
 
