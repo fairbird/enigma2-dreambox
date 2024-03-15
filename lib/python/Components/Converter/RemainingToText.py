@@ -40,7 +40,7 @@ class RemainingToText(Converter, Poll):
 		}.get(token, (None, 0))
 		if token and self.token is None:
 			print(f"[RemainingToText] Error: Converter argument '{token}' is invalid!")
-		elif self.token is None:
+		if self.token is None:
 			self.token = self.DEFAULT
 		if config.usage.swap_time_display_on_osd.value in ("1", "3", "5") or config.usage.swap_time_display_on_vfd.value in ("1", "3", "5"):
 			self.poll_interval = 60000
@@ -96,10 +96,14 @@ class RemainingToText(Converter, Poll):
 							result = ngettext("%d Min", "%d Mins", (duration // 60)) % (duration // 60)
 						else:
 							result = {
-								"1": f"{signElapsed}{ngettext("%d Min", "%d Mins", (elapsed // 60)) % (elapsed // 60)}",  # Elapsed
-								"2": f"{signElapsed}{elapsed // 60}  {signRemaining}{ngettext("%d Min", "%d Mins", (remaining // 60)) % (remaining // 60)}",  # Elapsed & Remaining
-								"3": f"{signRemaining}{remaining // 60}  {signElapsed}{ngettext("%d Min", "%d Mins", (elapsed // 60)) % (elapsed // 60)}"  # Remaining & Elapsed
-							}.get(config.usage.swap_time_remaining_on_osd.value, f"{signRemaining}{ngettext("%d Min", "%d Mins", (remaining // 60)) % (remaining // 60)}")
+								# "1": f"{signElapsed}{ngettext("%d Min", "%d Mins", (elapsed // 60)) % (elapsed // 60)}",  # Elapsed
+								"1": f"{signElapsed}{ngettext('%d Min', '%d Mins', (elapsed // 60)) % (elapsed // 60)}",  # Elapsed
+								# "2": f"{signElapsed}{elapsed // 60}  {signRemaining}{ngettext("%d Min", "%d Mins", (remaining // 60)) % (remaining // 60)}",  # Elapsed & Remaining
+								"2": f"{signElapsed}{elapsed // 60}  {signRemaining}{ngettext('%d Min', '%d Mins', (remaining // 60)) % (remaining // 60)}",  # Elapsed & Remaining
+								# "3": f"{signRemaining}{remaining // 60}  {signElapsed}{ngettext("%d Min", "%d Mins", (elapsed // 60)) % (elapsed // 60)}"  # Remaining & Elapsed
+								"3": f"{signRemaining}{remaining // 60}  {signElapsed}{ngettext('%d Min', '%d Mins', (elapsed // 60)) % (elapsed // 60)}"  # Remaining & Elapsed
+							}.get(config.usage.swap_time_remaining_on_osd.value, f"{signRemaining}{ngettext('%d Min', '%d Mins', (remaining // 60)) % (remaining // 60)}")
+							# }.get(config.usage.swap_time_remaining_on_osd.value, f"{signRemaining}{ngettext("%d Min", "%d Mins", (remaining // 60)) % (remaining // 60)}")
 					case "2":
 						if remaining is None:
 							result = f"{duration // 60}:{duration % 60:02d}"
@@ -146,10 +150,14 @@ class RemainingToText(Converter, Poll):
 									result = ngettext("%d Min", "%d Mins", (duration // 60)) % (duration // 60)
 								else:
 									result = {
-										"1": f"{signElapsed}{ngettext("%d Min", "%d Mins", (elapsed // 60)) % (elapsed // 60)}",  # Elapsed
-										"2": f"{signElapsed}{elapsed // 60}  {signRemaining}{ngettext("%d Min", "%d Mins", (remaining // 60)) % (remaining // 60)}",  # Elapsed & Remaining
-										"3": f"{signRemaining}{remaining // 60}  {signElapsed}{ngettext("%d Min", "%d Mins", (elapsed // 60)) % (elapsed // 60)}"  # Remaining & Elapsed
-									}.get(config.usage.swap_time_remaining_on_osd.value, f"{signRemaining}{ngettext("%d Min", "%d Mins", (remaining // 60)) % (remaining // 60)}")
+										# "1": f"{signElapsed}{ngettext("%d Min", "%d Mins", (elapsed // 60)) % (elapsed // 60)}",  # Elapsed
+										"1": f"{signElapsed}{ngettext('%d Min', '%d Mins', (elapsed // 60)) % (elapsed // 60)}",  # Elapsed
+										# "2": f"{signElapsed}{elapsed // 60}  {signRemaining}{ngettext("%d Min", "%d Mins", (remaining // 60)) % (remaining // 60)}",  # Elapsed & Remaining
+										"2": f"{signElapsed}{elapsed // 60}  {signRemaining}{ngettext('%d Min', '%d Mins', (remaining // 60)) % (remaining // 60)}",  # Elapsed & Remaining
+										# "3": f"{signRemaining}{remaining // 60}  {signElapsed}{ngettext("%d Min", "%d Mins", (elapsed // 60)) % (elapsed // 60)}"  # Remaining & Elapsed
+										"3": f"{signRemaining}{remaining // 60}  {signElapsed}{ngettext('%d Min', '%d Mins', (elapsed // 60)) % (elapsed // 60)}"  # Remaining & Elapsed
+									}.get(config.usage.swap_time_remaining_on_osd.value, f"{signRemaining}{ngettext('%d Min', '%d Mins', (remaining // 60)) % (remaining // 60)}")
+									# }.get(config.usage.swap_time_remaining_on_osd.value, f"{signRemaining}{ngettext("%d Min", "%d Mins", (remaining // 60)) % (remaining // 60)}")
 							case self.IN_SECONDS:
 								if remaining is None:
 									result = ngettext("%d Min", "%d Mins", (duration // 60)) % (duration // 60)
@@ -214,10 +222,14 @@ class RemainingToText(Converter, Poll):
 							result = ngettext("%d Min", "%d Mins", (duration // 60)) % (duration // 60)
 						else:
 							result = {
-								"1": f"{signElapsed}{ngettext("%d Min", "%d Mins", (elapsed // 60)) % (elapsed // 60)}",  # Elapsed
-								"2": f"{signElapsed}{elapsed // 60}  {signRemaining}{ngettext("%d Min", "%d Mins", (remaining // 60)) % (remaining // 60)}",  # Elapsed & Remaining
-								"3": f"{signRemaining}{remaining // 60}  {signElapsed}{ngettext("%d Min", "%d Mins", (elapsed // 60)) % (elapsed // 60)}"  # Remaining & Elapsed
-							}.get(config.usage.swap_time_remaining_on_vfd.value, f"{signRemaining}{ngettext("%d Min", "%d Mins", (remaining // 60)) % (remaining // 60)}")
+								# "1": f"{signElapsed}{ngettext("%d Min", "%d Mins", (elapsed // 60)) % (elapsed // 60)}",  # Elapsed
+								"1": f"{signElapsed}{ngettext('%d Min', '%d Mins', (elapsed // 60)) % (elapsed // 60)}",  # Elapsed
+								# "2": f"{signElapsed}{elapsed // 60}  {signRemaining}{ngettext("%d Min", "%d Mins", (remaining // 60)) % (remaining // 60)}",  # Elapsed & Remaining
+								"2": f"{signElapsed}{elapsed // 60}  {signRemaining}{ngettext('%d Min', '%d Mins', (remaining // 60)) % (remaining // 60)}",  # Elapsed & Remaining
+								# "3": f"{signRemaining}{remaining // 60}  {signElapsed}{ngettext("%d Min", "%d Mins", (elapsed // 60)) % (elapsed // 60)}"  # Remaining & Elapsed
+								"3": f"{signRemaining}{remaining // 60}  {signElapsed}{ngettext('%d Min', '%d Mins', (elapsed // 60)) % (elapsed // 60)}"  # Remaining & Elapsed
+							}.get(config.usage.swap_time_remaining_on_vfd.value, f"{signRemaining}{ngettext('%d Min', '%d Mins', (remaining // 60)) % (remaining // 60)}")
+							# }.get(config.usage.swap_time_remaining_on_vfd.value, f"{signRemaining}{ngettext("%d Min", "%d Mins", (remaining // 60)) % (remaining // 60)}")
 					case "2":
 						if remaining is None:
 							result = f"{duration // 60}:{duration % 60:02d}"
@@ -291,10 +303,14 @@ class RemainingToText(Converter, Poll):
 									result = ngettext("%d Min", "%d Mins", (duration // 60)) % (duration // 60)
 								else:
 									result = {
-										"1": f"{signElapsed}{ngettext("%d Min", "%d Mins", (elapsed // 60)) % (elapsed // 60)}",  # Elapsed
-										"2": f"{signElapsed}{elapsed // 60}  {signRemaining}{ngettext("%d Min", "%d Mins", (remaining // 60)) % (remaining // 60)}",  # Elapsed & Remaining
-										"3": f"{signRemaining}{remaining // 60}  {signElapsed}{ngettext("%d Min", "%d Mins", (elapsed // 60)) % (elapsed // 60)}"  # Remaining & Elapsed
-									}.get(swap_time_remaining_on_vfd.value, f"{signRemaining}{ngettext("%d Min", "%d Mins", (remaining // 60)) % (remaining // 60)}")
+										# "1": f"{signElapsed}{ngettext("%d Min", "%d Mins", (elapsed // 60)) % (elapsed // 60)}",  # Elapsed
+										"1": f"{signElapsed}{ngettext('%d Min', '%d Mins', (elapsed // 60)) % (elapsed // 60)}",  # Elapsed
+										# "2": f"{signElapsed}{elapsed // 60}  {signRemaining}{ngettext("%d Min", "%d Mins", (remaining // 60)) % (remaining // 60)}",  # Elapsed & Remaining
+										"2": f"{signElapsed}{elapsed // 60}  {signRemaining}{ngettext('%d Min', '%d Mins', (remaining // 60)) % (remaining // 60)}",  # Elapsed & Remaining
+										# "3": f"{signRemaining}{remaining // 60}  {signElapsed}{ngettext("%d Min", "%d Mins", (elapsed // 60)) % (elapsed // 60)}"  # Remaining & Elapsed
+										"3": f"{signRemaining}{remaining // 60}  {signElapsed}{ngettext('%d Min', '%d Mins', (elapsed // 60)) % (elapsed // 60)}"  # Remaining & Elapsed
+									}.get(swap_time_remaining_on_vfd.value, f"{signRemaining}{ngettext('%d Min', '%d Mins', (remaining // 60)) % (remaining // 60)}")
+									# }.get(swap_time_remaining_on_vfd.value, f"{signRemaining}{ngettext("%d Min", "%d Mins", (remaining // 60)) % (remaining // 60)}")
 							case self.WITH_SECONDS_VFD:
 								if remaining is None:
 									result = f"{signDuration}{duration // 3600}:{duration % 3600 // 60:02d}:{duration % 60:02d}"
