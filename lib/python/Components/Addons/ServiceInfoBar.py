@@ -213,7 +213,7 @@ class ServiceInfoBar(GUIAddon):
 					return "IS_HDR10"
 				if info.getInfo(iServiceInformation.sGamma) == 3:
 					return "IS_HLG"
-				elif key == "tuners":
+			elif key == "tuners":
 				string = ""
 				if self.frontendInfoSource:
 					for n in nimmanager.nim_slots:
