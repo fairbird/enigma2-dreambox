@@ -1583,7 +1583,7 @@ void eListboxPythonMultiContent::paint(gPainter &painter, eWindowStyle &style, c
 						  pfnt = PyTuple_GET_ITEM(item, 5),
 						  pflags = PyTuple_GET_ITEM(item, 6),
 						  pstring = PyTuple_GET_ITEM(item, 7),
-						  pforeColor, pforeColorSelected, pbackColor, pbackColorSelected, pborderWidth, pborderColor;
+						  pforeColor, pforeColorSelected, pbackColor, pbackColorSelected, pborderWidth, pborderColor, pTextBorderWidth, pTextBorderColor;
 
 				if (!(px && py && pwidth && pheight && pfnt && pflags && pstring))
 				{
@@ -1624,6 +1624,12 @@ void eListboxPythonMultiContent::paint(gPainter &painter, eWindowStyle &style, c
 				if (size > 15)
 					edges = PyLong_AsLong(PyTuple_GET_ITEM(item, 15));
 
+				if (size > 16)
+					pTextBorderWidth = PyTuple_GET_ITEM(item, 16);
+
+				if (size > 17)
+					pTextBorderColor = lookupColor(PyTuple_GET_ITEM(item, 17), data);
+
 				/* don't do anything if we have 'None' as string */
 				if (!pstring || pstring == Py_None)
 					continue;
@@ -1640,6 +1646,7 @@ void eListboxPythonMultiContent::paint(gPainter &painter, eWindowStyle &style, c
 				int flags = PyLong_AsLong(pflags);
 				int fnt = PyLong_AsLong(pfnt);
 				int bwidth = pborderWidth ? PyLong_AsLong(pborderWidth) : 0;
+				int btwidth = pTextBorderWidth ? PyLong_AsLong(pTextBorderWidth) : 0;
 
 				if (m_fonts.find(fnt) == m_fonts.end())
 				{
@@ -1725,7 +1732,8 @@ void eListboxPythonMultiContent::paint(gPainter &painter, eWindowStyle &style, c
 				}
 				else
 					painter.setFont(m_fonts[fnt]);
-				painter.renderText(rect, string, flags, border_color, border_size);
+				unsigned int textBColor = pTextBorderColor ? PyLong_AsUnsignedLongMask(pTextBorderColor) : 0x000000;
+				painter.renderText(rect, string, flags, gRGB(textBColor), btwidth);
 				painter.clippop();
 
 				// draw border
