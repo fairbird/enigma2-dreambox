@@ -1840,10 +1840,11 @@ def readSkin(screen, skin, names, desktop):
 					raise SkinError(f"For connection '%s' a renderer must be defined with a 'render=' attribute" % wconnection)
 			for converter in widget.findall("convert"):
 				converterType = converter.get("type")
+				nostrip = converter.get("nostrip") and converter.get("nostrip").lower() in ("1", "enabled", "nostrip", "on", "true", "yes")
 				assert converterType, "[Skin] The 'convert' tag needs a 'type' attribute!"
 				# print(f"[Skin] DEBUG: Converter='{converterType}'.")
 				try:
-					parms = converter.text.strip()
+					parms = converter.text if nostrip else converter.text.strip()
 				except Exception:
 					parms = ""
 				# print(f"[Skin] DEBUG: Params='{parms}'.")
