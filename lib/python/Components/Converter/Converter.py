@@ -18,8 +18,8 @@ class Converter(Element):
 		if str == "":
 			str = part
 		else:
-			str = str + " " + self.separator + " " + part #here add space around separator since skin engine strips all spaces around parameters
-		return str
+			text = f"{text}{self.separatorChar or ' '}{part}"
+		return text
 
 	def appendToStringWithSeparator(self, str, part):
 		if str == "":
