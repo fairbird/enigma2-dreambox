@@ -1348,6 +1348,7 @@ eDVBCISlot::eDVBCISlot(eMainloop *context, int nr):
 	m_ciplus_routing_tunernum = -1;
 	state = stateDisabled;
 	snprintf(configStr, 255, "config.ci.%d.enabled", slotid);
+	bool enabled = eConfigManager::getConfigBoolValue(configStr, true);
 	if (enabled)
 	{
 		int bootDelay = eConfigManager::getConfigIntValue("config.cimisc.bootDelay");
