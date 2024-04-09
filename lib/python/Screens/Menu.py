@@ -373,7 +373,8 @@ class Menu(Screen, ProtectedScreen):
 		self.okbuttonClick()
 
 	def layoutFinished(self):
-		if self.menuImage:
+		self.screenContentChanged()
+		if self.menuImage and "menuimage" in self:
 			self["menuimage"].instance.setPixmap(self.menuImage)
 
 	def loadMenuImage(self):
@@ -464,6 +465,7 @@ class Menu(Screen, ProtectedScreen):
 			self.menulength = len(self.list)
 
 		self["menu"].setList(self.list)
+		self.screenContentChanged()
 
 	def _onSelectionChanged(self):
 		current = self["menu"].current
