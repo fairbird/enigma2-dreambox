@@ -1,6 +1,5 @@
-# -*- coding: utf-8 -*-
-from Components.Renderer.Renderer import Renderer
 from enigma import eListbox
+from Components.Renderer.Renderer import Renderer
 
 # the listbox renderer is the listbox, but no listbox content.
 # the content will be provided by the source (or converter).
@@ -16,12 +15,13 @@ from enigma import eListbox
 
 
 class Listbox(Renderer):
+	GUI_WIDGET = eListbox
+
 	def __init__(self):
 		Renderer.__init__(self)
 		self.__content = None
 		self.__selectionEnabled = True  # FIXME: The default is true already.
-
-	GUI_WIDGET = eListbox
+		self.scale = None
 
 	def contentChanged(self):
 		self.content = self.source.content
@@ -33,14 +33,18 @@ class Listbox(Renderer):
 
 	content = property(lambda self: self.__content, setContent)
 
+	def applySkin(self, desktop, parent):
+		self.scale = parent.scale
+		return Renderer.applySkin(self, desktop, parent)
+
 	def postWidgetCreate(self, instance):
 		if self.__content is not None:
 			instance.setContent(self.__content)
 		instance.selectionChanged.get().append(self.selectionChanged)
 		# Trigger property changes
-		self.wrapAround = self.wrapAround
-		self.selectionEnabled = self.selectionEnabled
-		self.scrollbarMode = self.scrollbarMode
+		self.setWrapAround(self.wrapAround)
+		self.setSelectionEnabled(self.selectionEnabled)
+		self.setScrollbarMode(self.scrollbarMode)
 
 	def preWidgetRemove(self, instance):
 		instance.setContent(None)
@@ -110,9 +114,7 @@ class Listbox(Renderer):
 		if hasattr(self.source, "selectionEnabled"):
 			self.selectionEnabled = self.source.selectionEnabled
 		if hasattr(self.source, "scrollbarMode"):
-			for (attrib, value) in self.skinAttributes:
-				if attrib == "scrollbarMode":
-					self.scrollbarMode = value
+			self.scrollbarMode = self.source.scrollbarMode
 		if len(what) > 1 and isinstance(what[1], str) and what[1] == "style":
 			return
 		if self.content:
@@ -122,14 +124,3 @@ class Listbox(Renderer):
 	def entry_changed(self, index):
 		if self.instance is not None:
 			self.instance.entryChanged(index)
-
-	def applySkin(self, desktop, parent):
-		attribs = []
-		for (attrib, value) in self.skinAttributes[:]:
-			if attrib == "selectionFrame":
-				if value == "none":
-					self.instance.setSelectionBorderHidden()
-			else:
-				attribs.append((attrib, value))
-		self.skinAttributes = attribs
-		return Renderer.applySkin(self, desktop, parent)
