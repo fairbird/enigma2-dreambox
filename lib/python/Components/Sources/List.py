@@ -100,7 +100,7 @@ to generate HTML."""
 
 	@cached
 	def getCurrentIndex(self):
-		return self.master.index if self.master is not None and hasattr(self.master, "index") else self.__index
+		return self.master.index if self.master is not None else 0  # None - The 0 is a hack to avoid badly written code from crashing!
 
 	def setCurrentIndex(self, index):
 		if self.master is not None:
