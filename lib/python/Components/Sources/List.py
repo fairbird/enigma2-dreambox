@@ -109,6 +109,9 @@ to generate HTML."""
 			else:
 				self.__index = index
 			self.selectionChanged(index)
+		if self.connectedGuiElement is not None:
+			self.connectedGuiElement.moveSelection(index)
+
 
 	def setIndex(self, index):  # This method should be found and removed from all code.
 		return self.setCurrentIndex(index)
