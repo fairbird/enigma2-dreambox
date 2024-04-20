@@ -280,9 +280,14 @@ class PluginBrowser(Screen, ProtectedScreen):
 		self.session.openWithCallback(self.PluginDownloadBrowserClosed, PluginDownloadBrowser, PluginDownloadBrowser.DOWNLOAD, self.firsttime)
 		self.firsttime = False
 
-	def PluginDownloadBrowserClosed(self):
-		self.updateList()
-		self.checkWarnings()
+	def PluginDownloadBrowserClosed(self, returnValue):
+		if returnValue == None:
+			self.updateList()
+			self.checkWarnings()
+		elif returnValue == 0:
+			self.download()
+		else:
+			self.delete()
 
 	def openExtensionmanager(self):
 		if fileExists(resolveFilename(SCOPE_PLUGINS, "SystemPlugins/SoftwareManager/plugin.py")):
