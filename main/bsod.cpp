@@ -19,13 +19,6 @@
 
 /************************************************/
 
-static const char *crash_emailaddr =
-#ifndef CRASH_EMAILADDR
-	"the OpenPLi forum";
-#else
-	CRASH_EMAILADDR;
-#endif
-
 /* Defined in eerror.cpp */
 void retrieveLogBuffer(const char **p1, unsigned int *s1, const char **p2, unsigned int *s2);
 
@@ -237,12 +230,11 @@ void bsodFatal(const char *component)
 
 		eModelInformation &modelinformation = eModelInformation::getInstance();
 
-		std::ifstream in(eEnv::resolve("${libdir}/enigma.info").c_str());
 		const std::list<std::string> enigmainfovalues {
-			"model=",
-			"machinebuild=",
-			"imageversion=",
-			"imagebuild="
+			"model",
+			"machinebuild",
+			"imageversion",
+			"imagebuild"
 		};
 
 		for(std::list<std::string>::const_iterator i = enigmainfovalues.begin(); i != enigmainfovalues.end(); ++i)
@@ -300,7 +292,7 @@ void bsodFatal(const char *component)
 	{
 		os_text << "We are really sorry. Your receiver encountered "
 			"a software problem, and needs to be restarted.\n"
-			"Please send the logfile " << crashlog_name << " to " << crash_emailaddr << ".\n"
+			"Please send the logfile " << crashlog_name << " to (https://github.com/fairbird/enigma2-dreambox).".\n"
 			"Your receiver restarts in 10 seconds!\n"
 			"Component: " << component;
 	
@@ -317,7 +309,7 @@ void bsodFatal(const char *component)
 			txt = "if it happens next times";
 		os_text << "We are really sorry. Your receiver encountered "
 			"a software problem. So far it has occurred " << bsodcnt << " times.\n"
-			"Please send the logfile " << crashlog_name << " to " << crash_emailaddr << ".\n"
+			"Please send the logfile " << crashlog_name << " to (https://github.com/fairbird/enigma2-dreambox).".\n"
 			"Your receiver restarts " << txt << " by python crashes!\n"
 			"Component: " << component;
 		os << os_text.str();
