@@ -292,7 +292,7 @@ void bsodFatal(const char *component)
 	{
 		os_text << "We are really sorry. Your receiver encountered "
 			"a software problem, and needs to be restarted.\n"
-			"Please send the logfile " << crashlog_name << " to (https://github.com/fairbird/enigma2-dreambox).".\n"
+			"Please send the logfile " << crashlog_name << " to (https://github.com/fairbird/enigma2-dreambox).\n"
 			"Your receiver restarts in 10 seconds!\n"
 			"Component: " << component;
 	
@@ -309,7 +309,7 @@ void bsodFatal(const char *component)
 			txt = "if it happens next times";
 		os_text << "We are really sorry. Your receiver encountered "
 			"a software problem. So far it has occurred " << bsodcnt << " times.\n"
-			"Please send the logfile " << crashlog_name << " to (https://github.com/fairbird/enigma2-dreambox).".\n"
+			"Please send the logfile " << crashlog_name << " to (https://github.com/fairbird/enigma2-dreambox).\n"
 			"Your receiver restarts " << txt << " by python crashes!\n"
 			"Component: " << component;
 		os << os_text.str();
