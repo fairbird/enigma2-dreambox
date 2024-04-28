@@ -980,10 +980,12 @@ void eDVBDB::saveServicelist(const char *file)
 				fprintf(g, ",C:%x", *ca);
 		}
 
-		if (i->second->m_flags) {
-			fprintf(f, ",f:%x", i->second->m_flags);
+		int sflags = i->second->m_flags &= ~8192; // ignore in bouquet flag
+
+		if (sflags) {
+			fprintf(f, ",f:%x", sflags);
 			if (g)
-				fprintf(g, ",f:%x", i->second->m_flags);
+				fprintf(g, ",f:%x", sflags);
 		}
 
 		fprintf(f, "\n");
@@ -1273,6 +1275,8 @@ void eDVBDB::setNumberingMode(bool numberingMode)
 int eDVBDB::renumberBouquet(eBouquet &bouquet, int startChannelNum)
 {
 	std::list<eServiceReference> &list = bouquet.m_services;
+	bool addBQFlag = (bouquet.m_bouquet_name != "Last Scanned");
+
 	for (std::list<eServiceReference>::iterator it = list.begin(); it != list.end(); ++it)
 	{
 		eServiceReference &ref = *it;
@@ -1299,6 +1303,15 @@ int eDVBDB::renumberBouquet(eBouquet &bouquet, int startChannelNum)
 		if( !(ref.flags & (eServiceReference::isMarker|eServiceReference::isDirectory)) ||
 		   (ref.flags & eServiceReference::isNumberedMarker) )
 			ref.number = startChannelNum++;
+
+		// add is in bouquet flag to m_services
+		if(addBQFlag && ref.flags == 0)
+		{
+			eServiceReferenceDVB &service = (eServiceReferenceDVB&)ref;
+			std::map<eServiceReferenceDVB, ePtr<eDVBService> >::iterator it(m_services.find(service));
+			if (it != m_services.end())
+				it->second->m_flags |= 8192;
+		}
 
 	}
 	return startChannelNum;
@@ -2506,6 +2519,8 @@ RESULT eDVBDBQuery::getNextResult(eServiceReferenceDVB &ref)
 		else
 		{
 			ref = m_cursor->first;
+			if (service->m_flags & 8192)
+				ref.flags |= 8192;
 
 			int res = (!m_query) || service->checkFilter(ref, *m_query);
 
