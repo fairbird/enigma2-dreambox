@@ -676,9 +676,9 @@ import Components.EpgLoadSave
 Components.EpgLoadSave.EpgCacheSaveCheck()
 Components.EpgLoadSave.EpgCacheLoadCheck()
 
-enigma.eProfileWrite("InitOSD")
-from Screens.UserInterfacePositioner import InitOsd
-InitOsd()
+enigma.eProfileWrite("InitOSDCalibration")
+from Screens.OSDCalibration import InitOSDCalibration
+InitOSDCalibration()
 
 enigma.eProfileWrite("Init:PowerOffTimer")
 from Components.PowerOffTimer import powerOffTimer

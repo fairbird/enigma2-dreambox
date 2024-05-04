@@ -48,8 +48,8 @@
 					<item level="0" entryID="av_setup"><setup id="avsetup"/></item>
 					<item entryID="subtitle_setup" level="2" text="Subtitle Setup" weight="20"><setup id="subtitlesetup" /></item>
 					<item level="0" entryID="autolanguage_setup" text="Auto Language Setup"><setup id="autolanguagesetup"/></item>
-					<item entryID="osdsetup" level="1" text="OSD Position Settings" weight="50" requires="OsdMenu"><screen module="UserInterfacePositioner" screen="UserInterfacePositioner2" /></item>
-					<item entryID="setup_osd3d" level="2" text="OSD 3D Settings" weight="60" requires="CanChange3DOsd"><setup setupKey="OSD3D" /></item>
+					<item entryID="osdsetup" level="1" text="OSD Position Settings" weight="50" requires="OSDCalibration"><screen module="OSDCalibration" screen="OSDCalibration" /></item>
+					<item entryID="setup_osd3d" level="2" text="OSD 3D Settings" weight="60" requires="OSDCalibration"><screen module="OSDCalibration" screen="OSD3DCalibration" /></item>
 				</menu>
 				<menu level="0" text="GUI Settings" entryID="gui_settings">
 					<id val="gui"/>
