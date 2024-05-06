@@ -1236,26 +1236,58 @@ class ConfigPassword(ConfigText):
 		self.hidden = True
 		ConfigText.onDeselect(self, session)
 
-# lets the user select between [min, min + stepwidth, min + (stepwidth * 2)..., maxval] with maxval <= max depending
-# on the stepwidth
-# min, max, stepwidth, default are int values
-# wraparound: pressing RIGHT key at max value brings you to min value and vice versa if set to True
-
-
-class ConfigSelectionNumber(ConfigSelection):
-	def __init__(self, min, max, stepwidth, default=None, wraparound=False, units=None):
+# Let the user select from [first, first + step, first + (step * 2), ..., maxVal]
+# with maxVal <= last depending on the step. The default, first, last and step
+# are integer values.
+#
+# wrap: If set to True, pressing RIGHT key at last value brings you to first
+# value and vice versa.
+#
+# units: This is a list or tuple with two strings that contain a "%d" formatting
+# element that will be used, via ngettext(), to display the numbers in a more
+# meaningful way.  The first string in the list/tuple is the singular string and
+# the second is the one for other numbers.
+#
+# NOTE: If the units argument is used please ensure that the text to be used is
+# 	already defined and translated elsewhere so that unit strings are properly
+# 	available for translation. If the strings are not used elsewhere in the
+# 	code then the translations can be added to the TranslationHelper.py file.
+#
+class ConfigSelectionInteger(ConfigSelection):
+	def __init__(self, default=None, first=0, last=100, step=1, wrap=False, units=None):
 		if default is None:
-			default = min
-		ConfigSelection.__init__(self, choices=[(x, (ngettext(units[0], units[1], x) % x if units and isinstance(units, (list, tuple)) else str(x))) for x in range(min, max + 1, stepwidth)], default=default)
-		self.wraparound = wraparound
+			default = first
+		self.first = first
+		self.last = last
+		self.step = step
+		self.wrap = wrap
+		self.units = units
+		ConfigSelection.__init__(self, choices=[(x, (ngettext(units[0], units[1], x) % x if units and isinstance(units, (list, tuple)) else str(x))) for x in range(first, last + 1, step)], default=default)
 
 	def handleKey(self, key):
-		if not self.wraparound:
+		if not self.wrap:
 			if key == ACTIONKEY_RIGHT and self.choices.index(self.value) == len(self.choices) - 1:
 				return
 			if key == ACTIONKEY_LEFT and self.choices.index(self.value) == 0:
 				return
 		ConfigSelection.handleKey(self, key)
+
+	def setChoices(self, default=None, first=None, last=None, step=None, wrap=None, units=None):
+		self.first = self.first if first is None else first
+		self.last = self.last if last is None else last
+		self.step = self.step if step is None else step
+		self.wrap = self.wrap if wrap is None else wrap
+		self.units = self.units if units is None else units
+		if default is None:
+			default = self.default if first < self.default <= last else first
+		if self.value < self.first or self.value > self.last:
+			self.value = default
+		return self.setSelectionList([(x, (ngettext(self.units[0], self.units[1], x) % x if self.units and isinstance(self.units, (list, tuple)) else str(x))) for x in range(self.first, self.last + 1, self.step)], default=default)
+
+
+class ConfigSelectionNumber(ConfigSelectionInteger):
+	def __init__(self, min, max, stepwidth, default=None, wraparound=False, units=None):
+		ConfigSelectionInteger.__init__(self, default, min, max, stepwidth, wraparound, units)
 
 
 class ConfigNumber(ConfigText):
