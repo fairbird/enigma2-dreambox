@@ -2,6 +2,7 @@
 from enigma import eRCInput, eTimer, eWindow , getDesktop
 
 from skin import GUI_SKIN_ID, applyAllAttributes
+from Components.ActionMap import ActionMap
 from Components.config import config
 from Components.GUIComponent import GUIComponent
 from Components.Sources.Source import Source
@@ -20,7 +21,7 @@ class Screen(dict):
 	ALLOW_SUSPEND = False
 	globalScreen = None
 
-	def __init__(self, session, parent=None, mandatoryWidgets=None):
+	def __init__(self, session, parent=None, mandatoryWidgets=None, enableHelp=False):
 		dict.__init__(self)
 		self.skinName = self.__class__.__name__
 		self.session = session
@@ -55,6 +56,11 @@ class Screen(dict):
 		self.screenPath = ""  # This is the current screen path without the title.
 		self.screenTitle = ""  # This is the current screen title without the path.
 		self.handledWidgets = []
+		if enableHelp:
+			self["helpActions"] = ActionMap(["HelpActions"], {
+				"displayHelp": self.showHelp
+			}, prio=0)
+			self["key_help"] = StaticText(_("HELP"))
 
 	def __repr__(self):
 		return str(type(self))
@@ -190,6 +196,18 @@ class Screen(dict):
 
 	def setFocus(self, o):
 		self.instance.setFocus(o.instance)
+
+	def showHelp(self):
+		def callHelpAction(*args):
+			if args:
+				(actionMap, context, action) = args
+				actionMap.action(context, action)
+
+		from Screens.HelpMenu import HelpMenu  # Import needs to be here because of a circular import.
+		if hasattr(self, "secondInfoBarScreen"):
+			if self.secondInfoBarScreen and self.secondInfoBarScreen.shown:
+				self.secondInfoBarScreen.hide()
+		self.session.openWithCallback(callHelpAction, HelpMenu, self.helpList)
 
 	def setKeyboardModeNone(self):
 		rcinput = eRCInput.getInstance()

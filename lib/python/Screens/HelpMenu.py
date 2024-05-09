@@ -20,25 +20,13 @@ from skin import parameters, fonts
 from functools import cmp_to_key
 
 
-class HelpableScreen:
+class HelpableScreen:  # Deprecated stub class for old screens and plugins
 	def __init__(self):
-		self["helpActions"] = ActionMap(["HelpActions"], {
-			"displayHelp": self.showHelp
-		}, prio=0)
-		self["key_help"] = StaticText(_("HELP"))
-
-	def showHelp(self):
-		try:
-			if self.secondInfoBarScreen and self.secondInfoBarScreen.shown:
-				self.secondInfoBarScreen.hide()
-		except:
-			pass
-		self.session.openWithCallback(self.callHelpAction, HelpMenu, self.helpList)
-
-	def callHelpAction(self, *args):
-		if args:
-			(actionmap, context, action) = args
-			actionmap.action(context, action)
+		if "helpActions" not in self:
+			self["helpActions"] = ActionMap(["HelpActions"], {
+				"displayHelp": self.showHelp
+			}, prio=0)
+			self["key_help"] = StaticText(_("HELP"))
 
 
 class Rc:
