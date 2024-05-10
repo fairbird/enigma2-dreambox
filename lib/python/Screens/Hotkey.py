@@ -280,7 +280,7 @@ for x in hotkey.hotkeys:
 
 
 class HotkeySetup(Screen):
-	ALLOW_SUSPEND = False
+
 	if isHD():
 		skin = '''
 			<screen name="HotkeySetup" position="center,center" size="560,437" title="Input">

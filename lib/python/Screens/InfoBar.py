@@ -43,7 +43,6 @@ class InfoBar(InfoBarBase, InfoBarShowHide,
 	InfoBarPiP, InfoBarPlugins, InfoBarSubtitleSupport, InfoBarServiceErrorPopupSupport, InfoBarPowersaver,
 	InfoBarHDMI, InfoBarHdmi2, InfoBarHotkey, InfoBarJobman, InfoBarHandleBsod, Screen):
 
-	ALLOW_SUSPEND = True
 	instance = None
 
 	def __init__(self, session):
@@ -163,7 +162,6 @@ class MoviePlayer(InfoBarBase, InfoBarShowHide, InfoBarMenu, InfoBarSeek, InfoBa
 		InfoBarServiceErrorPopupSupport, InfoBarExtensions, InfoBarPlugins, InfoBarPiP, InfoBarHDMI, InfoBarHdmi2, InfoBarHotkey, InfoBarJobman):
 
 	ENABLE_RESUME_SUPPORT = True
-	ALLOW_SUSPEND = True
 	movie_instance = None
 
 	def __init__(self, session, service, slist=None, lastservice=None, infobar=None):

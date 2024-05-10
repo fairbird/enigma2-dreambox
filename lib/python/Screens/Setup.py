@@ -68,7 +68,7 @@ class SetupSummary(Screen):
 
 class Setup(ConfigListScreen, Screen):
 
-	ALLOW_SUSPEND = True
+	ALLOW_SUSPEND = False  # Not allow users to shutdown from Setup based screens.
 
 	def __init__(self, session, setup):
 		Screen.__init__(self, session)

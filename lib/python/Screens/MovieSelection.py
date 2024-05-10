@@ -517,7 +517,6 @@ class MovieSelectionSummary(Screen):
 
 class MovieSelection(Screen, HelpableScreen, SelectionEventInfo, InfoBarBase, ProtectedScreen):
 	# SUSPEND_PAUSES actually means "please call my pauseService()"
-	ALLOW_SUSPEND = Screen.SUSPEND_PAUSES
 
 	def __init__(self, session, selectedmovie=None, timeshiftEnabled=False):
 		Screen.__init__(self, session)

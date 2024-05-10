@@ -14,11 +14,11 @@ from Tools.CList import CList
 # Other commented out code is historic and should probably be deleted if it is not going to be used.
 #
 class Screen(dict):
-	NO_SUSPEND = False
-	SUSPEND_STOPS = True  # This does not appear to be used!
-	SUSPEND_PAUSES = True
+	NO_SUSPEND = False  # Deprecated feature needed for plugins
+	SUSPEND_STOPS = True  # Deprecated feature needed for plugins
+	SUSPEND_PAUSES = True  # Deprecated feature needed for plugins
 
-	ALLOW_SUSPEND = False
+	ALLOW_SUSPEND = True
 	globalScreen = None
 
 	def __init__(self, session, parent=None, mandatoryWidgets=None, enableHelp=False):

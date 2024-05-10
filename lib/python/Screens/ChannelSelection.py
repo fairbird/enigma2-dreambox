@@ -2069,7 +2069,6 @@ config.servicelist.startupmode = ConfigText(default="tv")
 
 
 class ChannelSelection(ChannelSelectionBase, ChannelSelectionEdit, ChannelSelectionEPG, SelectionEventInfo):
-	ALLOW_SUSPEND = True
 
 	def __init__(self, session):
 		ChannelSelectionBase.__init__(self, session)
@@ -2647,7 +2646,6 @@ class RadioInfoBar(Screen):
 
 
 class ChannelSelectionRadio(ChannelSelectionBase, ChannelSelectionEdit, ChannelSelectionEPG, InfoBarBase, SelectionEventInfo, InfoBarScreenSaver):
-	ALLOW_SUSPEND = True
 
 	def __init__(self, session, infobar):
 		ChannelSelectionBase.__init__(self, session)

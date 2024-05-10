@@ -125,7 +125,6 @@ class MenuSummary(Screen):
 
 
 class Menu(Screen, ProtectedScreen):
-	ALLOW_SUSPEND = True
 	png_cache = {}
 
 	def okbuttonClick(self):
