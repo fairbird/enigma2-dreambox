@@ -1024,9 +1024,7 @@ RESULT eServiceFactoryDVB::offlineOperations(const eServiceReference &ref, ePtr<
 
 RESULT eServiceFactoryDVB::lookupService(ePtr<eDVBService> &service, const eServiceReference &ref)
 {
-	eServiceReferenceDVB sRelayOrigSref;
-	bool res = ((const eServiceReferenceDVB&)ref).getSROriginal(sRelayOrigSref);
-	if (!ref.path.empty() && !res) // playback
+	if (!ref.path.empty()) // playback
 	{
 		eDVBMetaParser parser;
 		int ret=parser.parseFile(ref.path);
@@ -1039,17 +1037,13 @@ RESULT eServiceFactoryDVB::lookupService(ePtr<eDVBService> &service, const eServ
 		if (!ret)
 			eDVBDB::getInstance()->parseServiceData(service, parser.m_service_data);
 	}
-	else if (res)
-	{
-		int err;
-		if ((err = eDVBDB::getInstance()->getService(sRelayOrigSref, service)) != 0)
-		{
-			eTrace("[eServiceFactoryDVB] lookupService SR original service failed!");
-			return err;
-		}
-	}
 	else
 	{
+		// TODO: handle the listing itself
+		// if (ref.... == -1) .. return "... bouquets ...";
+		// could be also done in another serviceFactory (with seperate ID) to seperate actual services and lists
+			// TODO: cache
+
 		/* we are sure to have a ..DVB reference as the info() call was forwarded here according to it's ID. */
 		int err;
 		if ((err = eDVBDB::getInstance()->getService((eServiceReferenceDVB&)ref, service)) != 0)
