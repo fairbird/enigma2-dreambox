@@ -136,6 +136,11 @@ class ConfigElement(object):
 		self._value = value
 		self.changed()
 
+	def getNotifierNeeded(self):
+		if self.prev_value != self.value:
+			self.prev_value = self.value
+			return True
+
 	def getValue(self):
 		return self._value
 
@@ -384,7 +389,7 @@ class ConfigSelection(ConfigElement):
 			default = self.choices.default()
 
 		self._descr = None
-		self.default = self._value = self.lastValue = default
+		self.default = self._value = self.lastValue = self.prev_value = default
 		self.graphic = graphic
 
 	def setSelectionList(self, choices, default=None):
@@ -514,7 +519,7 @@ class ConfigBoolean(ConfigElement):
 	def __init__(self, default=False, descriptions={False: _("false"), True: _("true")}, graphic=True):
 		ConfigElement.__init__(self)
 		self.descriptions = descriptions
-		self.value = self.lastValue = self.default = default
+		self.value = self.lastValue = self.prev_value = self.default = default
 		self.graphic = graphic
 
 	def handleKey(self, key):
@@ -590,7 +595,7 @@ class ConfigDateTime(ConfigElement):
 		ConfigElement.__init__(self)
 		self.increment = increment
 		self.formatstring = formatstring
-		self.value = self.lastValue = self.default = int(default)
+		self.value = self.lastValue = self.prev_value = self.default = int(default)
 
 	def handleKey(self, key):
 		if key == ACTIONKEY_LEFT:
@@ -640,7 +645,7 @@ class ConfigSequence(ConfigElement):
 		self.blockLen = [len(str(x[1])) for x in limits]
 		self.totalLen = sum(self.blockLen) - 1
 		self.censor = censor
-		self.lastValue = self.default = default
+		self.lastValue = self.prev_value = self.default = default
 		self.value = shallowcopy(default)
 		self.hidden = censor != ""
 		self.endNotifier = None
@@ -1027,7 +1032,7 @@ class ConfigText(ConfigElement, NumericalTextInput):
 		self.offset = 0
 		self.overwrite = fixed_size
 		self.help_window = None
-		self.value = self.lastValue = self.default = default
+		self.value = self.lastValue = self.prev_value = self.default = default
 
 	def validateMarker(self):
 		textlen = len(self.text)
@@ -1461,7 +1466,7 @@ class ConfigSet(ConfigElement):
 			default = []
 		self.pos = -1
 		default.sort()
-		self.lastValue = self.default = default
+		self.lastValue = self.default = self.prev_value = default
 		self.value = default[:]
 
 	def toggleChoice(self, choice):
