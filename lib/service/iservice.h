@@ -170,6 +170,7 @@ public:
 	eServiceReference(const std::string &string);
 	std::string toString() const;
 	std::string toCompareString() const;
+	std::string toReferenceString() const;
 	bool operator==(const eServiceReference &c) const
 	{
 		if (!c || type != c.type)
