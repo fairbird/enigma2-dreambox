@@ -15,7 +15,6 @@ from Components.Sources.StaticText import StaticText
 from Components.UsageConfig import preferredTimerPath
 import Screens.InfoBar
 from Screens.Screen import Screen
-from Screens.HelpMenu import HelpableScreen
 from Screens.EventView import EventViewEPGSelect
 from Screens.InputBox import PinInput
 from Screens.TimeDateInput import TimeDateInput
@@ -959,7 +958,7 @@ class TimelineText(GUIComponent):
 			timeline_now.visible = False
 
 
-class GraphMultiEPG(Screen, HelpableScreen):
+class GraphMultiEPG(Screen):
 	EMPTY = 0
 	ADD_TIMER = 1
 	REMOVE_TIMER = 2
@@ -969,7 +968,7 @@ class GraphMultiEPG(Screen, HelpableScreen):
 	ZAP = 1
 
 	def __init__(self, session, services, zapFunc=None, bouquetChangeCB=None, bouquetname="", selectBouquet=None, epg_bouquet=None):
-		Screen.__init__(self, session)
+		Screen.__init__(self, session, enableHelp=True)
 		self.bouquetChangeCB = bouquetChangeCB
 		self.selectBouquet = selectBouquet
 		self.epg_bouquet = epg_bouquet
@@ -1013,7 +1012,6 @@ class GraphMultiEPG(Screen, HelpableScreen):
 					overjump_empty=config.misc.graph_mepg.overjump.value,
 					epg_bouquet=epg_bouquet)
 
-		HelpableScreen.__init__(self)
 		self["okactions"] = HelpableActionMap(self, ["OkCancelActions"],
 			{
 				"cancel": (self.closeScreen, _("Exit EPG")),

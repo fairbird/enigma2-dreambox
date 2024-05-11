@@ -12,7 +12,6 @@ from Components.MenuList import MenuList
 from Components.MultiContent import MultiContentEntryText, MultiContentEntryPixmapAlphaTest
 from Components.Sources.StaticText import StaticText
 from Screens.ChoiceBox import ChoiceBox
-from Screens.HelpMenu import HelpableScreen
 from Screens.Screen import Screen
 from Tools.Directories import SCOPE_CURRENT_SKIN, resolveFilename
 from Tools.LoadPixmap import LoadPixmap
@@ -112,10 +111,9 @@ class VirtualKeyBoardEntryComponent:
 
 # For more information about using VirtualKeyBoard see /doc/VIRTUALKEYBOARD
 #
-class VirtualKeyBoard(Screen, HelpableScreen):
+class VirtualKeyBoard(Screen):
 	def __init__(self, session, title=_("Virtual KeyBoard Text:"), text="", maxSize=False, visible_width=False, type=Input.TEXT, currPos=None, allMarked=False, style=VKB_ENTER_ICON):
-		Screen.__init__(self, session)
-		HelpableScreen.__init__(self)
+		Screen.__init__(self, session, enableHelp=True)
 		self.setTitle(_("Virtual keyboard"))
 		prompt = title  # Title should only be used for screen titles!
 		self["key_info"] = StaticText(_("INFO"))
@@ -1242,10 +1240,9 @@ class VirtualKeyBoard(Screen, HelpableScreen):
 					selkey += 1
 		return False
 
-class VirtualKeyBoardstyle(Screen, HelpableScreen):
+class VirtualKeyBoardstyle(Screen):
 	def __init__(self, session, title=_("Virtual KeyBoard Text:"), text="", maxSize=False, visible_width=False, type=Input.TEXT, currPos=None, allMarked=False, style=VKB_ENTER_ICON):
-		Screen.__init__(self, session)
-		HelpableScreen.__init__(self)
+		Screen.__init__(self, session, enableHelp=True)
 		self.setTitle(_("Virtual keyboard"))
 		prompt = title  # Title should only be used for screen titles!
 		greenLabel, self.green = {

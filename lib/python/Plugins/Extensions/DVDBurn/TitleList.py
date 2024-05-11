@@ -9,7 +9,6 @@ from . import Process
 from Screens.Screen import Screen
 from Screens.ChoiceBox import ChoiceBox
 from Screens.MessageBox import MessageBox
-from Screens.HelpMenu import HelpableScreen
 from Screens.TaskView import JobView
 from Components.Task import job_manager
 from Components.ActionMap import HelpableActionMap, ActionMap
@@ -22,7 +21,7 @@ from enigma import gFont, RT_HALIGN_LEFT, RT_HALIGN_RIGHT
 from Tools.Directories import resolveFilename, SCOPE_PLUGINS
 
 
-class TitleList(Screen, HelpableScreen):
+class TitleList(Screen):
 	skin = """
 		<screen name="TitleList" position="center,center" size="560,470" title="DVD Tool" >
 			<ePixmap pixmap="buttons/red.png" position="0,0" size="140,40" alphaTest="on" />
@@ -61,8 +60,7 @@ class TitleList(Screen, HelpableScreen):
 		</screen>"""
 
 	def __init__(self, session, project=None):
-		Screen.__init__(self, session)
-		HelpableScreen.__init__(self)
+		Screen.__init__(self, session, enableHelp=True)
 
 		self.setTitle(_("DVD titlelist"))
 

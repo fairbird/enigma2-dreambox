@@ -7,7 +7,6 @@
 from Screens.Screen import Screen
 from Screens.MessageBox import MessageBox
 from Screens.InputBox import InputBox
-from Screens.HelpMenu import HelpableScreen
 from Screens.ChoiceBox import ChoiceBox
 
 # Generic
@@ -45,7 +44,7 @@ for dir in DEFAULT_INHIBIT_DIRECTORIES + ("/", "/media"):
 DEFAULT_INHIBIT_DEVICES = tuple(DEFAULT_INHIBIT_DEVICES)
 
 
-class LocationBox(Screen, NumericalTextInput, HelpableScreen):
+class LocationBox(Screen, NumericalTextInput):
 	"""Simple Class similar to MessageBox / ChoiceBox but used to choose a folder/pathname combination"""
 
 	skin = """<screen name="LocationBox" position="100,75" size="540,460" >
@@ -66,9 +65,8 @@ class LocationBox(Screen, NumericalTextInput, HelpableScreen):
 
 	def __init__(self, session, text="", filename="", currDir=None, bookmarks=None, userMode=False, windowTitle=None, minFree=None, autoAdd=False, editDir=False, inhibitDirs=[], inhibitMounts=[]):
 		# Init parents
-		Screen.__init__(self, session)
+		Screen.__init__(self, session, enableHelp=True)
 		NumericalTextInput.__init__(self, handleTimeout=False)
-		HelpableScreen.__init__(self)
 
 		# Set useable chars
 		self.setUseableChars('1234567890abcdefghijklmnopqrstuvwxyz')

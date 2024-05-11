@@ -14,7 +14,6 @@ from Components.VideoWindow import VideoWindow
 from Components.Label import Label
 from Screens.InfoBarGenerics import InfoBarSeek, InfoBarCueSheetSupport
 from Screens.FixedMenu import FixedMenu
-from Screens.HelpMenu import HelpableScreen
 from Components.Sources.List import List
 from Components.config import config, ConfigYesNo
 from Screens.MovieSelection import MovieSelection
@@ -148,7 +147,7 @@ class CutListContextMenu(FixedMenu):
 		self.close(self.RET_GRABFRAME)
 
 
-class CutListEditor(Screen, InfoBarBase, InfoBarSeek, InfoBarCueSheetSupport, HelpableScreen):
+class CutListEditor(Screen, InfoBarBase, InfoBarSeek, InfoBarCueSheetSupport):
 	skin = """
 	<screen name="CutListEditor" position="fill" flags="wfNoBorder">
 		<panel name="BasicTemplate"/>
@@ -188,12 +187,11 @@ class CutListEditor(Screen, InfoBarBase, InfoBarSeek, InfoBarCueSheetSupport, He
 
 	def __init__(self, session, service):
 		self.skin = CutListEditor.skin
-		Screen.__init__(self, session)
+		Screen.__init__(self, session, enableHelp=True)
 		Screen.setTitle(self, _("Cutlist editor"))
 		InfoBarSeek.__init__(self, actionmap=["CutlistSeekActions"])
 		InfoBarCueSheetSupport.__init__(self)
 		InfoBarBase.__init__(self, steal_current_service=True)
-		HelpableScreen.__init__(self)
 		self.old_service = session.nav.getCurrentlyPlayingServiceReference()
 		self.service = service
 		session.nav.playService(service)

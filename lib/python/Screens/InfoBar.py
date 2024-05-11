@@ -30,14 +30,13 @@ from Components.ActionMap import HelpableActionMap
 from Components.config import config
 from Components.ServiceEventTracker import ServiceEventTracker, InfoBarBase
 
-eProfileWrite("LOAD:HelpableScreen")
-from Screens.HelpMenu import HelpableScreen
+eProfileWrite("LOAD:InfoBar_Class")
 
 
 class InfoBar(InfoBarBase, InfoBarShowHide,
 	InfoBarNumberZap, InfoBarChannelSelection, InfoBarMenu, InfoBarEPG, InfoBarRdsDecoder, InfoBarResolutionSelection, InfoBarAspectSelection,
 	InfoBarInstantRecord, InfoBarAudioSelection, InfoBarRedButton, InfoBarTimerButton, InfoBarVmodeButton,
-	HelpableScreen, InfoBarAdditionalInfo, InfoBarNotifications, InfoBarDish, InfoBarUnhandledKey,
+	InfoBarAdditionalInfo, InfoBarNotifications, InfoBarDish, InfoBarUnhandledKey,
 	InfoBarSubserviceSelection, InfoBarTimeshift, InfoBarSeek, InfoBarCueSheetSupport, InfoBarBuffer,
 	InfoBarSummarySupport, InfoBarTimeshiftState, InfoBarTeletextPlugin, InfoBarExtensions,
 	InfoBarPiP, InfoBarPlugins, InfoBarSubtitleSupport, InfoBarServiceErrorPopupSupport, InfoBarPowersaver,
@@ -46,7 +45,7 @@ class InfoBar(InfoBarBase, InfoBarShowHide,
 	instance = None
 
 	def __init__(self, session):
-		Screen.__init__(self, session)
+		Screen.__init__(self, session, enableHelp=True)
 		self["actions"] = HelpableActionMap(self, ["InfobarActions"],
 			{
 				"showMovies": (self.showMovies, _("Play recorded movies...")),
@@ -63,8 +62,7 @@ class InfoBar(InfoBarBase, InfoBarShowHide,
 		self.radioTV = 0
 		self.allowPiP = True
 
-		for x in HelpableScreen, \
-				InfoBarBase, InfoBarShowHide, \
+		for x in InfoBarBase, InfoBarShowHide, \
 				InfoBarNumberZap, InfoBarChannelSelection, InfoBarMenu, InfoBarEPG, InfoBarRdsDecoder, InfoBarResolutionSelection, InfoBarAspectSelection, \
 				InfoBarInstantRecord, InfoBarAudioSelection, InfoBarRedButton, InfoBarTimerButton, InfoBarUnhandledKey, InfoBarVmodeButton,\
 				InfoBarAdditionalInfo, InfoBarNotifications, InfoBarDish, InfoBarSubserviceSelection, InfoBarBuffer, \
@@ -157,7 +155,7 @@ class InfoBar(InfoBarBase, InfoBarShowHide,
 
 
 class MoviePlayer(InfoBarBase, InfoBarShowHide, InfoBarMenu, InfoBarSeek, InfoBarShowMovies, InfoBarInstantRecord, InfoBarVmodeButton, InfoBarResolutionSelection, InfoBarAspectSelection,
-		InfoBarAudioSelection, HelpableScreen, InfoBarNotifications, InfoBarServiceNotifications, InfoBarPVRState,
+		InfoBarAudioSelection, InfoBarNotifications, InfoBarServiceNotifications, InfoBarPVRState,
 		InfoBarCueSheetSupport, InfoBarMoviePlayerSummarySupport, InfoBarSubtitleSupport, Screen, InfoBarTeletextPlugin,
 		InfoBarServiceErrorPopupSupport, InfoBarExtensions, InfoBarPlugins, InfoBarPiP, InfoBarHDMI, InfoBarHdmi2, InfoBarHotkey, InfoBarJobman):
 
@@ -165,7 +163,7 @@ class MoviePlayer(InfoBarBase, InfoBarShowHide, InfoBarMenu, InfoBarSeek, InfoBa
 	movie_instance = None
 
 	def __init__(self, session, service, slist=None, lastservice=None, infobar=None):
-		Screen.__init__(self, session)
+		Screen.__init__(self, session, enableHelp=True)
 
 		self["actions"] = HelpableActionMap(self, ["MoviePlayerActions"],
 			{
@@ -187,7 +185,7 @@ class MoviePlayer(InfoBarBase, InfoBarShowHide, InfoBarMenu, InfoBarSeek, InfoBa
 
 		self.allowPiP = True
 
-		for x in HelpableScreen, InfoBarShowHide, InfoBarMenu, \
+		for x in InfoBarShowHide, InfoBarMenu, \
 				InfoBarBase, InfoBarSeek, InfoBarShowMovies, InfoBarInstantRecord, InfoBarVmodeButton,\
 				InfoBarAudioSelection, InfoBarNotifications, InfoBarResolutionSelection, InfoBarAspectSelection, \
 				InfoBarServiceNotifications, InfoBarPVRState, InfoBarCueSheetSupport, \

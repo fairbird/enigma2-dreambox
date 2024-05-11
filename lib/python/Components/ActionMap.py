@@ -93,7 +93,7 @@ class HelpableActionMap(ActionMap):
 	# functions.  The classic actionmap is then passed to the
 	# ActionMapconstructor,	the collected helpstrings (with correct
 	# context, action) is added to the screen's "helpList", which will
-	# be picked up by the "HelpableScreen".
+	# be picked up by the "Screen".
 	def __init__(self, parent, contexts, actions=None, prio=0, description=None):
 		def exists(record):
 			for context in parent.helpList:

@@ -22,7 +22,6 @@ from Plugins.Plugin import PluginDescriptor
 from Screens.MessageBox import MessageBox
 from Screens.ChoiceBox import ChoiceBox
 from Screens.LocationBox import MovieLocationBox
-from Screens.HelpMenu import HelpableScreen
 from Screens.InputBox import PinInput
 import Screens.InfoBar
 
@@ -515,18 +514,17 @@ class MovieSelectionSummary(Screen):
 			self["name"].text = ""
 
 
-class MovieSelection(Screen, HelpableScreen, SelectionEventInfo, InfoBarBase, ProtectedScreen):
+class MovieSelection(Screen, SelectionEventInfo, InfoBarBase, ProtectedScreen):
 	# SUSPEND_PAUSES actually means "please call my pauseService()"
 
 	def __init__(self, session, selectedmovie=None, timeshiftEnabled=False):
-		Screen.__init__(self, session)
+		Screen.__init__(self, session, enableHelp=True)
 
 		if config.movielist.useslim.value:
 			self.skinName = ["MovieSelectionSlim", "MovieSelection"]
 		else:
 			self.skinName = "MovieSelection"
 
-		HelpableScreen.__init__(self)
 		if not timeshiftEnabled:
 			InfoBarBase.__init__(self) # For ServiceEventTracker
 		ProtectedScreen.__init__(self)

@@ -3,7 +3,6 @@ import os, re, random, netifaces
 from Screens.Screen import Screen
 from Screens.Setup import Setup
 from Screens.MessageBox import MessageBox
-from Screens.HelpMenu import HelpableScreen
 from Components.Network import iNetwork
 from Components.Sources.StaticText import StaticText
 from Components.Sources.Boolean import Boolean
@@ -31,11 +30,10 @@ config.macaddress.change = ConfigText(default="%s" % macaddress)
 configmac = config.macaddress
 
 
-class NetworkAdapterSelection(Screen, HelpableScreen):
+class NetworkAdapterSelection(Screen):
 
 	def __init__(self, session):
-		Screen.__init__(self, session)
-		HelpableScreen.__init__(self)
+		Screen.__init__(self, session, enableHelp=True)
 		self.setTitle(_("Select a network adapter"))
 		self.wlan_errortext = _("No working wireless network adapter found.\nPlease verify that you have attached a compatible WLAN device and your network is configured correctly.")
 		self.lan_errortext = _("No working local network adapter found.\nPlease verify that you have attached a network cable and your network is configured correctly.")

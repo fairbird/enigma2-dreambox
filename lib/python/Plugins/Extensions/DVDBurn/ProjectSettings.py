@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from Screens.Screen import Screen
 from Screens.MessageBox import MessageBox
-from Screens.HelpMenu import HelpableScreen
 from Components.ActionMap import ActionMap
 from Components.Sources.List import List
 from Components.Sources.StaticText import StaticText
@@ -11,15 +10,14 @@ from Components.config import config
 from Components.ConfigList import ConfigListScreen
 
 
-class FileBrowser(Screen, HelpableScreen):
+class FileBrowser(Screen):
 
 	def __init__(self, session, scope, configRef):
-		Screen.__init__(self, session)
+		Screen.__init__(self, session, enableHelp=True)
 		# for the skin: first try FileBrowser_DVDBurn, then FileBrowser, this allows individual skinning
 		self.skinName = ["FileBrowser_DVDBurn", "FileBrowser"]
 		self.setTitle(_("DVD file browser"))
 
-		HelpableScreen.__init__(self)
 		self.scope = scope
 		pattern = ""
 		self.configRef = configRef

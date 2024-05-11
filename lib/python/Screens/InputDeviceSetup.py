@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from enigma import getDesktop
 from Screens.Screen import Screen
-from Screens.HelpMenu import HelpableScreen
 from Screens.MessageBox import MessageBox
 from Screens.Setup import Setup
 from Components.InputDevice import iInputDevices, iRcTypeControl
@@ -18,7 +17,7 @@ if getDesktop(0).size().width() >= 1920:
 	FHD = True
 
 
-class InputDeviceSelection(HelpableScreen, Screen):
+class InputDeviceSelection(Screen):
 
 	if FHD:
 		skin = """
@@ -74,9 +73,8 @@ class InputDeviceSelection(HelpableScreen, Screen):
 		</screen>"""
 
 	def __init__(self, session):
-		Screen.__init__(self, session)
+		Screen.__init__(self, session, enableHelp=True)
 		self.setTitle(_("Select input device"))
-		HelpableScreen.__init__(self)
 
 		self.edittext = _("Press OK to edit the settings.")
 

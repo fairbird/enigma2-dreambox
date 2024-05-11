@@ -47,7 +47,6 @@ from Plugins.Plugin import PluginDescriptor
 from Components.PluginComponent import plugins
 from Screens.ChoiceBox import ChoiceBox
 from Screens.EventView import EventViewEPGSelect
-from Screens.HelpMenu import HelpableScreen
 import os
 from time import time, localtime, strftime
 from Components.Sources.List import List
@@ -2871,7 +2870,7 @@ class SimpleChannelSelection(ChannelSelectionBase, SelectionEventInfo):
 		return None
 
 
-class HistoryZapSelector(Screen, HelpableScreen):
+class HistoryZapSelector(Screen):
 	# HISTORY_SPACER = 0
 	# HISTORY_MARKER = 1
 	# HISTORY_SERVICE_NAME = 2
@@ -2882,8 +2881,7 @@ class HistoryZapSelector(Screen, HelpableScreen):
 	HISTORY_SERVICE_REFERENCE = 7
 
 	def __init__(self, session, serviceReferences, markedItem=0, selectedItem=0):
-		Screen.__init__(self, session)
-		HelpableScreen.__init__(self)
+		Screen.__init__(self, session, enableHelp=True)
 		self.setTitle(_("History Zap"))
 		serviceHandler = eServiceCenter.getInstance()
 		historyList = []

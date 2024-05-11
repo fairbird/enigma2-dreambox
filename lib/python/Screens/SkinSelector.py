@@ -12,14 +12,13 @@ from Components.config import config
 from Components.Pixmap import Pixmap
 from Components.Sources.List import List
 from Components.Sources.StaticText import StaticText
-from Screens.HelpMenu import HelpableScreen
 from Screens.MessageBox import MessageBox
 from Screens.Screen import Screen, ScreenSummary
 from Screens.Standby import TryQuitMainloop, QUIT_RESTART
 from Tools.Directories import resolveFilename, SCOPE_GUISKIN, SCOPE_LCDSKIN, SCOPE_SKIN, fileReadXML
 
 
-class SkinSelector(Screen, HelpableScreen):
+class SkinSelector(Screen):
 	skin = ["""
 	<screen name="SkinSelector" position="center,center" size="%d,%d">
 		<widget name="preview" position="center,%d" size="%d,%d" alphatest="blend" />
@@ -52,8 +51,7 @@ class SkinSelector(Screen, HelpableScreen):
 	]
 
 	def __init__(self, session, screenTitle=_("GUI Skin")):
-		Screen.__init__(self, session, mandatoryWidgets=["skins"])
-		HelpableScreen.__init__(self)
+		Screen.__init__(self, session, enableHelp=True, mandatoryWidgets=["skins"])
 
 		element = domScreens.get("SkinSelector", (None, None))[0]
 		Screen.setTitle(self, screenTitle)

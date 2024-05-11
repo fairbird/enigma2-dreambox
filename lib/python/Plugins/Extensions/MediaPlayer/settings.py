@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from Screens.Screen import Screen
-from Screens.HelpMenu import HelpableScreen
 from Components.FileList import FileList
 from Components.Sources.StaticText import StaticText
 from Components.MediaPlayer import PlayList
@@ -17,15 +16,13 @@ config.mediaplayer.alwaysHideInfoBar = ConfigYesNo(default=True)
 config.mediaplayer.onMainMenu = ConfigYesNo(default=False)
 
 
-class DirectoryBrowser(Screen, HelpableScreen):
+class DirectoryBrowser(Screen):
 
 	def __init__(self, session, currDir):
-		Screen.__init__(self, session)
+		Screen.__init__(self, session, enableHelp=True)
 		# for the skin: first try MediaPlayerDirectoryBrowser, then FileBrowser, this allows individual skinning
 		self.skinName = ["MediaPlayerDirectoryBrowser", "FileBrowser"]
 		self.setTitle(_("Directory browser"))
-
-		HelpableScreen.__init__(self)
 
 		self["key_red"] = StaticText(_("Cancel"))
 		self["key_green"] = StaticText(_("Use"))
