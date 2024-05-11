@@ -121,7 +121,6 @@ public:
 	void entryRemoved(int idx);
 	void setTemplate(SWIG_PYOBJECT(ePyObject) tmplate);
 	int getMaxItemTextWidth();
-
 protected:
 	virtual void setBuildArgs(int selected) {}
 	virtual bool getIsMarked(int selected) { return false; }

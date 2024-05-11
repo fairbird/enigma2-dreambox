@@ -164,7 +164,7 @@ int eListboxPythonStringContent::getMaxItemTextWidth()
 		local_style = m_listbox->getLocalStyle();
 	if (local_style) {
 		fnt = local_style->m_font;
-//		m_text_offset = local_style->m_text_offset.x();
+		m_text_offset = local_style->m_text_padding.x();
 	}
 	if (!fnt) fnt = new gFont("Regular", 20);
 
@@ -1138,7 +1138,7 @@ int eListboxPythonMultiContent::getMaxItemTextWidth()
 		local_style = m_listbox->getLocalStyle();
 	if (local_style) {
 		fnt = local_style->m_font;
-//		m_text_offset = local_style->m_text_offset.x();
+		m_text_offset = local_style->m_text_padding.x();
 	}
 	if (!fnt) fnt = new gFont("Regular", 20);
 
@@ -1202,34 +1202,34 @@ int eListboxPythonMultiContent::getMaxItemTextWidth()
 
 				switch (type)
 				{
-				case TYPE_TEXT: // text
-				{
-					ePyObject px = PyTuple_GET_ITEM(item, 1), pfnt = PyTuple_GET_ITEM(item, 5), pstring = PyTuple_GET_ITEM(item, 7);
+					case TYPE_TEXT: // text
+					{
+						ePyObject px = PyTuple_GET_ITEM(item, 1), pfnt = PyTuple_GET_ITEM(item, 5), pstring = PyTuple_GET_ITEM(item, 7);
 
-					if (PyLong_Check(pstring) && data) /* if the string is in fact a number, it refers to the 'data' list. */
-						pstring = PyTuple_GetItem(data, PyLong_AsLong(pstring));
+						if (PyLong_Check(pstring) && data) /* if the string is in fact a number, it refers to the 'data' list. */
+							pstring = PyTuple_GetItem(data, PyLong_AsLong(pstring));
 
-					if (pfnt) {
-						int fnt_i = PyLong_AsLong(pfnt);
-						if (m_fonts.find(fnt_i) != m_fonts.end()) fnt = m_fonts[fnt_i];
+						if (pfnt) {
+							int fnt_i = PyLong_AsLong(pfnt);
+							if (m_fonts.find(fnt_i) != m_fonts.end()) fnt = m_fonts[fnt_i];
+						}
+
+						/* don't do anything if we have 'None' as string */
+						if (pstring == Py_None)
+							continue;
+
+						const char *string = (PyUnicode_Check(pstring)) ? PyUnicode_AsUTF8(pstring) : "<not-a-string>";
+						eRect textRect = eRect(0,0, 9999, 100);
+
+						ePtr<eTextPara> para = new eTextPara(textRect);
+						para->setFont(fnt);
+						para->renderString(string);
+						int textWidth = para->getBoundBox().width() + PyLong_AsLong(px);
+						if (textWidth > m_max_text_width) {
+							m_max_text_width = textWidth;
+						}
+						break;
 					}
-
-								/* don't do anything if we have 'None' as string */
-					if (pstring == Py_None)
-						continue;
-
-					const char *string = (PyUnicode_Check(pstring)) ? PyUnicode_AsUTF8(pstring) : "<not-a-string>";
-					eRect textRect = eRect(0,0, 9999, 100);
-
-					ePtr<eTextPara> para = new eTextPara(textRect);
-					para->setFont(fnt);
-					para->renderString(string);
-					int textWidth = para->getBoundBox().width() + PyLong_AsLong(px);
-					if (textWidth > m_max_text_width) {
-						m_max_text_width = textWidth;
-					}
-					break;
-				}
 				}
 
 			}
@@ -1239,6 +1239,7 @@ int eListboxPythonMultiContent::getMaxItemTextWidth()
 
 	return m_max_text_width + (m_text_offset*2);
 }
+
 
 void eListboxPythonMultiContent::paint(gPainter &painter, eWindowStyle &style, const ePoint &offset, int selected)
 {
