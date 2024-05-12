@@ -831,6 +831,7 @@ void eDVBCIInterfaces::removePMTHandler(eDVBServicePMTHandler *pmthandler)
 
 				if (base_slot != slot)
 				{
+					eDVBCISlot *tmp = slot;
 					while(tmp->linked_next != slot)
 						tmp = tmp->linked_next;
 					ASSERT(tmp);
