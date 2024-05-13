@@ -170,6 +170,7 @@ class Setup(ConfigListScreen, Screen):
 
 	def changedEntry(self):
 		if isinstance(self["config"].getCurrent()[1], ConfigBoolean) or isinstance(self["config"].getCurrent()[1], ConfigSelection):
+			self.saveAll()
 			self.createSetupList()
 
 	def selectionChanged(self):
