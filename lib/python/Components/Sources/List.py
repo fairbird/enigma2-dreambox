@@ -18,10 +18,12 @@ to generate HTML."""
 	# use of the enableWrapAround="1" attribute in the skin. Similarly the
 	# itemHeight and font specifications are handled by the skin.
 	#
-	def __init__(self, list=None, enableWrapAround=None, item_height=0, fonts=None):
+	def __init__(self, list=None, enableWrapAround=None, item_height=0, fonts=None, templateName=None, indexNames=None):
 		Source.__init__(self)
 		self.listData = list or []
+		self.listTemplate = templateName or "Default"  # Style might be an optional string which can be used to define different visualizations in the skin.
 		self.listStyle = "default"  # Style might be an optional string which can be used to define different visualizations in the skin.
+		self.listIndexNames = indexNames or {}
 		self.onSelectionChanged = []
 		self.onListUpdated = []
 		self.disableCallbacks = False
@@ -34,7 +36,7 @@ to generate HTML."""
 			instance = self.master.master.instance
 			instance.enableAutoNavigation(enabled)
 		except AttributeError:
-			return
+			pass
 
 	def getList(self):
 		return self.listData
@@ -46,6 +48,9 @@ to generate HTML."""
 
 	list = property(getList, setList)
 
+	def count(self):
+		return len(self.listData)
+
 	def updateList(self, listData):
 		"""Changes the list without changing the selection or emitting changed Events"""
 		maxIndex = len(listData) - 1
@@ -55,9 +60,6 @@ to generate HTML."""
 		self.index = oldIndex
 		self.disableCallbacks = False
 
-	def count(self):
-		return len(self.listData)
-
 	def setConnectedGuiElement(self, guiElement):
 		self.connectedGuiElement = guiElement
 		index = guiElement.instance.getCurrentIndex()
@@ -65,29 +67,28 @@ to generate HTML."""
 		self.__index = index
 		self.changed((self.CHANGED_ALL,))
 
-	def selectionChanged(self, index):
-		if self.disableCallbacks:
-			return
-		for element in self.downstream_elements:  # Update all non-master targets.
-			if element is not self.master:
-				element.index = index
-		for callback in self.onSelectionChanged:
-			callback()
+	def updateEntry(self, index, data):
+		self.listData[index] = data
+		self.entryChanged(index)
 
 	def selectionEnabled(self, enabled):
 		try:
 			instance = self.master.master.instance
 			instance.selectionEnabled(enabled)
 		except AttributeError:
-			return
+			pass
 
-	def entryChanged(self, index):
+	def selectionChanged(self, index):
+		if not self.disableCallbacks:
+			for element in self.downstream_elements:  # Update all non-master targets.
+				if element is not self.master:
+					element.index = index
+			for callback in self.onSelectionChanged:
+				callback()
+
+	def entryChanged(self, index):  # Only used in CutListEditor.
 		if not self.disableCallbacks:
 			self.downstream_elements.entry_changed(index)
-
-	def modifyEntry(self, index, data):
-		self.listData[index] = data
-		self.entryChanged(index)
 
 	@cached
 	def getCurrent(self):
@@ -112,25 +113,42 @@ to generate HTML."""
 		if self.connectedGuiElement is not None:
 			self.connectedGuiElement.moveSelection(index)
 
-
-	def setIndex(self, index):  # This method should be found and removed from all code.
-		return self.setCurrentIndex(index)
-
 	index = property(getCurrentIndex, setCurrentIndex)
 
 	def getTopIndex(self):
 		try:
 			instance = self.master.master.instance
-			return instance.getTopIndex()
+			result = instance.getTopIndex()
 		except AttributeError:
-			return -1
+			result = -1
+		return result
 
 	def setTopIndex(self, index):
 		try:
 			instance = self.master.master.instance
 			instance.setTopIndex(index)
 		except AttributeError:
-			return
+			pass
+
+	@cached
+	def getTemplate(self):
+		return self.listTemplate
+
+	def setTemplate(self, template):
+		if self.listTemplate != template:
+			self.listTemplate = template
+			self.changed((self.CHANGED_SPECIFIC, "template"))
+
+	template = property(getTemplate, setTemplate)
+
+	@cached
+	def getMode(self):
+		return self.listStyle
+
+	def setMode(self, mode):
+		self.setStyle(mode)
+
+	mode = property(getMode, setMode)
 
 	@cached
 	def getStyle(self):
@@ -143,23 +161,11 @@ to generate HTML."""
 
 	style = property(getStyle, setStyle)
 
-	def listUpdated(self):
-		for x in self.onListUpdated:
-			x()
+	@cached
+	def getIndexNames(self):
+		return self.listIndexNames
 
-	def show(self):
-		try:
-			instance = self.master.master.instance
-			instance.show()
-		except AttributeError:
-			return
-
-	def hide(self):
-		try:
-			instance = self.master.master.instance
-			instance.hide()
-		except AttributeError:
-			return
+	indexNames = property(getIndexNames)
 
 	def setVisible(self, visble):
 		if visble:
@@ -170,83 +176,109 @@ to generate HTML."""
 	def getVisible(self):
 		try:
 			instance = self.master.master.instance
-			return instance.isVisible()
+			result = instance.isVisible()
 		except AttributeError:
-			return False
+			result = False
+		return result
 
 	visible = property(getVisible, setVisible)
+
+	def listUpdated(self):
+		for x in self.onListUpdated:
+			x()
+
+	def show(self):
+		try:
+			instance = self.master.master.instance
+			instance.show()
+		except AttributeError:
+			pass
+
+	def hide(self):
+		try:
+			instance = self.master.master.instance
+			instance.hide()
+		except AttributeError:
+			pass
+
+	def enableAutoNavigation(self, value):
+		try:
+			instance = self.master.master.instance
+			instance.enableAutoNavigation(value)
+		except AttributeError:
+			pass
 
 	def goTop(self):
 		try:
 			instance = self.master.master.instance
 			instance.goTop()
 		except AttributeError:
-			return
+			pass
 
 	def goPageUp(self):
 		try:
 			instance = self.master.master.instance
 			instance.goPageUp()
 		except AttributeError:
-			return
+			pass
 
 	def goLineUp(self):
 		try:
 			instance = self.master.master.instance
 			instance.goLineUp()
 		except AttributeError:
-			return
+			pass
 
 	def goFirst(self):
 		try:
 			instance = self.master.master.instance
 			instance.goFirst()
 		except AttributeError:
-			return
+			pass
 
 	def goLeft(self):
 		try:
 			instance = self.master.master.instance
 			instance.goLeft()
 		except AttributeError:
-			return
+			pass
 
 	def goRight(self):
 		try:
 			instance = self.master.master.instance
 			instance.goRight()
 		except AttributeError:
-			return
+			pass
 
 	def goLast(self):
 		try:
 			instance = self.master.master.instance
 			instance.goLast()
 		except AttributeError:
-			return
+			pass
 
 	def goLineDown(self):
 		try:
 			instance = self.master.master.instance
 			instance.goLineDown()
 		except AttributeError:
-			return
+			pass
 
 	def goPageDown(self):
 		try:
 			instance = self.master.master.instance
 			instance.goPageDown()
 		except AttributeError:
-			return
+			pass
 
 	def goBottom(self):
 		try:
 			instance = self.master.master.instance
 			instance.goBottom()
 		except AttributeError:
-			return
+			pass
 
-	# These hacks protect code that was modified to use the previous up/down hack!   This methods should be found and removed from all code.
+	# These hacks protect code that was modified to use the previous up/down hack!   These methods should be found and removed from all code.
 	#
 	def selectPrevious(self):
 		self.goLineUp()
@@ -254,13 +286,22 @@ to generate HTML."""
 	def selectNext(self):
 		self.goLineDown()
 
-	# Old method names. This methods should be found and removed from all code.
+	# Old method names. These methods should be found and removed from all code.
 	#
+	def entry_changed(self, index):
+		self.entryChanged(index)
+
+	def modifyEntry(self, index, data):  # This is only used by CutListEditor.
+		self.updateEntry(index, data)
+
 	def getSelectedIndex(self):
 		return self.getCurrentIndex()
 
 	def getIndex(self):
 		return self.getCurrentIndex()
+
+	def setIndex(self, index):
+		self.setCurrentIndex(index)
 
 	def top(self):
 		self.goTop()
