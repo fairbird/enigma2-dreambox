@@ -8,7 +8,7 @@ from Components.ConfigList import ConfigListScreen
 from Components.Label import Label
 from Components.Sources.Boolean import Boolean
 from Components.Pixmap import Pixmap
-from Components.ServiceList import ServiceList, refreshServiceList
+from Components.ServiceList import ServiceList, ServiceListLegacy, refreshServiceList
 from Components.ActionMap import NumberActionMap, ActionMap, HelpableActionMap
 from Components.MenuList import MenuList
 from Components.ServiceEventTracker import ServiceEventTracker, InfoBarBase
@@ -1489,7 +1489,7 @@ class ChannelSelectionBase(Screen):
 		self["key_menu"] = StaticText(_("MENU"))
 		self["key_info"] = StaticText(_("INFO"))
 
-		self["list"] = ServiceList(self)
+		self["list"] = ServiceListLegacy(self) if config.channelSelection.style.value == "" else ServiceList(self)
 		self.servicelist = self["list"]
 
 		self.numericalTextInput = NumericalTextInput(handleTimeout=False)
@@ -1602,6 +1602,8 @@ class ChannelSelectionBase(Screen):
 		inBouquetRootList = 'FROM BOUQUET "bouquets.' in path #FIXME HACK
 		if not inBouquetRootList and isBouquet:
 			self.servicelist.setMode(ServiceList.MODE_FAVOURITES)
+		elif path == serviceRefAppendPath(self.service_types_ref, "ORDER BY name").getPath():
+			self.servicelist.setMode(ServiceList.MODE_ALL)
 		else:
 			self.servicelist.setMode(ServiceList.MODE_NORMAL)
 		self.servicelist.setRoot(root, justSet)

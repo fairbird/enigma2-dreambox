@@ -1,12 +1,19 @@
 from enigma import eListboxServiceContent, eListbox, eServiceCenter, eServiceReference, gFont, eRect, eSize
 
-from Components.config import config
+from Components.config import config, ConfigSelection, ConfigSubsection
 from Components.GUIComponent import GUIComponent
 from Components.Renderer.Picon import getPiconName
 from skin import parseColor, parseFont
 from Tools.Directories import resolveFilename, SCOPE_GUISKIN
 from Tools.LoadPixmap import LoadPixmap
 from Tools.TextBoundary import getTextBoundarySize
+
+
+
+def InitServiceListSettings():
+	config.channelSelection = ConfigSubsection()
+	choiceList = [("", _("Legacy mode"))]
+	config.channelSelection.style = ConfigSelection(default="", choices=choiceList)
 
 
 def refreshServiceList(configElement=None):
