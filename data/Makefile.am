@@ -20,7 +20,6 @@ dist_pkgdata_DATA = \
 	startwizard.xml \
 	unicable.xml \
 	hd-testcard.mvi \
-	wizardosdcalibration.xml \
 	lcd_picon_default.png
 
 iso-639-3.pck: $(srcdir)/iso-639-3.tab
