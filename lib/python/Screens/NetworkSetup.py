@@ -208,10 +208,9 @@ class NetworkAdapterSelection(Screen):
 						if selection is not None:
 								self.session.openWithCallback(self.AdapterSetupClosed, NetworkWizard, selection[0])
 
-class NameserverSetup(ConfigListScreen, HelpableScreen, Screen):
+class NameserverSetup(ConfigListScreen, Screen):
 	def __init__(self, session):
-		Screen.__init__(self, session)
-		HelpableScreen.__init__(self)
+		Screen.__init__(self, session, enableHelp=True)
 		self.setTitle(_("Configure nameservers"))
 		self.backupNameserverList = iNetwork.getNameserverList()[:]
 		print("[NetworkSetup] backup-list:", self.backupNameserverList)
@@ -351,7 +350,7 @@ class NameserverSetup(ConfigListScreen, HelpableScreen, Screen):
 		return gateways
 
 
-class NetworkMacSetup(Screen, ConfigListScreen, HelpableScreen):
+class NetworkMacSetup(Screen, ConfigListScreen):
 
 	if getDesktop(0).size().width() == 1920:
 		skin = """
@@ -383,8 +382,7 @@ class NetworkMacSetup(Screen, ConfigListScreen, HelpableScreen):
 		</screen>"""
 
 	def __init__(self, session):
-		Screen.__init__(self, session)
-		HelpableScreen.__init__(self)
+		Screen.__init__(self, session, enableHelp=True)
 		self.onChangedEntry = []
 		self.list = []
 		ConfigListScreen.__init__(self, self.list)
@@ -511,10 +509,9 @@ class NetworkMacSetup(Screen, ConfigListScreen, HelpableScreen):
 		self.close()
 
 
-class AdapterSetup(ConfigListScreen, HelpableScreen, Screen):
+class AdapterSetup(ConfigListScreen, Screen):
 		def __init__(self, session, networkinfo, essid=None):
-				Screen.__init__(self, session)
-				HelpableScreen.__init__(self)
+				Screen.__init__(self, session, enableHelp=True)
 				self.setTitle(_("Network setup"))
 				if isinstance(networkinfo, (list, tuple)):
 						self.iface = networkinfo[0]
@@ -869,10 +866,9 @@ class AdapterSetup(ConfigListScreen, HelpableScreen, Screen):
 								current[1].help_window.instance.hide()
 
 
-class AdapterSetupConfiguration(Screen, HelpableScreen):
+class AdapterSetupConfiguration(Screen):
 		def __init__(self, session, iface):
-				Screen.__init__(self, session)
-				HelpableScreen.__init__(self)
+				Screen.__init__(self, session, enableHelp=True)
 				self.setTitle(_("Network configuration"))
 				self.iface = iface
 				self.restartLanRef = None
