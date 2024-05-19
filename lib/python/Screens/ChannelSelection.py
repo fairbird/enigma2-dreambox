@@ -1602,8 +1602,6 @@ class ChannelSelectionBase(Screen):
 		inBouquetRootList = 'FROM BOUQUET "bouquets.' in path #FIXME HACK
 		if not inBouquetRootList and isBouquet:
 			self.servicelist.setMode(ServiceList.MODE_FAVOURITES)
-		elif path == serviceRefAppendPath(self.service_types_ref, "ORDER BY name").getPath():
-			self.servicelist.setMode(ServiceList.MODE_ALL)
 		else:
 			self.servicelist.setMode(ServiceList.MODE_NORMAL)
 		self.servicelist.setRoot(root, justSet)
