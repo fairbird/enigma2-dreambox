@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: enigma2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-02 14:05+0100\n"
-"POT-Creation-Date: 2024-03-10 21:56+0100\n"
+"POT-Creation-Date: 2024-05-21 17:44+0200\n"
 "Last-Translator: RAED - Fairbirb <rrrr53@hotmail.com>\n"
 "Language-Team: \n"
 "Language: ar\n"
@@ -2725,6 +2725,10 @@ msgstr "إيقاف الحدث الحالي فقط وليس الأحداث الق
 msgid "Disable move mode"
 msgstr "تعطيل وضع التحريك"
 
+#, fuzzy
+msgid "Disable operator profiles"
+msgstr "متغيرات التهئية المتاحه"
+
 msgid "Disable timer"
 msgstr "تعطيل المؤقت"
 
@@ -3006,10 +3010,6 @@ msgstr ":الدليل الإلكتروني"
 msgid "ERROR - failed to scan (%s)!"
 msgstr "!(%s) خطأ - فشل البحث"
 
-#, python-format
-msgid "ERROR downloading file %s"
-msgstr "!(%s) خطأ تحميل الملف"
-
 msgid "East"
 msgstr "شرق"
 
@@ -3248,8 +3248,8 @@ msgstr "أدخل الرقم السري"
 msgid "Enter URL"
 msgstr "أعاده إدخال الرقم السري"
 
-msgid "Enter an URL where alternative images could be listed for FlashImage. Enter text 'all' for automatic access of many images."
-msgstr "حيث يمكن إدراج الصور البديلة لـصورة الفلاش الداخلية. أدخل النص 'الكل' للوصول التلقائي إلى العديد من الصور URL أدخل عنوان"
+msgid "Enter an URL where alternative images could be listed for FlashImage."
+msgstr "حيث يمكن إدراج الصور البديلة لـصورة الفلاش الداخلية URL أدخل عنوان"
 
 msgid "Enter if you are in the east or west hemisphere."
 msgstr "ادخل إذا كنت في الشرق أو نصف الكره الغربي."
@@ -7590,6 +7590,10 @@ msgstr "حدد مجموعة الأحرف التي تم إزاحتها للحرف
 msgid "Select the time zone within the area or region."
 msgstr "تعيين مكان أيقونة التسجيل"
 
+#, fuzzy
+msgid "Select the timer from the fallback tuner by default"
+msgstr "عند تمكين اندفاع اللاقط سيتم فرضه"
+
 msgid "Select the tuner that controls the motorised dish."
 msgstr "حدد المؤالف الذي يتحكم في نظام الطبق المتحرك."
 
@@ -7950,6 +7954,10 @@ msgstr "عرض منفذ سكارت في القائمة الرئيسية"
 msgid "Show WLAN status"
 msgstr "عرض حالة اتصال الشبكة اللاسلكية"
 
+#, fuzzy
+msgid "Show additional information on infobar"
+msgstr "عرض معلومات التشفير في شريط المعومات"
+
 msgid "Show alternatives"
 msgstr "عرض البدائل"
 
@@ -8111,6 +8119,10 @@ msgstr "عرض نوع أيقونة القناة"
 
 msgid "Show servicelist or movies"
 msgstr "عرض قائمة القنوات أو الافلام"
+
+#, fuzzy
+msgid "Show simple second infobar"
+msgstr "عرض شريط المعلومات الثاني"
 
 msgid "Show single service EPG"
 msgstr "عرض الإيقونات في قائمة القنوات"
@@ -9938,6 +9950,10 @@ msgstr "إستخدام معلومات دليل البرامج الإلكترون
 msgid "Use a gateway"
 msgstr "إستخدام المدخل"
 
+#, fuzzy
+msgid "Use alternative skin"
+msgstr "إضافة البديل"
+
 msgid "Use as PiP if possible"
 msgstr "أستخدام خاصية قناة داخل قناة إذا كان ذلك ممكنا"
 
@@ -9974,6 +9990,10 @@ msgstr "استخدم قـياس الطاقة"
 #, fuzzy
 msgid "Use skin default"
 msgstr "تعيين السكين الإفتراضي"
+
+#, fuzzy
+msgid "Use the alternative screen"
+msgstr "تعديل البديل"
 
 msgid "Use the network wizard to configure selected network adapter"
 msgstr "استخدام معالج شبكه الاتصال لتكوين محول شبكه الاتصال المحدد"
@@ -10356,9 +10376,15 @@ msgstr "الصحراء الغربية"
 msgid "What type of service scan do you want?"
 msgstr "ما نوع فحص الخدمة الذي تريده؟"
 
+msgid "When enabled a simplified version from the second infobar is shown. This can also be toggled instantly by holding the OK buttin when the second infobar is visible. The infobar will shortly disappear and then shown in the other mode."
+msgstr "عند التمكين، يتم عرض نسخة مبسطة من شريط المعلومات الثاني. يمكن أيضًا تبديل هذا على الفور عن طريق الضغط على الزر "موافق" عندما يكون شريط المعلومات الثاني مرئيًا. سيختفي شريط المعلومات قريبًا ثم يظهر في الوضع الآخر."
+
 msgid "When enabled enigma2 will load unlinked userbouquets. This means that userbouquets that are available, but not included in the bouquets.tv or bouquets.radio files, will still be loaded. This allows you for example to keep your own user bouquet while installed settings are updated"
 msgstr "عند تمكين الانجما 2 سيتم تحميل باقات المستخدم غير مرتبطة. وهذا يعني أنه لا يزال سيتم تحميل باقات المستخدم التي تتوفر ، ولكن لم يتم تضمينها في قنوات الباقات. أو ملفات باقات القنوات الإذاعية هذا يسمح لك على سبيل المثال للحفاظ على باقة المستخدم الخاصة بك أثناء التثبيت\n"
 "تتم ترقية الإعدادات"
+
+msgid "When enabled extra information is shown on the infobar. This can also be toggled instantly by holding the OK button when the inforbar is not visible."
+msgstr "عند التمكين، يتم عرض معلومات إضافية على شريط المعلومات. يمكن أيضًا تبديل هذا على الفور بالضغط على الزر "موافق" عندما لا يكون شريط المعلومات مرئيًا."
 
 msgid "When enabled the Picture in Picture window can be closed with 'exit' button."
 msgstr "عند التمكين يمكنك إغلاق خاصية قناة داخل قناة بواسطة زر الخروج من جهاز التحكم عن بعد."
@@ -10380,6 +10406,10 @@ msgstr "عند التمكين ، يكون جهاز فك التشفير قادر�
 
 msgid "When enabled the timer from the fallback tuner is imported"
 msgstr "عند تمكين اندفاع اللاقط سيتم فرضه"
+
+#, fuzzy
+msgid "When enabled the timer from the fallback tuner is the default timer"
+msgstr "عند التمكين، يكون المؤقت من الموالف الاحتياطي هو المؤقت الافتراضي"
 
 msgid "When enabled then when you select a new channel in the channel selection the channel selection will not close. It will only close when you select the current playing service. This is a kind of preview mode"
 msgstr "عند التمكين ، عند تحديد قناة جديدة في تحديد القناة ، لن يتم إغلاق اختيار القناة. سيتم إغلاقه فقط عند تحديد خدمة التشغيل الحالية. هذا نوع من وضع المعاينة"
