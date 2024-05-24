@@ -5642,7 +5642,7 @@ msgid "OE Version: "
 msgstr "إصدار جديد:"
 
 msgid "OK"
-msgstr 'موافق'
+msgstr "موافق"
 
 msgid "ONID"
 msgstr "معرف الشبكة الاصلي"
