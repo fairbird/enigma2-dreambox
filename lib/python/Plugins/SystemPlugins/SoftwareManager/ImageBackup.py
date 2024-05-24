@@ -17,7 +17,7 @@ from Screens.MessageBox import MessageBox
 from Screens.Screen import Screen
 from Tools.BoundFunction import boundFunction
 from Tools.MultiBoot import MultiBoot
-from Tools.Directories import fileReadLiness, fileWriteLine, fileWriteLines
+from Tools.Directories import fileWriteLine, fileWriteLines
 
 MODULE_NAME = __name__.split(".")[-1]
 
