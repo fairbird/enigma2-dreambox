@@ -5642,7 +5642,7 @@ msgid "OE Version: "
 msgstr "إصدار جديد:"
 
 msgid "OK"
-msgstr "موافق"
+msgstr 'موافق'
 
 msgid "ONID"
 msgstr "معرف الشبكة الاصلي"
@@ -10377,14 +10377,14 @@ msgid "What type of service scan do you want?"
 msgstr "ما نوع فحص الخدمة الذي تريده؟"
 
 msgid "When enabled a simplified version from the second infobar is shown. This can also be toggled instantly by holding the OK buttin when the second infobar is visible. The infobar will shortly disappear and then shown in the other mode."
-msgstr "عند التمكين، يتم عرض نسخة مبسطة من شريط المعلومات الثاني. يمكن أيضًا تبديل هذا على الفور عن طريق الضغط على الزر "موافق" عندما يكون شريط المعلومات الثاني مرئيًا. سيختفي شريط المعلومات قريبًا ثم يظهر في الوضع الآخر."
+msgstr "عند التمكين، يتم عرض نسخة مبسطة من شريط المعلومات الثاني. يمكن أيضًا تبديل هذا على الفور عن طريق الضغط على الزر 'موافق' عندما يكون شريط المعلومات الثاني مرئيًا. سيختفي شريط المعلومات قريبًا ثم يظهر في الوضع الآخر."
 
 msgid "When enabled enigma2 will load unlinked userbouquets. This means that userbouquets that are available, but not included in the bouquets.tv or bouquets.radio files, will still be loaded. This allows you for example to keep your own user bouquet while installed settings are updated"
 msgstr "عند تمكين الانجما 2 سيتم تحميل باقات المستخدم غير مرتبطة. وهذا يعني أنه لا يزال سيتم تحميل باقات المستخدم التي تتوفر ، ولكن لم يتم تضمينها في قنوات الباقات. أو ملفات باقات القنوات الإذاعية هذا يسمح لك على سبيل المثال للحفاظ على باقة المستخدم الخاصة بك أثناء التثبيت\n"
 "تتم ترقية الإعدادات"
 
 msgid "When enabled extra information is shown on the infobar. This can also be toggled instantly by holding the OK button when the inforbar is not visible."
-msgstr "عند التمكين، يتم عرض معلومات إضافية على شريط المعلومات. يمكن أيضًا تبديل هذا على الفور بالضغط على الزر "موافق" عندما لا يكون شريط المعلومات مرئيًا."
+msgstr "عند التمكين، يتم عرض معلومات إضافية على شريط المعلومات. يمكن أيضًا تبديل هذا على الفور بالضغط على الزر 'موافق' عندما لا يكون شريط المعلومات مرئيًا."
 
 msgid "When enabled the Picture in Picture window can be closed with 'exit' button."
 msgstr "عند التمكين يمكنك إغلاق خاصية قناة داخل قناة بواسطة زر الخروج من جهاز التحكم عن بعد."
