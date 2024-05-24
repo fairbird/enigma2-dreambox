@@ -46,7 +46,6 @@ jobs:
         sudo apt-get install libgstreamer-plugins-base1.0-dev
         sudo apt-get install libfreetype6-dev
         sudo apt-get install libfribidi-dev
-        sudo apt-get install libssl-dev
         sudo apt-get install libavahi-client-dev
         sudo apt-get install libjpeg-turbo8-dev
         sudo apt-get install libgif-dev
