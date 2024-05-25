@@ -286,6 +286,12 @@ def InitUsageConfig():
 		("intermediate", _("Advanced")),
 		("expert", _("Expert"))])
 
+	config.usage.sortExtensionslist = ConfigSelection(default="", choices=[
+		("alpha", _("Alphabetical")),
+		("", _("Default")),
+		("user", _("User defined"))
+	])
+
 	config.usage.helpSortOrder = ConfigSelection(default="headings+alphabetic", choices=[
 		("headings+alphabetic", _("Alphabetical under headings")),
 		("flat+alphabetic", _("Flat alphabetical")),

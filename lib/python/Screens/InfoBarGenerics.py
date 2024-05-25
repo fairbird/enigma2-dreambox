@@ -2456,35 +2456,39 @@ class InfoBarTimeshift:
 
 
 class ExtensionsList(ChoiceBox):
-	def __init__(self, session, clist, keys, refresh_list):
-		ChoiceBox.__init__(self, session, title=_("Please choose an extension..."), list=clist, keys=keys, skin_name="ExtensionsList", reorderConfig="extension_order", windowTitle=_("Extensions menu"))
-		if refresh_list:
-			self.refresh_timer = eTimer()
-			self.refresh_timer.callback.append(self.update_list)
-			self.refresh_timer.start(1000)
+	def __init__(self, session, extensions):
+		colorKeys = {
+			"red": 1,
+			"green": 2,
+			"yellow": 3,
+			"blue": 4
+		}
+		extensionListAll = []
+		for extension in extensions:
+			if extension[0] == 0:  # EXTENSION_SINGLE
+				extensionListAll.append((extension[1][0](), extension[1], extension[2], colorKeys.get(extension[2], 0)))
+			else:
+				for subExtension in extension[1]():
+					extensionListAll.append((subExtension[0][0](), subExtension[0], subExtension[1], colorKeys.get(subExtension[1], 0)))
 
-	def update_list(self):
-		updated = False
-		removed = []
-		for idx, x in enumerate(self.list):
-			text = x[0][1][0]()
-			if x[0][0] != text:  # Update text if changed
-				x[0] = (text, *x[0][1:])
-				x[1] = x[1][:7] + (text,)
-				self.summarylist[idx] = (self.summarylist[idx][0], text)
-				updated = True
-			elif not x[0][1][2]():  # Remove job if not active
-				updated = True
-				removed.append(idx)
-		if updated:
-			for idx, x in enumerate(removed):
-				del self.list[x - idx]
-				del self.summarylist[x - idx]
-			self["list"].setList(self.list)
-			self.updateSummary(self["list"].getSelectionIndex())
-			if removed:
-				for f in self.onLayoutFinish:  # For screen resize
-					exec(f)
+		if config.usage.sortExtensionslist.value == "alpha":
+			extensionListAll.sort(key=lambda x: (x[3], x[0]))
+		else:
+			extensionListAll.sort(key=lambda x: x[3])
+
+		allkeys = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"]
+		extensionList = []
+		extensionKeys = []
+
+		for extension in extensionListAll:
+			key = extension[2]
+			if not key and allkeys:
+				key = allkeys.pop(0)
+			extensionKeys.append(key or "")
+			extensionList.append((extension[0], extension[1]))
+
+		reorderConfig = "extension_order" if config.usage.sortExtensionslist.value == "user" else ""
+		ChoiceBox.__init__(self, session, title=_("Please choose an extension..."), list=extensionList, keys=extensionKeys, reorderConfig=reorderConfig, skin_name="ExtensionsList")
 
 
 class InfoBarExtensions:
@@ -2547,22 +2551,7 @@ class InfoBarExtensions:
 					self.updateExtension(y[0], y[1])
 
 	def showExtensionSelection(self):
-		self.updateExtensions()
-		extensionsList = self.extensionsList[:]
-		keys = []
-		clist = []
-		for x in self.availableKeys:
-			if x in self.extensionKeys:
-				entry = self.extensionKeys[x]
-				extension = self.extensionsList[entry]
-				if extension[2]():
-					clist.append((extension[0](), extension))
-					keys.append(x)
-					extensionsList.remove(extension)
-				else:
-					extensionsList.remove(extension)
-		clist.extend([(x[0](), x) for x in extensionsList])
-		clist and self.session.openWithCallback(self.extensionCallback, ExtensionsList, clist=clist, keys=keys, refresh_list="refresh" in self.extensionKeys)
+		self.session.openWithCallback(self.extensionCallback, ExtensionsList, self.list)
 
 	def extensionCallback(self, answer):
 		if answer is not None:
