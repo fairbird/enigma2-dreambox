@@ -1,83 +1,80 @@
-<menu text="Main menu" title="Main menu">
-	<id val="mainmenu"/>
-<!-- the following types are allowed:
+<menu key="mainmenu" text="Main menu">
+<!--
+	The following types are allowed:
 	<screen [module="mod"] [screen="classname"]>[arguments]</screen>
-		executes Screen called "classname" from module "Screen.mod"
-		if no module is given, Screen must be globally available.
-		if no screen is given, module is used as screen class name.
-		arguments must be comma seperated (will be fed to eval), and can
-			use stuff from module
-		(of course you must specify at least one of module, screen.)
-	<setup id="id"/>
-		opens a setup with specified id
+		Executes Screen called "classname" from module "Screen.mod".
+		If no module is given, Screen must be globally available.
+		If no screen is given, module is used as screen class name.
+		Arguments must be comma seperated (will be fed to eval), and can
+			use stuff from module.
+		(Of course you must specify at least one of module, screen.)
+	<plugin [extensions/system="pluginname"] [screen="classname"]>[arguments]</plugin>
+		Either "extensions" or "system" must be used. "extensions" is for 
+		Plugin.Extensions plugins and "system" is for Plugins.SystemPlugins.
+	<plugin [extensions="pluginname"] [screen="classname"]>[arguments]</plugin>
+		Executes Screen called "classname" from module "Plugins.Extensions.pluginname.plugin".
+		If no screen is given, "pluginname" is used as screen class name.
+		Arguments must be comma seperated (will be fed to eval), and can
+			use stuff from module.
+	<setup id="id" />
+		Opens a setup with specified id.
 	<code> .. code .. </code>
-		"exec"s code
+		Python "exec"s code.
 -->
-		<menu weight="7" level="0" text="Timers" entryID="timer_menu">
-			<id val="timermenu" />
-			<item weight="0" level="0" text="Timers" entryID="timer_edit"><screen module="TimerEdit" screen="TimerEditList" /></item>
-			<item weight="10" level="0" text="CronTimers" entryID="crontimer_edit"><screen module="CronTimer" screen="CronTimers" /></item>
+		<menu key="timermenu" weight="7" level="0" text="Timers">
+			<item key="timer_edit" weight="0" level="0" text="Timers"><screen module="TimerEdit" screen="TimerEditList" /></item>
+			<item key="crontimer_edit" weight="10" level="0" text="CronTimers"><screen module="CronTimer" screen="CronTimers" /></item>
 		</menu>
-		<item level="1" text="VCR scart" entryID="scart_switch" conditional="config.usage.show_vcr_scart.value" requires="ScartSwitch"><code>self.session.scart.VCRSbChanged(3)</code></item>
+		<item key="scart_switch" level="1" text="VCR scart" conditional="config.usage.show_vcr_scart.value" requires="ScartSwitch"><code>self.session.scart.VCRSbChanged(3)</code></item>
 
-		<menu level="0" text="Information" entryID="info_screen">
-			<id val="information"/>
-			<item level="1" text="Service" entryID="service_info_screen"><screen module="ServiceInfo" screen="ServiceInfo"/></item>
-			<item level="0" text="About" entryID="about_screen"><screen module="About"/></item>
-			<item level="2" text="Streaming clients info" entryID="streaming_clients_info_screen"><screen module="StreamingClientsInfo"/></item>
+		<menu key="information" level="0" text="Information">
+			<item key="service_info_screen" level="1" text="Service"><screen module="ServiceInfo" screen="ServiceInfo"/></item>
+			<item key="about_screen" level="0" text="About"><screen module="About"/></item>
+			<item key="streaming_clients_info_screen" level="2" text="Streaming clients info"><screen module="StreamingClientsInfo"/></item>
 		</menu>
 
-		<item level="0" text="Plugins" entryID="plugin_selection"><screen module="PluginBrowser" screen="PluginBrowser"/></item>
-		<menu level="0" text="Setup" flushConfigOnClose="1" entryID="setup_selection" >
-			<id val="setup"/>
-			<menu weight="7" level="0" text="Tuners &amp; scanning" entryID="service_searching_selection">
-				<id val="scan"/>
-				<item text="Tuner configuration" entryID="tuner_setup" conditional="nimmanager.nim_slots"><screen module="Satconfig" screen="NimSelection"/></item>
-				<item text="Automatic scan" entryID="auto_scan" conditional="nimmanager.somethingConnected()"><screen module="ScanSetup" screen="ScanSimple"/></item>
-				<item text="Manual scan" entryID="manual_scan" conditional="nimmanager.somethingConnected()"><screen module="ScanSetup"/></item>
-				<item text="Fallback remote receiver setup" entryID="fallbacktuner_settings"><screen module="SetupFallbacktuner"/></item>
+		<item key="plugin_selection" level="0" text="Plugins"><screen module="PluginBrowser" screen="PluginBrowser"/></item>
+		<menu key="setup" level="0" text="Setup" flushConfigOnClose="1">
+			<menu key="scan" weight="7" level="0" text="Tuners &amp; scanning">
+				<item key="tuner_setup"  text="Tuner configuration" conditional="nimmanager.nim_slots"><screen module="Satconfig" screen="NimSelection"/></item>
+				<item key="auto_scan"  text="Automatic scan" conditional="nimmanager.somethingConnected()"><screen module="ScanSetup" screen="ScanSimple"/></item>
+				<item key="manual_scan" text="Manual scan" conditional="nimmanager.somethingConnected()"><screen module="ScanSetup"/></item>
+				<item key="fallbacktuner_settings" text="Fallback remote receiver setup"><screen module="SetupFallbacktuner"/></item>
 			</menu>
-			<menu weight="5" level="0" text="System" entryID="system_selection">
-				<id val="system"/>
-				<menu weight="0" level="0" text="Check update Settings" entryID="check_update">
-					<id val="update"/>
-					<item level="0" entryID="check_update"><setup id="checkupdate"/></item>
+			<menu key="system" weight="5" level="0" text="System">
+				<menu key="update" weight="0" level="0" text="Check update Settings">
+					<item key="check_update" level="0"><setup id="checkupdate"/></item>
 				</menu>
-				<menu level="0" text="Audio &amp; Video" entryID="video_selection">
-					<id val="video"/>
-					<item level="0" entryID="av_setup"><setup id="avsetup"/></item>
-					<item entryID="subtitle_setup" level="2" text="Subtitle Setup" weight="20"><setup id="subtitlesetup" /></item>
-					<item level="0" entryID="autolanguage_setup" text="Auto Language Setup"><setup id="autolanguagesetup"/></item>
-					<item entryID="osdsetup" level="1" text="OSD Calibration" weight="50" requires="OSDCalibration"><screen module="OSDCalibration" screen="OSDCalibration" /></item>
-					<item entryID="setup_osd3d" level="2" text="OSD 3D Settings" weight="60" requires="OSD3DCalibration"><screen module="OSDCalibration" screen="OSD3DCalibration" /></item>
+				<menu key="video" level="0" text="Audio &amp; Video">
+					<item key="av_setup" level="0"><setup id="avsetup"/></item>
+					<item key="subtitle_setup" level="2" text="Subtitle Setup" weight="20"><setup id="subtitlesetup" /></item>
+					<item key="autolanguage_setup" level="0"text="Auto Language Setup"><setup id="autolanguagesetup"/></item>
+					<item key="osdsetup" level="1" text="OSD Calibration" weight="50" requires="OSDCalibration"><screen module="OSDCalibration" screen="OSDCalibration" /></item>
+					<item key="setup_osd3d" level="2" text="OSD 3D Settings" weight="60" requires="OSD3DCalibration"><screen module="OSDCalibration" screen="OSD3DCalibration" /></item>
 				</menu>
-				<menu level="0" text="GUI Settings" entryID="gui_settings">
-					<id val="gui"/>
-					<item level="0" text="Language" entryID="language_setup"><screen module="LanguageSelection"/></item>
+				<item key="usage_setup" level="0" text="Customize"><setup id="usage"/></item>
+				<menu key="gui" level="0" text="GUI Settings">
+					<item key="language_setup" level="0" text="Language"><screen module="LanguageSelection"/></item>
 					<!-- Menu / Setup / Time -->
-					<item entryID="time_setup" level="0" text="Time" weight="50"><screen module="Time" screen="Time" /></item>
-					<item level="0" entryID="user_interface" text="User Interface" ><setup id="userinterface"/></item>
-					<item level="0" entryID="usage_setup"><setup id="usage"/></item>
-					<item level="0" text="Skin" entryID="primary_skin_selector"><screen module="SkinSelector" screen="SkinSelector"/></item>
-					<menu entryID="display_selection" level="0" text="Front Panel Display">
-						<id val="lcd" />
-						<item entryID="display_skin_selector" level="0" text="Skin Setup" weight="5" requires="Display"><screen module="SkinSelector" screen="LcdSkinSelector" /></item>
-						<item entryID="lcd_setup" level="1" text="LCD Setup" weight="10" requires="Display"><setup id="FrontDisplay" /></item>
-						<item entryID="led_setup" level="1" text="LED Setup" weight="15"><setup id="LedDisplay" /></item>
+					<item key="time_setup" level="0" text="Time" weight="50"><screen module="Time" screen="Time" /></item>
+					<item key="user_interface" level="0" text="User Interface" ><setup id="userinterface"/></item>
+					<item key="usage_setup" level="0" ><setup id="usage"/></item>
+					<item key="primary_skin_selector" level="0" text="Skin"><screen module="SkinSelector" screen="SkinSelector"/></item>
+					<menu key="lcd" level="0" text="Front Panel Display">
+						<item key="display_skin_selector" level="0" text="Skin Setup" weight="5" requires="Display"><screen module="SkinSelector" screen="LcdSkinSelector" /></item>
+						<item key="lcd_setup" level="1" text="LCD Setup" weight="10" requires="Display"><setup id="FrontDisplay" /></item>
+						<item key="led_setup" level="1" text="LED Setup" weight="15"><setup id="LedDisplay" /></item>
 					</menu>
 				</menu>
-				<menu entryID="usage_setup" level="0" text="Log Manager" weight="2">
-					<id val="logs_menu" />
-					<item entryID="logs_setup" level="2" text="Settings"><setup id="Logs" /></item>
-					<item entryID="logs_man" level="2" text="View Log Manager"><screen module="LogManager" screen="LogManager" /></item>
+				<menu key="logs_menu" level="0" text="Log Manager" weight="2">
+					<item key="logs_setup" level="2" text="Settings"><setup id="Logs" /></item>
+					<item key="logs_man" level="2" text="View Log Manager"><screen module="LogManager" screen="LogManager" /></item>
 				</menu>
 				<!-- Menu / Setup / EPG -->
-				<menu entryID="epg_menu" level="0" text="EPG" weight="15">
-					<id val="epg" />
-					<item entryID="epg_setup" level="0" text="EPG Setup" weight="5"><setup id="EPG" /></item>
-					<menu entryID="epgloadsave_menu" level="2" text="Save, Load &amp; Delete EPG Cache" weight="10">
-						<id val="epgloadsave_menu" />
-						<item entryID="saveepgcache" level="0" text="Save EPG Cache">
+				<menu key="epg" level="0" text="EPG" weight="15">
+					<item key="epg_setup" level="0" text="EPG Setup" weight="5"><setup id="EPG" /></item>
+					<menu key="epgloadsave_menu" level="2" text="Save, Load &amp; Delete EPG Cache" weight="10">
+						<item key="saveepgcache" level="0" text="Save EPG Cache">
 							<code>
 from Components.EpgLoadSave import EpgSaveMsg
 def msgClosed(ret):
@@ -88,7 +85,7 @@ def msgClosed(ret):
 self.session.openWithCallback(msgClosed, EpgSaveMsg)
 							</code>
 						</item>
-						<item entryID="loadepgcache" level="0" text="Load EPG Cache">
+						<item key="loadepgcache" level="0" text="Load EPG Cache">
 							<code>
 from Components.EpgLoadSave import EpgLoadMsg
 def msgClosed(ret):
@@ -99,7 +96,7 @@ def msgClosed(ret):
 self.session.openWithCallback(msgClosed, EpgLoadMsg)
 							</code>
 						</item>
-						<item entryID="deleteepgcache" level="0" text="Delete EPG Cache">
+						<item key="deleteepgcache" level="0" text="Delete EPG Cache">
 							<code>
 from Components.EpgLoadSave import EpgDeleteMsg
 def msgClosed(ret):
@@ -116,60 +113,55 @@ self.session.openWithCallback(msgClosed, EpgDeleteMsg)
 						</item>
 					</menu>
 				</menu>
-				<item level="1" entryID="rfmod_setup" requires="RfModulator"><setup id="RFmod"/></item>
-				<menu level="0" text="Expert settings" entryID="expert_selection">
-				<id val="expert"/>
-				<item level="0" entryID="accesslevel_setup"><setup id="accesslevel"/></item>
+				<item key="rfmod_setup" level="1" requires="RfModulator"><setup id="RFmod"/></item>
+				<menu key="expert" level="0" text="Expert settings">
+				<item key="accesslevel_setup" level="0"><setup id="accesslevel"/></item>
 				<!-- Menu / Setup / Recordings, Playback & Timeshift -->
-				<menu entryID="rec_setup" level="1" text="Playback, Recording &amp; Timeshift" weight="45">
-					<id val="rec" />
-					<item entryID="playback_setup" level="0" text="Playback Setup" weight="5"><setup id="Playback" /></item>
-					<item entryID="recording_setup" level="0" text="Recording Setup" weight="10"><screen module="Recording" screen="RecordingSettings" /></item>
-					<item entryID="timeshift_setup" level="0" text="Timeshift Setup" weight="15"><screen module="Timeshift" screen="TimeshiftSettings" /></item>
-					<item entryID="hdmirecord_setup" level="0" text="HDMI-IN Recording settings" weight="15" requires="HDMIin"><setup id="HDMIRecord"/></item>
+				<menu key="rec" level="1" text="Playback, Recording &amp; Timeshift" weight="45">
+					<item key="playback_setup" level="0" text="Playback Setup" weight="5"><setup id="Playback" /></item>
+					<item key="recording_setup" level="0" text="Recording Setup" weight="10"><screen module="Recording" screen="RecordingSettings" /></item>
+					<item key="timeshift_setup" level="0" text="Timeshift Setup" weight="15"><screen module="Timeshift" screen="TimeshiftSettings" /></item>
+					<item key="hdmirecord_setup" level="0" text="HDMI-IN Recording settings" weight="15" requires="HDMIin"><setup id="HDMIRecord"/></item>
 				</menu>
-				<menu level="0" text="Harddisk" entryID="hardisk_selection" requires="Harddisk">
-					<id val="harddisk"/>
-					<item level="0" entryID="harddisk_setup"><setup id="harddisk"/></item>
-					<item level="0" text="Initialization" entryID="harddisk_init"><screen module="HarddiskSetup" screen="HarddiskSelection"/></item>
-					<item level="0" text="Filesystem check" entryID="harddisk_check"><screen module="HarddiskSetup" screen="HarddiskFsckSelection"/></item>
-					<item entryID="flash_expander" level="2" text="Flash Expander" weight="40"><screen module="FlashExpander" screen="FlashExpander" /></item>
+				<menu key="harddisk" level="0" text="Harddisk" requires="Harddisk">
+					<item key="harddisk_setup" level="0"><setup id="harddisk"/></item>
+					<item key="harddisk_init" level="0" text="Initialization"><screen module="HarddiskSetup" screen="HarddiskSelection"/></item>
+					<item key="harddisk_check" level="0" text="Filesystem check"><screen module="HarddiskSetup" screen="HarddiskFsckSelection"/></item>
+					<item key="flash_expander" level="2" text="Flash Expander" weight="40"><screen module="FlashExpander" screen="FlashExpander" /></item>
 				</menu>
-				<item level="0" text="Network" entryID="network_setup"><screen module="NetworkSetup" screen="NetworkAdapterSelection"/></item>
-				<item level="1" text="Input devices" entryID="input_device_setup"><screen module="InputDeviceSetup" screen="InputDeviceSelection"/></item>
-				<item entryID="keyboard_setup" text="Keyboard"><setup id="keyboard"/></item>
-				<item level="1" text="Hotkey" entryID="hotkey_setup"><screen module="Hotkey" screen="HotkeySetup"/></item>
+				<item key="network_setup" level="0" text="Network"><screen module="NetworkSetup" screen="NetworkAdapterSelection"/></item>
+				<item key="input_device_setup" level="1" text="Input devices"><screen module="InputDeviceSetup" screen="InputDeviceSelection"/></item>
+				<item key="keyboard_setup" text="Keyboard"><setup id="keyboard"/></item>
+				<item key="hotkey_setup" level="1" text="Hotkey"><screen module="Hotkey" screen="HotkeySetup"/></item>
 				</menu>
 			</menu>
 
-			<menu weight="10" text="SoftCam / CI" entryID="cam_setup">
-				<id val="cam"/>
-				<item weight="10" level="0" text="Softcam Setup" entryID="softcam_setup"><screen module="SoftcamSetup" screen="SoftcamSetup"/></item>
-				<item weight="10" level="0" text="Common Interface" entryID="ci_setup" requires="CommonInterface"><screen module="Ci" screen="CiSelection"/></item>
-				<item weight="110" level="2" text="Stream Relay Settings" entryID="streamrelay_settings"><screen module="SoftcamSetup" screen="StreamRelaySetup" /></item>
+			<menu key="cam" weight="10" text="SoftCam / CI">
+				<item key="softcam_setup" weight="10" level="0" text="Softcam Setup"><screen module="SoftcamSetup" screen="SoftcamSetup"/></item>
+				<item key="ci_setup" weight="10" level="0" text="Common Interface" requires="CommonInterface"><screen module="Ci" screen="CiSelection"/></item>
+				<item key="streamrelay_settings" weight="110" level="2" text="Stream Relay Settings"><screen module="SoftcamSetup" screen="StreamRelaySetup" /></item>
 			</menu>
 
-			<item weight="15" level="0" text="Parental control" entryID="parental_setup"><screen module="ParentalControlSetup" screen="ParentalControlSetup"/></item>
-			<item weight="15" level="0" text="Factory reset" entryID="factory_reset"><screen module="FactoryReset" screen="FactoryReset"/></item>
-			<!--item entryID="flash_online" level="0" text="Flash image Online" description="Download and flash images on your device." weight="13"><screen module="FlashManager" screen="FlashManager" /></item-->
-			<!--item weight="15" level="0" text="Software update" entryID="software_update"><screen module="SoftwareUpdate" screen="UpdatePlugin"/></item-->
+			<item key="parental_setup" weight="15" level="0" text="Parental control"><screen module="ParentalControlSetup" screen="ParentalControlSetup"/></item>
+			<item key="factory_reset" weight="15" level="0" text="Factory reset"><screen module="FactoryReset" screen="FactoryReset"/></item>
+			<!--item key="flash_online" level="0" text="Flash image Online" description="Download and flash images on your device." weight="13"><screen module="FlashManager" screen="FlashManager" /></item-->
+			<!--item key="software_update" weight="15" level="0" text="Software update"><screen module="SoftwareUpdate" screen="UpdatePlugin"/></item-->
 		</menu>
 
-		<menu text="Standby / restart" entryID="standby_restart_list">
-			<id val="shutdown"/>
-			<item text="Sleep timer" entryID="sleep"><screen module="SleepTimerEdit" screen="SleepTimerEdit"/></item>
-			<item text="Standby" entryID="standby"><screen module="Standby" screen="Standby"/></item>
-			<item text="Full Restart" entryID="restart"><screen module="Standby" screen="TryQuitMainloop">2</screen></item>
-			<item weight="24" level="0" text="Switch to Android" requires="canDualBoot" entryID="dualboot"><screen module="Standby" screen="SwitchToAndroid" /></item>
-			<!--item text="Restart enigma" requires="InDebugMode" entryID="restart_enigma_debug"><screen module="Standby" screen="TryQuitMainloop">6</screen></item>
-			<item text="Restart enigma" requires="!InDebugMode" entryID="restart_enigma"><screen module="Standby" screen="TryQuitMainloop">3</screen></item-->
-			<item text="Restart enigma" entryID="restart_enigma"><screen module="Standby" screen="TryQuitMainloop">3</screen></item>
-			<!--item text="Restart enigma in standard mode" requires="InDebugMode" entryID="restart_enigma"><screen module="Standby" screen="TryQuitMainloop">3</screen></item>
-			<item text="Restart enigma in debug mode" requires="!InDebugMode" entryID="restart_enigma_debug"><screen module="Standby" screen="TryQuitMainloop">6</screen></item-->
-			<item entryID="multiboot" level="0" text="MultiBoot Manager" weight="6" requires="canMultiBoot"><screen module="MultiBootManager" screen="MultiBootManager" /></item>
-			<item entryID="kexec_multiboot" level="2" text="Enable Kexec MultiBoot" weight="6" requires="cankexec"><screen module="MultiBootManager" screen="KexecInit">1</screen></item>
-			<item text="Deep standby" requires="DeepstandbySupport" entryID="deep_standby"><screen module="Standby" screen="TryQuitMainloop">1</screen></item>
-			<item text="Shutdown" requires="!DeepstandbySupport" entryID="deep_standby"><screen module="Standby" screen="TryQuitMainloop">1</screen></item>
-			<item entryID="maintenance_mode" level="0" text="Recovery Mode" weight="55" requires="RecoveryMode"><screen module="Standby" screen="TryQuitMainloop">16</screen></item>
+		<menu key="shutdown" text="Standby / restart">
+			<item key="sleep" text="Sleep timer"><screen module="SleepTimerEdit" screen="SleepTimerEdit"/></item>
+			<item key="standby" text="Standby"><screen module="Standby" screen="Standby"/></item>
+			<item key="restart" text="Full Restart"><screen module="Standby" screen="TryQuitMainloop">2</screen></item>
+			<item key="dualboot" weight="24" level="0" text="Switch to Android" requires="canDualBoot"><screen module="Standby" screen="SwitchToAndroid" /></item>
+			<!--item key="restart_enigma_debug" text="Restart enigma" requires="InDebugMode"><screen module="Standby" screen="TryQuitMainloop">6</screen></item>
+			<item key="restart_enigma" text="Restart enigma" requires="!InDebugMode"><screen module="Standby" screen="TryQuitMainloop">3</screen></item-->
+			<item key="restart_enigma" text="Restart enigma"><screen module="Standby" screen="TryQuitMainloop">3</screen></item>
+			<!--item key="restart_enigma" text="Restart enigma in standard mode" requires="InDebugMode"><screen module="Standby" screen="TryQuitMainloop">3</screen></item>
+			<item key="restart_enigma_debug" text="Restart enigma in debug mode" requires="!InDebugMode"><screen module="Standby" screen="TryQuitMainloop">6</screen></item-->
+			<item key="multiboot" level="0" text="MultiBoot Manager" weight="6" requires="canMultiBoot"><screen module="MultiBootManager" screen="MultiBootManager" /></item>
+			<item key="kexec_multiboot" level="2" text="Enable Kexec MultiBoot" weight="6" requires="cankexec"><screen module="MultiBootManager" screen="KexecInit">1</screen></item>
+			<item key="deep_standby" text="Deep standby" requires="DeepstandbySupport"><screen module="Standby" screen="TryQuitMainloop">1</screen></item>
+			<item key="deep_standby" text="Shutdown" requires="!DeepstandbySupport"><screen module="Standby" screen="TryQuitMainloop">1</screen></item>
+			<item key="maintenance_mode" level="0" text="Recovery Mode" weight="55" requires="RecoveryMode"><screen module="Standby" screen="TryQuitMainloop">16</screen></item>
 		</menu>
 </menu>
