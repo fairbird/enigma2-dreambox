@@ -134,7 +134,8 @@ class SoftwareTools(PackageInfoHandler):
 				else:
 					if self.UpdateConsole:
 						if not self.UpdateConsole.appContainers:
-								callback(True)
+								#callback(True)
+								pass
 		else:
 			self.list_updating = False
 			if self.UpdateConsole:
