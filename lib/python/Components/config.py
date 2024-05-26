@@ -62,8 +62,7 @@ def getKeyNumber(key):
 
 
 def getConfigListEntry(*args):
-	if len(args) < 1:  # A single argument creates a comment line in the ConfigList.  This item can't be selected!
-		print("[Config] Error: 'getConfigListEntry' needs at least one argument (description)!")
+	assert len(args) > 0, "getConfigListEntry needs a minimum of one argument (descr, configElement)"
 	return args
 
 
@@ -2163,8 +2162,7 @@ class ConfigSubsection:
 	def __setattr__(self, name, value):
 		if name == "saved_value":
 			return self.setSavedValue(value)
-		if not isinstance(value, (ConfigSubsection, ConfigElement, ConfigSubList, ConfigSubDict)):
-			raise TypeError("[Config] Error: 'ConfigSubsection' can only store ConfigSubsections, ConfigSubLists, ConfigSubDicts or ConfigElements!")
+		assert isinstance(value, (ConfigSubsection, ConfigElement, ConfigSubList, ConfigSubDict)), "ConfigSubsections can only store ConfigSubsections, ConfigSubLists, ConfigSubDicts or ConfigElements"
 		content = self.content
 		content.items[name] = value
 		val = content.stored_values.get(name, None)
