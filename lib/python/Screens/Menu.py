@@ -1,30 +1,34 @@
 # -*- coding: utf-8 -*-
-from Screens.Screen import Screen
 from xml.etree.ElementTree import parse
-from Screens.MessageBox import MessageBox
-from Screens.ParentalControlSetup import ProtectedScreen
-from Components.Sources.List import List
-from Components.ActionMap import NumberActionMap, ActionMap
-from Components.Sources.StaticText import StaticText
-from Components.config import configfile
-from Components.PluginComponent import plugins
-from Components.config import config, ConfigDictionarySet, NoSave
-from Components.SystemInfo import SystemInfo
-from Tools.BoundFunction import boundFunction
-from skin import parameters, menus, menuicons
-from Plugins.Plugin import PluginDescriptor
-from Tools.Directories import resolveFilename, SCOPE_SKIN, SCOPE_CURRENT_SKIN, SCOPE_GUISKIN, SCOPE_SKINS
-from Components.Button import Button
-from Tools.LoadPixmap import LoadPixmap
+
+from skin import findSkinScreen, menus, parameters, menus, menuicons
+from Components.config import ConfigDictionarySet, NoSave, config, configfile
 from Components.Pixmap import Pixmap
+from Components.PluginComponent import plugins
+from Components.Sources.List import List
+from Components.Sources.StaticText import StaticText
+from Components.ActionMap import NumberActionMap, ActionMap
+from Components.SystemInfo import SystemInfo
+from Components.Button import Button
+from Plugins.Plugin import PluginDescriptor
+from Screens.ParentalControlSetup import ProtectedScreen
+from Screens.Screen import Screen
+from Screens.Setup import Setup
+from Screens.MessageBox import MessageBox
+from Tools.BoundFunction import boundFunction
+from Tools.Directories import resolveFilename, SCOPE_CURRENT_SKIN, SCOPE_GUISKIN, SCOPE_SKINS
+from Tools.LoadPixmap import LoadPixmap
+
 from enigma import eTimer
-from skin import findSkinScreen
 from os.path import exists
 
-import xml.etree.ElementTree
-
-from Screens.Setup import Setup
 from Components.NimManager import nimmanager  # nimmanager is used in eval(conditional), do not remove this import
+
+
+# read the menu
+file = open(resolveFilename(SCOPE_SKINS, "menu.xml"))
+mdom = parse(file)
+file.close()
 
 
 def MenuEntryPixmap(key, png_cache):
@@ -38,14 +42,6 @@ def MenuEntryPixmap(key, png_cache):
 			png = LoadPixmap(resolveFilename(SCOPE_GUISKIN, pngPath), cached=True, width=w, height=0 if pngPath.endswith(".svg") else h)
 	return png
 
-# read the menu
-file = open(resolveFilename(SCOPE_SKINS, "menu.xml"), "r")
-mdom = parse(file)
-file.close()
-
-lastMenuID = None
-
-nomainmenupath = False if exists(resolveFilename(SCOPE_CURRENT_SKIN, "mainmenu")) else True
 
 def default_skin():
 	for line in open("/etc/enigma2/settings"):
@@ -128,13 +124,11 @@ class Menu(Screen, ProtectedScreen):
 	png_cache = {}
 
 	def okbuttonClick(self):
-		global lastMenuID
 		if self.number:
 			self["menu"].setIndex(self.number - 1)
 		self.resetNumberKey()
 		selection = self["menu"].getCurrent()
 		if selection and selection[1]:
-			lastMenuID = selection[2]
 			selection[1]()
 
 	def execText(self, text):
@@ -189,9 +183,7 @@ class Menu(Screen, ProtectedScreen):
 		self.menuClosed(*res)
 
 	def menuClosed(self, *res):
-		global lastMenuID
 		if res and res[0]:
-			lastMenuID = None
 			self.close(True)
 		elif len(self.list) == 1:
 			self.close()

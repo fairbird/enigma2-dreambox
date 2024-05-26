@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from enigma import eListbox, eListboxPythonConfigContent, ePoint, eRCInput, eTimer
-from skin import parameters, applySkinFactor
+from skin import parameters
 
 from Components.ActionMap import HelpableActionMap, HelpableNumberActionMap
 from Components.config import ConfigBoolean, ConfigElement, ConfigInteger, ConfigMacText, ConfigNothing, ConfigNumber, ConfigSelection, ConfigSequence, ConfigText, ACTIONKEY_0, ACTIONKEY_ASCII, ACTIONKEY_BACKSPACE, ACTIONKEY_DELETE, ACTIONKEY_ERASE, ACTIONKEY_FIRST, ACTIONKEY_LAST, ACTIONKEY_LEFT, ACTIONKEY_NUMBERS, ACTIONKEY_RIGHT, ACTIONKEY_SELECT, ACTIONKEY_TIMEOUT, ACTIONKEY_TOGGLE, configfile
