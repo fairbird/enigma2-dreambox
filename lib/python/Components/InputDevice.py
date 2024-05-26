@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from fcntl import ioctl
 from os import O_NONBLOCK, O_RDWR, close as osclose, listdir, open as osopen, write as oswrite
-from os.path import isdir, isfile
+from os.path import exists, isdir, isfile, join
 from platform import machine
 from struct import pack
 
@@ -29,24 +29,23 @@ class InputDevices:
 		self.currentDevice = None
 		for device in sorted(listdir("/dev/input/")):
 
-			if isdir("/dev/input/%s" % device):
+			if isdir(join("/dev/input", device)):
 				continue
 			try:
 				_buffer = "\0" * 512
-				self.fd = osopen("/dev/input/%s" % device, O_RDWR | O_NONBLOCK)
+				self.fd = osopen(join("/dev/input", device), O_RDWR | O_NONBLOCK)
 				self.name = ioctl(self.fd, self.EVIOCGNAME(256), _buffer)
-				self.name = self.name[:self.name.find(b"\0")]
-				self.name = str(self.name)
+				self.name = self.name[:self.name.find(b"\0")].decode()
 				if str(self.name).find("Keyboard") != -1:
-					self.name = 'keyboard'
+					self.name = "keyboard"
 				osclose(self.fd)
-			except (IOError, OSError) as err:
-				print("[InputDevice] Error: device='%s' getInputDevices <ERROR: ioctl(EVIOCGNAME): '%s'>" % (device, str(err)))
+			except OSError as err:
+				print(f"[InputDevice] Error: device='{device}' getInputDevices <ERROR: ioctl(EVIOCGNAME): '{str(err)}'>")
 				self.name = None
 
 			if self.name:
 				devType = self.getInputDeviceType(self.name.lower())
-				print("[InputDevice] Found device '%s' with name '%s' of type '%s'." % (device, self.name, "Unknown" if devType is None else devType.capitalize()))
+				print(f"[InputDevice] Found device '{device}' with name '{self.name}' of type '{'Unknown' if devType is None else devType.capitalize()}'.")
 				# What was this for?
 				# if self.name == "aml_keypad":
 				# 	print("[InputDevice] ALERT: Old code flag for 'aml_keypad'.")
@@ -84,7 +83,7 @@ class InputDevices:
 		elif "mouse" in name:
 			return "mouse"
 		else:
-			print("[InputDevice] Warning: Unknown device type: '%s'!" % name)
+			print(f"[InputDevice] Warning: Unknown device type: '{name}'!")
 			return None
 
 	def getDeviceList(self):
@@ -98,18 +97,18 @@ class InputDevices:
 	# }; -> size = 16
 	#
 	def setDeviceDefaults(self, device):
-		print("[InputDevice] setDeviceDefaults DEBUG: Device '%s'." % device)
+		print(f"[InputDevice] setDeviceDefaults DEBUG: Device '{device}'.")
 		self.setDeviceAttribute(device, 'configuredName', None)
 		eventRepeat = pack("LLHHi", 0, 0, 0x14, 0x01, 100)
 		eventDelay = pack("LLHHi", 0, 0, 0x14, 0x00, 700)
-		fd = osopen("/dev/input/%s" % device, O_RDWR)
+		fd = osopen(join("/dev/input", device), O_RDWR)
 		oswrite(fd, eventRepeat)
 		oswrite(fd, eventDelay)
 		osclose(fd)
 
 	def setDeviceEnabled(self, device, value):
 		oldVal = self.getDeviceAttribute(device, "enabled")
-		# print("[InputDevices] setDeviceEnabled for device %s to %s from %s" % (device,value,oldval))
+		# print(f"[InputDevices] setDeviceEnabled for device '{device}' to '{value}' from '{oldval}'.")
 		self.setDeviceAttribute(device, "enabled", value)
 		if oldVal is True and value is False:
 			self.setDeviceDefaults(device)
@@ -120,22 +119,22 @@ class InputDevices:
 		return "Unknown device name"
 
 	def setDeviceName(self, device, value):
-		# print("[InputDevices] setDeviceName for device %s to %s" % (device,value))
+		# print(f"[InputDevices] setDeviceName for device '{device}' to '{value}'.")
 		self.setDeviceAttribute(device, "configuredName", value)
 
-	def setDeviceDelay(self, device, value): # REP_DELAY
+	def setDeviceDelay(self, device, value):  # REP_DELAY.
 		if self.getDeviceAttribute(device, "enabled"):
-			# print("[InputDevices] setDeviceDelay for device %s to %d ms" % (device, value))
+			# print(f"[InputDevices] setDeviceDelay for device '{device}' to {value} ms.")
 			event = pack("LLHHi", 0, 0, 0x14, 0x00, int(value))
-			fd = osopen("/dev/input/%s" % device, O_RDWR)
+			fd = osopen(join("/dev/input", device), O_RDWR)
 			oswrite(fd, event)
 			osclose(fd)
 
-	def setDeviceRepeat(self, device, value): # REP_PERIOD
+	def setDeviceRepeat(self, device, value):  # REP_PERIOD.
 		if self.getDeviceAttribute(device, "enabled"):
-			# print("[InputDevices] setDeviceRepeat for device %s to %d ms" % (device, value))
+			# print(f"[InputDevices] setDeviceRepeat for device '{device}' to {value} ms.")
 			event = pack("LLHHi", 0, 0, 0x14, 0x01, int(value))
-			fd = osopen("/dev/input/%s" % device, O_RDWR)
+			fd = osopen(join("/dev/input", device), O_RDWR)
 			oswrite(fd, event)
 			osclose(fd)
 
@@ -145,9 +144,10 @@ class InputDevices:
 		return None
 
 	def setDeviceAttribute(self, device, attribute, value):
-		#print("[InputDevices] setting for device", device, "attribute", attribute, " to value", value)
+		# print "[InputDevices] setting for device", device, "attribute", attribute, " to value", value
 		if device in self.Devices:
 			self.Devices[device][attribute] = value
+
 
 class Keyboard:
 	def __init__(self):
@@ -354,7 +354,7 @@ class InitInputDevices:
 	def __init__(self):
 		self.currentDevice = None
 		for device in sorted(list(iInputDevices.Devices.keys())):
-			print("[InputDevice] InitInputDevices DEBUG: Creating config entry for device: '%s' -> '%s'." % (device, inputDevices.Devices[device]["name"]))
+			print(f"[InputDevice] InitInputDevices DEBUG: Creating config entry for device: '{device}' -> '{inputDevices.Devices[device]['name']}'.")
 			self.currentDevice = device
 			self.setupConfigEntries(self.currentDevice)
 			self.currentDevice = None
@@ -366,9 +366,9 @@ class InitInputDevices:
 		configItem.enabled.addNotifier(self.inputDevicesEnabledChanged)
 		configItem.name = ConfigText(default="")
 		configItem.name.addNotifier(self.inputDevicesNameChanged)
-		configItem.repeat = ConfigSlider(default=BoxInfo.getItem("RemoteRepeat", 100), increment = 10, limits=(0, 500))
+		configItem.repeat = ConfigSlider(default=BoxInfo.getItem("RemoteRepeat", 100), increment=10, limits=(0, 500))
 		configItem.repeat.addNotifier(self.inputDevicesRepeatChanged)
-		configItem.delay = ConfigSlider(default=BoxInfo.getItem("RemoteDelay", 700), increment = 100, limits=(0, 5000))
+		configItem.delay = ConfigSlider(default=BoxInfo.getItem("RemoteDelay", 700), increment=100, limits=(0, 5000))
 		configItem.delay.addNotifier(self.inputDevicesDelayChanged)
 
 	def inputDevicesEnabledChanged(self, configElement):
@@ -383,7 +383,7 @@ class InitInputDevices:
 			if configElement.value:
 				devName = inputDevices.getDeviceAttribute(self.currentDevice, "name")
 				if devName != configElement.value:
-					configItem = getattr(config.inputDevices, "%s.enabled" % self.currentDevice)
+					configItem = getattr(config.inputDevices, f"{self.currentDevice}.enabled")
 					configItem.value = False
 					configItem.save()
 		elif inputDevices.currentDevice:
@@ -421,7 +421,7 @@ class RcTypeControl():
 
 	def writeRcType(self, rctype):
 		fd = open('/proc/stb/ir/rc/type', 'w')
-		fd.write('%d' % rctype)
+		fd.write(f"{rctype}")
 		fd.close()
 
 

@@ -440,21 +440,19 @@ class descriptionsList(choicesList):
 		return [x[1] if isinstance(x, tuple) else x for x in self.choices] if self.type == choicesList.TYPE_LIST else list(self.choices.values()) or [""]  # Should [""] be []?
 
 
-# This is the control, and base class, for triggering action settings.
-#
-# class ConfigAction(ConfigElement):
-# 	def __init__(self, action, *args):
-# 		ConfigElement.__init__(self)
-# 		self.value = "(OK)"
-# 		self.action = action
-# 		self.actionargs = args
-#
-# 	def handleKey(self, key):
-# 		if (key == ACTIONKEY_SELECT):
-# 			self.action(*self.actionargs)
-#
-# 	def getMulti(self, selected):
-# 		return ("text", _("<Press OK to perform action>") if selected else "")
+class ConfigAction(ConfigElement):
+	def __init__(self, action, *args):
+		ConfigElement.__init__(self)
+		self.value = "(OK)"
+		self.action = action
+		self.actionargs = args
+
+	def handleKey(self, key, callback=None):
+		if (key == KEY_OK):
+			self.action(*self.actionargs)
+
+	def getMulti(self, dummy):
+		pass
 
 
 # This is the control, and base class, for binary decision settings.

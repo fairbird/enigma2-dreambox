@@ -10,6 +10,7 @@ from Screens.InfoBarGenerics import streamrelay
 from Tools.Directories import resolveFilename, SCOPE_PLUGINS
 from Tools.GetEcmInfo import GetEcmInfo
 from Components.Sources.StaticText import StaticText
+from ServiceReference import ServiceReference
 
 import os
 from Tools.camcontrol import CamControl

@@ -123,7 +123,7 @@ self.session.openWithCallback(msgClosed, EpgDeleteMsg)
 						<item key="hdmirecord_setup" level="0" text="HDMI-IN Recording settings" weight="15" requires="HDMIin"><setup id="HDMIRecord"/></item>
 					</menu>
 					<menu key="harddisk" level="0" text="Harddisk" requires="Harddisk">
-						<item key="harddisk_setup" level="0"><setup id="harddisk"/></item>
+						<item key="harddisk_setup" level="0" text="Harddisk Setup"><setup id="harddisk"/></item>
 						<item key="harddisk_init" level="0" text="Initialization"><screen module="HarddiskSetup" screen="HarddiskSelection"/></item>
 						<item key="harddisk_check" level="0" text="Filesystem check"><screen module="HarddiskSetup" screen="HarddiskFsckSelection"/></item>
 						<item key="flash_expander" level="2" text="Flash Expander" weight="40"><screen module="FlashExpander" screen="FlashExpander" /></item>
