@@ -1,30 +1,34 @@
 # -*- coding: utf-8 -*-
-from Screens.Screen import Screen
 from xml.etree.ElementTree import parse
-from Screens.MessageBox import MessageBox
-from Screens.ParentalControlSetup import ProtectedScreen
-from Components.Sources.List import List
-from Components.ActionMap import NumberActionMap, ActionMap
-from Components.Sources.StaticText import StaticText
-from Components.config import configfile
-from Components.PluginComponent import plugins
-from Components.config import config, ConfigDictionarySet, NoSave
-from Components.SystemInfo import SystemInfo
-from Tools.BoundFunction import boundFunction
-from skin import parameters, menus, menuicons
-from Plugins.Plugin import PluginDescriptor
-from Tools.Directories import resolveFilename, SCOPE_SKIN, SCOPE_CURRENT_SKIN, SCOPE_GUISKIN, SCOPE_SKINS
-from Components.Button import Button
-from Tools.LoadPixmap import LoadPixmap
+
+from skin import findSkinScreen, menus, parameters, menus, menuicons
+from Components.config import ConfigDictionarySet, NoSave, config, configfile
 from Components.Pixmap import Pixmap
+from Components.PluginComponent import plugins
+from Components.Sources.List import List
+from Components.Sources.StaticText import StaticText
+from Components.ActionMap import NumberActionMap, ActionMap
+from Components.SystemInfo import SystemInfo
+from Components.Button import Button
+from Plugins.Plugin import PluginDescriptor
+from Screens.ParentalControlSetup import ProtectedScreen
+from Screens.Screen import Screen
+from Screens.Setup import Setup
+from Screens.MessageBox import MessageBox
+from Tools.BoundFunction import boundFunction
+from Tools.Directories import resolveFilename, SCOPE_CURRENT_SKIN, SCOPE_GUISKIN, SCOPE_SKINS
+from Tools.LoadPixmap import LoadPixmap
+
 from enigma import eTimer
-from skin import findSkinScreen
 from os.path import exists
 
-import xml.etree.ElementTree
-
-from Screens.Setup import Setup, getSetupTitle
 from Components.NimManager import nimmanager  # nimmanager is used in eval(conditional), do not remove this import
+
+
+# read the menu
+file = open(resolveFilename(SCOPE_SKINS, "menu.xml"))
+mdom = parse(file)
+file.close()
 
 
 def MenuEntryPixmap(key, png_cache):
@@ -38,14 +42,6 @@ def MenuEntryPixmap(key, png_cache):
 			png = LoadPixmap(resolveFilename(SCOPE_GUISKIN, pngPath), cached=True, width=w, height=0 if pngPath.endswith(".svg") else h)
 	return png
 
-# read the menu
-file = open(resolveFilename(SCOPE_SKINS, "menu.xml"), "r")
-mdom = parse(file)
-file.close()
-
-lastMenuID = None
-
-nomainmenupath = False if exists(resolveFilename(SCOPE_CURRENT_SKIN, "mainmenu")) else True
 
 def default_skin():
 	for line in open("/etc/enigma2/settings"):
@@ -128,13 +124,11 @@ class Menu(Screen, ProtectedScreen):
 	png_cache = {}
 
 	def okbuttonClick(self):
-		global lastMenuID
 		if self.number:
 			self["menu"].setIndex(self.number - 1)
 		self.resetNumberKey()
 		selection = self["menu"].getCurrent()
 		if selection and selection[1]:
-			lastMenuID = selection[2]
 			selection[1]()
 
 	def execText(self, text):
@@ -159,43 +153,9 @@ class Menu(Screen, ProtectedScreen):
 	def openSetup(self, dialog):
 		self.session.openWithCallback(self.menuClosed, Setup, dialog)
 
-	def addMenu(self, destList, node, parent=None):
-		requires = node.get("requires")
-		if requires:
-			if requires[0] == '!':
-				if SystemInfo.get(requires[1:], False):
-					return
-			elif not SystemInfo.get(requires, False):
-				return
-		MenuTitle = _(node.get("text", "??"))
-		entryID = node.get("entryID", "undefined")
-		weight = node.get("weight", 50)
-		description = node.get("description", "").encode("UTF-8") or None
-		description = description and _(description)
-		menupng = MenuEntryPixmap(entryID, self.png_cache)
-		x = node.get("flushConfigOnClose")
-		if x:
-			a = boundFunction(self.session.openWithCallback, self.menuClosedWithConfigFlush, Menu, node)
-		else:
-			a = boundFunction(self.session.openWithCallback, self.menuClosed, Menu, node)
-		#TODO add check if !empty(node.childNodes)
-		destList.append((MenuTitle, a, entryID, weight, description, menupng))
-
-	def menuClosedWithConfigFlush(self, *res):
-		configfile.save()
-		self.menuClosed(*res)
-
-	def menuClosed(self, *res):
-		global lastMenuID
-		if res and res[0]:
-			lastMenuID = None
-			self.close(True)
-		elif len(self.list) == 1:
-			self.close()
-		else:
-			self.createMenuList()
-
-	def addItem(self, destList, node, parent=None):
+	def addMenu(self, destList, node):
+		if not (key := node.get("key")):
+			return
 		requires = node.get("requires")
 		if requires:
 			if requires[0] == '!':
@@ -206,12 +166,47 @@ class Menu(Screen, ProtectedScreen):
 		conditional = node.get("conditional")
 		if conditional and not eval(conditional):
 			return
-		item_text = node.get("text", "")
-		entryID = node.get("entryID", "undefined")
+		menu_text = _(x) if (x := node.get("text")) else "* fix me *"
 		weight = node.get("weight", 50)
-		description = node.get("description", "").encode("UTF-8") or None
-		description = description and _(description)
-		menupng = MenuEntryPixmap(entryID, self.png_cache)
+		description = _(x) if (x := node.get("description", "")) else None
+		menupng = MenuEntryPixmap(key, self.png_cache)
+		x = node.get("flushConfigOnClose")
+		if x:
+			a = boundFunction(self.session.openWithCallback, self.menuClosedWithConfigFlush, Menu, node)
+		else:
+			a = boundFunction(self.session.openWithCallback, self.menuClosed, Menu, node)
+		#TODO add check if !empty(node.childNodes)
+		destList.append((menu_text, a, key, weight, description, menupng))
+
+	def menuClosedWithConfigFlush(self, *res):
+		configfile.save()
+		self.menuClosed(*res)
+
+	def menuClosed(self, *res):
+		if res and res[0]:
+			self.close(True)
+		elif len(self.list) == 1:
+			self.close()
+		else:
+			self.createMenuList()
+
+	def addItem(self, destList, node):
+		if not (key := node.get("key")):
+			return
+		requires = node.get("requires")
+		if requires:
+			if requires[0] == '!':
+				if SystemInfo.get(requires[1:], False):
+					return
+			elif not SystemInfo.get(requires, False):
+				return
+		conditional = node.get("conditional")
+		if conditional and not eval(conditional):
+			return
+		item_text = _(x) if (x := node.get("text")) else "* fix me *"
+		weight = node.get("weight", 50)
+		description = _(x) if (x := node.get("description", "")) else None
+		menupng = MenuEntryPixmap(key, self.png_cache)
 		for x in node:
 			if x.tag == 'screen':
 				module = x.get("module")
@@ -220,7 +215,6 @@ class Menu(Screen, ProtectedScreen):
 				if screen is None:
 					screen = module
 
-				# print module, screen
 				if module:
 					module = "Screens." + module
 				else:
@@ -231,20 +225,43 @@ class Menu(Screen, ProtectedScreen):
 				args = x.text or ""
 				screen += ", " + args
 
-				destList.append((_(item_text or "??"), boundFunction(self.runScreen, (module, screen)), entryID, weight, description, menupng))
+				destList.append((item_text, boundFunction(self.runScreen, (module, screen)), key, weight, description, menupng))
+				return
+			elif x.tag == 'plugin':
+				extensions = x.get("extensions")
+				system = x.get("system")
+				screen = x.get("screen")
+
+				if extensions:
+					module = extensions
+				elif system:
+					module = system
+
+				if screen is None:
+					screen = module
+
+				if extensions:
+					module = "Plugins.Extensions." + extensions + '.plugin'
+				elif system:
+					module = "Plugins.SystemPlugins." + system + '.plugin'
+				else:
+					module = ""
+
+				# check for arguments. they will be appended to the
+				# openDialog call
+				args = x.text or ""
+				screen += ", " + args
+
+				destList.append((item_text, boundFunction(self.runScreen, (module, screen)), key, weight, description, menupng))
 				return
 			elif x.tag == 'code':
-				destList.append((_(item_text or "??"), boundFunction(self.execText, x.text), entryID, weight, description, menupng))
+				destList.append((item_text, boundFunction(self.execText, x.text), key, weight, description, menupng))
 				return
 			elif x.tag == 'setup':
 				id = x.get("id")
-				if item_text == "":
-					item_text = _(getSetupTitle(id))
-				else:
-					item_text = _(item_text)
-				destList.append((item_text, boundFunction(self.openSetup, id), entryID, weight, description, menupng))
+				destList.append((item_text, boundFunction(self.openSetup, id), key, weight, description, menupng))
 				return
-		destList.append((item_text, self.nothing, entryID, weight, description, menupng))
+		destList.append((item_text, self.nothing, key, weight, description, menupng))
 
 	def sortByName(self, listentry):
 		return listentry[0].lower()
@@ -393,25 +410,16 @@ class Menu(Screen, ProtectedScreen):
 	def createMenuList(self, showNumericHelp=False):
 		self["key_blue"].text = _("Edit menu") if config.usage.menu_sort_mode.value == "user" else ""
 		self.list = []
-		self.menuID = None
-		parentEntryID = None
+		self.menuID = self.parentmenu.get("key")
 		for x in self.parentmenu: #walk through the actual nodelist
 			if not x.tag:
 				continue
-			parentEntryID = self.parentmenu.get("entryID", None)
 			if x.tag == 'item':
-				item_level = int(x.get("level", 0))
-				if item_level <= config.usage.setup_level.index:
-					self.addItem(self.list, x, parentEntryID)
-					count += 1
+				if int(x.get("level", 0)) <= config.usage.setup_level.index:
+					self.addItem(self.list, x)
 			elif x.tag == 'menu':
-				item_level = int(x.get("level", 0))
-				if item_level <= config.usage.setup_level.index:
-					self.addMenu(self.list, x, parentEntryID)
-					count += 1
-			elif x.tag == "id":
-				self.menuID = x.get("val")
-				count = 0
+				if int(x.get("level", 0)) <= config.usage.setup_level.index:
+					self.addMenu(self.list, x)
 
 		if self.menuID:
 			# plugins

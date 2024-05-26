@@ -1,34 +1,14 @@
-# -*- coding: utf-8 -*-
-from Screens.Screen import Screen
-from Components.config import config, ConfigClock, ConfigDateTime
-from Components.ActionMap import NumberActionMap
-from Components.ConfigList import ConfigListScreen
-from Components.Sources.StaticText import StaticText
+from Screens.Setup import Setup
+from Components.config import ConfigClock, ConfigDateTime
 import time
 import datetime
 
 
-class TimeDateInput(ConfigListScreen, Screen):
+class TimeDateInput(Setup):
 	def __init__(self, session, config_time=None, config_date=None):
-		Screen.__init__(self, session)
-		self.setTitle(_("Date/time input"))
-		self["key_red"] = StaticText(_("Cancel"))
-		self["key_green"] = StaticText(_("OK"))
-
 		self.createConfig(config_date, config_time)
-
-		self["actions"] = NumberActionMap(["SetupActions", "OkCancelActions", "ColorActions"],
-		{
-			"ok": self.keyGo,
-			"green": self.keyGo,
-			"save": self.keyGo,
-			"red": self.keyCancel,
-			"cancel": self.keyCancel,
-		}, -2)
-
-		self.list = []
-		ConfigListScreen.__init__(self, self.list)
-		self.createSetup(self["config"])
+		Setup.__init__(self, session, None)
+		self.setTitle(_("Date/time input"))
 
 	def createConfig(self, conf_date, conf_time):
 		self.save_mask = 0
@@ -39,17 +19,16 @@ class TimeDateInput(ConfigListScreen, Screen):
 		if conf_date:
 			self.save_mask |= 2
 		else:
-			conf_date = ConfigDateTime(default=time.time(), formatstring=config.usage.date.dayfull.value, increment=86400)
+			conf_date = ConfigDateTime(default=time.time(), formatstring=_("%d.%B %Y"), increment=86400)
 		self.timeinput_date = conf_date
 		self.timeinput_time = conf_time
 
-	def createSetup(self, configlist):
+	def createSetup(self):
 		self.list = [
 			(_("Date"), self.timeinput_date),
 			(_("Time"), self.timeinput_time)
 		]
-		configlist.list = self.list
-		configlist.l.setList(self.list)
+		self["config"].list = self.list
 
 	def keyPageDown(self):
 		sel = self["config"].getCurrent()
@@ -68,7 +47,7 @@ class TimeDateInput(ConfigListScreen, Screen):
 		dt = datetime.datetime(d.tm_year, d.tm_mon, d.tm_mday, mytime[0], mytime[1])
 		return int(time.mktime(dt.timetuple()))
 
-	def keyGo(self):
+	def keySave(self):
 		time = self.getTimestamp(self.timeinput_date.value, self.timeinput_time.value)
 		if self.save_mask & 1:
 			self.timeinput_time.save()
