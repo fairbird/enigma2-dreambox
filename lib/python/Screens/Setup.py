@@ -24,7 +24,7 @@ setupModTimes = {}
 
 class Setup(ConfigListScreen, Screen, HelpableScreen):
 	def __init__(self, session, setup, plugin=None, PluginLanguageDomain=None):
-		Screen.__init__(self, session)
+		Screen.__init__(self, session, mandatoryWidgets=["config", "footnote", "description"], enableHelp=True)
 		HelpableScreen.__init__(self)
 		self.setup = setup
 		self.plugin = plugin
@@ -36,7 +36,13 @@ class Setup(ConfigListScreen, Screen, HelpableScreen):
 			self.skinName.append("setup_%s" % setup)
 		self.skinName.append("Setup")
 		self.list = []
-		ConfigListScreen.__init__(self, self.list, session=session, on_change=self.changedEntry, fullUI=True)
+		xmlData = setupDom(self.setup, self.plugin)
+		allowDefault = False
+		for setup in xmlData.findall("setup"):
+			if setup.get("key") == self.setup:
+				allowDefault = setup.get("allowDefault", "") in ("1", "allowDefault", "enabled", "on", "true", "yes")
+				break
+		ConfigListScreen.__init__(self, self.list, session=session, on_change=self.changedEntry, fullUI=True, allowDefault=allowDefault)
 		self["footnote"] = Label()
 		self["footnote"].hide()
 		self["description"] = Label()
@@ -79,17 +85,17 @@ class Setup(ConfigListScreen, Screen, HelpableScreen):
 				# This may not be appropriate if conditional setup blocks become available.
 				break
 		if appendItems:
-			self.list += appendItems
+			self.list = self.list + appendItems
 		if title:
 			title = dgettext(self.pluginLanguageDomain, title) if self.pluginLanguageDomain else _(title)
 		self.setTitle(title if title else _("Setup"))
-		if not self.list:  # This forces the self["config"] list to be cleared if there are no eligible items available to be displayed.
-			self["config"].list = self.list
+		if not self.list:
+			self["config"].setList(self.list)
 		elif self.list != oldList or self.showDefaultChanged or self.graphicSwitchChanged:
 			currentItem = self["config"].getCurrent()
-			self["config"].list = self.list
+			self["config"].setList(self.list)
 			if config.usage.sort_settings.value:
-				self["config"].list.sort(key=lambda x: x[0])
+				self["config"].list.sort()
 			self.moveToItem(currentItem)
 
 	def addItems(self, parentNode, including=True):
@@ -185,17 +191,20 @@ class Setup(ConfigListScreen, Screen, HelpableScreen):
 	def selectionChanged(self):
 		if self["config"]:
 			self.setFootnote(None)
+			self["description"].setText(self.getCurrentDescription())
+		else:
+			self["description"].setText(_("There are no items currently available for this screen."))
 
 	def setFootnote(self, footnote):
 		if footnote is None:
 			if self.getCurrentEntry().endswith("*"):
-				self["footnote"].text = _("* = Restart Required")
+				self["footnote"].setText(_("* = Restart Required"))
 				self["footnote"].show()
 			else:
-				self["footnote"].text = ""
+				self["footnote"].setText("")
 				self["footnote"].hide()
 		else:
-			self["footnote"].text = footnote
+			self["footnote"].setText(footnote)
 			self["footnote"].show()
 
 	def getFootnote(self):
