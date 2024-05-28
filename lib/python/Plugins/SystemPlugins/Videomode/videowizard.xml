@@ -16,7 +16,7 @@ self.selectKey("OK")
 		</code>
 	</step>
 
-	<step id="modesdetection" >
+	<!--step id="modesdetection" >
 		<condition>
 self.condition = (self.port == "DVI" or self.port == "HDMI")
 		</condition>
@@ -55,7 +55,7 @@ self.condition = (self.port == "DVI" or self.port == "HDMI")
 config.av.edid_override.setValue(False)
 config.av.edid_override.save()
 		</code>
-	</step>
+	</step-->
 
 	<step id="modeselection" nextstep="rateselection" timeout="10" timeoutaction="selectnext">
 		<text value="Select the video mode to be used on the TV." />
