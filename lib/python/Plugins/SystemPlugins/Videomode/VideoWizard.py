@@ -27,12 +27,10 @@ class VideoWizard(WizardLanguage, Rc):
 		self.mode = None
 		self.rate = None
 		self["portpic"] = Pixmap()
-		self["lab1"] = StaticText(_("OpenVision"))
+		self["lab1"] = StaticText(_("OpenPLI"))
 		self["lab2"] = StaticText(_("Lets define enigma2 once more"))
-		self["lab3"] = StaticText(_("Report problems to:"))
-		self["lab4"] = StaticText(_("https://openvision.tech"))
-		self["lab5"] = StaticText(_("Sources are available at:"))
-		self["lab6"] = StaticText(_("https://github.com/OpenVisionE2"))
+		self["lab3"] = StaticText(_("Report problems to Sources:"))
+		self["lab4"] = StaticText(_("https://github.com/fairbird/enigma2-dreambox"))
 
 	def listPorts(self):  # Called by videowizard.xml
 		ports = []
