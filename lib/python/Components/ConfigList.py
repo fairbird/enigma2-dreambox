@@ -247,9 +247,6 @@ class ConfigListScreen:
 	def getCurrentItem(self):
 		return self["config"].getCurrent() and len(self["config"].getCurrent()) > 1 and self["config"].getCurrent()[1] or None
 
-	def getCurrentItem(self):
-		return self["config"].getCurrent() and self["config"].getCurrent()[1] or None
-
 	def getCurrentEntry(self):
 		return self["config"].getCurrent() and self["config"].getCurrent()[0] or ""
 
