@@ -1869,7 +1869,7 @@ class ConfigDirectory(ConfigText):
 		self.allmarked = (self.value != "")
 
 
-class ConfigMACText(ConfigText):
+class ConfigMacText(ConfigText):
 	def __init__(self, default="", visible_width=17):
 		ConfigText.__init__(self, default, fixed_size=True, visible_width=visible_width)
 		self.allmarked = False
@@ -1936,9 +1936,9 @@ class ConfigMACText(ConfigText):
 		self.value = str(value)
 
 
-class ConfigMacText(ConfigMACText):  # Deprecated class name.
+class ConfigMacText(ConfigMacText):  # Deprecated class name.
 	def __init__(self, default="", visible_width=17):
-		ConfigMACText.__init__(self, default=default, visible_width=visible_width)
+		ConfigMacText.__init__(self, default=default, visible_width=visible_width)
 
 
 class ConfigNumber(ConfigText):
