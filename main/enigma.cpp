@@ -365,7 +365,7 @@ void dump_malloc_stats(void)
 	eDebug("MALLOC: %ld total", mi.uordblks);
 
 #else
-	eDebug("MALLOC: %zu total", mi.uordblks);
+	eDebug("MALLOC: %u total", mi.uordblks);
 #endif
 #else
 	struct mallinfo mi = mallinfo();
