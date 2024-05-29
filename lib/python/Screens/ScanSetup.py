@@ -608,6 +608,7 @@ class ScanSetup(ConfigListScreen, Screen, CableTransponderSearchSupport, Terrest
 	def __init__(self, session):
 		Screen.__init__(self, session)
 		Screen.setTitle(self, _("Manual Scan"))
+		self.skinName = ["ScanSetup", "Setup"]
 
 		self.finished_cb = None
 		self.updateSatList()
@@ -628,26 +629,19 @@ class ScanSetup(ConfigListScreen, Screen, CableTransponderSearchSupport, Terrest
 
 		self.session.postScanService = session.nav.getCurrentlyPlayingServiceOrGroup()
 
-		self["key_red"] = StaticText(_("Close"))
 		self["key_green"] = StaticText(_("Scan"))
 
-		self["actions"] = NumberActionMap(["SetupActions", "MenuActions", "ColorActions"],
+		self["actions"] = NumberActionMap(["SetupActions"],
 		{
-			"ok": self.keyGo,
 			"save": self.keyGo,
-			"cancel": self.keyCancel,
-			"red": self.keyCancel,
-			"green": self.keyGo,
-			"menu": self.doCloseRecursive,
 		}, -2)
 
 		self.statusTimer = eTimer()
 		self.statusTimer.callback.append(self.updateStatus)
 
 		self.list = []
-		ConfigListScreen.__init__(self, self.list)
+		ConfigListScreen.__init__(self, self.list, fullUI=True)
 		self["introduction"] = Label("")
-		self["description"] = Label("")
 		if self.scan_nims.value == "":
 			self["introduction"].text = _("Nothing to scan! Setup your tuner and try again.")
 			return
@@ -1713,18 +1707,13 @@ class ScanSimple(ConfigListScreen, Screen, CableTransponderSearchSupport, Terres
 	def __init__(self, session):
 		Screen.__init__(self, session)
 		Screen.setTitle(self, _("Automatic Scan"))
+		self.skinName = ["ScanSimple", "Setup"]
 
-		self["key_red"] = StaticText(_("Close"))
 		self["key_green"] = StaticText(_("Scan"))
 
 		self["actions"] = ActionMap(["SetupActions", "MenuActions", "ColorActions"],
 		{
-			"ok": self.keyGo,
 			"save": self.keyGo,
-			"cancel": self.keyCancel,
-			"menu": self.doCloseRecursive,
-			"red": self.keyCancel,
-			"green": self.keyGo,
 		}, -2)
 
 		self.session.postScanService = session.nav.getCurrentlyPlayingServiceOrGroup()
@@ -1782,7 +1771,7 @@ class ScanSimple(ConfigListScreen, Screen, CableTransponderSearchSupport, Terres
 			if self.t2_nim_found:
 				self.list.append((_("Blindscan terrestrial (if possible)"), self.scan_terrestrial_binary_scan))
 
-		ConfigListScreen.__init__(self, self.list)
+		ConfigListScreen.__init__(self, self.list, fullUI=True)
 		self["footer"] = Label(_("Press OK to scan"))
 
 	def getNetworksForNim(self, nim):
