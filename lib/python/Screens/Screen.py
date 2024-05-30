@@ -258,7 +258,9 @@ class Screen(dict):
 		resolution = bounds
 		zPosition = 0
 		for (key, value) in self.skinAttributes:
-			if key == "resolution":
+			if key == "handledWidgets":
+				self.handledWidgets = [x.strip() for x in value.split(",")]
+			elif key == "resolution":
 				resolution = tuple([int(x.strip()) for x in value.split(",")])
 			elif key == "zPosition":
 				zPosition = int(value)
