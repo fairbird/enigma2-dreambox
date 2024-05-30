@@ -23,7 +23,7 @@ setupModTimes = {}
 
 
 class Setup(ConfigListScreen, Screen, HelpableScreen):
-	def __init__(self, session, setup, plugin=None, PluginLanguageDomain=None):
+	def __init__(self, session, setup, plugin=None, PluginLanguageDomain=None, yellow_button={}, blue_button={}):
 		Screen.__init__(self, session, mandatoryWidgets=["config", "footnote", "description"], enableHelp=True)
 		HelpableScreen.__init__(self)
 		self.setup = setup
@@ -42,7 +42,7 @@ class Setup(ConfigListScreen, Screen, HelpableScreen):
 			if setup.get("key") == self.setup:
 				allowDefault = setup.get("allowDefault", "") in ("1", "allowDefault", "enabled", "on", "true", "yes")
 				break
-		ConfigListScreen.__init__(self, self.list, session=session, on_change=self.changedEntry, fullUI=True, allowDefault=allowDefault)
+		ConfigListScreen.__init__(self, self.list, session=session, on_change=self.changedEntry, fullUI=True, allowDefault=allowDefault, yellow_button=yellow_button, blue_button=blue_button)
 		self["footnote"] = Label()
 		self["footnote"].hide()
 		self["description"] = Label()
