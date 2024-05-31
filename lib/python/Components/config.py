@@ -444,6 +444,7 @@ class ConfigAction(ConfigElement):
 	def __init__(self, action, *args):
 		ConfigElement.__init__(self)
 		self.value = "(OK)"
+		self.default = self.value
 		self.action = action
 		self.actionargs = args
 
@@ -452,6 +453,9 @@ class ConfigAction(ConfigElement):
 			self.action(*self.actionargs)
 
 	def getMulti(self, dummy):
+		pass
+
+	def getText(self):
 		pass
 
 
