@@ -1730,8 +1730,8 @@ except Exception as e:
 		<widget name="key_green" position="140,0" zPosition="1" size="140,40" font="Regular;20" horizontalAlignment="center" verticalAlignment="center" backgroundColor="#1f771f" transparent="1"/>
 		<ePixmap pixmap="buttons/yellow.png" position="280,0" size="140,40" alphaTest="on"/>
 		<widget name="key_yellow" position="280,0" zPosition="1" size="140,40" font="Regular;20" horizontalAlignment="center" verticalAlignment="center" backgroundColor="#a08500" transparent="1"/>
-		<ePixmap pixmap="buttons/blue.png" position="420,0" size="140,40" alphaTest="on"/>
-		<widget name="key_blue" position="420,0" zPosition="1" size="140,40" font="Regular;20" horizontalAlignment="center" verticalAlignment="center" backgroundColor="#141484" transparent="1"/>
+		<!--ePixmap pixmap="buttons/blue.png" position="420,0" size="140,40" alphaTest="on"/>
+		<widget name="key_blue" position="420,0" zPosition="1" size="140,40" font="Regular;20" horizontalAlignment="center" verticalAlignment="center" backgroundColor="#141484" transparent="1"/-->
 		<widget name="list" position="0,70" size="560,325" transparent="0" scrollbarMode="showOnDemand"/>
 		<applet type="onLayoutFinish">
 			self["list"].instance.setItemHeight(25)
