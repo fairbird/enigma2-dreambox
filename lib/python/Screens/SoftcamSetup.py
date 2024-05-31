@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from Screens.Screen import Screen
+from Screens.Setup import Setup
 from Screens.MessageBox import MessageBox
 from Components.ConfigList import ConfigListScreen
 from Components.ActionMap import ActionMap, HelpableActionMap
@@ -17,7 +17,7 @@ from Tools.camcontrol import CamControl
 from enigma import eTimer, getDesktop
 
 
-class SoftcamSetup(Screen, ConfigListScreen):
+class SoftcamSetup(Setup):
 	if getDesktop(0).size().width() == 1280:
 		skin = """
 		<screen name="SoftcamSetup" position="center,center" size="560,550" >
@@ -48,20 +48,8 @@ class SoftcamSetup(Screen, ConfigListScreen):
 		</screen>"""
 
 	def __init__(self, session):
-		Screen.__init__(self, session)
-
+		Setup.__init__(self, session, blue_button={'function': self.key_blue, 'helptext': _("Show softcam information")})
 		self.setTitle(_("Softcam setup"))
-
-		self["actions"] = ActionMap(["OkCancelActions", "ColorActions", "CiSelectionActions"],
-			{
-				"cancel": self.cancel,
-				"green": self.save,
-				"red": self.cancel,
-				"blue": self.ppanelShortcut,
-			}, -1)
-
-		self.list = []
-		ConfigListScreen.__init__(self, self.list, session=session, on_change=self.changedEntry)
 
 		self.softcam = CamControl('softcam')
 		self.cardserver = CamControl('cardserver')
@@ -91,10 +79,7 @@ class SoftcamSetup(Screen, ConfigListScreen):
 			self.list.append((_("Restart cardserver"), ConfigAction(self.restart, "c")))
 			self.list.append((_("Restart both"), ConfigAction(self.restart, "sc")))
 
-		self["key_red"] = StaticText(_("Cancel"))
-		self["key_green"] = StaticText(_("OK"))
-		self["key_blue"] = StaticText()
-		self.onShown.append(self.blueButton)
+		self.blueButton
 
 	def changedEntry(self):
 		if self["config"].getCurrent()[0] == self.softcams_text:
@@ -111,7 +96,7 @@ class SoftcamSetup(Screen, ConfigListScreen):
 		if newEcmFound:
 			self["info"].setText("".join(ecmInfo))
 
-	def ppanelShortcut(self):
+	def key_blue(self):
 		ppanelFileName = '/etc/ppanels/' + self.softcams.value + '.xml'
 		if "oscam" in self.softcams.value.lower() and os.path.isfile(resolveFilename(SCOPE_PLUGINS, 'Extensions/OscamStatus/plugin.pyc')):
 			from Plugins.Extensions.OscamStatus.plugin import OscamStatus
@@ -175,7 +160,7 @@ class SoftcamSetup(Screen, ConfigListScreen):
 	def restartSoftcam(self):
 		self.restart("s")
 
-	def save(self):
+	def saveAll(self):
 		what = ''
 		if hasattr(self, 'cardservers') and (self.cardservers.value != self.cardserver.current()):
 			what = 'sc'
