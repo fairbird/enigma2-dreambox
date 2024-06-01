@@ -150,15 +150,11 @@ class PluginBrowser(Screen, ProtectedScreen):
 		self.onChangedEntry = []
 		self["list"].onSelectionChanged.append(self.selectionChanged)
 		self.onLayoutFinish.append(self.saveListsize)
-		if config.pluginfilter.userfeed.value != "http://":
-			if not fileExists("/etc/opkg/user-feed.conf"):
-				CreateFeedConfig()
+		if config.pluginfilter.userfeed.value != "http://" and not fileExists("/etc/opkg/user-feed.conf"):
+			self.CreateFeedConfig()
 
 	def isProtected(self):
 		return config.ParentalControl.setuppinactive.value and (not config.ParentalControl.config_sections.main_menu.value or hasattr(self.session, 'infobar') and self.session.infobar is None) and config.ParentalControl.config_sections.plugin_browser.value
-
-	def menu(self):
-		self.session.openWithCallback(self.PluginDownloadBrowserClosed, PluginFilter)
 
 	def saveListsize(self):
 		listsize = self["list"].instance.size()
@@ -272,6 +268,9 @@ class PluginBrowser(Screen, ProtectedScreen):
 		if config.usage.menu_show_numbers.value not in ("menu&plugins", "plugins"):
 			self.help = not self.help
 			self.updateList(self.help)
+
+	def menu(self):
+		self.session.open(PluginFilter)
 
 	def delete(self):
 		self.session.openWithCallback(self.PluginDownloadBrowserClosed, PluginDownloadBrowser, PluginDownloadBrowser.REMOVE)
@@ -841,16 +840,12 @@ class PluginBrowserNew(Screen):
 		self.onLayoutFinish.append(self.activeBox)
 		self.onLayoutFinish.append(self.saveListsize)
 		self.setTitle(_("Plugin browser"))
-		if config.pluginfilter.userfeed.value != "http://":
-			if not fileExists("/etc/opkg/user-feed.conf"):
-				CreateFeedConfig()
+		if config.pluginfilter.userfeed.value != "http://" and not fileExists("/etc/opkg/user-feed.conf"):
+			self.CreateFeedConfig()
 
 	def exit(self):
 		self.close()
-
-	def menu(self):
-		self.session.openWithCallback(self.PluginDownloadBrowserClosed, PluginFilter)
-
+		
 	def saveListsize(self):
 		listsize = self["list"].instance.size()
 		self.listWidth = listsize.width()
@@ -1190,6 +1185,9 @@ class PluginBrowserNew(Screen):
 		if config.usage.menu_show_numbers.value not in ("menu&plugins", "plugins"):
 			self.help = not self.help
 			self.updateList(self.help)
+
+	def menu(self):
+		self.session.open(PluginFilter)
 
 	def delete(self):
 		self.session.openWithCallback(self.PluginDownloadBrowserClosed, PluginDownloadBrowser, PluginDownloadBrowser.REMOVE)
