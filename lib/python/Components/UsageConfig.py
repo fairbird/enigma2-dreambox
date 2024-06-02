@@ -1095,6 +1095,8 @@ def InitUsageConfig():
 
 	config.misc.usegstplaybin3 = ConfigYesNo(default=False)
 
+	config.misc.spinnerPosition = ConfigText(default="100,100")
+
 	def correctInvalidEPGDataChange(configElement):
 		eServiceEvent.setUTF8CorrectMode(int(configElement.value))
 	config.epg.correct_invalid_epgdata = ConfigSelection(default="1", choices=[("0", _("Disabled")), ("1", _("Enabled")), ("2", _("Debug"))])
