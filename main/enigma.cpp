@@ -13,8 +13,10 @@
 #include <lib/base/ebase.h>
 #include <lib/base/eenv.h>
 #include <lib/base/eerror.h>
+#include <lib/base/esimpleconfig.h>
 #include <lib/base/init.h>
 #include <lib/base/init_num.h>
+#include <lib/base/nconfig.h>
 #include <lib/gdi/gmaindc.h>
 #include <lib/gdi/glcddc.h>
 #include <lib/gdi/grc.h>
@@ -133,6 +135,48 @@ public:
 		e2avahi_close();
 	}
 };
+
+bool replace(std::string &str, const std::string &from, const std::string &to)
+{
+	size_t start_pos = str.find(from);
+	if (start_pos == std::string::npos)
+		return false;
+	str.replace(start_pos, from.length(), to);
+	return true;
+}
+
+static const std::string getConfigCurrentSpinner(const char *key)
+{
+	auto value = eSimpleConfig::getString(key);
+
+	// if value is not empty, means config.skin.primary_skin exist in settings file
+
+	if (!value.empty())
+	{
+		replace(value, "skin.xml", "spinner");
+		std::string png_location = eEnv::resolve("${datadir}/enigma2/" + value + "/wait1.png");
+		std::ifstream png(png_location.c_str());
+		if (png.good())
+		{
+			png.close();
+			return value; // if value is NOT empty, means config.skin.primary_skin exist in settings file, so return SCOPE_GUISKIN + "/spinner" ( /usr/share/enigma2/MYSKIN/spinner/wait1.png exist )
+		}
+	}
+
+	// try to find spinner in skin_default/spinner subfolder
+	value = "skin_default/spinner";
+
+	// check /usr/share/enigma2/skin_default/spinner/wait1.png
+	std::string png_location = eEnv::resolve("${datadir}/enigma2/" + value + "/wait1.png");
+	std::ifstream png(png_location.c_str());
+	if (png.good())
+	{
+		png.close();
+		return value; // ( /usr/share/enigma2/skin_default/spinner/wait1.png exist )
+	}
+	else
+		return "spinner"; // ( /usr/share/enigma2/skin_default/spinner/wait1.png DOES NOT exist )
+}
 
 int exit_code;
 
@@ -257,42 +301,75 @@ int main(int argc, char **argv)
 	dsk.setRedrawTask(main);
 	dsk_lcd.setRedrawTask(main);
 
+	std::string active_skin = getConfigCurrentSpinner("config.skin.primary_skin");
+	std::string spinnerPostion = eSimpleConfig::getString("config.misc.spinnerPosition", "100,100");
+	int spinnerPostionX, spinnerPostionY;
+	if (sscanf(spinnerPostion.c_str(), "%d,%d", &spinnerPostionX, &spinnerPostionY) != 2)
+	{
+		spinnerPostionX = spinnerPostionY = 100;
+	}
 
 	eDebug("[MAIN] Loading spinners...");
-
 	{
-		int i;
 #define MAX_SPINNER 64
-		ePtr<gPixmap> wait[MAX_SPINNER];
-		for (i=0; i<MAX_SPINNER; ++i)
+		int i = 0;
+		char filename[64];
+		std::string rfilename;
+		std::string skinpath = "${datadir}/enigma2/" + active_skin;
+		std::string defpath = "${datadir}/enigma2/spinner";
+		std::string userpath = "${sysconfdir}/enigma2/spinner";
+		bool def = (skinpath.compare(defpath) == 0);
+
+		snprintf(filename, sizeof(filename), "%s/wait%d.png", userpath.c_str(), i + 1);
+		rfilename = eEnv::resolve(filename);
+
+		struct stat st;
+		if (::stat(rfilename.c_str(), &st) == 0)
 		{
-			char filename[64] = {};
-			std::string rfilename;
-			snprintf(filename, sizeof(filename), "${datadir}/enigma2/skin_default/spinner/wait%d.png", i + 1);
+			def = true;
+			skinpath = userpath;
+		}
+
+		ePtr<gPixmap> wait[MAX_SPINNER];
+		while (i < MAX_SPINNER)
+		{
+			snprintf(filename, sizeof(filename), "%s/wait%d.png", skinpath.c_str(), i + 1);
 			rfilename = eEnv::resolve(filename);
 
-			if (::access(rfilename.c_str(), R_OK) < 0)
-				break;
+			wait[i] = 0;
+			if (::stat(rfilename.c_str(), &st) == 0)
+				loadPNG(wait[i], rfilename.c_str());
 
-			loadImage(wait[i], rfilename.c_str());
 			if (!wait[i])
 			{
-				eDebug("[MAIN] failed to load %s: %m", rfilename.c_str());
+				// spinner failed
+				if (i == 0)
+				{
+					// retry default spinner only once
+					if (!def)
+					{
+						def = true;
+						skinpath = defpath;
+						continue;
+					}
+				}
+				// exit loop because of no more spinners
 				break;
 			}
+			i++;
 		}
-		eDebug("[MAIN] found %d spinner!", i);
-		if (i)
-			my_dc->setSpinner(eRect(ePoint(100, 100), wait[0]->size()), wait, i);
+		eDebug("[Enigma] Found %d spinners. Position x=%d y=%d", i, spinnerPostionX, spinnerPostionY);
+		if (i == 0)
+			my_dc->setSpinner(eRect(spinnerPostionX, spinnerPostionY, 0, 0), wait, 1);
 		else
-			my_dc->setSpinner(eRect(100, 100, 0, 0), wait, 1);
+			my_dc->setSpinner(eRect(ePoint(spinnerPostionX, spinnerPostionY), wait[0]->size()), wait, i);
 	}
 
 	gRC::getInstance()->setSpinnerDC(my_dc);
 
 	eRCInput::getInstance()->keyEvent.connect(sigc::ptr_fun(&keyEvent));
 
-	printf("[MAIN] executing main\n");
+	eDebug("[Enigma] Executing StartEnigma.py");
 
 	eProfile::getInstance().write("StartPython");
 
