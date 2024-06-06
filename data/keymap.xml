@@ -780,6 +780,16 @@
 		<key id="KEY_EPG" mapto="openSingleServiceEPG" flags="m" />
 	</map>
 
+	map context="OkActions">
+		<key id="KEY_OK" mapto="ok" flags="m" />
+		<key id="KEY_OK" mapto="OK" flags="b" />
+		<key id="KEY_OK" mapto="OKLong" flags="l" />
+		<!-- Keyboard specific buttons -->
+		<key id="KEY_ENTER" mapto="ok" flags="m" />
+		<key id="KEY_ENTER" mapto="OK" flags="b" />
+		<key id="KEY_ENTER" mapto="OKLong" flags="l" />
+	</map>
+
 	<map context="OkCancelActions">
 		<key id="\x0a" mapto="ok" flags="m" />
 		<key id="\x1b" mapto="cancel" flags="m" />

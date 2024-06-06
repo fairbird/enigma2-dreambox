@@ -1,828 +1,593 @@
-from datetime import timedelta
-from os import chmod, listdir, makedirs, remove, system
+from os import chmod, listdir, makedirs
 from os.path import exists, isdir, isfile, join
-from subprocess import getoutput
-from time import localtime, strftime, time
 
-from Components.About import getCPUBrand, getCPUInfoString
-from Components.ActionMap import ActionMap
-from Components.ChoiceList import ChoiceList, ChoiceEntryComponent
+from Components.ActionMap import HelpableActionMap
+from Components.ChoiceList import ChoiceEntryComponent, ChoiceList
 from Components.config import config, configfile
-from Components.Harddisk import Freespace, getFolderSize
+from Components.Harddisk import Freespace
+from Components.SystemInfo import BoxInfo, getBoxDisplayName
 from Components.Sources.StaticText import StaticText
-from Components.SystemInfo import BoxInfo
 from Screens.Console import Console
 from Screens.ChoiceBox import ChoiceBox
 from Screens.MessageBox import MessageBox
 from Screens.Screen import Screen
-from Tools.BoundFunction import boundFunction
 from Tools.MultiBoot import MultiBoot
-from Tools.Directories import fileReadLines, fileWriteLine, fileWriteLines
+from Tools.Directories import fileReadLines, fileWriteLines
 
 MODULE_NAME = __name__.split(".")[-1]
 
-DISTRO = BoxInfo.getItem("distro")
-DISPLAYDISTRO = BoxInfo.getItem("displaydistro")
-DISTROVERSION = BoxInfo.getItem("imageversion")
-MACHINEBRAND = BoxInfo.getItem("displaybrand")
-MACHINENAME = BoxInfo.getItem("displaymodel")
-
-USEP = "_________________________________________________"
+MACHINE_BRAND = BoxInfo.getItem("displaybrand")
+MACHINE_NAME = BoxInfo.getItem("displaymodel")
 
 
 class ImageBackup(Screen):
-
 	skin = """
-	<screen name="Image Backup" position="center,center" size="750,900" flags="wfNoBorder" backgroundColor="transparent" resolution="1280,720">
-		<eLabel name="b" position="0,0" size="750,700" backgroundColor="#00ffffff" zPosition="-2" />
-		<eLabel name="a" position="1,1" size="748,698" backgroundColor="#00000000" zPosition="-1" />
-		<widget source="Title" render="Label" position="60,10" foregroundColor="#00ffffff" size="480,50" halign="left" font="Regular; 28" backgroundColor="#00000000" />
-		<eLabel name="line" position="1,60" size="748,1" backgroundColor="#00ffffff" zPosition="1" />
-		<eLabel name="line2" position="1,250" size="748,4" backgroundColor="#00ffffff" zPosition="1" />
-		<widget name="config" position="2,280" size="730,380" font="Regular; 22" backgroundColor="#00000000" foregroundColor="#00e5b243" />
-		<widget source="description" render="Label" position="2,80" size="730,30" halign="center" font="Regular; 22" backgroundColor="#00000000" foregroundColor="#00ffffff" />
-		<widget source="options" render="Label" position="2,130" size="730,60" halign="center" font="Regular; 22" backgroundColor="#00000000" foregroundColor="#00ffffff" />
-		<widget source="key_red" render="Label" position="30,200" size="150,30" noWrap="1" zPosition="1" valign="center" font="Regular; 20" halign="left" backgroundColor="#00000000" foregroundColor="#00ffffff" />
-		<widget source="key_green" render="Label" position="200,200" size="150,30" noWrap="1" zPosition="1" valign="center" font="Regular; 20" halign="left" backgroundColor="#00000000" foregroundColor="#00ffffff" />
-		<eLabel position="20,200" size="6,40" backgroundColor="#00e61700" /> <!-- Should be a pixmap -->
-		<eLabel position="190,200" size="6,40" backgroundColor="#0061e500" /> <!-- Should be a pixmap -->
+	<screen name="ImageBackup" title="Image Backup" position="center,center" size="800,460" resolution="1280,720">
+		<widget source="description" render="Label" position="0,0" size="e,50" font="Regular;20" verticalAlignment="center" />
+		<widget name="config" position="0,60" size="e,350" font="Regular;25" itemHeight="35" />
+		<widget source="key_red" render="Label" position="0,e-40" size="180,40" backgroundColor="key_red" conditional="key_red" font="Regular;20" foregroundColor="key_text" halign="center" valign="center">
+			<convert type="ConditionalShowHide" />
+		</widget>
+		<widget source="key_green" render="Label" position="190,e-40" size="180,40" backgroundColor="key_green" conditional="key_green" font="Regular;20" foregroundColor="key_text" halign="center" valign="center">
+			<convert type="ConditionalShowHide" />
+		</widget>
+		<widget source="key_help" render="Label" position="e-80,e-40" size="80,40" backgroundColor="key_back" conditional="key_help" font="Regular;20" foregroundColor="key_text" halign="center" valign="center">
+			<convert type="ConditionalShowHide" />
+		</widget>
 	</screen>
 	"""
 
 	def __init__(self, session, *args):
-		Screen.__init__(self, session)
+		Screen.__init__(self, session, enableHelp=True)
 		self.setTitle(_("Image Backup"))
 		self["key_red"] = StaticText(_("Cancel"))
 		self["key_green"] = StaticText(_("Start"))
-		self["description"] = StaticText(_("Use the cursor keys to select an installed image and then Start button."))
-		self["options"] = StaticText("")
-		self["config"] = ChoiceList(list=[ChoiceEntryComponent("", ((_("Retrieving image slots - Please wait...")), "Queued"))])
-		self["actions"] = ActionMap(["OkCancelActions", "ColorActions", "DirectionActions", "KeyboardInputActions", "MenuActions"], {
-			"red": boundFunction(self.close, None),
-			"green": self.start,
-			"ok": self.start,
-			"cancel": boundFunction(self.close, None),
-			"up": self["config"].goLineUp,
-			"down": self["config"].goLineDown,
-			"left": self["config"].goLineUp,
-			"right": self["config"].goLineDown,
-			"menu": boundFunction(self.close, True),
-		}, prio=0)
-		# imagedict = []
-		# self.getImageList = None
-		# self.startit()
+		self["description"] = StaticText(_("Use the UP/DOWN buttons to select the installed image to be backed up. Press the 'Start' (GREEN) button to start the backup."))
+		self["config"] = ChoiceList([ChoiceEntryComponent(None, (_("Retrieving image slots - Please wait..."), None, False))])
+		self["actions"] = HelpableActionMap(self, ["CancelSaveActions", "OkActions", "NavigationActions"], {
+			"cancel": (self.close, _("Exit without performing a backup")),
+			"save": (self.keyStart, _("Start the backup of the selected image")),
+			"close": (self.keyCloseRecursive, _("Exit and close all screens without performing a backup")),
+			"ok": (self.keyStart, _("Start the backup of the selected image")),
+			"top": (self["config"].goTop, _("Move to first line / screen")),
+			"pageUp": (self["config"].goPageUp, _("Move up a screen")),
+			"up": (self["config"].goLineUp, _("Move up a line")),
+			"down": (self["config"].goLineDown, _("Move down a line")),
+			"pageDown": (self["config"].goPageDown, _("Move down a screen")),
+			"bottom": (self["config"].goBottom, _("Move to last line / screen"))
+		}, prio=0, description=_("Image Backup Actions"))
+		self.bzip2Cmd = "/usr/bin/bzip2"
+		self.catCmd = "/bin/cat"
+		self.copyCmd = "/bin/cp"
+		self.cutCmd = "/usr/bin/cut"
+		self.dateCmd = "/bin/date"
+		self.ddCmd = "/bin/dd"
+		self.duCmd = "/usr/bin/du"
+		self.echoCmd = "/bin/echo"
+		self.grepCmd = "/bin/grep"
+		self.makeDirCmd = "/bin/mkdir"
+		self.mkfsExt4 = "/sbin/mkfs.ext4"
+		self.mkfsJffs2 = "/usr/sbin/mkfs.jffs2"
+		self.mkfsUbiCmd = "/usr/sbin/mkfs.ubifs"
+		self.mkupdateCmd = "/usr/sbin/mkupdate"
+		self.mountCmd = "/bin/mount"
+		self.moveCmd = "/bin/mv"
+		self.nandDumpCmd = "/usr/sbin/nanddump"
+		self.opkgCmd = "/usr/bin/opkg"
+		self.partedCmd = "/usr/sbin/parted"
+		self.removeCmd = "/bin/rm"
+		self.removeDirCmd = "/bin/rmdir"
+		self.rsyncCmd = "/usr/bin/rsync"
+		self.sedCmd = "/bin/sed"
+		self.shellCmd = "/bin/sh"
+		self.syncCmd = "/bin/sync"
+		self.tarCmd = "/bin/tar"
+		self.touchCmd = "/bin/touch"
+		self.ubiCmd = "/usr/sbin/ubinize"
+		self.unmountCmd = "/bin/umount"
+		self.zipCmd = "/usr/bin/7za"
 		self.runScript = "/tmp/imagebackup.sh"
+		self.usbBin = "usb_update.bin"
+		self.separator = f"{"_" * 70}"
 		self.onLayoutFinish.append(self.layoutFinished)
-		print("[ImageBackup] DEBUG: Now running '__init__'.")
-		self.callLater(self.startit)
+		self.callLater(self.getImageList)
 
 	def layoutFinished(self):
 		self["config"].enableAutoNavigation(False)
 
-	def startit(self):
-		MultiBoot.getSlotImageList(self.ImageList)
-
-	def ImageList(self, imagedict):
-		self.saveImageList = imagedict
-		imageList = []
-		currentImageSlot = MultiBoot.getCurrentSlotCode()
-		rootSlot = BoxInfo.getItem("HasKexecMultiboot") and currentImageSlot == "R"
-		currentImageSlot = int(currentImageSlot) if currentImageSlot and currentImageSlot.isdecimal() else 1
-		print(f"[Image Backup] Current Image Slot {currentImageSlot}, Imagelist {imagedict}, rootSlot={rootSlot}")
-		if imagedict:
-			for slotCode in sorted(imagedict.keys()):
-				if imagedict[slotCode]["status"] == "active":
-					slotText = f"{slotCode} {"eMMC" if "mmcblk" in imagedict[slotCode]["device"] else "USB"}"
-					if slotCode == "1" and currentImageSlot == 1 and BoxInfo.getItem("canRecovery"):
-						imageList.append(ChoiceEntryComponent("", (_("Slot %s: %s as USB Recovery") % (slotText, imagedict[slotCode]["imagename"]), slotCode, True)))
-					if rootSlot:
-						imageList.append(ChoiceEntryComponent("", ((_("Slot %s: %s")) % (slotText, imagedict[slotCode]["imagename"]), slotCode, False)))
-					else:
-						imageList.append(ChoiceEntryComponent("", ((_("Slot %s: %s (Current image)") if slotCode == str(currentImageSlot) else _("Slot %s: %s")) % (slotText, imagedict[slotCode]["imagename"]), slotCode, False)))
-			if rootSlot:
-				imageList.append(ChoiceEntryComponent("", (_("Slot R: Root Slot Full Backup (Current image)"), "R", False)))
-		else:
-			if BoxInfo.getItem("canRecovery"):
-				imageList.append(ChoiceEntryComponent("", (_("Internal flash: %s %s as USB Recovery") % (DISTRO, DISTROVERSION), "slotCode", True)))
-			imageList.append(ChoiceEntryComponent("", (_("Internal flash:  %s %s ") % (DISTRO, DISTROVERSION), "slotCode", False)))
-		self["config"].setList(imageList)
-		index = 0
-		for index, item in enumerate(imageList):
-			if item[0][1] == str(currentImageSlot):
-				break
-		self["config"].moveToIndex(index)
-
-	def start(self):
-		self.currentSelected = self["config"].l.getCurrentSelection()
-		title = _("Please select a backup destination")
-		choices = []
-		if self.currentSelected[0][1] != "Queued":
-			for media in [f"/media/{x}" for x in listdir("/media")] + ([f"/media/net/{x}" for x in listdir("/media/net")] if isdir("/media/net") else []):
-				if Freespace(media) > 300000:
-					choices.append((_("Backup to destination: %s") % (media), self.currentSelected[0][1], media, self.currentSelected[0][2]))
-			choices.append((_("No, do not backup a image"), False))
-			self.session.openWithCallback(self.doFullBackup, ChoiceBox, title=title, list=choices)
-
-	def doFullBackup(self, answer):
-		if answer is not None and answer[1]:
-			configfile.save()
-			fileWriteLine("/proc/sys/vm/drop_caches", "3")  # Clear Memory
-			self.RECOVERY = answer[3]
-			self.DIRECTORY = f"{answer[2]}/images"
-			if not exists(self.DIRECTORY):
-				try:
-					makedirs(self.DIRECTORY)
-				except OSError:
-					self.session.open(MessageBox, _("Cannot create backup directory"), MessageBox.TYPE_ERROR, timeout=10)
-					return
-			self.SLOT = str(answer[1])
-			self.DISTRO = DISTRO
-			self.DISPLAYDISTRO = DISPLAYDISTRO
-			self.DISTROVERSION = DISTROVERSION
-			self.IMAGETYPE = BoxInfo.getItem("imagetype")
-			self.IMAGEDEVBUILD = "" if self.IMAGETYPE == "release" else BoxInfo.getItem("imagedevbuild")
-			self.MODEL = BoxInfo.getItem("BoxName")
-			self.OEM = BoxInfo.getItem("brand")
-			self.MACHINEBUILD = BoxInfo.getItem("model")
-			self.IMAGEFOLDER = BoxInfo.getItem("imagedir")
-			self.UBINIZE_ARGS = BoxInfo.getItem("ubinize")
-			self.MKUBIFS_ARGS = BoxInfo.getItem("mkubifs")
-			self.ROOTFSSUBDIR = "none"
-			self.ROOTFSBIN = BoxInfo.getItem("rootfile")
-			self.KERNELBIN = BoxInfo.getItem("kernelfile")
-			self.ROOTFSTYPE = BoxInfo.getItem("imagefs").strip()
-			self.IMAGEBUILD = BoxInfo.getItem("imagebuild")
-			self.DRIVERSDATE = BoxInfo.getItem("driversdate")
-			self.IMGREVISION = BoxInfo.getItem("imgrevision")
-			self.IMGVERSION = BoxInfo.getItem("imgversion")
-			self.KERNEL = BoxInfo.getItem("kernel")
-			self.HasKexecMultiboot = BoxInfo.getItem("HasKexecMultiboot")
-
-			if BoxInfo.getItem("canRecovery"):
-				self.EMMCIMG = BoxInfo.getItem("canRecovery")[0]
-				self.MTDBOOT = BoxInfo.getItem("canRecovery")[1]
+	def getImageList(self):
+		def getImageListCallback(imageList):
+			currentImageSlot = MultiBoot.getCurrentSlotCode()
+			rootSlot = BoxInfo.getItem("HasKexecMultiboot") and currentImageSlot == "R"
+			currentImageSlot = int(currentImageSlot) if currentImageSlot and currentImageSlot.isdecimal() else 1
+			print(f"[ImageBackup] Current slot={currentImageSlot}, rootSlot={rootSlot}.")
+			images = []  # ChoiceEntryComponent(key, (Label, slotCode, recovery))
+			if imageList:
+				for slotCode in sorted(imageList.keys()):
+					print(f"[ImageBackup]     Slot {slotCode}: {imageList[slotCode]}")
+					if imageList[slotCode]["status"] == "active":
+						slotText = f"{slotCode} {"eMMC" if "mmcblk" in imageList[slotCode]["device"] else "USB"}"
+						if slotCode == "1" and currentImageSlot == 1 and BoxInfo.getItem("canRecovery"):
+							images.append(ChoiceEntryComponent(None, (_("Slot %s: %s as USB Recovery") % (slotText, imageList[slotCode]["imagename"]), slotCode, True)))
+						if rootSlot:
+							images.append(ChoiceEntryComponent(None, ((_("Slot %s: %s")) % (slotText, imageList[slotCode]["imagename"]), slotCode, False)))
+						else:
+							images.append(ChoiceEntryComponent(None, ((_("Slot %s: %s (Current image)") if slotCode == str(currentImageSlot) else _("Slot %s: %s")) % (slotText, imageList[slotCode]["imagename"]), slotCode, False)))
+				if rootSlot:
+					images.append(ChoiceEntryComponent(None, (_("Slot R: Root Slot Image Backup (Current image)"), "R", False)))
 			else:
-				self.EMMCIMG = "none"
-				self.MTDBOOT = "none"
-			self.hasMultiBootMDT = False
-			self.ROOTFSSUBDIR = "none"
+				if BoxInfo.getItem("canRecovery"):
+					images.append(ChoiceEntryComponent(None, (_("Internal flash: %s %s as USB Recovery") % (displayDistro, imageVersion), "slotCode", True)))
+				images.append(ChoiceEntryComponent(None, (_("Internal flash:  %s %s ") % (displayDistro, imageVersion), "slotCode", False)))
+			self["config"].setList(images)
+			for index, item in enumerate(images):
+				if item[0][1] == str(currentImageSlot):
+					self["config"].moveToIndex(index)
+					break
+
+		displayDistro = BoxInfo.getItem("displaydistro")
+		imageVersion = BoxInfo.getItem("imageversion")
+		MultiBoot.getSlotImageList(getImageListCallback)
+
+	def keyStart(self):
+		current = self["config"].getCurrent()  # (label, slotCode, recovery)
+		targets = []
+		choiceList = []  # (label, slotCode, target, recovery)
+		if current[0][1]:  # The MultiBoot enumeration is complete as we now have slotCodes.
+			for target in [join("/media", x) for x in listdir("/media")] + ([join("/media/net", x) for x in listdir("/media/net")] if isdir("/media/net") else []):
+				if Freespace(target) > 300000:
+					targets.append(target)
+					choiceList.append((target, current[0][1], target, current[0][2]))
+			choiceList.append((_("Do not backup the image"), False, None, False))
+			print(f"[ImageBackup] Potential target{"" if len(targets) == 1 else "s"}: '{"', '".join(targets)}'.")
+			self.session.openWithCallback(self.runImageBackup, ChoiceBox, title=_("Please select the target location to save the backup:"), list=choiceList, windowTitle=self.getTitle())
+
+	def keyCloseRecursive(self):
+		self.close(True)
+
+	def runImageBackup(self, answer):
+		def consoleCallback(result=None):
+			print("[ImageBackup] Image backup completed.")
+			self.close()
+
+		label, slotCode, target, recovery = answer if answer else (None, None, None, None)
+		if slotCode:
+			# Make sure that the image backup target exists.
+			target = join(target, "images")
+			if not exists(target):
+				try:
+					makedirs(target)
+				except OSError as err:
+					print(f"[ImageBackup] Error {err.errno}: Can't create backup directory '{target}'!  ({err.strerror})")
+					self.session.open(MessageBox, f"{_("Error")} {err.errno}: {_("Can't create backup directory!")}  ({err.strerror})", MessageBox.TYPE_ERROR, timeout=10, windowTitle=self.getTitle())
+					return
+			# Get information about image to be backed up.
+			if BoxInfo.getItem("canRecovery"):
+				emmcing = BoxInfo.getItem("canRecovery")[0]
+				mtdBoot = BoxInfo.getItem("canRecovery")[1]
+			else:
+				emmcing = "None"
+				mtdBoot = "None"
+			hasMultiBootMDT = False
+			rootfsSubDir = None
 			if MultiBoot.canMultiBoot():
 				bootSlots = MultiBoot.getBootSlots()
-				self.hasMultiBootMDT = bootSlots[self.SLOT].get("ubi", False)
-				self.ROOTFSSUBDIR = bootSlots[self.SLOT].get("rootsubdir", "none")
-				if BoxInfo.getItem("HasKexecMultiboot") and self.SLOT == "R":
-					self.MTDKERNEL = bootSlots[self.SLOT]["kernel"]
-					self.ROOTFSSUBDIR = "none"
+				hasMultiBootMDT = bootSlots[slotCode].get("ubi", False)
+				rootfsSubDir = bootSlots[slotCode].get("rootsubdir")
+				if BoxInfo.getItem("HasKexecMultiboot") and slotCode == "R":
+					mtdKernel = bootSlots[slotCode]["kernel"]
+					rootfsSubDir = None
 				else:
-					self.MTDKERNEL = bootSlots[self.SLOT]["kernel"].split("/")[2]
-				if self.hasMultiBootMDT:
-					self.MTDROOTFS = bootSlots[self.SLOT]["device"]
-				else:
-					self.MTDROOTFS = bootSlots[self.SLOT]["device"].split("/")[2]
+					mtdKernel = bootSlots[slotCode]["kernel"].split("/")[2]
+				mtdRootFs = bootSlots[slotCode]["device"] if hasMultiBootMDT else bootSlots[slotCode]["device"].split("/")[2]
 			else:
-				self.MTDKERNEL = BoxInfo.getItem("mtdkernel")
-				self.MTDROOTFS = BoxInfo.getItem("mtdrootfs")
-
-			print(f"[Image Backup] BOX MACHINEBUILD = >{self.MACHINEBUILD}<")
-			print(f"[Image Backup] BOX MACHINENAME = >{MACHINENAME}<")
-			print(f"[Image Backup] BOX MACHINEBRAND = >{MACHINEBRAND}<")
-			print(f"[Image Backup] BOX MODEL = >{self.MODEL}<")
-			print(f"[Image Backup] OEM MODEL = >{self.OEM}<")
-			print(f"[Image Backup] IMAGEFOLDER = >{self.IMAGEFOLDER}<")
-			print(f"[Image Backup] UBINIZE = >{self.UBINIZE_ARGS}<")
-			print(f"[Image Backup] MKUBIFS = >{self.MKUBIFS_ARGS}<")
-			print(f"[Image Backup] MTDBOOT = >{self.MTDBOOT}<")
-			print(f"[Image Backup] MTDKERNEL = >{self.MTDKERNEL}<")
-			print(f"[Image Backup] MTDROOTFS = >{self.MTDROOTFS}<")
-			print(f"[Image Backup] ROOTFSBIN = >{self.ROOTFSBIN}<")
-			print(f"[Image Backup] KERNELBIN = >{self.KERNELBIN}<")
-			print(f"[Image Backup] ROOTFSSUBDIR = >{self.ROOTFSSUBDIR}<")
-			print(f"[Image Backup] ROOTFSTYPE = >{self.ROOTFSTYPE}<")
-			print(f"[Image Backup] hasMultiBootMDT = >{self.hasMultiBootMDT}<")
-			print(f"[Image Backup] EMMCIMG = >{self.EMMCIMG}<")
-			print(f"[Image Backup] MTDBOOT = >{self.MTDBOOT}<")
-			print(f"[Image Backup] USB RECOVERY = >{self.RECOVERY}< ")
-			print(f"[Image Backup] DESTINATION = >{self.DIRECTORY}< ")
-			print(f"[Image Backup] SLOT = >{self.SLOT}< ")
-			print(f"[Image Backup] HasKexecMultiboot = >{self.HasKexecMultiboot}< ")
-			print(f"[Image Backup] canMultiBoot = >{MultiBoot.canMultiBoot()}< ")
-
-			isNotCurrent = MultiBoot.getCurrentSlotCode() != answer[1]
-
-			print(f"[Image Backup] isNotCurrent = >{isNotCurrent}< ")
-
-			if self.RECOVERY and not isNotCurrent:
-				print(f"[Image Backup] IMAGEDISTRO = >{self.DISTRO}<")
-				print(f"[Image Backup] DISPLAYDISTRO = >{self.DISPLAYDISTRO}<")
-				print(f"[Image Backup] DISTROVERSION = >{self.DISTROVERSION}<")
-				print(f"[Image Backup] IMAGEBUILD = >{self.IMAGEBUILD}<")
-				print(f"[Image Backup] IMGVERSION = >{self.IMGVERSION}<")
-				print(f"[Image Backup] IMGREVISION = >{self.IMGREVISION}<")
-				print(f"[Image Backup] DRIVERSDATE = >{self.DRIVERSDATE}<")
-				print(f"[Image Backup] IMAGEDEVBUILD = >{self.IMAGEDEVBUILD}<")
-				print(f"[Image Backup] IMAGETYPE = >{self.IMAGETYPE}<")
-
-			self.TITLE = _("Full back-up on %s") % (self.DIRECTORY)
-			self.START = time()
-			self.DATE = strftime("%Y%m%d_%H%M", localtime(self.START))
-			self.MKFS_UBI = "/usr/sbin/mkfs.ubifs"
-			self.MKFS_TAR = "/bin/tar"
-			self.BZIP2 = "/usr/bin/bzip2"
-			self.MKFS_JFFS2 = "/usr/sbin/mkfs.jffs2"
-			self.UBINIZE = "/usr/sbin/ubinize"
-			self.NANDDUMP = "/usr/sbin/nanddump"
-			self.FASTBOOT = "/usr/bin/ext2simg"
-			self.WORKDIR = f"{self.DIRECTORY}/bi"
-
-			self.SHOWNAME = f"{MACHINEBRAND} {self.MODEL}"
-			self.MAINDEST = f"{self.DIRECTORY}/build_{self.MODEL}/{self.IMAGEFOLDER}"
-			self.MAINDESTROOT = f"{self.DIRECTORY}/build_{self.MODEL}"
-
-			## PREPARING THE BUILDING ENVIRONMENT
-			system(f"rm -rf {self.WORKDIR}")
-			self.backuproot = "/tmp/bi/RootSubdir" if self.ROOTFSSUBDIR != "none" else "/tmp/bi/root"
-			if not exists(self.WORKDIR):
-				makedirs(self.WORKDIR)
-			if not exists(self.backuproot):
-				makedirs(self.backuproot)
-			system("sync")
+				mtdKernel = BoxInfo.getItem("mtdkernel")
+				mtdRootFs = BoxInfo.getItem("mtdrootfs")
+			isNotCurrent = MultiBoot.getCurrentSlotCode() != slotCode
+			# Start creating the image backup script.
+			print(f"[ImageBackup] Bulding shell script '{self.runScript}' to perform the image backup.")
+			cmdLines = []
+			cmdLines.append(f"#!{self.shellCmd}")
+			cmdLines.append(f"StartTime=`{self.dateCmd} -u +\"%s\"`")
+			# Display the starting message to the user.
+			lines = []
+			lines.append(_("Backup tool for %s %s") % getBoxDisplayName())
+			lines.append(self.separator)
+			lines.append("")
+			lines.append(_("A backup is now being created. Please be patient as, due to"))
+			lines.append(_("the number of files to be processed, the backup will take up"))
+			lines.append(_("to about 15 minutes to complete."))
+			lines.append(self.separator)
+			lines.append("")
+			lines.append(_("Backup Mode: USB Recovery") if recovery else _("Backup Mode: Flash Online"))
+			lines.append(self.separator)
+			lines.append("")
+			cmdLines.append(f"{self.echoCmd} \"{"\n".join(lines)}\"")
+			# Create working directories.
+			cmdLines.append(f"{self.echoCmd} \"Create working directories.\"")
+			workDir = f"{join(target, "ib", "")}"  # NOTE: workDir will always have a trailing "/".
+			cmdLines.append(f"{self.removeCmd} -rf {workDir}")
+			cmdLines.append(f"{self.makeDirCmd} -p {workDir}")
+			mountPoint = "/tmp/ib/RootSubdir/" if rootfsSubDir else "/tmp/ib/root/"  # NOTE: mountPoint will always have a trailing "/".
+			backupRoot = mountPoint  # NOTE: backupRoot will always have a trailing "/".
+			cmdLines.append(f"{self.makeDirCmd} -p {mountPoint}")
+			cmdLines.append(f"{self.echoCmd} \"Mount root file system.\"")  # Mount the root file system.
 			if MultiBoot.canMultiBoot():
-				mountcmd = f"/dev/{self.MTDROOTFS} {self.backuproot}"
-				if self.ROOTFSSUBDIR != "none":
-					if self.hasMultiBootMDT:
-						mountcmd = f"-t ubifs {self.MTDROOTFS} {self.backuproot}"
-					self.backuproot = f"{self.backuproot}/{self.ROOTFSSUBDIR}"
+				mountArgs = f"/dev/{mtdRootFs} {mountPoint}"
+				if rootfsSubDir:
+					if hasMultiBootMDT:
+						mountArgs = f"-t ubifs {mtdRootFs} {mountPoint}"
+					backupRoot = f"{join(backupRoot, rootfsSubDir, "")}"  # NOTE: backupRoot will always have a trailing "/".
 			else:
-				mountcmd = f"--bind / {self.backuproot}"
-			system(f"mount {mountcmd}")
-
-			self.IMAGEVERSION = ""
-			# Get real slot info if not current slot and not recovery
-			if not self.RECOVERY:
+				mountArgs = f"--bind / {mountPoint}"
+			cmdLines.append(f"{self.mountCmd} {mountArgs}")
+			# Extract some image information.
+			cmdLines.append(f"if [ -f {backupRoot}usr/lib/enigma.info ]; then")
+			cmdLines.append(f"\tDistro=`{self.grepCmd} \"^distro=\" {backupRoot}usr/lib/enigma.info | {self.sedCmd} -En \"s/^\\w+=(['\\\"]?)(.*?)\\1$/\\2/p\"`")
+			cmdLines.append(f"\tDisplayDistro=`{self.grepCmd} \"^displaydistro=\" {backupRoot}usr/lib/enigma.info | {self.sedCmd} -En \"s/^\\w+=(['\\\"]?)(.*?)\\1$/\\2/p\"`")
+			cmdLines.append(f"\tImageVersion=`{self.grepCmd} \"^imageversion=\" {backupRoot}usr/lib/enigma.info | {self.sedCmd} -En \"s/^\\w+=(['\\\"]?)(.*?)\\1$/\\2/p\"`")
+			cmdLines.append(f"elif [ -f {backupRoot}etc/image-version ]; then")
+			cmdLines.append(f"\tDistro=`{self.grepCmd} \"^distro=\" {backupRoot}etc/image-version | {self.cutCmd} -d\"=\" -f2`")
+			cmdLines.append("\tif [ \"$Distro\" == \"\" ]; then")
+			cmdLines.append(f"\t\tDisplayDistro=`{self.grepCmd} \"^creator=\" {backupRoot}etc/image-version | {self.cutCmd} -d\"=\" -f2`")
+			cmdLines.append(f"\t\tDistro=`{self.echoCmd} \"$DisplayDistro\" | {self.cutCmd} -d\" \" -f1`")
+			cmdLines.append(f"\t\tVersion=`{self.grepCmd} \"^version=\" {backupRoot}etc/image-version | {self.cutCmd} -d\"=\" -f2`")
+			cmdLines.append(f"\t\tImageVersion=`{self.echoCmd} \"${{Version:0:3}}\" | {self.sedCmd} -En \"s/^0*(\\d*)/\\1/p\"`.${{Version:3:1}}.${{Version:4:2}}")
+			cmdLines.append("\telse")
+			cmdLines.append(f"\t\tDisplayDistro=`{self.grepCmd} \"^creator=\" {backupRoot}etc/image-version | {self.cutCmd} -d\"=\" -f2`")
+			cmdLines.append(f"\t\tImageVersion=`{self.grepCmd} \"^imageversion=\" {backupRoot}etc/image-version | {self.cutCmd} -d\"=\" -f2`")
+			cmdLines.append("\tfi")
+			cmdLines.append(f"elif [ -f {backupRoot}etc/issue ]; then")
+			cmdLines.append(f"\tData=`{self.sedCmd} -n 2p {backupRoot}etc/issue`")
+			cmdLines.append(f"\tDistro=`{self.echoCmd} $Data | {self.cutCmd} -d\" \" -f1`")
+			cmdLines.append(f"\tDisplayDistro=`{self.sedCmd} -n 1p {backupRoot}etc/issue | {self.cutCmd} -d\" \" -f3`")
+			cmdLines.append(f"\tImageVersion=`{self.echoCmd} $Data | {self.cutCmd} -d\" \" -f2`")
+			cmdLines.append("else")
+			cmdLines.append("\tDistro=Unknown")
+			cmdLines.append("\tDisplayDistro=Unknown")
+			cmdLines.append("\tImageVersion=Unknown")
+			cmdLines.append("fi")
+			cmdLines.append(f"{self.echoCmd} \"Image version $DisplayDistro $ImageVersion.\"")
+			# Build the "imageversion" inventory file.
+			cmdLines.append(f"{self.echoCmd} \"[Image Version]\" > /tmp/imageversion")
+			cmdLines.append(f"{self.echoCmd} \"distro=$Distro\" >> /tmp/imageversion")
+			cmdLines.append(f"{self.echoCmd} \"displaydistro=$DisplayDistro\" >> /tmp/imageversion")
+			cmdLines.append(f"{self.echoCmd} \"imageversion=$ImageVersion.\" >> /tmp/imageversion")
+			if not recovery:
 				infoPath = "/"
 				if MultiBoot.canMultiBoot() and isNotCurrent:
-					infoPath = self.backuproot
-				(enigmaInfo, info, settingsFile, bouquetsTV, bouquetsRadio) = self.getImageData(infoPath, isNotCurrent)
-
-				if isNotCurrent:
-					if "distro" in info:
-						self.DISTRO = info["distro"]
-					if "displaydistro" in info:
-						self.DISPLAYDISTRO = info["displaydistro"]
-					if "imageversion" in info:
-						self.DISTROVERSION = info["imageversion"]
-					if "imagetype" in info:
-						self.IMAGETYPE = info["imagetype"]
-					if "imagedevbuild" in info:
-						self.IMAGEDEVBUILD = info["imagedevbuild"]
-					if "imagebuild" in info:
-						self.IMAGEBUILD = info["imagebuild"]
-					if "driversdate" in info:
-						self.DRIVERSDATE = info["driversdate"]
-					if "imgrevision" in info:
-						self.IMGREVISION = info["imgrevision"]
-					if "imgversion" in info:
-						self.IMGVERSION = info["imgversion"]
-					if "kernel" in info:
-						self.KERNEL = info["kernel"]
-					if not enigmaInfo:
-						self.IMGREVISION = info["compiledate"]
-						self.DISTROVERSION = info["imgversion"]
-						self.IMAGEBUILD = info["compiledate"]
-						self.DRIVERSDATE = ""
-
-					if self.IMAGETYPE != "release" and self.IMAGEDEVBUILD:
-						self.DISTROVERSION = f"{self.DISTROVERSION}.{self.IMAGEDEVBUILD}"
-
-					print(f"[Image Backup] IMAGEDISTRO = >{self.DISTRO}<")
-					print(f"[Image Backup] DISPLAYDISTRO = >{self.DISPLAYDISTRO}<")
-					print(f"[Image Backup] DISTROVERSION = >{self.DISTROVERSION}<")
-					print(f"[Image Backup] IMAGEBUILD = >{self.IMAGEBUILD}<")
-					print(f"[Image Backup] IMGVERSION = >{self.IMGVERSION}<")
-					print(f"[Image Backup] IMGREVISION = >{self.IMGREVISION}<")
-					print(f"[Image Backup] DRIVERSDATE = >{self.DRIVERSDATE}<")
-					print(f"[Image Backup] IMAGEDEVBUILD = >{self.IMAGEDEVBUILD}<")
-					print(f"[Image Backup] IMAGETYPE = >{self.IMAGETYPE}<")
-
-				self.IMAGEVERSION = self.imageInfo(settingsFile, bouquetsTV, bouquetsRadio, isNotCurrent)
-			else:
-				self.IMAGEVERSION = ""  # TODO TEST Recovery image
-
-			self.message = "echo -e '\n"
-			if MACHINEBRAND.startswith("A") or MACHINEBRAND.startswith("E") or MACHINEBRAND.startswith("I") or MACHINEBRAND.startswith("O") or MACHINEBRAND.startswith("U") or MACHINEBRAND.startswith("Xt"):
-				self.message += (_("Back-up Tool for an %s\n") % self.SHOWNAME).upper()
-			else:
-				self.message += (_("Back-up Tool for a %s\n") % self.SHOWNAME).upper()
-			self.message += _("Version %s %s") % (self.DISTRO, self.DISTROVERSION) + "\n"
-			self.message += f"{USEP}\n\n"
-			self.message += _("Please be patient, a backup will now be made,\n")
-			self.message += _("because of the used file system the back-up\n")
-			self.message += _("will take about 1-15 minutes for this system\n")
-			self.message += f"{USEP}\n\n"
-			if self.RECOVERY:
-				self.message += _("Backup Mode: USB Recovery\n")
-			else:
-				self.message += _("Backup Mode: Flash Online\n")
-			self.message += f"{USEP}\n"
-			self.message += "'"
-
-			cmd1 = None
-			cmd2 = None
-			cmd3 = None
-			if "jffs2" in self.ROOTFSTYPE.split():
-				cmd1 = f"{self.MKFS_JFFS2} --root={self.backuproot} --faketime --output={self.WORKDIR}/root.jffs2 {self.MKUBIFS_ARGS}"
-			elif "ubi" in self.ROOTFSTYPE.split():
+					infoPath = backupRoot
+				cmdLines.append(f"{self.echoCmd} >> /tmp/imageversion")
+				cmdLines.append(f"{self.echoCmd} \"[Enigma2 Settings]\" >> /tmp/imageversion")
+				cmdLines.append(f"{self.catCmd} {infoPath}etc/enigma2/settings >> /tmp/imageversion")
+			if not isNotCurrent:
+				cmdLines.append(f"{self.echoCmd} >> /tmp/imageversion")
+				cmdLines.append(f"{self.echoCmd} \"[Installed Plugins]\" >> /tmp/imageversion")
+				cmdLines.append(f"{self.opkgCmd} list-installed | {self.grepCmd} \"enigma2-plugin-*\" >> /tmp/imageversion")
+			cmdLines.append(f"{self.echoCmd} 3 > /proc/sys/vm/drop_caches")  # Clear memory caches.
+			# Create the root file system image.
+			imageFs = BoxInfo.getItem("imagefs").strip().split()
+			mkubifsArgs = BoxInfo.getItem("mkubifs")
+			backupRootNoSlash = backupRoot[:-1]
+			if "jffs2" in imageFs:
+				cmdLines.append(f"{self.echoCmd} \"Create root journaling flash file system.\"")
+				cmdLines.append(f"{self.mkfsJffs2} --root={backupRootNoSlash} --faketime --output={workDir}root.jffs2 {mkubifsArgs}")
+			elif "ubi" in imageFs:
+				cmdLines.append(f"{self.echoCmd} \"Create root UBI file system.\"")
+				cmdLines.append(f"{self.echoCmd} > {workDir}root.ubi")
+				cmdLines.append(f"{self.mkfsUbiCmd} -r {backupRootNoSlash} -o {workDir}root.ubi {mkubifsArgs}")
 				lines = []
 				lines.append("[ubifs]")
 				lines.append("mode=ubi")
-				lines.append(f"image={self.WORKDIR}/root.ubi")
-				lines.append(f"vol_id=0")
-				lines.append(f"vol_type=dynamic")
-				lines.append(f"vol_name=rootfs")
-				lines.append(f"vol_flags=autoresize")
-				fileWriteLines(f"{self.WORKDIR}/ubinize.cfg", lines, source=MODULE_NAME)
-				fileWriteLine(f"{self.WORKDIR}/root.ubi", "", source=MODULE_NAME)
-				cmd1 = f"{self.MKFS_UBI} -r {self.backuproot} -o {self.WORKDIR}/root.ubi {self.MKUBIFS_ARGS}"
-				cmd2 = f"{self.UBINIZE} -o {self.WORKDIR}/root.ubifs {self.UBINIZE_ARGS} {self.WORKDIR}/ubinize.cfg"
-			elif not self.RECOVERY:
-				cmd1 = f"{self.MKFS_TAR} -cf {self.WORKDIR}/rootfs.tar -C {self.backuproot} --exclude ./boot/kernel.img --exclude ./var/nmbd --exclude ./.resizerootfs --exclude ./.resize-rootfs --exclude ./.resize-linuxrootfs --exclude ./.resize-userdata --exclude ./var/lib/samba/private/msg.sock --exclude ./var/lib/samba/msg.sock/* --exclude ./run/avahi-daemon/socket --exclude ./run/chrony/chronyd.sock ."
-				cmd2 = "sync"
-				cmd3 = f"{self.BZIP2} {self.WORKDIR}/rootfs.tar"
-
-			cmdlist = []
-			cmdlist.append(self.message)
-			if cmd1:
-				cmdlist.append(self.makeEchoCreate(self.ROOTFSBIN))
-				cmdlist.append(cmd1)
-			if cmd2:
-				cmdlist.append(cmd2)
-			if cmd3:
-				cmdlist.append(cmd3)
-
-			if self.MODEL in ("gbquad4k", "gbue4k", "gbx34k"):
-				cmdlist.append(self.makeEchoCreate("boot dump"))
-				cmdlist.append(f"dd if=/dev/mmcblk0p1 of={self.WORKDIR}/boot.bin")
-				cmdlist.append(self.makeEchoCreate("rescue dump"))
-				cmdlist.append(f"dd if=/dev/mmcblk0p3 of={self.WORKDIR}/rescue.bin")
-
-			if self.MACHINEBUILD in ("h9", "i55plus"):
+				lines.append(f"image={workDir}root.ubi")
+				lines.append("vol_id=0")
+				lines.append("vol_type=dynamic")
+				lines.append("vol_name=rootfs")
+				lines.append("vol_flags=autoresize")
+				cmdLines.append(f"{self.echoCmd} '{"\n".join(lines)}' > {workDir}ubinize.cfg")
+				cmdLines.append(f"{self.ubiCmd} -o {workDir}root.ubifs {BoxInfo.getItem("ubinize")} {workDir}ubinize.cfg")
+			elif not recovery:
+				cmdLines.append(f"{self.echoCmd} \"Create tar file of root file system.\"")
+				# cmdLines.append(f"{self.touchCmd} {workDir}rootfs.tar")  # Uncomment this line and comment out the line below to enable a fast backup debugging mode.
+				cmdLines.append(f"{self.tarCmd} -cf {workDir}rootfs.tar -C {backupRootNoSlash} --exclude ./boot/kernel.img --exclude ./var/nmbd --exclude ./.resizerootfs --exclude ./.resize-rootfs --exclude ./.resize-linuxrootfs --exclude ./.resize-userdata --exclude ./var/lib/samba/private/msg.sock --exclude ./var/lib/samba/msg.sock/* --exclude ./run/avahi-daemon/socket --exclude ./run/chrony/chronyd.sock --exclude ./run/udev/control .")
+				cmdLines.append(f"{self.syncCmd}")
+				cmdLines.append(f"{self.echoCmd} \"Compress root file system tar file. (This takes the most time!)\"")
+				cmdLines.append(f"{self.bzip2Cmd} {workDir}rootfs.tar")
+			cmdLines.append(f"{self.syncCmd}")
+			# Create other image backup components.
+			boxName = BoxInfo.getItem("BoxName")
+			if boxName in ("gbquad4k", "gbue4k", "gbx34k"):
+				cmdLines.append(f"{self.echoCmd} \"Create boot dump.\"")
+				cmdLines.append(f"{self.ddCmd} if=/dev/mmcblk0p1 of={workDir}boot.bin")
+				cmdLines.append(f"{self.echoCmd} \"Create rescue dump.\"")
+				cmdLines.append(f"{self.ddCmd} if=/dev/mmcblk0p3 of={workDir}rescue.bin")
+			displayNames = ["fast boot", "boot arguments", "base parameters", "PQ parameters", "logo"]
+			model = BoxInfo.getItem("model")
+			if model in ("h9", "i55plus"):
 				for index, value in enumerate(["fastboot", "bootargs", "baseparam", "pq_param", "logo"]):
-					cmdlist.append(self.makeEchoCreate(f"{value} dump"))
-					cmdlist.append(f"dd if=/dev/mtd{index} of={self.WORKDIR}/{value}.bin")
-
-			if self.EMMCIMG == "usb_update.bin" and self.RECOVERY:
-				SEEK_CONT = int((getFolderSize(self.backuproot) / 1024) + 100000)
-
-				cmdlist.append(self.makeEchoCreate("fastboot dump"))
-				cmdlist.append(self.makeCopyBinFile("fastboot", self.WORKDIR))
-				#cmdlist.append("dd if=/dev/mmcblk0p1 of=%s/fastboot.bin" % self.WORKDIR)
-
-				cmdlist.append(self.makeEchoCreate("bootargs dump"))
-				cmdlist.append(self.makeCopyBinFile("bootargs", self.WORKDIR))
-				#cmdlist.append("dd if=/dev/mmcblk0p2 of=%s/bootargs.bin" % self.WORKDIR)
-
-				cmdlist.append(self.makeEchoCreate("boot dump"))
-				cmdlist.append(f"dd if=/dev/mmcblk0p3 of={self.WORKDIR}/boot.img")
-
-				cmdlist.append(self.makeEchoCreate("baseparam dump"))
-				#cmdlist.append("cp -f /usr/share/bootargs.bin %s/baseparam.img" %(self.WORKDIR))
-				cmdlist.append(f"dd if=/dev/mmcblk0p4 of={self.WORKDIR}/baseparam.img")
-
-				cmdlist.append(self.makeEchoCreate("pq_param dump"))
-				#cmdlist.append("cp -f /usr/share/bootargs.bin %s/pq_param.bin" %(self.WORKDIR))
-				cmdlist.append(f"dd if=/dev/mmcblk0p5 of={self.WORKDIR}/pq_param.bin")
-
-				cmdlist.append(self.makeEchoCreate("logo dump"))
-				cmdlist.append(f"dd if=/dev/mmcblk0p6 of={self.WORKDIR}/logo.img")
-
-				cmdlist.append(self.makeEchoCreate("deviceinfo dump"))
-				#cmdlist.append("cp -f /usr/share/bootargs.bin %s/deviceinfo.bin" %(self.WORKDIR))
-				cmdlist.append(f"dd if=/dev/mmcblk0p7 of={self.WORKDIR}/deviceinfo.bin")
-
-				cmdlist.append(self.makeEchoCreate("apploader dump"))
-				cmdlist.append(self.makeCopyBinFile("apploader", self.WORKDIR))
-				#cmdlist.append("dd if=/dev/mmcblk0p10 of=%s/apploader.bin" % self.WORKDIR)
-
-				cmdlist.append(self.makeEchoCreate("rootfs dump"))
-				cmdlist.append(f"dd if=/dev/zero of={self.WORKDIR}/rootfs.ext4 seek={SEEK_CONT} count=60 bs=1024")
-				cmdlist.append(f"mkfs.ext4 -F -i 4096 {self.WORKDIR}/rootfs.ext4")
-				cmdlist.append(f"mkdir -p {self.WORKDIR}/userdata")
-				cmdlist.append(f"mount {self.WORKDIR}/rootfs.ext4 {self.WORKDIR}/userdata")
-				for rootindex in range(1, 5):
-					cmdlist.append(f"mkdir -p {self.WORKDIR}/userdata/linuxrootfs{rootindex}")
-
-				cmdlist.append(f"rsync -aAX {self.backuproot}/ {self.WORKDIR}/userdata/linuxrootfs1/")
-				cmdlist.append(f"umount {self.WORKDIR}/userdata")
-
-			cmdlist.append(self.makeEchoCreate("kerneldump"))
-			if MultiBoot.canMultiBoot() or self.MTDKERNEL.startswith("mmcblk0") or self.MACHINEBUILD in ("h8", "hzero"):
+					cmdLines.append(f"{self.echoCmd} \"Create {displayNames[index]} dump.\"")
+					cmdLines.append(f"{self.ddCmd} if=/dev/mtd{index} of={workDir}{value}.bin")
+			if emmcing == self.usbBin and recovery:
+				cmdLines.append(f"{self.echoCmd} \"Create {displayNames[0]} dump.\"")
+				# cmdLines.append(f"{self.ddCmd} if=/dev/mmcblk0p1 of={workDir}fastboot.bin")
+				cmdLines.append(f"{self.copyCmd} -f /usr/share/fastboot.bin {workDir}")
+				cmdLines.append(f"{self.echoCmd} \"Create {displayNames[1]} dump.\"")
+				# cmdLines.append(f"{self.ddCmd} if=/dev/mmcblk0p2 of={workDir}bootargs.bin")
+				cmdLines.append(f"{self.copyCmd} -f /usr/share/bootargs.bin {workDir}")
+				cmdLines.append(f"{self.echoCmd} \"Create boot image dump.\"")
+				cmdLines.append(f"{self.ddCmd} if=/dev/mmcblk0p3 of={workDir}boot.img")
+				cmdLines.append(f"{self.echoCmd} \"Create {displayNames[2]} dump.\"")
+				# cmdLines.append(f"{self.copyCmd} -f /usr/share/bootargs.bin {workDir}baseparam.img")
+				cmdLines.append(f"{self.ddCmd} if=/dev/mmcblk0p4 of={workDir}baseparam.img")
+				cmdLines.append(f"{self.echoCmd} \"Create {displayNames[3]} dump.\"")
+				# cmdLines.append(f"{self.copyCmd} -f /usr/share/bootargs.bin {workDir}pq_param.bin")
+				cmdLines.append(f"{self.ddCmd} if=/dev/mmcblk0p5 of={workDir}pq_param.bin")
+				cmdLines.append(f"{self.echoCmd} \"Create {displayNames[4]} dump.\"")
+				cmdLines.append(f"{self.ddCmd} if=/dev/mmcblk0p6 of={workDir}logo.img")
+				cmdLines.append(f"{self.echoCmd} \"Create device information dump.\"")
+				# cmdLines.append(f"{self.copyCmd} -f /usr/share/bootargs.bin {workDir}deviceinfo.bin")
+				cmdLines.append(f"{self.ddCmd} if=/dev/mmcblk0p7 of={workDir}deviceinfo.bin")
+				cmdLines.append(f"{self.echoCmd} \"Create application loader dump.\"")
+				# cmdLines.append(f"{self.ddCmd} if=/dev/mmcblk0p10 of={workDir}apploader.bin")
+				cmdLines.append(f"{self.copyCmd} -f /usr/share/apploader.bin {workDir}")
+				cmdLines.append(f"{self.echoCmd} \"Create root file system dump.\"")
+				cmdLines.append(f"{self.ddCmd} if=/dev/zero of={workDir}rootfs.ext4 seek=$(((`{self.duCmd} -sb \"{backupRoot}\" | cut -f1` / 1024) + 200000)) count=60 bs=1024")
+				cmdLines.append(f"{self.mkfsExt4} -F -i 4096 {workDir}rootfs.ext4")
+				cmdLines.append(f"{self.makeDirCmd} -p {workDir}userdata")
+				cmdLines.append(f"{self.mountCmd} {workDir}rootfs.ext4 {workDir}userdata")
+				for rootIndex in range(1, 5):
+					cmdLines.append(f"{self.makeDirCmd} -p {workDir}userdata/linuxrootfs{rootIndex}")
+				cmdLines.append(f"{self.rsyncCmd} -aAX {backupRoot} {workDir}userdata/linuxrootfs1")
+				cmdLines.append(f"{self.unmountCmd} {workDir}userdata")
+			# Create the kernel dump.
+			cmdLines.append(f"{self.echoCmd} \"Create kernel dump.\"")
+			kernelFile = BoxInfo.getItem("kernelfile")
+			if MultiBoot.canMultiBoot() or mtdKernel.startswith("mmcblk0") or model in ("h8", "hzero"):
 				if BoxInfo.getItem("HasKexecMultiboot") or BoxInfo.getItem("HasGPT"):
-					cmdlist.append(f"cp /{self.MTDKERNEL} {self.WORKDIR}/{self.KERNELBIN}")
+					cmdLines.append(f"{self.copyCmd} /{mtdKernel} {workDir}{kernelFile}")
 				else:
-					cmdlist.append(f"dd if=/dev/{self.MTDKERNEL} of={self.WORKDIR}/{self.KERNELBIN}")
+					cmdLines.append(f"{self.ddCmd} if=/dev/{mtdKernel} of={workDir}{kernelFile}")
 			else:
-				cmdlist.append(f"nanddump -a -f {self.WORKDIR}/vmlinux.gz /dev/{self.MTDKERNEL}")
-
-			if self.EMMCIMG == "disk.img" and self.RECOVERY:
-				EMMC_IMAGE = f"{self.WORKDIR}/{self.EMMCIMG}"
-				BLOCK_SIZE = 512
-				BLOCK_SECTOR = 2
-				IMAGE_ROOTFS_ALIGNMENT = 1024
-				BOOT_PARTITION_SIZE = 3072
-				KERNEL_PARTITION_SIZE = 8192
-				ROOTFS_PARTITION_SIZE = 1048576
-				EMMC_IMAGE_SIZE = 3817472
-				KERNEL_PARTITION_OFFSET = int(IMAGE_ROOTFS_ALIGNMENT) + int(BOOT_PARTITION_SIZE)
-				ROOTFS_PARTITION_OFFSET = int(KERNEL_PARTITION_OFFSET) + int(KERNEL_PARTITION_SIZE)
-				SECOND_KERNEL_PARTITION_OFFSET = int(ROOTFS_PARTITION_OFFSET) + int(ROOTFS_PARTITION_SIZE)
-				THRID_KERNEL_PARTITION_OFFSET = int(SECOND_KERNEL_PARTITION_OFFSET) + int(KERNEL_PARTITION_SIZE)
-				FOURTH_KERNEL_PARTITION_OFFSET = int(THRID_KERNEL_PARTITION_OFFSET) + int(KERNEL_PARTITION_SIZE)
-				MULTI_ROOTFS_PARTITION_OFFSET = int(FOURTH_KERNEL_PARTITION_OFFSET) + int(KERNEL_PARTITION_SIZE)
-				EMMC_IMAGE_SEEK = int(EMMC_IMAGE_SIZE) * int(BLOCK_SECTOR)
-				cmdlist.append(self.makeEcho(_("Create: Recovery Fullbackup %s") % (self.EMMCIMG)))
-				cmdlist.append(f"dd if=/dev/zero of={EMMC_IMAGE} bs={BLOCK_SIZE} count=0 seek={EMMC_IMAGE_SEEK}")
-				cmdlist.append(f"parted -s {EMMC_IMAGE} mklabel gpt")
-				PARTED_END_BOOT = int(IMAGE_ROOTFS_ALIGNMENT) + int(BOOT_PARTITION_SIZE)
-				cmdlist.append(f"parted -s {EMMC_IMAGE} unit KiB mkpart boot fat16 {IMAGE_ROOTFS_ALIGNMENT} {PARTED_END_BOOT}")
-				PARTED_END_KERNEL1 = int(KERNEL_PARTITION_OFFSET) + int(KERNEL_PARTITION_SIZE)
-				cmdlist.append(f"parted -s {EMMC_IMAGE} unit KiB mkpart linuxkernel {KERNEL_PARTITION_OFFSET} {PARTED_END_KERNEL1}")
-				PARTED_END_ROOTFS1 = int(ROOTFS_PARTITION_OFFSET) + int(ROOTFS_PARTITION_SIZE)
-				cmdlist.append(f"parted -s {EMMC_IMAGE} unit KiB mkpart linuxrootfs ext4 {ROOTFS_PARTITION_OFFSET} {PARTED_END_ROOTFS1}")
-				PARTED_END_KERNEL2 = int(SECOND_KERNEL_PARTITION_OFFSET) + int(KERNEL_PARTITION_SIZE)
-				cmdlist.append(f"parted -s {EMMC_IMAGE} unit KiB mkpart linuxkernel2 {SECOND_KERNEL_PARTITION_OFFSET} {PARTED_END_KERNEL2}")
-				PARTED_END_KERNEL3 = int(THRID_KERNEL_PARTITION_OFFSET) + int(KERNEL_PARTITION_SIZE)
-				cmdlist.append(f"parted -s {EMMC_IMAGE} unit KiB mkpart linuxkernel3 {THRID_KERNEL_PARTITION_OFFSET} {PARTED_END_KERNEL3}")
-				PARTED_END_KERNEL4 = int(FOURTH_KERNEL_PARTITION_OFFSET) + int(KERNEL_PARTITION_SIZE)
-				cmdlist.append(f"parted -s {EMMC_IMAGE} unit KiB mkpart linuxkernel4 {FOURTH_KERNEL_PARTITION_OFFSET} {PARTED_END_KERNEL4}")
-				rd = open("/proc/swaps").read()
-				if "mmcblk0p7" in rd:
-					SWAP_PARTITION_OFFSET = int(FOURTH_KERNEL_PARTITION_OFFSET) + int(KERNEL_PARTITION_SIZE)
-					SWAP_PARTITION_SIZE = int(262144)
-					MULTI_ROOTFS_PARTITION_OFFSET = int(SWAP_PARTITION_OFFSET) + int(SWAP_PARTITION_SIZE)
-					cmdlist.append(f"parted -s {EMMC_IMAGE} unit KiB mkpart swap linux-swap {SWAP_PARTITION_OFFSET} {SWAP_PARTITION_OFFSET + SWAP_PARTITION_SIZE}")
-					cmdlist.append(f"parted -s {EMMC_IMAGE} unit KiB mkpart userdata ext4 {MULTI_ROOTFS_PARTITION_OFFSET} 100%")
+				cmdLines.append(f"{self.nandDumpCmd} -a -f {workDir}vmlinux.gz {join("/dev", mtdKernel)}")
+			if emmcing == "disk.img" and recovery:
+				blockSize = 512  # These values are all assumed to be integers!
+				blockSectors = 2
+				imageRoorFSAlignment = 1024
+				bootPartitionSize = 3072
+				kernelPartitionSize = 8192
+				rootFSPartitionSize = 1048576
+				emmcImageSize = 3817472
+				kernelPartitionOffset = imageRoorFSAlignment + bootPartitionSize
+				rootFSPartitionOffset = kernelPartitionOffset + kernelPartitionSize
+				secondKernelPartitionOffset = rootFSPartitionOffset + rootFSPartitionSize
+				thirdKernelPartitionOffset = secondKernelPartitionOffset + kernelPartitionSize
+				fourthKernelPartitionOffset = thirdKernelPartitionOffset + kernelPartitionSize
+				emmcImage = f"{workDir}{emmcing}"
+				cmdLines.append(f"{self.echoCmd} \"{_("Create recovery image backup '%s'.") % emmcing}\"")
+				cmdLines.append(f"{self.ddCmd} if=/dev/zero of={emmcImage} bs={blockSize} count=0 seek={emmcImageSize * blockSectors}")
+				cmdLines.append(f"{self.partedCmd} -s {emmcImage} mklabel gpt")
+				cmdLines.append(f"{self.partedCmd} -s {emmcImage} unit KiB mkpart boot fat16 {imageRoorFSAlignment} {imageRoorFSAlignment + bootPartitionSize}")
+				cmdLines.append(f"{self.partedCmd} -s {emmcImage} unit KiB mkpart linuxkernel {kernelPartitionOffset} {kernelPartitionOffset + kernelPartitionSize}")
+				cmdLines.append(f"{self.partedCmd} -s {emmcImage} unit KiB mkpart linuxrootfs ext4 {rootFSPartitionOffset} {rootFSPartitionOffset + rootFSPartitionSize}")
+				cmdLines.append(f"{self.partedCmd} -s {emmcImage} unit KiB mkpart linuxkernel2 {secondKernelPartitionOffset} {secondKernelPartitionOffset + kernelPartitionSize}")
+				cmdLines.append(f"{self.partedCmd} -s {emmcImage} unit KiB mkpart linuxkernel3 {thirdKernelPartitionOffset} {thirdKernelPartitionOffset + kernelPartitionSize}")
+				cmdLines.append(f"{self.partedCmd} -s {emmcImage} unit KiB mkpart linuxkernel4 {fourthKernelPartitionOffset} {fourthKernelPartitionOffset + kernelPartitionSize}")
+				lines = fileReadLines("/proc/swaps", default=[], source=MODULE_NAME)
+				mmcblk0p7Found = False
+				for line in lines:
+					if "mmcblk0p7" in line:
+						mmcblk0p7Found = True
+						break
+				if mmcblk0p7Found:
+					swapPartitionSize = 262144
+					swapPartitionOffset = fourthKernelPartitionOffset + kernelPartitionSize
+					cmdLines.append(f"{self.partedCmd} -s {emmcImage} unit KiB mkpart swap linux-swap {swapPartitionOffset} {swapPartitionOffset + swapPartitionSize}")
+					cmdLines.append(f"{self.partedCmd} -s {emmcImage} unit KiB mkpart userdata ext4 {swapPartitionOffset + swapPartitionSize} 100%")
 				else:
-					cmdlist.append(f"parted -s {EMMC_IMAGE} unit KiB mkpart userdata ext4 {MULTI_ROOTFS_PARTITION_OFFSET} 100%")
-				BOOT_IMAGE_SEEK = int(IMAGE_ROOTFS_ALIGNMENT) * int(BLOCK_SECTOR)
-				cmdlist.append(f"dd if=/dev/{self.MTDBOOT} of={EMMC_IMAGE} seek={BOOT_IMAGE_SEEK}")
-				KERNAL_IMAGE_SEEK = int(KERNEL_PARTITION_OFFSET) * int(BLOCK_SECTOR)
-				cmdlist.append(f"dd if=/dev/{self.MTDKERNEL} of={EMMC_IMAGE} seek={KERNAL_IMAGE_SEEK}")
-				ROOTFS_IMAGE_SEEK = int(ROOTFS_PARTITION_OFFSET) * int(BLOCK_SECTOR)
-				cmdlist.append(f"dd if=/dev/{self.MTDROOTFS} of={EMMC_IMAGE} seek={ROOTFS_IMAGE_SEEK} ")
-			elif self.EMMCIMG == "emmc.img" and self.RECOVERY:
-				EMMC_IMAGE = f"{self.WORKDIR}/{self.EMMCIMG}"
-				BLOCK_SECTOR = 2
-				IMAGE_ROOTFS_ALIGNMENT = 1024
-				BOOT_PARTITION_SIZE = 3072
-				KERNEL_PARTITION_SIZE = 8192
-				ROOTFS_PARTITION_SIZE = 1898496
-				EMMC_IMAGE_SIZE = 7634944
-				BOOTDD_VOLUME_ID = "boot"
-				KERNEL1_PARTITION_OFFSET = int(IMAGE_ROOTFS_ALIGNMENT) + int(BOOT_PARTITION_SIZE)
-				ROOTFS1_PARTITION_OFFSET = int(KERNEL1_PARTITION_OFFSET) + int(KERNEL_PARTITION_SIZE)
-				KERNEL2_PARTITION_OFFSET = int(ROOTFS1_PARTITION_OFFSET) + int(ROOTFS_PARTITION_SIZE)
-				ROOTFS2_PARTITION_OFFSET = int(KERNEL2_PARTITION_OFFSET) + int(KERNEL_PARTITION_SIZE)
-				KERNEL3_PARTITION_OFFSET = int(ROOTFS2_PARTITION_OFFSET) + int(ROOTFS_PARTITION_SIZE)
-				ROOTFS3_PARTITION_OFFSET = int(KERNEL3_PARTITION_OFFSET) + int(KERNEL_PARTITION_SIZE)
-				KERNEL4_PARTITION_OFFSET = int(ROOTFS3_PARTITION_OFFSET) + int(ROOTFS_PARTITION_SIZE)
-				ROOTFS4_PARTITION_OFFSET = int(KERNEL4_PARTITION_OFFSET) + int(KERNEL_PARTITION_SIZE)
-				EMMC_IMAGE_SEEK = int(EMMC_IMAGE_SIZE) * int(IMAGE_ROOTFS_ALIGNMENT)
-				cmdlist.append(self.makeEcho(_("Create: Recovery Fullbackup %s") % (self.EMMCIMG)))
-				cmdlist.append(f"dd if=/dev/zero of={EMMC_IMAGE} bs=1 count=0 seek={EMMC_IMAGE_SEEK}")
-				cmdlist.append(f"parted -s {EMMC_IMAGE} mklabel gpt")
-				PARTED_END_BOOT = int(IMAGE_ROOTFS_ALIGNMENT) + int(BOOT_PARTITION_SIZE)
-				cmdlist.append(f"parted -s {EMMC_IMAGE} unit KiB mkpart boot fat16 {IMAGE_ROOTFS_ALIGNMENT} {PARTED_END_BOOT}")
-				cmdlist.append(f"parted -s {EMMC_IMAGE} set 1 boot on")
-				PARTED_END_KERNEL1 = int(KERNEL1_PARTITION_OFFSET) + int(KERNEL_PARTITION_SIZE)
-				cmdlist.append(f"parted -s {EMMC_IMAGE} unit KiB mkpart kernel1 {KERNEL1_PARTITION_OFFSET} {PARTED_END_KERNEL1}")
-				PARTED_END_ROOTFS1 = int(ROOTFS1_PARTITION_OFFSET) + int(ROOTFS_PARTITION_SIZE)
-				cmdlist.append(f"parted -s {EMMC_IMAGE} unit KiB mkpart rootfs1 ext4 {ROOTFS1_PARTITION_OFFSET} {PARTED_END_ROOTFS1}")
-				PARTED_END_KERNEL2 = int(KERNEL2_PARTITION_OFFSET) + int(KERNEL_PARTITION_SIZE)
-				cmdlist.append(f"parted -s {EMMC_IMAGE} unit KiB mkpart kernel2 {KERNEL2_PARTITION_OFFSET} {PARTED_END_KERNEL2}")
-				PARTED_END_ROOTFS2 = int(ROOTFS2_PARTITION_OFFSET) + int(ROOTFS_PARTITION_SIZE)
-				cmdlist.append(f"parted -s {EMMC_IMAGE} unit KiB mkpart rootfs2 ext4 {ROOTFS2_PARTITION_OFFSET} {PARTED_END_ROOTFS2}")
-				PARTED_END_KERNEL3 = int(KERNEL3_PARTITION_OFFSET) + int(KERNEL_PARTITION_SIZE)
-				cmdlist.append(f"parted -s {EMMC_IMAGE} unit KiB mkpart kernel3 {KERNEL3_PARTITION_OFFSET} {PARTED_END_KERNEL3}")
-				PARTED_END_ROOTFS3 = int(ROOTFS3_PARTITION_OFFSET) + int(ROOTFS_PARTITION_SIZE)
-				cmdlist.append(f"parted -s {EMMC_IMAGE} unit KiB mkpart rootfs3 ext4 {ROOTFS3_PARTITION_OFFSET} {PARTED_END_ROOTFS3}")
-				PARTED_END_KERNEL4 = int(KERNEL4_PARTITION_OFFSET) + int(KERNEL_PARTITION_SIZE)
-				cmdlist.append(f"parted -s {EMMC_IMAGE} unit KiB mkpart kernel4 {KERNEL4_PARTITION_OFFSET} {PARTED_END_KERNEL4}")
-				PARTED_END_ROOTFS4 = int(ROOTFS4_PARTITION_OFFSET) + int(ROOTFS_PARTITION_SIZE)
-				cmdlist.append(f"parted -s {EMMC_IMAGE} unit KiB mkpart rootfs4 ext4 {ROOTFS4_PARTITION_OFFSET} {PARTED_END_ROOTFS4}")
-				BOOT_IMAGE_SEEK = int(IMAGE_ROOTFS_ALIGNMENT) * int(BLOCK_SECTOR)
-				cmdlist.append(f"dd if=/dev/{self.MTDBOOT} of={EMMC_IMAGE} seek={BOOT_IMAGE_SEEK}")
-				KERNAL_IMAGE_SEEK = int(KERNEL1_PARTITION_OFFSET) * int(BLOCK_SECTOR)
-				cmdlist.append(f"dd if=/dev/{self.MTDKERNEL} of={EMMC_IMAGE} seek={KERNAL_IMAGE_SEEK}")
-				ROOTFS_IMAGE_SEEK = int(ROOTFS1_PARTITION_OFFSET) * int(BLOCK_SECTOR)
-				cmdlist.append(f"dd if=/dev/{self.MTDROOTFS} of={EMMC_IMAGE} seek={ROOTFS_IMAGE_SEEK} ")
-			elif self.EMMCIMG == "usb_update.bin" and self.RECOVERY:
-				cmdlist.append(self.makeEcho(_("Create: Recovery Fullbackup %s") % (self.EMMCIMG)))
-				f = open(f"{self.WORKDIR}/emmc_partitions.xml", "w")
-				f.write('<?xml version="1.0" encoding="GB2312" ?>\n')
-				f.write("<Partition_Info>\n")
-				f.write('<Part Sel="1" PartitionName="fastboot" FlashType="emmc" FileSystem="none" Start="0" Length="1M" SelectFile="fastboot.bin"/>\n')
-				f.write('<Part Sel="1" PartitionName="bootargs" FlashType="emmc" FileSystem="none" Start="1M" Length="1M" SelectFile="bootargs.bin"/>\n')
-				f.write('<Part Sel="1" PartitionName="bootoptions" FlashType="emmc" FileSystem="none" Start="2M" Length="1M" SelectFile="boot.img"/>\n')
-				f.write('<Part Sel="1" PartitionName="baseparam" FlashType="emmc" FileSystem="none" Start="3M" Length="3M" SelectFile="baseparam.img"/>\n')
-				f.write('<Part Sel="1" PartitionName="pqparam" FlashType="emmc" FileSystem="none" Start="6M" Length="4M" SelectFile="pq_param.bin"/>\n')
-				f.write('<Part Sel="1" PartitionName="logo" FlashType="emmc" FileSystem="none" Start="10M" Length="4M" SelectFile="logo.img"/>\n')
-				f.write('<Part Sel="1" PartitionName="deviceinfo" FlashType="emmc" FileSystem="none" Start="14M" Length="4M" SelectFile="deviceinfo.bin"/>\n')
-				f.write('<Part Sel="1" PartitionName="loader" FlashType="emmc" FileSystem="none" Start="26M" Length="32M" SelectFile="apploader.bin"/>\n')
-				f.write('<Part Sel="1" PartitionName="linuxkernel1" FlashType="emmc" FileSystem="none" Start="66M" Length="16M" SelectFile="kernel.bin"/>\n')
-				if self.MACHINEBUILD in ("sf8008m"):
-					f.write('<Part Sel="1" PartitionName="userdata" FlashType="emmc" FileSystem="ext3/4" Start="130M" Length="3580M" SelectFile="rootfs.ext4"/>\n')
+					cmdLines.append(f"{self.partedCmd} -s {emmcImage} unit KiB mkpart userdata ext4 {fourthKernelPartitionOffset + kernelPartitionSize} 100%")
+				cmdLines.append(f"{self.ddCmd} if=/dev/{mtdBoot} of={emmcImage} seek={imageRoorFSAlignment * blockSectors}")
+				cmdLines.append(f"{self.ddCmd} if=/dev/{mtdKernel} of={emmcImage} seek={kernelPartitionOffset * blockSectors}")
+				cmdLines.append(f"{self.ddCmd} if=/dev/{mtdRootFs} of={emmcImage} seek={rootFSPartitionOffset * blockSectors}")
+			elif emmcing == "emmc.img" and recovery:  # BOOTDD_VOLUME_ID = "boot".
+				blockSectors = 2  # These values are all assumed to be integers!
+				imageRoorFSAlignment = 1024
+				bootPartitionSize = 3072
+				kernelPartitionSize = 8192
+				rootFSPartitionSize = 1898496
+				emmcImageSize = 7634944
+				el1PartitionOffset = imageRoorFSAlignment + bootPartitionSize
+				rootFSPartitionOffset = el1PartitionOffset + kernelPartitionSize
+				kernel2PartitionOffset = rootFSPartitionOffset + rootFSPartitionSize
+				rootFS2PartitionOffset = kernel2PartitionOffset + kernelPartitionSize
+				kernel3PartitionOffset = rootFS2PartitionOffset + rootFSPartitionSize
+				rootFS3PartitionOffset = kernel3PartitionOffset + kernelPartitionSize
+				kernel4PartitionOffset = rootFS3PartitionOffset + rootFSPartitionSize
+				rootFS4PartitionOffset = kernel4PartitionOffset + kernelPartitionSize
+				emmcImage = f"{workDir}{emmcing}"
+				cmdLines.append(f"{self.echoCmd} \"{_("Create recovery image backup '%s'.") % emmcing}\"")
+				cmdLines.append(f"{self.ddCmd} if=/dev/zero of={emmcImage} bs=1 count=0 seek={emmcImageSize * imageRoorFSAlignment}")
+				cmdLines.append(f"{self.partedCmd} -s {emmcImage} mklabel gpt")
+				cmdLines.append(f"{self.partedCmd} -s {emmcImage} unit KiB mkpart boot fat16 {imageRoorFSAlignment} {imageRoorFSAlignment + bootPartitionSize}")
+				cmdLines.append(f"{self.partedCmd} -s {emmcImage} set 1 boot on")
+				cmdLines.append(f"{self.partedCmd} -s {emmcImage} unit KiB mkpart kernel1 {el1PartitionOffset} {el1PartitionOffset + kernelPartitionSize}")
+				cmdLines.append(f"{self.partedCmd} -s {emmcImage} unit KiB mkpart rootfs1 ext4 {rootFSPartitionOffset} {rootFSPartitionOffset + rootFSPartitionSize}")
+				cmdLines.append(f"{self.partedCmd} -s {emmcImage} unit KiB mkpart kernel2 {kernel2PartitionOffset} {kernel2PartitionOffset + kernelPartitionSize}")
+				cmdLines.append(f"{self.partedCmd} -s {emmcImage} unit KiB mkpart rootfs2 ext4 {rootFS2PartitionOffset} {rootFS2PartitionOffset + rootFSPartitionSize}")
+				cmdLines.append(f"{self.partedCmd} -s {emmcImage} unit KiB mkpart kernel3 {kernel3PartitionOffset} {kernel3PartitionOffset + kernelPartitionSize}")
+				cmdLines.append(f"{self.partedCmd} -s {emmcImage} unit KiB mkpart rootfs3 ext4 {rootFS3PartitionOffset} {rootFS3PartitionOffset + rootFSPartitionSize}")
+				cmdLines.append(f"{self.partedCmd} -s {emmcImage} unit KiB mkpart kernel4 {kernel4PartitionOffset} {kernel4PartitionOffset + kernelPartitionSize}")
+				cmdLines.append(f"{self.partedCmd} -s {emmcImage} unit KiB mkpart rootfs4 ext4 {rootFS4PartitionOffset} {rootFS4PartitionOffset + rootFSPartitionSize}")
+				cmdLines.append(f"{self.ddCmd} if=/dev/{mtdBoot} of={emmcImage} seek={imageRoorFSAlignment * blockSectors}")
+				cmdLines.append(f"{self.ddCmd} if=/dev/{mtdKernel} of={emmcImage} seek={el1PartitionOffset * blockSectors}")
+				cmdLines.append(f"{self.ddCmd} if=/dev/{mtdRootFs} of={emmcImage} seek={rootFSPartitionOffset * blockSectors} ")
+			elif emmcing == self.usbBin and recovery:
+				cmdLines.append(f"{self.echoCmd} \"{_("Create recovery image backup '%s'.") % emmcing}\"")
+				lines = []
+				lines.append("<?xml version=\"1.0\" encoding=\"GB2312\" ?>")
+				lines.append("<Partition_Info>")
+				lines.append("\t<Part Sel=\"1\" PartitionName=\"fastboot\" FlashType=\"emmc\" FileSystem=\"none\" Start=\"0\" Length=\"1M\" SelectFile=\"fastboot.bin\"/>")
+				lines.append("\t<Part Sel=\"1\" PartitionName=\"bootargs\" FlashType=\"emmc\" FileSystem=\"none\" Start=\"1M\" Length=\"1M\" SelectFile=\"bootargs.bin\"/>")
+				lines.append("\t<Part Sel=\"1\" PartitionName=\"bootoptions\" FlashType=\"emmc\" FileSystem=\"none\" Start=\"2M\" Length=\"1M\" SelectFile=\"boot.img\"/>")
+				lines.append("\t<Part Sel=\"1\" PartitionName=\"baseparam\" FlashType=\"emmc\" FileSystem=\"none\" Start=\"3M\" Length=\"3M\" SelectFile=\"baseparam.img\"/>")
+				lines.append("\t<Part Sel=\"1\" PartitionName=\"pqparam\" FlashType=\"emmc\" FileSystem=\"none\" Start=\"6M\" Length=\"4M\" SelectFile=\"pq_param.bin\"/>")
+				lines.append("\t<Part Sel=\"1\" PartitionName=\"logo\" FlashType=\"emmc\" FileSystem=\"none\" Start=\"10M\" Length=\"4M\" SelectFile=\"logo.img\"/>")
+				lines.append("\t<Part Sel=\"1\" PartitionName=\"deviceinfo\" FlashType=\"emmc\" FileSystem=\"none\" Start=\"14M\" Length=\"4M\" SelectFile=\"deviceinfo.bin\"/>")
+				lines.append("\t<Part Sel=\"1\" PartitionName=\"loader\" FlashType=\"emmc\" FileSystem=\"none\" Start=\"26M\" Length=\"32M\" SelectFile=\"apploader.bin\"/>")
+				lines.append("\t<Part Sel=\"1\" PartitionName=\"linuxkernel1\" FlashType=\"emmc\" FileSystem=\"none\" Start=\"66M\" Length=\"16M\" SelectFile=\"kernel.bin\"/>")
+				lines.append(f"\t<Part Sel=\"1\" PartitionName=\"userdata\" FlashType=\"emmc\" FileSystem=\"ext3/4\" Start=\"130M\" Length=\"{"3580" if model == "sf8008m" else "7000"}M\" SelectFile=\"rootfs.ext4\"/>")
+				lines.append("</Partition_Info>")
+				cmdLines.append(f"{self.echoCmd} '{"\n".join(lines)}' > {workDir}emmc_partitions.xml")
+				cmdLines.append(f"{self.mkupdateCmd} -s 00000003-00000001-01010101 -f {workDir}emmc_partitions.xml -d {workDir}{emmcing}")
+			cmdLines.append(f"{self.syncCmd}")
+			# Assemble the image backup.
+			cmdLines.append(f"{self.echoCmd} \"{_("Assembling the image backup files.")}\"")
+			mainDestinationRoot = f"{join(target, f"build_{boxName}", "")}"  # NOTE: mainDestinationRoot will always have a trailing "/".
+			mainDestination = f"{join(target, f"build_{boxName}", BoxInfo.getItem("imagedir"), "")}"  # NOTE: mainDestination will always have a trailing "/".
+			checkFiles = []
+			if emmcing == self.usbBin and recovery:
+				cmdLines.append(f"{self.removeCmd} -rf {mainDestinationRoot}")
+				cmdLines.append(f"{self.makeDirCmd} -p {mainDestinationRoot}")
+				cmdLines.append(f"{self.moveCmd} /tmp/imageversion {mainDestinationRoot}")
+				cmdLines.append(f"if [ -f {backupRoot}usr/lib/enigma.info ]; then")
+				cmdLines.append(f"\t{self.copyCmd} {backupRoot}usr/lib/enigma.info {mainDestinationRoot}")
+				cmdLines.append("fi")
+				cmdLines.append(f"if [ -f {backupRoot}usr/lib/enigma.conf ]; then")
+				cmdLines.append(f"\t{self.copyCmd} {backupRoot}usr/lib/enigma.conf {mainDestinationRoot}")
+				cmdLines.append("fi")
+			else:
+				cmdLines.append(f"{self.removeCmd} -rf {mainDestination}")
+				cmdLines.append(f"{self.makeDirCmd} -p {mainDestination}")
+				cmdLines.append(f"{self.moveCmd} /tmp/imageversion {mainDestination}")
+				cmdLines.append(f"if [ -f {backupRoot}usr/lib/enigma.info ]; then")
+				cmdLines.append(f"\t{self.copyCmd} {backupRoot}usr/lib/enigma.info {mainDestination}")
+				cmdLines.append("fi")
+				cmdLines.append(f"if [ -f {backupRoot}usr/lib/enigma.conf ]; then")
+				cmdLines.append(f"\t{self.copyCmd} {backupRoot}usr/lib/enigma.conf {mainDestination}")
+				cmdLines.append("fi")
+				cmdLines.append(f"if [ -f {backupRoot}etc/image-version ]; then")
+				cmdLines.append(f"\t{self.copyCmd} {backupRoot}etc/image-version {mainDestination}")
+				cmdLines.append("fi")
+				if not recovery:
+					if model in ("dm800se", "dm500hd", "dreamone", "dreamtwo"):
+						cmdLines.append(f"{self.touchCmd} {mainDestination}{kernelFile}")
+					elif MultiBoot.canMultiBoot() or mtdKernel.startswith("mmcblk0") or model in ("h8", "hzero"):
+						cmdLines.append(f"{self.moveCmd} {workDir}{kernelFile} {mainDestination}")
+					else:
+						cmdLines.append(f"{self.moveCmd} {workDir}vmlinux.gz {mainDestination}{kernelFile}")
+					rootFile = BoxInfo.getItem("rootfile")
+					if rootFile in ("rootfs.tar.bz2", "rootfs-two.tar.bz2", "rootfs-one.tar.bz2"):
+						if model in ("dreamone", "dreamtwo"):
+							cmdLines.append(f"{self.moveCmd} {workDir}rootfs.tar.bz2 {mainDestination}{rootFile}")
+						else:
+							cmdLines.append(f"{self.moveCmd} {workDir}{rootFile} {mainDestination}")
+					else:
+						cmdLines.append(f"{self.moveCmd} {workDir}root.ubifs {mainDestination}{rootFile}")
+					checkFiles.append(f"{mainDestination}{kernelFile}")
+					checkFiles.append(f"{mainDestination}{rootFile}")
+			if recovery:
+				if emmcing == self.usbBin:
+					cmdLines.append(f"{self.moveCmd} {workDir}{emmcing} {mainDestinationRoot}")
+					cmdLines.append(f"{self.copyCmd} -f /usr/share/fastboot.bin {mainDestinationRoot}")
+					cmdLines.append(f"{self.copyCmd} -f /usr/share/bootargs.bin {mainDestinationRoot}")
+					cmdLines.append(f"{self.copyCmd} -f /usr/share/apploader.bin {mainDestinationRoot}")
+					checkFiles.append(f"{mainDestinationRoot}{emmcing}")
 				else:
-					f.write('<Part Sel="1" PartitionName="userdata" FlashType="emmc" FileSystem="ext3/4" Start="130M" Length="7000M" SelectFile="rootfs.ext4"/>\n')
-				f.write("</Partition_Info>\n")
-				f.close()
-				cmdlist.append(f"mkupdate -s 00000003-00000001-01010101 -f {self.WORKDIR}/emmc_partitions.xml -d {self.WORKDIR}/{self.EMMCIMG}")
-
-			fileWriteLines(self.runScript, cmdlist, source=MODULE_NAME)
+					checkFiles.append(f"{mainDestination}{emmcing}")
+					cmdLines.append(f"{self.moveCmd} {workDir}{emmcing} {mainDestination}")
+				if emmcing == "emmc.img":
+					cmdLines.append(f"{self.echoCmd} \"Rename this file to 'force' to force an update without confirmation.\" > {mainDestination}noforce")
+			elif boxName in ("vuultimo4k", "vusolo4k", "vuduo2", "vusolo2", "vusolo", "vuduo", "vuultimo", "vuuno"):
+				cmdLines.append(f"{self.echoCmd} \"This file forces a reboot after the update.\" > {mainDestination}reboot.update")
+			elif boxName in ("vuzero", "vusolose", "vuuno4k", "vuzero4k"):
+				cmdLines.append(f"{self.echoCmd} \"This file forces the update.\" > {mainDestination}force.update")
+			elif boxName in ("viperslim", "evoslimse", "evoslimt2c", "novaip", "zgemmai55", "sf98", "xpeedlxpro", "evoslim", "vipert2c"):
+				cmdLines.append(f"{self.echoCmd} \"This file forces the update.\" > {mainDestination}force")
+			elif rootfsSubDir:
+				lines = []
+				lines.append(f"Rename the 'unforce_{model}.txt' to 'force_{model}.txt' and move it to the root of your usb-stick.")
+				lines.append("When you enter the recovery menu then it will force to install the image in the linux1 selection.")
+				cmdLines.append(f"{self.echoCmd} \"{"\n".join(lines)}\" > {mainDestination}force_{model}_READ.ME")
+			else:
+				cmdLines.append(f"{self.echoCmd} \"Rename this file to 'force' to force an update without confirmation.\" > {mainDestination}noforce")
+			if boxName in ("gbquad4k", "gbue4k", "gbx34k"):
+				cmdLines.append(f"{self.moveCmd} {workDir}boot.bin {mainDestination}")
+				cmdLines.append(f"{self.moveCmd} {workDir}rescue.bin {mainDestination}")
+				cmdLines.append(f"{self.copyCmd} -f /usr/share/gpt.bin {mainDestination}")
+			if model in ("h9", "i55plus"):
+				cmdLines.append(f"{self.moveCmd} {workDir}fastboot.bin {mainDestination}")
+				cmdLines.append(f"{self.moveCmd} {workDir}pq_param.bin {mainDestination}")
+				cmdLines.append(f"{self.moveCmd} {workDir}bootargs.bin {mainDestination}")
+				cmdLines.append(f"{self.moveCmd} {workDir}baseparam.bin {mainDestination}")
+				cmdLines.append(f"{self.moveCmd} {workDir}logo.bin {mainDestination}")
+			if boxName in ("gbquad", "gbquadplus", "gb800ue", "gb800ueplus", "gbultraue", "gbultraueh", "twinboxlcd", "twinboxlcdci", "singleboxlcd", "sf208", "sf228"):
+				lcdWaitKey = "/usr/share/lcdwaitkey.bin"
+				if isfile(lcdWaitKey):
+					cmdLines.append(f"{self.copyCmd} {lcdWaitKey} {mainDestination}")
+				lcdWarning = "/usr/share/lcdwarning.bin"
+				if isfile(lcdWarning):
+					cmdLines.append(f"{self.copyCmd} {lcdWarning} {mainDestination}")
+			if boxName in ("e4hdultra", "protek4k"):
+				lcdWarning = "/usr/share/lcdflashing.bmp"
+				if isfile(lcdWarning):
+					cmdLines.append(f"{self.copyCmd} {lcdWarning} {mainDestination}")
+			if boxName == "gb800solo":
+				lines = []
+				lines.append("flash -noheader usbdisk0:gigablue/solo/kernel.bin flash0.kernel")
+				lines.append("flash -noheader usbdisk0:gigablue/solo/rootfs.bin flash0.rootfs")
+				lines.append("setenv -p STARTUP \"boot -z -elf flash0.kernel: 'rootfstype=jffs2 bmem=106M@150M root=/dev/mtdblock6 rw '\"")
+				cmdLines.append(f"{self.echoCmd} '{"\n".join(lines)}' > {mainDestinationRoot}burn.bat")
+			if model in ("h9", "i55plus"):
+				cmdLines.append(f"{self.copyCmd} -f /usr/share/fastboot.bin {mainDestinationRoot}")
+				cmdLines.append(f"{self.copyCmd} -f /usr/share/bootargs.bin {mainDestinationRoot}")
+			name = "recovery_emmc" if BoxInfo.getItem("canRecovery") and recovery else "usb"
+			cmdLines.append(f"{self.echoCmd} 3 > /proc/sys/vm/drop_caches")  # Clear memory caches.
+			cmdLines.append(f"{self.echoCmd} \"Create backup image zip file.\"")
+			cmdLines.append(f"ZipName=$Distro-$ImageVersion-{boxName}-backup-`{self.dateCmd} +\"%Y%m%d_%H%M\"`_{name}.zip")
+			cmdLines.append(f"{self.zipCmd} a -r -bt -bd -bso0 {target}/$ZipName {join(mainDestinationRoot, "*")}")
+			cmdLines.append(self.syncCmd)
+			checkFiles = "\" -a \"".join(checkFiles)
+			cmdLines.append(f"if [ -r \"{checkFiles}\" ]; then")
+			if MultiBoot.canMultiBoot() and not recovery and rootfsSubDir is None:
+				lines = []
+				lines.append(self.separator)
+				lines.append("")
+				lines.append(f"{_("Multiboot Image created:")} $ZipName")
+				lines.append(self.separator)
+				lines.append("")
+				lines.append(_("To restore the image use 'OnlineFlash' option in the 'SoftwareManager' menu."))
+				cmdLines.append(f"\t{self.echoCmd} \"{"\n".join(lines)}\"")
+			else:
+				lines = []
+				lines.append(self.separator)
+				lines.append("")
+				lines.append(f"{_("Image created:")} $ZipName")
+				lines.append(self.separator)
+				lines.append("")
+				lines.append(_("To restore the image check the manual or documentation for the receiver."))
+				cmdLines.append(f"\t{self.echoCmd} \"{"\n".join(lines)}\"")
+			cmdLines.append("else")
+			lines = []
+			lines.append(f"{_("Image creation failed!")}")
+			lines.append(f"{_("Possible causes could be:")}")
+			lines.append(f"{_("- Wrong backup destination.")}")
+			lines.append(f"{_("- No space left on backup device.")}")
+			lines.append(f"{_("- No write permission on backup device.")}")
+			cmdLines.append(f"\t{self.echoCmd} \"{"\n".join(lines)}\"")
+			cmdLines.append("fi")
+			cmdLines.append(f"{self.removeCmd} -rf {join(target, f"build_{boxName}")}")
+			cmdLines.append(f"{self.unmountCmd} {mountPoint}")  # Unmount the root file system.
+			cmdLines.append(f"{self.removeDirCmd} {mountPoint}")
+			cmdLines.append(f"{self.removeDirCmd} /tmp/ib/")
+			cmdLines.append(f"{self.removeCmd} -rf {workDir}")
+			cmdLines.append(f"{self.echoCmd} 3 > /proc/sys/vm/drop_caches")  # Clear memory caches.
+			cmdLines.append(f"{self.syncCmd}")
+			cmdLines.append(f"{self.echoCmd}")
+			cmdLines.append(f"EndTime=`{self.dateCmd} -u +\"%s\"`")
+			cmdLines.append(f"RunTime=`{self.dateCmd} -u -d@\"$(($EndTime - $StartTime))\" +\"%H:%M:%S\"`")
+			cmdLines.append(f"{self.echoCmd} \"{_("Time taken for the backup:")} $RunTime\"")
+			fileWriteLines(self.runScript, cmdLines, source=MODULE_NAME)
 			chmod(self.runScript, 0o755)
-			cmdlist = [self.runScript]
-			self.session.open(Console, title=self.TITLE, cmdlist=cmdlist, finishedCallback=self.doFullBackupCB, closeOnSuccess=True)
+			print("[ImageBackup] Running the shell script.")
+			self.session.openWithCallback(consoleCallback, Console, title=_("Image Backup To %s") % target, cmdlist=[self.runScript], closeOnSuccess=False)
 		else:
 			self.close()
-
-	def makeEchoCreate(self, txt):
-		return self.makeEcho(f"{_("Create:")} {txt}")
-
-	def makeEcho(self, txt):
-		return f"echo \"{txt}\""
-
-	def makeEchoLine(self, nocr=False):
-		return "echo \"%s%s\"" % (USEP, "" if nocr else "\n")
-
-	def makeSpace(self):
-		return "echo \" \""
-
-	def makeCopyBinFile(self, fileName, destination):
-		return f"cp -f /usr/share/{fileName}.bin {destination}/{fileName}.bin"
-
-	def doFullBackupCB(self):
-		cmdlist = []
-		cmdlist.append(self.message)
-		cmdlist.append(self.makeEcho(_("Almost there... ")))
-		cmdlist.append(self.makeEcho(_("Now building the Backup Image")))
-
-		configfile.save()
-
-		def initDestination(destination):
-			system(f"rm -rf {destination}")
-			if not exists(destination):
-				makedirs(destination)
-			fileWriteLine(f"{destination}/imageversion", self.IMAGEVERSION, source=MODULE_NAME)
-
-		if self.EMMCIMG == "usb_update.bin" and self.RECOVERY:
-			initDestination(self.MAINDESTROOT)
-		else:
-			initDestination(self.MAINDEST)
-			if not self.RECOVERY:
-				if self.ROOTFSBIN in ("rootfs.tar.bz2", "rootfs-two.tar.bz2", "rootfs-one.tar.bz2"):
-					if self.MACHINEBUILD in ("dreamone", "dreamtwo"):
-						system(f"mv {self.WORKDIR}/rootfs.tar.bz2 {self.MAINDEST}/{self.ROOTFSBIN}")
-					else:
-						system(f"mv {self.WORKDIR}/{self.ROOTFSBIN} {self.MAINDEST}/{self.ROOTFSBIN}")
-				else:
-					system(f"mv {self.WORKDIR}/root.ubifs {self.MAINDEST}/{self.ROOTFSBIN}")
-				if self.MACHINEBUILD in ("dm800se", "dm500hd", "dreamone", "dreamtwo"):
-					system("touch %s/%s" % (self.MAINDEST, self.KERNELBIN))
-				elif MultiBoot.canMultiBoot() or self.MTDKERNEL.startswith("mmcblk0") or self.MACHINEBUILD in ("h8", "hzero"):
-					system(f"touch {self.MAINDEST}/{self.KERNELBIN}")
-				else:
-					system(f"mv {self.WORKDIR}/vmlinux.gz {self.MAINDEST}/{self.KERNELBIN}")
-
-		if self.RECOVERY:
-			if self.EMMCIMG == "usb_update.bin":
-				system(f"mv {self.WORKDIR}/{self.EMMCIMG} {self.MAINDESTROOT}/{self.EMMCIMG}")
-				cmdlist.append(self.makeCopyBinFile("fastboot", self.MAINDESTROOT))
-				cmdlist.append(self.makeCopyBinFile("bootargs", self.MAINDESTROOT))
-				cmdlist.append(self.makeCopyBinFile("apploader", self.MAINDESTROOT))
-			else:
-				system(f"mv {self.WORKDIR}/{self.EMMCIMG} {self.MAINDEST}/{self.EMMCIMG}")
-			if self.EMMCIMG == "emmc.img":
-				cmdlist.append(f'echo "rename this file to "force" to force an update without confirmation" > {self.MAINDEST}/noforce')
-		elif self.MODEL in ("vuultimo4k", "vusolo4k", "vuduo2", "vusolo2", "vusolo", "vuduo", "vuultimo", "vuuno"):
-			cmdlist.append(f'echo "This file forces a reboot after the update." > {self.MAINDEST}/reboot.update')
-		elif self.MODEL in ("vuzero", "vusolose", "vuuno4k", "vuzero4k"):
-			cmdlist.append(f'echo "This file forces the update." > {self.MAINDEST}/force.update')
-		elif self.MODEL in ("viperslim", "evoslimse", "evoslimt2c", "novaip", "zgemmai55", "sf98", "xpeedlxpro", "evoslim", "vipert2c"):
-			cmdlist.append(f'echo "This file forces the update." > {self.MAINDEST}/force')
-		elif self.ROOTFSSUBDIR != "none":
-			cmdlist.append(f'echo "Rename the unforce_{self.MACHINEBUILD}.txt to force_{self.MACHINEBUILD}.txt and move it to the root of your usb-stick" > {self.MAINDEST}/force_{self.MACHINEBUILD}_READ.ME')
-			cmdlist.append(f'echo "When you enter the recovery menu then it will force to install the image in the linux1 selection" >> {self.MAINDEST}/force_{self.MACHINEBUILD}_READ.ME')
-		else:
-			cmdlist.append(f'echo "rename this file to "force" to force an update without confirmation" > {self.MAINDEST}/noforce')
-
-		if self.MODEL in ("gbquad4k", "gbue4k", "gbx34k"):
-			system(f"mv {self.WORKDIR}/boot.bin {self.MAINDEST}/boot.bin")
-			system(f"mv {self.WORKDIR}/rescue.bin {self.MAINDEST}/rescue.bin")
-			system(f"cp -f /usr/share/gpt.bin {self.MAINDEST}/gpt.bin")
-
-		if self.MACHINEBUILD in ("h9", "i55plus"):
-			system(f"mv {self.WORKDIR}/fastboot.bin {self.MAINDEST}/fastboot.bin")
-			system(f"mv {self.WORKDIR}/pq_param.bin {self.MAINDEST}/pq_param.bin")
-			system(f"mv {self.WORKDIR}/bootargs.bin {self.MAINDEST}/bootargs.bin")
-			system(f"mv {self.WORKDIR}/baseparam.bin {self.MAINDEST}/baseparam.bin")
-			system(f"mv {self.WORKDIR}/logo.bin {self.MAINDEST}/logo.bin")
-
-		if self.MODEL in ("gbquad", "gbquadplus", "gb800ue", "gb800ueplus", "gbultraue", "gbultraueh", "twinboxlcd", "twinboxlcdci", "singleboxlcd", "sf208", "sf228"):
-			lcdwaitkey = "/usr/share/lcdwaitkey.bin"
-			lcdwarning = "/usr/share/lcdwarning.bin"
-			if isfile(lcdwaitkey):
-				system(f"cp {lcdwaitkey} {self.MAINDEST}/lcdwaitkey.bin")
-			if isfile(lcdwarning):
-				system(f"cp {lcdwarning} {self.MAINDEST}/lcdwarning.bin")
-		if self.MODEL in ("e4hdultra", "protek4k"):
-			lcdwarning = "/usr/share/lcdflashing.bmp"
-			if isfile(lcdwarning):
-				system(f"cp {lcdwarning} {self.MAINDEST}/lcdflashing.bmp")
-		if self.MODEL == "gb800solo":
-			f = open(f"{self.MAINDESTROOT}/burn.bat", "w")
-			f.write("flash -noheader usbdisk0:gigablue/solo/kernel.bin flash0.kernel\n")
-			f.write("flash -noheader usbdisk0:gigablue/solo/rootfs.bin flash0.rootfs\n")
-			f.write('setenv -p STARTUP "boot -z -elf flash0.kernel: ')
-			f.write("'rootfstype=jffs2 bmem=106M@150M root=/dev/mtdblock6 rw '")
-			f.write('"\n')
-			f.close()
-
-		if self.MACHINEBUILD in ("h9", "i55plus"):
-			cmdlist.append(self.makeCopyBinFile("fastboot", self.MAINDESTROOT))
-			cmdlist.append(self.makeCopyBinFile("bootargs", self.MAINDESTROOT))
-
-		iname = "recovery_emmc" if BoxInfo.getItem("canRecovery") and self.RECOVERY else "usb"
-
-		cmdlist.append("echo 3 > /proc/sys/vm/drop_caches")  # Clear Memory
-		cmdlist.append(f"7za a -r -bt -bd {self.DIRECTORY}/{self.DISTRO}-{self.DISTROVERSION}-{self.MODEL}-backup-{self.DATE}_{iname}.zip {self.MAINDESTROOT}/*")
-		cmdlist.append("sync")
-		fileNotFound = ""
-
-		if self.RECOVERY:
-			if self.EMMCIMG == "usb_update.bin":
-				if not isfile(f"{self.MAINDESTROOT}/{self.EMMCIMG}"):
-					fileNotFound = self.EMMCIMG
-			else:
-				if not isfile(f"{self.MAINDEST}/{self.EMMCIMG}"):
-					fileNotFound = self.EMMCIMG
-		else:
-			if not isfile(f"{self.MAINDEST}/{self.ROOTFSBIN}"):
-				fileNotFound = self.ROOTFSBIN
-
-			if not isfile(f"{self.MAINDEST}/{self.KERNELBIN}"):
-				fileNotFound = self.KERNELBIN
-
-		if fileNotFound:
-			print(f"[Image Backup] {fileNotFound} file not found")
-
-		cmdlist.append(self.makeEchoLine())
-		if MultiBoot.canMultiBoot() and not self.RECOVERY and self.ROOTFSSUBDIR == "none":
-			cmdlist.append(self.makeEcho(_("Multiboot Image created on: %s/%s-%s-%s-backup-%s_usb.zip") % (self.DIRECTORY, self.DISTRO, self.DISTROVERSION, self.MODEL, self.DATE)))
-			cmdlist.append(self.makeEchoLine(True))
-			cmdlist.append(self.makeSpace())
-			cmdlist.append(self.makeEcho(_("Please wait...almost ready! ")))
-			cmdlist.append(self.makeSpace())
-			cmdlist.append(self.makeEcho(_("To restore the image:")))
-			cmdlist.append(self.makeEcho(_("Use OnlineFlash in SoftwareManager")))
-		elif fileNotFound == "":
-			cmdlist.append(self.makeEcho(_("Image created on: %s/%s-%s-%s-backup-%s_%s.zip") % (self.DIRECTORY, self.DISTRO, self.DISTROVERSION, self.MODEL, self.DATE, iname)))
-			cmdlist.append(self.makeEchoLine(True))
-			cmdlist.append(self.makeSpace())
-			cmdlist.append(self.makeEcho(_("Please wait...almost ready! ")))
-			cmdlist.append(self.makeSpace())
-			cmdlist.append(self.makeEcho(_("To restore the image:")))
-			cmdlist.append(self.makeEcho(_("Please check the manual of the receiver")))
-			cmdlist.append(self.makeEcho(_("on how to restore the image")))
-		else:
-			cmdlist.append(self.makeEcho(_("Image creation failed - ")))
-			cmdlist.append(self.makeEcho(_("Probable causes could be") + ":"))
-			cmdlist.append(self.makeEcho(_("     wrong back-up destination ")))
-			cmdlist.append(self.makeEcho(_("     no space left on back-up device")))
-			cmdlist.append(self.makeEcho(_("     no writing permission on back-up device")))
-			cmdlist.append(self.makeSpace())
-
-		cmdlist.append(f"rm -rf {self.DIRECTORY}/build_{self.MODEL}")
-		rdir = "RootSubdir" if self.ROOTFSSUBDIR != "none" else "root"
-		cmdlist.append(f"umount /tmp/bi/{rdir}")
-		cmdlist.append(f"rmdir /tmp/bi/{rdir}")
-		cmdlist.append("rmdir /tmp/bi")
-		cmdlist.append("echo 3 > /proc/sys/vm/drop_caches")  # Clear Memory
-		cmdlist.append(f"rm -rf {self.WORKDIR}")
-		cmdlist.append("sleep 5")
-		END = time()
-		DIFF = int(END - self.START)
-		TIMELAP = str(timedelta(seconds=DIFF))
-		cmdlist.append(self.makeEcho(_("Time required for this process: %s") % TIMELAP + "\n"))
-
-		fileWriteLines(self.runScript, cmdlist, source=MODULE_NAME)
-		chmod(self.runScript, 0o755)
-		cmdlist = [self.runScript]
-
-		def consoleCallback(result=None):
-			remove(self.runScript)
-			self.close(True)
-
-		self["config"].setList([])  # Clear list to prevent crash
-		self.session.openWithCallback(consoleCallback, Console, title=self.TITLE, cmdlist=cmdlist, closeOnSuccess=False)
-
-	def imageInfo(self, settings, bouquetsTV, bouquetsRadio, isNotCurrent):
-		AboutText = _("Full Image Backup ")
-		AboutText += _("By openpli Image Team For Dreambox") + "\n"
-		AboutText += _("Support at") + " https://github.com/fairbird/enigma2-dreambox\n\n"
-		AboutText += _("[Image Info]\n")
-		AboutText += f"{_("Model")}: {MACHINEBRAND} {MACHINENAME}\n"
-		AboutText += _("Backup Date: %s\n") % strftime("%Y-%m-%d", localtime(self.START))
-
-		if exists("/proc/stb/info/chipset"):
-			AboutText += _("Chipset: BCM%s") % BoxInfo.getItem("ChipsetString") + "\n"
-
-		cpu = getCPUInfoString()
-		AboutText += f"{_("CPU")}: {cpu[0]}\n"
-		AboutText += f"{_("CPU speed/cores")}: {cpu[1]}/{cpu[2]}\n"
-		AboutText += f"{_("CPU brand")}: {getCPUBrand()}\n"
-		socFamily = BoxInfo.getItem("socfamily")
-		if socFamily:
-			AboutText += f"{_("SoC family")}: {socFamily}\n"
-
-		AboutText += _("Version: %s") % self.DISTROVERSION + "\n"
-		AboutText += _("Build: %s") % self.IMAGEBUILD + "\n"
-		if self.KERNEL:  # TODO get slot info
-			AboutText += f"{_("Kernel version")}: {self.KERNEL}\n"
-
-		if self.DRIVERSDATE:
-			driversdate = str(self.DRIVERSDATE)
-			year = driversdate[0:4]
-			month = driversdate[4:6]
-			day = driversdate[6:8]
-			driversdate = "-".join((year, month, day))
-			AboutText += f"{_("Drivers version")}:\t{driversdate}\n"
-
-		AboutText += f"{_("Last update")}\t{self.IMGREVISION}\n\n"
-
-		AboutText += _("[Enigma2 Settings]\n")
-		for setting in settings:
-			AboutText += f"{setting}\n"
-		AboutText += _("\n\n[User - bouquets (TV)]\n")
-		if bouquetsTV:
-			for bouquet in bouquetsTV:
-				AboutText += bouquet
-		else:
-			AboutText += _("Error reading bouquets.tv")
-		AboutText += _("\n[User - bouquets (RADIO)]\n")
-		if bouquetsRadio:
-			for bouquet in bouquetsRadio:
-				AboutText += bouquet
-		else:
-			AboutText += _("Error reading bouquets.radio")
-
-		if not isNotCurrent:
-			AboutText += _("\n[Installed Plugins]\n")
-			AboutText += getoutput("opkg list_installed | grep enigma2-plugin-")  # TODO get slot info
-		return AboutText
-
-	def getImageData(self, imageDir, isNotCurrent):
-		infoFile = join(imageDir, "usr/lib/enigma.info")
-		info = {}
-		enigmaInfo = False
-		if isNotCurrent:
-			if isfile(infoFile):
-				info = MultiBoot.readSlotInfo(infoFile)
-				enigmaInfo = True
-			elif isfile(join(imageDir, "usr/bin/enigma2")):
-				info = MultiBoot.deriveSlotInfo(imageDir)
-
-		settingsFile = fileReadLines(join(imageDir, "etc/enigma2/settings"), source=MODULE_NAME) or []
-		bouquetsTV = []
-		bouquetsRadio = []
-		lines = fileReadLines(join(imageDir, "etc/enigma2/bouquets.tv"), source=MODULE_NAME)
-		if lines:
-			for line in lines:
-				if line.startswith("#SERVICE "):
-					bouqet = line.split()
-					if len(bouqet) > 3:
-						bouqet[3] = bouqet[3].replace("\"", "")
-						try:
-							with open(f"/etc/enigma2/{bouqet[3]}") as fd:
-								userbouqet = fd.readline()
-							bouquetsTV.append(userbouqet.replace("#NAME ", ""))
-						except UnicodeDecodeError:
-							bouquetsTV.append(f"Error: {bouqet[3]} / not UTF-8")
-						except OSError:
-							pass
-
-		lines = fileReadLines(join(imageDir, "etc/enigma2/bouquets.radio"), source=MODULE_NAME)
-		if lines:
-			for line in lines:
-				if line.startswith("#SERVICE "):
-					bouqet = line.split()
-					if len(bouqet) > 3:
-						bouqet[3] = bouqet[3].replace("\"", "")
-						try:
-							with open(f"/etc/enigma2/{bouqet[3]}") as fd:
-								userbouqet = fd.readline()
-							bouquetsRadio.append(userbouqet.replace("#NAME ", ""))
-						except UnicodeDecodeError:
-							bouquetsRadio.append(f"Error: {bouqet[3]} / not UTF-8")
-						except OSError:
-							pass
-
-		return (enigmaInfo, info, settingsFile, bouquetsTV, bouquetsRadio)
