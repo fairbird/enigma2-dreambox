@@ -780,7 +780,7 @@
 		<key id="KEY_EPG" mapto="openSingleServiceEPG" flags="m" />
 	</map>
 
-	map context="OkActions">
+	<map context="OkActions">
 		<key id="KEY_OK" mapto="ok" flags="m" />
 		<key id="KEY_OK" mapto="OK" flags="b" />
 		<key id="KEY_OK" mapto="OKLong" flags="l" />
