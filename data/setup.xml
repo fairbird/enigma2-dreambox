@@ -128,6 +128,7 @@
 		<item level="2" text="Show additional slider value" description="Enable to display the current value of the slider at end of the slider bar.">config.usage.show_slider_value</item>
 		<item level="0" text="Sort order for help screen" description="Choose the order in which items are displayed in Help windows">config.usage.helpSortOrder</item>
 		<item level="0" text="Animation speed of help indicators" description="Control the animation speed of the button indicators in the Help screen. 'Disabled' turns off animation so that indicators jump between buttons.">config.usage.helpAnimationSpeed</item>
+		<item level="2" text="Spinner Position" description="Set the top left location of the busy spinner. The coordinates are scaled such that the top left is at (0,0) and the bottom right is at (1260,700). Note that the position is the top left of the spinner and not the centre of the spinner.">config.misc.spinnerPosition</item>
 	</setup>
 	<setup key="EPG" title="EPG Setup">
 		<item level="2" text="EPG location" description="Choose the location where the EPG data will be stored when your device is shut down. The location must be available at boot time.">config.misc.epgcachepath</item>
