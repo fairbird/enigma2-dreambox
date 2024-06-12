@@ -4144,9 +4144,9 @@ class InfoBarHdmi2:
 
 		if BoxInfo.getItem("HasHDMIin") or BoxInfo.getItem("HasHDMIinFHD"):
 			if not self.hdmi_enabled_full:
-				self.addExtension((self.getHDMIInFullScreen, self.HDMIInFull, lambda: True), "blue")
+				self.addExtension((self.getHDMIInFullScreen, self.HDMIInFull, lambda: True))
 			if not self.hdmi_enabled_pip:
-				self.addExtension((self.getHDMIInPiPScreen, self.HDMIInPiP, lambda: True), "green")
+				self.addExtension((self.getHDMIInPiPScreen, self.HDMIInPiP, lambda: True))
 		self["HDMIActions"] = HelpableActionMap(self, "InfobarHDMIActions",
 			{
 				"HDMIin": (self.HDMIIn, _("Switch to HDMI in mode")),
