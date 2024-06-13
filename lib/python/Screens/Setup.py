@@ -60,7 +60,7 @@ class Setup(ConfigListScreen, Screen, HelpableScreen):
 			if setupImage:
 				self.setupImage = LoadPixmap(resolveFilename(SCOPE_CURRENT_SKIN, setupImage))
 				if self.setupImage:
-					self["setupimage"] = Pixmap()
+					self["Image"] = Pixmap()
 
 	def changedEntry(self):
 		if isinstance(self["config"].getCurrent()[1], (ConfigBoolean, ConfigSelection)):
@@ -185,7 +185,7 @@ class Setup(ConfigListScreen, Screen, HelpableScreen):
 
 	def layoutFinished(self):
 		if self.setupImage:
-			self["setupimage"].instance.setPixmap(self.setupImage)
+			self["Image"].instance.setPixmap(self.setupImage)
 		if not self["config"]:
 			print("[Setup] No setup items available!")
 
