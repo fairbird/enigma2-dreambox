@@ -1,13 +1,19 @@
 # -*- coding: utf-8 -*-
+from os.path import isfile
+
 from enigma import eRCInput, eTimer, eWindow , getDesktop
 
 from skin import GUI_SKIN_ID, applyAllAttributes
+from skin import GUI_SKIN_ID, applyAllAttributes, menus, screens, setups
 from Components.ActionMap import ActionMap
 from Components.config import config
 from Components.GUIComponent import GUIComponent
+from Components.Pixmap import Pixmap
 from Components.Sources.Source import Source
 from Components.Sources.StaticText import StaticText
 from Tools.CList import CList
+from Tools.Directories import SCOPE_GUISKIN, resolveFilename
+from Tools.LoadPixmap import LoadPixmap
 
 
 # The lines marked DEBUG: are proposals for further fixes or improvements.
@@ -23,7 +29,8 @@ class Screen(dict):
 
 	def __init__(self, session, parent=None, mandatoryWidgets=None, enableHelp=False):
 		dict.__init__(self)
-		self.skinName = self.__class__.__name__
+		className = self.__class__.__name__
+		self.skinName = className
 		self.session = session
 		self.parent = parent
 		self.mandatoryWidgets = mandatoryWidgets
@@ -56,6 +63,7 @@ class Screen(dict):
 		self.screenPath = ""  # This is the current screen path without the title.
 		self.screenTitle = ""  # This is the current screen title without the path.
 		self.handledWidgets = []
+		self.setImage(className)
 		if enableHelp:
 			self["helpActions"] = ActionMap(["HelpActions"], {
 				"displayHelp": self.showHelp
@@ -194,6 +202,14 @@ class Screen(dict):
 
 	title = property(getTitle, setTitle)
 
+	def setImage(self, image, source=None):
+		self.screenImage = None
+		if image and (images := {"menu": menus, "setup": setups}.get(source, screens)):
+			if (x := images.get(image, images.get("default", ""))) and isfile(x := resolveFilename(GUI_SKIN_ID, x)):
+				self.screenImage = x
+				if self.screenImage and "Image" not in self:
+					self["Image"] = Pixmap()
+
 	def setFocus(self, o):
 		self.instance.setFocus(o.instance)
 
@@ -300,6 +316,8 @@ class Screen(dict):
 				w.instance = w.widget(parent)
 				# w.instance.thisown = 0
 			applyAllAttributes(w.instance, desktop, w.skinAttributes, self.scale)
+		if self.screenImage:
+			self["Image"].instance.setPixmap(LoadPixmap(self.screenImage))
 		for f in self.onLayoutFinish:
 			if not isinstance(f, type(self.close)):
 				# exec f in globals(), locals()  # Python 2

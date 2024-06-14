@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from xml.etree.ElementTree import parse
 
-from skin import findSkinScreen, menus, parameters, menus, menuicons
+from skin import findSkinScreen, parameters, menuicons
 from Components.config import ConfigDictionarySet, NoSave, config, configfile
 from Components.Pixmap import Pixmap
 from Components.PluginComponent import plugins
@@ -318,7 +318,7 @@ class Menu(Screen, ProtectedScreen):
 			t_history.reset()
 		self["title"] = StaticText(title)
 		self.setTitle(title)
-		self.loadMenuImage()
+		self.setImage(self.menuID, "menu")
 
 		self.menu_title = title
 		self["thistory"] = StaticText(t_history.thistory)
@@ -390,17 +390,6 @@ class Menu(Screen, ProtectedScreen):
 
 	def layoutFinished(self):
 		self.screenContentChanged()
-		if self.menuImage and "menuimage" in self:
-			self["Image"].instance.setPixmap(self.menuImage)
-
-	def loadMenuImage(self):
-		self.menuImage = None
-		if menus and self.menuID:
-			menuImage = menus.get(self.menuID, menus.get("default", ""))
-			if menuImage:
-				self.menuImage = LoadPixmap(resolveFilename(SCOPE_GUISKIN, menuImage))
-				if self.menuImage:
-					self["Image"] = Pixmap()
 
 	def showHelp(self):
 		if config.usage.menu_show_numbers.value not in ("menu&plugins", "menu"):
