@@ -233,7 +233,7 @@
 		-->
 	</setup>
 	<setup key="PluginBrowser" title="Plugin Browser Settings" showOpenWebif="1">
-		<item level="0" text="Plugin Browser layout *" description="Select the layout of the installed plugins in the Plugin Browser screen. NOTE: The change is not immediate but will be seen when Plugin Browser is restarted!">config.usage.plugin_style</item>
+		<item level="0" text="Plugin Browser layout *" description="Select the layout of the installed plugins in the Plugin Browser screen. NOTE: The change is not immediate but will be seen when Plugin Browser is restarted!">config.misc.plugin_style</item>
 		<item level="0" text="Picon install location" description="Select the location where the picon files will be installed.">config.usage.piconInstallLocation</item>
 		<item level="0" text="Show Driver packages" description="Select 'Yes' to show driver packages in the Download Plugins screen.">config.pluginfilter.drivers</item>
 		<item level="0" text="Show Extension packages" description="Select 'Yes' to show extensions packages in the Download Plugins screen.">config.pluginfilter.extensions</item>
