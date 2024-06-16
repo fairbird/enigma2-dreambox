@@ -461,6 +461,17 @@ def InitUsageConfig():
 
 	config.usage.show_timer_conflict_warning = ConfigYesNo(default=True)
 
+	config.usage.alternateGitHubDNS = ConfigYesNo(default=False)
+
+	config.usage.plugin_style = ConfigSelection(default="list", choices=[
+		("list", _("View as list")),
+		("grid1", _("View as grid 1")),
+		("grid2", _("View as grid 2")),
+		("grid3", _("View as grid 3")),
+		("grid4", _("View as grid 4")),
+		("grid5", _("View as grid 5")),
+		("grid6", _("View as grid 6"))])
+
 	preferredTunerChoicesUpdate()
 
 	config.misc.disable_background_scan = ConfigYesNo(default=False)

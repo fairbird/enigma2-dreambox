@@ -8,7 +8,7 @@ from Screens.MessageBox import MessageBox
 from Screens.Screen import Screen
 from Screens.Standby import TryQuitMainloop
 from Screens.Opkg import Opkg
-from Screens.SoftwareUpdate import UpdatePlugin
+from Screens.SoftwareUpdate import SoftwareUpdate
 from Components.ActionMap import ActionMap, NumberActionMap
 from Components.Input import Input
 from Components.Opkg import OpkgComponent
@@ -250,7 +250,7 @@ class UpdatePluginMenu(Screen):
 			currentEntry = current[0]
 			if self.menu == 0:
 				if (currentEntry == "software-update"):
-					self.session.open(UpdatePlugin, self.skin_path)
+					self.session.open(SoftwareUpdate, self.skin_path)
 				elif (currentEntry == "install-extensions"):
 					self.session.open(PluginManager, self.skin_path)
 				elif (currentEntry == "backup-image"):

@@ -247,6 +247,17 @@ class ConfigListScreen:
 		if self.hideHelpWindow not in self.onExecEnd:
 			self.onExecEnd.append(self.hideHelpWindow)
 
+	def suspendAllActionMaps(self):
+		self.actionMapStates = []
+		for actionMap in self.actionMaps:
+			self.actionMapStates.append(self[actionMap].getEnabled())
+			self[actionMap].setEnabled(False)
+
+	def resumeAllActionMaps(self):
+		if hasattr(self, "actionMapStates"):
+			for index, actionMap in enumerate(self.actionMaps):
+				self[actionMap].setEnabled(self.actionMapStates[index])
+
 	def setCancelMessage(self, msg):
 		self.cancelMsg = _("Really close without saving settings?") if msg is None else msg
 

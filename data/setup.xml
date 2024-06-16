@@ -14,7 +14,6 @@
 		<item level="1" text="Show screen path" description="This option allows you to show the full screen path leading to the current screen.">config.usage.showScreenPath</item>
 		<item level="1" text="Sort Extension Menu" description="Select the sort order of the Extension Menu entries.">config.usage.sortExtensionslist</item>
 		<item level="1" text="Virtual keyboard skin" description="You can select the skin of virtual keyboard.">config.misc.virtualkeyBoardstyle</item>
-		<item level="0" text="Plugin Browser Style (Need Restart GUI) *" description="This option allows you to select the plugin browser style (Need Restart GUI).">config.misc.plugin_style</item>
 		<item level="0" text="Show menu or plugin numbers" description="This option allows you to show menu and/or plugin number quick links.">config.usage.menu_show_numbers</item>
 		<item level="2" text="Show softcam setup in extensions menu" description="This option allows you to add the softcam setup in the extensions menu." requires="HasSoftcamInstalled">config.misc.softcam_setup.extension_menu</item>
 		<item level="1" text="Zap key delay for channel number input" description="In live view wait this many seconds after a numeric key press before assuming the required channel number has been entered. Default: 5 seconds. Setting zero will require confirmation with 'OK'. ">config.misc.zapkey_delay</item>
@@ -129,7 +128,6 @@
 		<item level="0" text="Sort order for help screen" description="Choose the order in which items are displayed in Help windows">config.usage.helpSortOrder</item>
 		<item level="0" text="Animation speed of help indicators" description="Control the animation speed of the button indicators in the Help screen. 'Disabled' turns off animation so that indicators jump between buttons.">config.usage.helpAnimationSpeed</item>
 		<item level="2" text="Spinner Position" description="Set the top left location of the busy spinner. The coordinates are scaled such that the top left is at (0,0) and the bottom right is at (1260,700). Note that the position is the top left of the spinner and not the centre of the spinner.">config.misc.spinnerPosition</item>
-		<item text="Fallback Font *" description="Choose the fallback font.">config.skin.FallbackFont</item>
 	</setup>
 	<setup key="EPG" title="EPG Setup">
 		<item level="2" text="EPG location" description="Choose the location where the EPG data will be stored when your device is shut down. The location must be available at boot time.">config.misc.epgcachepath</item>
@@ -234,6 +232,31 @@
 		<item level="2" text="Quit Movie Player with EXIT button" description="When enabled, it is possible to leave the Movie Player with exit.">config.usage.leave_movieplayer_onExit</item>
 		-->
 	</setup>
+	<setup key="PluginBrowser" title="Plugin Browser Settings" showOpenWebif="1">
+		<item level="0" text="Plugin Browser layout" description="Select the layout of the installed plugins in the Plugin Browser screen. NOTE: The change is not immediate but will be seen when Plugin Browser is restarted!">config.usage.plugin_style</item>
+		<item level="0" text="Picon install location" description="Select the location where the picon files will be installed.">config.usage.piconInstallLocation</item>
+		<item level="0" text="Show Driver packages" description="Select 'Yes' to show driver packages in the Download Plugins screen.">config.pluginfilter.drivers</item>
+		<item level="0" text="Show Extension packages" description="Select 'Yes' to show extensions packages in the Download Plugins screen.">config.pluginfilter.extensions</item>
+		<item level="0" text="Show System Plugin packages" description="Select 'Yes' to show system plugin packages in the Download Plugins screen.">config.pluginfilter.systemplugins</item>
+		<item level="0" text="Show Softcam packages" description="Select 'Yes' to show Softcam packages in the Download Plugins screen." requires="SoftCam">config.pluginfilter.softcams</item>
+		<item level="0" text="Show Skin packages" description="Select 'Yes' to show skin packages in the Download Plugins screen.">config.pluginfilter.skins</item>
+		<item level="0" text="Show Skin Component packages" description="Select 'Yes' to show skin component packages in the Download Plugins screen.">config.pluginfilter.skincomponents</item>
+		<item level="0" text="Show Plugin Skin packages" description="Select 'Yes' to show plugin skin packages in the Download Plugins screen.">config.pluginfilter.skinpacks</item>
+		<item level="0" text="Show Display packages" description="Select 'Yes' to show LCD skin packages in the Download Plugins screen.">config.pluginfilter.display</item>
+		<item level="0" text="Show Picon packages" description="Select 'Yes' to show picon packages in the Download Plugins screen.">config.pluginfilter.picons</item>
+		<item level="0" text="Show Setting packages" description="Select 'Yes' to show settings packages in the Download Plugins screen.">config.pluginfilter.settings</item>
+		<item level="0" text="Show Subscription packages" description="Select 'Yes' to show subscription packages in the Download Plugins screen.">config.pluginfilter.subscription</item>
+		<item level="0" text="Show M2k packages" description="Select 'Yes' to show m2k packages in the Download Plugins screen.">config.pluginfilter.m2k</item>
+		<item level="0" text="Show Web Link packages" description="Select 'Yes' to show web link packages in the Download Plugins screen.">config.pluginfilter.weblinks</item>
+		<item level="0" text="Show OpenPLi packages" description="Select 'Yes' to show OpenPLi packages in the Download Plugins screen.">config.pluginfilter.pli</item>
+		<item level="0" text="Show OpenViX packages" description="Select 'Yes' to show OpenViX packages in the Download Plugins screen.">config.pluginfilter.vix</item>
+		<item level="0" text="Show Security packages" description="Select 'Yes' to show security packages in the Download Plugins screen.">config.pluginfilter.security</item>
+		<item level="0" text="Show Kernel packages" description="Select 'Yes' to show kernel packages in the Download Plugins screen.">config.pluginfilter.kernel</item>
+		<item level="2" text="Show Source packages" description="Select 'Yes' to show source 'src' packages in the Download Plugins screen.">config.pluginfilter.src</item>
+		<item level="2" text="Show Development packages" description="Select 'Yes' to show 'dev', 'staticdev', 'dbg' and 'doc' packages in the Download Plugins screen.">config.pluginfilter.extraopkgpackages</item>
+		<item level="0" text="User Feed URL" description="Enter your personal feed URL to allow you to select packages from your personal feed.">config.pluginfilter.userfeed</item>
+		<item level="0" text="Use alternate GitHub DNS" description="Select 'Yes' to use alternate GitHub feed IP addresses. This can be helpful if you use a VPN and the normal feeds can't be accessed via the published DNS names.">config.usage.alternateGitHubDNS</item>
+	</setup>
 	<setup key="Time" title="Time Setup">
 		<item level="0" text="Time zone area" description="Select your time zone area or region.">config.timezone.area</item>
 		<item level="0" text="Time zone" description="Select the time zone within the area or region.">config.timezone.val</item>		
@@ -313,6 +336,7 @@
 		<item level="2" text="Include keyboard data" description="Enable this option to add keyboard key map data to the debug log file.">config.crash.debugKeyboards</item>
 		<item level="2" text="Include remote control data" description="Enable this option to add remote control data to the debug log file.">config.crash.debugRemoteControls</item>
 		<item level="2" text="Include screen load data" description="Enable this option to add screen names and resolution data to the debug log file.">config.crash.debugScreens</item>
+		<item level="2" text="Include opkg output data" description="Enable this option to add opkg output data to the debug log file.">config.crash.debugOpkg</item>
 		<item level="2" text="Include DVB scan data" description="Enable this option to add extra DVB scan data to the debug log file.">config.crash.debugDVBScan</item>
 		<item level="2" text="Limit debug log size (MB)" description="Allows you to set the maximum size of the Debug log size (MB). When that size is reached, a new file will be created.">config.crash.debugloglimit</item>
 		<item level="2" text="Show Log Manager in extensions list" description="Allows you to show/hide Log Manager in extensions (BLUE button).">config.logmanager.showinextensions</item>

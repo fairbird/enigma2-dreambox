@@ -22,6 +22,7 @@ MODEL = BoxInfo.getItem("model")
 # These entries should be moved back to UsageConfig.py when it is safe to bring UsageConfig init to this location in StartEnigma.py.
 #
 config.crash = ConfigSubsection()
+config.crash.debugOpkg = ConfigYesNo(default=False)
 config.crash.debugScreens = ConfigYesNo(default=False)
 config.crash.debugMultiBoot = ConfigYesNo(default=False)
 config.crash.debugKeyboards = ConfigYesNo(default=False)
@@ -32,16 +33,6 @@ config.crash.debugDVBScan = ConfigYesNo(default=False)
 config.plugins = ConfigSubsection()
 config.plugins.remotecontroltype = ConfigSubsection()
 config.plugins.remotecontroltype.rctype = ConfigInteger(default=0)
-
-# New Plugin Style
-config.misc.plugin_style = ConfigSelection(default="list", choices=[
-	("list", _("View as list")),
-	("grid1", _("View as grid 1")),
-	("grid2", _("View as grid 2")),
-	("grid3", _("View as grid 3")),
-	("grid4", _("View as grid 4")),
-	("grid5", _("View as grid 5")),
-	("grid6", _("View as grid 6"))])
 
 # New VirtualkeyBoard Style
 config.misc.virtualkeyBoardstyle = ConfigSelection(default="new", choices=[
@@ -439,7 +430,7 @@ class PowerKey:
 				for x in root.findall("menu"):
 					if x.get("key") == "shutdown":
 						self.session.infobar = self
-						menu_screen = self.session.open(MainMenu, x)
+						menu_screen = self.session.openWithCallback(self.MenuClosed, MainMenu, x)
 						menu_screen.setTitle(_("Standby / restart"))
 						break
 
