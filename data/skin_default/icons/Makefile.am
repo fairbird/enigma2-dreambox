@@ -50,6 +50,9 @@ dist_install_DATA = \
 	input_rcnew.png \
 	input_rcold-configured.png \
 	input_rcold.png \
+	install.png \
+	installable.png \
+	installed.png \
 	lock_error.png \
 	lock_off.png \
 	lock_on.png \
@@ -115,6 +118,7 @@ dist_install_DATA = \
 	repzaprecclock_post.svg \
 	repzaprecclock_pre.svg \
 	repzaprecclock_prepost.svg \
+	remove.png \
 	stream.png \
 	stream24.png \
 	scan-c.png \
@@ -135,6 +139,8 @@ dist_install_DATA = \
 	trashcan.png \
 	unlock.png \
 	unlockBouquet.png \
+	upgrade.png \
+	upgradeable.png \
 	verticalline.png \
 	verticalline-plugins.png \
 	za.png \
