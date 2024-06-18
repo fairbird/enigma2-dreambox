@@ -315,6 +315,15 @@ class VideoHardware:
 		else:
 			print("[AVSwitch] Current port not available, not setting video mode!")
 
+	def setVideoModeDirect(self, mode):
+		if BoxInfo.getItem("AmlogicFamily"):
+			rate = mode[-4:].replace("hz", "Hz")
+			force = int(rate[:-2])
+			mode = mode[:-4]
+			self.setMode("HDMI", mode, rate, force)
+		else:
+			eAVControl.getInstance().setVideoMode(mode)
+
 	def setMode(self, port, mode, rate):
 		force = config.av.force.value
 		print("[VideoHardware] Setting mode for port '%s', mode '%s', rate '%s', force '%s'." % (port, mode, rate, force))
