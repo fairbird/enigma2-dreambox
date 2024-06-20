@@ -309,7 +309,7 @@ void eDVBTeletextParser::processPESPacket(uint8_t *pkt, int len)
 			int X = decode_hamming_84(data + 1) * 0x10 + decode_hamming_84(data),
 				S2C4 = decode_hamming_84(data + 3),
 				S4C5C6 = decode_hamming_84(data + 5),
-				C = ((S2C4 & 8) ? (1 < <4) : 0) |
+				C = ((S2C4 & 8) ? (1 << 4) : 0) |
 					((S4C5C6 & 0xC) << 3) |
 					(decode_hamming_84(data + 6) << 7) |
 					(decode_hamming_84(data + 7) << 11),
