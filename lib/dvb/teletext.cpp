@@ -360,7 +360,7 @@ void eDVBTeletextParser::processPESPacket(uint8_t *pkt, int len)
 		else if (Y == 26 && m_page_open && M == m_page_M)
 		{
 			int display_row = -1, display_column = -1;
-			for (int a = 1; a < 40; a+ = 3)
+			for (int a = 1; a < 40; a += 3)
 			{
 				int val;
 				if ((val = decode_hamming_2418(data+a)) >= 0)
