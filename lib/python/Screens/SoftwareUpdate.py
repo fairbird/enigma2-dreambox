@@ -16,8 +16,9 @@ from Components.Sources.List import List
 from Components.Sources.StaticText import StaticText
 from Screens.MessageBox import MessageBox
 from Screens.ParentalControlSetup import ProtectedScreen
+from Screens.ChoiceBox import ChoiceBox
 from Screens.Screen import Screen, ScreenSummary
-from Screens.Standby import QUIT_REBOOT, TryQuitMainloop
+from Screens.Standby import QUIT_REBOOT, QUIT_RESTART, TryQuitMainloop
 from Tools.Directories import SCOPE_GUISKIN, resolveFilename
 from Tools.LoadPixmap import LoadPixmap
 
@@ -495,26 +496,23 @@ class RunSoftwareUpdate(Screen):
 	def keyCancel(self):
 		def keyCancelCallback(result=None):
 			def rebootCallback(answer):
-				if answer:
+				if answer[1] == "hot":
+					self.session.open(TryQuitMainloop, retvalue=QUIT_RESTART)
+				elif answer[1] == "cold":
 					self.session.open(TryQuitMainloop, retvalue=QUIT_REBOOT)
+				else:
+					self.close()
 				self.close()
 
-			self.session.openWithCallback(rebootCallback, MessageBox, f"{_("Upgrade finished.")} {_("Do you want to reboot your %s %s?") % getBoxDisplayName()}")
+			TEXT = "Upgrade finished. Do you want to"
+			choices = [(_('%s Restart GUI ?!' % TEXT), 'hot'),
+					(_('%s Full Reboot (recommended) ?!' % TEXT), 'cold'),
+					(_('%s Exit without Action !!' % TEXT), 'exit')]
+			self.session.openWithCallback(rebootCallback, ChoiceBox, list=choices, windowTitle=self.title)
 
 		if self.opkg.isRunning():
 			self.opkg.stop()
 		self.opkg.removeCallback(self.opkgCallback)
-		if config.skin.primary_skin.value == "MetrixHD/skin.MySkin.xml" and self.metrixUpdated:   # TODO: move this to Metrix Plugin.
-			try:
-				if not exists("/usr/share/enigma2/MetrixHD/skin.MySkin.xml"):
-					from Plugins.SystemPlugins.SoftwareManager.BackupRestore import RestoreMyMetrixHD
-					self.session.openWithCallback(keyCancelCallback, RestoreMyMetrixHD)
-					return
-				elif config.plugins.MyMetrixLiteOther.EHDenabled.value != "0":
-					from Plugins.Extensions.MyMetrixLite.ActivateSkinSettings import ActivateSkinSettings
-					ActivateSkinSettings().RefreshIcons()
-			except Exception:
-				pass
 		if self.upgradeCount != 0:
 			keyCancelCallback()
 		else:

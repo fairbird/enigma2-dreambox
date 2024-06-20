@@ -151,7 +151,9 @@ class InstallerUpdateCheck:
         def runUpgrade(self, result):
             #logdata('runUpgrade', result)
             if result:
-                self.session.open(UpdatePlugin)
+            	from Screens.SoftwareUpdate import SoftwareUpdate
+            	self.session.open(SoftwareUpdate)
+            	#self.session.open(UpdatePlugin) # Old method
 
 
 class UpdatePlugin(Screen, ProtectedScreen):
