@@ -40,6 +40,17 @@ config.plugins.configurationbackup.backuplocation = ConfigText(default='/media/h
 config.plugins.configurationbackup.backupdirs = ConfigLocations(default=[eEnv.resolve('${sysconfdir}/enigma2/'), '/etc/network/interfaces', '/etc/wpa_supplicant.conf', '/etc/wpa_supplicant.ath0.conf', '/etc/wpa_supplicant.wlan0.conf', '/etc/enigma2/nameserversdns.conf', '/etc/default_gw', '/etc/hostname'])
 
 config.plugins.softwaremanager = ConfigSubsection()
+config.plugins.softwaremanager.overwriteSettingsFiles = ConfigYesNo(default=False)
+config.plugins.softwaremanager.overwriteDriversFiles = ConfigYesNo(default=True)
+config.plugins.softwaremanager.overwriteEmusFiles = ConfigYesNo(default=True)
+config.plugins.softwaremanager.overwritePiconsFiles = ConfigYesNo(default=True)
+config.plugins.softwaremanager.overwriteBootlogoFiles = ConfigYesNo(default=True)
+config.plugins.softwaremanager.overwriteSpinnerFiles = ConfigYesNo(default=True)
+config.plugins.softwaremanager.restoremode = ConfigSelection(default="turbo", choices=[
+		("turbo", _("turbo")),
+		("fast", _("fast")),
+		("slow", _("slow"))
+	])
 config.plugins.softwaremanager.overwriteConfigFiles = ConfigSelection(
 				[
 					("Y", _("Yes, always")),
@@ -382,6 +393,13 @@ class SoftwareManagerSetup(ConfigListScreen, Screen):
 		self.list.append((_("show softwaremanager in setup menu"), config.plugins.softwaremanager.onSetupMenu))
 		self.list.append((_("show softwaremanager on blue button"), config.plugins.softwaremanager.onBlueButton))
 		self.list.append((_("backup EPG cache"), config.plugins.softwaremanager.epgcache))
+		self.list.append((_("Overwrite Setting Files ?"), config.plugins.softwaremanager.overwriteSettingsFiles))
+		self.list.append((_("Overwrite Driver Files ?"), config.plugins.softwaremanager.overwriteDriversFiles))
+		self.list.append((_("Overwrite Emu Files ?"), config.plugins.softwaremanager.overwriteEmusFiles))
+		self.list.append((_("Overwrite Picon Files ?"), config.plugins.softwaremanager.overwritePiconsFiles))
+		self.list.append((_("Overwrite Bootlogo Files ?"), config.plugins.softwaremanager.overwriteBootlogoFiles))
+		self.list.append((_("Overwrite Spinner Files ?"), config.plugins.softwaremanager.overwriteSpinnerFiles))
+		self.list.append((_("Mode for autorestore"), config.plugins.softwaremanager.restoremode))
 
 		self["config"].list = self.list
 		self["config"].l.setSeperation(400)
