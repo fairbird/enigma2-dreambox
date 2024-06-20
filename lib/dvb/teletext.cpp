@@ -548,7 +548,7 @@ void eDVBTeletextParser::handleLine(unsigned char *data, int len)
 			if (utf8_code > 0xFFFFFF)
 				out[outidx++] = (utf8_code & 0xFF000000) >> 24;
 			if (utf8_code > 0xFFFF)
-				out[outidx++] = (utf8_code & 0xFF0000 )> >16;
+				out[outidx++] = (utf8_code & 0xFF0000 ) >>16;
 			if (utf8_code > 0xFF)
 				out[outidx++] = (utf8_code & 0xFF00) >> 8;
 			if (utf8_code)
