@@ -10,7 +10,7 @@ std::map<eSubtitleWidget::subfont_t, eSubtitleWidget::eSubtitleStyle> eSubtitleW
 eSubtitleWidget::eSubtitleWidget(eWidget *parent)
 	: eWidget(parent), m_hide_subtitles_timer(eTimer::create(eApp))
 {
-	setBackgroundColor(gRGB(0,0,0,255));
+	setBackgroundColor(gRGB(0, 0, 0, 255));
 	m_page_ok = 0;
 	m_dvb_page_ok = 0;
 	m_pango_page_ok = 0;
@@ -37,17 +37,17 @@ void eSubtitleWidget::setPage(const eDVBTeletextSubtitlePage &p)
 		bool original_colors = false;
 		switch (eConfigManager::getConfigIntValue("config.subtitles.ttx_subtitle_colors", 1))
 		{
-			case 0: /* use original teletext colors */
-				color = newpage.m_elements[0].m_color;
-				original_colors = true;
-				break;
-			default:
-			case 1: /* white */
-				color = gRGB(255, 255, 255);
-				break;
-			case 2: /* yellow */
-				color = gRGB(255, 255, 0);
-				break;
+		case 0: /* use original teletext colors */
+			color = newpage.m_elements[0].m_color;
+			original_colors = true;
+			break;
+		default:
+		case 1: /* white */
+			color = gRGB(255, 255, 255);
+			break;
+		case 2: /* yellow */
+			color = gRGB(255, 255, 0);
+			break;
 		}
 
 		if (!original_position)
@@ -60,7 +60,8 @@ void eSubtitleWidget::setPage(const eDVBTeletextSubtitlePage &p)
 			m_page.m_elements.push_back(eDVBTeletextSubtitlePageElement(color, "", 0));
 			for (unsigned int i = 0; i < elements; ++i)
 			{
-				if (!m_page.m_elements[0].m_text.empty()) m_page.m_elements[0].m_text += " ";
+				if (!m_page.m_elements[0].m_text.empty())
+					m_page.m_elements[0].m_text += " ";
 				if (original_colors && color != newpage.m_elements[i].m_color)
 				{
 					color = newpage.m_elements[i].m_color;
@@ -88,7 +89,8 @@ void eSubtitleWidget::setPage(const eDVBTeletextSubtitlePage &p)
 			m_page.m_elements.push_back(eDVBTeletextSubtitlePageElement(color, "", line));
 			for (unsigned int i = 0; i < elements; ++i)
 			{
-				if (!m_page.m_elements[currentelement].m_text.empty()) m_page.m_elements[currentelement].m_text += " ";
+				if (!m_page.m_elements[currentelement].m_text.empty())
+					m_page.m_elements[currentelement].m_text += " ";
 				if (original_colors && color != newpage.m_elements[i].m_color)
 				{
 					color = newpage.m_elements[i].m_color;
@@ -108,7 +110,7 @@ void eSubtitleWidget::setPage(const eDVBTeletextSubtitlePage &p)
 				area.setLeft(startX);
 				area.setTop(size_per_element * m_page.m_elements[i].m_source_line);
 				area.setWidth(width);
-				area.setHeight(size_per_element * 2); //teletext subtitles are double height only even lines are used
+				area.setHeight(size_per_element * 2); // teletext subtitles are double height only even lines are used
 				m_visible_region |= area;
 			}
 		}
@@ -151,9 +153,9 @@ void eSubtitleWidget::setPage(const eDVBSubtitlePage &p)
 			if (lowerborder >= 0)
 			{
 				if (original_position == 1)
-					it->m_position=ePoint(it->m_position.x(), it->m_position.y()-verticalShift);
+					it->m_position = ePoint(it->m_position.x(), it->m_position.y()-verticalShift);
 				else
-					it->m_position=ePoint(it->m_position.x(), it->m_position.y() + 55 - lowerborder);
+					it->m_position = ePoint(it->m_position.x(), it->m_position.y() + 55 - lowerborder);
 			}
 		}
 		eDebug("[eSubtitleWidget] add %d %d %d %d", it->m_position.x(), it->m_position.y(), it->m_pixmap->size().width(), it->m_pixmap->size().height());
@@ -185,33 +187,33 @@ void eSubtitleWidget::setPage(const ePangoSubtitlePage &p)
 
 	elements = m_pango_page.m_elements.size();
 
-	if(rewrap_enabled | colourise_dialogs_enabled)
+	if (rewrap_enabled | colourise_dialogs_enabled)
 	{
 		size_t ix, colourise_dialogs_current = 0;
 		std::vector<std::string> colourise_dialogs_colours;
 		std::string replacement;
 		bool alignment_center = eConfigManager::getConfigValue("config.subtitles.subtitle_alignment") == "center";
 
-		if(colourise_dialogs_enabled)
+		if (colourise_dialogs_enabled)
 		{
-			colourise_dialogs_colours.push_back((std::string)gRGB(0xff, 0xff, 0x00));	// yellow
-			colourise_dialogs_colours.push_back((std::string)gRGB(0x00, 0xff, 0xff));	// cyan
-			colourise_dialogs_colours.push_back((std::string)gRGB(0xff, 0x00, 0xff));	// magenta
-			colourise_dialogs_colours.push_back((std::string)gRGB(0x00, 0xff, 0x00));	// green
-			colourise_dialogs_colours.push_back((std::string)gRGB(0xff, 0xaa, 0xaa));	// light red
-			colourise_dialogs_colours.push_back((std::string)gRGB(0xaa, 0xaa, 0xff));	// light blue
+			colourise_dialogs_colours.push_back((std::string)gRGB(0xff, 0xff, 0x00)); // yellow
+			colourise_dialogs_colours.push_back((std::string)gRGB(0x00, 0xff, 0xff)); // cyan
+			colourise_dialogs_colours.push_back((std::string)gRGB(0xff, 0x00, 0xff)); // magenta
+			colourise_dialogs_colours.push_back((std::string)gRGB(0x00, 0xff, 0x00)); // green
+			colourise_dialogs_colours.push_back((std::string)gRGB(0xff, 0xaa, 0xaa)); // light red
+			colourise_dialogs_colours.push_back((std::string)gRGB(0xaa, 0xaa, 0xff)); // light blue
 		}
 
 		for (element = 0; element < elements; element++)
 		{
-			std::string& line = m_pango_page.m_elements[element].m_pango_line;
+			std::string &line = m_pango_page.m_elements[element].m_pango_line;
 
 			for (ix = 0; ix < line.length(); ix++)
 			{
-				if(rewrap_enabled && !line.compare(ix, 1, "\n"))
+				if (rewrap_enabled && !line.compare(ix, 1, "\n"))
 					line.replace(ix, 1, " ");
 
-				if(colourise_dialogs_enabled && !line.compare(ix, 2, "- "))
+				if (colourise_dialogs_enabled && !line.compare(ix, 2, "- "))
 				{
 					/* workaround for rendering fault when colouring is enabled, rewrap is off and alignment is center */
 					replacement = std::string((!rewrap_enabled && alignment_center) ? "  " : "") + colourise_dialogs_colours.at(colourise_dialogs_current);
@@ -219,7 +221,7 @@ void eSubtitleWidget::setPage(const ePangoSubtitlePage &p)
 					line.replace(ix, 2, replacement);
 					colourise_dialogs_current++;
 
-					if(colourise_dialogs_current >= colourise_dialogs_colours.size())
+					if (colourise_dialogs_current >= colourise_dialogs_colours.size())
 						colourise_dialogs_current = 0;
 				}
 			}
@@ -241,7 +243,7 @@ void eSubtitleWidget::setPage(const ePangoSubtitlePage &p)
 
 	for (element = 0; element < elements; element++)
 	{
-		eRect& area = m_pango_page.m_elements[element].m_area;
+		eRect &area = m_pango_page.m_elements[element].m_area;
 		area.setLeft(startX);
 		area.setTop(size_per_element * element + startY - lowerborder);
 		area.setWidth(width);
@@ -267,7 +269,7 @@ void eSubtitleWidget::setPixmap(ePtr<gPixmap> &pixmap, gRegion changed, eRect pi
 	m_pixmap = pixmap;
 	m_pixmap_dest = pixmap_dest; /* this is in a virtual 720x576 cage */
 
-		/* incoming "changed" regions are relative to the physical pixmap area, so they have to be scaled to the virtual pixmap area, then to the screen */
+	/* incoming "changed" regions are relative to the physical pixmap area, so they have to be scaled to the virtual pixmap area, then to the screen */
 	changed.scale(m_pixmap_dest.width(), 720, m_pixmap_dest.height(), 576);
 	changed.moveBy(ePoint(m_pixmap_dest.x(), m_pixmap_dest.y()));
 
@@ -284,7 +286,7 @@ int eSubtitleWidget::event(int event, void *data, void *data2)
 	case evtPaint:
 	{
 		ePtr<eWindowStyle> style;
-		gPainter &painter = *(gPainter*)data2;
+		gPainter &painter = *(gPainter *)data2;
 
 		getStyle(style);
 		eWidget::event(event, data, data2);
@@ -313,7 +315,7 @@ int eSubtitleWidget::event(int event, void *data, void *data2)
 		{
 			unsigned int elements = m_page.m_elements.size();
 
-			subtitleStyles[Subtitle_TTX].font->pointSize=fontsize;
+			subtitleStyles[Subtitle_TTX].font->pointSize = fontsize;
 
 			painter.setFont(subtitleStyles[Subtitle_TTX].font);
 			for (unsigned int i = 0; i < elements; ++i)
@@ -346,7 +348,7 @@ int eSubtitleWidget::event(int event, void *data, void *data2)
 							bbox.setHeight(bboxHeight);
 							area.setTop(area.top() - borderwidth);
 						}
-						painter.setForegroundColor(gRGB(0,0,0,64));
+						painter.setForegroundColor(gRGB(0, 0, 0, 64));
 						painter.fill(bbox);
 						borderwidth = 0;
 					}
@@ -354,7 +356,7 @@ int eSubtitleWidget::event(int event, void *data, void *data2)
 						painter.setForegroundColor(element.m_color);
 					else
 						painter.setForegroundColor(subtitleStyles[Subtitle_TTX].foreground_color);
-					painter.renderText(area, element.m_text, gPainter::RT_WRAP|gPainter::RT_VALIGN_BOTTOM|rt_halignment_flag, subtitleStyles[Subtitle_TTX].border_color, borderwidth);
+					painter.renderText(area, element.m_text, gPainter::RT_WRAP | gPainter::RT_VALIGN_BOTTOM | rt_halignment_flag, subtitleStyles[Subtitle_TTX].border_color, borderwidth);
 				}
 			}
 		}
@@ -363,7 +365,7 @@ int eSubtitleWidget::event(int event, void *data, void *data2)
 			int elements = m_pango_page.m_elements.size();
 			subfont_t face;
 
-			for (int i=0; i<elements; ++i)
+			for (int i = 0; i < elements; ++i)
 			{
 				face = Subtitle_Regular;
 				ePangoSubtitlePageElement &element = m_pango_page.m_elements[i];
@@ -390,18 +392,18 @@ int eSubtitleWidget::event(int event, void *data, void *data2)
 				}
 				int subtitleColors = eConfigManager::getConfigIntValue("config.subtitles.pango_subtitle_colors", 1);
 				if (!subtitleColors)
-					{
-						text = replace_all(text, "<i>", gRGB(255,255,0));
-						text = replace_all(text, "<b>", gRGB(0,255,255));
-						text = replace_all(text, "<u>", (std::string) gRGB(0,255,0));
-						text = replace_all(text, "</i>", (std::string) gRGB(255,255,255));
-						text = replace_all(text, "</b>", (std::string) gRGB(255,255,255));
-						text = replace_all(text, "</u>", (std::string) gRGB(255,255,255));
-					}
+				{
+					text = replace_all(text, "<i>", gRGB(255,255,0));
+					text = replace_all(text, "<b>", gRGB(0,255,255));
+					text = replace_all(text, "<u>", (std::string) gRGB(0,255,0));
+					text = replace_all(text, "</i>", (std::string) gRGB(255,255,255));
+					text = replace_all(text, "</b>", (std::string) gRGB(255,255,255));
+					text = replace_all(text, "</u>", (std::string) gRGB(255,255,255));
+				}
 				else
 				{
 					if (subtitleColors == 2)
-						text = (std::string) gRGB(255, 255, 0) + text;
+						text = (std::string)gRGB(255, 255, 0) + text;
 					text = replace_all(text, "</u>", "");
 					text = replace_all(text, "</i>", "");
 					text = replace_all(text, "</b>", "");
@@ -416,7 +418,7 @@ int eSubtitleWidget::event(int event, void *data, void *data2)
 					size_t end = text.find('>', subtitleFont);
 					text.erase(subtitleFont, end - subtitleFont + 1);
 				}
-				subtitleStyles[face].font->pointSize=fontsize;
+				subtitleStyles[face].font->pointSize = fontsize;
 				painter.setFont(subtitleStyles[face].font);
 				eRect &area = element.m_area;
 				if (eConfigManager::getConfigBoolValue("config.subtitles.showbackground"))
@@ -438,15 +440,15 @@ int eSubtitleWidget::event(int event, void *data, void *data2)
 					bbox.setTop(bboxTop);
 					bbox.setHeight(bboxHeight);
 					area.setTop(area.top() - borderwidth);
-					painter.setForegroundColor(gRGB(0,0,0,64));
+					painter.setForegroundColor(gRGB(0, 0, 0, 64));
 					painter.fill(bbox);
 					borderwidth = 0;
 				}
-				if ( !subtitleStyles[face].have_foreground_color && element.m_have_color )
+				if (!subtitleStyles[face].have_foreground_color && element.m_have_color)
 					painter.setForegroundColor(element.m_color);
 				else
 					painter.setForegroundColor(subtitleStyles[face].foreground_color);
-				painter.renderText(area, text, gPainter::RT_WRAP|gPainter::RT_VALIGN_BOTTOM|rt_halignment_flag, subtitleStyles[face].border_color, borderwidth);
+				painter.renderText(area, text, gPainter::RT_WRAP | gPainter::RT_VALIGN_BOTTOM | rt_halignment_flag, subtitleStyles[face].border_color, borderwidth);
 			}
 		}
 		else if (m_dvb_page_ok)
@@ -474,7 +476,7 @@ void eSubtitleWidget::setFontStyle(subfont_t face, gFont *font, int haveColor, c
 	subtitleStyles[face].border_width = borderWidth;
 }
 
-void eSubtitleWidget::removeHearingImpaired(std::string& str)
+void eSubtitleWidget::removeHearingImpaired(std::string &str)
 {
 	// remove texts in round brackets
 	while (true)
