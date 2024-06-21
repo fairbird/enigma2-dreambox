@@ -588,6 +588,7 @@ class ImageBackup(Screen):
 			fileWriteLines(self.runScript, cmdLines, source=MODULE_NAME)
 			chmod(self.runScript, 0o755)
 			print("[ImageBackup] Running the shell script.")
-			self.session.openWithCallback(consoleCallback, Console, title=_("Image Backup To %s") % target, cmdlist=[self.runScript], closeOnSuccess=False)
+			self.session.openWithCallback(consoleCallback, Console, title=_("Image Backup To %s") % target, cmdlist=[self.runScript], closeOnSuccess=False, showScripts=False)
+			configfile.save()
 		else:
 			self.close()
