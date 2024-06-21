@@ -492,10 +492,12 @@ class RunSoftwareUpdate(Screen):
 	def keyCancel(self):
 		def keyCancelCallback(result=None):
 			def rebootCallback(answer):
-				if answer[1] == "hot":
+				if answer == "hot":
 					self.session.open(TryQuitMainloop, retvalue=QUIT_RESTART)
-				elif answer[1] == "cold":
+				elif answer == "cold":
 					self.session.open(TryQuitMainloop, retvalue=QUIT_REBOOT)
+				elif answer == "exit":
+					self.close()
 				else:
 					self.close()
 				self.close()
