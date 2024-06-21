@@ -1,55 +1,29 @@
 # -*- coding: utf-8 -*-
-from os import link, remove, stat
-from os.path import isdir, join as pathjoin, splitext
-from tempfile import NamedTemporaryFile
+from os import stat
+from os.path import isdir, join as pathjoin
 
 from Components.config import config
-from Screens.LocationBox import defaultInhibitDirs, TimeshiftLocationBox
+from Screens.LocationBox import DEFAULT_INHIBIT_DEVICES, TimeshiftLocationBox
 from Screens.MessageBox import MessageBox
 from Screens.Setup import Setup
-from Tools.Directories import fileAccess
+from Tools.Directories import fileAccess, hasHardLinks
 
 
 class TimeshiftSettings(Setup):
 	def __init__(self, session):
-		self.inhibitDevs = []
-		for dir in defaultInhibitDirs + ["/", "/media"]:
-			if isdir(dir):
-				device = stat(dir).st_dev
-				if device not in self.inhibitDevs:
-					self.inhibitDevs.append(device)
-		self.buildChoices("TimeshiftPath", config.usage.timeshift_path, None)
+		self.buildChoices(config.timeshift.path, None)
 		Setup.__init__(self, session=session, setup="Timeshift")
-		self.greenText = self["key_green"].text
-		self.errorItem = -1
-		if self.getCurrentItem() is config.usage.timeshift_path:
-			self.pathStatus(self.getCurrentValue())
-
-	def selectionChanged(self):
-		if self.errorItem == -1:
-			Setup.selectionChanged(self)
+		for index, item in enumerate(self["config"].getList()):
+			if len(item) > 1 and item[1] == config.timeshift.path:
+				self.pathItem = index
+				break
 		else:
-			self["config"].setCurrentIndex(self.errorItem)
+			print("[Timeshift] Error: ConfigList time shift path entry not found!")
+			self.pathItem = None
+		self.status = None
 
-	def changedEntry(self):
-		if self.getCurrentItem() is config.usage.timeshift_path:
-			self.pathStatus(self.getCurrentValue())
-		Setup.changedEntry(self)
-
-	def keyOK(self):
-		if self.getCurrentItem() is config.usage.timeshift_path:
-			self.session.openWithCallback(self.pathSelect, TimeshiftLocationBox)
-		else:
-			Setup.keyOK(self)
-
-	def keySave(self):
-		if self.errorItem == -1:
-			Setup.keySave(self)
-		else:
-			self.session.open(MessageBox, "%s" % (_("Please select an acceptable directory.")), type=MessageBox.TYPE_ERROR)
-
-	def buildChoices(self, item, configEntry, path):
-		configList = config.usage.allowed_timeshift_paths.value[:]
+	def buildChoices(self, configEntry, path):
+		configList = config.timeshift.allowedPaths.value[:]
 		if configEntry.saved_value and configEntry.saved_value not in configList:
 			configList.append(configEntry.saved_value)
 			configEntry.value = configEntry.saved_value
@@ -57,59 +31,52 @@ class TimeshiftSettings(Setup):
 			path = configEntry.value
 		if path and path not in configList:
 			configList.append(path)
-		pathList = [(x, x) for x in configList]
 		configEntry.value = path
-		configEntry.setChoices(pathList, default=configEntry.default)
-		print("[Timeshift] %s: Current='%s', Default='%s', Choices='%s'" % (item, configEntry.value, configEntry.default, configList))
+		configEntry.setChoices([(x, x) for x in configList], default=configEntry.default)
+		# print("[Timeshift] buildChoices DEBUG: Current='%s', Default='%s', Choices=%s." % (configEntry.value, configEntry.default, configList))
 
-	def pathSelect(self, path):
+	def selectionChanged(self):
+		Setup.selectionChanged(self)
+		self.pathStatus()
+
+	def changedEntry(self):
+		Setup.changedEntry(self)
+		self.pathStatus()
+
+	def pathStatus(self):
+		if self["config"].getCurrentIndex() == self.pathItem:
+			path = self.getCurrentValue()
+			if not isdir(path):
+				footnote = _("Directory '%s' does not exist!") % path
+			elif stat(path).st_dev in DEFAULT_INHIBIT_DEVICES and config.timeshift.skipreturntolive.value is False:  # allow timeshift on flash for audio plugins and no other volume availabe
+				footnote = _("Flash directory '%s' not allowed!") % path
+			elif not fileAccess(path, "w"):
+				footnote = _("Directory '%s' not writable!") % path
+			elif not hasHardLinks(path):
+				footnote = _("Directory '%s' can't be linked to recordings!") % path
+			else:
+				footnote = ""
+			self.setFootnote(footnote)
+			self.status = footnote
+
+	def keySelect(self):
+		if self.getCurrentItem() == config.timeshift.path:
+			self.session.openWithCallback(self.keySelectCallback, TimeshiftLocationBox)
+		else:
+			Setup.keySelect(self)
+
+	def keySelectCallback(self, path):
 		if path is not None:
 			path = pathjoin(path, "")
-			self.buildChoices("TimeshiftPath", config.usage.timeshift_path, path)
+			self.buildChoices(config.timeshift.path, path)
 		self["config"].invalidateCurrent()
 		self.changedEntry()
 
-	def pathStatus(self, path):
-		if not isdir(path):
-			self.errorItem = self["config"].getCurrentIndex()
-			green = ""
-		elif stat(path).st_dev in self.inhibitDevs:
-			self.errorItem = self["config"].getCurrentIndex()
-			green = ""
-		elif not fileAccess(path, "w"):
-			self.errorItem = self["config"].getCurrentIndex()
-			green = ""
-		elif not self.hasHardLinks(path):
-			self.errorItem = self["config"].getCurrentIndex()
-			green = ""
+	def keySave(self):
+		if self.status:
+			self.session.openWithCallback(self.keySaveCallback, MessageBox, "%s\n\n%s" % (self.status, _("Time shift may not work correctly without an acceptable directory.")), type=MessageBox.TYPE_WARNING)
 		else:
-			self.errorItem = -1
-			green = self.greenText
-		self["key_green"].text = green
+			Setup.keySave(self)
 
-	def hasHardLinks(self, path):
-		try:
-			tmpfile = NamedTemporaryFile(suffix='.file', prefix='tmp', dir=path, delete=False)
-		except (IOError, OSError) as err:
-			print("[Timeshift] DEBUG: Create temp file - I/O Error %d: %s!" % (err.errno, err.strerror))
-			return False
-		srcname = tmpfile.name
-		tmpfile.close()
-		dstname = "%s.link" % splitext(srcname)[0]
-		try:
-			link(srcname, dstname)
-			result = True
-		except (IOError, OSError) as err:
-			print("[Timeshift] DEBUG: Create link - I/O Error %d: %s!" % (err.errno, err.strerror))
-			result = False
-		try:
-			remove(srcname)
-		except (IOError, OSError) as err:
-			print("[Timeshift] DEBUG: Remove source - I/O Error %d: %s!" % (err.errno, err.strerror))
-			pass
-		try:
-			remove(dstname)
-		except (IOError, OSError) as err:
-			print("[Timeshift] DEBUG: Remove target - I/O Error %d: %s!" % (err.errno, err.strerror))
-			pass
-		return result
+	def keySaveCallback(self, result):
+		Setup.keySave(self)

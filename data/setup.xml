@@ -270,7 +270,7 @@
 		<item level="0" text="DNS data source" description="Select the source of the default DNS settings.">config.usage.dns</item>
 	</setup>
 	<setup key="Recording" title="Recording Setup">
-		<item level="0" text="Default movie location" description="Set the default location for your recordings. Press OK to add new locations, LEFT/RIGHT to select from any existing locations.">config.usage.default_path</item>
+		<item level="0" text="Default movie selection location" description="Set the default movie selection location for your media files. Press 'OK' to add new locations, press 'LEFT'/'RIGHT' to select from previously defined locations.">config.usage.default_path</item>
 		<item level="2" text="Timer recording location" description="Set the default location for your timers. Press OK to add new locations, LEFT/RIGHT to select from any existing locations.">config.usage.timer_path</item>
 		<item level="2" text="Instant recording location" description="Set the default location for your instant recordings. Press OK to add new locations, LEFT/RIGHT to select from any existing locations.">config.usage.instantrec_path</item>
 		<item level="1" text="Recordings always have priority" description="When enabled, a recording is allowed to interrupt live tv, when there are no free tuners.">config.recording.asktozap</item>
@@ -295,8 +295,8 @@
 		<item level="2" text="Default recording type" description="Descramble &amp; record ECM' gives the option to descramble afterwards if descrambling on recording failed. 'Don't descramble, record ECM' save a scramble recording that can be descrambled on playback. 'Normal' means descramble the recording and don't record ECM.">config.recording.ecm_data</item>
 		-->
 	</setup>
-	<setup key="Timeshift" title="Timeshift Setup">
-		<item level="0" text="Timeshift location" description="Set the default location for your timeshift files. Press OK to add new locations, LEFT/RIGHT to select any existing locations.">config.usage.timeshift_path</item>
+	<setup key="Timeshift" title="Timeshift Setup" level="1" showOpenWebif="1">
+		<item level="0" text="Time shift buffer location" description="Set the default location to store your time shift buffer files. Press 'OK' to add new locations, press 'LEFT'/'RIGHT' to select from previously defined locations.">config.timeshift.path</item>
 		<item level="1" text="Automatically start timeshift after" description="When enabled, timeshift starts automatically in background after the specified time.">config.usage.timeshift_start_delay</item>
 		<item level="1" text="Show warning when timeshift is stopped" description="When enabled, a warning will be displayed and the user will get an option to stop or to continue the timeshift.">config.usage.check_timeshift</item>
 		<item level="2" text="Skip jumping to live TV while timeshifting with plugins" description="If set to 'yes', allows you to use timeshift with alternative audio plugins.">config.usage.timeshift_skipreturntolive</item>
