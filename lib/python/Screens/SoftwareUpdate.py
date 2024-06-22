@@ -492,15 +492,16 @@ class RunSoftwareUpdate(Screen):
 	def keyCancel(self):
 		def keyCancelCallback(result=None):
 			def rebootCallback(answer):
-				if answer == "hot":
-					self.session.open(TryQuitMainloop, retvalue=QUIT_RESTART)
-				elif answer == "cold":
-					self.session.open(TryQuitMainloop, retvalue=QUIT_REBOOT)
-				elif answer == "exit":
+				try:
+					if answer[1] == "hot":
+						self.session.open(TryQuitMainloop, retvalue=QUIT_RESTART)
+					elif answer[1] == "cold":
+						self.session.open(TryQuitMainloop, retvalue=QUIT_REBOOT)
+					else:
+						self.close()
 					self.close()
-				else:
+				except:
 					self.close()
-				self.close()
 
 			TEXT = "Upgrade finished. Do you want to"
 			choices = [(_('%s Restart GUI ?!' % TEXT), 'hot'),
