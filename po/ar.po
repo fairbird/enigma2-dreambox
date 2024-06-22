@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: enigma2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-02 14:05+0100\n"
-"POT-Creation-Date: 2024-05-21 17:44+0200\n"
+"POT-Creation-Date: 2024-06-21 11:25+0200\n"
 "Last-Translator: RAED - Fairbirb <rrrr53@hotmail.com>\n"
 "Language-Team: \n"
 "Language: ar\n"
@@ -147,6 +147,9 @@ msgstr "%A %d %B %Y"
 
 msgid "%H:%M"
 msgstr "%H:%M"
+
+msgid "%R"
+msgstr ""
 
 #. TRANSLATORS: full date representations short dayname daynum monthname long year in strftime() format! See 'man strftime'
 msgid "%a %e %B %Y"
@@ -338,6 +341,10 @@ msgstr[3] "التحديثات المتوفرة."
 msgstr[4] "التحديثات المتوفرة."
 msgstr[5] "التحديثات المتوفرة."
 
+#, python-format
+msgid "%s%s(Default: %s)"
+msgstr ""
+
 #, fuzzy
 msgid "(VU+ type)"
 msgstr ""
@@ -367,6 +374,9 @@ msgstr "(عرض قائمة صوت ديفيدي إختياريه)"
 
 msgid "(unknown)"
 msgstr "(مجهول)"
+
+msgid "* = Restart Required"
+msgstr ""
 
 msgid "* Only available if more than one interface is active."
 msgstr "* متوفر فقط إذا كانت أكثر من واجهة نشطة."
@@ -506,9 +516,6 @@ msgstr "<مجهول>"
 
 msgid "=NO STREAM\n"
 msgstr "= لا يوجد قنوات تدفق\n"
-
-msgid "??"
-msgstr "??"
 
 msgid "A"
 msgstr "A"
@@ -1132,6 +1139,9 @@ msgstr "اكتمل التثبيت التلقائي"
 msgid "Autoinstalling please wait for packages being updated"
 msgstr "التثبيت التلقائي يرجى الانتظار حتى يتم تحديث الحزم"
 
+msgid "Automatic Language"
+msgstr "بحث آلـى"
+
 msgid "Automatic Scan"
 msgstr "بحث آلـى"
 
@@ -1303,6 +1313,9 @@ msgstr "منع الحد من الضوضاء"
 
 msgid "Blue"
 msgstr "أزرق"
+
+msgid "Blue button function"
+msgstr "حدد الاجراء"
 
 msgid "Bolivia (Plurinational State of)"
 msgstr "بوليفيا (دولة متعددة القوميات)"
@@ -1501,6 +1514,12 @@ msgstr "كندا"
 
 msgid "Cancel"
 msgstr "إلغاء"
+
+msgid "Cancel any changed settings and exit"
+msgstr "قم بإلغاء أي إعدادات تم تغييرها والخروج"
+
+msgid "Cancel any changed settings and exit all menus"
+msgstr "قم بإلغاء أي إعدادات تم تغييرها واخرج من كافة القوائم"
 
 msgid "Cancel any changes to the currently active skin"
 msgstr "قم بإلغاء أي تغييرات على الجلد النشط حاليًا"
@@ -1804,6 +1823,9 @@ msgstr "وحده النفاذ المشروط"
 msgid "Common Interface assignment"
 msgstr "تحديد وحدة النفاذ المشروط"
 
+msgid "Common Setup Actions"
+msgstr "حدد الاجراء"
+
 msgid "Communication"
 msgstr "إتصال"
 
@@ -1969,8 +1991,8 @@ msgstr ".قم بتكوين المدة بالساعات التي يجب أن ين
 msgid "Configure the duration in minutes for the screensaver."
 msgstr "إعدادات المدة (بالدقائق) على شاشة التوقف."
 
-msgid "Configure the duration in minutes for the sleeptimer. Select this entry and click OK or green to start/stop the sleeptimer"
-msgstr "قم بتكوين المدة بالدقائق لمؤقت النوم. حدد هذا الإدخال وانقر فوق موافق أو الأخضر لبدء/إيقاف مؤقت السكون"
+msgid "Configure the duration in minutes for the sleeptimer. Select this entry and press blue to start/restart the sleeptimer or use yellow for stop active sleeptimer."
+msgstr "قم بتكوين المدة بالدقائق لمؤقت النوم. حدد هذا الإدخال واضغط على اللون الأزرق لبدء/إعادة تشغيل مؤقت النوم أو استخدم اللون الأصفر لإيقاف مؤقت النوم النشط."
 
 msgid "Configure the duration when the receiver should go to shut down in case the receiver is in standby mode."
 msgstr ".قم بتكوين المدة التي يجب أن يتم فيها إيقاف تشغيل جهاز الاستقبال في حالة وجود جهاز الاستقبال في وضع الاستعداد"
@@ -2160,9 +2182,6 @@ msgstr "تكوين شبة الإنترنت الداخليه الخاصة بك"
 
 msgid "Configure your network again"
 msgstr "تكوين الشبكة مره ثانيه"
-
-msgid "Configure your network settings and press OK to scan"
-msgstr "تشكيل إعدادات شبكة الاتصال ثم اضغط موافق لبدء البحث"
 
 msgid "Configure your wireless LAN again"
 msgstr "تكوين الشبكة اللاسلكيه الخاصة بك"
@@ -2483,6 +2502,10 @@ msgstr "نوع التسيجل الإفتراضي"
 msgid "Default+Picon"
 msgstr "الإفتراضي"
 
+#, fuzzy, python-format
+msgid "Default: '%s'."
+msgstr "الإفتراضي"
+
 msgid "Define additional delay in milliseconds before start of http(s) streams, e.g. to connect a remote tuner, you use a complex system of DiSEqC."
 msgstr "حدد تأخيرًا إضافيًا بالمللي ثانية قبل بدء تدفقات http (s) ، على سبيل المثال لتوصيل موالف بعيد ، يمكنك استخدام نظام معقد من DiSEqC."
 
@@ -2566,6 +2589,12 @@ msgstr "حذف المؤقت"
 
 msgid "Delete all the text"
 msgstr "حذف قائمة التشغيل المدخلة"
+
+msgid "Delete character to left of cursor or select AM times"
+msgstr "AM احذف الحرف الموجود على يسار المؤشر أو حدد أوقات"
+
+msgid "Delete character under cursor or select PM times"
+msgstr "PM احذف الحرف الموجود أسفل المؤشر أو حدد أوقات"
 
 msgid "Delete entry"
 msgstr "مسح المدخل"
@@ -2773,6 +2802,9 @@ msgstr ".عرض طول الفيلم في فيلم (باستثناء نمط سط�
 msgid "Display setup"
 msgstr "اعداد الاستخدام"
 
+msgid "Display the virtual keyboard for data entry"
+msgstr "عرض لوحة المفاتيح الافتراضية لإدخال البيانات"
+
 msgid "Djibouti"
 msgstr "جيبوتي"
 
@@ -2916,7 +2948,10 @@ msgid "Dominican Republic"
 msgstr "جمهورية الدومينيكان"
 
 msgid "Don't save and stop timeshift"
-msgstr "لا تتنقل وأحذف المؤقت"
+msgstr "لا تتنقل وأحذف التسجيل المؤقت"
+
+msgid "Don't show default"
+msgstr "تعيين افتراضي"
 
 msgid "Don't stop current event but disable coming events"
 msgstr "لا توقف الحدث الحالي لكن قم بتعطيل الأحداث القادمة"
@@ -3407,6 +3442,9 @@ msgstr "في كل مكان"
 
 msgid "Exceeds dual layer medium!"
 msgstr "تتعدى وسيط طبقه مزدوجه!"
+
+msgid "Exclude first CA device"
+msgstr ""
 
 msgid "Execution finished!!"
 msgstr "إنهاء التنفيذ!!"
@@ -4352,6 +4390,9 @@ msgstr "الريموت الإحتياطي من خلال الرابط على ال
 msgid "Import remote receiver URL"
 msgstr "الريموت الإحتياطي من خلال الرابط على الرسيفر"
 
+msgid "In Setup screens choose whether to show the default value of the selected item in the description field."
+msgstr "في شاشات الإعداد، اختر ما إذا كنت تريد إظهار القيمة الافتراضية للعنصر المحدد في حقل الوصف أم لا."
+
 msgid "In order to record a timer, the TV was switched to the recording service!\n"
 msgstr "لكى تسجل مؤقت ، يجب تحويل التليفزيون الى القناة التى ستسجل منها!\n"
 "\n"
@@ -4589,7 +4630,7 @@ msgstr "الايطالية"
 msgid "Italy"
 msgstr "إيطاليا"
 
-msgid "Items per page "
+msgid "Items per page"
 msgstr "مواد لكل صفحة"
 
 msgid "Items per page for list screen"
@@ -4618,6 +4659,12 @@ msgstr "الانتقال إلى بداية القائمة"
 
 msgid "Jump to end of list"
 msgstr "الانتقال إلى نهاية القائمة"
+
+msgid "Jump to first item in list or the start of text"
+msgstr "انتقل إلى العنصر الأول في القائمة أو إلى بداية النص"
+
+msgid "Jump to last item in list or the end of text"
+msgstr "انتقل إلى العنصر الأخير في القائمة أو نهاية النص"
 
 msgid "Jump to next marked position"
 msgstr "الإنتقال إلى الوضع القادم المحدد"
@@ -4908,6 +4955,9 @@ msgstr "ميجابايت"
 msgid "MENU"
 msgstr "قائمة"
 
+msgid "Menu button function"
+msgstr "وظيفة زر القائمة"
+
 msgid "MHz"
 msgstr "ميجاهيرتز"
 
@@ -5154,6 +5204,12 @@ msgstr "تحريك قناة داخل قناة من القناة الرئيسية
 msgid "Move Picture in Picture"
 msgstr "تحريك صوره داخل صوره"
 
+msgid "Move down a line"
+msgstr "الانتقال إلى أخر القائمة"
+
+msgid "Move down a screen"
+msgstr "تحرك لأسفل الشاشة"
+
 msgid "Move east"
 msgstr "تحرك شرقا"
 
@@ -5181,6 +5237,12 @@ msgstr "حرك مؤشر النص إلى الحرف الأول"
 msgid "Move the text cursor to the last character"
 msgstr "حرك مؤشر النص إلى الحرف الأخير"
 
+msgid "Move to first line / screen"
+msgstr "الانتقال إلى السطر الأول / الشاشة"
+
+msgid "Move to last line / screen"
+msgstr "الانتقال إلى السطر الأخير / الشاشة"
+
 msgid "Move to position X"
 msgstr "الانتقال إلى المكان إكس"
 
@@ -5197,6 +5259,12 @@ msgstr "عوده للفصل السابق"
 #, fuzzy
 msgid "Move to the previous skin"
 msgstr "تحرك للأعلى المدخل السابق"
+
+msgid "Move up a line"
+msgstr "انتقل إلى المكان في الفهرس"
+
+msgid "Move up a screen"
+msgstr "تحريك الشاشة لأعلى"
 
 msgid "Move west"
 msgstr "تحرك للغرب"
@@ -5431,6 +5499,9 @@ msgstr "لايوجد وصف متوفر."
 
 msgid "No age block"
 msgstr "لا يوجد حجب للعمر"
+
+msgid "No config items available"
+msgstr "لا توجد عناصر التكوين المتاحة"
 
 msgid "No data on transponder!\n"
 "(Timeout reading PAT)"
@@ -5824,9 +5895,6 @@ msgstr "سابق"
 msgid "PULSe 4K(mini)"
 msgstr "PULSe 4K(mini)"
 
-msgid "PVR"
-msgstr "مسجل الفيديو الشخصي"
-
 msgid "Package list update"
 msgstr "تحديث قائمة الباقات"
 
@@ -6018,6 +6086,9 @@ msgstr "من فضلك أختار من الملحقات..."
 
 msgid "Please connect your receiver to the internet"
 msgstr "الرجاء توصيل جهاز الاستقبال الخاص بك على شبكة الإنترنت"
+
+msgid "Please contact the manufacturer for clarification."
+msgstr "يرجى الاتصال بالشركة المصنعة للتوضيح."
 
 msgid "Please do not change any values unless you know what you are doing!"
 msgstr "من فضلك لا تغير أى قيمه ألا إذا كنت متأكد مما تفعل !"
@@ -6904,6 +6975,9 @@ msgstr "إعادة التشغيل"
 msgid "Restart GUI now?"
 msgstr "هل تريد إعادة تشغيل الاينجما2 الان ؟"
 
+msgid "Restart Sleeptimer"
+msgstr "أعد تشغيل مؤقت النوم"
+
 msgid "Restart both"
 msgstr "إعادة الاختبار"
 
@@ -7145,6 +7219,9 @@ msgstr "حفظ"
 
 msgid "Save / Enter text and exit"
 msgstr "حفظ و خروج"
+
+msgid "Save all changed settings and exit"
+msgstr "احفظ جميع الإعدادات التي تم تغييرها واخرج"
 
 msgid "Save and activate the currently selected skin"
 msgstr "أضغط موافق لتفعيل السكن المختار."
@@ -7560,6 +7637,12 @@ msgstr "حدد رقم طراز جهاز بدون كيبل الخاص بك. إذ�
 msgid "Select the movie path"
 msgstr "أختار مسار الفيلم"
 
+msgid "Select the next item in list or move cursor right"
+msgstr "حدد العنصر التالي في القائمة أو حرك المؤشر إلى اليمين"
+
+msgid "Select the previous item in list or move cursor left"
+msgstr "حدد العنصر السابق في القائمة أو حرك المؤشر إلى اليسار"
+
 msgid "Select the protocol used by your SCR device. Choices are 'SCR Unicable' (Unicable), or 'SCR JESS' (JESS, also known as Unicable II)."
 msgstr "حدد تنسيق جهاز بدون كيبل الخاص بك. الاختيارات هي 'إشارة قناة واحدة بدون كيبل' (تشكيل قناة بدون كيبل أول) أو 'إشارة قناة واحدة جيسس' (تشكيل قناة بدون كيبل ثاني)."
 
@@ -7650,14 +7733,14 @@ msgstr "اختر بلدك. إذا لم يكن متاحًا ، فحدد 'الكل
 msgid "Select your provider and region. If not present in this list you will need to select one of the other 'service scan types'."
 msgstr "حدد مزود الخدمة والمنطقة. إذا لم تكن موجودة في هذه القائمة سوف تحتاج إلى تحديد واحد من الآخر ' أنواع البحث القناة '."
 
-msgid "Select your provider, and press OK to start the scan"
-msgstr "أختار المزود الخاص بك,أو أضغط على موافق لبدء البحث"
-
 msgid "Select your region. If not available change 'Country' to 'all' and select one of the default alternatives."
 msgstr "حدد منطقتك. إذا لم يكن متوفرا تغيير ' البلد ' إلى ' كل ' وحدد واحده من البدائل الافتراضية."
 
 msgid "Select your time zone area or region."
 msgstr "إعداد توقيت المنطقة الزمنية الخاصة بك."
+
+msgid "Select, toggle, process or edit the current entry"
+msgstr "تحديد الإدخال الحالي أو تبديله أو معالجته أو تحريره"
 
 msgid "Selecting satellites 1 (USALS)"
 msgstr "اختيار الأقمار الصناعية 1 (نظام مواقع الأقمار الصناعية العالمية )"
@@ -7799,6 +7882,9 @@ msgstr "إعدادات سلوك عند بدء تشغيل الفيلم."
 
 msgid "Set all hotkey to default?"
 msgstr "فرز قائمه الإضافات إلى الافتراضي؟"
+
+msgid "Set all the settings back as they were"
+msgstr "قم بإعادة كافة الإعدادات كما كانت"
 
 msgid "Set alternative fallback tuners for DVB-T/C or ATSC"
 msgstr "DVB-T/C أو ATSC قم بتعيين موالفات بديلة لـ"
@@ -7954,9 +8040,14 @@ msgstr "عرض منفذ سكارت في القائمة الرئيسية"
 msgid "Show WLAN status"
 msgstr "عرض حالة اتصال الشبكة اللاسلكية"
 
-#, fuzzy
 msgid "Show additional information on infobar"
 msgstr "عرض معلومات التشفير في شريط المعومات"
+
+msgid "Show default after description"
+msgstr "إظهار الافتراضي بعد الوصف"
+
+msgid "Show default on new line"
+msgstr "إظهار الافتراضي على السطر الجديد"
 
 msgid "Show alternatives"
 msgstr "عرض البدائل"
@@ -8120,7 +8211,9 @@ msgstr "عرض نوع أيقونة القناة"
 msgid "Show servicelist or movies"
 msgstr "عرض قائمة القنوات أو الافلام"
 
-#, fuzzy
+msgid "Show setup default values"
+msgstr "إظهار القيم الافتراضية للإعداد"
+
 msgid "Show simple second infobar"
 msgstr "عرض شريط المعلومات الثاني"
 
@@ -8261,8 +8354,12 @@ msgid "Skin & Resolution: %s (%sx%s)\n"
 msgstr "الجلد والدقة: %s (%sx%s)\n"
 
 #, fuzzy
-msgid "Skin Selection Actions"
+msgid "Skin Selection"
 msgstr "حدد الاجراء"
+
+#, fuzzy
+msgid "Skin Selection Actions"
+msgstr "اختيار السكين"
 
 #, fuzzy
 msgid "SkinSelector: Restart GUI"
@@ -8508,6 +8605,18 @@ msgstr "القائمة العادية"
 msgid "Standby"
 msgstr "وضع الإستعداد"
 
+msgid "Start CableScan"
+msgstr "بحث عن قنوات الكيبل"
+
+msgid "Start Cablescan"
+msgstr "أبدا الإختبار"
+
+msgid "Start Fastscan"
+msgstr "البحث السريع"
+
+msgid "Start Sleeptimer"
+msgstr "حذف المؤقت"
+
 msgid "Standby / restart"
 msgstr "وضع الإستعداد / إعادة التشغيل"
 
@@ -8596,6 +8705,9 @@ msgstr "إيقاف"
 
 msgid "Stop PiP"
 msgstr "إيقاف قناة داخل قناة"
+
+msgid "Stop Sleeptimer"
+msgstr "إيقاف مؤقت النوم"
 
 msgid "Stop all current recordings"
 msgstr "إيقاف جميع التسجيلات الحالية"
@@ -9465,6 +9577,9 @@ msgstr "التداخل الموقت في المؤقتاتا.xml الكشف!\n"
 msgid "Timer overview"
 msgstr "نظرة عامة على المؤقت التلقائي"
 
+msgid "Timer recording failed. No space left on device!\n"
+msgstr "فشل تسجيل الموقت. لم يتبق أي مساحة على الجهاز!\n"
+
 msgid "Timer recording location"
 msgstr "مكان المؤقتات المسجلة"
 
@@ -9530,6 +9645,9 @@ msgstr "عرض الترجمة المختارة"
 
 msgid "Today"
 msgstr "اليوم"
+
+msgid "Toggle Configuration Mode or AutoDisqc"
+msgstr "AutoDisqc تبديل وضع التكوين أو"
 
 msgid "Toggle HDMI In"
 msgstr "تبديل تشغيل كيبل عالي الوضوح في وضع خاصية قناة داخل قناة"
@@ -10130,6 +10248,9 @@ msgstr "إختيار وضعية الفيديو."
 msgid "Video output"
 msgstr "إخراج الفيديو"
 
+msgid "Video settings"
+msgstr "اعدادات الفيديو"
+
 msgid "Video setup"
 msgstr "إخراج الفيديو"
 
@@ -10692,6 +10813,9 @@ msgstr "أصفر"
 msgid "Yellow DVB subtitles"
 msgstr "الترجمة الأساسية للقنوات باللون الأصفر"
 
+msgid "Yellow button function"
+msgstr "وظيفة الزر الأصفر"
+
 msgid "Yemen"
 msgstr "اليمن"
 
@@ -10994,9 +11118,6 @@ msgstr "واجهة الانجما قنوات/مزودين/كايدات في وح
 msgid "about to start"
 msgstr "على وشك البدأ"
 
-msgid "activate network adapter configuration"
-msgstr "تنشيط تشكيل محول الشبكة"
-
 msgid "active"
 msgstr "غير فعال"
 
@@ -11261,9 +11382,6 @@ msgstr "(MovieCut يتطلب البرنامج المساعد) تنفيذ الت�
 
 msgid "exit DVD player or return to file browser"
 msgstr "الخروج من مشغل الدى فى دى أو العوده الى متصفح الملفات"
-
-msgid "exit network adapter configuration"
-msgstr "الخروج من تهيئة محول الشبكة"
 
 msgid "exit networkadapter setup menu"
 msgstr "الخروج من قائمه إعداد الشبكة"
