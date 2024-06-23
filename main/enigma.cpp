@@ -433,6 +433,11 @@ const char *getBoxType()
 	return BOXTYPE;
 }
 
+int getE2Flags()
+{
+	return 1;
+}
+
 #include <malloc.h>
 
 void dump_malloc_stats(void)
