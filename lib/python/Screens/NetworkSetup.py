@@ -350,7 +350,7 @@ class NameserverSetup(ConfigListScreen, Screen):
 		return gateways
 
 
-class NetworkMacSetup(Screen, ConfigListScreen):
+class NetworkMacSetup(ConfigListScreen, Screen):
 
 	if getDesktop(0).size().width() == 1920:
 		skin = """

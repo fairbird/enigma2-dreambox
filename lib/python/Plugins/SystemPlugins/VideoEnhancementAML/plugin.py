@@ -16,7 +16,7 @@ from Screens.MessageBox import MessageBox
 from . import VideoEnhancement
 
 
-class VideoEnhancementSetup(Screen, ConfigListScreen):
+class VideoEnhancementSetup(ConfigListScreen, Screen):
 	def __init__(self, session):
 		Screen.__init__(self, session)
 		self.onChangedEntry = []
@@ -191,7 +191,7 @@ class VideoEnhancementSetup(Screen, ConfigListScreen):
 		return str(self["config"].getCurrent()[1].getText())
 
 
-class VideoEnhancementPreview(Screen, ConfigListScreen):
+class VideoEnhancementPreview(ConfigListScreen, Screen):
 	skin = """
 		<screen name="VideoEnhancementPreview" position="center,e-170" size="560,170" title="VideoEnhancementPreview">
 			<ePixmap pixmap="buttons/red.png" position="0,0" size="140,40" alphaTest="on" />

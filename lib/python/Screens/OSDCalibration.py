@@ -108,7 +108,7 @@ def InitOSDCalibration():
 	config.osd.threeDznorm.addNotifier(set3DZnorm)
 
 
-class OSDCalibration(Screen, ConfigListScreen):
+class OSDCalibration(ConfigListScreen, Screen):
 	if (getDesktop(0).size().width() == 1920):
 		skin = """
 			<screen position="center,center" size="1920,1080" backgroundColor="#000000" title="OSD Adjustment" >
