@@ -1473,7 +1473,7 @@ class ChannelSelectionBase(Screen):
 		self["key_menu"] = StaticText(_("MENU"))
 		self["key_info"] = StaticText(_("INFO"))
 
-		self["list"] = ServiceListLegacy(self) if config.channelSelection.style.value == "" else ServiceList(self)
+		self["list"] = ServiceListLegacy(self) if config.channelSelection.screenStyle.value == "" or config.channelSelection.widgetStyle.value == "" else ServiceList(self)
 		self.servicelist = self["list"]
 
 		self.numericalTextInput = NumericalTextInput(handleTimeout=False)
@@ -2055,6 +2055,8 @@ class ChannelSelection(ChannelSelectionBase, ChannelSelectionEdit, ChannelSelect
 
 	def __init__(self, session):
 		ChannelSelectionBase.__init__(self, session)
+		if config.channelSelection.screenStyle.value:
+			self.skinName = [config.channelSelection.screenStyle.value]
 		ChannelSelectionEdit.__init__(self)
 		ChannelSelectionEPG.__init__(self)
 		SelectionEventInfo.__init__(self)

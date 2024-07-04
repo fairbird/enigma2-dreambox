@@ -55,7 +55,8 @@
 		<item level="2" text="Enable new GStreamer 1.x playback" description="If enabled, the new GStreamer 1.x playback engine will be used.">config.misc.usegstplaybin3</item>
 	</setup>
 	<setup key="channelselection" title="Channel Selection">
-		<item level="0" text="Style of the channel list" description="Set the style of the channel list.">config.channelSelection.style</item>
+		<item text="Channel Selection Screen" description="Select the screen layout, from the options provided by the skin, to be used for the ChannelSelection screen." conditional="len(config.channelSelection.screenStyle.choices) > 1">config.channelSelection.screenStyle</item>
+		<item text="Channel Selection List" description="Select the layout of the information in the services list, from the options provided by the skin, displayed within the ChannelSelection screen." conditional="config.channelSelection.screenStyle.value">config.channelSelection.widgetStyle</item>
 		<item level="2" text="Show channel numbers in channel selection" description="When enabled, show channel numbers in the channel selection screen.">config.usage.show_channel_numbers_in_servicelist</item>
 		<item level="2" text="Hide number markers" conditional="config.usage.show_channel_numbers_in_servicelist.value" description="When enabled, number markers will be hidden.">config.usage.hide_number_markers</item>
 		<item level="1" text="Show two lines per entry" description="Show service name and event description among each other instead of side by side. After a change, an adjustment of the number of lines is required.">config.usage.servicelist_twolines</item>
