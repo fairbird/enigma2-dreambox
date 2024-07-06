@@ -75,7 +75,6 @@
 			<item level="1" text="Service number font size" description="This allows you change the font size relative to skin size, so 1 increases by 1 point size, and -1 decreases by 1 point size">config.usage.servicenum_fontsize</item>
 			<item level="1" text="Service name font size" description="This allows you change the font size relative to skin size, so 1 increases by 1 point size, and -1 decreases by 1 point size">config.usage.servicename_fontsize</item>
 			<item level="1" text="Service info font size" description="This allows you change the font size relative to skin size, so 1 increases by 1 point size, and -1 decreases by 1 point size">config.usage.serviceinfo_fontsize</item>
-			<item level="2" text="Enable OK as preview in channel selection" description="When enabled then when you select a new channel in the channel selection the channel selection will not close. It will only close when you select the current playing service. This is a kind of preview mode">config.usage.channelselection_preview</item>
 			<item level="1" text="Progress info font size" description="This allows you change the font size relative to skin size, so 1 increases by 1 point size, and -1 decreases by 1 point size">config.usage.progressinfo_fontsize</item>
 			<item level="2" text="Show service type icons" description="Configure if and how service type icons will be shown in the channel selection list.">config.usage.servicetype_icon_mode</item>
 			<item level="2" text="Show crypto icons" description="Configure if and how crypto icons will be shown in the channel selection list.">config.usage.crypto_icon_mode</item>
@@ -93,6 +92,7 @@
 			<item level="1" text="Show record indicator" description="Configure if and how the record indicator will be shown in the channel selection list.">config.usage.record_indicator_mode</item>
 		</if>
 		<item level="2" text="Change bouquets in quickzap" description="When enabled, continue to the next bouquet when the last channel of the current bouquet is reached while changing channels.">config.usage.quickzap_bouquet_change</item>
+		<item level="2" text="Enable OK as preview in channel selection" description="When enabled then when you select a new channel in the channel selection the channel selection will not close. It will only close when you select the current playing service. This is a kind of preview mode">config.usage.channelselection_preview</item>
 		<item level="2" text="Enable 'neutrino' style zap controlling" description="When enabled the arrow buttons around the OK button will follow the 'neutrino' style zap controls instead of the enigma2 style.">config.usage.oldstyle_zap_controls</item>
 		<item level="2" text="Enable 'neutrino' style channel select controlling" description="When enabled the left, right, CH+/-, B+/-, P+/- buttons will follow the 'neutrino' style zap controls instead of the enigma2 style.">config.usage.oldstyle_channel_select_controls</item>
 		<item level="2" text="Enable zapping with CH+/-, B+/-, P+/-" description="When enabled you can zap channels with the CH+/-, B+/-, P+/- buttons instead of opening the channel selection list.">config.usage.zap_with_ch_buttons</item>
