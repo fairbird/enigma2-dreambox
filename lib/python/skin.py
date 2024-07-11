@@ -1079,6 +1079,9 @@ class AttributeParser:
 		# print(f"[Skin] DEBUG: Scale itemWidth {int(value)} -> {self.applyHorizontalScale(value)}.")
 		self.guiObject.setItemWidth(self.applyHorizontalScale(value))
 
+	def label(self, value):
+		pass
+
 	def listOrientation(self, value):  # Used by eListBox.
 		self.guiObject.setOrientation(parseListOrientation(value))
 
@@ -1935,7 +1938,21 @@ class TemplateParser():
 		if self.debug:
 			print(f"[TemplateParser] processPanel DEBUG: Position={widget.attrib.get("position")}, Size={widget.attrib.get("size")}.")
 			print(f"[TemplateParser] processPanel DEBUG: Parent x={context.x}, width={context.w}.")
-		pos = [int(x.strip()) for x in widget.attrib.get("position").split(",")]
+		position = widget.attrib.get("position")
+		if "left" in position or "right" in position:
+			pos = position.split(",")
+			top = 0
+			if len(pos) == 2 and pos[0] in ("left", "right") and pos[1].isdigit():
+				top = pos[1]
+			position = (context.x, top)
+		elif "top" in position or "bottom" in position:
+			pos = position.split(",")
+			left = 0
+			if len(pos) == 2 and pos[1] in ("top", "bottom") and pos[0].isdigit():
+				left = pos[0]
+			position = (left, context.y)
+		else:
+			position = [int(x.strip()) for x in widget.attrib.get("position").split(",")]
 		layout = widget.attrib.get("layout")
 		classes = {
 			"stack": SkinContextStack,
@@ -1947,8 +1964,8 @@ class TemplateParser():
 		newContext.spacing = int(widget.attrib.get("spacing", "0"))
 		if self.debug:
 			print(f"[TemplateParser] processPanel DEBUG: Parent x={newContext.x}, width={newContext.w}.")
-		newContext.x = pos[0]
-		newContext.y = pos[1]
+		newContext.x = position[0]
+		newContext.y = position[1]
 		if layout == "horizontal":
 			newContext.w -= newContext.x  # I have no idea why this is needed!
 		if self.debug:
