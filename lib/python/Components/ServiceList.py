@@ -11,6 +11,11 @@ from Tools.TextBoundary import getTextBoundarySize
 
 
 def InitServiceListSettings():
+	config.channelSelection.piconRatio = ConfigSelection(default=167, choices=[
+		(167, _("XPicon, ZZZPicon")),
+		(235, _("ZZPicon")),
+		(250, _("ZPicon"))
+	])
 	config.channelSelection = ConfigSubsection()
 	choiceList = [("", _("Legacy mode"))]
 	config.channelSelection.screenStyle = ConfigSelection(default="", choices=choiceList)
