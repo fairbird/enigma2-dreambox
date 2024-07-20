@@ -656,8 +656,8 @@ from Components.NetworkTime import ntpSyncPoller
 ntpSyncPoller.startTimer()
 
 enigma.eProfileWrite("Network")
-import Components.Network
-Components.Network.waitForNetwork()
+from Components.Network import InitNetwork
+InitNetwork()
 
 enigma.eProfileWrite("LCD")
 import Components.Lcd

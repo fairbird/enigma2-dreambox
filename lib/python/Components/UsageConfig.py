@@ -2,7 +2,7 @@
 from Components.Harddisk import harddiskmanager
 from Components.Console import Console
 from Components.config import ConfigSubsection, ConfigDirectory, ConfigYesNo, config, ConfigSelection, ConfigText, ConfigNumber, ConfigSet, ConfigLocations, ConfigSelectionNumber, ConfigClock, ConfigSlider, ConfigEnableDisable, ConfigSubDict, ConfigDictionarySet, ConfigInteger, ConfigIP, ConfigPassword, ConfigSequence, NoSave, ConfigBoolean
-from Tools.Directories import SCOPE_HDD, SCOPE_TIMESHIFT, defaultRecordingLocation, fileContains, resolveFilename, fileHas
+from Tools.Directories import SCOPE_HDD, SCOPE_TIMESHIFT, defaultRecordingLocation, fileContains, resolveFilename, fileHas, fileReadXML, SCOPE_SKIN
 from enigma import setTunerTypePriorityOrder, setPreferredTuner, setSpinnerOnOff, setEnableTtCachingOnOff, eEnv, eDVBDB, Misc_Options, eBackgroundFileEraser, eServiceEvent, eDVBLocalTimeHandler, eEPGCache
 from Tools.HardwareInfo import HardwareInfo
 from Components.About import GetIPsFromNetworkInterfaces
@@ -17,6 +17,7 @@ from boxbranding import getDisplayType
 
 displaytype = getDisplayType()
 
+MODULE_NAME = __name__.split(".")[-1]
 
 originalAudioTracks = "orj dos ory org esl qaa qaf und mis mul ORY ORJ Audio_ORJ oth"
 visuallyImpairedCommentary = "NAR qad"
@@ -31,22 +32,6 @@ def InitUsageConfig():
 			Console().ePopen("sed -i '$a@reboot root rm -f /home/root/.cache/gstreamer-0.10/registry.arm.bin' /etc/crontab")
 		else:
 			print("[UsageConfig] No registry.arm.bin?")
-	config.usage.dns = ConfigSelection(default="dhcp-router", choices=[
-		("dhcp-router", _("DHCP Router")),
-		("staticip", _("Static IP Router")),
-		("google", _("Google DNS")),
-		("NordVPN", _("NordVPN")),
-		("quad9security", _("Quad9 Security")),
-		("quad9nosecurity", _("Quad9 No Security")),
-		("cloudflare", _("Cloudflare")),
-		("opendns", _("OpenDNS")),
-		("opendns-2", _("OpenDNS-2"))
-	])
-	config.usage.subnetwork = ConfigYesNo(default=True)
-	config.usage.subnetwork_cable = ConfigYesNo(default=True)
-	config.usage.subnetwork_terrestrial = ConfigYesNo(default=True)
-	config.usage.showdish = ConfigYesNo(default=True)
-	config.usage.multibouquet = ConfigYesNo(default=True)
 
 	showrotorpositionChoicesUpdate()
 
@@ -86,6 +71,31 @@ def InitUsageConfig():
 		("3", _("Red colored"))
 	])
 	config.usage.record_indicator_mode.addNotifier(refreshServiceList)
+
+	config.network = ConfigSubsection()
+	choices = [
+		("dhcp-router", _("Router / Gateway")),
+		("custom", _("Static IP / Custom"))
+	]
+	fileDom = fileReadXML(resolveFilename(SCOPE_SKIN, "dnsservers.xml"), source=MODULE_NAME)
+	for dns in fileDom.findall("dnsserver"):
+		if dns.get("key", ""):
+			choices.append((dns.get("key"), _(dns.get("title"))))
+
+	config.usage.dns = ConfigSelection(default="dhcp-router", choices=choices)
+	config.usage.dnsMode = ConfigSelection(default=0, choices=[
+		(0, _("Prefer IPv4")),
+		(1, _("Prefer IPv6")),
+		(2, _("IPv4 only")),
+		(3, _("IPv6 only"))
+	])
+	config.usage.dnsSuffix = ConfigText(default="")
+	config.usage.dnsRotate = ConfigYesNo(default=False)
+	config.usage.subnetwork = ConfigYesNo(default=True)
+	config.usage.subnetwork_cable = ConfigYesNo(default=True)
+	config.usage.subnetwork_terrestrial = ConfigYesNo(default=True)
+	config.usage.showdish = ConfigYesNo(default=True)
+	config.usage.multibouquet = ConfigYesNo(default=True)
 
 	# Just merge note, config.usage.servicelist_column was already there.
 	config.usage.servicelist_column = ConfigSelection(default="-1", choices=[("-1", _("Disable"))
