@@ -140,7 +140,9 @@ def getHardwareTypeString():
 
 
 def getImageTypeString():
-	return "%s %s" % (BoxInfo.getItem("displaydistro"), BoxInfo.getItem("imageversion").title())
+	if BoxInfo.getItem("imageversion"):
+		return "%s %s %s" % (BoxInfo.getItem("displaydistro"), BoxInfo.getItem("imageversion"), BoxInfo.getItem("imagetype").title())
+	return "%s %s" % (BoxInfo.getItem("displaydistro"), BoxInfo.getItem("imagetype").title())
 
 
 def getOEVersionString():
