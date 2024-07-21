@@ -1401,8 +1401,8 @@ msgstr "بوروندي"
 msgid "Bus: "
 msgstr "الناقل: "
 
-msgid "By default, SNR will be shown in dB (when supported by the tuner). This setting forces SNR to be shown as a percentage instead."
-msgstr ".بشكل افتراضي, قوة الإشارة سوف تظهر في ديسيبل (عندما يدعمه الموالف). هذا الإعداد يفترض أن تكون نسبة الإشارة إلى الضوضاء ليتم عرضها كنسبة مئوية بدلاً من ذلك"
+msgid "When set to \"Yes\", all locations where SNR is displayed in dB will show an SNR percentage, and vice versa."
+msgstr "إذا تم التعيين على نعم، فستعرض جميع الأماكن التي يتم فيها عرض نسبة الإشارة إلى الضوضاء (SNR) بالديسيبل نسبة نسبة الإشارة إلى الضوضاء (SNR) والعكس صحيح"
 
 msgid "Bypass HDMI EDID checking"
 msgstr "إختيار كيبل عالي الوضوح وفحص بيانات الهوية"
@@ -8028,8 +8028,8 @@ msgstr "عرض المعلومات"
 msgid "Show PiP"
 msgstr "عرض خاصية قناة داخل قناة"
 
-msgid "Show SNR percentage instead of dB value"
-msgstr "dB بدلاً من قيمة SNR إظهار نسبة"
+msgid "Toggle the SNR values displayed"
+msgstr "تبديل قيم SNR المعروضة"
 
 msgid "Show True/False as graphical switch"
 msgstr "عرض الصح/خطأ كتبديل المخطط البياني"
