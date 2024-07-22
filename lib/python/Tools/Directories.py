@@ -9,6 +9,7 @@ from traceback import print_exc
 from sys import _getframe as getframe
 from unicodedata import normalize
 from tempfile import mkstemp
+from datetime import datetime
 from xml.etree.ElementTree import Element, ParseError, fromstring, parse
 
 from enigma import eEnv, getDesktop, eGetEnigmaDebugLvl
@@ -313,6 +314,12 @@ def fileWriteLines(filename, lines, source=DEFAULT_MODULE_NAME, debug=False):
 	if debug or forceDebug:
 		print("[%s] Line %d: %s %d lines to file '%s'." % (source, getframe(1).f_lineno, msg, len(lines), filename))
 	return result
+
+
+def fileDate(f):
+	if fileExists(f):
+		return datetime.fromtimestamp(os.stat(f).st_mtime).strftime("%Y-%m-%d")
+	return("1970-01-01")
 
 
 def fileReadXML(filename, default=None, source=DEFAULT_MODULE_NAME, debug=False):
