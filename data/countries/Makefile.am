@@ -1,6 +1,7 @@
 installdir = $(pkgdatadir)/countries
 
 dist_install_DATA = \
+    ar_BH.png \
     ar_AE.png \
     bg_BG.png \
     ca_AD.png \
