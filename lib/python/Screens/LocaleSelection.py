@@ -425,6 +425,14 @@ class LocaleSettings(Setup):
 
 
 class LocaleSelectionSummary(ScreenSummary):
+	skin = '''
+	<screen name="SkinSelectorSummary" position="0,0" size="400,240"> 
+		<widget source="native" render="Label" position="0,30" size="400,50" font="FdLcD;35" halign="center" valign="center" zPosition="2"/>
+		<widget source="name" render="Label" position="0,85" size="400,50" font="FdLcD;35" halign="center" zPosition="2"/>
+		<widget source="locale" render="Label" position="0,135" size="400,50" font="FdLcD;35" halign="center" zPosition="2"/>
+		<widget source="package" render="Label" position="0,190" size="400,50" font="FdLcD;35" halign="center" zPosition="2"/>
+	</screen>
+	'''
 	def __init__(self, session, parent):
 		ScreenSummary.__init__(self, session, parent=parent)
 		self["native"] = StaticText("")
