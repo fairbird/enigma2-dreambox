@@ -28,6 +28,7 @@ config.crash.debugMultiBoot = ConfigYesNo(default=False)
 config.crash.debugKeyboards = ConfigYesNo(default=False)
 config.crash.debugRemoteControls = ConfigYesNo(default=False)
 config.crash.debugDVBScan = ConfigYesNo(default=False)
+config.crash.debugInternational = ConfigYesNo(default=False)
 
 # config.plugins needs to be defined before InputDevice < HelpMenu < MessageBox < InfoBar.
 config.plugins = ConfigSubsection()
