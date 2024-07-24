@@ -53,7 +53,7 @@
 					<item key="setup_osd3d" level="2" text="OSD 3D Settings" weight="60" requires="OSD3DCalibration"><screen module="OSDCalibration" screen="OSD3DCalibration" /></item>
 				</menu>
 				<menu key="gui" level="0" text="GUI Settings">
-					<item key="language_setup" level="0" text="Language"><screen module="LanguageSelection"/></item>
+					<item key="locale_setup" level="0" text="Locale / Language Settings"><screen module="LocaleSelection"/></item>
 					<!-- Menu / Setup / Time -->
 					<item key="time_setup" level="0" text="Time" weight="50"><screen module="Time" screen="Time" /></item>
 					<item key="user_interface" level="0" text="User Interface" ><setup id="userinterface"/></item>
