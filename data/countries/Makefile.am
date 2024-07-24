@@ -18,7 +18,6 @@ dist_install_DATA = \
     fi_FI.png \
     fr_FR.png \
     fy_NL.png \
-    he_IL.png \
     zh_HK.png \
     hr_HR.png \
     hu_HU.png \
@@ -128,7 +127,6 @@ dist_install_DATA = \
 	hu.png \
 	id.png \
 	ie.png \
-	il.png \
 	in.png \
 	iq.png \
 	ir.png \
