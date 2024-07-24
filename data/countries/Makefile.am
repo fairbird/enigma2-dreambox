@@ -89,7 +89,7 @@ dist_install_DATA = \
 	cv.png \
 	cy.png \
 	da_DK.png \
-	da_DE.png \
+	de_DE.png \
 	dj.png \
 	dm.png \
 	do.png \
