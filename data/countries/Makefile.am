@@ -1,49 +1,53 @@
 installdir = $(pkgdatadir)/countries
 
 dist_install_DATA = \
+    ar_AE.png \
+    bg_BG.png \
+    ca_AD.png \
+    cs_CZ.png \
+    da_DK.png \
+    de_DE.png \
+    el_GR.png \
+    en_AU.png \
+    en_GB.png \
+    en_US.png \
+    es_ES.png \
+    es-ga.png \
+    et_EE.png \
+    fa_IR.png \
+    fi_FI.png \
+    fr_FR.png \
+    fy_NL.png \
+    he_IL.png \
+    zh_HK.png \
+    hr_HR.png \
+    hu_HU.png \
+    id_ID.png \
+    is_IS.png \
+    it_IT.png \
+    ku_KU.png \
+    lt_LT.png \
+    lv_LV.png \
+    missing.png \
+    nb_NO.png \
+    nl_NL.png \
+    no_NO.png \
+    pl_PL.png \
+    pt_BR.png \
+    pt_PT.png \
+    ro_RO.png \
+    ru_RU.png \
+    sk_SK.png \
+    sl_SI.png \
+    sr_YU.png \
+    sv_SE.png \
+    th_TH.png \
+    tr_TR.png \
+    uk_UA.png \
+    vi_VN.png \
+    zh_CN.png \
 	ad.png \
 	ae.png \
-	ae2.png \
-	bg.png \
-	br.png \
-	cn.png \
-	cz.png \
-	de.png \
-	dk.png \
-	en.png \
-	es.png \
-	ee.png \
-	fi.png \
-	fr.png \
-	gl_ES.png \
-	gr.png \
-	hk.png \
-	hr.png \
-	hu.png \
-	id.png \
-	ir.png \
-	is.png \
-	it.png \
-	ku.png \
-	lt.png \
-	lv.png \
-	missing.png \
-	mk.png \
-	nl.png \
-	no.png \
-	pl.png \
-	pt.png \
-	ro.png \
-	ru.png \
-	se.png \
-	si.png \
-	sk.png \
-	th.png \
-	tr.png \
-	ua.png \
-	vn.png \
-	fy_NL.png \
-	yu.png \
 	af.png \
 	ag.png \
 	ai.png \
@@ -51,7 +55,6 @@ dist_install_DATA = \
 	am.png \
 	ao.png \
 	ar.png \
-	ar_AE.png \
 	at.png \
 	au.png \
 	aw.png \
@@ -62,19 +65,19 @@ dist_install_DATA = \
 	bd.png \
 	be.png \
 	bf.png \
-	bg_BG.png \
+	bg.png \
 	bh.png \
 	bi.png \
 	bj.png \
 	bn.png \
 	bo.png \
+	br.png \
 	bs.png \
 	bt.png \
 	bw.png \
 	by.png \
 	bz.png \
 	ca.png \
-	ca_AD.png \
 	cd.png \
 	cf.png \
 	cg.png \
@@ -82,37 +85,31 @@ dist_install_DATA = \
 	ci.png \
 	cl.png \
 	cm.png \
+	cn.png \
 	co.png \
 	cr.png \
-	cs_CZ.png \
 	cu.png \
 	cv.png \
 	cy.png \
-	da_DK.png \
-	de_DE.png \
+	cz.png \
+	de.png \
 	dj.png \
+	dk.png \
 	dm.png \
 	do.png \
 	dz.png \
 	ec.png \
+	ee.png \
 	eg.png \
 	eh.png \
-	el_GR.png \
-	en_AU.png \
-	en_GB.png \
-	en_US.png \
 	er.png \
-	es_ES.png \
-	es-ga.png \
+	es.png \
 	et.png \
-	et_EE.png \
-	fa_IR.png \
-	fi_FI.png \
+	fi.png \
 	fj.png \
 	fm.png \
-	fr_FR.png \
+	fr.png \
 	ga.png \
-	gb.png \
 	gb.png \
 	gd.png \
 	ge.png \
@@ -120,19 +117,23 @@ dist_install_DATA = \
 	gm.png \
 	gn.png \
 	gq.png \
+	gr.png \
 	gt.png \
 	gw.png \
 	gy.png \
+	hk.png \
 	hn.png \
-	hr_HR.png \
+	hr.png \
 	ht.png \
-	hu_HU.png \
-	id_ID.png \
+	hu.png \
+	id.png \
 	ie.png \
+	il.png \
 	in.png \
 	iq.png \
-	is_IS.png \
-	it_IT.png \
+	ir.png \
+	is.png \
+	it.png \
 	jm.png \
 	jo.png \
 	jp.png \
@@ -145,7 +146,6 @@ dist_install_DATA = \
 	kp.png \
 	kr.png \
 	ks.png \
-	ku_KU.png \
 	kw.png \
 	kz.png \
 	la.png \
@@ -155,16 +155,17 @@ dist_install_DATA = \
 	lk.png \
 	lr.png \
 	ls.png \
-	lt_LT.png \
+	lt.png \
 	lu.png \
-	lv_LV.png \
+	lv.png \
 	ly.png \
 	ma.png \
 	mc.png \
 	md.png \
-	ma.png \
+	me.png \
 	mg.png \
 	mh.png \
+	mk.png \
 	ml.png \
 	mm.png \
 	mn.png \
@@ -178,12 +179,11 @@ dist_install_DATA = \
 	my.png \
 	mz.png \
 	na.png \
-	nb_NO.png \
 	ne.png \
 	ng.png \
 	ni.png \
-	nl_NL.png \
-	no_NO.png \
+	nl.png \
+	no.png \
 	np.png \
 	nr.png \
 	nz.png \
@@ -193,66 +193,61 @@ dist_install_DATA = \
 	pg.png \
 	ph.png \
 	pk.png \
-	pl_PL.png \
+	pl.png \
 	pr.png \
-	pt_BR.png \
-	pt_PT.png \
+	pt.png \
 	pw.png \
 	py.png \
 	qa.png \
-	ro_RO.png \
+	ro.png \
 	rs.png \
-	ru_RU.png \
+	ru.png \
 	rw.png \
 	sa.png \
 	sb.png \
 	sc.png \
 	sd.png \
+	se.png \
 	sg.png \
-	sk_SK.png \
+	si.png \
+	sk.png \
 	sl.png \
-	sl_SI.png \
 	sm.png \
 	sn.png \
 	so.png \
 	sr.png \
-	sr_YU.png \
 	ss.png \
 	st.png \
 	sv.png \
-	sv_SE.png \
 	sx.png \
 	sy.png \
 	sz.png \
 	td.png \
 	tg.png \
-	th_TH.png \
+	th.png \
 	tj.png \
 	tl.png \
 	tm.png \
 	tn.png \
 	to.png \
-	tr_TR.png \
+	tr.png \
 	tt.png \
 	tv.png \
 	tw.png \
 	tz.png \
+	ua.png \
 	ug.png \
-	uk_UA.png \
 	us.png \
 	uy.png \
 	uz.png \
 	va.png \
 	vc.png \
-	va.png \
+	ve.png \
 	vi.png \
-	vi_VN.png \
+	vn.png \
 	vu.png \
 	ws.png \
-	ya.png \
+	ye.png \
 	za.png \
-	zh_CN.png \
-	zh_HK.png \
 	zm.png \
 	zw.png
-	
