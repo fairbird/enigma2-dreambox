@@ -103,7 +103,7 @@ dist_install_DATA = \
 	en_US.png \
 	er.png \
 	es_ES.png \
-	es_ga.png \
+	es-ga.png \
 	et.png \
 	et_EE.png \
 	fa_IR.png \
