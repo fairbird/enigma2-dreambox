@@ -1,46 +1,252 @@
 installdir = $(pkgdatadir)/countries
 
 dist_install_DATA = \
+    ar_BH.png \
+    ar_AE.png \
+    bg_BG.png \
+    ca_AD.png \
+    cs_CZ.png \
+    da_DK.png \
+    de_DE.png \
+    el_GR.png \
+    en_AU.png \
+    en_GB.png \
+    en_US.png \
+    es_ES.png \
+    es-ga.png \
+    et_EE.png \
+    fa_IR.png \
+    fi_FI.png \
+    fr_FR.png \
+    fy_NL.png \
+    zh_HK.png \
+    hr_HR.png \
+    hu_HU.png \
+    id_ID.png \
+    is_IS.png \
+    it_IT.png \
+    ku_KU.png \
+    lt_LT.png \
+    lv_LV.png \
+    missing.png \
+    nb_NO.png \
+    nl_NL.png \
+    no_NO.png \
+    pl_PL.png \
+    pt_BR.png \
+    pt_PT.png \
+    ro_RO.png \
+    ru_RU.png \
+    sk_SK.png \
+    sl_SI.png \
+    sr_YU.png \
+    sv_SE.png \
+    th_TH.png \
+    tr_TR.png \
+    uk_UA.png \
+    vi_VN.png \
+    zh_CN.png \
 	ad.png \
 	ae.png \
-	ae2.png \
+	af.png \
+	ag.png \
+	ai.png \
+	al.png \
+	am.png \
+	ao.png \
+	ar.png \
+	at.png \
+	au.png \
+	aw.png \
+	ax.png \
+	az.png \
+	ba.png \
+	bb.png \
+	bd.png \
+	be.png \
+	bf.png \
 	bg.png \
+	bh.png \
+	bi.png \
+	bj.png \
+	bn.png \
+	bo.png \
 	br.png \
+	bs.png \
+	bt.png \
+	bw.png \
+	by.png \
+	bz.png \
+	ca.png \
+	cd.png \
+	cf.png \
+	cg.png \
+	ch.png \
+	ci.png \
+	cl.png \
+	cm.png \
 	cn.png \
+	co.png \
+	cr.png \
+	cu.png \
+	cv.png \
+	cy.png \
 	cz.png \
 	de.png \
+	dj.png \
 	dk.png \
-	en.png \
-	es.png \
+	dm.png \
+	do.png \
+	dz.png \
+	ec.png \
 	ee.png \
+	eg.png \
+	eh.png \
+	er.png \
+	es.png \
+	et.png \
 	fi.png \
+	fj.png \
+	fm.png \
 	fr.png \
-	gl_ES.png \
+	ga.png \
+	gb.png \
+	gd.png \
+	ge.png \
+	gh.png \
+	gm.png \
+	gn.png \
+	gq.png \
 	gr.png \
+	gt.png \
+	gw.png \
+	gy.png \
 	hk.png \
+	hn.png \
 	hr.png \
+	ht.png \
 	hu.png \
 	id.png \
+	ie.png \
+	in.png \
+	iq.png \
 	ir.png \
 	is.png \
 	it.png \
-	ku.png \
+	jm.png \
+	jo.png \
+	jp.png \
+	ke.png \
+	kg.png \
+	kh.png \
+	ki.png \
+	km.png \
+	kn.png \
+	kp.png \
+	kr.png \
+	ks.png \
+	kw.png \
+	kz.png \
+	la.png \
+	lb.png \
+	lc.png \
+	li.png \
+	lk.png \
+	lr.png \
+	ls.png \
 	lt.png \
+	lu.png \
 	lv.png \
-	missing.png \
+	ly.png \
+	ma.png \
+	mc.png \
+	md.png \
+	me.png \
+	mg.png \
+	mh.png \
 	mk.png \
+	ml.png \
+	mm.png \
+	mn.png \
+	mq.png \
+	mr.png \
+	mt.png \
+	mu.png \
+	mv.png \
+	mw.png \
+	mx.png \
+	my.png \
+	mz.png \
+	na.png \
+	ne.png \
+	ng.png \
+	ni.png \
 	nl.png \
 	no.png \
+	np.png \
+	nr.png \
+	nz.png \
+	om.png \
+	pa.png \
+	pe.png \
+	pg.png \
+	ph.png \
+	pk.png \
 	pl.png \
+	pr.png \
 	pt.png \
+	pw.png \
+	py.png \
+	qa.png \
 	ro.png \
+	rs.png \
 	ru.png \
+	rw.png \
+	sa.png \
+	sb.png \
+	sc.png \
+	sd.png \
 	se.png \
+	sg.png \
 	si.png \
 	sk.png \
+	sl.png \
+	sm.png \
+	sn.png \
+	so.png \
+	sr.png \
+	ss.png \
+	st.png \
+	sv.png \
+	sx.png \
+	sy.png \
+	sz.png \
+	td.png \
+	tg.png \
 	th.png \
+	tj.png \
+	tl.png \
+	tm.png \
+	tn.png \
+	to.png \
 	tr.png \
+	tt.png \
+	tv.png \
+	tw.png \
+	tz.png \
 	ua.png \
+	ug.png \
+	us.png \
+	uy.png \
+	uz.png \
+	va.png \
+	vc.png \
+	ve.png \
+	vi.png \
 	vn.png \
-	fy_NL.png \
-	yu.png
+	vu.png \
+	ws.png \
+	ye.png \
+	za.png \
+	zm.png \
+	zw.png

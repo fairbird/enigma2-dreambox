@@ -28,6 +28,7 @@ config.crash.debugMultiBoot = ConfigYesNo(default=False)
 config.crash.debugKeyboards = ConfigYesNo(default=False)
 config.crash.debugRemoteControls = ConfigYesNo(default=False)
 config.crash.debugDVBScan = ConfigYesNo(default=False)
+config.crash.debugInternational = ConfigYesNo(default=False)
 
 # config.plugins needs to be defined before InputDevice < HelpMenu < MessageBox < InfoBar.
 config.plugins = ConfigSubsection()
@@ -57,6 +58,19 @@ from sys import stdout
 
 enigma.eProfileWrite("Bouquets")
 config.misc.load_unlinked_userbouquets = ConfigYesNo(default=True)
+
+
+def localeNotifier(configElement):
+	international.activateLocale(configElement.value)
+
+
+enigma.eProfileWrite("International")
+from Components.International import international
+
+config.misc.locale = ConfigText(default="en_US")
+config.misc.locale.addNotifier(localeNotifier)
+config.misc.language = ConfigText(default=international.getLanguage("en_US"))
+config.misc.country = ConfigText(default=international.getCountry("en_US"))
 
 
 def setLoadUnlinkedUserbouquets(configElement):

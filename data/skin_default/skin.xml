@@ -1791,4 +1791,45 @@ except Exception as e:
 			</convert>
 		</widget>
 	</screen>
+	<!-- LocaleSelection -->
+	<!-- Icons PACK_AVAILABLE, PACK_INSTALLED, PACK_IN_USE -->
+	<screen name="LocaleSelection" position="center,center" size="1000,560" resolution="1280,720">
+		<widget name="icons" position="0,0" size="30,27" pixmaps="icons/menu_download.png,icons/menu_off.png,icons/menu_on.png" alphatest="blend" />
+		<widget source="locales" render="Listbox" position="10,10" size="e-20,442" enableWrapAround="1" scrollbarMode="showOnDemand">
+			<convert type="TemplatedMultiContent">
+				{
+				"template":
+					[
+					MultiContentEntryPixmapAlphaBlend(pos = (5, 2), size = (60, 30), flags = BT_SCALE, png = 0),  # Flag.
+					MultiContentEntryText(pos = (80, 0), size = (400, 34), font = 0, flags = RT_HALIGN_LEFT | RT_VALIGN_CENTER, text = 1),  # Language name (Native).
+					MultiContentEntryText(pos = (490, 0), size = (330, 34), font = 0, flags = RT_HALIGN_LEFT | RT_VALIGN_CENTER, text = 2),  # Language name (English).
+					# MultiContentEntryText(pos = (810, 0), size = (90, 34), font = 0, flags = RT_HALIGN_LEFT | RT_VALIGN_CENTER, text = 3),  # Locale name.
+					MultiContentEntryText(pos = (810, 0), size = (90, 34), font = 0, flags = RT_HALIGN_LEFT | RT_VALIGN_CENTER, text = 4),  # Package name.
+					MultiContentEntryPixmapAlphaBlend(pos = (910, 7), size = (49, 19), flags = BT_SCALE, png = 5)  # Status icon.
+					],
+				"fonts": [parseFont("MultiLingual;25")],
+				"itemHeight": 34
+				}
+			</convert>
+		</widget>
+		<widget source="description" render="Label" position="10,e-85" size="e-20,25" font="Regular;20" valign="center" />
+		<widget source="key_red" render="Label" position="10,e-50" size="140,40" backgroundColor="#009f1313" font="Regular;20" foregroundColor="key_text" halign="center" valign="center">
+			<convert type="ConditionalShowHide" />
+		</widget>
+		<widget source="key_green" render="Label" position="160,e-50" size="140,40" backgroundColor="#001f771f" font="Regular;20" foregroundColor="key_text" halign="center" valign="center">
+			<convert type="ConditionalShowHide" />
+		</widget>
+		<widget source="key_yellow" render="Label" position="310,e-50" size="140,40" backgroundColor="#00a08500" font="Regular;20" foregroundColor="key_text" halign="center" valign="center">
+			<convert type="ConditionalShowHide" />
+		</widget>
+		<widget source="key_menu" render="Label" position="e-450,e-50" size="140,40" backgroundColor="#00313131" font="Regular;20" foregroundColor="key_text" halign="center" valign="center">
+			<convert type="ConditionalShowHide" />
+		</widget>
+		<widget source="key_info" render="Label" position="e-300,e-50" size="140,40" backgroundColor="#00313131" font="Regular;20" foregroundColor="key_text" halign="center" valign="center">
+			<convert type="ConditionalShowHide" />
+		</widget>
+		<widget source="key_help" render="Label" position="e-150,e-50" size="140,40" backgroundColor="#00313131" font="Regular;20" foregroundColor="key_text" halign="center" valign="center">
+			<convert type="ConditionalShowHide" />
+		</widget>
+	</screen>
 </skin>
