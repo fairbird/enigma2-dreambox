@@ -24,7 +24,7 @@ from enigma import eConsoleAppContainer, eTimer, eActionMap
 import os
 
 config.misc.firstrun = ConfigBoolean(default=True)
-config.misc.languageselected = ConfigBoolean(default=True)
+config.misc.wizardLanguageEnabled = ConfigBoolean(default=True)
 config.misc.do_overscanwizard = ConfigBoolean(default=OverscanWizard and config.skin.primary_skin.value == "PLi-FullNightHD/skin.xml")
 
 
@@ -49,6 +49,12 @@ class StartWizard(WizardLanguage, Rc):
 		config.misc.firstrun.value = 0
 		config.misc.firstrun.save()
 		configfile.save()
+
+	def saveWizardChanges(self):
+		config.misc.wizardLanguageEnabled.value = 0
+		config.misc.wizardLanguageEnabled.save()
+		configfile.save()
+		self.close()
 
 
 def setLanguageFromBackup(backupfile):
@@ -202,8 +208,8 @@ if not os.path.isfile("/etc/installed"):
 
 wizardManager.registerWizard(IncorrectBoxInfoWizard, not BoxInfo.getItem("checksum"), priority=0)
 wizardManager.registerWizard(AutoInstallWizard, os.path.isfile("/etc/.doAutoinstall"), priority=0)
-wizardManager.registerWizard(AutoRestoreWizard, config.misc.languageselected.value and config.misc.firstrun.value and checkForAvailableAutoBackup(), priority=0)
-wizardManager.registerWizard(LocaleSelection, config.misc.languageselected.value, priority=10)
+wizardManager.registerWizard(AutoRestoreWizard, config.misc.wizardLanguageEnabled.value and config.misc.firstrun.value and checkForAvailableAutoBackup(), priority=0)
+wizardManager.registerWizard(LocaleSelection, config.misc.wizardLanguageEnabled.value, priority=10)
 wizardManager.registerWizard(TimeWizard, config.misc.firstrun.value, priority=20)
 if OverscanWizard:
 	wizardManager.registerWizard(OverscanWizard, config.misc.do_overscanwizard.value, priority=30)
