@@ -29,15 +29,14 @@ protected:
 	ePtr<eSocketNotifier> rsn;
 	eMainloop *mainloop;
 	virtual void notifier(int);
-	int connect(struct addrinfo *addr);
 public:
-	eSocket(eMainloop *ml);
+	eSocket(eMainloop *ml, int domain = AF_INET);
 	eSocket(int socket, int issocket, eMainloop *ml);
 	virtual ~eSocket();
 	int connectToHost(std::string hostname, int port);
-	int getDescriptor() const { return socketdesc; }
+	int getDescriptor();
 	int writeBlock(const char *data, unsigned int len);
-	int setSocket(int socketfd, int issocket);
+	int setSocket(int socketfd, int issocket, eMainloop *ml);
 	int bytesToWrite();
 	int readBlock(char *data, unsigned int maxlen);
 	int bytesAvailable();
@@ -54,12 +53,12 @@ public:
 			Listening, Connection, Closing };
 	int state();
 
-	sigc::signal<void()> connectionClosed_;
-	sigc::signal<void()> connected_;
-	sigc::signal<void()> readyRead_;
-	sigc::signal<void()> hangup;
-	sigc::signal<void(int)> bytesWritten_;
-	sigc::signal<void(int)> error_;
+	sigc::signal0<void> connectionClosed_;
+	sigc::signal0<void> connected_;
+	sigc::signal0<void> readyRead_;
+	sigc::signal0<void> hangup;
+	sigc::signal1<void,int> bytesWritten_;
+	sigc::signal1<void,int> error_;
 };
 
 class eUnixDomainSocket: public eSocket
