@@ -425,6 +425,7 @@ void eXMLRPCResponse::haveData(void *data, int len)
 
 	if (err)
 	{
+		eDebug("[eXMLRPCResponse] connection error: %d", err);
 		connection->code=400;
 		connection->code_descr="Bad request";
 		char buffer[10];
