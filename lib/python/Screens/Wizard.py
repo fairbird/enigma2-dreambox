@@ -390,7 +390,7 @@ class Wizard(Screen):
 			self.currStep = self.stepHistory[-2]
 			self.stepHistory = self.stepHistory[:-2]
 		else:
-			self.session.openWithCallback(self.exitWizardQuestion, MessageBox, (_("Are you sure you want to exit this wizard?")), windowTitle=self.getTitle())
+			self.session.openWithCallback(self.exitWizardQuestion, MessageBox, (_("Are you sure you want to exit this wizard?")), title=self.getTitle())
 		if self.currStep < 1:
 			self.currStep = 1
 		print("[Wizard] The current step is %d and the current step history is %s." % (self.currStep, self.stepHistory))
