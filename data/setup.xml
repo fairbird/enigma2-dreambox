@@ -344,6 +344,7 @@
 		<item level="2" text="Show crash info on screen and write crash log for x times" description="If 'never', will write crash log despite that for the first crash." requires="config.crash.bsodpython">config.crash.bsodhide</item>
 		<item level="2" text="Restart GUI after x crashes" description="If 'never', will force restart despite that after 100 crashes." requires="config.crash.bsodpython">config.crash.bsodmax</item>
 		<item level="2" text="Enable debug log *" description="Allows you to enable the debug log. They contain very detailed information of everything the system does.">config.crash.enabledebug</item>
+		<item level="2" text="Include international data *" description="Enable this option to add international language and country load information detected during system boot to the debug log file.">config.crash.debugInternational</item>
 		<item level="2" text="Include MultiBoot data *" description="Enable this option to add MultiBoot information detected during system boot to the debug log file.">config.crash.debugMultiBoot</item>
 		<item level="2" text="Include keyboard data" description="Enable this option to add keyboard key map data to the debug log file.">config.crash.debugKeyboards</item>
 		<item level="2" text="Include remote control data" description="Enable this option to add remote control data to the debug log file.">config.crash.debugRemoteControls</item>
@@ -457,6 +458,10 @@
 		<item level="0" requires="Power4x7Standby" text="Switch on the display during Standby Mode" description="With this option you can switch on the display in Standby Mode.">config.lcd.power4x7standby</item>
 		<item level="0" requires="Power4x7Suspend" text="Switch on the display during Suspend Mode" description="With this option you can switch on the display in Deep Standby Mode.">config.lcd.power4x7suspend</item>
 		<item level="0" requires="7segment" text="Show in Standby" description="This option allows you choose how to display the time or nothing in Standby">config.usage.show_in_standby</item>
+	</setup>
+	<setup key="Locale" title="Locale Selection Settings" menuTitle="Locale">
+		<item level="0" text="Locales to be displayed" description="Display the base locales or all locales for a language.">config.locales.packageLocales</item>
+		<item level="0" text="Locale list sort order" description="Sort order for the language list.">config.locales.localesSortBy</item>
 	</setup>
 	<setup key="satconfig" title="Satellite dish setup">
 		<item text="Tuner slot" description="Choose which tuner to configure.">config.sat.tunerslot</item>

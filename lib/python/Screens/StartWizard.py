@@ -2,9 +2,11 @@
 from Screens.Wizard import wizardManager
 from Screens.Screen import Screen
 from Screens.MessageBox import MessageBox
-from Screens.WizardLanguage import WizardLanguage
+# from Screens.WizardLanguage import WizardLanguage
+from Screens.Wizard import wizardManager, Wizard
 from Screens.Time import TimeWizard
 from Screens.HelpMenu import Rc
+from Screens.Standby import TryQuitMainloop, QUIT_RESTART
 from Components.SystemInfo import BoxInfo
 try:
 	from Plugins.SystemPlugins.OSDPositionSetup.overscanwizard import OverscanWizard
@@ -18,23 +20,23 @@ from Components.Label import Label
 from Components.ScrollLabel import ScrollLabel
 from Components.SystemInfo import BoxInfo
 from Components.config import config, ConfigBoolean, configfile
-from Screens.LanguageSelection import LanguageWizard
+from Screens.LocaleSelection import LocaleSelection
 from enigma import eConsoleAppContainer, eTimer, eActionMap
 
 import os
 
 config.misc.firstrun = ConfigBoolean(default=True)
-config.misc.languageselected = ConfigBoolean(default=True)
+config.misc.wizardLanguageEnabled = ConfigBoolean(default=True)
 config.misc.do_overscanwizard = ConfigBoolean(default=OverscanWizard and config.skin.primary_skin.value == "PLi-FullNightHD/skin.xml")
 
 
 MODEL = BoxInfo.getItem("model")
 
 
-class StartWizard(WizardLanguage, Rc):
+class StartWizard(Wizard, Rc):
 	def __init__(self, session, silent=True, showSteps=False, neededTag=None):
 		self.xmlfile = ["startwizard.xml"]
-		WizardLanguage.__init__(self, session, showSteps=False)
+		Wizard.__init__(self, session, showSteps=False)
 		Rc.__init__(self)
 		self["wizard"] = Pixmap()
 
@@ -196,14 +198,38 @@ class IncorrectBoxInfoWizard(MessageBox):
 		MessageBox.close(self)
 
 
+class WizardLanguage(Wizard, Rc):
+	def __init__(self, session, silent=True, showSteps=False, neededTag=None):
+		self.xmlfile = ["wizardlanguage.xml"]
+		Wizard.__init__(self, session, showSteps=False)
+		Rc.__init__(self)
+		self.skinName = ["WizardLanguage", "StartWizard"]
+		self.oldLanguage = config.osd.language.value
+		self["wizard"] = Pixmap()
+		self["HelpWindow"] = Pixmap()
+		self["HelpWindow"].hide()
+		self.setTitle(_("Start Wizard"))
+
+	def saveWizardChanges(self):
+		config.misc.wizardLanguageEnabled.value = 0
+		config.misc.wizardLanguageEnabled.save()
+		configfile.save()
+		if config.osd.language.value != self.oldLanguage:
+			self.session.open(TryQuitMainloop, QUIT_RESTART)
+		self.close()
+
+
 if not os.path.isfile("/etc/installed"):
 	from Components.Console import Console
 	Console().ePopen("opkg list_installed | cut -d ' ' -f 1 > /etc/installed;chmod 444 /etc/installed")
 
+# StartEnigma.py#L528ff - RestoreSettings
+if config.misc.firstrun.value:
+	wizardManager.registerWizard(WizardLanguage, config.misc.wizardLanguageEnabled.value, priority=0)
 wizardManager.registerWizard(IncorrectBoxInfoWizard, not BoxInfo.getItem("checksum"), priority=0)
 wizardManager.registerWizard(AutoInstallWizard, os.path.isfile("/etc/.doAutoinstall"), priority=0)
-wizardManager.registerWizard(AutoRestoreWizard, config.misc.languageselected.value and config.misc.firstrun.value and checkForAvailableAutoBackup(), priority=0)
-wizardManager.registerWizard(LanguageWizard, config.misc.languageselected.value, priority=10)
+wizardManager.registerWizard(AutoRestoreWizard, config.misc.wizardLanguageEnabled.value and config.misc.firstrun.value and checkForAvailableAutoBackup(), priority=0)
+#wizardManager.registerWizard(LocaleSelection, config.misc.wizardLanguageEnabled.value, priority=10)
 wizardManager.registerWizard(TimeWizard, config.misc.firstrun.value, priority=20)
 if OverscanWizard:
 	wizardManager.registerWizard(OverscanWizard, config.misc.do_overscanwizard.value, priority=30)

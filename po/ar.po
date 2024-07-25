@@ -923,6 +923,12 @@ msgstr "أنتيغوا وبربودا"
 msgid "Any activity"
 msgstr "أي نشاط"
 
+msgid "Apply any changes to the active locale/language and exit"
+msgstr "قم بتطبيق أي تغييرات على اللغة النشطة والخروج"
+
+msgid "Apply the currently highlighted locale/language and exit"
+msgstr "قم بتطبيق اللغة المميزة حاليًا والخروج"
+
 msgid "Arabic"
 msgstr "العربية"
 
@@ -1526,6 +1532,12 @@ msgstr "قم بإلغاء أي تغييرات على الجلد النشط حا�
 
 msgid "Cancel any changes to the currently active skin and exit all menus"
 msgstr "قم بإلغاء أي تغييرات على الجلد النشط حاليًا واخرج من جميع القوائم"
+
+msgid "Cancel any changes the active locale/language and exit all menus"
+msgstr "قم بإلغاء أي تغييرات على اللغة النشطة واخرج من جميع القوائم"
+
+msgid "Cancel any changes to the active locale/language and exit"
+msgstr "قم بإلغاء أي تغييرات على اللغة النشطة واخرج"
 
 msgid "Cancel any text changes and exit"
 msgstr "قم بإلغاء أي تغييرات نصية واخرج"
@@ -4672,6 +4684,9 @@ msgstr "الإنتقال إلى الوضع القادم المحدد"
 msgid "Jump to previous marked position"
 msgstr "الرجوع إلى الوضع السابق المحدد"
 
+msgid "Jump to the currently active locale/language"
+msgstr "انتقل إلى اللغة النشطة حاليًا"
+
 #. TRANSLATORS: (aspect ratio policy: scale as close to fullscreen as possible)
 msgid "Just scale"
 msgstr "مقياس مجرد"
@@ -4901,6 +4916,12 @@ msgstr "شبكة إتصال محلية"
 msgid "Locale"
 msgstr "محلي"
 
+msgid "Locale/Language Selection"
+msgstr "إختيار اللغـه"
+
+msgid "Locale/Language Selection Actions"
+msgstr "إختيار اللغـه"
+
 msgid "Location"
 msgstr "مكان"
 
@@ -5005,6 +5026,9 @@ msgstr "مالي"
 
 msgid "Malta"
 msgstr "مالطا"
+
+msgid "Manage Locale/Language Selection settings"
+msgstr "إعدادات المجموعه"
 
 msgid "Manage extensions"
 msgstr "التحكم فى الاضافات"
@@ -6239,6 +6263,15 @@ msgstr "من فضلك أنتظر (جاري تحديث الحزم)"
 msgid "Please wait for activation of your network configuration..."
 msgstr "يرجى الانتظار حتى يتم تنشيط تكوين شبكة الاتصال..."
 
+msgid "Please wait while locale/language is deleted..."
+msgstr "الرجاء الانتظار حتى يتم حذف اللغة..."
+
+msgid "Please wait while locale/language is installed..."
+msgstr "الرجاء الانتظار حتى يتم تثبيت اللغة..."
+
+msgid "Please wait while locales/languages are purged..."
+msgstr "الرجاء الانتظار بينما يتم مسح اللغات..."
+
 msgid "Please wait while scanning..."
 msgstr "من فضلك أنتظر حيث جارى البحث..."
 
@@ -6600,6 +6633,12 @@ msgstr "مزودي القنوات"
 
 msgid "Puerto Rico"
 msgstr "بورتوريكو"
+
+msgid "Purge all but / Add / Delete the currently highlighted locale/language"
+msgstr "إزالة الكل ما عدا / إضافة / حذف اللغة المميزة حاليًا"
+
+msgid "Purge all but the current and permanent locales/languages. Add the current locale/language if it is not installed. Delete the current locale/language if it is installed."
+msgstr "تطهير جميع اللغات باستثناء اللغات الحالية والدائمة. أضف اللغة الحالية إذا لم تكن مثبتة. احذف اللغة الحالية إذا كانت مثبتة."
 
 msgid "Purge deleted user bouquets"
 msgstr "أزاله باقات المستخدم المحذوفة"
@@ -6974,6 +7013,9 @@ msgstr "إعادة التشغيل"
 
 msgid "Restart GUI now?"
 msgstr "هل تريد إعادة تشغيل الاينجما2 الان ؟"
+
+msgid "Restart GUI now to start using the new locale/language?"
+msgstr "هل تريد إعادة تشغيل واجهة المستخدم الرسومية الآن لبدء استخدام اللغة الجديدة؟"
 
 msgid "Restart Sleeptimer"
 msgstr "أعد تشغيل مؤقت النوم"
@@ -7756,6 +7798,9 @@ msgstr ".LCD يحدد الوضع الذي يجب أن يظهر به البث ا�
 
 msgid "Selects video source displayed on the LCD."
 msgstr ".LCD يحدد مصدر الفيديو المعروض على"
+
+msgid "Select the currently highlighted locale/language for the user interface"
+msgstr "حدد اللغة المميزة حاليًا لواجهة المستخدم"
 
 msgid "Send 'sourceactive' before zap timers"
 msgstr "أرسل 'مصدر التفعيل' قبل الإنتقال إلى المؤقتات"
@@ -10136,6 +10181,9 @@ msgstr "إستخدم إعدادات تحسين الفديو هذه؟"
 
 msgid "Use trash can in movielist"
 msgstr "استخدام سلة المهملات في قائمة الأفلام"
+
+msgid "Use the UP and DOWN buttons to select your locale/language then press the OK button to continue."
+msgstr "استخدم الزرين لأعلى ولأسفل لتحديد لغتك ثم اضغط على الزر موافق للمتابعة."
 
 msgid "Used service scan type"
 msgstr "نوع البحث عن القنوات المستخدمة"

@@ -18,6 +18,7 @@ dist_pkgdata_DATA = \
 	setup.xml \
 	skin_subtitles.xml \
 	startwizard.xml \
+	wizardlanguage.xml \
 	dnsservers.xml \
 	unicable.xml \
 	hd-testcard.mvi \

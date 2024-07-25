@@ -61,6 +61,7 @@ dist_install_DATA = \
 	loop.png \
 	menu_off.png \
 	menu_on.png \
+	menu_download.png \
 	marker.png \
 	mp_buttons.png \
 	movie_play.png \
