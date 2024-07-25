@@ -28,7 +28,7 @@ textdomain("enigma2")
 
 class International:
 	LOCALE_TEMPLATE = "enigma2-locale-%s"
-	PERMANENT_LOCALES = ["de_DE", "en_US", "fr_FR"]
+	PERMANENT_LOCALES = [ "en_US", "de_DE","fr_FR"]
 
 	LANG_NAME = 0
 	LANG_TRANSLATED = 1
