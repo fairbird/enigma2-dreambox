@@ -770,7 +770,10 @@ class Wizard(Screen):
 						if self.wizard[self.currStep]["config"]["args"] is None:
 							self.screenInstance = self.session.instantiateDialog(self.wizard[self.currStep]["config"]["screen"])
 						else:
-							self.screenInstance = self.session.instantiateDialog(self.wizard[self.currStep]["config"]["screen"], eval(self.wizard[self.currStep]["config"]["args"]))
+							try:
+								self.screenInstance = self.session.instantiateDialog(self.wizard[self.currStep]["config"]["screen"], eval(self.wizard[self.currStep]["config"]["args"]))
+							except:
+								self.screenInstance = self.session.instantiateDialog(self.wizard[self.currStep]["config"]["screen"], self.wizard[self.currStep]["config"]["args"])
 						self.screenInstance.setAnimationMode(0)
 						self["config"].setList(self.screenInstance["config"].getList())
 						callbacks = self.screenInstance["config"].onSelectionChanged[:]
