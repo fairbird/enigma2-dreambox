@@ -3,18 +3,18 @@ from array import array
 from binascii import hexlify
 from fcntl import ioctl
 from glob import glob
-from locale import format_string
 from os import stat
 from os.path import isfile
 from platform import libc_ver
 from re import search
+from Tools.HardwareInfo import HardwareInfo
+from Components.SystemInfo import BoxInfo
+from sys import maxsize, modules, version_info, version as pyversion
+from Tools.Directories import fileReadLine, fileReadLines
+from subprocess import PIPE, Popen
 from socket import AF_INET, SOCK_DGRAM, inet_ntoa, socket
 from struct import pack, unpack
-from sys import maxsize, modules, version as pyversion
 from time import localtime, strftime
-
-from Components.SystemInfo import BoxInfo
-from Tools.Directories import fileReadLine, fileReadLines
 
 MODULE_NAME = __name__.split(".")[-1]
 
@@ -67,6 +67,8 @@ def getVersionString():
 def getImageVersionString():
 	return str(BoxInfo.getItem("imageversion"))
 
+# WW -placeholder for BC purposes, commented out for the moment in the Screen
+
 
 def getFlashDateString():
 	try:
@@ -115,24 +117,23 @@ def getEnigmaVersionString():
 
 
 def getGStreamerVersionString():
-	from enigma import getGStreamerVersionString
-	return getGStreamerVersionString()
+	try:
+		gst = [x.split("Version: ") for x in open(glob("/var/lib/opkg/info/gstreamer[0-9].[0-9].control")[0], "r") if x.startswith("Version:")][0]
+		return "%s" % gst[1].split("+")[0].split("-")[0].replace("\n", "")
+	except:
+		return _("Not Installed")
 
 
-def getFFmpegVersionString():
-	lines = fileReadLines("/var/lib/opkg/info/ffmpeg.control", source=MODULE_NAME)
-	if lines:
-		for line in lines:
-			if line[0:8] == "Version:":
-				return line[9:].split("+")[0]
-	return _("Not Installed")
+def getffmpegVersionString():
+	try:
+		ffmpeg = [x.split("Version: ") for x in open(glob("/var/lib/opkg/info/ffmpeg.control")[0], "r") if x.startswith("Version:")][0]
+		return "%s" % ffmpeg[1].split("+")[0].replace("\n", "")
+	except:
+		return _("Not Installed")
 
 
 def getKernelVersionString():
-	version = fileReadLine("/proc/version", source=MODULE_NAME)
-	if version is None:
-		return _("Unknown")
-	return version.split(" ", 4)[2].split("-", 2)[0]
+	return BoxInfo.getItem("kernel")
 
 
 def getHardwareTypeString():
@@ -140,9 +141,7 @@ def getHardwareTypeString():
 
 
 def getImageTypeString():
-	if BoxInfo.getItem("imageversion"):
-		return "%s %s %s" % (BoxInfo.getItem("displaydistro"), BoxInfo.getItem("imageversion"), BoxInfo.getItem("imagetype").title())
-	return "%s %s" % (BoxInfo.getItem("displaydistro"), BoxInfo.getItem("imagetype").title())
+	return "%s %s" % (BoxInfo.getItem("displaydistro"), BoxInfo.getItem("imageversion").title())
 
 
 def getOEVersionString():
@@ -158,87 +157,56 @@ def getCPUSerial():
 	return _("Undefined")
 
 
-def _getCPUSpeedMhz():
-	if MODEL in ('hzero', 'h8', 'sfx6008', 'sfx6018'):
-		return 1200
-	elif MODEL in ('dreamone', 'dreamtwo', 'dreamseven'):
-		return 1800
-	elif MODEL in ('vuduo4k',):
-		return 2100
-	else:
-		return 0
-
-
 def getCPUInfoString():
-	cpuCount = 0
-	cpuSpeedStr = "-"
-	cpuSpeedMhz = _getCPUSpeedMhz()
-	processor = ""
-	lines = fileReadLines("/proc/cpuinfo", source=MODULE_NAME)
-	if lines:
-		for line in lines:
-			line = [x.strip() for x in line.strip().split(":", 1)]
+	try:
+		cpu_count = 0
+		cpu_speed = 0
+		processor = ""
+		for line in open("/proc/cpuinfo").readlines():
+			line = [x.strip() for x in line.strip().split(":")]
 			if not processor and line[0] in ("system type", "model name", "Processor"):
 				processor = line[1].split()[0]
-			elif not cpuSpeedMhz and line[0] == "cpu MHz":
-				cpuSpeedMhz = float(line[1])
+			elif not cpu_speed and line[0] == "cpu MHz":
+				cpu_speed = "%1.0f" % float(line[1])
 			elif line[0] == "processor":
-				cpuCount += 1
+				cpu_count += 1
+
 		if processor.startswith("ARM") and isfile("/proc/stb/info/chipset"):
-			processor = "%s (%s)" % (fileReadLine("/proc/stb/info/chipset", "", source=MODULE_NAME).upper(), processor)
-		if not cpuSpeedMhz:
-			cpuSpeed = fileReadLine("/sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_max_freq", source=MODULE_NAME)
-			if cpuSpeed:
-				cpuSpeedMhz = int(cpuSpeed) / 1000
-			else:
+			processor = "%s (%s)" % (open("/proc/stb/info/chipset").readline().strip().upper(), processor)
+
+		if not cpu_speed:
+			try:
+				cpu_speed = int(open("/sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_max_freq").read()) // 1000
+			except:
 				try:
-					cpuSpeedMhz = int(int(hexlify(open("/sys/firmware/devicetree/base/cpus/cpu@0/clock-frequency", "rb").read()), 16) / 100000000) * 100
+					import binascii
+					cpu_speed = int(int(binascii.hexlify(open('/sys/firmware/devicetree/base/cpus/cpu@0/clock-frequency', 'rb').read()), 16) // 100000000) * 100
 				except:
-					cpuSpeedMhz = 1500
+					cpu_speed = "-"
 
 		temperature = None
-		if isfile("/proc/stb/fp/temp_sensor_avs"):
-			temperature = fileReadLine("/proc/stb/fp/temp_sensor_avs", source=MODULE_NAME)
-		elif isfile("/proc/stb/power/avs"):
-			temperature = fileReadLine("/proc/stb/power/avs", source=MODULE_NAME)
-#		elif isfile("/proc/stb/fp/temp_sensor"):
-#			temperature = fileReadLine("/proc/stb/fp/temp_sensor", source=MODULE_NAME)
-#		elif isfile("/proc/stb/sensors/temp0/value"):
-#			temperature = fileReadLine("/proc/stb/sensors/temp0/value", source=MODULE_NAME)
-#		elif isfile("/proc/stb/sensors/temp/value"):
-#			temperature = fileReadLine("/proc/stb/sensors/temp/value", source=MODULE_NAME)
+		freq = _("MHz")
+		if isfile('/proc/stb/fp/temp_sensor_avs'):
+			temperature = open("/proc/stb/fp/temp_sensor_avs").readline().replace('\n', '')
+		elif isfile('/proc/stb/power/avs'):
+			temperature = open("/proc/stb/power/avs").readline().replace('\n', '')
+		elif isfile('/proc/stb/fp/temp_sensor'):
+			temperature = open("/proc/stb/fp/temp_sensor").readline().replace('\n', '')
 		elif isfile("/sys/devices/virtual/thermal/thermal_zone0/temp"):
-			temperature = fileReadLine("/sys/devices/virtual/thermal/thermal_zone0/temp", source=MODULE_NAME)
-			if temperature:
-				temperature = int(temperature) / 1000
-		elif isfile("/sys/class/thermal/thermal_zone0/temp"):
-			temperature = fileReadLine("/sys/class/thermal/thermal_zone0/temp", source=MODULE_NAME)
-			if temperature:
-				temperature = int(temperature) / 1000
+			try:
+				temperature = int(open("/sys/devices/virtual/thermal/thermal_zone0/temp").read().strip()) // 1000
+			except:
+				pass
 		elif isfile("/proc/hisi/msp/pm_cpu"):
-			lines = fileReadLines("/proc/hisi/msp/pm_cpu", source=MODULE_NAME)
-			if lines:
-				for line in lines:
-					if "temperature = " in line:
-						temperature = int(line.split("temperature = ")[1].split()[0])
-
-		if cpuSpeedMhz and cpuSpeedMhz >= 1000:
-			cpuSpeedStr = _("%s GHz") % format_string("%.1f", cpuSpeedMhz / 1000)
-		else:
-			cpuSpeedStr = _("%d MHz") % int(cpuSpeedMhz)
-
+			try:
+				temperature = search('temperature = (\d+) degree', open("/proc/hisi/msp/pm_cpu").read()).group(1)
+			except:
+				pass
 		if temperature:
-			degree = "\u00B0"
-			if not isinstance(degree, str):
-				degree = degree.encode("UTF-8", errors="ignore")
-			if isinstance(temperature, float):
-				temperature = format_string("%.1f", temperature)
-			else:
-				temperature = str(temperature)
-			return (processor, cpuSpeedStr, ngettext("%d core", "%d cores", cpuCount) % cpuCount, "%s%s C" % (temperature, degree))
-			#return ("%s %s MHz (%s) %s%sC") % (processor, cpuSpeed, ngettext("%d core", "%d cores", cpuCount) % cpuCount, temperature, degree)
-		return (processor, cpuSpeedStr, ngettext("%d core", "%d cores", cpuCount) % cpuCount, "")
-		#return ("%s %s MHz (%s)") % (processor, cpuSpeed, ngettext("%d core", "%d cores", cpuCount) % cpuCount)
+			return "%s %s %s (%s) %s\xb0C" % (processor, cpu_speed, freq, ngettext("%d core", "%d cores", cpu_count) % cpu_count, temperature)
+		return "%s %s %s (%s)" % (processor, cpu_speed, freq, ngettext("%d core", "%d cores", cpu_count) % cpu_count)
+	except:
+		return _("undefined")
 
 
 def getSystemTemperature():
@@ -300,14 +268,6 @@ def getDVBAPI():
 		return _("New")
 
 
-def getFlashType():
-	if BoxInfo.getItem("SmallFlash"):
-		return _("Small - Tiny image")
-	elif BoxInfo.getItem("MiddleFlash"):
-		return _("Middle - Lite image")
-	return _("Normal - Standard image")
-
-
 def getDriverInstalledDate():
 
 	def extractDate(value):
@@ -338,6 +298,21 @@ def getDriverInstalledDate():
 			for line in lines:
 				if line[0:8] == "Version:":
 					return extractDate(line)
+	return _("Unknown")
+
+
+def getPythonVersionString():
+	return "%s.%s.%s" % (version_info.major, version_info.minor, version_info.micro)
+
+
+def getOpenSSLVersion():
+	process = Popen(("/usr/bin/openssl", "version"), stdout=PIPE, stderr=PIPE, universal_newlines=True)
+	stdout, stderr = process.communicate()
+	if process.returncode == 0:
+		data = stdout.strip().split()
+		if len(data) > 1 and data[0] == "OpenSSL":
+			return data[1]
+	print("[About] Get OpenSSL version failed.")
 	return _("Unknown")
 
 
@@ -394,22 +369,6 @@ def getGccVersion():
 	except:
 		print("[About] Get gcc version failed.")
 	return _("Unknown")
-
-
-def getPythonVersionString():
-	try:
-		return pyversion.split(' ')[0]
-	except:
-		return _("Unknown")
-
-
-def getopensslVersionString():
-	lines = fileReadLines("/var/lib/opkg/info/openssl.control", source=MODULE_NAME)
-	if lines:
-		for line in lines:
-			if line[0:8] == "Version:":
-				return line[9:].split("+")[0]
-	return _("Not Installed")
 
 
 # For modules that do "from About import about"
