@@ -112,8 +112,42 @@ class ImportChannels:
 		return result
 
 	def threaded_function(self):
-		self.getTerrestrialRegion()
 		self.tmp_dir = mkdtemp(prefix="ImportChannels_")
+
+		if "channels" in self.remote_fallback_import:
+			print("[Import Channels] Enumerate remote files")
+			files = self.ImportGetFilelist(True, 'bouquets.tv', 'bouquets.radio')
+
+			print("[Import Channels] Enumerate remote support files")
+			for file in loads(self.getUrl(f"{self.url}/file?dir={self.e2path}"))["files"]:
+				if os.path.basename(file).startswith(supportfiles):
+					files.append(file.replace(self.e2path, ''))
+
+			print("[Import Channels] Fetch remote files")
+			for file in files:
+#				print("[Import Channels] Downloading %s..." % file)
+				try:
+					open(os.path.join(self.tmp_dir, os.path.basename(file)), "wb").write(self.getUrl("{self.url}/file?file={self.e2path}/{quote(file)}"))
+				except Exception as e:
+					print("[Import Channels] Exception: {str(e}")
+
+			print("[Import Channels] Enumerate local files")
+			files = self.ImportGetFilelist(False, 'bouquets.tv', 'bouquets.radio')
+
+			print("[Import Channels] Removing old local files...")
+			for file in files:
+#				print("- Removing %s..." % file)
+				try:
+					os.remove(os.path.join(self.e2path, file))
+				except OSError:
+					print("[Import Channels] File {file} did not exist")
+
+			print("[Import Channels] Updating files...")
+			files = [x for x in os.listdir(self.tmp_dir)]
+			for file in files:
+#				print("- Moving %s..." % file)
+				shutil.move(os.path.join(self.tmp_dir, file), os.path.join(self.e2path, file))
+
 		if "epg" in self.remote_fallback_import:
 			print("[Import Channels] Writing epg.dat file on server box")
 			try:
@@ -157,42 +191,7 @@ class ImportChannels:
 			else:
 				self.ImportChannelsDone(False, _("No epg.dat file found on the fallback receiver"))
 
-		if "channels" in self.remote_fallback_import:
-			print("[Import Channels] enumerate remote files")
-			files = self.ImportGetFilelist(True, "bouquets.tv", "bouquets.radio")
-
-			print("[Import Channels] Enumerate remote support files")
-			supportfiles = ('lamedb', 'bouquets.', 'userbouquet.', 'blacklist', 'whitelist', 'alternatives.')
-
-			for file in loads(self.getUrl(f"{self.url}/file?dir={self.e2path}"))["files"]:
-				if basename(file).startswith(supportfiles):
-					files.append(file.replace(self.e2path, ""))
-
-			print("[Import Channels] fetch remote files")
-			for file in files:
-				print(f"[Import Channels] Downloading {file}...")
-				try:
-					open(join(self.tmp_dir, basename(file)), "wb").write(self.getUrl(f"{self.url}/file?file={self.e2path}/{quote(file)}"))
-				except Exception as e:
-					print(f"[Import Channels] Exception: {str(e)}")
-
-			print("[Import Channels] enumerate local files")
-			files = self.ImportGetFilelist(False, "bouquets.tv", "bouquets.radio")
-
-			print("[Import Channels] Removing old local files...")
-			for file in files:
-#				print("[Import Channels] Removing %s..." % file)
-				try:
-					remove(join(self.e2path, file))
-				except OSError:
-					print(f"[Import Channels] File {file} did not exist")
-
-			print("[Import Channels] copying files...")
-			files = [x for x in listdir(self.tmp_dir)]
-			for file in files:
-				print(f"[Import Channels] Moving {file}...")
-				move(join(self.tmp_dir, file), join(self.e2path, file))
-
+		self.getTerrestrialRegion()
 		self.ImportChannelsDone(True, {"channels": _("Channels"), "epg": _("EPG"), "channels_epg": _("Channels and EPG")}[self.remote_fallback_import])
 
 	def ImportChannelsDone(self, flag, message=None):
