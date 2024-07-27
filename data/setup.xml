@@ -56,7 +56,7 @@
 		<item level="0" text="Include CI assignment" description="Set CI assignment for detection of available services." >config.misc.use_ci_assignment</item>
 		<item level="1" text="Enable multiple bouquets" description="When enabled, services may be grouped in multiple bouquets.">config.usage.multibouquet</item>
 		<item level="1" text="Multi-EPG bouquet selection" description="Enable bouquet selection in multi-EPG">config.usage.multiepg_ask_bouquet</item>
-		<item level="0" text="Alternative numbering mode" description="When enabled, channel numbering will start at '1' for each bouquet.">config.usage.alternative_number_mode</item>
+		<item level="0" text="Numbering mode" description="Select 'Unique numbering' to assign unique numbers for every service in every bouquet. Use 'Bouquets start at 1' to start numbering each bouquet from 1. Use 'LCN numbering' to use consistent service LCNs where ever that service is used.">config.usage.numberMode</item>
 		<item level="2" text="Hide number markers" conditional="config.usage.show_channel_numbers_in_servicelist.value" description="When enabled, number markers will be hidden.">config.usage.hide_number_markers</item>
 		<if conditional="config.channelSelection.screenStyle.value == ''">
 			<item level="2" text="Show channel numbers in channel selection" description="When enabled, show channel numbers in the channel selection screen.">config.usage.show_channel_numbers_in_servicelist</item>
@@ -473,7 +473,7 @@
 	</setup>
 	<setup key="wizardsetup" title="Wizard setup">
 		<item level="0" text="Setup mode" description="Configure which access level to use for the configuration menu. Expert level gives access to all items.">config.usage.setup_level</item>
-		<item level="0" text="Alternative numbering mode" description="When enabled, channel numbering will start at '1' for each bouquet.">config.usage.alternative_number_mode</item>
+		<item level="0" text="Numbering mode" description="Select 'Unique numbering' to assign unique numbers for every service in every bouquet. Use 'Bouquets start at 1' to start numbering each bouquet from 1. Use 'LCN numbering' to use consistent service LCNs where ever that service is used.">config.usage.numberMode</item>
 		<item level="0" text="Show picons in channel selection list" description="Configure if service picons will be shown in the channel selection list.">config.usage.service_icon_enable</item>
 		<item level="0" text="Enable HDMI-CEC" description="When enabled, HDMI-CEC is enabled with standard configuration" requires="HasHDMI-CEC">config.hdmicec.enabled</item>
 	</setup>
