@@ -33,6 +33,7 @@ class ImportChannels:
 					self.header = "Basic %s" % encodebytes(("%s:%s" % (config.usage.remote_fallback_openwebif_userid.value, config.usage.remote_fallback_openwebif_password.value)).encode("UTF-8")).strip().decode()
 			self.remote_fallback_import = config.usage.remote_fallback_import.value
 			self.thread = Thread(target=self.threaded_function, name="ChannelsImport")
+			self.settings = {}
 			self.thread.start()
 
 	def getUrl(self, url, timeout=5):
@@ -51,13 +52,13 @@ class ImportChannels:
 					return {}
 
 	def getFallbackSettingsValue(self, url, e2settingname):
-		result = self.getUrl(f"{url}/api/settings")
-		if result:
-			result = loads(result.decode("utf-8"))
-			if result.get("result"):
-				for key, value in result['settings']:
-					if key.endswith(e2settingname): #use the config key when the endp art but also the whole part matches
-						return value
+		if url not in self.settings:
+			result = self.getUrl(f"{url}/api/settings")
+			if result:
+				self.settings['url'] = loads(result.decode('utf-8'))
+		if 'url' in self.settings and 'result' in self.settings['url'] and self.settings['url']['result'] == True:
+				for key, value in self.settings['url']['settings']:
+					if key.endswith(e2settingname): #use the config key when the endpart but also the whole part matches
 		return ""
 
 	def getTerrestrialUrl(self):
@@ -125,11 +126,11 @@ class ImportChannels:
 
 			print("[Import Channels] Fetch remote files")
 			for file in files:
-#				print("[Import Channels] Downloading %s..." % file)
+#				print(f"[Import Channels] Downloading {file}...")
 				try:
-					open(os.path.join(self.tmp_dir, os.path.basename(file)), "wb").write(self.getUrl("{self.url}/file?file={self.e2path}/{quote(file)}"))
+					open(os.path.join(self.tmp_dir, os.path.basename(file)), "wb").write(self.getUrl(f"{self.url}/file?file={self.e2path}/{quote(file)}"))
 				except Exception as e:
-					print("[Import Channels] Exception: {str(e}")
+					print(f"[Import Channels] Exception: {str(e}")
 
 			print("[Import Channels] Enumerate local files")
 			files = self.ImportGetFilelist(False, 'bouquets.tv', 'bouquets.radio')
@@ -140,7 +141,7 @@ class ImportChannels:
 				try:
 					os.remove(os.path.join(self.e2path, file))
 				except OSError:
-					print("[Import Channels] File {file} did not exist")
+					print(f"[Import Channels] File {file} did not exist")
 
 			print("[Import Channels] Updating files...")
 			files = [x for x in os.listdir(self.tmp_dir)]
