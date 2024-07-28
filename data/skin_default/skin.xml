@@ -1486,7 +1486,7 @@ except Exception as e:
 
 		<widget name="rotorstatus" position="120,300" size="400,21" font="Regular;20" foregroundColor="#00ffc000" horizontalAlignment="center" verticalAlignment="center"/>
 		<ePixmap pixmap="div-h.png" position="0,450" zPosition="1" size="660,2"/>
-		<widget name="status_bar" position="90,460" size="520,21" horizontalAlignment="center" verticalAlignment="left" font="Regular;20" foregroundColor="white"/>
+		<widget name="status_bar" position="90,460" size="520,21" horizontalAlignment="center" verticalAlignment="center" font="Regular;20" foregroundColor="white"/>
 		<ePixmap alphaTest="on" pixmap="buttons/key_info.png" position="0,455" size="40,30" zPosition="1"/>
 		<ePixmap alphaTest="on" pixmap="buttons/key_menu.png" position="45,455" size="40,30" zPosition="1"/>
 		<ePixmap alphaTest="on" pixmap="icons/clock.png" position="585,460" size="14,14" zPosition="1"/>
