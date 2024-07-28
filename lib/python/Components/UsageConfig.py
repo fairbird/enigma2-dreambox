@@ -1259,7 +1259,7 @@ def InitUsageConfig():
 		else:
 			StackTracePrinter.getInstance().deactivate()
 
-	config.crash.pystackonspinner = ConfigYesNo(default=True)
+	config.crash.pystackonspinner = ConfigYesNo(default=False)
 	config.crash.pystackonspinner.addNotifier(updateStackTracePrinter, immediate_feedback=False, initial_call=True)
 
 	config.seek = ConfigSubsection()
