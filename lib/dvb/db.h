@@ -59,6 +59,7 @@ class eDVBDB: public iDVBChannelList
 	std::map<std::string, eBouquet> m_bouquets;
 
 	bool m_numbering_mode, m_load_unlinked_userbouquets;
+	int m_max_number;
 #ifdef SWIG
 	eDVBDB();
 	~eDVBDB();
@@ -121,6 +122,7 @@ public:
 	void reloadBouquets();
 	bool isValidService(int tsid, int onid, int sid);
 	void parseServiceData(ePtr<eDVBService> s, std::string str);
+	int getMaxNumber() const { return m_max_number; }
 };
 
 #ifndef SWIG
