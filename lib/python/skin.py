@@ -2112,7 +2112,10 @@ def readSkin(screen, skin, names, desktop):
 			try:  # Get corresponding "gui" object.
 				attributes = screen[widgetName].skinAttributes = []
 			except Exception:
-				raise SkinError(f"Component with name '{widgetName}' was not found in skin of screen '{myName}'")
+				if config.crash.debugScreens.value:
+					raise SkinError(f"Component with name '{widgetName}' was not found in skin of screen '{myName}'")
+				else:
+					pass
 			# assert screen[widgetName] is not Source
 			collectAttributes(attributes, widget, context, skinPath, ignore=("name",))
 		elif widgetSource:
