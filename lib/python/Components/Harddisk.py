@@ -638,6 +638,7 @@ class HarddiskManager:
 		self.devices_scanned_on_init = []
 		self.on_partition_list_change = CList()
 		self.enumerateBlockDevices()
+		self.enumerateNetworkMounts()
 		# Find stuff not detected by the enumeration
 		p = (
 			("/media/hdd", _("Hard disk")),
@@ -720,6 +721,27 @@ class HarddiskManager:
 				for part in partitions:
 					self.addHotplugPartition(part)
 				self.devices_scanned_on_init.append((blockdev, removable, is_cdrom, medium_found))
+
+	def enumerateNetworkMounts(self, refresh=False):
+		print("[Harddisk] Enumerating network mounts...")
+		for mount in ("net", "autofs"):
+			netMounts = (os.path.exists(os.path.join("/media", mount)) and os.listdir(os.path.join("/media", mount))) or []
+			for netMount in netMounts:
+				path = os.path.join("/media", mount, netMount, "")
+				if os.path.ismount(path):
+					partition = Partition(mountpoint=path, description=netMount)
+					if str(partition) not in [str(x) for x in self.partitions]:
+						print(f"[Harddisk] New network mount {mount}->{path}.")
+						if refresh:
+							self.addMountedPartition(device=path, desc=netMount)
+						else:
+							self.partitions.append(partition)
+		if os.path.ismount("/media/hdd") and "/media/hdd/" not in [x.mountpoint for x in self.partitions]:
+			print("[Harddisk] New network mount being used as HDD replacement -> '/media/hdd/'.")
+			if refresh:
+				self.addMountedPartition(device="/media/hdd/", desc="/media/hdd/")
+			else:
+				self.partitions.append(Partition(mountpoint="/media/hdd/", description="/media/hdd"))
 
 	def getAutofsMountpoint(self, device):
 		r = self.getMountpoint(device)
