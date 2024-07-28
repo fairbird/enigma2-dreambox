@@ -1463,7 +1463,7 @@ service_types_radio = '1:7:2:0:0:0:0:0:0:0:(type == 2) || (type == 10)'
 
 
 class ChannelSelectionBase(Screen):
-	def __init__(self, session):
+	def __init__(self, session, forceLegacy=False):
 		Screen.__init__(self, session)
 		self["key_red"] = Button(_("All"))
 		self["key_green"] = Button(_("Satellites"))
@@ -1473,7 +1473,7 @@ class ChannelSelectionBase(Screen):
 		self["key_menu"] = StaticText(_("MENU"))
 		self["key_info"] = StaticText(_("INFO"))
 
-		self["list"] = ServiceListLegacy(self) if config.channelSelection.screenStyle.value == "" or config.channelSelection.widgetStyle.value == "" else ServiceList(self)
+		self["list"] = ServiceListLegacy(self) if config.channelSelection.screenStyle.value == "" or config.channelSelection.widgetStyle.value == "" or forceLegacy else ServiceList(self)
 		self.servicelist = self["list"]
 
 		self.numericalTextInput = NumericalTextInput(handleTimeout=False)
@@ -2053,9 +2053,9 @@ config.servicelist.startupmode = ConfigText(default="tv")
 
 class ChannelSelection(ChannelSelectionBase, ChannelSelectionEdit, ChannelSelectionEPG, SelectionEventInfo):
 
-	def __init__(self, session):
-		ChannelSelectionBase.__init__(self, session)
-		if config.channelSelection.screenStyle.value:
+	def __init__(self, session, forceLegacy=False):
+		ChannelSelectionBase.__init__(self, session, forceLegacy)
+		if config.channelSelection.screenStyle.value and not forceLegacy:
 			self.skinName = [config.channelSelection.screenStyle.value]
 		ChannelSelectionEdit.__init__(self)
 		ChannelSelectionEPG.__init__(self)
@@ -2633,7 +2633,7 @@ class RadioInfoBar(Screen):
 class ChannelSelectionRadio(ChannelSelectionBase, ChannelSelectionEdit, ChannelSelectionEPG, InfoBarBase, SelectionEventInfo, InfoBarScreenSaver):
 
 	def __init__(self, session, infobar):
-		ChannelSelectionBase.__init__(self, session)
+		ChannelSelectionBase.__init__(self, session, forceLegacy=True)
 		ChannelSelectionEdit.__init__(self)
 		ChannelSelectionEPG.__init__(self)
 		InfoBarBase.__init__(self)
