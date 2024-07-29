@@ -1570,10 +1570,6 @@ class ChannelSelectionBase(Screen):
 		self.servicetitle = ""
 		self.functiontitle = ""
 		self.recallBouquetMode()
-		self.onLayoutFinish.append(self.layoutFinished)
-
-	def layoutFinished(self):
-		self.servicelist.instance.enableAutoNavigation(False)  # Override list box navigation.
 
 	def compileTitle(self):
 		self.setTitle("%s%s%s%s" % (self.maintitle, self.modetitle, self.functiontitle, self.servicetitle))
