@@ -61,6 +61,14 @@ class CurrentService(PerServiceBase, Source):
 
 		self.changed((self.CHANGED_SPECIFIC, iPlayableService.evStart))
 
+	@cached
+	def getCurrentBouquetName(self):
+		if NavigationInstance.instance is not None:
+			return NavigationInstance.instance.currentBouquetName
+		return ""
+
+	currentBouquetName = property(getCurrentBouquetName)
+
 	def destroy(self):
 		PerServiceBase.destroy(self)
 		Source.destroy(self)

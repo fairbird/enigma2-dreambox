@@ -36,6 +36,7 @@ class Navigation:
 		self.pnav.m_record_event.get().append(self.dispatchRecordEvent)
 		self.event = []
 		self.record_event = []
+		self.currentBouquetName = ""
 		self.firstStart = True
 		self.currentlyPlayingServiceReference = None
 		self.currentlyPlayingServiceOrGroup = None
