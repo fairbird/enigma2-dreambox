@@ -66,7 +66,7 @@ class MultiBootManager(Screen):
 		self["key_green"] = StaticText(_("Reboot"))
 		self["key_yellow"] = StaticText()
 		self["key_blue"] = StaticText()
-		self["actions"] = HelpableActionMap(self, ["CancelActions", "NavigationActions2"], {
+		self["actions"] = HelpableActionMap(self, ["CancelActions", "NavigationActions"], {
 			"cancel": (self.cancel, _("Cancel the slot selection and exit")),
 			"close": (self.closeRecursive, _("Cancel the slot selection and exit all menus")),
 			"top": (self.keyTop, _("Move to first line / screen")),
