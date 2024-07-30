@@ -40,19 +40,6 @@ from Tools.LoadPixmap import LoadPixmap
 MODULE_NAME = __name__.split(".")[-1]
 BASE_GROUP = "packagegroup-base"
 
-macaddress = str(dict(netifaces.ifaddresses("eth0")[netifaces.AF_LINK][0])["addr"].upper())
-config.macaddress = ConfigSubsection()
-config.macaddress.interfaces = ConfigSelection(default="1", choices=[("1", "eth0")])
-config.macaddress.mac = ConfigText(default="", fixed_size=False)
-config.macaddress.change = ConfigText(default="%s" % macaddress)
-configmac = config.macaddress
-
-def getmac(iface):
-	eth = about.getIfConfig(iface)
-	return eth["hwaddr"]
-
-curMac = getmac("eth0")
-getConfigMac = NoSave(ConfigMacText(default=curMac))
 
 class NetworkAdapterSelection(Screen):
 	def __init__(self, session):
@@ -400,12 +387,12 @@ class NameserverSetup(DNSSettings):
 		DNSSettings.__init__(self, session=session)
 
 
-class NetworkMacSetup(Setup):
+class NetworkMacSetup(ConfigListScreen, Screen):
 	def __init__(self, session):
-		Setup.__init__(self, session)
+		Screen.__init__(self, session, enableHelp=True)
 		self.setTitle(_("MAC Address Settings"))
-		self.skinName = ["NetworkMacSetup", "Setup"]
-		
+		self.curMac = self.getmac("eth0")
+		self.getConfigMac = NoSave(ConfigMacText(default=self.curMac))
 		self["key_red"] = StaticText(_("Cancel"))
 		self["key_green"] = StaticText(_("Save"))
 		self["introduction"] = StaticText(_("Press OK to set the MAC address."))
@@ -419,14 +406,17 @@ class NetworkMacSetup(Setup):
 		ConfigListScreen.__init__(self, self.list)
 		self.createSetup()
 
+	def getmac(self, iface):
+		eth = about.getIfConfig(iface)
+		return eth["hwaddr"]
+
 	def createSetup(self):
 		self.list = []
-		self.list.append(getConfigListEntry(_("MAC-address"), getConfigMac))
+		self.list.append(getConfigListEntry(_("MAC-address"), self.getConfigMac))
 		self["config"].list = self.list
 
 	def ok(self):
-		MAC = getConfigMac.value
-		print(f"MAC: *********************** {MAC}")
+		MAC = self.getConfigMac.value
 		f = open("/etc/enigma2/hwmac", "w")
 		f.write(MAC)
 		f.close()
