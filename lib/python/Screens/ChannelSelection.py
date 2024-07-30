@@ -1550,12 +1550,12 @@ class ChannelSelectionBase(Screen):
 				"0": self.keyNumber0
 			}, -2)
 		self["legacyNavigationActions"] = HelpableActionMap(self, ["NavigationActions", "PreviousNextActions"], {
-			"pageUp": (self.prevBouquet, _("Move to previous bouquet")),
+			"pageUp": (self.nextBouquet, _("Move to next bouquet")),
 			"previous": (self.prevMarker, _("Move to previous marker")),
 			"left": (self.servicelist.goLeft, _("Move up a screen / Move to previous item")),
 			"right": (self.servicelist.goRight, _("Move down a screen / Move to next item")),
 			"next": (self.nextMarker, _("Move to next marker")),
-			"pageDown": (self.nextBouquet, _("Move to next bouquet"))
+			"pageDown": (self.prevBouquet, _("Move to previous bouquet"))
 		}, prio=0, description=_("Channel Selection Navigation Actions"))
 		self["newNavigationActions"] = HelpableActionMap(self, ["NavigationActions"], {
 			"pageUp": (self.servicelist.goPageUp, _("Move up a screen")),
