@@ -391,7 +391,7 @@ class NetworkMacSetup(ConfigListScreen, Screen):
 	def __init__(self, session):
 		Screen.__init__(self, session, enableHelp=True)
 		self.setTitle(_("MAC Address Settings"))
-		self.curMac = self.getmac("eth0")
+		self.curMac = self.getmac()
 		self.getConfigMac = NoSave(ConfigMacText(default=self.curMac))
 		self["key_red"] = StaticText(_("Cancel"))
 		self["key_green"] = StaticText(_("Save"))
@@ -406,9 +406,9 @@ class NetworkMacSetup(ConfigListScreen, Screen):
 		ConfigListScreen.__init__(self, self.list)
 		self.createSetup()
 
-	def getmac(self, iface):
-		eth = about.getIfConfig(iface)
-		return eth["hwaddr"]
+	def getmac(self):
+		macaddress = str(dict(netifaces.ifaddresses("eth0")[netifaces.AF_LINK][0])["addr"].upper())
+		return macaddress
 
 	def createSetup(self):
 		self.list = []
