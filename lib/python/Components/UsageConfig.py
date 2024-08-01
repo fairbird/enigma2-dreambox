@@ -1457,6 +1457,7 @@ def InitUsageConfig():
 		config.av.sync_mode.addNotifier(setSyncMode)
 
 	config.subtitles = ConfigSubsection()
+	config.subtitles.show = ConfigYesNo(default=True)
 
 	def setTTXSubtitleColors(configElement):
 		eSubtitleSettings.setTTXSubtitleColors(configElement.value)
@@ -1467,6 +1468,26 @@ def InitUsageConfig():
 		(2, _("Yellow"))
  	])
 	config.subtitles.ttx_subtitle_colors.addNotifier(setTTXSubtitleColors)
+	config.subtitles.ttx_subtitle_position = ConfigSelection(default="50", choices=[
+		"0",
+		"10",
+		"20",
+		"30",
+		"40",
+		"50",
+		"60",
+		"70",
+		"80",
+		"90",
+		"100",
+		"150",
+		"200",
+		"250",
+		"300",
+		"350",
+		"400",
+		"450"
+	])
 
 	def setTTXSubtitleOriginalPosition(configElement):
 		eSubtitleSettings.setTTXSubtitleOriginalPosition(configElement.value)
