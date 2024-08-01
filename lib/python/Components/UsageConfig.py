@@ -1459,6 +1459,8 @@ def InitUsageConfig():
 
 	config.subtitles = ConfigSubsection()
 
+	config.subtitles.show = ConfigYesNo(default=True)
+
 	def setTTXSubtitleColors(configElement):
 		eSubtitleSettings.setTTXSubtitleColors(configElement.value)
 

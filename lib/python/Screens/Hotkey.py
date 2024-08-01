@@ -192,6 +192,7 @@ def getHotkeyFunctions():
 	hotkey.functions.append((_("Stop timeshift"), "Infobar/stopTimeshift", "InfoBar"))
 	hotkey.functions.append((_("Start teletext"), "Infobar/startTeletext", "InfoBar"))
 	hotkey.functions.append((_("Show subservice selection"), "Infobar/subserviceSelection", "InfoBar"))
+	hotkey.functions.append((_("Show subtitle quick menu"), "Infobar/subtitleQuickMenu", "InfoBar"))
 	hotkey.functions.append((_("Show subtitle selection"), "Infobar/subtitleSelection", "InfoBar"))
 	hotkey.functions.append((_("Show InfoBar"), "Infobar/showFirstInfoBar", "InfoBar"))
 	hotkey.functions.append((_("Show second InfoBar"), "Infobar/showSecondInfoBar", "InfoBar"))
