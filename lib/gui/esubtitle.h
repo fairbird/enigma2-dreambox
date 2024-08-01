@@ -48,6 +48,7 @@ public:
 	void setPage(const eDVBTeletextSubtitlePage &p);
 	void setPage(const eDVBSubtitlePage &p);
 	void setPage(const ePangoSubtitlePage &p);
+	void setPage(const eVobSubtitlePage &p);
 	void clearPage();
 	void setPixmap(ePtr<gPixmap> &pixmap, gRegion changed, eRect dest = eRect(0, 0, 720, 576));
 	void destroy() { delete this; }
@@ -56,7 +57,8 @@ public:
 	{
 		Subtitle_TTX,
 		Subtitle_Regular,
-		Subtitle_Bold, Subtitle_Italic,
+		Subtitle_Bold,
+		Subtitle_Italic,
 		Subtitle_MAX
 	} subfont_t;
 	struct eSubtitleStyle
@@ -73,6 +75,7 @@ public:
 protected:
 	int event(int event, void *data = 0, void *data2 = 0);
 	void removeHearingImpaired(std::string &str);
+
 private:
 	int m_page_ok;
 	eDVBTeletextSubtitlePage m_page;

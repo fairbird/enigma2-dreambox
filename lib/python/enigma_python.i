@@ -120,6 +120,7 @@ is usually caused by not marking PSignals as immutable.
 #include <lib/dvb/fcc.h>
 #include <lib/gdi/accel.h>
 #include <include/hardwaredb.h>
+#include <lib/base/esettings.h>
 %}
 
 %feature("ref")   iObject "$this->AddRef(); /* eDebug(\"AddRef (%s:%d)!\", __FILE__, __LINE__); */ "
@@ -275,6 +276,7 @@ typedef long time_t;
 %include <lib/dvb/fcc.h>
 %include <lib/dvb/streamserver.h>
 %include <lib/gdi/accel.h>
+%include <lib/base/esettings.h>
 
 /**************  eptr  **************/
 
