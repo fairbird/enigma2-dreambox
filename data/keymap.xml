@@ -458,10 +458,12 @@
 		<key id="KEY_PVR" mapto="showMovies" flags="b" />
 	</map>
 
-	<map context="InfobarAudioSelectionActions">
-		<key id="KEY_AUDIO" mapto="audioSelection" flags="m" />
-		<key id="KEY_YELLOW" mapto="audioSelection" flags="b" />
+	<map context="InfobarAudioSelectionActions">		
+		<key id="KEY_YELLOW" mapto="yellow_key" flags="b" />
+		<key id="KEY_YELLOW" mapto="yellow_key" flags="l" />
+		<key id="KEY_AUDIO" mapto="audioSelection" flags="b" />
 		<key id="KEY_AUDIO" mapto="audioSelectionLong" flags="l" />
+		<key id="KEY_OPTION" mapto="audioSelection" flags="b" />
 	</map>
 
 	<map context="InfobarAspectSelectionActions">
@@ -784,10 +786,10 @@
 	</map>
 
 	<map context="DirectionActions">
-		<key id="KEY_UP" mapto="up" flags="m" />
-		<key id="KEY_DOWN" mapto="down" flags="m" />
-		<key id="KEY_LEFT" mapto="left" flags="m" />
-		<key id="KEY_RIGHT" mapto="right" flags="m" />
+		<key id="KEY_UP" mapto="up" flags="mr" />
+		<key id="KEY_DOWN" mapto="down" flags="mr" />
+		<key id="KEY_LEFT" mapto="left" flags="mr" />
+		<key id="KEY_RIGHT" mapto="right" flags="mr" />
 		<key id="KEY_UP" mapto="upRepeated" flags="r" />
 		<key id="KEY_DOWN" mapto="downRepeated" flags="r" />
 		<key id="KEY_LEFT" mapto="leftRepeated" flags="r" />
@@ -796,6 +798,8 @@
 		<key id="KEY_RIGHT" mapto="rightUp" flags="b" />
 		<key id="KEY_UP" mapto="upUp" flags="b" />
 		<key id="KEY_DOWN" mapto="downUp" flags="b" />
+		<key id="KEY_CHANNELUP" mapto="chplus" flags="m" />
+		<key id="KEY_CHANNELDOWN" mapto="chminus" flags="m" />
 		<key id="KEY_PREVIOUS" mapto="moveUp" flags="m" />
 		<key id="KEY_NEXT" mapto="moveDown" flags="m" />
 	</map>
