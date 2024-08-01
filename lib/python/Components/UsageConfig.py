@@ -1457,7 +1457,6 @@ def InitUsageConfig():
 		config.av.sync_mode.addNotifier(setSyncMode)
 
 	config.subtitles = ConfigSubsection()
-	config.subtitles.show = ConfigYesNo(default=True)
 
 	def setTTXSubtitleColors(configElement):
 		eSubtitleSettings.setTTXSubtitleColors(configElement.value)
@@ -1466,28 +1465,8 @@ def InitUsageConfig():
 		(0, _("Original")),
 		(1, _("White")),
 		(2, _("Yellow"))
- 	])
-	config.subtitles.ttx_subtitle_colors.addNotifier(setTTXSubtitleColors)
-	config.subtitles.ttx_subtitle_position = ConfigSelection(default="50", choices=[
-		"0",
-		"10",
-		"20",
-		"30",
-		"40",
-		"50",
-		"60",
-		"70",
-		"80",
-		"90",
-		"100",
-		"150",
-		"200",
-		"250",
-		"300",
-		"350",
-		"400",
-		"450"
 	])
+	config.subtitles.ttx_subtitle_colors.addNotifier(setTTXSubtitleColors)
 
 	def setTTXSubtitleOriginalPosition(configElement):
 		eSubtitleSettings.setTTXSubtitleOriginalPosition(configElement.value)
@@ -1498,21 +1477,7 @@ def InitUsageConfig():
 	def setSubtitlePosition(configElement):
 		eSubtitleSettings.setSubtitlePosition(configElement.value)
 
-	config.subtitles.dvb_subtitles_yellow.addNotifier(setDVBSubtitleYellow)
-
-	def setDVBSubtitleOriginalPosition(configElement):
-		eSubtitleSettings.setDVBSubtitleOriginalPosition(configElement.value)
-
-	config.subtitles.dvb_subtitles_original_position = ConfigSelection(default=0, choices=[
-		(0, _("Original")),
-		(1, _("Fixed")),
-		(2, _("Relative"))
-	])
-	config.subtitles.dvb_subtitles_original_position.addNotifier(setDVBSubtitleOriginalPosition)
-
-	def setDVBSubtitleCentered(configElement):
-		eSubtitleSettings.setDVBSubtitleCentered(configElement.value)
-
+	config.subtitles.subtitle_position = ConfigSelection(default=50, choices=[(x, _("%d Pixels") % x) for x in list(range(0, 91, 10)) + list(range(100, 451, 50))])
 	config.subtitles.subtitle_position.addNotifier(setSubtitlePosition)
 
 	def setSubtitleAligment(configElement):
@@ -1522,16 +1487,23 @@ def InitUsageConfig():
 			"right": 2
 		}
 		eSubtitleSettings.setSubtitleAligment(aligments.get(configElement.value, 4))
-	config.subtitles.subtitle_alignment = ConfigSelection(default="center", choices=[("left", _("left")), ("center", _("center")), ("right", _("right"))])
-	config.subtitles.subtitle_position.addNotifier(setSubtitleAligment)
+
+	config.subtitles.subtitle_alignment = ConfigSelection(default="center", choices=[
+		("left", _("Left")),
+		("center", _("Center")),
+		("right", _("Right"))
+	])
+	config.subtitles.subtitle_alignment.addNotifier(setSubtitleAligment)
 
 	def setSubtitleReWrap(configElement):
 		eSubtitleSettings.setSubtitleReWrap(configElement.value)
+
 	config.subtitles.subtitle_rewrap = ConfigYesNo(default=False)
 	config.subtitles.subtitle_rewrap.addNotifier(setSubtitleReWrap)
 
 	def setSubtitleColoriseDialogs(configElement):
 		eSubtitleSettings.setSubtitleColoriseDialogs(configElement.value)
+
 	config.subtitles.colourise_dialogs = ConfigYesNo(default=False)
 	config.subtitles.colourise_dialogs.addNotifier(setSubtitleColoriseDialogs)
 
@@ -1571,7 +1543,7 @@ def InitUsageConfig():
 		eSubtitleSettings.setDVBSubtitleBacktrans(configElement.value)
 
 	config.subtitles.dvb_subtitles_backtrans = ConfigSelection(default=0, choices=choiceList)
-	config.subtitles.subtitles_backtrans.addNotifier(setDVBSubtitleBacktrans)
+	config.subtitles.dvb_subtitles_backtrans.addNotifier(setDVBSubtitleBacktrans)
 
 	choiceList = []
 	for x in range(-54000000, 54045000, 45000):
@@ -1603,8 +1575,21 @@ def InitUsageConfig():
 
 	config.subtitles.dvb_subtitles_yellow = ConfigYesNo(default=False)
 	config.subtitles.dvb_subtitles_yellow.addNotifier(setDVBSubtitleYellow)
-	config.subtitles.dvb_subtitles_centered = ConfigYesNo(default=False)
 
+	def setDVBSubtitleOriginalPosition(configElement):
+		eSubtitleSettings.setDVBSubtitleOriginalPosition(configElement.value)
+
+	config.subtitles.dvb_subtitles_original_position = ConfigSelection(default=0, choices=[
+		(0, _("Original")),
+		(1, _("Fixed")),
+		(2, _("Relative"))
+	])
+	config.subtitles.dvb_subtitles_original_position.addNotifier(setDVBSubtitleOriginalPosition)
+
+	def setDVBSubtitleCentered(configElement):
+		eSubtitleSettings.setDVBSubtitleCentered(configElement.value)
+
+	config.subtitles.dvb_subtitles_centered = ConfigYesNo(default=False)
 	config.subtitles.dvb_subtitles_centered.addNotifier(setDVBSubtitleCentered)
 
 	def setPangoSubtitleColors(configElement):
@@ -1614,14 +1599,13 @@ def InitUsageConfig():
 		(0, _("Alternative")),
 		(1, _("White")),
 		(2, _("Yellow"))
- 	])
+	])
 	config.subtitles.pango_subtitle_colors.addNotifier(setPangoSubtitleColors)
 
 	def setPangoSubtitleFontWitch(configElement):
 		eSubtitleSettings.setPangoSubtitleFontWitch(configElement.value)
 
 	config.subtitles.pango_subtitle_fontswitch = ConfigYesNo(default=True)
-
 	config.subtitles.pango_subtitle_fontswitch.addNotifier(setPangoSubtitleFontWitch)
 
 	def setPangoSubtitleFPS(configElement):
@@ -1640,7 +1624,7 @@ def InitUsageConfig():
 	def setPangoSubtitleRemovehi(configElement):
 		eSubtitleSettings.setPangoSubtitleRemovehi(configElement.value)
 
-	config.subtitles.pango_subtitle_removehi = ConfigYesNo(default = False)
+	config.subtitles.pango_subtitle_removehi = ConfigYesNo(default=False)
 	config.subtitles.pango_subtitle_removehi.addNotifier(setPangoSubtitleRemovehi)
 
 	def setPangoSubtitleAutoRun(configElement):
