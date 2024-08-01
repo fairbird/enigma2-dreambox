@@ -39,5 +39,14 @@ aclocal-copy
 compile
 .dirstamp
 mipsel-oe-linux-libtool
+doxy/
+*.vsidx
+*.ipch
+*.db
+*.db-shm
+*.db-wal
+*.opendb
+*.wsuo
+*.bin
 /.vs
 .vscode/
