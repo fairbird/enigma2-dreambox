@@ -567,7 +567,6 @@ class QuickSubtitlesConfigMenu(ConfigListScreen, Screen):
 			menu = [
 				getConfigMenuItem("config.subtitles.ttx_subtitle_colors"),
 				getConfigMenuItem("config.subtitles.ttx_subtitle_original_position"),
-				getConfigMenuItem("config.subtitles.ttx_subtitle_position"),
 				getConfigMenuItem("config.subtitles.subtitle_fontsize"),
 				getConfigMenuItem("config.subtitles.subtitle_rewrap"),
 				getConfigMenuItem("config.subtitles.subtitle_borderwidth"),
