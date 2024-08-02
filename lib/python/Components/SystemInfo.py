@@ -405,7 +405,7 @@ BoxInfo.setItem("FrontpanelLEDColorControl", fileExists("/proc/stb/fp/led_color"
 BoxInfo.setItem("FrontpanelLEDFadeControl", fileExists("/proc/stb/fp/led_fade"))
 
 # AI
-BoxInfo.setItem("AISubs", fileExists("/etc/init.d/aisocket"))
+BoxInfo.setItem("AISubs", False)
 
 # Dont't sort.
 BoxInfo.setMutableItem("SeekStatePlay", False)
