@@ -533,8 +533,8 @@ class ChannelContextMenu(Screen):
 		self.close(False)
 
 	def reloadServicesBouquets(self):
-		eDVBDB.getInstance().reloadBouquets()
 		eDVBDB.getInstance().reloadServicelist()
+		eDVBDB.getInstance().reloadBouquets()
 		self.session.openWithCallback(self.close, MessageBox, _("The services/bouquets list is reloaded!"), MessageBox.TYPE_INFO, timeout=5)
 
 	def showServiceInformations(self):
