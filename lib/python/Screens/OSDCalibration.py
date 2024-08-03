@@ -16,7 +16,6 @@ from Screens.MessageBox import MessageBox
 from Screens.Screen import Screen
 from Screens.Setup import Setup, SetupSummary
 from Tools.Directories import fileReadLine, fileWriteLine
-from Screens.Setup import Setup
 
 MODULE_NAME = __name__.split(".")[-1]
 
@@ -93,11 +92,11 @@ def InitOSDCalibration():
 class OSDCalibration(ConfigListScreen, Screen):
 	if (getDesktop(0).size().width() == 1920):
 		skin = """
-			<screen position="center,center" size="1920,1080" backgroundColor="#000000" title="OSD Adjustment" >
+			<screen name="OSDCalibration" position="fill" backgroundColor="#1A0F0F0F" flags="wfNoBorder" title="OSD Calibration Settings">
 
-				<widget name="text" position="300,165" zPosition="1" size="1320,180" font="Regular;32" halign="center" valign="center" foregroundColor="yellow" backgroundColor="#1f771f" transparent="1" />
+				<widget name="text" position="300,165" zPosition="+4" size="1320,180" font="Regular;32" halign="center" valign="center" foregroundColor="#00FFFF00" transparent="1" />
 				<widget name="config" position="225,375" zPosition="1" size="1470,315" itemHeight="45" font="Regular;30" transparent="1" />
-				<widget source="status" render="Label" position="300,713" zPosition="1" size="1320,120" font="Regular;32" halign="center" valign="center" foregroundColor="yellow" backgroundColor="#1f771f" transparent="1" />
+				<widget source="status" render="Label" position="300,713" zPosition="1" size="1320,120" font="Regular;32" halign="center" valign="center" foregroundColor="#00FFFF00" transparent="1" />
 
 				<eLabel backgroundColor="red" position="0,0" size="1920,1" zPosition="0" />
 				<eLabel backgroundColor="red" position="0,1079" size="1920,1" zPosition="0" />
@@ -120,19 +119,19 @@ class OSDCalibration(ConfigListScreen, Screen):
 				<eLabel backgroundColor="green" position="665,941" size="210,5" zPosition="0" />
 				<eLabel backgroundColor="yellow" position="1046,941" size="210,5" zPosition="0" />
 				<eLabel backgroundColor="blue" position="1427,941" size="210,5" zPosition="0" />
-				<widget source="key_red" render="Label" position="284,908" zPosition="1" size="210,33" font="Regular;27" halign="center" valign="center" backgroundColor="#1f771f" transparent="1" />
-				<widget source="key_green" render="Label" position="665,908" zPosition="1" size="210,33" font="Regular;27" halign="center" valign="center" backgroundColor="#1f771f" transparent="1" />
-				<widget source="key_yellow" render="Label" position="1046,908" zPosition="1" size="210,33" font="Regular;27" halign="center" valign="center" backgroundColor="#1f771f" transparent="1" />
-				<widget source="key_blue" render="Label" position="1427,908" zPosition="1" size="210,33" font="Regular;27" halign="center" valign="center" backgroundColor="#1f771f" transparent="1" />
+				<widget source="key_red" render="Label" position="284,908" zPosition="1" size="210,33" font="Regular;27" halign="center" valign="center" transparent="1" />
+				<widget source="key_green" render="Label" position="665,908" zPosition="1" size="210,33" font="Regular;27" halign="center" valign="center" transparent="1" />
+				<widget source="key_yellow" render="Label" position="1046,908" zPosition="1" size="210,33" font="Regular;27" halign="center" valign="center" transparent="1" />
+				<widget source="key_blue" render="Label" position="1427,908" zPosition="1" size="210,33" font="Regular;27" halign="center" valign="center" transparent="1" />
 
 			</screen>"""
 	elif (getDesktop(0).size().width() == 1280):
 		skin = """
-			<screen position="center,center" size="1280,720" backgroundColor="#000000" title="OSD Adjustment" >
+			<screen name="OSDCalibration" position="fill" backgroundColor="#1A0F0F0F" flags="wfNoBorder" title="OSD Calibration Settings">
 
-				<widget name="text" position="200,110" zPosition="1" size="880,120" font="Regular;21" halign="center" valign="center" foregroundColor="yellow" backgroundColor="#1f771f" transparent="1" />
+				<widget name="text" position="200,110" zPosition="+4" size="880,120" font="Regular;21" halign="center" valign="center" foregroundColor="#00FFFF00" transparent="1" />
 				<widget name="config" position="150,250" zPosition="1" size="980,210" itemHeight="30" font="Regular;20" transparent="1" />
-				<widget source="status" render="Label" position="200,475" zPosition="1" size="880,80" font="Regular;21" halign="center" valign="center" foregroundColor="yellow" backgroundColor="#1f771f" transparent="1" />
+				<widget source="status" render="Label" position="200,475" zPosition="1" size="880,80" font="Regular;21" halign="center" valign="center" foregroundColor="#00FFFF00" transparent="1" />
 
 				<eLabel backgroundColor="red" position="0,0" size="1280,1" zPosition="0" />
 				<eLabel backgroundColor="red" position="0,719" size="1280,1" zPosition="0" />
@@ -155,20 +154,20 @@ class OSDCalibration(ConfigListScreen, Screen):
 				<eLabel backgroundColor="green" position="443,627" size="140,3" zPosition="0" />
 				<eLabel backgroundColor="yellow" position="697,627" size="140,3" zPosition="0" />
 				<eLabel backgroundColor="blue" position="951,627" size="140,3" zPosition="0" />
-				<widget source="key_red" render="Label" position="189,605" zPosition="1" size="140,22" font="Regular;18" halign="center" valign="center" backgroundColor="#1f771f" transparent="1" />
-				<widget source="key_green" render="Label" position="443,605" zPosition="1" size="140,22" font="Regular;18" halign="center" valign="center" backgroundColor="#1f771f" transparent="1" />
-				<widget source="key_yellow" render="Label" position="697,605" zPosition="1" size="140,22" font="Regular;18" halign="center" valign="center" backgroundColor="#1f771f" transparent="1" />
-				<widget source="key_blue" render="Label" position="951,605" zPosition="1" size="140,22" font="Regular;18" halign="center" valign="center" backgroundColor="#1f771f" transparent="1" />
+				<widget source="key_red" render="Label" position="189,605" zPosition="1" size="140,22" font="Regular;18" halign="center" valign="center" transparent="1" />
+				<widget source="key_green" render="Label" position="443,605" zPosition="1" size="140,22" font="Regular;18" halign="center" valign="center" transparent="1" />
+				<widget source="key_yellow" render="Label" position="697,605" zPosition="1" size="140,22" font="Regular;18" halign="center" valign="center" transparent="1" />
+				<widget source="key_blue" render="Label" position="951,605" zPosition="1" size="140,22" font="Regular;18" halign="center" valign="center" transparent="1" />
 
 			</screen>"""
 
 	elif (getDesktop(0).size().width() == 1024):
 		skin = """
-			<screen position="center,center" size="1024,576" backgroundColor="#000000" title="OSD Adjustment" >
+			<screen name="OSDCalibration" position="fill" backgroundColor="#1A0F0F0F" flags="wfNoBorder" title="OSD Calibration Settings">
 
-				<widget name="text"  position="200,180" zPosition="1" size="624,100" font="Regular;21" halign="center" valign="center" foregroundColor="yellow" backgroundColor="#1f771f" transparent="1" />
+				<widget name="text" position="200,180" zPosition="+4" size="624,100" font="Regular;21" halign="center" valign="center" foregroundColor="#00FFFF00" transparent="1" />
 				<widget name="config" position="100,180" zPosition="1" size="824,50" font="Regular;24" halign="center" valign="center" transparent="1" />
-				<widget source="status" render="Label" position="200,450" zPosition="1" size="624,80" font="Regular;21" halign="center" valign="center" foregroundColor="yellow" backgroundColor="#1f771f" transparent="1" />
+				<widget source="status" render="Label" position="200,450" zPosition="1" size="624,80" font="Regular;21" halign="center" valign="center" foregroundColor="#00FFFF00" transparent="1" />
 
 				<eLabel backgroundColor="red" position="0,0" size="1024,1" zPosition="0" />
 				<eLabel backgroundColor="red" position="0,575" size="1024,1" zPosition="0" />
@@ -191,19 +190,19 @@ class OSDCalibration(ConfigListScreen, Screen):
 				<eLabel backgroundColor="green" position="341,477" size="140,3" zPosition="0" />
 				<eLabel backgroundColor="yellow" position="544,477" size="140,3" zPosition="0" />
 				<eLabel backgroundColor="blue" position="747,477" size="140,3" zPosition="0" />
-				<widget source="key_red" render="Label" position="138,455" zPosition="1" size="140,22" font="Regular;18" halign="center" valign="center" backgroundColor="#1f771f" transparent="1" />
-				<widget source="key_green" render="Label" position="341,455" zPosition="1" size="140,22" font="Regular;18" halign="center" valign="center" backgroundColor="#1f771f" transparent="1" />
-				<widget source="key_yellow" render="Label" position="544,455" zPosition="1" size="140,22" font="Regular;18" halign="center" valign="center" backgroundColor="#1f771f" transparent="1" />
-				<widget source="key_blue" render="Label" position="747,455" zPosition="1" size="140,22" font="Regular;18" halign="center" valign="center" backgroundColor="#1f771f" transparent="1" />
+				<widget source="key_red" render="Label" position="138,455" zPosition="1" size="140,22" font="Regular;18" halign="center" valign="center" transparent="1" />
+				<widget source="key_green" render="Label" position="341,455" zPosition="1" size="140,22" font="Regular;18" halign="center" valign="center" transparent="1" />
+				<widget source="key_yellow" render="Label" position="544,455" zPosition="1" size="140,22" font="Regular;18" halign="center" valign="center" transparent="1" />
+				<widget source="key_blue" render="Label" position="747,455" zPosition="1" size="140,22" font="Regular;18" halign="center" valign="center" transparent="1" />
 			</screen>"""
 
 	else:
 		skin = """
-			<screen position="center,center" size="720,576" backgroundColor="#000000" title="OSD Adjustment" >
+			<screen name="OSDCalibration" position="fill" backgroundColor="#1A0F0F0F" flags="wfNoBorder" title="OSD Calibration Settings">
 
-				<widget source="text" render="Label" position="75,80" zPosition="1" size="570,100" font="Regular;21" halign="center" valign="center" foregroundColor="yellow" backgroundColor="#1f771f" transparent="1" />
-				<widget source="config" render="Label" position="75,180" zPosition="1" size="570,50" font="Regular;21" halign="center" valign="center" transparent="1" />
-				<widget source="status" render="Label" position="75,450" zPosition="1" size="570,80" font="Regular;21" halign="center" valign="center" foregroundColor="yellow" backgroundColor="#1f771f" transparent="1" />
+				<widget name="text" position="75,80" zPosition="+4" size="570,100" font="Regular;21" halign="center" valign="center" foregroundColor="#00FFFF00" transparent="1" />
+				<widget name="config" position="75,180" zPosition="1" size="570,50" font="Regular;21" halign="center" valign="center" transparent="1" />
+				<widget source="status" render="Label" position="75,450" zPosition="1" size="570,80" font="Regular;21" halign="center" valign="center" foregroundColor="#00FFFF00" transparent="1" />
 
 				<eLabel backgroundColor="red" position="0,0" size="720,1" zPosition="0" />
 				<eLabel backgroundColor="red" position="0,575" size="720,1" zPosition="0" />
@@ -226,18 +225,18 @@ class OSDCalibration(ConfigListScreen, Screen):
 				<eLabel backgroundColor="green" position="220,477" size="140,3" zPosition="0" />
 				<eLabel backgroundColor="yellow" position="360,477" size="140,3" zPosition="0" />
 				<eLabel backgroundColor="blue" position="500,477" size="140,3" zPosition="0" />
-				<widget source="key_red" render="Label" position="80,455" zPosition="1" size="140,22" font="Regular;18" halign="center" valign="center" backgroundColor="#1f771f" transparent="1" />
-				<widget source="key_green" render="Label" position="220,455" zPosition="1" size="140,22" font="Regular;18" halign="center" valign="center" backgroundColor="#1f771f" transparent="1" />
-				<widget source="key_yellow" render="Label" position="360,455" zPosition="1" size="140,22" font="Regular;18" halign="center" valign="center" backgroundColor="#1f771f" transparent="1" />
-				<widget source="key_blue" render="Label" position="500,455" zPosition="1" size="140,22" font="Regular;18" halign="center" valign="center" backgroundColor="#1f771f" transparent="1" />
+				<widget source="key_red" render="Label" position="80,455" zPosition="1" size="140,22" font="Regular;18" halign="center" valign="center" transparent="1" />
+				<widget source="key_green" render="Label" position="220,455" zPosition="1" size="140,22" font="Regular;18" halign="center" valign="center" transparent="1" />
+				<widget source="key_yellow" render="Label" position="360,455" zPosition="1" size="140,22" font="Regular;18" halign="center" valign="center" transparent="1" />
+				<widget source="key_blue" render="Label" position="500,455" zPosition="1" size="140,22" font="Regular;18" halign="center" valign="center" transparent="1" />
 
 			</screen>"""
 
 	def __init__(self, session):
 		Screen.__init__(self, session)
-		self.skinName = ["OSDCalibration", "OSDCalibration2"]
+		self.skinName = ["OSDCalibration"]  # Don't use the standard Setup screen.
 		self.setup_title = _("Position Setup")
-		self.ConsoleB = Console(binary=True)
+		# self.Console = Console()
 		self["status"] = StaticText()
 		self["key_red"] = StaticText(_("Cancel"))
 		self["key_green"] = StaticText(_("Save"))
@@ -245,7 +244,10 @@ class OSDCalibration(ConfigListScreen, Screen):
 		self["key_blue"] = StaticText()
 
 		self["title"] = StaticText(_("OSD Adjustment"))
-		self["text"] = Label(_("Please setup your user interface by adjusting the values till the edges of the red box are touching the edges of your TV.\nWhen you are ready press green to continue."))
+		text = []
+		text.append(_("Before changing these settings try to disable any overscan settings on th TV / display screen. To calibrate the On-Screen-Display (OSD) adjust the position and size values until the red box is *just* visible and touches the edges of the screen."))
+		text.append(_("When the red box is correctly visible press the GREEN button to save the settings and exit."))
+		self["text"] = Label("\n".join(text))
 
 		self["actions"] = ActionMap(["SetupActions", "ColorActions"],
 			{
@@ -273,9 +275,10 @@ class OSDCalibration(ConfigListScreen, Screen):
 			self.list.append((_("Right"), config.osd.dst_width, _("Use the Left/Right buttons on your remote to move the user interface right")))
 			self.list.append((_("Top"), config.osd.dst_top, _("Use the Left/Right buttons on your remote to move the user interface top")))
 			self.list.append((_("Bottom"), config.osd.dst_height, _("Use the Left/Right buttons on your remote to move the user interface bottom")))
-		self.serviceRef = None
-		if self.welcomeWarning not in self.onShow:
-			self.onShow.append(self.welcomeWarning)
+		self["config"].list = self.list
+		self["config"].l.setList(self.list)
+
+		self.onLayoutFinish.append(self.layoutFinished)
 		if self.selectionChanged not in self["config"].onSelectionChanged:
 			self["config"].onSelectionChanged.append(self.selectionChanged)
 		self.selectionChanged()
@@ -283,32 +286,9 @@ class OSDCalibration(ConfigListScreen, Screen):
 	def selectionChanged(self):
 		self["status"].setText(self["config"].getCurrent()[2])
 
-	def welcomeWarning(self):
-		if self.welcomeWarning in self.onShow:
-			self.onShow.remove(self.welcomeWarning)
-		popup = self.session.openWithCallback(self.welcomeAction, MessageBox, _("NOTE: This feature is intended for people who cannot disable overscan "
-			"on their television / display.  Please first try to disable overscan before using this feature.\n\n"
-			"USAGE: Adjust the screen size and position settings so that the shaded user interface layer *just* "
-			"covers the test pattern in the background.\n\n"
-			"Select Yes to continue or No to exit."), type=MessageBox.TYPE_YESNO, timeout=-1, default=False)
-		popup.setTitle(_("OSD position"))
-
-	def welcomeAction(self, answer):
-		if answer:
-			self.serviceRef = self.session.nav.getCurrentlyPlayingServiceReference()
-			self.session.nav.stopService()
-			if self.restoreService not in self.onClose:
-				self.onClose.append(self.restoreService)
-			self.ConsoleB.ePopen('/usr/bin/showiframe /usr/share/enigma2/hd-testcard.mvi')
-			# config.osd.alpha.setValue(155)
-		else:
-			self.close()
-
-	def restoreService(self):
-		try:
-			self.session.nav.playService(self.serviceRef)
-		except:
-			pass
+	def layoutFinished(self):
+		self.setTitle(_(self.setup_title))
+#		self.Console.ePopen("/usr/bin/showiframe /usr/share/enigma2/hd-testcard.mvi")
 
 	def createSummary(self):
 		return SetupSummary
