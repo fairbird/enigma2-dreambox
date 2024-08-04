@@ -15,11 +15,16 @@ from Components.Sources.Boolean import Boolean
 from Components.SystemInfo import BoxInfo
 from Components.VolumeControl import VolumeControl
 
-from enigma import iPlayableService, eTimer, eSize
+from enigma import iPlayableService, eTimer, eDVBDB
 
 from Tools.ISO639 import LanguageCodes
 FOCUS_CONFIG, FOCUS_STREAMS = range(2)
 [PAGE_AUDIO, PAGE_SUBTITLES] = ["audio", "subtitles"]
+
+
+def isIPTV(service):
+	path = service and service.getPath()
+	return path and not path.startswith("/") and service.type in [0x1, 0x1001, 0x138A, 0x1389]
 
 
 def getConfigMenuItem(configElementName):
@@ -93,6 +98,9 @@ class AudioSelection(ConfigListScreen, Screen):
 		self["config"].instance.setSelectionEnable(False)
 		self.focus = FOCUS_STREAMS
 		self.settings.menupage.addNotifier(self.fillList)
+
+	def saveAVDict(self):
+		eDVBDB.getInstance().saveIptvServicelist()
 
 	def fillList(self, arg=None):
 		streams = []
@@ -417,7 +425,7 @@ class AudioSelection(ConfigListScreen, Screen):
 		self.fillList()
 
 	def changeAACDownmix(self, downmix):
-		if BoxInfo.getItem("machinebuild") in ('dm900', 'dm920', 'dm7080', 'dm800', 'gbquad4k', 'gbquad4kpro', 'gbue4k', 'gbx34k'):
+		if BoxInfo.getItem("machinebuild") in ('dm900', 'dm920', 'dm7080', 'dm800'):
 			config.av.downmix_aac.setValue(downmix.value)
 		else:
 			if downmix.value:
@@ -466,6 +474,8 @@ class AudioSelection(ConfigListScreen, Screen):
 		if isinstance(track, int):
 			if self.session.nav.getCurrentService().audioTracks().getNumberOfTracks() > track:
 				self.audioTracks.selectTrack(track)
+				if isIPTV(ref):
+					self.saveAVDict()
 
 	def keyLeft(self):
 		if self.focus == FOCUS_CONFIG:
@@ -577,6 +587,8 @@ class AudioSelection(ConfigListScreen, Screen):
 				else:
 					self.enableSubtitle(cur[0][:5])
 					self.__updatedInfo()
+				if isIPTV(ref):
+					self.saveAVDict()
 			self.close(0)
 		elif self.focus == FOCUS_CONFIG:
 			self.keyRight()
