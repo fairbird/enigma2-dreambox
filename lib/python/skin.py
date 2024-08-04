@@ -2375,7 +2375,7 @@ def findWidgets(name):
 # Return the XML formatting and style template for a multi content listbox.
 #
 def getcomponentTemplate(component, name):
-	if component in componentTemplates and componentTemplates[component][name]:
+	if component in componentTemplates and componentTemplates[component][name] is not None:
 		return componentTemplates[component][name]
 	return None
 
