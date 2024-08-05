@@ -6,4 +6,5 @@ install_PYTHON = \
 
 dist_install_DATA = \
 	rules.xml \
-	setup.xml
+	setup.xml \
+	LCNScanner.png
