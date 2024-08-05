@@ -1,6 +1,9 @@
 installdir = $(pkglibdir)/python/Plugins/SystemPlugins/LCNScanner
 
-install_PYTHON = *.py
+install_PYTHON = \
+	__init__.py \
+	plugin.py
 
-dist_install_DATA = *.xml
-	
+dist_install_DATA = \
+	rules.xml \
+	setup.xml
