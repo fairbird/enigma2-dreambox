@@ -1519,7 +1519,7 @@ int eDVBDB::renumberBouquet(eBouquet &bouquet, int startChannelNum)
 					channel.setServiceType(0);
 					std::map<eServiceReferenceDVB, LCNData>::iterator it = m_lcnmap.find(channel);
 					if (it != m_lcnmap.end())
-						ref.number = it->getLCN;
+						ref.number = it->second.getLCN();
 				}
 			}
 			else
