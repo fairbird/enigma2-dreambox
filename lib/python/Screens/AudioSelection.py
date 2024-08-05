@@ -15,7 +15,7 @@ from Components.Sources.Boolean import Boolean
 from Components.SystemInfo import BoxInfo
 from Components.VolumeControl import VolumeControl
 
-from enigma import iPlayableService, eTimer, eDVBDB
+from enigma import iPlayableService, eTimer, eDVBDB, eSize
 
 from Tools.ISO639 import LanguageCodes
 FOCUS_CONFIG, FOCUS_STREAMS = range(2)
@@ -127,12 +127,11 @@ class AudioSelection(ConfigListScreen, Screen):
 			if BoxInfo.getItem("CanDownmixAC3"):
 				if BoxInfo.getItem("machinebuild") in ('dm900', 'dm920', 'dm7080', 'dm800'):
 					choice_list = [("downmix", _("Downmix")), ("passthrough", _("Pass-through")), ("multichannel", _("Convert to multi-channel PCM")), ("hdmi_best", _("Use best / Controlled by HDMI"))]
-					self.settings.downmix_ac3 = ConfigSelection(choices=choice_list, default=config.av.downmix_ac3.value)
 				elif BoxInfo.getItem("machinebuild") in ('dreamone', 'dreamtwo'):
 					choice_list = [("0", _("Downmix")), ("1", _("Pass-through")), ("2", _("Use best / Controlled by HDMI"))]
-					self.settings.downmix_ac3 = ConfigSelection(choices=choice_list, default=config.av.downmix_ac3.value)
 				else:
-					self.settings.downmix_ac3 = ConfigOnOff(default=config.av.downmix_ac3.value)
+					choice_list = [("downmix", _("Downmix")), ("passthrough", _("Pass-through"))]
+				self.settings.downmix_ac3 = ConfigSelection(choices=choice_list, default=config.av.downmix_ac3.value)
 				self.settings.downmix_ac3.addNotifier(self.changeAC3Downmix, initial_call=False)
 				conflist.append(getConfigListEntry(_("AC3 downmix"), self.settings.downmix_ac3, None))
 
@@ -144,12 +143,11 @@ class AudioSelection(ConfigListScreen, Screen):
 			if BoxInfo.getItem("CanDownmixAAC"):
 				if BoxInfo.getItem("machinebuild") in ('dm900', 'dm920', 'dm7080', 'dm800'):
 					choice_list = [("downmix", _("Downmix")), ("passthrough", _("Pass-through")), ("multichannel", _("Convert to multi-channel PCM")), ("hdmi_best", _("Use best / Controlled by HDMI"))]
-					self.settings.downmix_aac = ConfigSelection(choices=choice_list, default=config.av.downmix_aac.value)
 				elif BoxInfo.getItem("machinebuild") in ('gbquad4k', 'gbquad4kpro', 'gbue4k', 'gbx34k'):
 					choice_list = [("downmix", _("Downmix")), ("passthrough", _("Pass-through")), ("multichannel", _("Convert to multi-channel PCM")), ("force_ac3", _("Convert to AC3")), ("force_dts", _("Convert to DTS")), ("use_hdmi_cacenter", _("Use best / Controlled by HDMI")), ("wide", _("Wide")), ("extrawide", _("Extra wide"))]
-					self.settings.downmix_aac = ConfigSelection(choices=choice_list, default=config.av.downmix_aac.value)
 				else:
-					self.settings.downmix_aac = ConfigOnOff(default=config.av.downmix_aac.value)
+					choice_list = [("downmix", _("Downmix")), ("passthrough", _("Pass-through"))]
+				self.settings.downmix_aac = ConfigSelection(choices=choice_list, default=config.av.downmix_aac.value)
 				self.settings.downmix_aac.addNotifier(self.changeAACDownmix, initial_call=False)
 				conflist.append(getConfigListEntry(_("AAC downmix"), self.settings.downmix_aac, None))
 
@@ -472,6 +470,8 @@ class AudioSelection(ConfigListScreen, Screen):
 	def changeAudio(self, audio):
 		track = int(audio)
 		if isinstance(track, int):
+			ref = self.session.nav.getCurrentlyPlayingServiceReference()
+			#ref = ref and eServiceReference(ref.toString())
 			if self.session.nav.getCurrentService().audioTracks().getNumberOfTracks() > track:
 				self.audioTracks.selectTrack(track)
 				if isIPTV(ref):
@@ -578,6 +578,8 @@ class AudioSelection(ConfigListScreen, Screen):
 			if self.settings.menupage.value == PAGE_AUDIO and cur[0] is not None:
 				self.changeAudio(cur[0])
 				self.__updatedInfo()
+			ref = self.session.nav.getCurrentlyPlayingServiceReference()
+			#ref = ref and eServiceReference(ref.toString())
 			if self.settings.menupage.value == PAGE_SUBTITLES and cur[0] is not None:
 				if self.infobar.selected_subtitle and self.infobar.selected_subtitle[:4] == cur[0][:4]:
 					self.enableSubtitle(None)
