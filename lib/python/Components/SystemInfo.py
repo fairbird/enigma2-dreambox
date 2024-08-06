@@ -5,7 +5,7 @@ from os import R_OK, access
 from os.path import exists as fileAccess, isdir, isfile, join
 from re import findall
 
-from enigma import Misc_Options, eDVBCIInterfaces, eDVBResourceManager, eGetEnigmaDebugLvl
+from enigma import eAVControl, Misc_Options, eDVBCIInterfaces, eDVBResourceManager, eGetEnigmaDebugLvl
 from Tools.Directories import SCOPE_PLUGINS, SCOPE_LIBDIR, SCOPE_SKIN, fileCheck, fileReadLine, fileReadLines, resolveFilename, fileExists, fileHas, fileReadLine, pathExists
 from Tools.MultiBoot import MultiBoot
 
@@ -386,7 +386,7 @@ BoxInfo.setItem("HasPhysicalLoopthrough", ["Vuplus DVB-S NIM(AVL2108)", "GIGA DV
 BoxInfo.setItem("CanAC3plusTranscode", fileExists("/proc/stb/audio/ac3plus_choices"))
 BoxInfo.setItem("CanAudioDelay", fileCheck("/proc/stb/audio/audio_delay_pcm") or fileCheck("/proc/stb/audio/audio_delay_bitstream"))
 BoxInfo.setItem("CanSyncMode", fileExists("/proc/stb/video/sync_mode_choices"))
-BoxInfo.setItem("CanChangeOsdAlpha", access("/proc/stb/video/alpha", R_OK) and True or False)
+BoxInfo.setItem("CanChangeOsdAlpha", eAVControl.getInstance().hasOSDAlpha())
 BoxInfo.setItem("CanChangeOsdPlaneAlpha", access("/sys/class/graphics/fb0/osd_plane_alpha", R_OK) and True or False)
 BoxInfo.setItem("CanChangeOsdPositionAML", access("/sys/class/graphics/fb0/free_scale", R_OK) and True or False)
 BoxInfo.setItem("ScalerSharpness", fileCheck("/proc/stb/vmpeg/0/pep_scaler_sharpness"))

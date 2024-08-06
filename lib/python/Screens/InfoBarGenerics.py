@@ -585,10 +585,9 @@ class InfoBarShowHide(InfoBarScreenSaver):
 
 	def doShow(self):
 		self.show()
-		if config.usage.show_infobar_do_dimming.value is True:
-			self.hideTimer.stop()
-			self.DimmingTimer.stop()
-			self.doWriteAlpha(config.av.osd_alpha.value)
+		self.hideTimer.stop()
+		self.DimmingTimer.stop()
+		self.doWriteAlpha(config.av.osd_alpha.value)
 		self.startHideTimer()
 
 	def doTimerHide(self):

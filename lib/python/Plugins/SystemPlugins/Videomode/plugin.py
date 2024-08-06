@@ -154,12 +154,6 @@ class VideoSetup(ConfigListScreen, Screen):
 			if BoxInfo.getItem("CanBTAudioDelay"):
 				self.list.append((_("General BT audio delay"), config.av.btaudiodelay, _("This option configures the general audio delay for BT speakers.")))
 
-		if BoxInfo.getItem("CanChangeOsdAlpha"):
-			self.list.append((_("OSD transparency"), config.av.osd_alpha, _("Configure the transparency of the OSD.")))
-			self.list.append((_("Teletext base visibility"), config.osd.alpha_teletext, _("Base transparency for teletext, more options available within teletext screen.")))
-		if BoxInfo.getItem("CanChangeOsdPlaneAlpha"):
-			self.list.append((_("OSD plane transparency"), config.av.osd_planealpha, _("Configure the transparency of the OSD.")))
-
 		if not isinstance(config.av.scaler_sharpness, ConfigNothing) and not isPluginInstalled("VideoEnhancement"):
 			self.list.append((_("Scaler sharpness"), config.av.scaler_sharpness, _("Configure the sharpness of the video scaling.")))
 

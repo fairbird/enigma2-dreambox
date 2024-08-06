@@ -103,6 +103,8 @@ def InitAVSwitch():
 	config.av = ConfigSubsection()
 	config.av.yuvenabled = ConfigBoolean(default=True)
 	colorformat_choices = {"cvbs": "CVBS"}
+	
+	config.av.osd_alpha = ConfigSlider(default=255, increment=5, limits=(20, 255))  # Make Openpli compatible with some plugins who still use config.av.osd_alpha.
 
 	# when YUV, Scart or S-Video is not support by HW, don't let the user select it
 	if BoxInfo.getItem("HasYPbPr"):
@@ -851,24 +853,6 @@ def InitAVSwitch():
 		eDVBVolumecontrol.getInstance().setVolumeSteps(int(configElement.value))
 	config.av.volume_stepsize = ConfigSelectionNumber(1, 10, 1, default=5)
 	config.av.volume_stepsize.addNotifier(setVolumeStepsize)
-
-	if BoxInfo.getItem("CanChangeOsdAlpha"):
-		def setOSDAlpha(config):
-			try:
-				open("/proc/stb/video/alpha", "w").write(str(config.value))
-			except:
-				print("[AVSwitch] Write to /proc/stb/video/alpha failed!")
-		config.av.osd_alpha = ConfigSlider(default=255, increment=5, limits=(20, 255)) # Make Openpli compatible with some plugins who still use config.av.osd_alpha.
-		config.av.osd_alpha.addNotifier(setOSDAlpha)
-
-	if BoxInfo.getItem("CanChangeOsdPlaneAlpha"):
-		def setOSDPlaneAlpha(config):
-			try:
-				open("/sys/class/graphics/fb0/osd_plane_alpha", "w").write(hex(config.value))
-			except:
-				print("[AVSwitch] Write to /sys/class/graphics/fb0/osd_plane_alpha failed!")
-		config.av.osd_planealpha = ConfigSlider(default=255, limits=(0, 255))
-		config.av.osd_planealpha.addNotifier(setOSDPlaneAlpha)
 
 	config.av.force = ConfigSelection(default=None, choices=[
 		(None, _("Do not force")),
