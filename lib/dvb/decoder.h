@@ -15,6 +15,7 @@ class eDVBAudio: public iObject
 private:
 	ePtr<eDVBDemux> m_demux;
 	int m_fd, m_fd_demux, m_dev, m_is_freezed;
+	static int m_debug;
 public:
 	enum { aMPEG, aAC3, aDTS, aAAC, aAACHE, aLPCM, aDTSHD, aDDP, aDRA, aAC4 };
 	eDVBAudio(eDVBDemux *demux, int dev);
@@ -36,6 +37,7 @@ private:
 	ePtr<eDVBDemux> m_demux;
 	int m_fd, m_fd_demux, m_dev;
 	bool m_fcc_enable;
+	static int m_debug;
 	static int m_close_invalidates_attributes;
 	int m_is_slow_motion, m_is_fast_forward, m_is_freezed;
 	ePtr<eSocketNotifier> m_sn;
@@ -70,6 +72,7 @@ class eDVBPCR: public iObject
 private:
 	ePtr<eDVBDemux> m_demux;
 	int m_fd_demux, m_dev;
+	static int m_debug;
 public:
 	eDVBPCR(eDVBDemux *demux, int dev);
 	int startPid(int pid);
@@ -83,6 +86,7 @@ class eDVBTText: public iObject
 private:
 	ePtr<eDVBDemux> m_demux;
 	int m_fd_demux, m_dev;
+	static int m_debug;
 public:
 	eDVBTText(eDVBDemux *demux, int dev);
 	int startPid(int pid);

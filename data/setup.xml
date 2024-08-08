@@ -359,6 +359,8 @@
 		<item level="2" text="Include screen load data" description="Enable this option to add screen names and resolution data to the debug log file.">config.crash.debugScreens</item>
 		<item level="2" text="Include opkg output data" description="Enable this option to add opkg output data to the debug log file.">config.crash.debugOpkg</item>
 		<item level="2" text="Include DVB scan data" description="Enable this option to add extra DVB scan data to the debug log file.">config.crash.debugDVBScan</item>
+		<item level="2" text="Include DVB timesync data" description="Enable this option to add extra DVB time sync data to the debug log file.">config.crash.debugDVBTime</item>
+		<item level="2" text="Include DVB details" description="Enable this option to add extra DVB details to the debug log file.">config.crash.debugDVB</item>
 		<item level="2" text="Limit debug log size (MB)" description="Allows you to set the maximum size of the Debug log size (MB). When that size is reached, a new file will be created.">config.crash.debugloglimit</item>
 		<item level="2" text="Show Log Manager in extensions list" description="Allows you to show/hide Log Manager in extensions (BLUE button).">config.logmanager.showinextensions</item>
 		<item level="2" text="Maximum no of days" description="Logs older then the set no of days will be deleted.">config.crash.daysloglimit</item>
