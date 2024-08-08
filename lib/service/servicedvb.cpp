@@ -17,6 +17,7 @@
 #include <lib/dvb/tstools.h>
 #include <lib/python/python.h>
 #include <lib/base/nconfig.h> // access to python config
+#include <lib/base/esimpleconfig.h>
 #include <lib/base/httpsstream.h>
 #include <lib/base/httpstream.h>
 #include <lib/base/esettings.h>
@@ -1238,7 +1239,7 @@ void eDVBServicePlay::serviceEvent(int event)
 		updateEpgCacheNowNext();
 
 		/* default behaviour is to start an eit reader, and wait for now/next info, unless this is disabled */
-		if (m_dvb_service && m_dvb_service->useEIT() && eConfigManager::getConfigBoolValue("config.usage.show_eit_nownext", true))
+		if (m_dvb_service && m_dvb_service->useEIT() && eSimpleConfig::getBool("config.usage.show_eit_nownext", true))
 		{
 			ePtr<iDVBDemux> m_demux;
 			if (!m_service_handler.getDataDemux(m_demux))
@@ -1429,7 +1430,7 @@ RESULT eDVBServicePlay::start()
 		 * streams are considered to be descrambled by default;
 		 * user can indicate a stream is scrambled, by using servicetype id + 0x100
 		 */
-		bool config_descramble_client = eConfigManager::getConfigBoolValue("config.streaming.descramble_client", false);
+		bool config_descramble_client = eSimpleConfig::getBool("config.streaming.descramble_client", false);
 
 		scrambled = (m_reference.type == eServiceFactoryDVB::id + 0x100);
 
@@ -2486,7 +2487,7 @@ bool eDVBServiceBase::tryFallbackTuner(eServiceReferenceDVB &service, bool &is_s
 	if (is_stream || is_pvr || simulate)
 		return false;
 
-	if (!eConfigManager::getConfigBoolValue("config.usage.remote_fallback_enabled", false))
+	if (!eSettings::remote_fallback_enabled)
 		return false;
 
 	if (eDVBResourceManager::getInstance(res_mgr))
@@ -3173,12 +3174,8 @@ void eDVBServicePlay::updateDecoder(bool sendSeekableStateChanged)
 		else
 		{
 			std::string value;
-			bool showRadioBackground = eConfigManager::getConfigBoolValue("config.misc.showradiopic", true);
-			std::string radio_pic;
-			if (showRadioBackground)
-				radio_pic = eConfigManager::getConfigValue("config.misc.radiopic");
-			else
-				radio_pic = eConfigManager::getConfigValue("config.misc.blackradiopic");
+			bool showRadioBackground = eSimpleConfig::getBool("config.misc.showradiopic", true);
+			std::string radio_pic = eConfigManager::getConfigValue( showRadioBackground ? "config.misc.radiopic" : "config.misc.blackradiopic" );
 			m_decoder->setRadioPic(radio_pic);
 		}
 
@@ -3463,7 +3460,7 @@ RESULT eDVBServicePlay::getCachedSubtitle(struct SubtitleTrack &track)
 		eDVBServicePMTHandler &h = m_timeshift_active ? m_service_handler_timeshift : m_service_handler;
 		if (!h.getProgramInfo(program))
 		{
-			bool usecache = eConfigManager::getConfigBoolValue("config.autolanguage.subtitle_usecache");
+			bool usecache = eSubtitleSettings::subtitle_usecache;
 			int stream = program.defaultSubtitleStream;
 			int tmp = usecache ? m_dvb_service->getCacheEntry(eDVBService::cSUBTITLE) : -1;
 

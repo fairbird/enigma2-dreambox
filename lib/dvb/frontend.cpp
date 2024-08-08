@@ -5,7 +5,7 @@
 #include <lib/base/cfile.h>
 #include <lib/base/eerror.h>
 #include <lib/base/estring.h>
-#include <lib/base/nconfig.h> // access to python config
+#include <lib/base/esimpleconfig.h>
 #include <errno.h>
 #include <unistd.h>
 #include <fcntl.h>
@@ -1448,7 +1448,7 @@ int eDVBFrontend::readFrontendData(int type)
 				int signalquality = 0;
 				int signalqualitydb = 0;
 #if DVB_API_VERSION > 5 || DVB_API_VERSION == 5 && DVB_API_VERSION_MINOR >= 10
-				if (m_dvbversion >= DVB_VERSION(5, 10) && !eConfigManager::getConfigBoolValue(force_legacy_signal_stats, false))
+				if (m_dvbversion >= DVB_VERSION(5, 10) && !eSimpleConfig::getBool(force_legacy_signal_stats, false))
 				{
 					dtv_property prop[1] = {};
 					prop[0].cmd = DTV_STAT_CNR;
@@ -1510,7 +1510,7 @@ int eDVBFrontend::readFrontendData(int type)
 				if (!m_simulate)
 				{
 #if DVB_API_VERSION > 5 || DVB_API_VERSION == 5 && DVB_API_VERSION_MINOR >= 10
-					if (m_dvbversion >= DVB_VERSION(5, 10) && !eConfigManager::getConfigBoolValue(force_legacy_signal_stats, false))
+					if (m_dvbversion >= DVB_VERSION(5, 10) && !eSimpleConfig::getBool(force_legacy_signal_stats, false))
 					{
 						dtv_property prop[1] = {};
 						prop[0].cmd = DTV_STAT_SIGNAL_STRENGTH;
@@ -2701,7 +2701,7 @@ RESULT eDVBFrontend::tune(const iDVBFrontendParameters &where, bool blindscan)
 		{
 			char configStr[255];
 			snprintf(configStr, 255, "config.Nims.%d.terrestrial_5V", m_slotid);
-			if (eConfigManager::getConfigBoolValue(configStr))
+			if (eSimpleConfig::getBool(configStr, false))
 			{
 				m_sec_sequence.push_back( eSecCommand(eSecCommand::SET_VOLTAGE, iDVBFrontend::voltage5_terrestrial) );
 				m_voltage5_terrestrial = 1;
