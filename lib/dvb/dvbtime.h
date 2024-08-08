@@ -86,6 +86,7 @@ class eDVBLocalTimeHandler: public sigc::trackable
 	bool m_time_debug;
 	int m_time_difference;
 	int m_last_tp_time_difference;
+	int m_SyncTimeUsing;
 	void DVBChannelAdded(eDVBChannel*);
 	void DVBChannelStateChanged(iDVBChannel*);
 	void readTimeOffsetData(const char*);
@@ -102,10 +103,9 @@ public:
 	eDVBLocalTimeHandler();
 	~eDVBLocalTimeHandler();
 #endif
-	// 1.1.2004 - system time can be assumed to be OK if >= timeOK
-	static const time_t timeOK = 1072915200;
 	bool getUseDVBTime() { return m_use_dvb_time; }
 	void setUseDVBTime(bool b);
+	void setDVBTimeMode(int b);
 	void syncDVBTime();
 	PSignal0<void> m_timeUpdated;
 	time_t nowTime() const { return m_time_ready ? ::time(0)+m_time_difference : -1; }
