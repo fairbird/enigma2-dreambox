@@ -25,11 +25,7 @@ void setRTC(time_t time, bool debug)
 	{
 		if (fprintf(f, "%u", (unsigned int)time))
 		{
-#ifdef HAVE_NO_RTC
-			prev_time = 0; // Sorry no RTC
-#else
 			prev_time = time;
-#endif
 		}
 		else
 			eDebug("[eDVBLocalTimeHandler] Write /proc/stb/fp/rtc failed: %m");
@@ -60,11 +56,7 @@ time_t getRTC()
 		if (fscanf(f, "%u", &tmp) != 1)
 			eDebug("[eDVBLocalTimeHandler] Read /proc/stb/fp/rtc failed: %m");
 		else
-#ifdef HAVE_NO_RTC
-			rtc_time = 0; // Sorry no RTC
-#else
 			rtc_time = tmp;
-#endif
 		fclose(f);
 	}
 	else
@@ -244,12 +236,8 @@ eDVBLocalTimeHandler::~eDVBLocalTimeHandler()
 	instance = 0;
 	if (ready())
 	{
-#ifdef HAVE_NO_RTC
-		eDebug("Dont set RTC to previous valid time, Giga box!");
-#else
 		eDebug("[eDVBLocalTimeHandler] Set RTC to previous valid time.");
 		setRTC(::time(0), m_time_debug);
-#endif
 	}
 }
 
