@@ -77,7 +77,7 @@ eAVControl::eAVControl()
 {
 	struct stat buffer;
 
-#ifdef HAVE_HDMIIN_DREAMBOX
+#ifdef HAVE_HDMIIN_DM
 	m_b_has_proc_hdmi_rx_monitor = (stat(proc_hdmi_rx_monitor, &buffer) == 0);
 #else
 	m_b_has_proc_hdmi_rx_monitor = false;

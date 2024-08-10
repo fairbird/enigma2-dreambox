@@ -273,7 +273,6 @@ void eDVBAudio::freeze()
 		}
 		else
 			::ioctl(m_fd, AUDIO_PAUSE);
-
 	}
 #ifdef DREAMNEXTGEN
 	if (m_fd_demux >= 0)

@@ -257,6 +257,7 @@ int fbClass::SetMode(int nxRes, int nyRes, int nbpp)
 #endif
 
 	m_number_of_pages = screeninfo.yres_virtual / nyRes;
+	eDebug("[fb] %d page(s) available!", m_number_of_pages);
 
 	ioctl(fbFd, FBIOGET_VSCREENINFO, &screeninfo);
 
