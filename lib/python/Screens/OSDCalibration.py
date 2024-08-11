@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
-from os import W_OK, access
+from os import access, R_OK
 from os.path import exists
+from enigma import getDesktop
 
 from enigma import eAVControl, getDesktop
 
@@ -8,7 +9,6 @@ from Components.ActionMap import ActionMap, HelpableActionMap
 from Components.AVSwitch import iAVSwitch
 from Components.config import ConfigNumber, ConfigSelection, ConfigSelectionInteger, ConfigSlider, ConfigSubsection, ConfigText, ConfigYesNo, NoSave, config, configfile
 from Components.ConfigList import ConfigListScreen
-from Components.Console import Console
 from Components.Label import Label
 from Components.SystemInfo import BoxInfo
 from Components.Sources.StaticText import StaticText
@@ -21,72 +21,93 @@ MODULE_NAME = __name__.split(".")[-1]
 
 
 def InitOSDCalibration():
-	def setPositionParameter(parameter, value):
-		if BoxInfo.getItem("CanChangeOsdPosition"):
-			fileWriteLine(f"/proc/stb/fb/dst_{parameter}", f"{value:08x}\n", source=MODULE_NAME)
+
+	BoxInfo.setItem("OSD3DCalibration", access("/proc/stb/fb/3dmode", R_OK))
+	BoxInfo.setItem("CanChangeOsdAlpha", access("/proc/stb/video/alpha", R_OK))
+	BoxInfo.setItem("CanChangeOsdPlaneAlpha", access("/sys/class/graphics/fb0/osd_plane_alpha", R_OK))
+	BoxInfo.setItem("CanChangeOsdPosition", access("/proc/stb/fb/dst_left", R_OK))
+	BoxInfo.setItem("CanChangeOsdPositionAML", access("/sys/class/graphics/fb0/free_scale", R_OK))
+	BoxInfo.setItem("OsdSetup", BoxInfo.getItem("CanChangeOsdPosition"))
+	if BoxInfo.getItem("CanChangeOsdAlpha") is True or BoxInfo.getItem("CanChangeOsdPosition") is True or BoxInfo.getItem("CanChangeOsdPositionAML") is True or BoxInfo.getItem("CanChangeOsdPlaneAlpha") is True:
+		BoxInfo.setItem("OSDCalibration", True)
+	else:
+		BoxInfo.setItem("OSDCalibration", False)
+
+	if BoxInfo.getItem("CanChangeOsdPosition"):
+		def setPositionParameter(parameter, configElement):
+			fileWriteLine(f"/proc/stb/fb/dst_{parameter}", "%08X\n" % configElement.value, source=MODULE_NAME)
 			fileName = "/proc/stb/fb/dst_apply"
 			if exists(fileName):
 				fileWriteLine(fileName, "1", source=MODULE_NAME)
-		elif BoxInfo.getItem("CanChangeOsdPositionAML"):
+	elif BoxInfo.getItem("CanChangeOsdPositionAML"):
+		def setPositionParameter(parameter, configElement):
 			value = f"{config.osd.dst_left.value} {config.osd.dst_top.value} {config.osd.dst_width.value} {config.osd.dst_height.value}"
 			fileWriteLine("/sys/class/graphics/fb0/window_axis", value, source=MODULE_NAME)
 			fileWriteLine("/sys/class/graphics/fb0/free_scale", "0x10001", source=MODULE_NAME)
 
-	def setLeft(configElement):
-		setPositionParameter("left", configElement.value)
+	else:
+		def setPositionParameter(parameter, configElement):
+			# dummy else case
+			pass
 
-	def setTop(configElement):
-		setPositionParameter("top", configElement.value)
+	def setOSDLeft(configElement):
+		setPositionParameter("left", configElement)
+	config.osd.dst_left.addNotifier(setOSDLeft)
 
-	def setWidth(configElement):
-		setPositionParameter("width", configElement.value)
+	def setOSDWidth(configElement):
+		setPositionParameter("width", configElement)
+	config.osd.dst_width.addNotifier(setOSDWidth)
 
-	def setHeight(configElement):
-		setPositionParameter("height", configElement.value)
+	def setOSDTop(configElement):
+		setPositionParameter("top", configElement)
+	config.osd.dst_top.addNotifier(setOSDTop)
 
-	print(f"[OSDCalibration] Setting OSD position: {config.osd.dst_left.value} {config.osd.dst_width.value} {config.osd.dst_top.value} {config.osd.dst_height.value}")
+	def setOSDHeight(configElement):
+		setPositionParameter("height", configElement)
+	config.osd.dst_height.addNotifier(setOSDHeight)
 
-	def setAlpha(configElement):
-		value = configElement.value
-		print(f"[OSDCalibration] Setting OSD alpha to {value}.")
-		config.av.osd_alpha.setValue(value)
-		eAVControl.getInstance().setOSDAlpha(value)
+	print(f"[UserInterfacePositioner] Setting OSD position: {config.osd.dst_left.value} {config.osd.dst_width.value} {config.osd.dst_top.value} {config.osd.dst_height.value}")
+
+	def setOSDAlpha(configElement):
+		if BoxInfo.getItem("CanChangeOsdAlpha"):
+			print(f"[UserInterfacePositioner] Setting OSD alpha:{str(configElement.value)}")
+			config.av.osd_alpha.setValue(configElement.value)
+			fileWriteLine("/proc/stb/video/alpha", str(configElement.value), source=MODULE_NAME)
+	config.osd.alpha.addNotifier(setOSDAlpha)
+
+	def setOSDPlaneAlpha(configElement):
+		if BoxInfo.getItem("CanChangeOsdPlaneAlpha"):
+			print(f"[UserInterfacePositioner] Setting OSD plane alpha:{str(configElement.value)}")
+			config.av.osd_alpha.setValue(configElement.value)
+			fileWriteLine("/sys/class/graphics/fb0/osd_plane_alpha", hex(configElement.value), source=MODULE_NAME)
+	config.osd.alpha.addNotifier(setOSDPlaneAlpha)
 
 	def set3DMode(configElement):
-		value = configElement.value
-		print(f"[OSDCalibration] Setting 3D mode to {value}.")
-		if BoxInfo.getItem("CanUse3DModeChoices"):
-			choices = fileReadLine("/proc/stb/fb/3dmode_choices", "", source=MODULE_NAME).split()
-			if value not in choices:
-				match value:
-					case "sidebyside":
-						value = "sbs"
-					case "topandbottom":
-						value = "tab"
-					case "auto":
-						value = "off"
-			fileWriteLine("/proc/stb/fb/3dmode", value, source=MODULE_NAME)
+		if BoxInfo.getItem("OSD3DCalibration"):
+			value = configElement.value
+			print(f"[UserInterfacePositioner] Setting 3D mode: {str(value)}")
+			try:
+				if BoxInfo.getItem("CanUse3DModeChoices"):
+					f = open("/proc/stb/fb/3dmode_choices")
+					choices = f.readlines()[0].split()
+					f.close()
+					if value not in choices:
+						if value == "sidebyside":
+							value = "sbs"
+						elif value == "topandbottom":
+							value = "tab"
+						elif value == "auto":
+							value = "off"
+				fileWriteLine("/proc/stb/fb/3dmode", value, source=MODULE_NAME)
+			except OSError:
+				pass
+	config.osd.threeDmode.addNotifier(set3DMode)
 
 	def set3DZnorm(configElement):
-		value = configElement.value
-		print(f"[OSDCalibration] Setting 3D depth to {value}.")
-		fileWriteLine("/proc/stb/fb/znorm", str(value), source=MODULE_NAME)
-
-	BoxInfo.setItem("CanChangeOsdPosition", access("/proc/stb/fb/dst_left", W_OK))
-	BoxInfo.setItem("CanChangeOsdPositionAML", access("/sys/class/graphics/fb0/free_scale", W_OK))  # Is this the same as BoxInfo.getItem("AmlogicFamily")?
-	BoxInfo.setItem("CanChangeOsdAlpha", eAVControl.getInstance().hasOSDAlpha())
-	BoxInfo.setItem("OSDCalibration", BoxInfo.getItem("CanChangeOsdPosition") or BoxInfo.getItem("CanChangeOsdPositionAML") or BoxInfo.getItem("CanChangeOsdAlpha"))
-	BoxInfo.setItem("OSD3DCalibration", access("/proc/stb/fb/3dmode", W_OK))
-	print(f"[OSDCalibration] Setting OSD position to (X={config.osd.dst_left.value}, Y={config.osd.dst_top.value}) and size to (W={config.osd.dst_width.value}, H={config.osd.dst_height.value}).")
-	config.osd.dst_left.addNotifier(setLeft)
-	config.osd.dst_top.addNotifier(setTop)
-	config.osd.dst_width.addNotifier(setWidth)
-	config.osd.dst_height.addNotifier(setHeight)
-	if BoxInfo.getItem("CanChangeOsdAlpha"):
-		config.osd.alpha.addNotifier(setAlpha)
-	if BoxInfo.getItem("OSD3DCalibration"):
-		config.osd.threeDmode.addNotifier(set3DMode)
-		config.osd.threeDznorm.addNotifier(set3DZnorm)
+		if BoxInfo.getItem("OSD3DCalibration"):
+			print(f"[UserInterfacePositioner] Setting 3D depth: {str(configElement.value)}")
+			fileWriteLine("/proc/stb/fb/znorm", str(int(configElement.value)), source=MODULE_NAME)
+	config.osd.threeDznorm.addNotifier(set3DZnorm)
 
 
 class OSDCalibration(ConfigListScreen, Screen):
@@ -94,7 +115,7 @@ class OSDCalibration(ConfigListScreen, Screen):
 		skin = """
 			<screen name="OSDCalibration" position="fill" backgroundColor="#1A0F0F0F" flags="wfNoBorder" title="OSD Calibration Settings">
 
-				<widget name="text" position="300,165" zPosition="+4" size="1320,180" font="Regular;32" halign="center" valign="center" foregroundColor="#00FFFF00" transparent="1" />
+				<widget name="text" position="300,165" zPosition="+4" size="1320,180" font="Regular;32" halign="center" valign="center" foregroundColor="#00FFFF00" backgroundColor="#1f771f" transparent="1" />
 				<widget name="config" position="225,375" zPosition="1" size="1470,315" itemHeight="45" font="Regular;30" transparent="1" />
 				<widget source="status" render="Label" position="300,713" zPosition="1" size="1320,120" font="Regular;32" halign="center" valign="center" foregroundColor="#00FFFF00" transparent="1" />
 
@@ -129,7 +150,7 @@ class OSDCalibration(ConfigListScreen, Screen):
 		skin = """
 			<screen name="OSDCalibration" position="fill" backgroundColor="#1A0F0F0F" flags="wfNoBorder" title="OSD Calibration Settings">
 
-				<widget name="text" position="200,110" zPosition="+4" size="880,120" font="Regular;21" halign="center" valign="center" foregroundColor="#00FFFF00" transparent="1" />
+				<widget name="text" position="200,110" zPosition="+4" size="880,120" font="Regular;21" halign="center" valign="center" foregroundColor="#00FFFF00" backgroundColor="#1f771f" transparent="1" />
 				<widget name="config" position="150,250" zPosition="1" size="980,210" itemHeight="30" font="Regular;20" transparent="1" />
 				<widget source="status" render="Label" position="200,475" zPosition="1" size="880,80" font="Regular;21" halign="center" valign="center" foregroundColor="#00FFFF00" transparent="1" />
 
@@ -165,7 +186,7 @@ class OSDCalibration(ConfigListScreen, Screen):
 		skin = """
 			<screen name="OSDCalibration" position="fill" backgroundColor="#1A0F0F0F" flags="wfNoBorder" title="OSD Calibration Settings">
 
-				<widget name="text" position="200,180" zPosition="+4" size="624,100" font="Regular;21" halign="center" valign="center" foregroundColor="#00FFFF00" transparent="1" />
+				<widget name="text"  position="200,180" zPosition="+4" size="624,100" font="Regular;21" halign="center" valign="center" foregroundColor="#00FFFF00" backgroundColor="#1f771f" transparent="1" />
 				<widget name="config" position="100,180" zPosition="1" size="824,50" font="Regular;24" halign="center" valign="center" transparent="1" />
 				<widget source="status" render="Label" position="200,450" zPosition="1" size="624,80" font="Regular;21" halign="center" valign="center" foregroundColor="#00FFFF00" transparent="1" />
 
@@ -200,7 +221,7 @@ class OSDCalibration(ConfigListScreen, Screen):
 		skin = """
 			<screen name="OSDCalibration" position="fill" backgroundColor="#1A0F0F0F" flags="wfNoBorder" title="OSD Calibration Settings">
 
-				<widget name="text" position="75,80" zPosition="+4" size="570,100" font="Regular;21" halign="center" valign="center" foregroundColor="#00FFFF00" transparent="1" />
+				<widget name="text" position="75,80" zPosition="1" size="570,100" font="Regular;21" halign="center" valign="center" foregroundColor="#00FFFF00" backgroundColor="#1f771f" transparent="1" />
 				<widget name="config" position="75,180" zPosition="1" size="570,50" font="Regular;21" halign="center" valign="center" transparent="1" />
 				<widget source="status" render="Label" position="75,450" zPosition="1" size="570,80" font="Regular;21" halign="center" valign="center" foregroundColor="#00FFFF00" transparent="1" />
 
@@ -236,7 +257,7 @@ class OSDCalibration(ConfigListScreen, Screen):
 		Screen.__init__(self, session)
 		self.skinName = ["OSDCalibration"]  # Don't use the standard Setup screen.
 		self.setup_title = _("Position Setup")
-		# self.Console = Console()
+#		self.Console = Console()
 		self["status"] = StaticText()
 		self["key_red"] = StaticText(_("Cancel"))
 		self["key_green"] = StaticText(_("Save"))
@@ -275,6 +296,7 @@ class OSDCalibration(ConfigListScreen, Screen):
 			self.list.append((_("Right"), config.osd.dst_width, _("Use the Left/Right buttons on your remote to move the user interface right")))
 			self.list.append((_("Top"), config.osd.dst_top, _("Use the Left/Right buttons on your remote to move the user interface top")))
 			self.list.append((_("Bottom"), config.osd.dst_height, _("Use the Left/Right buttons on your remote to move the user interface bottom")))
+
 		self["config"].list = self.list
 		self["config"].l.setList(self.list)
 
@@ -351,7 +373,7 @@ class OSDCalibration(ConfigListScreen, Screen):
 		config.osd.dst_width.setValue(dst_width)
 		config.osd.dst_top.setValue(dst_top)
 		config.osd.dst_height.setValue(dst_height)
-		print(f"[OSDCalibration] Setting OSD position: {config.osd.dst_left.value} {config.osd.dst_width.value} {config.osd.dst_top.value} {config.osd.dst_height.value}")
+		print(f"[UserInterfacePositioner] Setting OSD position: {config.osd.dst_left.value} {config.osd.dst_width.value} {config.osd.dst_top.value} {config.osd.dst_height.value}")
 
 	def saveAll(self):
 		for x in self["config"].list:
