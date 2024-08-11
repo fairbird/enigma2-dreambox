@@ -3,19 +3,18 @@ from os import access, R_OK
 from os.path import exists
 from enigma import getDesktop
 
-from enigma import eAVControl, getDesktop
-
 from Components.ActionMap import ActionMap, HelpableActionMap
 from Components.AVSwitch import iAVSwitch
-from Components.config import ConfigNumber, ConfigSelection, ConfigSelectionInteger, ConfigSlider, ConfigSubsection, ConfigText, ConfigYesNo, NoSave, config, configfile
+from Components.config import config, configfile
 from Components.ConfigList import ConfigListScreen
+from Components.Console import Console
 from Components.Label import Label
 from Components.SystemInfo import BoxInfo
 from Components.Sources.StaticText import StaticText
 from Screens.MessageBox import MessageBox
 from Screens.Screen import Screen
 from Screens.Setup import Setup, SetupSummary
-from Tools.Directories import fileReadLine, fileWriteLine
+from Tools.Directories import fileWriteLine
 
 MODULE_NAME = __name__.split(".")[-1]
 
@@ -66,18 +65,18 @@ def InitOSDCalibration():
 		setPositionParameter("height", configElement)
 	config.osd.dst_height.addNotifier(setOSDHeight)
 
-	print(f"[UserInterfacePositioner] Setting OSD position: {config.osd.dst_left.value} {config.osd.dst_width.value} {config.osd.dst_top.value} {config.osd.dst_height.value}")
+	print(f"[OSDCalibration] Setting OSD position: {config.osd.dst_left.value} {config.osd.dst_width.value} {config.osd.dst_top.value} {config.osd.dst_height.value}")
 
 	def setOSDAlpha(configElement):
 		if BoxInfo.getItem("CanChangeOsdAlpha"):
-			print(f"[UserInterfacePositioner] Setting OSD alpha:{str(configElement.value)}")
+			print(f"[OSDCalibration] Setting OSD alpha:{str(configElement.value)}")
 			config.av.osd_alpha.setValue(configElement.value)
 			fileWriteLine("/proc/stb/video/alpha", str(configElement.value), source=MODULE_NAME)
 	config.osd.alpha.addNotifier(setOSDAlpha)
 
 	def setOSDPlaneAlpha(configElement):
 		if BoxInfo.getItem("CanChangeOsdPlaneAlpha"):
-			print(f"[UserInterfacePositioner] Setting OSD plane alpha:{str(configElement.value)}")
+			print(f"[OSDCalibration] Setting OSD plane alpha:{str(configElement.value)}")
 			config.av.osd_alpha.setValue(configElement.value)
 			fileWriteLine("/sys/class/graphics/fb0/osd_plane_alpha", hex(configElement.value), source=MODULE_NAME)
 	config.osd.alpha.addNotifier(setOSDPlaneAlpha)
@@ -85,7 +84,7 @@ def InitOSDCalibration():
 	def set3DMode(configElement):
 		if BoxInfo.getItem("OSD3DCalibration"):
 			value = configElement.value
-			print(f"[UserInterfacePositioner] Setting 3D mode: {str(value)}")
+			print(f"[OSDCalibration] Setting 3D mode: {str(value)}")
 			try:
 				if BoxInfo.getItem("CanUse3DModeChoices"):
 					f = open("/proc/stb/fb/3dmode_choices")
@@ -105,7 +104,7 @@ def InitOSDCalibration():
 
 	def set3DZnorm(configElement):
 		if BoxInfo.getItem("OSD3DCalibration"):
-			print(f"[UserInterfacePositioner] Setting 3D depth: {str(configElement.value)}")
+			print(f"[OSDCalibration] Setting 3D depth: {str(configElement.value)}")
 			fileWriteLine("/proc/stb/fb/znorm", str(int(configElement.value)), source=MODULE_NAME)
 	config.osd.threeDznorm.addNotifier(set3DZnorm)
 
@@ -265,10 +264,7 @@ class OSDCalibration(ConfigListScreen, Screen):
 		self["key_blue"] = StaticText()
 
 		self["title"] = StaticText(_("OSD Adjustment"))
-		text = []
-		text.append(_("Before changing these settings try to disable any overscan settings on th TV / display screen. To calibrate the On-Screen-Display (OSD) adjust the position and size values until the red box is *just* visible and touches the edges of the screen."))
-		text.append(_("When the red box is correctly visible press the GREEN button to save the settings and exit."))
-		self["text"] = Label("\n".join(text))
+		self["text"] = Label(_("Please setup your user interface by adjusting the values till the edges of the red box are touching the edges of your TV.\nWhen you are ready press green to continue."))
 
 		self["actions"] = ActionMap(["SetupActions", "ColorActions"],
 			{
@@ -373,7 +369,7 @@ class OSDCalibration(ConfigListScreen, Screen):
 		config.osd.dst_width.setValue(dst_width)
 		config.osd.dst_top.setValue(dst_top)
 		config.osd.dst_height.setValue(dst_height)
-		print(f"[UserInterfacePositioner] Setting OSD position: {config.osd.dst_left.value} {config.osd.dst_width.value} {config.osd.dst_top.value} {config.osd.dst_height.value}")
+		print(f"[OSDCalibration] Setting OSD position: {config.osd.dst_left.value} {config.osd.dst_width.value} {config.osd.dst_top.value} {config.osd.dst_height.value}")
 
 	def saveAll(self):
 		for x in self["config"].list:
