@@ -336,7 +336,6 @@ class ServiceList(GUIComponent):
 		else:
 			itemHeight = 28
 		self.ItemHeight = itemHeight
-		self.l.setItemHeight(itemHeight)
 		if self.listHeight:
 			self.instance.resize(eSize(self.listWidth, self.listHeight // itemHeight * itemHeight))
 
