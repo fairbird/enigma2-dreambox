@@ -9,6 +9,28 @@ if [ -d /home/root ]; then
 	cd
 fi
 
+# any debuglevel passed?
+if [ -z $ENIGMA_DEBUG_LVL ]; then
+	DEBUG_LVL=3
+else
+	DEBUG_LVL=$ENIGMA_DEBUG_LVL
+fi
+
+if [ ! -e /etc/enigma2/settings ]; then
+	touch /etc/enigma2/settings
+	ENIGMA_DEBUG=1
+	DEBUG_LVL=4
+elif [ "$(grep -i config.crash.debugLevel=4 /etc/enigma2/settings)" != "" ]; then
+	ENIGMA_DEBUG=1
+	DEBUG_LVL=4
+elif [ "$(grep -i config.crash.debugLevel=5 /etc/enigma2/settings)" != "" ]; then
+	ENIGMA_DEBUG=1
+	DEBUG_LVL=5
+elif [ "$(grep -i config.crash.enabledebug=true /etc/enigma2/settings)" != "" ]; then
+	ENIGMA_DEBUG=1
+	DEBUG_LVL=4
+fi
+
 # LC_ALL available?
 if [ -z $LC_ALL ]; then
 	export LC_ALL=en_GB.utf8
@@ -39,8 +61,18 @@ if [ -f /proc/stb/fp/nec_ir ]; then
 	[ -f /sys/class/remote/amremote/protocol ] && echo "2" > /sys/class/remote/amremote/protocol
 fi
 
-# enigma main loop
-while : ; do
+# hook to execute dhcp wait script
+if [ -x /usr/bin/enigma2_dhcp_wait.sh ]; then
+	/usr/bin/enigma2_dhcp_wait.sh
+fi
+
+# hook to execute scripts always before enigma2 start
+if [ -x /usr/bin/enigma2_pre_start.sh ]; then
+	/usr/bin/enigma2_pre_start.sh
+fi
+
+# Show backdrop on enigma2 start.
+if [ -x "/usr/bin/exteplayer3" -o -x "/usr/bin/showiframe" ]; then
 	# show bootlogo on enigma2 start
 	SKIN=`sed -En 's|^config\.skin\.primary_skin=(.+)/skin\.xml$|\1|p' "/etc/enigma2/settings"`
 	if [ -z "${SKIN}" ]; then
@@ -51,69 +83,60 @@ while : ; do
 	else
 		SEARCHDIRS="/etc/enigma2/skin_common /etc/enigma2 /usr/share/enigma2/skin_default /usr/share/enigma2 /usr/share"
 	fi
-	if [ -x "/usr/bin/exteplayer3" -o -x "/usr/bin/showiframe" ]; then
-		for DIR in $SEARCHDIRS
-		do
-			if [ -d ${DIR} ] && [ -f ${DIR}/backdrop.mp4 ]; then
-				"/usr/bin/exteplayer3" "${DIR}/bootlogo.mp4"
-				break
-			elif [ -d ${DIR} ] && [ -f ${DIR}/backdrop.mvi ]; then
-				"/usr/bin/showiframe" "${DIR}/backdrop.mvi"
-				break
-			fi
-		done
-	fi
 
-	# hook to execute dhcp wait script
-	if [ -x @bindir@/enigma2_dhcp_wait.sh ]; then
-		@bindir@/enigma2_dhcp_wait.sh
-	fi
-
-	# hook to execute scripts always before enigma2 start
-	if [ -x @bindir@/enigma2_pre_start.sh ]; then
-		@bindir@/enigma2_pre_start.sh
-	fi
-
-	# start enigma
-	sync
-	# Randomize timestamp if clock is not set
-	RANDOMIZE1970=''
-	time=`date +%Y` ;
-	if [ "$time" = 1970 ]; then
-		RANDOMIZE1970="$(strings /dev/urandom | grep -o '[[:alnum:]]' | head -n 5 | tr -d '\n')"
-	fi
-
-	# Set time format used to prefix each line in the debug logs.
-	DEBUGTIME=`sed -En 's|^config\.crash\.debugTimeFormat=(.+)$|\1|p' "/etc/enigma2/settings"`
-	[ -n "${DEBUGTIME}" ] || DEBUGTIME="2"
-	DEBUG_TIME="${DEBUGTIME}"
-
-	# Create and set log folder
-	LOGFOLDER="/home/root/logs/"
-	if [ ! -d $LOGFOLDER ] ; then mkdir -p $LOGFOLDER; fi
-	if [ "$(grep config.crash.debugPath= /etc/enigma2/settings | sed 's/config.crash.debugPath=//g')" != "" -a -d "$(grep config.crash.debugPath= /etc/enigma2/settings | sed 's/config.crash.debugPath=//g')" ]; then
-		LOGFOLDER=$(grep config.crash.debugPath= /etc/enigma2/settings | sed 's/config.crash.debugPath=//g')
-	fi
-
-	# Enable and configure gstreamer debug log of category and level without color
-	if [ "$(grep -i config.crash.gstdebug=true /etc/enigma2/settings)" != "" ]; then
-		GSTDEBUGCATEGORY="*"
-		GSTDEBUGLEVEL="INFO"
-		if [ "$(grep config.crash.gstdebugcategory= /etc/enigma2/settings | sed 's/config.crash.gstdebugcategory=//g')" != "" ]; then
-			GSTDEBUGCATEGORY=$(grep config.crash.gstdebugcategory= /etc/enigma2/settings | sed 's/config.crash.gstdebugcategory=//g')
+	for DIR in $SEARCHDIRS
+	do
+		if [ -d ${DIR} ] && [ -f ${DIR}/backdrop.mp4 ]; then
+			"/usr/bin/exteplayer3" "${DIR}/bootlogo.mp4"
+			break
+		elif [ -d ${DIR} ] && [ -f ${DIR}/backdrop.mvi ]; then
+			"/usr/bin/showiframe" "${DIR}/backdrop.mvi"
+			break
 		fi
-		if [ "$(grep config.crash.gstdebuglevel= /etc/enigma2/settings | sed 's/config.crash.gstdebuglevel=//g')" != "" ]; then
-			GSTDEBUGLEVEL=$(grep config.crash.gstdebuglevel= /etc/enigma2/settings | sed 's/config.crash.gstdebuglevel=//g')
-		fi
-		export GST_DEBUG_FILE="${LOGFOLDER}$(date +%Y%m%d-%H%M%S)-gstreamer-debug.log"
-		export GST_DEBUG="${GSTDEBUGCATEGORY}:${GSTDEBUGLEVEL}"
-		export GST_DEBUG_NO_COLOR="1"
-	fi
+	done
+fi
 
-	# Enable and set gstreamer directory for pipeline graphs that are not created if directory is not set
-	if [ "$(grep -i config.crash.gstdot=true /etc/enigma2/settings)" != "" ]; then
-		export GST_DEBUG_DUMP_DOT_DIR=${LOGFOLDER}
+# start enigma
+sync
+
+# Randomize timestamp if clock is not set
+RANDOMIZE1970=''
+time=`date +%Y` ;
+if [ "$time" = 1970 ]; then
+	RANDOMIZE1970="$(strings /dev/urandom | grep -o '[[:alnum:]]' | head -n 5 | tr -d '\n')"
+fi
+
+# Set time format used to prefix each line in the debug logs.
+DEBUGTIME=`sed -En 's|^config\.crash\.debugTimeFormat=(.+)$|\1|p' "/etc/enigma2/settings"`
+[ -n "${DEBUGTIME}" ] || DEBUGTIME="2"
+DEBUG_TIME="${DEBUGTIME}"
+
+# Create and set log folder
+LOGFOLDER="/home/root/logs/"
+if [ ! -d $LOGFOLDER ] ; then mkdir -p $LOGFOLDER; fi
+if [ "$(grep config.crash.debugPath= /etc/enigma2/settings | sed 's/config.crash.debugPath=//g')" != "" -a -d "$(grep config.crash.debugPath= /etc/enigma2/settings | sed 's/config.crash.debugPath=//g')" ]; then
+	LOGFOLDER=$(grep config.crash.debugPath= /etc/enigma2/settings | sed 's/config.crash.debugPath=//g')
+fi
+
+# Enable and configure gstreamer debug log of category and level without color
+if [ "$(grep -i config.crash.gstdebug=true /etc/enigma2/settings)" != "" ]; then
+	GSTDEBUGCATEGORY="*"
+	GSTDEBUGLEVEL="INFO"
+	if [ "$(grep config.crash.gstdebugcategory= /etc/enigma2/settings | sed 's/config.crash.gstdebugcategory=//g')" != "" ]; then
+		GSTDEBUGCATEGORY=$(grep config.crash.gstdebugcategory= /etc/enigma2/settings | sed 's/config.crash.gstdebugcategory=//g')
 	fi
+	if [ "$(grep config.crash.gstdebuglevel= /etc/enigma2/settings | sed 's/config.crash.gstdebuglevel=//g')" != "" ]; then
+		GSTDEBUGLEVEL=$(grep config.crash.gstdebuglevel= /etc/enigma2/settings | sed 's/config.crash.gstdebuglevel=//g')
+	fi
+	export GST_DEBUG_FILE="${LOGFOLDER}$(date +%Y%m%d-%H%M%S)-gstreamer-debug.log"
+	export GST_DEBUG="${GSTDEBUGCATEGORY}:${GSTDEBUGLEVEL}"
+	export GST_DEBUG_NO_COLOR="1"
+fi
+
+# Enable and set gstreamer directory for pipeline graphs that are not created if directory is not set
+if [ "$(grep -i config.crash.gstdot=true /etc/enigma2/settings)" != "" ]; then
+	export GST_DEBUG_DUMP_DOT_DIR=${LOGFOLDER}
+fi
 
 # Enable generation of core dumps
 # It would be best to have this at system startup because this way we may not
@@ -131,136 +154,134 @@ if [ "$(grep -i config.crash.coredump=true /etc/enigma2/settings)" != "" ]; then
 	ulimit -c ${COREDUMPSIZE}
 fi
 
-	# Start enigma2 with or without debug
-	if [ "$(grep -i config.crash.enabledebug=true /etc/enigma2/settings)" != "" ]; then
-		(LD_PRELOAD=$LIBS ENIGMA_DEBUG_TIME="${DEBUG_TIME}" @bindir@/enigma2 &> ${LOGFOLDER}$(date +%Y%m%d-%H%M%S)-enigma2-debug.log) &
-	else
-		(LD_PRELOAD=$LIBS ENIGMA_DEBUG_TIME="${DEBUG_TIME}" @bindir@/enigma2) &
-	fi
+# Start enigma2 with or without debug
+if [ -n "$ENIGMA_DEBUG" ]; then
+	(LD_PRELOAD=$LIBS ENIGMA_DEBUG_LVL=$DEBUG_LVL ENIGMA_DEBUG_TIME="${DEBUG_TIME}" /usr/bin/enigma2 &> ${LOGFOLDER}$(date +%Y%m%d-%H%M%S)-enigma2-debug.log) &
+else
+	(LD_PRELOAD=$LIBS ENIGMA_DEBUG_LVL=$DEBUG_LVL ENIGMA_DEBUG_TIME="${DEBUG_TIME}" /usr/bin/enigma2) &
+fi
 
-	enigma2pid=$!
+enigma2pid=$!
 
-	# Enable generation of core dumps with ELF header included.
-	# This seem to be required by gdb.
-	# Would be default if kernel is configured with CONFIG_CORE_DUMP_DEFAULT_ELF_HEADERS.
-	# Default coredump filter can only be set via kernel command line.
-	# In all other cases this is only available per process.
-	if [ "$(grep -i config.crash.coredump=true /etc/enigma2/settings)" != "" ]; then
-		COREDUMPFILTER=0x33
-		echo ${COREDUMPFILTER} > /proc/${enigma2pid}/coredump_filter
-	fi
+# Enable generation of core dumps with ELF header included.
+# This seem to be required by gdb.
+# Would be default if kernel is configured with CONFIG_CORE_DUMP_DEFAULT_ELF_HEADERS.
+# Default coredump filter can only be set via kernel command line.
+# In all other cases this is only available per process.
+if [ "$(grep -i config.crash.coredump=true /etc/enigma2/settings)" != "" ]; then
+	COREDUMPFILTER=0x33
+	echo ${COREDUMPFILTER} > /proc/${enigma2pid}/coredump_filter
+fi
 
-	wait ${enigma2pid}
+wait ${enigma2pid}
 
-	# enigma2 exit codes:
-	#
-	#  1 - halt
-	#  2 - reboot
-	#  3 - restart enigma in normal mode
-	#  4 - front processor upgrade
-	#  5 - install new settings
-	#  6 - restart enigma in debug mode
-	#  7 - manufacturer reset
-	# 16 - recovery mode
-	# 42 - restart for unattended update
-	# 43 - restart for network restore
-	# 44 - restart for autobackup restore
-	#
-	# >128 signal
+# enigma2 exit codes:
+#
+#  1 - halt
+#  2 - reboot
+#  3 - restart enigma in normal mode
+#  4 - front processor upgrade
+#  5 - install new settings
+#  6 - restart enigma in debug mode
+#  7 - manufacturer reset
+# 16 - recovery mode
+# 42 - restart for unattended update
+# 43 - restart for network restore
+# 44 - restart for autobackup restore
+#
+# >128 signal
 
-	ret=$?
-	case $ret in
-		1)
-			if [ -f /proc/stb/fp/led_color ]; then
-				echo "00ffffff" > /proc/stb/fp/led_color
-			elif [ -f /proc/stb/fp/led_brightness ]; then
-				echo "00000008" > /proc/stb/fp/led_brightness
-			fi
-			/sbin/halt
-			;;
-		2)
-			/sbin/reboot
-			;;
-		3)
-			ENIGMA_DEBUG_LVL="3"
-			;;
-		4)
-			/sbin/rmmod lcd
-			/usr/sbin/fpupgrade --upgrade 2>&1 | tee /home/root/fpupgrade.log
-			sleep 1;
-			/sbin/rmmod fp
-			/sbin/modprobe fp
-			/sbin/reboot
-			;;
-		5)
-			if ! grep -q config.misc.RestartUI /etc/enigma2/settings; then
-				echo "config.misc.RestartUI=true" >>/etc/enigma2/settings
-			fi
-			;;
-		6)
-			ENIGMA_DEBUG_LVL="4"
-			;;
-		7)
-			rm -R /etc/enigma2
-			;;
-		16)
-			stbcheck=`cat /proc/stb/info/model`
-			if [[ $stbcheck == "one" || $stbcheck == "two" ]]; then
-				/usr/sbin/to-the-rescue
-			fi
-			if [ -e /dev/block/by-name/flag ]; then
-				echo -n "0" > /dev/block/by-name/flag
-			elif [ -e /dev/block/by-name/bootoptions ]; then
-				mkdir -p /tmp/bootoptions
-				mount /dev/block/by-name/bootoptions /tmp/bootoptions
-				cp -f /tmp/bootoptions/STARTUP_RECOVERY /tmp/bootoptions/STARTUP_ONCE
-			else
-				echo "rescue" > /proc/stb/fp/boot_mode
-			fi
-			[[ -e /etc/enigma2/.deep ]] && rm /etc/enigma2/.deep
-			/sbin/reboot
-			;;
-		42)
-			df -P | grep -v "tmpfs " | awk '{print $6}' | tail -n +3 > /tmp/upgrade_mountpoints.txt
-			while read line; do
-				if [  -f $line/var/lib/opkg/status ]; then
-				DESTS=$DESTS" --add-dest "$line":"$line
-			fi
-			done < /tmp/upgrade_mountpoints.txt
-			# bind the console (when available)
-			[ -f /sys/class/vtconsole/vtcon1/bind ] && echo 1 > /sys/class/vtconsole/vtcon1/bind
-			prevupd=0
-			currupd=999
-			opkg update 2>&1 | tee /home/root/opkgupgrade.log
-			# check if we need to upgrade busybox first
-			if [ "$(opkg list-upgradable busybox)" != "" ]; then
-				opkg update busybox 2>&1 | tee -a /home/root/opkgupgrade.log
-			fi
-			# update all other packages
-			while [ $currupd -gt 0 -a $currupd -ne $prevupd ]; do
-				opkg upgrade $DESTS 2>&1 | tee -a /home/root/opkgupgrade.log
-				prevupd=$currupd
-				currupd=`opkg list-upgradable | wc -l`
-				echo "===> $currupd PACKAGE(S) REMAINING" >> /home/root/opkgupgrade.log
-			done
-			/sbin/reboot
-			;;
-		43)
-			# restore only network from autobackup
-			[ -f /sys/class/vtconsole/vtcon1/bind ] && echo 1 > /sys/class/vtconsole/vtcon1/bind
-			/etc/init.d/settings-restore.sh network
-			break
-			;;
-		44)
-			# restore autobackup
-			[ -f /sys/class/vtconsole/vtcon1/bind ] && echo 1 > /sys/class/vtconsole/vtcon1/bind
-			/etc/init.d/settings-restore.sh
-			[ -f /etc/init.d/softcam ] && /etc/init.d/softcam restart
-			break
-			;;
-		*)
-			break
-			;;
-	esac
-
-done
+ret=$?
+case $ret in
+	1)
+		if [ -f /proc/stb/fp/led_color ]; then
+			echo "00ffffff" > /proc/stb/fp/led_color
+		elif [ -f /proc/stb/fp/led_brightness ]; then
+			echo "00000008" > /proc/stb/fp/led_brightness
+		fi
+		/sbin/halt
+		;;
+	2)
+		/sbin/reboot
+		;;
+	3)
+		ENIGMA_DEBUG_LVL="3"
+		;;
+	4)
+		/sbin/rmmod lcd
+		/usr/sbin/fpupgrade --upgrade 2>&1 | tee /home/root/fpupgrade.log
+		sleep 1;
+		/sbin/rmmod fp
+		/sbin/modprobe fp
+		/sbin/reboot
+		;;
+	5)
+		if ! grep -q config.misc.RestartUI /etc/enigma2/settings; then
+			echo "config.misc.RestartUI=true" >>/etc/enigma2/settings
+		fi
+		;;
+	6)
+		ENIGMA_DEBUG_LVL="4"
+		;;
+	7)
+		rm -R /etc/enigma2
+		;;
+	16)
+		stbcheck=`cat /proc/stb/info/model`
+		if [[ $stbcheck == "one" || $stbcheck == "two" ]]; then
+			/usr/sbin/to-the-rescue
+		fi
+		if [ -e /dev/block/by-name/flag ]; then
+			echo -n "0" > /dev/block/by-name/flag
+		elif [ -e /dev/block/by-name/bootoptions ]; then
+			mkdir -p /tmp/bootoptions
+			mount /dev/block/by-name/bootoptions /tmp/bootoptions
+			cp -f /tmp/bootoptions/STARTUP_RECOVERY /tmp/bootoptions/STARTUP_ONCE
+		else
+			echo "rescue" > /proc/stb/fp/boot_mode
+		fi
+		[[ -e /etc/enigma2/.deep ]] && rm /etc/enigma2/.deep
+		/sbin/reboot
+		;;
+	42)
+		df -P | grep -v "tmpfs " | awk '{print $6}' | tail -n +3 > /tmp/upgrade_mountpoints.txt
+		while read line; do
+			if [  -f $line/var/lib/opkg/status ]; then
+			DESTS=$DESTS" --add-dest "$line":"$line
+		fi
+		done < /tmp/upgrade_mountpoints.txt
+		# bind the console (when available)
+		[ -f /sys/class/vtconsole/vtcon1/bind ] && echo 1 > /sys/class/vtconsole/vtcon1/bind
+		prevupd=0
+		currupd=999
+		opkg update 2>&1 | tee /home/root/opkgupgrade.log
+		# check if we need to upgrade busybox first
+		if [ "$(opkg list-upgradable busybox)" != "" ]; then
+			opkg update busybox 2>&1 | tee -a /home/root/opkgupgrade.log
+		fi
+		# update all other packages
+		while [ $currupd -gt 0 -a $currupd -ne $prevupd ]; do
+			opkg upgrade $DESTS 2>&1 | tee -a /home/root/opkgupgrade.log
+			prevupd=$currupd
+			currupd=`opkg list-upgradable | wc -l`
+			echo "===> $currupd PACKAGE(S) REMAINING" >> /home/root/opkgupgrade.log
+		done
+		/sbin/reboot
+		;;
+	43)
+		# restore only network from autobackup
+		[ -f /sys/class/vtconsole/vtcon1/bind ] && echo 1 > /sys/class/vtconsole/vtcon1/bind
+		/etc/init.d/settings-restore.sh network
+		break
+		;;
+	44)
+		# restore autobackup
+		[ -f /sys/class/vtconsole/vtcon1/bind ] && echo 1 > /sys/class/vtconsole/vtcon1/bind
+		/etc/init.d/settings-restore.sh
+		[ -f /etc/init.d/softcam ] && /etc/init.d/softcam restart
+		break
+		;;
+	*)
+		break
+		;;
+esac
