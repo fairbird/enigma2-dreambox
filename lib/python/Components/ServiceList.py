@@ -88,6 +88,9 @@ class ServiceList(GUIComponent):
 
 		self.onSelectionChanged = []
 
+	def reloadSkin(self):
+		pass
+
 	def applySkin(self, desktop, parent):
 		def foregroundColorMarked(value):
 			self.l.setColor(eListboxServiceContent.markedForeground, parseColor(value))
