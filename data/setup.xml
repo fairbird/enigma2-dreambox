@@ -105,7 +105,7 @@
 		<item level="1" text="Show background in radio mode" description="When enabled, a radio background image will be visible while listening to a radio channel.">config.misc.showradiopic</item>
 		<item level="2" text="Hide channel list in radio mode" description="When enabled, the channel selection list will be hidden while listening to a radio channel. When disabled, the option 'Auto play last service in radio mode' is available.">config.usage.e1like_radio_mode</item>
 		<item level="2" text="Auto play last service in radio mode" conditional="not config.usage.e1like_radio_mode.value" description="When enabled, it will automatically play to the last saved radio service when switching to radio mode.">config.usage.e1like_radio_mode_last_play</item>
-		<item text="AutoRefresh" description="Enable autorefresh templates." conditional="config.channelSelection.screenStyle.value">config.skin.autorefresh</item>
+		<item text="AutoRefresh" description="Enable autorefresh templates." requires="CanRefreshTemplates">config.skin.autorefresh</item>
 	</setup>
 	<setup key="userinterface" title="User interface">
 		<item level="1" text="Enable blinking" description="Enable blink functionality for some areas like record icon.">config.usage.enable_blinking</item>
