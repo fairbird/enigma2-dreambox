@@ -1565,6 +1565,17 @@ class ChannelSelectionBase(Screen):
 			"last": (self.nextBouquet, _("Move to next bouquet")),
 			"pageDown": (self.servicelist.goPageDown, _("Move down a screen"))
 		}, prio=0, description=_("Channel Selection Navigation Actions"))
+		if "keymap.ntr" in config.usage.keymap.value:
+			self["legacyNavigationActions"].setEnabled(False)
+			self["newNavigationActions"].setEnabled(False)
+			self["neutrinoNavigationActions"] = HelpableActionMap(self, ["NavigationActions", "PreviousNextActions"], {
+				"pageUp": (self.servicelist.goPageUp, _("Move up a screen")),
+				"previous": (self.prevMarker, _("Move to previous marker")),
+				"right": (self.nextBouquet, _("Move to next bouquet")),
+				"left": (self.prevBouquet, _("Move to previous bouquet")),
+				"next": (self.nextMarker, _("Move to next marker")),
+				"pageDown": (self.servicelist.goPageDown, _("Move down a screen"))
+			}, prio=0, description=_("Channel Selection Navigation Actions"))
 		self.maintitle = _("Channel selection")
 		self.modetitle = ""
 		self.servicetitle = ""
