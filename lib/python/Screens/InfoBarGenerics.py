@@ -608,15 +608,6 @@ class InfoBarShowHide(InfoBarScreenSaver):
 			else:
 				self.DimmingTimer.stop()
 				self.hide()
-		elif self.__state == self.STATE_HIDDEN and self.secondInfoBarScreen and self.secondInfoBarScreen.shown:
-			if self.dimmed > 0:
-				self.doWriteAlpha((config.av.osd_alpha.value * self.dimmed / config.usage.show_infobar_dimming_speed.value))
-				self.DimmingTimer.start(5, True)
-			else:
-				self.DimmingTimer.stop()
-				self.secondInfoBarScreen.hide()
-				self.secondInfoBarWasShown = False
-				self.resetAlpha()
 
 	def okButtonCheck(self):
 		if config.usage.ok_is_channelselection.value and hasattr(self, "openServiceList"):
