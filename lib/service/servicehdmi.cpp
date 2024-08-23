@@ -9,6 +9,7 @@
 #include <lib/service/servicehdmi.h>
 #include <lib/service/service.h>
 #include <lib/driver/avcontrol.h>
+#include <lib/base/modelinformation.h>
 
 #include <string>
 
