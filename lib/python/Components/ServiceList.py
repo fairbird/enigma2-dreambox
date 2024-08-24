@@ -9,19 +9,6 @@ from Tools.LoadPixmap import LoadPixmap
 from Tools.TextBoundary import getTextBoundarySize
 
 
-
-def InitServiceListSettings():
-	config.channelSelection = ConfigSubsection()
-	config.channelSelection.piconRatio = ConfigSelection(default=167, choices=[
-		(167, _("XPicon, ZZZPicon")),
-		(235, _("ZZPicon")),
-		(250, _("ZPicon"))
-	])
-	choiceList = [("", _("Legacy mode"))]
-	config.channelSelection.screenStyle = ConfigSelection(default="", choices=choiceList)
-	config.channelSelection.widgetStyle = ConfigSelection(default="", choices=choiceList)
-
-
 def refreshServiceList(configElement=None):
 	from Screens.InfoBar import InfoBar
 	InfoBarInstance = InfoBar.instance
