@@ -47,6 +47,7 @@ from Plugins.Plugin import PluginDescriptor
 from Components.PluginComponent import plugins
 from Screens.ChoiceBox import ChoiceBox
 from Screens.EventView import EventViewEPGSelect
+from Screens.Setup import Setup
 import os
 from time import time, localtime, strftime
 from Components.Sources.List import List
@@ -178,7 +179,7 @@ def removed_userbouquets_available():
 class ChannelContextMenu(Screen):
 	def __init__(self, session, csel):
 
-		Screen.__init__(self, session)
+		Screen.__init__(self, session, enableHelp=True)
 		self.setTitle(_("Channel context menu"))
 		self.csel = csel
 		self.bsel = None
@@ -526,8 +527,7 @@ class ChannelContextMenu(Screen):
 		self["menu"].getCurrent()[0][1]()
 
 	def openSetup(self):
-		from Screens.Setup import Setup
-		self.session.openWithCallback(self.cancelClick, Setup, "channelselection")
+		self.session.openWithCallback(self.cancelClick, Setup, "ChannelSelection")
 
 	def cancelClick(self, dummy=False):
 		self.close(False)
@@ -1457,15 +1457,15 @@ class ChannelSelectionEdit:
 		l = self["list"]
 		l.setFontsize()
 		l.setItemsPerPage()
-		l.setMode("MODE_TV")
+		# l.setMode("MODE_TV") # disabled because there is something wrong
 		# l.setMode("MODE_TV") automatically sets "hide number marker" to
 		# the config.usage.hide_number_markers.value so when we are in "move mode"
 		# we need to force display of the markers here after l.setMode("MODE_TV")
 		# has run. If l.setMode("MODE_TV") were ever removed above,
-		# "self.servicelist.l.setHideNumberMarker(False)" could be moved
+		# "self.servicelist.setHideNumberMarker(False)" could be moved
 		# directly to the "else" clause of "def toggleMoveMode".
 		if self.movemode:
-			self.servicelist.l.setHideNumberMarker(False)
+			self.servicelist.setHideNumberMarker(False)
 		if close:
 			self.cancel()
 

@@ -512,6 +512,7 @@ class ServiceList(GUIComponent):
 		self.l.setServiceTypeIconMode(int(config.usage.servicetype_icon_mode.value))
 		self.l.setCryptoIconMode(int(config.usage.crypto_icon_mode.value))
 		self.l.setRecordIndicatorMode(int(config.usage.record_indicator_mode.value))
+		self.l.setChannelNumbersVisible(config.usage.show_channel_numbers_in_servicelist.value)
 		self.l.setColumnWidth(-1 if twoLines else int(config.usage.servicelist_column.value))
 
 	def selectionEnabled(self, enabled):

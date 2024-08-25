@@ -46,13 +46,12 @@
 		<item level="2" text="Wake On LAN" description="When enabled the set top box is able to wakeup on LAN" requires="WakeOnLAN">config.usage.wakeOnLAN</item>
 		<item level="1" text="Startup to Standby" description="Startup the set top box in standby">config.usage.startup_to_standby</item>
 		<item level="2" text="Config resolution of pictures" description="Select in which resolution pictures are displayed with picture viewer or movie player.">config.usage.pic_resolution</item>
-		<item level="2" text="Load unlinked userbouquets" description="When enabled enigma2 will load unlinked userbouquets. This means that userbouquets that are available, but not included in the bouquets.tv or bouquets.radio files, will still be loaded. This allows you for example to keep your own user bouquet while installed settings are updated">config.misc.load_unlinked_userbouquets</item>
 		<item level="2" text="Ignore DVB-S namespace sub network" description="On valid ONIDs, ignore frequency sub network part">config.usage.subnetwork</item>
 		<item level="2" text="Ignore DVB-C namespace sub network" description="On valid ONIDs, ignore frequency sub network part">config.usage.subnetwork_cable</item>
 		<item level="2" text="Ignore DVB-T namespace sub network" description="On valid ONIDs, ignore frequency sub network part">config.usage.subnetwork_terrestrial</item>
 		<!--item level="2" text="Enable new GStreamer 1.x playback" description="If enabled, the new GStreamer 1.x playback engine will be used.">config.misc.usegstplaybin3</item-->
 	</setup>
-	<setup key="channelselection" title="Channel Selection">
+	<setup key="ChannelSelection" title="Channel Selection Settings" showOpenWebif="1">
 		<item text="Channel Selection Screen" description="Select the screen layout, from the options provided by the skin, to be used for the ChannelSelection screen." conditional="len(config.channelSelection.screenStyle.choices) > 1">config.channelSelection.screenStyle</item>
 		<item text="Channel Selection List" description="Select the layout of the information in the services list, from the options provided by the skin, displayed within the ChannelSelection screen." conditional="config.channelSelection.screenStyle.value">config.channelSelection.widgetStyle</item>
 		<item text="Channel Selection Screen" description="Select the screen layout, from the options provided by the skin, to be used for the ChannelSelection screen." conditional="len(config.channelSelection.screenStyle.choices) > 1">config.channelSelection.screenStyle</item>
@@ -61,7 +60,8 @@
 		<item level="1" text="Enable multiple bouquets" description="When enabled, services may be grouped in multiple bouquets.">config.usage.multibouquet</item>
 		<item level="1" text="Multi-EPG bouquet selection" description="Enable bouquet selection in multi-EPG">config.usage.multiepg_ask_bouquet</item>
 		<item level="0" text="Numbering mode" description="Select 'Unique numbering' to assign unique numbers for every service in every bouquet. Use 'Bouquets start at 1' to start numbering each bouquet from 1. Use 'LCN numbering' to use consistent service LCNs where ever that service is used.">config.usage.numberMode</item>
-		<item level="2" text="Hide number markers" conditional="config.usage.show_channel_numbers_in_servicelist.value" description="When enabled, number markers will be hidden.">config.usage.hide_number_markers</item>
+		<item level="2" text="Load unlinked userbouquets" description="When enabled enigma2 will load unlinked userbouquets. This means that userbouquets that are available, but not included in the bouquets.tv or bouquets.radio files, will still be loaded. This allows you for example to keep your own user bouquet while installed settings are updated">config.misc.load_unlinked_userbouquets</item>
+		<item level="2" text="Hide number markers" description="When enabled, number markers will be hidden.">config.usage.hide_number_markers</item>
 		<if conditional="config.channelSelection.screenStyle.value == ''">
 			<item level="2" text="Show channel numbers in channel selection" description="When enabled, show channel numbers in the channel selection screen.">config.usage.show_channel_numbers_in_servicelist</item>
 			<item level="1" text="Show two lines per entry" description="Show service name and event description among each other instead of side by side. After a change, an adjustment of the number of lines is required.">config.usage.servicelist_twolines</item>
@@ -85,7 +85,6 @@
 			<item level="2" text="Customize channel list cursor behavior" description="Configure the cursor behaviour in the channel selection list. When opening the channel selection list you can keep on the current service or already select up/down and you are able to revert the B+/B- buttons.">config.usage.servicelist_cursor_behavior</item>
 			<item level="1" text="Number of channels shown in channel selection list" description="Configure how many channels are shown in the selection list.">config.usage.servicelist_number_of_services</item>
 		<else />
-			<item level="2" text="Show channel numbers in channel selection" description="When enabled, show channel numbers in the channel selection screen.">config.usage.show_channel_numbers_in_servicelist</item>
 			<item level="1" text="Show picons in channel selection list" description="Configure if service picons will be shown in the channel selection list.">config.usage.service_icon_enable</item>
 			<item level="1" text="Service picons aspect ratio" description="Set the aspect ratio of the service picons." requires="config.usage.service_icon_enable">config.channelSelection.piconRatio</item>
 			<item level="2" text="Show service type icons" description="Configure if and how service type icons will be shown in the channel selection list.">config.usage.servicetype_icon_mode</item>
