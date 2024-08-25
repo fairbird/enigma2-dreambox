@@ -13,7 +13,6 @@ from Components.Sources.StaticText import StaticText
 from Components.Sources.List import List
 from Components.Sources.Boolean import Boolean
 from Components.SystemInfo import BoxInfo
-from Components.VolumeControl import VolumeControl
 
 from enigma import iPlayableService, eTimer, eDVBDB, eSize
 
@@ -74,9 +73,6 @@ class AudioSelection(ConfigListScreen, Screen):
 			"down": self.keyDown,
 			"left": self.keyLeft,
 			"right": self.keyRight,
-			"volumeUp": self.volumeUp,
-			"volumeDown": self.volumeDown,
-			"volumeMute": self.volumeMute,
 			"menu": self.openAutoLanguageSetup,
 			"1": self.keyNumberGlobal,
 			"2": self.keyNumberGlobal,
@@ -557,15 +553,6 @@ class AudioSelection(ConfigListScreen, Screen):
 				self.focus = FOCUS_STREAMS
 		elif self.focus == FOCUS_STREAMS:
 			self["streams"].selectNext()
-
-	def volumeUp(self):
-		VolumeControl.instance and VolumeControl.instance.volUp()
-
-	def volumeDown(self):
-		VolumeControl.instance and VolumeControl.instance.volDown()
-
-	def volumeMute(self):
-		VolumeControl.instance and VolumeControl.instance.volMute()
 
 	def keyNumberGlobal(self, number):
 		if number <= len(self["streams"].list):
