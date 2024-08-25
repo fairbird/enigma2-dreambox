@@ -200,7 +200,7 @@ class TimerSanityCheck:
 			else:
 				timer = self.check_timerlist[event[2]]
 			if event[1] == self.bflag:
-				tunerType = []
+				tunerTypes = []
 				ref = timer.service_ref and timer.service_ref.ref
 				timer_ref = timer.service_ref
 				if ref and ref.flags & eServiceReference.isGroup and timer.isRunning():
@@ -224,7 +224,7 @@ class TimerSanityCheck:
 					if hasattr(fakeRecService, 'frontendInfo'):
 						feinfo = fakeRecService.frontendInfo()
 						if feinfo and hasattr(feinfo, 'getFrontendData'):
-							tunerType.append(feinfo.getFrontendData().get("tuner_type", -1))
+							tunerTypes.append(feinfo.getFrontendData().get("tuner_type", -1))
 						feinfo = None
 				else: # tune failed.. so we must go another way to get service type (DVB-S, DVB-T, DVB-C)
 
@@ -237,20 +237,20 @@ class TimerSanityCheck:
 						serviceList = serviceHandler.list(ref) # get all alternative services
 						if serviceList:
 							for ref in serviceList.getContent("R"): # iterate over all group service references
-								type = getServiceType(ref)
-								if not type in tunerType: # just add single time
-									tunerType.append(type)
+								tunerType = getServiceType(ref)
+								if not tunerType in tunerTypes: # just add single time
+									tunerTypes.append(tunerType)
 					elif ref:
-						tunerType.append(getServiceType(ref))
+						tunerTypes.append(getServiceType(ref))
 
 				if event[2] == -1: # new timer
-					newTimerTunerType = tunerType
-				overlaplist.append((fakeRecResult, timer, tunerType))
+					newTimerTunerType = tunerTypes
+				overlaplist.append((fakeRecResult, timer, tunerTypes))
 				fakeRecList.append((timer, fakeRecService))
 				if fakeRecResult:
 					if ConflictTimer is None: # just take care of the first conflict
 						ConflictTimer = timer
-						ConflictTunerType = tunerType
+						ConflictTunerType = tunerTypes
 			elif event[1] == self.eflag:
 				for fakeRec in fakeRecList:
 					if timer == fakeRec[0] and fakeRec[1]:
@@ -290,7 +290,7 @@ class TimerSanityCheck:
 									break
 					if is_ci_timer_conflict and ConflictTimer is None:
 						ConflictTimer = timer
-						ConflictTunerType = tunerType
+						ConflictTunerType = tunerTypes
 
 			self.nrep_eventlist[idx] = (event[0], event[1], event[2], cnt, overlaplist[:]) # insert a duplicate into current overlaplist
 			fakeRecService = None
