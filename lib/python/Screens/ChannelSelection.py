@@ -527,7 +527,7 @@ class ChannelContextMenu(Screen):
 		self["menu"].getCurrent()[0][1]()
 
 	def openSetup(self):
-		self.session.openWithCallback(self.cancelClick, Setup, "ChannelSelection")
+		self.session.openWithCallback(self.cancelClick, ChannelSelectionSetup)
 
 	def cancelClick(self, dummy=False):
 		self.close(False)
@@ -3001,3 +3001,41 @@ class HistoryZapSelector(Screen):
 	def keySelect(self):
 		current = self["menu"].getCurrent()
 		self.close(current and current[self.HISTORY_SERVICE_REFERENCE])  # Send the selected ServiceReference to the calling code.
+
+
+class ChannelSelectionSetup(Setup):
+	def __init__(self, session):
+		Setup.__init__(self, session=session, setup="ChannelSelection")
+		self.addSaveNotifier(self.onUpdateSettings)
+		self.onClose.append(self.clearSaveNotifiers)
+
+	def onUpdateSettings(self):
+		self.updateSettings(self.session)
+
+	def updateSettings(self, session):
+		styleChanged = False
+		styleScreenChanged = config.channelSelection.screenStyle.isChanged() or config.channelSelection.widgetStyle.isChanged()
+		if not styleScreenChanged:
+			for setting in ("showNumber", "showPicon", "showServiceTypeIcon", "showCryptoIcon", "recordIndicatorMode", "piconRatio"):
+				if getattr(config.channelSelection, setting).isChanged():
+					styleChanged = True
+					break
+			if styleChanged:
+				from Screens.InfoBar import InfoBar
+				InfoBarInstance = InfoBar.instance
+				if InfoBarInstance is not None and InfoBarInstance.servicelist is not None:
+					InfoBarInstance.servicelist.servicelist.readTemplate(config.channelSelection.widgetStyle.value)
+		else:
+			InfoBarInstance = Screens.InfoBar.InfoBar.instance
+			if InfoBarInstance is not None and InfoBarInstance.servicelist is not None:
+				oldDialogIndex = (-1, None)
+				oldSummarys = InfoBarInstance.servicelist.summaries[:]
+				for index, dialog in enumerate(session.dialog_stack):
+					if isinstance(dialog[0], ChannelSelection):
+						oldDialogIndex = (index, dialog[1])
+				InfoBarInstance.servicelist = session.instantiateDialog(ChannelSelection)
+				InfoBarInstance.servicelist.summaries = oldSummarys
+				InfoBarInstance.servicelist.isTmp = False
+				InfoBarInstance.servicelist.callback = None
+				if oldDialogIndex[0] != -1:
+					session.dialog_stack[oldDialogIndex[0]] = (InfoBarInstance.servicelist, oldDialogIndex[1])

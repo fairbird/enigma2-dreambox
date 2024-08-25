@@ -11,9 +11,10 @@ from Components.NimManager import nimmanager
 from Components.Renderer.FrontpanelLed import ledPatterns, PATTERN_ON, PATTERN_OFF, PATTERN_BLINK
 from Components.ServiceList import refreshServiceList
 from Components.SystemInfo import BoxInfo
+from skin import getcomponentTemplateNames, parameters, domScreens
 from os import makedirs
 from os.path import exists, isfile, join as pathjoin, normpath
-import os, time, locale, skin
+import os, time, locale
 from boxbranding import getDisplayType
 
 displaytype = getDisplayType()
@@ -165,20 +166,44 @@ def InitUsageConfig():
 		choicelist.append((str(i)))
 	config.usage.servicelist_number_of_services = ConfigSelection(default="by skin", choices=choicelist)
 	config.usage.servicelist_number_of_services.addNotifier(refreshServiceList)
-
 	config.usage.multiepg_ask_bouquet = ConfigYesNo(default=False)
 
 	# New ServiceList
 	config.channelSelection = ConfigSubsection()
+	config.channelSelection.showNumber = ConfigYesNo(default=True)
+	config.channelSelection.showPicon = ConfigYesNo(default=False)
+	config.channelSelection.showServiceTypeIcon = ConfigYesNo(default=False)
+	config.channelSelection.showCryptoIcon = ConfigYesNo(default=False)
+	config.channelSelection.recordIndicatorMode = ConfigSelection(default=2, choices=[
+		(0, _("None")),
+		(1, _("Record Icon")),
+		(2, _("Colored Text"))
+	])
 	config.channelSelection.piconRatio = ConfigSelection(default=167, choices=[
 		(167, _("XPicon, ZZZPicon")),
 		(235, _("ZZPicon")),
 		(250, _("ZPicon"))
 	])
 
+	config.channelSelection.showTimers = ConfigYesNo(default=False)
+
 	screenChoiceList = [("", _("Legacy mode"))]
+	widgetChoiceList = []
+	styles = getcomponentTemplateNames("serviceList")
+	default = ""
+	if styles:
+		for screen in domScreens:
+			element, path = domScreens.get(screen, (None, None))
+			if element.get("base") == "ChannelSelection":
+				label = element.get("label", screen)
+				screenChoiceList.append((screen, label))
+
+		default = styles[0]
+		for style in styles:
+			widgetChoiceList.append((style, style))
+
 	config.channelSelection.screenStyle = ConfigSelection(default="", choices=screenChoiceList)
-	config.channelSelection.widgetStyle = ConfigSelection(default="", choices=screenChoiceList)
+	config.channelSelection.widgetStyle = ConfigSelection(default=default, choices=widgetChoiceList)
 
 	# ########  Workaround for VTI Skins   ##############
 	config.usage.picon_dir = ConfigDirectory(default="/usr/share/enigma2/picon")
@@ -566,8 +591,8 @@ def InitUsageConfig():
 		("minsright", _("Remaining minutes right")),
 		("no", _("No"))
 	])
-	config.usage.show_channel_numbers_in_servicelist = ConfigYesNo(default=True)
 	config.usage.show_event_progress_in_servicelist.addNotifier(refreshServiceList)
+	config.usage.show_channel_numbers_in_servicelist = ConfigYesNo(default=True)
 	config.usage.show_channel_numbers_in_servicelist.addNotifier(refreshServiceList)
 
 	config.usage.blinking_display_clock_during_recording = ConfigYesNo(default=False)
@@ -783,7 +808,7 @@ def InitUsageConfig():
 	config.usage.time.long.addNotifier(setTimeStyles)
 
 	try:
-		dateEnabled, timeEnabled = skin.parameters.get("AllowUserDatesAndTimes", (0, 0))
+		dateEnabled, timeEnabled = parameters.get("AllowUserDatesAndTimes", (0, 0))
 	except Exception as error:
 		print("[UsageConfig] Error loading 'AllowUserDatesAndTimes' skin parameter! (%s)" % error)
 		dateEnabled, timeEnabled = (0, 0)
@@ -906,7 +931,7 @@ def InitUsageConfig():
 	config.usage.time.display.addNotifier(setTimeDisplayStyles)
 
 	try:
-		dateDisplayEnabled, timeDisplayEnabled = skin.parameters.get("AllowUserDatesAndTimesDisplay", (0, 0))
+		dateDisplayEnabled, timeDisplayEnabled = parameters.get("AllowUserDatesAndTimesDisplay", (0, 0))
 	except Exception as error:
 		print("[UsageConfig] Error loading 'AllowUserDatesAndTimesDisplay' display skin parameter! (%s)" % error)
 		dateDisplayEnabled, timeDisplayEnabled = (0, 0)
