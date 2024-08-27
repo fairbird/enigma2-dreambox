@@ -42,7 +42,7 @@ def parseKeys(context, filename, actionmap, device, keys):
 		id = get_attr("id")
 		flags = get_attr("flags")
 
-		flag_ascii_to_id = lambda x: {'m': 1, 'b': 2, 'r': 4, 'l': 8}[x]
+		flag_ascii_to_id = lambda x: {'m': 1, 'b': 2, 'r': 4, 'l': 8, 's': 32}[x]
 
 		flags = sum(map(flag_ascii_to_id, flags))
 

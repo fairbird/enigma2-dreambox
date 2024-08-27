@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from Components.config import config, ConfigSlider, ConfigSelection, ConfigYesNo, ConfigEnableDisable, ConfigOnOff, ConfigSubsection, ConfigBoolean, ConfigSelectionNumber, ConfigNothing, NoSave
-from enigma import eAVSwitch, eAVControl, eDVBVolumecontrol, getDesktop
+from enigma import eAVSwitch, eAVControl, getDesktop
 from Components.SystemInfo import BoxInfo
 from Tools.Directories import fileWriteLine
 from Tools.AVHelper import pChoice, readChoices
@@ -848,11 +848,6 @@ def InitAVSwitch():
 				print("[AVSwitch] Write to /proc/stb/audio/3dsurround_softlimiter failed!")
 		config.av.surround_softlimiter_3d = ConfigYesNo(default=False)
 		config.av.surround_softlimiter_3d.addNotifier(set3DSurroundSoftLimiter)
-
-	def setVolumeStepsize(configElement):
-		eDVBVolumecontrol.getInstance().setVolumeSteps(int(configElement.value))
-	config.av.volume_stepsize = ConfigSelectionNumber(1, 10, 1, default=5)
-	config.av.volume_stepsize.addNotifier(setVolumeStepsize)
 
 	config.av.force = ConfigSelection(default=None, choices=[
 		(None, _("Do not force")),

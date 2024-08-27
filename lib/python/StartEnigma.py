@@ -616,6 +616,8 @@ def runScreenTest():
 	enigma.eProfileWrite("nav shutdown")
 	session.nav.shutdown()
 
+	VolumeControl.instance.saveVolumeState()
+
 	enigma.eProfileWrite("configfile.save")
 	configfile.save()
 	from Screens import InfoBarGenerics

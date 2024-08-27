@@ -1174,10 +1174,10 @@ class InfoBarChannelSelection:
 		self.session.execDialog(self.servicelist)
 
 	def volumeUp(self):
-		VolumeControl.instance and VolumeControl.instance.volUp()
+		VolumeControl.instance and VolumeControl.instance.keyVolumeUp()
 
 	def volumeDown(self):
-		VolumeControl.instance and VolumeControl.instance.volDown()
+		VolumeControl.instance and VolumeControl.instance.keyVolumeDown()
 
 
 class InfoBarMenu:

@@ -1,88 +1,124 @@
 # -*- coding: utf-8 -*-
-from enigma import eDVBVolumecontrol, eTimer, eProfileWrite
-from Screens.Volume import Volume
-from Screens.Mute import Mute
+from enigma import eDVBVolumecontrol, eTimer
+
 from GlobalActions import globalActionMap
-from Components.config import config, ConfigSubsection, ConfigInteger
-
-eProfileWrite("VolumeControl")
-#TODO .. move this to a own .py file
+from Components.config import ConfigBoolean, ConfigInteger, ConfigSelectionNumber, ConfigSubsection, config
+from Screens.VolumeControl import Mute, Volume
 
 
+# NOTE: This code does not remember the current volume as other code can change
+# 	the volume directly. Always get the current volume from the driver.
+#
 class VolumeControl:
+	"""Volume control, handles volumeUp, volumeDown, volumeMute, and other actions and display a corresponding dialog."""
 	instance = None
-	"""Volume control, handles volUp, volDown, volMute actions and display
-	a corresponding dialog"""
 
 	def __init__(self, session):
-		globalActionMap.actions["volumeUp"] = self.volUp
-		globalActionMap.actions["volumeDown"] = self.volDown
-		globalActionMap.actions["volumeMute"] = self.volMute
-		globalActionMap.actions["volumeMuteLong"] = self.volMuteLong
+		def updateStep(configElement):
+			self.dvbVolumeControl.setVolumeSteps(configElement.value)
 
-		assert not VolumeControl.instance, "only one VolumeControl instance is allowed!"
-		VolumeControl.instance = self
-
-		config.audio = ConfigSubsection()
-		config.audio.volume = ConfigInteger(default=50, limits=(0, 100))
-
-		self.volumeDialog = session.instantiateDialog(Volume)
-		self.muteDialog = session.instantiateDialog(Mute)
-
-		self.hideVolTimer = eTimer()
-		self.hideVolTimer.callback.append(self.volHide)
-
-		vol = config.audio.volume.value
-		self.volumeDialog.setValue(vol)
-		self.volctrl = eDVBVolumecontrol.getInstance()
-		self.volctrl.setVolume(vol, vol)
-
-	def volSave(self):
-		if self.volctrl.isMuted():
-			config.audio.volume.value = 0
+		if VolumeControl.instance:
+			print("[VolumeControl] Error: Only one VolumeControl instance is allowed!")
 		else:
-			config.audio.volume.value = self.volctrl.getVolume()
-		config.audio.volume.save()
+			VolumeControl.instance = self
+			global globalActionMap
+			globalActionMap.actions["volumeUp"] = self.keyVolumeUp
+			globalActionMap.actions["volumeUpLong"] = self.keyVolumeLong
+			globalActionMap.actions["volumeUpStop"] = self.keyVolumeStop
+			globalActionMap.actions["volumeDown"] = self.keyVolumeDown
+			globalActionMap.actions["volumeDownLong"] = self.keyVolumeLong
+			globalActionMap.actions["volumeDownStop"] = self.keyVolumeStop
+			globalActionMap.actions["volumeMute"] = self.keyVolumeMute
+			globalActionMap.actions["volumeMuteLong"] = self.keyVolumeMuteLong
+			self.dvbVolumeControl = eDVBVolumecontrol.getInstance()
+			config.volumeControl = ConfigSubsection()
+			config.volumeControl.volume = ConfigInteger(default=20, limits=(0, 100))
+			config.volumeControl.mute = ConfigBoolean(default=False)
+			config.volumeControl.pressStep = ConfigSelectionNumber(1, 10, 1, default=1)
+			config.volumeControl.pressStep.addNotifier(updateStep, initial_call=True, immediate_feedback=True)
+			config.volumeControl.longStep = ConfigSelectionNumber(1, 10, 1, default=5)
+			config.volumeControl.hideTimer = ConfigSelectionNumber(1, 10, 1, default=3)
+			self.muteDialog = session.instantiateDialog(Mute)
+			self.muteDialog.setAnimationMode(0)
+			self.volumeDialog = session.instantiateDialog(Volume)
+			self.volumeDialog.setAnimationMode(0)
+			self.hideTimer = eTimer()
+			self.hideTimer.callback.append(self.hideVolume)
+			if config.volumeControl.mute.value:
+				self.dvbVolumeControl.volumeMute()
+				self.muteDialog.show()
+			volume = config.volumeControl.volume.value
+			self.volumeDialog.setValue(volume)
+			self.dvbVolumeControl.setVolume(volume, volume)
+			# Compatibility interface for shared plugins.
+			self.volctrl = self.dvbVolumeControl
+			self.hideVolTimer = self.hideTimer
 
-	def volUp(self):
-		self.setVolume(+1)
+	def keyVolumeUp(self):
+		self.dvbVolumeControl.volumeUp(0, 0)
+		self.updateVolume()
 
-	def volDown(self):
-		self.setVolume(-1)
+	def keyVolumeDown(self):
+		self.dvbVolumeControl.volumeDown(0, 0)
+		self.updateVolume()
 
-	def setVolume(self, direction):
-		if direction > 0:
-			self.volctrl.volumeUp()
-		else:
-			self.volctrl.volumeDown()
-		is_muted = self.volctrl.isMuted()
-		vol = self.volctrl.getVolume()
-		self.volumeDialog.show()
-		if is_muted:
-			self.volMute() # unmute
-		elif not vol:
-			self.volMute(False, True) # mute but dont show mute symbol
-		if self.volctrl.isMuted():
-			self.volumeDialog.setValue(0)
-		else:
-			self.volumeDialog.setValue(self.volctrl.getVolume())
-		self.volSave()
-		self.hideVolTimer.start(3000, True)
+	def keyVolumeLong(self):
+		self.dvbVolumeControl.setVolumeSteps(config.volumeControl.longStep.value)
 
-	def volHide(self):
-		self.volumeDialog.hide()
+	def keyVolumeStop(self):
+		self.dvbVolumeControl.setVolumeSteps(config.volumeControl.pressStep.value)
 
-	def volMute(self, showMuteSymbol=True, force=False):
-		vol = self.volctrl.getVolume()
-		if vol or force:
-			self.volctrl.volumeToggleMute()
-			if self.volctrl.isMuted():
-				if showMuteSymbol:
-					self.muteDialog.show()
-				self.volumeDialog.setValue(0)
+	def keyVolumeMute(self):  # This will toggle the current mute status. Mute will not be activated if the volume is at 0.
+		volume = self.dvbVolumeControl.getVolume()
+		isMuted = self.dvbVolumeControl.isMuted()
+		if volume or (volume == 0 and isMuted):
+			self.dvbVolumeControl.volumeToggleMute()
+			if self.dvbVolumeControl.isMuted():
+				self.muteDialog.show()
+				self.volumeDialog.hide()
 			else:
 				self.muteDialog.hide()
-				self.volumeDialog.setValue(vol)
+				self.volumeDialog.setValue(volume)
+				self.volumeDialog.show()
+			self.hideTimer.start(config.volumeControl.hideTimer.value * 1000, True)
 
-	def volMuteLong(self):
+	def keyVolumeMuteLong(self):  # Long press MUTE will keep the mute icon on-screen without a timeout.
+		if self.dvbVolumeControl.isMuted():
+			self.hideTimer.stop()
+
+	def updateVolume(self):
+		if self.dvbVolumeControl.isMuted():
+			self.keyVolumeMute()  # Unmute.
+		else:
+			self.volumeDialog.setValue(self.dvbVolumeControl.getVolume())
+			self.volumeDialog.show()
+			self.hideTimer.start(config.volumeControl.hideTimer.value * 1000, True)
+
+	def hideVolume(self):
 		self.muteDialog.hide()
+		self.volumeDialog.hide()
+
+	def saveVolumeState(self):
+		config.volumeControl.mute.value = self.dvbVolumeControl.isMuted()
+		config.volumeControl.volume.setValue(self.dvbVolumeControl.getVolume())
+		config.volumeControl.save()
+
+	def showMute(self):  # This method is only called by InfoBarGenerics.py:
+		if self.dvbVolumeControl.isMuted():
+			self.muteDialog.show()
+			self.hideTimer.start(config.volumeControl.hideTimer.value * 1000, True)
+
+	# These methods are provided for compatibly with shared plugins.
+	#
+	def volUp(self):
+		self.keyVolumeUp()
+
+	def volDown(self):
+		self.keyVolumeDown()
+
+	def volMute(self):
+		self.keyVolumeMute()
+
+	def volSave(self):
+		# Volume (and mute) saving is now done when Enigma2 shuts down.
+		pass
