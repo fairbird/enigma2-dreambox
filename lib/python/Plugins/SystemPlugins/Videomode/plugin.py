@@ -55,9 +55,9 @@ class VideoSetup(ConfigListScreen, Screen):
 	def createSetup(self):
 		level = config.usage.setup_level.index
 
-		self.list = [
-			(_("Video output"), config.av.videoport, _("Configures which video output connector will be used."))
-		]
+		self.list = []
+		self.list.append((_(" ____________________________  Video Settings  ____________________________ "), ))
+		self.list.append((_("Video output"), config.av.videoport, _("Configures which video output connector will be used.")))
 
 		# if we have modes for this port:
 		if config.av.videoport.value in config.av.videomode:
@@ -112,6 +112,7 @@ class VideoSetup(ConfigListScreen, Screen):
 					self.list.append((_("Auto scart switching"), config.av.vcrswitch, _("When enabled, your receiver will detect activity on the VCR SCART input.")))
 
 		if level >= 1:
+			self.list.append((_(" ____________________________  Audio Settings  ____________________________ "), ))
 			self.list.append((_("Volume steps"), config.volumeControl.pressStep, _("Select the size of the volume step when the VOLUME buttons are pressed.")))
 			self.list.append((_("Long press volume steps"), config.volumeControl.longStep, _("Select the size of the volume steps when the VOLUME buttons are held down.")))
 			self.list.append((_("Volume/Mute display timer"), config.volumeControl.hideTimer, _("Select how long, in seconds, that the volume and mute displays are shown before they automatically hide.")))
