@@ -56,7 +56,6 @@ dist_install_DATA = \
 	screws_mp.png \
 	screws.png \
 	skin.xml \
-	skinTemplates.xml \
 	sleeptimer.png \
 	testscreen.png \
 	timeline-now.png \
