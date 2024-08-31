@@ -211,6 +211,10 @@ class SkinSelector(Screen):
 			restartBox = self.session.openWithCallback(self.restartGUI, MessageBox, _("To save and apply the selected '%s' skin the GUI needs to restart.\nWould you like to save the selection and restart the GUI now?") % label, MessageBox.TYPE_YESNO)
 			restartBox.setTitle(_("SkinSelector: Restart GUI"))
 
+		if config.channelSelection.screenStyle.isChanged() or config.channelSelection.widgetStyle.isChanged():
+			from Screens.ChannelSelection.ChannelSelectionSetup import updateSettings
+			updateSettings(self.session)
+
 	def restartGUI(self, answer):
 		if answer:
 			self.config.value = self.currentSelectedSkin[4]
