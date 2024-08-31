@@ -212,8 +212,8 @@ class SkinSelector(Screen):
 			restartBox.setTitle(_("SkinSelector: Restart GUI"))
 
 		if config.channelSelection.screenStyle.isChanged() or config.channelSelection.widgetStyle.isChanged():
-			from Screens.ChannelSelection.ChannelSelectionSetup import updateSettings
-			updateSettings(self.session)
+			from Screens.ChannelSelection import ChannelSelectionSetup
+			ChannelSelectionSetup.updateSettings(self, self.session)
 
 	def restartGUI(self, answer):
 		if answer:
