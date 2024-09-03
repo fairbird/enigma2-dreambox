@@ -1220,11 +1220,6 @@ void eDVBScan::start(const eSmartPtrList<iDVBFrontendParameters> &known_transpon
 		transponderlist = &m_ch_blindscan;
 	}
 
-	if (m_flags & scanRemoveServices)
-	{
-		eDVBDB::getInstance()->resetLcnDB();
-	}
-
 	for (eSmartPtrList<iDVBFrontendParameters>::const_iterator i(known_transponders.begin()); i != known_transponders.end(); ++i)
 	{
 		bool exist=false;

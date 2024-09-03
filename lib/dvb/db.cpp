@@ -946,11 +946,11 @@ void eDVBDB::loadServicelist(const char *file)
 	eDebug("[eDVBDB] Loaded %d channels/transponders and %d services.", tcount, scount);
 }
 
-void eDVBDB::resetLcnDB()
+void eDVBDB::resetLcnDB(int dvb_namespace)
 {
 	for (auto &kv : m_lcnmap)
 	{
-		kv.second.resetFound();
+		kv.second.resetFound(dvb_namespace);
 	}
 }
 
