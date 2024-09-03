@@ -1169,7 +1169,7 @@ class ChannelSelectionEdit:
 		serviceHandler = eServiceCenter.getInstance()
 		mutableBouquetList = serviceHandler.list(self.bouquet_root).startEdit()
 		if mutableBouquetList:
-			name = sanitizeFilename(bName.replace(" ", ""))
+			name = sanitizeFilename(bName)
 			while os.path.isfile((self.mode == MODE_TV and '/etc/enigma2/userbouquet.%s.tv' or '/etc/enigma2/userbouquet.%s.radio') % name):
 				name = name.rsplit('_', 1)
 				name = ('_').join((name[0], len(name) == 2 and name[1].isdigit() and str(int(name[1]) + 1) or '1'))
@@ -1682,11 +1682,14 @@ class ChannelSelectionBase(Screen):
 				self.servicetitle += self.getServiceName(self.servicePath[pathlen - 1])
 		self.compileTitle()
 
-	def moveUp(self):
-		self.servicelist.moveUp()
+	def moveTop(self):  # This is used by InfoBarGenerics.
+		self.servicelist.goTop()
 
-	def moveDown(self):
-		self.servicelist.moveDown()
+	def moveUp(self):  # This is used by InfoBarGenerics.
+		if self.servicelist.isVertical():
+			self.servicelist.goLineUp()
+		else:
+			self.servicelist.goLeft()
 
 	def moveLeft(self):
 		if self.servicelist.isVertical():
@@ -1699,6 +1702,15 @@ class ChannelSelectionBase(Screen):
 			self.nextMarker()
 		else:
 			self.servicelist.goRight()
+
+	def moveDown(self):  # This is used by InfoBarGenerics.
+		if self.servicelist.isVertical():
+			self.servicelist.goLineDown()
+		else:
+			self.servicelist.goRight()
+
+	def moveEnd(self):  # This is used by InfoBarGenerics.
+		self.servicelist.goBottom()
 
 	def clearPath(self):
 		del self.servicePath[:]
