@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from Components.PerServiceDisplay import PerServiceBase
-from enigma import iPlayableService, iPlayableService
+from enigma import iPlayableService, iPlayableService, eServiceCenter
 from Components.Sources.Source import Source
 from Components.Element import cached
 import NavigationInstance
