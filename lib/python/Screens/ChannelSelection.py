@@ -58,6 +58,7 @@ eProfileWrite("ChannelSelection.py after imports")
 FLAG_SERVICE_NEW_FOUND = 64
 FLAG_IS_DEDICATED_3D = 128
 FLAG_CENTER_DVB_SUBS = 2048 #define in lib/dvb/idvb.h as dxNewFound = 64 and dxIsDedicated3D = 128
+FLAG_NO_AI_TRANSLATION = 8192
 
 
 class InsertService(Setup):
@@ -259,6 +260,11 @@ class ChannelContextMenu(Screen):
 								append_when_current_valid(current, menu, (_("Do not center DVB subs on this service"), self.removeCenterDVBSubsFlag), level=2)
 							else:
 								append_when_current_valid(current, menu, (_("Do center DVB subs on this service"), self.addCenterDVBSubsFlag), level=2)
+					if BoxInfo.getItem("AISubs"):
+						if eDVBDB.getInstance().getFlag(eServiceReference(current.toString())) & FLAG_NO_AI_TRANSLATION:
+							appendWhenValid(current, menu, (_("Translate Subs On This Service"), self.removeNoAITranslationFlag))
+						else:
+							appendWhenValid(current, menu, (_("Don't Translate Subs On This Service"), self.addNoAITranslationFlag))
 					if haveBouquets:
 						bouquets = self.csel.getBouquetList()
 						if bouquets is None:
@@ -429,6 +435,16 @@ class ChannelContextMenu(Screen):
 			self.session.openWithCallback(self.close, MessageBox, _("The PIN code you entered is wrong."), MessageBox.TYPE_ERROR)
 		else:
 			self.close()
+
+	def addNoAITranslationFlag(self):
+		eDVBDB.getInstance().addFlag(eServiceReference(self.csel.getCurrentSelection().toString()), FLAG_NO_AI_TRANSLATION)
+		eDVBDB.getInstance().reloadBouquets()
+		self.close()
+
+	def removeNoAITranslationFlag(self):
+		eDVBDB.getInstance().removeFlag(eServiceReference(self.csel.getCurrentSelection().toString()), FLAG_NO_AI_TRANSLATION)
+		eDVBDB.getInstance().reloadBouquets()
+		self.close()
 
 	def addServiceToBouquetOrAlternative(self):
 		if self.addFunction:
