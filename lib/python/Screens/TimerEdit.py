@@ -52,6 +52,7 @@ class TimerEditList(Screen):
 		self["key_info"] = StaticText(_("INFO"))
 
 		self["description"] = Label("")
+		self["event_nr"] = Label("")
 
 		self["actions"] = ActionMap(["OkCancelActions", "DirectionActions", "ShortcutActions", "TimerEditActions"],
 			{
@@ -168,6 +169,7 @@ class TimerEditList(Screen):
 		cur = self["timerlist"].getCurrent()
 		if cur:
 			self["Service"].newService(cur.service_ref.ref)
+			self["event_nr"].setText(cur.eit if cur.eit else "")
 			if cur.external:
 				self["key_info"].setText("")
 			else:
@@ -220,6 +222,7 @@ class TimerEditList(Screen):
 				self.key_yellow_choice = self.DISABLE
 		else:
 			self["description"].setText("")
+			self["event_nr"].setText("")
 			if self.key_red_choice != self.EMPTY:
 				self.removeAction("red")
 				self["key_red"].setText("")
