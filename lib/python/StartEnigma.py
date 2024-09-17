@@ -249,6 +249,7 @@ class Session:
 		if MODEL in ("dreamone", "dreamtwo"):
 			from Components.FrontPanelLed import frontPanelLed
 			frontPanelLed.init(self)
+			self.allDialogs = []
 
 		for p in plugins.getPlugins(PluginDescriptor.WHERE_SESSIONSTART):
 			try:
@@ -309,6 +310,16 @@ class Session:
 	def deleteDialog(self, screen):
 		screen.hide()
 		screen.doClose()
+		if screen in self.allDialogs:
+			self.allDialogs.remove(screen)
+
+	def deleteDialogWithCallback(self, callback, screen, *retVal):
+		if screen in self.allDialogs:
+			self.allDialogs.remove(screen)
+		screen.hide()
+		screen.doClose()
+		if callback is not None:
+			callback(*retVal)
 
 	def instantiateSummaryDialog(self, screen, **kwargs):
 		if self.summary_desktop is not None:
@@ -329,6 +340,7 @@ class Session:
 		# create GUI view of this dialog
 		dlg.setDesktop(desktop)
 		dlg.applySkin()
+		self.allDialogs.append(dlg)
 		return dlg
 
 	def pushCurrent(self):
@@ -406,6 +418,11 @@ class Session:
 		self.summary = self.summary_stack and self.summary_stack.pop()
 		if self.summary:
 			self.summary.show()
+
+	def onShutdown(self):
+		for dialog in self.allDialogs:
+			if hasattr(dialog, "onShutdown"):
+				dialog.onShutdown()
 
 
 enigma.eProfileWrite("Standby,PowerKey")
@@ -615,6 +632,7 @@ def runScreenTest():
 	session.nav.stopService()
 	enigma.eProfileWrite("nav shutdown")
 	session.nav.shutdown()
+	session.onShutdown()
 
 	VolumeControl.instance.saveVolumeState()
 
