@@ -688,22 +688,22 @@ class ServiceListLegacy(ServiceListBase):
 			self.ItemHeight = int(value)
 
 		def serviceNameFont(value):
-			font = parseFont(value, ((1, 1), (1, 1)))
+			font = parseFont(value, parent.scale)
 			self.ServiceNameFontName = font.family
 			self.ServiceNameFontSize = font.pointSize
 
 		def serviceInfoFont(value):
-			font = parseFont(value, ((1, 1), (1, 1)))
+			font = parseFont(value, parent.scale)
 			self.ServiceInfoFontName = font.family
 			self.ServiceInfoFontSize = font.pointSize
 
 		def serviceNumberFont(value):
-			font = parseFont(value, ((1, 1), (1, 1)))
+			font = parseFont(value, parent.scale)
 			self.ServiceNumberFontName = font.family
 			self.ServiceNumberFontSize = font.pointSize
 
 		def progressInfoFont(value):
-			font = parseFont(value, ((1, 1), (1, 1)))
+			font = parseFont(value, parent.scale)
 			self.progressInfoFontName = font.family
 			self.progressInfoFontSize = font.pointSize
 
