@@ -245,11 +245,9 @@ class Session:
 		self.in_exec = False
 
 		self.screen = SessionGlobals(self)
-
-		if MODEL in ("dreamone", "dreamtwo"):
-			from Components.FrontPanelLed import frontPanelLed
-			frontPanelLed.init(self)
-			self.allDialogs = []
+		from Components.FrontPanelLed import frontPanelLed
+		frontPanelLed.init(self)
+		self.allDialogs = []
 
 		for p in plugins.getPlugins(PluginDescriptor.WHERE_SESSIONSTART):
 			try:
