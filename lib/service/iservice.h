@@ -175,6 +175,7 @@ public:
 	std::string toString() const;
 	std::string toCompareString() const;
 	std::string toReferenceString() const;
+	std::string toLCNReferenceString() const;
 	bool operator==(const eServiceReference &c) const
 	{
 		if (!c || type != c.type)
