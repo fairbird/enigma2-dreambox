@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from re import compile
-from os import makedirs, system, unlink
+from os import makedirs, symlink, unlink
 from os.path import exists, join, islink
 from Screens.Screen import Screen
 from Screens.ParentalControlSetup import ProtectedScreen
