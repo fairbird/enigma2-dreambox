@@ -2,7 +2,7 @@ from Components.Addons.GUIAddon import GUIAddon
 
 from enigma import eListbox, eListboxPythonMultiContent, BT_ALIGN_CENTER
 
-from skin import parseScale
+from skin import parseScale, applySkinFactor
 
 from Components.MultiContent import MultiContentEntryPixmapAlphaBlend
 from Components.Sources.Boolean import Boolean
@@ -19,7 +19,7 @@ class ButtonSequence(GUIAddon):
 		self.l.setBuildFunc(self.buildEntry)
 		self.l.setItemHeight(36)
 		self.l.setItemWidth(36)
-		self.spacing = 10
+		self.spacing = applySkinFactor(10)
 		self.orientations = {"orHorizontal": eListbox.orHorizontal, "orVertical": eListbox.orVertical}
 		self.orientation = eListbox.orHorizontal
 		self.alignment = "left"
