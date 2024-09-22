@@ -192,8 +192,7 @@ class PictureInPicture(Screen):
 		if service is None:
 			return False
 		from Screens.InfoBarGenerics import streamrelay
-		orig_ref = self.resolveAlternatePipService(service)
-		ref = orig_ref and streamrelay.streamrelayChecker(orig_ref)
+		ref, isStreamRelay = streamrelay.streamrelayChecker(self.resolveAlternatePipService(service))
 		if ref:
 			if BoxInfo.getItem("CanNotDoSimultaneousTranscodeAndPIP") and StreamServiceList:
 				self.pipservice = None
@@ -205,17 +204,17 @@ class PictureInPicture(Screen):
 			if ref.toString().startswith("4097"):
 				#Change to service type 1 and try to play a stream as type 1
 				ref = eServiceReference("1" + ref.toString()[4:])
-			if not self.isPlayableForPipService(orig_ref):
+			if not self.isPlayableForPipService(ref):
 				if not config.usage.hide_zap_errors.value:
 					AddPopup(text="PiP...\n" + _("No free tuner!"), type=MessageBox.TYPE_ERROR, timeout=5, id="ZapPipError")
 				return False
 			self.pipservice = eServiceCenter.getInstance().play(ref)
 			if self.pipservice and not self.pipservice.setTarget(1, True):
 				if hasattr(self, "dishpipActive") and self.dishpipActive is not None:
-					self.dishpipActive.startPiPService(orig_ref)
+					self.dishpipActive.startPiPService(ref)
 				self.pipservice.start()
 				self.currentService = service
-				self.currentServiceReference = orig_ref
+				self.currentServiceReference = ref
 				print("[PictureInPicture] playing pip service", ref and ref.toString())
 				return True
 			else:
