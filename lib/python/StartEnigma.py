@@ -240,6 +240,7 @@ class Session:
 
 		self.dialog_stack = []
 		self.summary_stack = []
+		self.onShutdown = []
 		self.summary = None
 
 		self.in_exec = False
@@ -247,7 +248,6 @@ class Session:
 		self.screen = SessionGlobals(self)
 		from Components.FrontPanelLed import frontPanelLed
 		frontPanelLed.init(self)
-		self.allDialogs = []
 
 		for p in plugins.getPlugins(PluginDescriptor.WHERE_SESSIONSTART):
 			try:
@@ -308,12 +308,8 @@ class Session:
 	def deleteDialog(self, screen):
 		screen.hide()
 		screen.doClose()
-		if screen in self.allDialogs:
-			self.allDialogs.remove(screen)
 
 	def deleteDialogWithCallback(self, callback, screen, *retVal):
-		if screen in self.allDialogs:
-			self.allDialogs.remove(screen)
 		screen.hide()
 		screen.doClose()
 		if callback is not None:
@@ -338,7 +334,6 @@ class Session:
 		# create GUI view of this dialog
 		dlg.setDesktop(desktop)
 		dlg.applySkin()
-		self.allDialogs.append(dlg)
 		return dlg
 
 	def pushCurrent(self):
@@ -417,10 +412,10 @@ class Session:
 		if self.summary:
 			self.summary.show()
 
-	def onShutdown(self):
-		for dialog in self.allDialogs:
-			if hasattr(dialog, "onShutdown"):
-				dialog.onShutdown()
+	def doShutdown(self):
+		for function in self.onShutdown:
+			if callable(function):
+				function()
 
 
 enigma.eProfileWrite("Standby,PowerKey")
@@ -630,7 +625,7 @@ def runScreenTest():
 	session.nav.stopService()
 	enigma.eProfileWrite("nav shutdown")
 	session.nav.shutdown()
-	session.onShutdown()
+	session.doShutdown()
 
 	VolumeControl.instance.saveVolumeState()
 
