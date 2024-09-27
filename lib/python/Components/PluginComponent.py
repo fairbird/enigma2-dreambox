@@ -22,8 +22,10 @@ class PluginComponent:
 	def setPluginPrefix(self, prefix):
 		self.prefix = prefix
 
-	def addPlugin(self, plugin):
+	def addPlugin(self, plugin, path=None):
 		if self.firstRun or not plugin.needsRestart:
+			if path:
+				plugin.updateIcon(path)
 			self.pluginList.append(plugin)
 			for x in plugin.where:
 				insort(self.plugins.setdefault(x, []), plugin)
@@ -80,7 +82,6 @@ class PluginComponent:
 
 						for p in plugins:
 							if p:
-								p.path = path
 								p.updateIcon(path)
 								new_plugins.append(p)
 

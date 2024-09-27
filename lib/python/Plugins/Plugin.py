@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from Components.config import ConfigSubsection, config
-import os
+from os.path import basename, isdir, join, normpath
 
 config.plugins = ConfigSubsection()
 
@@ -74,6 +74,7 @@ class PluginDescriptor:
 		self.internal = internal
 		self.needsRestart = needsRestart
 		self.path = None
+		self.key = name
 		if isinstance(where, list):
 			self.where = where
 		else:
@@ -99,6 +100,8 @@ class PluginDescriptor:
 
 	def updateIcon(self, path):
 		self.path = path
+		if isdir(path):
+			self.key = basename(normpath(path))
 
 	def getWakeupTime(self):
 		return self.wakeupfnc and self.wakeupfnc() or -1
@@ -107,7 +110,7 @@ class PluginDescriptor:
 	def icon(self):
 		if self.iconstr and self.path:
 			from Tools.LoadPixmap import LoadPixmap
-			return LoadPixmap(os.path.join(self.path, self.iconstr))
+			return LoadPixmap(join(self.path, self.iconstr))
 		else:
 			return self._icon
 
