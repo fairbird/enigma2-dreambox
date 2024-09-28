@@ -8,13 +8,20 @@ from Tools.Directories import fileReadXML
 
 from Components.config import config, ConfigSubsection, ConfigSelection, ConfigFloat, ConfigSatlist, ConfigYesNo, ConfigInteger, ConfigSubList, ConfigNothing, ConfigSubDict, ConfigOnOff, ConfigDateTime, ConfigText
 
-from enigma import eDVBFrontendParametersSatellite, eDVBSatelliteEquipmentControl as secClass, eDVBSatelliteDiseqcParameters as diseqcParam, eDVBSatelliteSwitchParameters as switchParam, eDVBSatelliteRotorParameters as rotorParam, eDVBResourceManager, eDVBDB, eEnv
+from enigma import eDVBFrontendParametersSatellite, eDVBSatelliteEquipmentControl as secClass, eDVBSatelliteDiseqcParameters as diseqcParam, eDVBSatelliteSwitchParameters as switchParam, eDVBSatelliteRotorParameters as rotorParam, eDVBResourceManager, eDVBDB, eEnv, iDVBFrontend
 
 from time import localtime, mktime
 from datetime import datetime
 from itertools import chain
 
 config.unicable = ConfigSubsection()
+
+iDVBFrontendDict = {
+	iDVBFrontend.feSatellite: "DVB-S",
+	iDVBFrontend.feCable: "DVB-C",
+	iDVBFrontend.feTerrestrial: "DVB-T",
+	iDVBFrontend.feATSC: "ATSC",
+}
 
 
 def getConfigSatlist(orbpos, satlist):
@@ -1714,7 +1721,10 @@ def InitNimManager(nimmgr, update_slots=[]):
 								open("/sys/module/dvb_core/parameters/dvb_shutdown_timeout", "w").write("0")
 							except:
 								print("[InitNimManager] tunerTypeChanged read /sys/module/dvb_core/parameters/dvb_shutdown_timeout failed")
-
+						for fe_item in iDVBFrontendDict.items():
+							if fe_item[1] == system:
+								frontend.overrideType(fe_item[0])
+								break
 						frontend.closeFrontend()
 						open("/proc/stb/frontend/%d/mode" % (fe_id), "w").write(configElement.value)
 						frontend.reopenFrontend()
