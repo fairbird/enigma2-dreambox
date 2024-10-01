@@ -786,7 +786,7 @@ void eDVBScan::channelDone()
 						unsigned long hash=0;
 						feparm->getHash(hash);
 						ns = buildNamespace(onid, tsid, hash);
-						SCAN_eDebug("[eDVBScan] terrestrial delivery system descriptor found %d", d.getCentreFrequency() * 10);
+
 						addChannelToScan(feparm);
 						break;
 					}
@@ -803,7 +803,7 @@ void eDVBScan::channelDone()
 						unsigned long hash=0;
 						feparm->getHash(hash);
 						ns = buildNamespace(onid, tsid, hash);
-
+						SCAN_eDebug("[eDVBScan] terrestrial delivery system descriptor found %d", d.getCentreFrequency() * 10);
 						addChannelToScan(feparm);
 						break;
 					}
