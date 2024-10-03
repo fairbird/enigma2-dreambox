@@ -168,7 +168,7 @@ class StandbyScreen(Screen):
 		self.close(True)
 
 	def setMute(self):
-		self.wasMuted = eDVBVolumecontrol.getInstance().isMuted()
+		self.wasMuted = eDVBVolumecontrol.getInstance().isMuted(True)
 		if not self.wasMuted:
 			eDVBVolumecontrol.getInstance().volumeMute()
 
