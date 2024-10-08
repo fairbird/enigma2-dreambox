@@ -358,7 +358,7 @@ def InitUsageConfig():
 		eSettings.setTimeshiftPath(configElement.value)
 
 	config.timeshift.path.addNotifier(setTimeshiftPath)
-	config.usage.timeshift_skipreturntolive = ConfigYesNo(default=False)
+	config.timeshift.skipreturntolive = ConfigYesNo(default=False)
 
 	config.usage.movielist_trashcan = ConfigYesNo(default=True)
 	config.usage.movielist_trashcan_days = ConfigNumber(default=8)
