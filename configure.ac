@@ -1,4 +1,4 @@
-AC_INIT([enigma2],[4],[forum@openpli.org])
+AC_INIT([enigma2],[4],[https://github.com/fairbird/enigma2-dreambox])
 AM_INIT_AUTOMAKE([dist-bzip2 no-define tar-pax -Wno-portability])
 AC_CONFIG_HEADERS([enigma2_config.h])
 
@@ -51,7 +51,7 @@ AC_SUBST(LIBGIF_LIBS)
 
 AC_ARG_WITH(crashlogemail,
 	[  --with-crashlogemail=crash log email address],
-	[CRASHLOGEMAIL="$withval"],[CRASHLOGEMAIL="the OpenPLi forum"])
+	[CRASHLOGEMAIL="$withval"],[CRASHLOGEMAIL="https://github.com/fairbird/enigma2-dreambox"])
 AC_SUBST(CRASHLOGEMAIL)
 AC_DEFINE_UNQUOTED(CRASH_EMAILADDR,"$CRASHLOGEMAIL",[crash log email address])
 
