@@ -20,9 +20,93 @@
 		<font filename="nmsbd.ttf" name="FdLcD" scale="100"/>
 	</fonts>
 
+	<!-- NEU: "TheTunerPanel" - wird von "InfoBarSummary", "ChannelSelectionSummary" und "EPGSelectionSummary" aufgerufen -->
+	<screen name="TheTunerPanel" position="0,0" size="480,320">
+
+<!-- ###########
+#####		<eLabel text="TUNER:" position="20,260" size="160,60" halign="center" valign="center" font="FdLcD;40" />
+#####		<widget source="session.FrontendInfo" render="FixedLabel" position="180,260" size="60,60" text="A" foregroundColor="#04B404" font="FdLcD;40" halign="center" valign="center">
+#####
+#####		"TUNER:" linksbuendig zm Fortschrittsbalken. Tunerbuchstabe naeher am Doppelpunkt, dadurch kann das Aufnahme "R" dann genau in die Screenmitte.
+############ -->
+
+		<eLabel text="TUNER:" position="20,251" size="160,60" halign="left" valign="center" font="FdLcD;40" />
+		<widget source="session.FrontendInfo" render="FixedLabel" position="180,251" size="60,60" text="A" foregroundColor="#04B404" font="FdLcD;40" halign="left" valign="center">
+			<convert type="FrontendInfo">NUMBER</convert>
+			<convert type="ValueRange">0,0</convert>
+			<convert type="ConditionalShowHide" />
+		</widget>
+		<widget source="session.FrontendInfo" render="FixedLabel" position="180,251" size="60,60" text="B" foregroundColor="#04B404" font="FdLcD;40" halign="left" valign="center">
+			<convert type="FrontendInfo">NUMBER</convert>
+			<convert type="ValueRange">1,1</convert>
+			<convert type="ConditionalShowHide" />
+		</widget>
+		<widget source="session.FrontendInfo" render="FixedLabel" position="180,251" size="60,60" text="C" foregroundColor="#04B404" font="FdLcD;40" halign="left" valign="center">
+			<convert type="FrontendInfo">NUMBER</convert>
+			<convert type="ValueRange">2,2</convert>
+			<convert type="ConditionalShowHide" />
+		</widget>
+		<widget source="session.FrontendInfo" render="FixedLabel" position="180,251" size="60,60" text="D" foregroundColor="#04B404" font="FdLcD;40" halign="left" valign="center">
+			<convert type="FrontendInfo">NUMBER</convert>
+			<convert type="ValueRange">3,3</convert>
+			<convert type="ConditionalShowHide" />
+		</widget>
+		<widget source="session.FrontendInfo" render="FixedLabel" position="180,251" size="60,60" text="E" foregroundColor="#04B404" font="FdLcD;40" halign="left" valign="center">
+			<convert type="FrontendInfo">NUMBER</convert>
+			<convert type="ValueRange">4,4</convert>
+			<convert type="ConditionalShowHide" />
+		</widget>
+		<widget source="session.FrontendInfo" render="FixedLabel" position="180,251" size="60,60" text="F" foregroundColor="#04B404" font="FdLcD;40" halign="left" valign="center">
+			<convert type="FrontendInfo">NUMBER</convert>
+			<convert type="ValueRange">5,5</convert>
+			<convert type="ConditionalShowHide" />
+		</widget>
+		<widget source="session.FrontendInfo" render="FixedLabel" position="180,251" size="60,60" text="G" foregroundColor="#04B404" font="FdLcD;40" halign="left" valign="center">
+			<convert type="FrontendInfo">NUMBER</convert>
+			<convert type="ValueRange">6,6</convert>
+			<convert type="ConditionalShowHide" />
+		</widget>
+		<widget source="session.FrontendInfo" render="FixedLabel" position="180,251" size="60,60" text="H" foregroundColor="#04B404" font="FdLcD;40" halign="left" valign="center">
+			<convert type="FrontendInfo">NUMBER</convert>
+			<convert type="ValueRange">7,7</convert>
+			<convert type="ConditionalShowHide" />
+		</widget>
+		<widget source="session.FrontendInfo" render="FixedLabel" position="180,251" size="60,60" text="I" foregroundColor="#04B404" font="FdLcD;40" halign="left" valign="center">
+			<convert type="FrontendInfo">NUMBER</convert>
+			<convert type="ValueRange">8,8</convert>
+			<convert type="ConditionalShowHide" />
+		</widget>
+		<widget source="session.FrontendInfo" render="FixedLabel" position="180,251" size="60,60" text="J" foregroundColor="#04B404" font="FdLcD;40" halign="left" valign="center">
+			<convert type="FrontendInfo">NUMBER</convert>
+			<convert type="ValueRange">9,9</convert>
+			<convert type="ConditionalShowHide" />
+		</widget>
+	</screen>
+
+	<!-- NEU: "TheRecordingPanel" - wird von verschiedenen Screens aufgerufen - Blinkendes oder permanentes "R" unten mittig - je 1 Pixel ueber und unter 40er Font -->
+	<screen name="TheRecordingPanel">
+		<widget source="session.RecordState" render="Pixmap" position="center,265" pixmap="/usr/share/enigma2/display/skin_default/record.png" alphatest="blend" size="31,31">
+			<convert type="ConfigEntryTest">config.usage.blinking_rec_symbol_during_recording,True,CheckSourceBoolean</convert>
+			<convert type="ConditionalShowHide">Blink,1000</convert>
+		</widget>
+		<widget source="session.RecordState" render="Pixmap" position="center,265" pixmap="/usr/share/enigma2/display/skin_default/record.png" alphatest="blend" size="31,31">
+			<convert type="ConfigEntryTest">config.usage.blinking_rec_symbol_during_recording,False,CheckSourceBoolean</convert>
+			<convert type="ConditionalShowHide"/>
+		</widget>
+	</screen>
+
 	<screen name="SummaryClockPanel">
-		<widget source="global.CurrentTime" render="Label" position="center,227" size="230,100" font="FdLcD;75" horizontalAlignment="center" noWrap="1" transparent="1">
-			<convert type="ClockToText"></convert>
+
+<!-- ###########
+#####		Nur hier "center"
+#####
+#####		<widget source="global.CurrentTime" render="Label" position="center,227" size="230,100" font="FdLcD;75" halign="center" noWrap="1" transparent="1">
+#####
+#####		Grosse Uhrzeit unten mittig
+############ -->
+
+		<widget source="global.CurrentTime" render="Label" position="0,227" size="480,75" font="FdLcD;75" halign="center">
+			<convert type="ClockToText" />
 		</widget>
 	</screen>
 
@@ -107,26 +191,67 @@
 
 <!-- main-->
 	<screen name="InfoBarSummary" position="5,0" size="471,320">
-		<widget source="session.CurrentService" render="LcdPicon" position="118,0" zPosition="2" size="236,142" alphaTest="on">
+
+<!-- ###########
+#####		118 + 236 = 354 Dann ist das Picon von links 118 und nach rechts 126 vom Rand
+#####
+#####		<widget source="session.CurrentService" render="LcdPicon" position="118,20" zPosition="2" size="236,142" alphatest="on">
+#####
+#####		Picons sind 220x132 gross - 130 + 220 + 130 = 480 dann Picon in der Mitte, muss nicht vergroessert werden und ist deshalb nicht verzerrt
+#####		Picon 20 von oberem Rand
+############ -->
+
+		<widget source="session.CurrentService" render="LcdPicon" position="130,20" size="220,132">
 			<convert type="ServiceName">Reference</convert>
 		</widget>
-		<widget source="session.Event_Now" render="Label" position="0,111" size="115,51" font="FdLcD;38" foregroundColor="#87CEFA">
+
+<!-- ###########
+#####		<widget source="session.Event_Now" render="Label" position="0,100" size="115,51" font="FdLcD;38" foregroundColor="#87CEFA" valign="center" halign="center">
+#####
+#####		Startzeit 10 Pixel von links wie Tunerbuchstabe - Groesse 40
+#####		Unterkante auf Hoehe der Unterkante vom Picon
+############ -->
+
+		<widget source="session.Event_Now" render="Label" position="10,115" size="120,40" font="FdLcD;40" foregroundColor="#87CEFA" halign="left">
 			<convert type="EventTime">StartTime</convert>
-			<convert type="ClockToText"></convert>
+			<convert type="ClockToText" />
 		</widget>
-		<widget source="session.Event_Now" render="Label" position="357,111" size="115,51" font="FdLcD;38" foregroundColor="#87CEFA">
+
+<!-- ###########
+#####		<widget source="session.Event_Now" render="Label" position="357,100" size="115,51" font="FdLcD;38" foregroundColor="#87CEFA" valign="center" halign="center">
+#####
+#####		Endzeit 10 Pixel von rechts wie Restzeit - Groesse 40
+#####		Unterkante auf Hoehe der Unterkante vom Picon
+#####		Zweiten Trennstrich 1 Pixel hoeher, dann beide Trennstriche gleich weit vom Fortschrittsbalken entfernt
+#####		Fortschrittsbalken je 10 Pixel von den Raendern
+#####		Fortschrittsbalken 5 Pixel hoeher, damit, falls es 2 Zeilen in "ChannelSelectionSummary" gibt, diese komplett zu sehen sind
+############ -->
+
+		<widget source="session.Event_Now" render="Label" position="350,115" size="120,40" font="FdLcD;40" foregroundColor="#87CEFA" halign="right">
 			<convert type="EventTime">EndTime</convert>
-			<convert type="ClockToText"></convert>
+			<convert type="ClockToText" />
 		</widget>
-		<eLabel position="0,175" size="471,3" backgroundColor="#BDBDBD" zPosition="3" />
-		<widget source="session.Event_Now" render="Progress" position="0,184" size="471,33" transparent="1">
+
+		<eLabel position="10,170" size="460,3" backgroundColor="#BDBDBD" />
+
+		<widget source="session.Event_Now" render="Progress" position="10,179" size="460,33">
 			<convert type="EventTime">Progress</convert>
 		</widget>
-		<eLabel position="0,224" size="471,3" backgroundColor="#BDBDBD" zPosition="3" />
-		<widget source="session.Event_Now" render="Label" position="353,231" size="118,53" font="FdLcD;40" zPosition="0" foregroundColor="#A9E2F3" transparent="1">
+
+		<eLabel position="10,218" size="460,3" backgroundColor="#BDBDBD" />
+
+<!-- ###########
+#####		<widget source="session.Event_Now" render="Label" position="340,252" size="130,40" font="FdLcD;40" zPosition="0" foregroundColor="#A9E2F3" halign="right" transparent="1">
+#####
+#####		Restzeit 10 Pixel von rechts (wie das "A" von links) - Gleiche Farbe wie die Uhrzeiten
+#####		Blinkendes oder permanentes "R" mittig im Fortschrittsbalken
+############ -->
+
+		<widget source="session.Event_Now" render="Label" position="345,246" size="125,40" font="FdLcD;40" zPosition="1" foregroundColor="#87CEFA" halign="right">
 			<convert type="EventTime">Remaining</convert>
 			<convert type="RemainingToText">OnlyMinute</convert>
 		</widget>
+
 		<panel name="MeinRecordingPanel" />
 		<panel name="SummaryClockPanel" />
 		<panel name="MeinTunerInfoPanel" />
@@ -188,25 +313,61 @@
 
 <!-- channelselection -->
 	<screen name="ChannelSelection_summary" position="5,0" size="471,320">
-		<widget source="parent.Service" render="LcdPicon" position="147,0" size="177,120" zPosition="2" alphaTest="on">
+<!-- ###########
+#####		<widget source="parent.Service" render="LcdPicon" position="147,0" size="177,120" zPosition="2" alphatest="on">
+#####			<convert type="ServiceName">Reference</convert>
+#####		</widget>
+#####		<eLabel position="0,123" size="480,1" backgroundColor="#BDBDBD" />
+#####		<widget source="parent.ServiceEvent" render="Progress" position="0,127" size="480,20">
+#####			<convert type="EventTime">Progress</convert>
+#####		</widget>
+#####		<eLabel position="0,149" size="480,1" backgroundColor="#BDBDBD" />
+#####		<widget source="parent.ServiceEvent" render="Label" position="5,67" size="470,51" font="FdLcD;38" foregroundColor="#87CEFA" transparent="1" valign="center" halign="left">
+#####			<convert type="EventTime">StartTime</convert>
+#####			<convert type="ClockToText" />
+#####		</widget>
+#####		<widget source="parent.ServiceEvent" render="Label" position="5,67" size="470,51" font="FdLcD;38" foregroundColor="#87CEFA" transparent="1" valign="center" halign="right">
+#####			<convert type="EventTime">EndTime</convert>
+#####			<convert type="ClockToText" />
+#####		</widget>
+#####		<widget source="parent.ServiceEvent" render="Label" position="0,153" size="480,167" font="FdLcD;42" halign="center" valign="center">
+#####			<convert type="EventName">Name</convert>
+#####		</widget>
+#####		<panel name="MeinRecordingPanel" />
+#####
+#####		Oberer Teil wie in "InfoBarSummary" mit Picon und Uhrzeiten
+#####		Sendername maximal 2 Zeilen mittig in Groesse 40
+#####		Zweiten Trennstrich 1 Pixel hoeher, dann beide Trennstriche gleich weit vom Fortschrittsbalken entfernt
+#####		Fortschrittsbalken je 10 Pixel von den Raendern
+#####		Blinkendes oder permanentes "R" mittig im Fortschrittsbalken
+############ -->
+
+		<widget source="parent.Service" render="LcdPicon" position="130,20" size="220,132">
 			<convert type="ServiceName">Reference</convert>
 		</widget>
-		<eLabel position="0,123" size="471,1" backgroundColor="#BDBDBD" />
-		<widget source="parent.ServiceEvent" render="Progress" position="0,127" size="471,20">
+
+		<widget source="parent.ServiceEvent" render="Label" position="10,115" size="120,40" font="FdLcD;40" foregroundColor="#87CEFA" halign="left">
+			<convert type="EventTime">StartTime</convert>
+			<convert type="ClockToText" />
+		</widget>
+
+		<widget source="parent.ServiceEvent" render="Label" position="350,115" size="120,40" font="FdLcD;40" foregroundColor="#87CEFA" halign="right">
+			<convert type="EventTime">EndTime</convert>
+			<convert type="ClockToText" />
+		</widget>
+
+		<eLabel position="10,170" size="460,3" backgroundColor="#BDBDBD" />
+
+		<widget source="parent.ServiceEvent" render="Progress" position="10,179" size="460,33">
 			<convert type="EventTime">Progress</convert>
 		</widget>
-		<eLabel position="0,149" size="471,1" backgroundColor="#BDBDBD" />
-		<widget source="parent.ServiceEvent" render="Label" position="5,67" size="471,51" font="FdLcD;38" foregroundColor="#87CEFA" transparent="1" verticalAlignment="center" horizontalAlignment="left">
-			<convert type="EventTime">StartTime</convert>
-			<convert type="ClockToText"></convert>
-		</widget>
-		<widget source="parent.ServiceEvent" render="Label" position="0,67" size="471,51" font="FdLcD;38" foregroundColor="#87CEFA" transparent="1" verticalAlignment="center" horizontalAlignment="right">
-			<convert type="EventTime">EndTime</convert>
-			<convert type="ClockToText"></convert>
-		</widget>
-		<widget source="parent.ServiceEvent" render="Label" position="0,153" size="471,167" font="FdLcD;34" horizontalAlignment="center" verticalAlignment="center" >
+
+		<eLabel position="10,218" size="460,3" backgroundColor="#BDBDBD" />
+
+		<widget source="parent.ServiceEvent" render="Label" position="0,221" size="480,92" font="FdLcD;40" halign="center" valign="center">
 			<convert type="EventName">Name</convert>
 		</widget>
+
 		<panel name="MeinRecordingPanel" />
 	</screen>
 

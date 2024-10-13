@@ -22,7 +22,7 @@
 
 <!-- template V1.6.8b 13.03.2016-->
 	<screen name="SummaryClockPanel">
-		<widget source="global.CurrentTime" render="Label" position="center,163" size="195,75" font="FdLcD;75" horizontalAlignment="center" noWrap="1" transparent="1">
+		<widget source="global.CurrentTime" render="Label" position="center,163" size="195,75" font="FdLcD;75" halign="center" noWrap="1" transparent="1">
 			<convert type="ClockToText"></convert>
 		</widget>
 	</screen>
@@ -108,23 +108,23 @@
 
 <!-- main-->
 	<screen name="InfoBarSummary" position="0,0" size="390,240">
-		<widget source="session.CurrentService" render="LcdPicon" position="100,0" zPosition="2" size="200,120" alphaTest="on">
+		<widget source="session.CurrentService" render="LcdPicon" position="100,0" zPosition="2" size="200,120" alphatest="on">
 			<convert type="ServiceName">Reference</convert>
 		</widget>
-		<widget source="session.Event_Now" render="Label" position="0,83" size="98,38" font="FdLcD;38" foregroundColor="#87CEFA">
+		<widget source="session.Event_Now" render="Label" position="0,83" size="98,38" font="FdLcD;38" foregroundColor="#87CEFA" valign="center" halign="center">
 			<convert type="EventTime">StartTime</convert>
 			<convert type="ClockToText"></convert>
 		</widget>
-		<widget source="session.Event_Now" render="Label" position="295,83" size="98,38" font="FdLcD;38" foregroundColor="#87CEFA">
+		<widget source="session.Event_Now" render="Label" position="295,83" size="98,38" font="FdLcD;38" foregroundColor="#87CEFA" valign="center" halign="center">
 			<convert type="EventTime">EndTime</convert>
 			<convert type="ClockToText"></convert>
-		</widget>
+		</widget>	
 		<eLabel position="0,131" size="389,2" backgroundColor="#BDBDBD" zPosition="3" />
 		<widget source="session.Event_Now" render="Progress" position="0,138" size="390,25" transparent="1">
 			<convert type="EventTime">Progress</convert>
 		</widget>
 		<eLabel position="0,168" size="390,2" backgroundColor="#BDBDBD" zPosition="3" />
-		<widget source="session.Event_Now" render="Label" position="300,173" size="90,40" font="FdLcD;40" zPosition="0" foregroundColor="#A9E2F3" transparent="1">
+		<widget source="session.Event_Now" render="Label" position="300,173" size="90,40" font="FdLcD;40" zPosition="0" foregroundColor="#A9E2F3" halign="right" transparent="1">
 			<convert type="EventTime">Remaining</convert>
 			<convert type="RemainingToText">OnlyMinute</convert>
 		</widget>
@@ -189,7 +189,7 @@
 
 <!-- channelselection -->
 	<screen name="ChannelSelection_summary" position="0,0" size="390,240">
-		<widget source="parent.Service" render="LcdPicon" position="125,0" size="150,90" zPosition="2" alphaTest="on">
+		<widget source="parent.Service" render="LcdPicon" position="125,0" size="150,90" zPosition="2" alphatest="on">
 			<convert type="ServiceName">Reference</convert>
 		</widget>
 		<eLabel position="0,92" size="390,1" backgroundColor="#BDBDBD" />
@@ -197,18 +197,18 @@
 			<convert type="EventTime">Progress</convert>
 		</widget>
 		<eLabel position="0,112" size="390,1" backgroundColor="#BDBDBD" />
-		<widget source="parent.ServiceEvent" render="Label" position="0,50" size="390,38" font="FdLcD;38" foregroundColor="#87CEFA" transparent="1" verticalAlignment="center" horizontalAlignment="left">
+		<widget source="parent.ServiceEvent" render="Label" position="0,50" size="390,38" font="FdLcD;38" foregroundColor="#87CEFA" transparent="1" valign="center" halign="left">
 			<convert type="EventTime">StartTime</convert>
 			<convert type="ClockToText"></convert>
 		</widget>
-		<widget source="parent.ServiceEvent" render="Label" position="0,50" size="390,38" font="FdLcD;38" foregroundColor="#87CEFA" transparent="1" verticalAlignment="center" horizontalAlignment="right">
+		<widget source="parent.ServiceEvent" render="Label" position="0,50" size="390,38" font="FdLcD;38" foregroundColor="#87CEFA" transparent="1" valign="center" halign="right">
 			<convert type="EventTime">EndTime</convert>
 			<convert type="ClockToText"></convert>
-		</widget>
-		<widget source="parent.ServiceEvent" render="Label" position="0,115" size="390,125" font="FdLcD;34" horizontalAlignment="center" verticalAlignment="center" >
+		</widget>		
+		<widget source="parent.ServiceEvent" render="Label" position="0,115" size="390,125" font="FdLcD;34" halign="center" valign="center" >
 			<convert type="EventName">Name</convert>
 		</widget>
-		<panel name="MeinRecordingPanel" />
+		<panel name="MeinRecordingPanel" /> 
 	</screen>
 
 <!-- RadioChannelselection  -->

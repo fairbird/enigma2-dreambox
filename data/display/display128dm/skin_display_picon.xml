@@ -23,7 +23,7 @@
 
 <!-- template -->
 	<screen name="SummaryClockPanel">
-		<widget source="global.CurrentTime" render="Label" position="right" size="60,5" font="FdLcD;24" horizontalAlignment="right" verticalAlignment="top" noWrap="1">
+		<widget source="global.CurrentTime" render="Label" position="right" size="60,5" font="FdLcD;24" halign="right" valign="top" noWrap="1">
 			<convert type="ClockToText"></convert>
 		</widget>
 		<widget source="session.RecordState" render="FixedLabel" text="Rec" position="4,12" size="24,12" font="FdLcD;12" zPosition="1" noWrap="1">
@@ -44,28 +44,30 @@
 		<widget source="session.Event_Now" render="Progress" position="0,45" size="128,5" borderWidth="1" >
 			<convert type="EventTime">Progress</convert>
 		</widget>
-		<widget source="global.CurrentTime" render="Label" position="0,50" size="64,16" font="FdLcD;18" horizontalAlignment="left" >
+		<widget source="global.CurrentTime" render="Label" position="0,50" size="64,16" font="FdLcD;18" halign="left" >
 			<convert type="ClockToText"/>
 		</widget>
-		<widget source="session.Event_Now" render="Label" position="64,50" size="64,16" font="FdLcD;18" horizontalAlignment="right" >
+		<widget source="session.Event_Now" render="Label" position="64,50" size="64,16" font="FdLcD;18" halign="right" >
 			<convert type="EventTime">VFDRemaining</convert>
 			<convert type="RemainingToText">VFDNoSeconds</convert>
 		</widget>
-
 	</screen>
 
 <!-- channelselection-->
 	<screen name="ChannelSelection_summary" position="2,0" size="128,64">
-		<widget source="parent.ServiceEvent" render="Label" position="top" size="100,21" font="FdLcD;20" horizontalAlignment="center" verticalAlignment="center"  noWrap="1" >
-			<convert type="ServiceName">Name</convert>
+		<widget source="session.CurrentService" render="LcdPicon" position="0,0" size="128,44" zPosition="1" >
+			<convert type="ServiceName">Reference</convert>
 		</widget>
-		<widget source="parent.ServiceEvent" render="Label" position="top" size="100,15" font="FdLcD;14"  noWrap="1">
-			<convert type="EventName">Name</convert>
-		</widget>
-		<widget source="parent.ServiceEvent" render="Progress" position="top" size="100,4" borderWidth="1">
+		<widget source="session.Event_Now" render="Progress" position="0,45" size="128,5" borderWidth="1" >
 			<convert type="EventTime">Progress</convert>
 		</widget>
-		<panel position="bottom" size="198,24" name="SummaryClockPanel" />
+		<widget source="global.CurrentTime" render="Label" position="0,50" size="64,16" font="FdLcD;18" halign="left" >
+			<convert type="ClockToText"/>
+		</widget>
+		<widget source="session.Event_Now" render="Label" position="64,50" size="64,16" font="FdLcD;18" halign="right" >
+			<convert type="EventTime">VFDRemaining</convert>
+			<convert type="RemainingToText">VFDNoSeconds</convert>
+		</widget>
 	</screen>
 
 <!-- menus-->

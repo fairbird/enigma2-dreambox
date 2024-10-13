@@ -24,45 +24,45 @@
 
 <!-- template -->
 	<screen name="SummaryClockPanel">
-		<widget source="global.CurrentTime" render="Label" position="500,490" size="182,52" horizontalAlignment="right" font="FdLcD;50" >
+		<widget source="global.CurrentTime" render="Label" position="500,490" size="182,52" halign="right" font="FdLcD;50" >
 			<convert type="ClockToText">Default</convert>
 		</widget>
 	</screen>
 
 <!-- main-->
 	<screen name="InfoBarSummary" position="0,0" size="720,576">
-		<widget source="session.CurrentService" render="Label" position="15,21" size="675,70" foregroundColor="#e5b243" font="FdLcD; 60" horizontalAlignment="center" verticalAlignment="center" zPosition="14">
+		<widget source="session.CurrentService" render="Label" position="15,21" size="675,70" foregroundColor="#e5b243" font="FdLcD; 60" halign="center" zPosition="14">
 			<convert type="ServiceName">Name</convert>
 		</widget>
-		<widget source="session.Event_Now" render="Label" position="14,189" foregroundColor="#dedede" size="675,192" font="FdLcDLight; 55">
+		<widget source="session.Event_Now" render="Label" position="14,189" foregroundColor="#dedede" size="675,192" font="FdLcDLight; 55" halign="center" valign="center">
 			<convert type="EventName">Name</convert>
 		</widget>
 		<widget source="session.Event_Now" render="Progress" position="27,98" size="660,25" foregroundColor="#02c6ff" borderWidth="2">
 			<convert type="EventTime">Progress</convert>
 		</widget>
-		<widget source="session.Event_Now" render="Label" position="14,140" size="139,46" font="FdLcD;50" transparent="1">
+		<widget source="session.Event_Now" render="Label" position="14,140" size="139,46" font="FdLcD;50" halign="center" transparent="1">
 			<convert type="EventTime">StartTime</convert>
 			<convert type="ClockToText">Format:%H:%M</convert>
 		</widget>
-		<widget source="session.Event_Now" render="Label" position="143,140" size="169,46" font="FdLcD;50" transparent="1">
+		<widget source="session.Event_Now" render="Label" position="143,140" size="169,46" font="FdLcD;50" halign="center" transparent="1">
 			<convert type="EventTime">EndTime</convert>
 			<convert type="ClockToText">Format:- %H:%M</convert>
 		</widget>
-		<widget source="session.RecordState" render="FixedLabel" text="&#174;" position="334,140" foregroundColor="#ff0000" size="50,46" font="FdLcD;50" zPosition="22">
+		<widget source="session.RecordState" render="FixedLabel" text="&#174;" position="334,140" foregroundColor="#ff0000" size="50,46" font="FdLcD;50" halign="left" valign="center" zPosition="22">
 			<convert type="ConfigEntryTest">config.usage.blinking_rec_symbol_during_recording,True,CheckSourceBoolean</convert>
 			<convert type="ConditionalShowHide">Blink</convert>
 		</widget>
-		<widget source="session.RecordState" render="FixedLabel" text="&#174;" position="334,140" foregroundColor="#ff0000" size="50,46" font="FdLcD;50" zPosition="22">
+		<widget source="session.RecordState" render="FixedLabel" text="&#174;" position="334,140" foregroundColor="#ff0000" size="50,46" font="FdLcD;50" halign="left" valign="center" zPosition="22">
 			<convert type="ConfigEntryTest">config.usage.blinking_rec_symbol_during_recording,False,CheckSourceBoolean</convert>
 			<convert type="ConditionalShowHide" />
 		</widget>
-		<widget source="session.Event_Now" render="Label" position="421,140" size="266,46" font="FdLcD;50" >
+		<widget source="session.Event_Now" render="Label" position="421,140" size="266,46" font="FdLcD;50" halign="right">
 			<convert type="EventTime">Remaining</convert>
-			<convert type="RemainingToText">InMinutes</convert>
+			<convert type="RemainingToText"></convert>
 		</widget>
 		<panel name="SummaryClockPanel" />
-		<widget source="session.CurrentService" render="ChannelNumber" position="14,481" size="169,61" zPosition="8" font="FdLcD;60" transparent="1" />
-		<widget source="session.CurrentService" render="LcdPicon" zPosition="13" position="224,394" size="242,142" transparent="1" alphaTest="blend">
+		<widget source="session.CurrentService" render="ChannelNumber" position="14,481" size="169,61" zPosition="8" font="FdLcD;60" halign="center" valign="top" transparent="1" />
+		<widget source="session.CurrentService" render="LcdPicon" zPosition="13" position="224,394" size="242,142" transparent="1" alphatest="blend">	
 			<convert type="ServiceName">Reference</convert>
 		</widget>
 	</screen>
@@ -79,38 +79,38 @@
 
 <!-- channelselection-->
 	<screen name="ChannelSelection_summary" position="0,0" size="720,576">
-		<widget source="parent.ServiceEvent" render="Label" position="15,21" size="675,70" foregroundColor="#e5b243" font="FdLcD; 60" horizontalAlignment="center">
+		<widget source="parent.ServiceEvent" render="Label" position="15,21" size="675,70" foregroundColor="#e5b243" font="FdLcD; 60" halign="center">
 			<convert type="ServiceName">Name</convert>
 		</widget>
-		<widget source="parent.ServiceEvent" render="Label" position="14,189" foregroundColor="#dedede" size="675,192" font="FdLcDLight; 55" horizontalAlignment="center" verticalAlignment="center">
+		<widget source="parent.ServiceEvent" render="Label" position="14,189" foregroundColor="#dedede" size="675,192" font="FdLcDLight; 55" halign="center" valign="center">
 			<convert type="EventName">Name</convert>
 		</widget>
 		<widget source="parent.ServiceEvent" render="Progress" position="27,98" size="660,25" foregroundColor="#02c6ff" borderWidth="2">
 			<convert type="EventTime">Progress</convert>
 		</widget>
-		<widget source="parent.ServiceEvent" render="Label" position="14,140" size="139,46" font="FdLcD;50" horizontalAlignment="center" transparent="1">
+		<widget source="parent.ServiceEvent" render="Label" position="14,140" size="139,46" font="FdLcD;50" halign="center" transparent="1">
 			<convert type="EventTime">StartTime</convert>
 			<convert type="ClockToText">Format:%H:%M</convert>
 		</widget>
-		<widget source="parent.ServiceEvent" render="Label" position="143,140" size="169,46" font="FdLcD;50" horizontalAlignment="center" transparent="1">
+		<widget source="parent.ServiceEvent" render="Label" position="143,140" size="169,46" font="FdLcD;50" halign="center" transparent="1">
 			<convert type="EventTime">EndTime</convert>
 			<convert type="ClockToText">Format:- %H:%M</convert>
 		</widget>
-		<widget source="session.RecordState" render="FixedLabel" text="&#174;" position="334,140" foregroundColor="#ff0000" size="50,46" font="FdLcD;50" horizontalAlignment="left" verticalAlignment="center" zPosition="22">
+		<widget source="session.RecordState" render="FixedLabel" text="&#174;" position="334,140" foregroundColor="#ff0000" size="50,46" font="FdLcD;50" halign="left" valign="center" zPosition="22">
 			<convert type="ConfigEntryTest">config.usage.blinking_rec_symbol_during_recording,True,CheckSourceBoolean</convert>
 			<convert type="ConditionalShowHide">Blink</convert>
 		</widget>
-		<widget source="session.RecordState" render="FixedLabel" text="&#174;" position="334,140" foregroundColor="#ff0000" size="50,46" font="FdLcD;50" horizontalAlignment="left" verticalAlignment="center" zPosition="22">
+		<widget source="session.RecordState" render="FixedLabel" text="&#174;" position="334,140" foregroundColor="#ff0000" size="50,46" font="FdLcD;50" halign="left" valign="center" zPosition="22">
 			<convert type="ConfigEntryTest">config.usage.blinking_rec_symbol_during_recording,False,CheckSourceBoolean</convert>
 			<convert type="ConditionalShowHide" />
 		</widget>
-		<widget source="parent.ServiceEvent" render="Label" position="421,140" size="266,46" font="FdLcD;50" horizontalAlignment="right">
+		<widget source="parent.ServiceEvent" render="Label" position="421,140" size="266,46" font="FdLcD;50" halign="right">
 			<convert type="EventTime">Remaining</convert>
-			<convert type="RemainingToText">InMinutes</convert>
+			<convert type="RemainingToText"></convert>
 		</widget>
 		<panel name="SummaryClockPanel" />
-		<widget source="parent.Service" render="ChannelNumber" position="14,481" size="169,61" zPosition="8" font="FdLcD;60" horizontalAlignment="center" verticalAlignment="top" transparent="1" />
-		<widget source="parent.Service" render="LcdPicon" zPosition="13" position="224,394" size="242,142" transparent="1" alphaTest="blend">
+		<widget source="parent.Service" render="ChannelNumber" position="14,481" size="169,61" zPosition="8" font="FdLcD;60" halign="center" valign="top" transparent="1" />
+		<widget source="parent.Service" render="LcdPicon" zPosition="13" position="224,394" size="242,142" transparent="1" alphatest="blend">	
 			<convert type="ServiceName">Reference</convert>
 		</widget>
 	</screen>

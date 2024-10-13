@@ -21,17 +21,17 @@
 
 <!-- template -->
 	<screen name="SummaryClockPanel">
-		<widget source="global.CurrentTime" render="Label" position="54,142" size="100,45" font="FdLcD;40" horizontalAlignment="right" verticalAlignment="bottom" noWrap="1">
+		<widget source="global.CurrentTime" render="Label" position="54,142" size="100,45" font="FdLcD;40" halign="right" valign="bottom" noWrap="1">
 			<convert type="ClockToText"></convert>
 		</widget>
 	</screen>
 
 <!-- main-->
 	<screen name="InfoBarSummary" position="0,0" size="240,80">
-		<widget source="session.CurrentService" render="Label" position="0,0" size="240,24" font="FdLcD;24" horizontalAlignment="center" verticalAlignment="center" foregroundColor="#FFFF00" >
+		<widget source="session.CurrentService" render="Label" position="0,0" size="240,24" font="FdLcD;24" halign="center" foregroundColor="#FFFF00" >
 			<convert type="ServiceName">Name</convert>
 		</widget>
-		<widget source="session.Event_Now" render="Label" position="0,23" size="240,24" font="FdLcD;21" >
+		<widget source="session.Event_Now" render="Label" position="0,23" size="240,24" font="FdLcD;21" halign="center" >
 			<convert type="EventName">Name</convert>
 		</widget>
 		<widget source="session.Event_Now" render="Progress" position="0,45" size="240,10" borderWidth="1" >
@@ -39,34 +39,34 @@
 		</widget>
 		<widget source="session.Event_Now" render="Label" position="10,55" size="70,20" font="Regular; 15" foregroundColor="#F78181" >
 			<convert type="EventTime">Remaining</convert>
-			<convert type="RemainingToText">FOLLOW</convert>
+			<convert type="RemainingToText"></convert>
 		</widget>
-		<eLabel text="TUNER:" position="0,55" size="80,25" horizontalAlignment="left" font="FdLcD;20" />
-		<widget source="session.FrontendInfo" render="FixedLabel" position="80,55" size="20,20" text="A" foregroundColor="#ff0000" font="FdLcD;20" >
+		<eLabel text="TUNER:" position="0,55" size="80,25" halign="left" font="FdLcD;20" />
+		<widget source="session.FrontendInfo" render="FixedLabel" position="80,55" size="20,20" text="A" foregroundColor="#ff0000" font="FdLcD;20" halign="center" >
 			<convert type="FrontendInfo">NUMBER</convert>
 			<convert type="ValueRange">0,0</convert>
 			<convert type="ConditionalShowHide" />
 		</widget>
-		<widget source="session.FrontendInfo" render="FixedLabel" position="80,55" size="20,20" text="B" foregroundColor="#04B404" font="FdLcD;20" >
+		<widget source="session.FrontendInfo" render="FixedLabel" position="80,55" size="20,20" text="B" foregroundColor="#04B404" font="FdLcD;20" halign="center" >
 			<convert type="FrontendInfo">NUMBER</convert>
 			<convert type="ValueRange">1,1</convert>
 			<convert type="ConditionalShowHide" />
 		</widget>
-		<widget source="session.FrontendInfo" render="FixedLabel" position="80,55" size="20,20" text="C" foregroundColor="#04B404" font="FdLcD;20" >
+		<widget source="session.FrontendInfo" render="FixedLabel" position="80,55" size="20,20" text="C" foregroundColor="#04B404" font="FdLcD;20" halign="center" >
 			<convert type="FrontendInfo">NUMBER</convert>
 			<convert type="ValueRange">2,2</convert>
 			<convert type="ConditionalShowHide" />
 		</widget>
-		<widget source="session.FrontendInfo" render="FixedLabel" position="80,55" size="20,20" text="D" foregroundColor="#04B404" font="FdLcD;20" >
+		<widget source="session.FrontendInfo" render="FixedLabel" position="80,55" size="20,20" text="D" foregroundColor="#04B404" font="FdLcD;20" halign="center" >
 			<convert type="FrontendInfo">NUMBER</convert>
 			<convert type="ValueRange">3,3</convert>
 			<convert type="ConditionalShowHide" />
 		</widget>
-		<widget source="session.RecordState" render="FixedLabel" text="Recording" position="0,55" size="110,25" foregroundColor="#ff0000" font="FdLcD;20" zPosition="1" noWrap="1" >
+		<widget source="session.RecordState" render="FixedLabel" text="Recording" position="0,55" size="110,25" halign="left" foregroundColor="#ff0000" font="FdLcD;20" zPosition="1" noWrap="1" >
 			<convert type="ConfigEntryTest">config.usage.blinking_rec_symbol_during_recording,True,CheckSourceBoolean</convert>
 			<convert type="ConditionalShowHide">Blink</convert>
 		</widget>
-		<widget source="session.RecordState" render="FixedLabel" text="Recording" position="0,55" size="110,25" foregroundColor="#ff0000" font="FdLcD;20" zPosition="1" noWrap="1" >
+		<widget source="session.RecordState" render="FixedLabel" text="Recording" position="0,55" size="110,25" halign="left" foregroundColor="#ff0000" font="FdLcD;20" zPosition="1" noWrap="1" >
 			<convert type="ConfigEntryTest">config.usage.blinking_rec_symbol_during_recording,False,CheckSourceBoolean</convert>
 			<convert type="ConditionalShowHide" />
 		</widget>
@@ -104,10 +104,10 @@
 
 <!-- channelselection-->
 	<screen name="ChannelSelection_summary" position="fill">
-		<widget source="parent.ServiceEvent" render="Label" position="top" foregroundColor="#FFFF00" size="*,30" font="FdLcD;30" horizontalAlignment="center" >
+		<widget source="parent.ServiceEvent" render="Label" position="top" foregroundColor="#FFFF00" size="*,30" font="FdLcD;30" halign="center" >
 			<convert type="ServiceName">Name</convert>
 		</widget>
-		<widget source="parent.ServiceEvent" render="Label" position="top" size="*,50" font="FdLcD;20" horizontalAlignment="center" >
+		<widget source="parent.ServiceEvent" render="Label" position="top" size="*,50" font="FdLcD;20" halign="center" >
 			<convert type="EventName">Name</convert>
 		</widget>
 		<widget source="parent.ServiceEvent" render="Progress" position="top" size="*,5" borderWidth="3">
