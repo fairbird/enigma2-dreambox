@@ -1994,10 +1994,10 @@ class ChannelSelectionBase(Screen):
 								self.setCurrentSelectionAlternative(playingref)
 
 	def keyNumber0(self, number):
-		if len(self.servicePath) > 1 and not self.selectionNumber:
-			self.keyGoUp()
-		else:
+		if self.selectionNumber:
 			self.keyNumberGlobal(number)
+		elif len(self.servicePath) > 1:
+			self.keyGoUp()
 
 	def keyNumberGlobal(self, number):
 		if self.isBasePathEqual(self.bouquet_root):
