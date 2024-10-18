@@ -69,6 +69,15 @@ class PluginDescriptor:
 	WHERE_INFOBAR_SCREEN = 16
 	WHERE_SECONDINFOBAR_SCREEN = 17
 
+	# Support playservice hook to modify the service ref.
+	WHERE_PLAYSERVICE = 18
+
+	# Arguments: reason, session, instance, type.
+	WHERE_INFOBARLOADED = 19
+
+	# Argument: session
+	WHERE_BUTTONSETUP = 20
+
 	def __init__(self, name="Plugin", where=[], description="", icon=None, fnc=None, wakeupfnc=None, needsRestart=None, internal=False, weight=0):
 		self.name = name
 		self.internal = internal
