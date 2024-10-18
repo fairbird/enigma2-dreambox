@@ -6,7 +6,9 @@ from Components.ImportChannels import ImportChannels
 from Components.ParentalControl import parentalControl
 from Components.SystemInfo import BoxInfo
 from Components.config import config, configfile
+from Components.PluginComponent import plugins
 from Components.Sources.StreamService import StreamServiceList
+from Plugins.Plugin import PluginDescriptor
 from Tools.BoundFunction import boundFunction
 from Tools.StbHardware import getFPWasTimerWakeup
 from Tools.Alternatives import ResolveCiAlternative
