@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: enigma2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-02 14:05+0100\n"
-"POT-Creation-Date: 2024-08-01 15:48+0200\n"
+"POT-Creation-Date: 2024-10-19 15:02+0200\n"
 "Last-Translator: RAED - Fairbirb <rrrr53@hotmail.com>\n"
 "Language-Team: \n"
 "Language: ar\n"
@@ -396,6 +396,9 @@ msgstr ""
 
 msgid "1"
 msgstr ""
+
+msgid "0 minutes"
+msgstr "%d دقائق"
 
 msgid "10 MB/s"
 msgstr "10 ميغا بايت/ثانيه"
@@ -1357,6 +1360,9 @@ msgstr "البوسنة و الهرسك"
 msgid "Botswana"
 msgstr "بوتسوانا"
 
+msgid "Bottom"
+msgstr "أسفل"
+
 msgid "Bouvet Island"
 msgstr "جزيرة بوفيت"
 
@@ -1896,7 +1902,7 @@ msgstr "إعدادات قناع الشبكة."
 msgid "Configure for how long the infobar will remain visible after activation."
 msgstr ".قم بتكوين المدة التي سيظل شريط المعلومات مرئيًا بعد التنشيط"
 
-msgid "Configure for how many minutes finished events should remain visible in the EPG. Useful when you need information about an event which has just finished, or has been delayed."
+msgid "Configure how long finished events should remain visible in the EPG. Useful when you need information about an event which has just finished, or has been delayed (or for plugins that support catchup)."
 msgstr "إعدادات كيفية إضافة العديد من الدقائق قبل إنتهاء الأحداث يجب أن تظل مرئية في دليل البرامج الإلكترونية. مفيدة عندما تحتاج إلى معلومات حول الحدث الذي انتهى لتوه، أو قد تأخر."
 
 msgid "Configure how many channels are shown in the selection list."
@@ -2298,6 +2304,12 @@ msgstr "%s تعذر التسجيل بسبب تعارض المؤقت"
 #, python-format
 msgid "Could not record due to invalid service %s"
 msgstr "%s تعذر التسجيل بسبب خدمة غير صالحة"
+
+msgid "Could not retrieve basic bouquets files"
+msgstr "لم يتمكن من استرداد ملفات الباقات الأساسية"
+
+msgid "Could not retrieve the remote support files"
+msgstr "لم يتمكن من استرداد ملفات الدعم عن بعد"
 
 msgid "Country"
 msgstr "الدولة"
@@ -4221,6 +4233,12 @@ msgstr "هونج كونج"
 
 msgid "Horizontal"
 msgstr "أفقـي"
+
+msgid "hour"
+msgstr "ساعة"
+
+msgid "hours"
+msgstr "ساعات"
 
 msgid "Horizontal turning speed"
 msgstr "سرعة تحول أفقيه"
@@ -9748,6 +9766,9 @@ msgstr "التنقل بين التيونرين أ/ب"
 msgid "Tonga"
 msgstr "تونغا"
 
+msgid "Top"
+msgstr "اثنين"
+
 msgid "Top and bottom"
 msgstr "فوق وأسفل"
 
@@ -11332,6 +11353,9 @@ msgstr "يوميا"
 msgid "day"
 msgstr "يوم"
 
+msgid "days"
+msgstr ""
+
 msgid "default"
 msgstr "الإفتراضي"
 
@@ -11644,6 +11668,12 @@ msgstr "%d دقيقة"
 
 msgid "mins"
 msgstr "دقائق"
+
+msgid "minute"
+msgstr "%d دقائق"
+
+msgid "minutes"
+msgstr "%d دقائق"
 
 msgid "module disabled"
 msgstr "تم التعطيل"
@@ -12118,7 +12148,13 @@ msgstr "فى الانتظار"
 msgid "water sport"
 msgstr "الرياضة المائية"
 
+msgid "week"
+msgstr "اسبوعى"
+
 msgid "weekly"
+msgstr "اسبوعى"
+
+msgid "weeks"
 msgstr "اسبوعى"
 
 msgid "west"
