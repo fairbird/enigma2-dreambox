@@ -516,6 +516,7 @@ lib/python/Screens/Makefile
 lib/python/Plugins/Makefile
 lib/python/Plugins/SystemPlugins/CableScan/Makefile
 lib/python/Plugins/SystemPlugins/FastScan/Makefile
+lib/python/Plugins/SystemPlugins/FastScan/Makefile
 lib/python/Plugins/SystemPlugins/OSDPositionSetup/Makefile
 lib/python/Plugins/SystemPlugins/OSD3DSetup/Makefile
 lib/python/Plugins/SystemPlugins/HdmiCEC/Makefile
@@ -525,7 +526,7 @@ lib/python/Plugins/Extensions/CutListEditor/meta/Makefile
 lib/python/Plugins/Extensions/DVDBurn/Makefile
 lib/python/Plugins/Extensions/DVDBurn/meta/Makefile
 lib/python/Plugins/Extensions/DVDPlayer/Makefile
-lib/python/Plugins/Extensions/DVDPlayer/meta/Makefile
+lib/python/Plugins/Extensions/FileCommander/Makefile
 lib/python/Plugins/Extensions/GraphMultiEPG/Makefile
 lib/python/Plugins/Extensions/GraphMultiEPG/meta/Makefile
 lib/python/Plugins/Extensions/Makefile
