@@ -28,6 +28,7 @@ public:
 
 	enum
 	{
+		noFlags=0,
 		isDirectory=1,		// SHOULD enter  (implies mustDescent)
 		mustDescent=2,		// cannot be played directly - often used with "isDirectory" (implies canDescent)
 		/*
