@@ -191,7 +191,7 @@ RESULT eServiceFS::getContent(std::list<eServiceReference> &list, bool sorted)
 				eServiceReferenceFS::shouldSort|eServiceReference::sort1,
 				filename);
 			service.data[0] = eServiceReferenceFS::directory;
-			list.push_back(service);gbg
+			list.push_back(service);
 		} else
 		{
 			size_t e = filename.rfind('.');
