@@ -13,7 +13,7 @@ install_PYTHON = \
 	TimerSelection.py Timeshift.py PictureInPicture.py TimeDateInput.py \
 	SubtitleDisplay.py SubservicesQuickzap.py ParentalControlSetup.py NumericalTextInputHelpDialog.py \
 	SleepTimerEdit.py Opkg.py RdsDisplay.py Globals.py \
-	SessionGlobals.py LocationBox.py WizardLanguage.py TaskView.py Rc.py VirtualKeyBoard.py \
+	SessionGlobals.py LocationBox.py WizardLanguage.py TaskList.py TaskView.py Rc.py VirtualKeyBoard.py \
 	TextBox.py FactoryReset.py Recording.py UnhandledKey.py ServiceStopScreen.py \
 	InputDeviceSetup.py DVD.py SoftwareUpdate.py AutoDiseqc.py InstallWizard.py ScreenSaver.py \
 	Hotkey.py StreamingClientsInfo.py SoftcamSetup.py FlashManager.py SetupFallbacktuner.py \
