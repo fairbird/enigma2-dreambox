@@ -16,7 +16,7 @@ config.misc.pluginlist.extension_order = ConfigText(default="")
 class ChoiceBox(Screen):
 	def __init__(self, session, title="", list=[], keys=None, selection=0, skin_name=[], reorderConfig="", windowTitle=None):
 		Screen.__init__(self, session)
-
+		self.setTitle(windowTitle if windowTitle else _("Choice Box"))
 		if isinstance(skin_name, str):
 			skin_name = [skin_name]
 		self.skinName = skin_name + ["ChoiceBox"]
@@ -232,7 +232,7 @@ class ChoiceBox(Screen):
 	def setDefaultChoiceList(self):
 		if self.reorder_config:
 			if self.list and self.config_type.value != "":
-				self.session.openWithCallback(self.setDefaultChoiceListCallback, MessageBox, _("Sort list to default and exit?"), MessageBox.TYPE_YESNO)
+				self.session.openWithCallback(self.setDefaultChoiceListCallback, MessageBox, _("Sort list to default and exit?"), MessageBox.TYPE_YESNO, windowTitle=self.getTitle())
 		elif "menu" in self.keymap:
 			self.goKey("menu")
 		else:

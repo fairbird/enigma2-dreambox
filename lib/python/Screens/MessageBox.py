@@ -14,8 +14,15 @@ class MessageBox(Screen):
 	TYPE_WARNING = 2
 	TYPE_ERROR = 3
 	TYPE_MESSAGE = 4
+	TYPE_PREFIX = {
+		TYPE_YESNO: _("Question"),
+		TYPE_INFO: _("Information"),
+		TYPE_WARNING: _("Warning"),
+		TYPE_ERROR: _("Error"),
+		TYPE_MESSAGE: _("Message")
+	}
 
-	def __init__(self, session, text, type=TYPE_YESNO, timeout=-1, close_on_any_key=False, default=True, enable_input=True, msgBoxID=None, picon=None, simple=False, list=[], timeout_default=None, title=None, showYESNO=False):
+	def __init__(self, session, text, type=TYPE_YESNO, timeout=-1, close_on_any_key=False, default=True, enable_input=True, msgBoxID=None, picon=None, simple=False, list=[], timeout_default=None, windowTitle=None, title=None, showYESNO=False):
 		self.type = type
 		Screen.__init__(self, session)
 		self.skinName = ["MessageBox"]
@@ -50,6 +57,9 @@ class MessageBox(Screen):
 			self["InfoPixmap"].hide()
 		if picon != self.TYPE_WARNING:
 			self["WarningPixmap"].hide()
+		if title is not None:  # Process legacy title argument.
+			windowTitle = title
+		self.windowTitle = windowTitle or self.TYPE_PREFIX.get(type, _("Message"))
 		self.title = title or self.type < self.TYPE_MESSAGE and [_("Question"), _("Information"), _("Warning"), _("Error")][self.type] or _("Message")
 		if type == self.TYPE_YESNO or showYESNO:
 			if list:

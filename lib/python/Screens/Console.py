@@ -14,9 +14,10 @@ class Console(Screen):
 			<widget name="text" position="0,0" size="550,400" font="Console;14" />
 		</screen>"""
 
-	def __init__(self, session, title="Console", cmdlist=None, finishedCallback=None, closeOnSuccess=False, showStartStopText=True, skin=None):
+	def __init__(self, session, title="Console", cmdlist=None, finishedCallback=None, closeOnSuccess=False, showStartStopText=True, skin=None, windowTitle=None):
 		Screen.__init__(self, session)
-
+		if windowTitle:
+			title = windowTitle
 		self.finishedCallback = finishedCallback
 		self.closeOnSuccess = closeOnSuccess
 		self.showStartStopText = showStartStopText
@@ -98,7 +99,7 @@ class Console(Screen):
 		if self.finished:
 			self.closeConsole()
 		else:
-			self.cancel_msg = self.session.openWithCallback(self.cancelCallback, MessageBox, _("Cancel execution?"), type=MessageBox.TYPE_YESNO, default=False)
+			self.cancel_msg = self.session.openWithCallback(self.cancelCallback, MessageBox, _("Cancel execution?"), type=MessageBox.TYPE_YESNO, default=False, windowTitle=self.getTitle())
 
 	def cancelCallback(self, ret=None):
 		self.cancel_msg = None
