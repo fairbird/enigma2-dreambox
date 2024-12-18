@@ -4914,7 +4914,7 @@ msgstr "إجراءات التبديل الزمني لشريط المعلومات
 
 #, fuzzy
 msgid "Infobar Timeshift Activate Actions"
-msgstr "إجراءات تفعيل ميزة "التحويل الزمني لشريط المعلومات"
+msgstr "إجراءات تفعيل ميزة التحويل الزمني لشريط المعلومات"
 
 msgid "Infobar Vmode Button Actions"
 msgstr "إجراءات زر وضع شريط المعلومات"
