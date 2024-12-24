@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: enigma2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-12-15 13:08+0100\n"
+"POT-Creation-Date: 2024-12-20 11:32+0100\n"
 "PO-Revision-Date: 2021-03-06\n"
 "Last-Translator: LinuxSTV\n"
 "Language-Team: \n"
@@ -570,6 +570,9 @@ msgstr "=Tidak ada stream\n"
 
 msgid "A"
 msgstr "A"
+
+msgid "A color filter can be used for better readability of DVB subtitles."
+msgstr ""
 
 msgid "A completed recording timer is about to put your receiver in standby mode. Would you like to proceed?"
 msgstr "Pewaktu rekam yang telah selesai ingin memproses Rx pada mode standby. Lakukan sekarang?"
@@ -1166,6 +1169,10 @@ msgstr "PID Audio"
 #, python-format
 msgid "Audio PID%s, codec & lang"
 msgstr "PID Audio%s, codec & bhs"
+
+#, fuzzy
+msgid "Audio Selection Actions"
+msgstr "Pilih tindakan"
 
 msgid "Audio auto volume level"
 msgstr "level suara audio otomatis"
@@ -1790,6 +1797,18 @@ msgid "Channel Info"
 msgstr "Info Kanal"
 
 #, fuzzy
+msgid "Channel Select Base Actions"
+msgstr "Pilihan kanal"
+
+#, fuzzy
+msgid "Channel Select Edit Actions"
+msgstr "Pilihan kanal"
+
+#, fuzzy
+msgid "Channel SelectEPG Actions"
+msgstr "Pilihan kanal"
+
+#, fuzzy
 msgid "Channel Selection"
 msgstr "Pilihan kanal"
 
@@ -1929,6 +1948,10 @@ msgstr "Pilih penala mana untuk disetel."
 msgid "Christmas Island"
 msgstr "Pulau Natal"
 
+#, fuzzy
+msgid "Ci Selection Actions"
+msgstr "Pilih tindakan"
+
 msgid "Circular LNB"
 msgstr "LNB Sirkular"
 
@@ -1991,6 +2014,9 @@ msgstr "Code rate LP"
 msgid "Codec & lang%s"
 msgstr ""
 
+msgid "Collapse"
+msgstr ""
+
 msgid "Collection name"
 msgstr "Nama koleksi"
 
@@ -2004,6 +2030,10 @@ msgstr "Kolombia"
 #, fuzzy
 msgid "Color"
 msgstr "Kolombia"
+
+#, fuzzy
+msgid "Color Actions"
+msgstr "Pilih tindakan"
 
 msgid "Color format"
 msgstr "Format warna"
@@ -2033,10 +2063,6 @@ msgstr "Antarmuka Umum"
 msgid "Common Interface assignment"
 msgstr "Penetapan Antarmuka Umum"
 
-#, fuzzy
-msgid "Common Setup Actions"
-msgstr "Pilih tindakan"
-
 msgid "Communication"
 msgstr "Komunikasi"
 
@@ -2056,8 +2082,8 @@ msgid "Composition of the recording filenames"
 msgstr "Komposisi nama berkas hasil rekaman"
 
 #, fuzzy
-msgid "Compress"
-msgstr "Selesai"
+msgid "Config List Actions"
+msgstr "Pilih tindakan"
 
 msgid "Config Scan Details"
 msgstr "Detil Setelan Pelacakan"
@@ -2624,11 +2650,22 @@ msgstr "Ubahsuai aturan kursor daftar kanal"
 msgid "Cut"
 msgstr "Potong"
 
+#, fuzzy
+msgid "Cut List Editor Actions"
+msgstr "Penyunting daftarpotong"
+
+#, fuzzy
+msgid "Cutlist Seek Actions"
+msgstr "Penyunting daftarpotong"
+
 msgid "Cutlist editor"
 msgstr "Penyunting daftarpotong"
 
 msgid "Cutlist editor..."
 msgstr "Penyunting daftarpotong..."
+
+msgid "Cyan"
+msgstr ""
 
 msgid "Cyprus"
 msgstr "Siprus"
@@ -2685,6 +2722,10 @@ msgstr "Versi modul DVB: "
 msgid "DVB subtitle black transparency"
 msgstr "Transparansi hitam terjemahan DVB"
 
+#, fuzzy
+msgid "DVB subtitles color filter"
+msgstr "Warna terjemahan dari luar"
+
 msgid "DVB type"
 msgstr "Jenis DVB"
 
@@ -2693,6 +2734,18 @@ msgstr "Bakar DVD"
 
 msgid "DVD Menu"
 msgstr "Menu DVD"
+
+#, fuzzy
+msgid "DVD Player Actions"
+msgstr "Pemutar DVD"
+
+#, fuzzy
+msgid "DVD Title List"
+msgstr "Daftar judul DVD"
+
+#, fuzzy
+msgid "DVD Toolbox"
+msgstr "Peralatan media DVD"
 
 msgid "DVD data format"
 msgstr "Format data DVD"
@@ -3001,6 +3054,10 @@ msgstr "Penghapus kontur digital"
 msgid "Direct playback of linked titles without menu"
 msgstr "Putar langsung judul terkait tanpa menu"
 
+#, fuzzy
+msgid "Direction Actions"
+msgstr "Pilih tindakan"
+
 msgid "Directory"
 msgstr "Direktori"
 
@@ -3133,6 +3190,10 @@ msgid ""
 msgstr ""
 "Anda yakin ingin memeriksa sistem berkas?\n"
 "Ini memerlukan waktu yang cukup lama!"
+
+#, fuzzy
+msgid "Do you really want to clear this playlist?"
+msgstr "Anda yakin ingin menghapus %s?"
 
 #, python-format
 msgid "Do you really want to delete %s?"
@@ -3339,6 +3400,10 @@ msgstr ""
 
 msgid "EPG"
 msgstr "EPG"
+
+#, fuzzy
+msgid "EPG Select Actions"
+msgstr "Pilih tindakan"
 
 msgid "EPG language selection 1"
 msgstr "Pemilihan bahasa EPG 1"
@@ -3760,6 +3825,14 @@ msgstr "Antarmuka jaringan ethernet"
 
 msgid "Ethiopia"
 msgstr ""
+
+#, fuzzy
+msgid "Event View Actions"
+msgstr "Menu lihat acara"
+
+#, fuzzy
+msgid "Event ViewEPG Actions"
+msgstr "Menu lihat acara"
 
 msgid "Event font size (relative to skin size)"
 msgstr "Ukuran huruf acara (tergantung ukurang tampilan)"
@@ -4287,6 +4360,10 @@ msgstr "Resolusi tinjauan penuh"
 msgid "Fullbackup Images"
 msgstr "Pewaktu Mundur"
 
+#, fuzzy
+msgid "Function Key Actions"
+msgstr "Fungsi tombol OK"
+
 msgid "Function of OK button"
 msgstr "Fungsi tombol OK"
 
@@ -4302,6 +4379,10 @@ msgstr "G"
 #, fuzzy
 msgid "GB"
 msgstr "RGB"
+
+#, fuzzy
+msgid "GMEPG Select Actions"
+msgstr "Pilih tindakan"
 
 msgid "GREEN"
 msgstr ""
@@ -4361,6 +4442,9 @@ msgstr "Ghana"
 
 msgid "Gibraltar"
 msgstr "Jibraltar"
+
+msgid "Global Actions"
+msgstr ""
 
 msgid "Go down the list"
 msgstr "Menuju bawah daftar"
@@ -4601,6 +4685,10 @@ msgid "Help"
 msgstr ""
 
 #, fuzzy
+msgid "Help Actions"
+msgstr "Pilih tindakan"
+
+#, fuzzy
 msgid "Help Screen"
 msgstr "Tahan layar"
 
@@ -4679,6 +4767,10 @@ msgstr "Pengaturan Tombol Pintas"
 
 msgid "Hotkey"
 msgstr "Tombol Pintas"
+
+#, fuzzy
+msgid "Hotkey Actions"
+msgstr "edukasi lanjut"
 
 msgid "Hotkey Panic"
 msgstr "Tombol Pintas Panik"
@@ -4926,8 +5018,90 @@ msgstr "Bilah info"
 msgid "Info bar timeout"
 msgstr "Batas waktu bilah info"
 
+#, fuzzy
+msgid "Infobar Actions"
+msgstr "Batas waktu bilah info"
+
+#, fuzzy
+msgid "Infobar Audio Selection Actions"
+msgstr "Pilih tindakan"
+
+#, fuzzy
+msgid "Infobar Channel Selection"
+msgstr "Pilihan kanal"
+
+msgid "Infobar Cue Sheet Actions"
+msgstr ""
+
+#, fuzzy
+msgid "Infobar Extensions"
+msgstr "Pasang ekstensi"
+
+#, fuzzy
+msgid "Infobar Instant Record"
+msgstr "Perekaman segera"
+
+#, fuzzy
+msgid "Infobar Menu Actions"
+msgstr "Batas waktu bilah info"
+
+#, fuzzy
+msgid "Infobar Movie List Actions"
+msgstr "Pengaturan daftar film"
+
+#, fuzzy
+msgid "Infobar PiP Actions"
+msgstr "Batas waktu bilah info"
+
+#, fuzzy
+msgid "Infobar Rds Actions"
+msgstr "Batas waktu bilah info"
+
+msgid "Infobar Red Button Actions"
+msgstr ""
+
+#, fuzzy
+msgid "Infobar Seek Actions"
+msgstr "Pilih tindakan"
+
+msgid "Infobar Show Hide Actions"
+msgstr ""
+
+msgid "Infobar Subservice Quickzap Actions"
+msgstr ""
+
+#, fuzzy
+msgid "Infobar Subservice Selection Actions"
+msgstr "Pilih tindakan"
+
+#, fuzzy
+msgid "Infobar Subtitle Selection Actions"
+msgstr "Pilih tindakan"
+
+#, fuzzy
+msgid "Infobar Teletext Actions"
+msgstr "Pilih tindakan"
+
+msgid "Infobar Timer Button Actions"
+msgstr ""
+
+#, fuzzy
+msgid "Infobar Timeshift Actions"
+msgstr "Lokasi pergeseran waktu"
+
+#, fuzzy
+msgid "Infobar Timeshift Activate Actions"
+msgstr "Lokasi pergeseran waktu"
+
+msgid "Infobar Vmode Button Actions"
+msgstr ""
+
 msgid "Infobar frontend data source"
 msgstr "Sumber data frontend pada bilah info"
+
+#, fuzzy
+msgid "InfobarEPG Actions"
+msgstr "Batas waktu bilah info"
 
 msgid "Information"
 msgstr "Informasi"
@@ -4976,6 +5150,16 @@ msgstr "Masukan"
 msgid "Input "
 msgstr "Masukan "
 
+#, fuzzy
+msgid "Input Actions"
+msgstr "Masukan "
+
+msgid "Input Ascii Actions"
+msgstr ""
+
+msgid "Input Box Actions"
+msgstr ""
+
 msgid "Input Stream ID"
 msgstr "Masukkan ID Stream"
 
@@ -5007,6 +5191,10 @@ msgstr "Pasang ekstensi lokal"
 
 msgid "Install picons on"
 msgstr "Pasang picon pada"
+
+#, fuzzy
+msgid "Install plugin"
+msgstr "Pemasangan"
 
 msgid "Installation has completed."
 msgstr "Pemasangan telah selesai."
@@ -5195,6 +5383,10 @@ msgid "Keyboard"
 msgstr "Papankunci"
 
 #, fuzzy
+msgid "Keyboard Input Actions"
+msgstr "Papankunci virtual"
+
+#, fuzzy
 msgid "Keyboard data entry"
 msgstr "Entri data papankunci"
 
@@ -5369,6 +5561,13 @@ msgid_plural "List version %(ver)d, found %(num)d channels"
 msgstr[0] "Daftar versi %(ver)d, ditemukan %(num)d kanal"
 msgstr[1] "Daftar versi %(ver)d, ditemukan %(num)d kanal"
 
+#, fuzzy
+msgid "Listbox Actions"
+msgstr "Lokasi"
+
+msgid "Listbox Help Menu Actions"
+msgstr ""
+
 msgid "Listen to the radio..."
 msgstr "Mendengarkan radio..."
 
@@ -5485,6 +5684,10 @@ msgstr "Makau"
 msgid "Madagascar"
 msgstr "Madagaskar"
 
+#, fuzzy
+msgid "Magenta"
+msgstr "Argentina"
+
 msgid "Main menu"
 msgstr "Menu Utama"
 
@@ -5595,6 +5798,16 @@ msgstr "Mungkin penyebabnya perekaman sedang berjalan saat ini. Mohon berhenti m
 msgid "Mayotte"
 msgstr "Mayotte"
 
+#, fuzzy
+msgid "Media Player Actions"
+msgstr "Pemutar media"
+
+msgid "Media Player Cue Sheet Actions"
+msgstr ""
+
+msgid "Media Player Seek Actions"
+msgstr ""
+
 msgid "Media player"
 msgstr "Pemutar media"
 
@@ -5618,6 +5831,10 @@ msgstr "Indeks memori"
 
 msgid "Menu"
 msgstr "Menu"
+
+#, fuzzy
+msgid "Menu Actions"
+msgstr "Pilih tindakan"
 
 #, fuzzy
 msgid "Menu button function"
@@ -5649,6 +5866,10 @@ msgstr "Umur minimum %d tahun"
 
 msgid "Minimum send interval"
 msgstr "Selang waktu kirim minimum"
+
+#, fuzzy
+msgid "Minute Input Actions"
+msgstr "Pilih fungsi"
 
 msgid "Missing "
 msgstr "Hilang "
@@ -5822,6 +6043,14 @@ msgstr "Bergerak ke posisi pada indeks"
 msgid "Movement"
 msgstr "Pergerakan"
 
+#, fuzzy
+msgid "Movie Player Actions"
+msgstr "Pemilihan film"
+
+#, fuzzy
+msgid "Movie Selection Actions"
+msgstr "Pilih tindakan"
+
 msgid "Movie list configuration"
 msgstr "Pengaturan daftar film"
 
@@ -5848,6 +6077,9 @@ msgstr "Bergerak ke barat..."
 
 msgid "Mozambique"
 msgstr "Mozambik"
+
+msgid "Msg Box Actions"
+msgstr ""
 
 msgid "Multi EPG"
 msgstr "EPG Multi"
@@ -5936,6 +6168,10 @@ msgstr "Nauru"
 
 msgid "Navigate up/down with UP/DOWN buttons and page up/down with LEFT/RIGHT. EXIT to return to the help screen. OK to perform the action described in the currently highlighted help."
 msgstr ""
+
+#, fuzzy
+msgid "Navigation Actions"
+msgstr "Pilih tindakan"
 
 msgid "Nepal"
 msgstr "Nepal"
@@ -6281,6 +6517,10 @@ msgstr "Sedang dimainkan"
 msgid "Now, use the contrast setting to turn up the brightness of the background as much as possible, but make sure that you can still see the difference between the two brightest levels of shades.If you have done that, press OK."
 msgstr "Sekarang, gunakan setelan kontran untuk menaikkan kecerahan latar sebanyak mungkin, tapi pastikan bahwa anda masih bisa melihat perbedaan antara dua tingkat warna paling cerah. Jika anda telah melakukan itu, tekan OK."
 
+#, fuzzy
+msgid "Number Actions"
+msgstr "edukasi lanjut"
+
 msgid "Number of channels shown in channel selection list"
 msgstr "Jumlah kanal ditampilkan pada daftar pilihan kanal"
 
@@ -6323,6 +6563,10 @@ msgstr "Mati"
 
 msgid "Offline decode delay (ms)"
 msgstr "Tunda dekode offline (md)"
+
+#, fuzzy
+msgid "Ok Cancel Actions"
+msgstr "Pilihan kanal"
 
 msgid "Oman"
 msgstr "Oman"
@@ -6632,6 +6876,10 @@ msgstr "Peru"
 
 msgid "Philippines"
 msgstr "Filipina"
+
+#, fuzzy
+msgid "PiP Setup Actions"
+msgstr "Pilih tindakan"
 
 msgid "PiP setup"
 msgstr "Atur PiP"
@@ -7021,6 +7269,9 @@ msgstr "Atur Posisioner"
 msgid "Positioner setup log"
 msgstr "Log pengaturan posisioner"
 
+msgid "Power Key Actions"
+msgstr ""
+
 msgid "Power LED"
 msgstr "LED Power"
 
@@ -7359,6 +7610,10 @@ msgstr "Ram disk"
 msgid "Random"
 msgstr "Acak"
 
+#, fuzzy
+msgid "Rass Interactive Actions"
+msgstr "View Rass interactive..."
+
 #, python-format
 msgid "Rating defined by broadcaster - %d"
 msgstr "Peringkat ditentukan oleh penyiar - %d"
@@ -7580,6 +7835,10 @@ msgstr "Hapus item dari tong sampah setelah (hari)"
 
 msgid "Remove new found flag"
 msgstr "Hapus semua bendera ditemukan"
+
+#, fuzzy
+msgid "Remove plugin"
+msgstr "Hapus plugin"
 
 msgid "Remove plugins"
 msgstr "Hapus plugin"
@@ -7956,6 +8215,9 @@ msgstr "Longitude satelit:"
 
 msgid "Satellites"
 msgstr "Satelit"
+
+msgid "Satlist Shortcut Action"
+msgstr ""
 
 msgid "Sats"
 msgstr "Sat"
@@ -8777,6 +9039,10 @@ msgid "Setup"
 msgstr "Pengaturan"
 
 #, fuzzy
+msgid "Setup Actions"
+msgstr "Pilih tindakan"
+
+#, fuzzy
 msgid "Setup hard disk"
 msgstr "Atur hard disk"
 
@@ -8806,6 +9072,10 @@ msgstr "Perubahan"
 
 msgid "Short filenames"
 msgstr "Nama file pendek"
+
+#, fuzzy
+msgid "Shortcut Actions"
+msgstr "Pilih tindakan"
 
 #, fuzzy
 msgid "Show"
@@ -9194,6 +9464,10 @@ msgstr "Lewatkan pemeriksaan koneksi internet (matikan instalasi paket otomatis)
 msgid "Skip jumping to live TV while timeshifting with plugins"
 msgstr ""
 
+#, fuzzy
+msgid "Sleep Timer Editor Actions"
+msgstr "Setelan Pewaktu Tidur"
+
 msgid "Sleep timer"
 msgstr "Pewaktu tidur"
 
@@ -9446,6 +9720,10 @@ msgstr "Standby"
 
 msgid "Standby / restart"
 msgstr "Standby / mulai ulang"
+
+#, fuzzy
+msgid "Standby Actions"
+msgstr "Standby dalam"
 
 #, fuzzy
 msgid "Standby LED"
@@ -9950,6 +10228,10 @@ msgstr "Tajikistan"
 msgid "Tanzania, United Republic of"
 msgstr "Republik Persekutuan Tanzania"
 
+#, fuzzy
+msgid "Teletext Actions"
+msgstr "Pilih tindakan"
+
 msgid "Teletext subtitle color"
 msgstr "Warna terjemahan teleteks"
 
@@ -9977,6 +10259,13 @@ msgstr "Tes Layar"
 msgid "Testscreens that are helpfull to fine-tune your display"
 msgstr "Tes layar yg berguna untuk menyetel layar anda"
 
+#, fuzzy
+msgid "Text Edit Actions"
+msgstr "Pemilihan EPG"
+
+msgid "Text Entry Actions"
+msgstr ""
+
 msgid "Text View On"
 msgstr "Tampilan Teks Hidup"
 
@@ -9997,9 +10286,10 @@ msgstr ""
 "Terima kasih telah menggunakan wizard.\n"
 "Tekan OK untuk lanjut."
 
+#, fuzzy
 msgid ""
 "Thank you for using the wizard. Your receiver is now ready for use.\n"
-"Press OK to start using your receiver."
+"Press Blue or OK to start using your receiver."
 msgstr ""
 "Terima kasih telah menggunakan wizard. Rx anda telah siap digunakan.\n"
 "Tekan OK untuk mulai menggunakan Rx anda."
@@ -10478,6 +10768,10 @@ msgstr "Zona Waktu"
 msgid "Timer"
 msgstr "Pewaktu"
 
+#, fuzzy
+msgid "Timer Edit Actions"
+msgstr "Pilihan pewaktu"
+
 msgid "Timer Overview"
 msgstr "Ikhtisar Pewaktu"
 
@@ -10771,6 +11065,10 @@ msgstr "Ubah ukuran jangka"
 
 msgid "Tuvalu"
 msgstr "Tuvalu"
+
+#, fuzzy
+msgid "Tv Radio Actions"
+msgstr "Ke pemilihan audio"
 
 msgid "Two"
 msgstr "Dua"
@@ -11077,7 +11375,8 @@ msgstr "Gunakan wizard jaringan untuk menyetel adapter jaringan yg dipilih"
 msgid "Use the network wizard to configure your network\n"
 msgstr "Gunakna wizard jaringan untuk menyetel jaringan anda\n"
 
-msgid "Use the up/down keys on your remote control to select an option. After that, press OK."
+#, fuzzy
+msgid "Use the up/down keys on your remote control to select an option. After that, press Blue or OK."
 msgstr "Gunakan tombol atas/bawah pada remote kontrol untuk memilih pilihan. Setelah itu, tekan OK."
 
 msgid "Use the wizard to set up basic features"
@@ -11316,12 +11615,20 @@ msgid "Virgin Islands (U.S.)"
 msgstr "Kepulauan Virgin (Amerika Serikat)"
 
 #, fuzzy
+msgid "Virtual Key Board Actions"
+msgstr "Papankunci virtual"
+
+#, fuzzy
 msgid "Virtual KeyBoard Functions"
 msgstr "Papankunci virtual"
 
 #, fuzzy
 msgid "Virtual KeyBoard Text:"
 msgstr "Teks Papankunci Virtual:"
+
+#, fuzzy
+msgid "Virtual Keyboard Actions"
+msgstr "Papankunci virtual"
 
 msgid "Virtual keyboard"
 msgstr "Papankunci virtual"
@@ -11478,11 +11785,12 @@ msgstr ""
 "\n"
 "Tekan OK untuk mulai penyetelan jaringan anda"
 
+#, fuzzy
 msgid ""
 "Welcome.\n"
 "\n"
 "This start wizard will guide you through the basic setup of your receiver.\n"
-"Press the OK button on your remote control to move to the next step."
+"Press the Blue or OK button on your remote control to move to the next step."
 msgstr ""
 "Selamat Datang.\n"
 "\n"
@@ -11631,9 +11939,6 @@ msgstr "Ketika diaktifkan, terjemahan DVB grafis akan ditengahkan secara horizon
 msgid "When enabled, graphical DVB subtitles will be displayed at their original position."
 msgstr "Ketika diaktifkan, terjemahan DVB grafis akan ditampilkan pada posisi aslinya."
 
-msgid "When enabled, graphical DVB subtitles will be displayed in yellow, instead of the original color."
-msgstr "Ketika diaktifkan, terjemahan DVB grafis akan ditampilkan berwarna kuning, daripada warna aslinya."
-
 msgid "When enabled, http streams are descrambled on the server side. The (remote) client receiver does not have to do descrambling. Default on."
 msgstr "Ketika diaktifkan, streaming http melakukan descramble pada sisi server. rx klien tidak perlu melakukan descramble. Bawaan diaktifkan."
 
@@ -11753,6 +12058,10 @@ msgstr "Ketika rx bangun dari siaga atau siaga dalam, ia akan mengirim perintah 
 msgid "Where to save temporary timeshift recordings?"
 msgstr "Di mana menyimpan rekaman timeshift temporer?"
 
+#, fuzzy
+msgid "Window Actions"
+msgstr "Pilih tindakan"
+
 msgid "Wireless LAN"
 msgstr "Nirkabel"
 
@@ -11799,6 +12108,10 @@ msgid "Without popup"
 msgstr "Tanpa popup"
 
 #, fuzzy
+msgid "Wizard Actions"
+msgstr "Atur video"
+
+#, fuzzy
 msgid "Wizard setup"
 msgstr "Atur video"
 
@@ -11829,9 +12142,6 @@ msgstr "Tahun"
 
 msgid "Yellow"
 msgstr "Kuning"
-
-msgid "Yellow DVB subtitles"
-msgstr "terjemahan DVB warna kuning"
 
 #, fuzzy
 msgid "Yellow button function"

@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: enigma2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-12-15 13:08+0100\n"
+"POT-Creation-Date: 2024-12-20 11:32+0100\n"
 "PO-Revision-Date: 2008-12-29 16:22+0100\n"
 "Last-Translator: gerrit <gerrit@nedlinux.nl>\n"
 "Language-Team: gerrit <fy@li.org>\n"
@@ -612,6 +612,9 @@ msgstr ""
 #
 msgid "A"
 msgstr "A"
+
+msgid "A color filter can be used for better readability of DVB subtitles."
+msgstr ""
 
 msgid "A completed recording timer is about to put your receiver in standby mode. Would you like to proceed?"
 msgstr ""
@@ -1276,6 +1279,11 @@ msgstr ""
 #, python-format
 msgid "Audio PID%s, codec & lang"
 msgstr ""
+
+#
+#, fuzzy
+msgid "Audio Selection Actions"
+msgstr "Kies Lokaasje"
 
 msgid "Audio auto volume level"
 msgstr ""
@@ -1955,6 +1963,21 @@ msgstr ""
 
 #
 #, fuzzy
+msgid "Channel Select Base Actions"
+msgstr "Kanaal seleksje"
+
+#
+#, fuzzy
+msgid "Channel Select Edit Actions"
+msgstr "Kanaal seleksje"
+
+#
+#, fuzzy
+msgid "Channel SelectEPG Actions"
+msgstr "Kanaal seleksje"
+
+#
+#, fuzzy
 msgid "Channel Selection"
 msgstr "Kanaal seleksje"
 
@@ -2102,6 +2125,11 @@ msgstr ""
 msgid "Christmas Island"
 msgstr ""
 
+#
+#, fuzzy
+msgid "Ci Selection Actions"
+msgstr "Kies Lokaasje"
+
 msgid "Circular LNB"
 msgstr ""
 
@@ -2172,6 +2200,9 @@ msgstr ""
 msgid "Codec & lang%s"
 msgstr ""
 
+msgid "Collapse"
+msgstr ""
+
 #
 msgid "Collection name"
 msgstr "Kolleksje namme"
@@ -2189,6 +2220,11 @@ msgstr "Kleur formaat"
 #, fuzzy
 msgid "Color"
 msgstr "Kleur formaat"
+
+#
+#, fuzzy
+msgid "Color Actions"
+msgstr "Kies Lokaasje"
 
 #
 #, fuzzy
@@ -2227,11 +2263,6 @@ msgid "Common Interface assignment"
 msgstr "Common Interface"
 
 #
-#, fuzzy
-msgid "Common Setup Actions"
-msgstr "Kies Lokaasje"
-
-#
 msgid "Communication"
 msgstr ""
 
@@ -2256,8 +2287,8 @@ msgstr ""
 
 #
 #, fuzzy
-msgid "Compress"
-msgstr "Kompleet"
+msgid "Config List Actions"
+msgstr "Kies Lokaasje"
 
 msgid "Config Scan Details"
 msgstr ""
@@ -2872,12 +2903,25 @@ msgstr ""
 msgid "Cut"
 msgstr "Knip"
 
+#
+#, fuzzy
+msgid "Cut List Editor Actions"
+msgstr "Kniplyst bewurker..."
+
+#
+#, fuzzy
+msgid "Cutlist Seek Actions"
+msgstr "Undertitel seleksje"
+
 msgid "Cutlist editor"
 msgstr ""
 
 #
 msgid "Cutlist editor..."
 msgstr "Kniplyst bewurker..."
+
+msgid "Cyan"
+msgstr ""
 
 msgid "Cyprus"
 msgstr ""
@@ -2940,6 +2984,9 @@ msgstr "Nije ferzje:"
 msgid "DVB subtitle black transparency"
 msgstr ""
 
+msgid "DVB subtitles color filter"
+msgstr ""
+
 msgid "DVB type"
 msgstr ""
 
@@ -2948,6 +2995,21 @@ msgstr ""
 
 msgid "DVD Menu"
 msgstr ""
+
+#
+#, fuzzy
+msgid "DVD Player Actions"
+msgstr "DVD Spieler"
+
+#
+#, fuzzy
+msgid "DVD Title List"
+msgstr "wyte lyst"
+
+#
+#, fuzzy
+msgid "DVD Toolbox"
+msgstr "DVD media arkbak"
 
 msgid "DVD data format"
 msgstr ""
@@ -3296,6 +3358,11 @@ msgstr ""
 msgid "Direct playback of linked titles without menu"
 msgstr "Direkt ôfspielje fan keppele titels sûnder menu"
 
+#
+#, fuzzy
+msgid "Direction Actions"
+msgstr "Kies Lokaasje"
+
 msgid "Directory"
 msgstr ""
 
@@ -3453,6 +3520,11 @@ msgid ""
 "Do you really want to check the filesystem?\n"
 "This could take lots of time!"
 msgstr "Wolle jo echt it bestânsysteem neisjen ?<br> Dit kin lang duorje !"
+
+#
+#, fuzzy
+msgid "Do you really want to clear this playlist?"
+msgstr "Wolle jo wier %s ferwiderje?"
 
 #
 #, python-format
@@ -3687,6 +3759,11 @@ msgstr ""
 
 msgid "EPG"
 msgstr ""
+
+#
+#, fuzzy
+msgid "EPG Select Actions"
+msgstr "EPG Seleksje"
 
 msgid "EPG language selection 1"
 msgstr ""
@@ -4125,6 +4202,16 @@ msgstr ""
 
 msgid "Ethiopia"
 msgstr ""
+
+#
+#, fuzzy
+msgid "Event View Actions"
+msgstr "Barren oersjoch"
+
+#
+#, fuzzy
+msgid "Event ViewEPG Actions"
+msgstr "Barren oersjoch"
 
 msgid "Event font size (relative to skin size)"
 msgstr ""
@@ -4697,6 +4784,11 @@ msgstr ""
 msgid "Fullbackup Images"
 msgstr "Flash"
 
+#
+#, fuzzy
+msgid "Function Key Actions"
+msgstr "Kies Lokaasje"
+
 msgid "Function of OK button"
 msgstr ""
 
@@ -4713,6 +4805,11 @@ msgstr ""
 #, fuzzy
 msgid "GB"
 msgstr "RGB"
+
+#
+#, fuzzy
+msgid "GMEPG Select Actions"
+msgstr "EPG Seleksje"
 
 msgid "GREEN"
 msgstr ""
@@ -4775,6 +4872,9 @@ msgid "Ghana"
 msgstr ""
 
 msgid "Gibraltar"
+msgstr ""
+
+msgid "Global Actions"
 msgstr ""
 
 msgid "Go down the list"
@@ -5040,6 +5140,11 @@ msgstr ""
 msgid "Help"
 msgstr ""
 
+#
+#, fuzzy
+msgid "Help Actions"
+msgstr "Kies Lokaasje"
+
 msgid "Help Screen"
 msgstr ""
 
@@ -5123,6 +5228,11 @@ msgstr ""
 
 msgid "Hotkey"
 msgstr ""
+
+#
+#, fuzzy
+msgid "Hotkey Actions"
+msgstr "Kies Lokaasje"
 
 msgid "Hotkey Panic"
 msgstr ""
@@ -5383,8 +5493,102 @@ msgstr "Ynfobalke"
 msgid "Info bar timeout"
 msgstr "Ynfobalke tiid"
 
+#
+#, fuzzy
+msgid "Infobar Actions"
+msgstr "Ynfobalke tiid"
+
+#
+#, fuzzy
+msgid "Infobar Audio Selection Actions"
+msgstr "Kies Lokaasje"
+
+#
+#, fuzzy
+msgid "Infobar Channel Selection"
+msgstr "Kanaal seleksje"
+
+msgid "Infobar Cue Sheet Actions"
+msgstr ""
+
+#
+#, fuzzy
+msgid "Infobar Extensions"
+msgstr "Utwreidingen"
+
+#
+#, fuzzy
+msgid "Infobar Instant Record"
+msgstr "In direct opnimmen"
+
+#
+#, fuzzy
+msgid "Infobar Menu Actions"
+msgstr "Ynfobalke tiid"
+
+#
+#, fuzzy
+msgid "Infobar Movie List Actions"
+msgstr "Tuner ynstellingen"
+
+#
+#, fuzzy
+msgid "Infobar PiP Actions"
+msgstr "Ynfobalke tiid"
+
+#
+#, fuzzy
+msgid "Infobar Rds Actions"
+msgstr "Ynfobalke tiid"
+
+msgid "Infobar Red Button Actions"
+msgstr ""
+
+#
+#, fuzzy
+msgid "Infobar Seek Actions"
+msgstr "Kies Lokaasje"
+
+msgid "Infobar Show Hide Actions"
+msgstr ""
+
+msgid "Infobar Subservice Quickzap Actions"
+msgstr ""
+
+#
+#, fuzzy
+msgid "Infobar Subservice Selection Actions"
+msgstr "Kies Lokaasje"
+
+#
+#, fuzzy
+msgid "Infobar Subtitle Selection Actions"
+msgstr "Kies Lokaasje"
+
+#
+#, fuzzy
+msgid "Infobar Teletext Actions"
+msgstr "Kies Lokaasje"
+
+msgid "Infobar Timer Button Actions"
+msgstr ""
+
+msgid "Infobar Timeshift Actions"
+msgstr ""
+
+msgid "Infobar Timeshift Activate Actions"
+msgstr ""
+
+msgid "Infobar Vmode Button Actions"
+msgstr ""
+
 msgid "Infobar frontend data source"
 msgstr ""
+
+#
+#, fuzzy
+msgid "InfobarEPG Actions"
+msgstr "Ynfobalke tiid"
 
 #
 msgid "Information"
@@ -5445,6 +5649,17 @@ msgstr "Ynfier"
 msgid "Input "
 msgstr "Ynfier"
 
+#
+#, fuzzy
+msgid "Input Actions"
+msgstr "Ynfier"
+
+msgid "Input Ascii Actions"
+msgstr ""
+
+msgid "Input Box Actions"
+msgstr ""
+
 msgid "Input Stream ID"
 msgstr ""
 
@@ -5482,6 +5697,11 @@ msgstr ""
 
 msgid "Install picons on"
 msgstr ""
+
+#
+#, fuzzy
+msgid "Install plugin"
+msgstr "Oan it ynstallearjen"
 
 msgid "Installation has completed."
 msgstr ""
@@ -5699,6 +5919,11 @@ msgstr ""
 
 #
 #, fuzzy
+msgid "Keyboard Input Actions"
+msgstr "Virtueel Toetseboerd"
+
+#
+#, fuzzy
 msgid "Keyboard data entry"
 msgstr "Toetseboerd Ynstellingen"
 
@@ -5903,6 +6128,14 @@ msgstr[1] ""
 
 #
 #, fuzzy
+msgid "Listbox Actions"
+msgstr "Doel"
+
+msgid "Listbox Help Menu Actions"
+msgstr ""
+
+#
+#, fuzzy
 msgid "Listen to the radio..."
 msgstr "nei radio harkje..."
 
@@ -6040,6 +6273,9 @@ msgstr ""
 msgid "Madagascar"
 msgstr ""
 
+msgid "Magenta"
+msgstr ""
+
 #
 msgid "Main menu"
 msgstr "Haad menu"
@@ -6166,6 +6402,17 @@ msgid "Mayotte"
 msgstr ""
 
 #
+#, fuzzy
+msgid "Media Player Actions"
+msgstr "Media Spieler"
+
+msgid "Media Player Cue Sheet Actions"
+msgstr ""
+
+msgid "Media Player Seek Actions"
+msgstr ""
+
+#
 msgid "Media player"
 msgstr "Media Spieler"
 
@@ -6194,6 +6441,11 @@ msgstr ""
 #
 msgid "Menu"
 msgstr "Menu"
+
+#
+#, fuzzy
+msgid "Menu Actions"
+msgstr "Kies Lokaasje"
 
 #
 #, fuzzy
@@ -6229,6 +6481,11 @@ msgstr ""
 
 msgid "Minimum send interval"
 msgstr ""
+
+#
+#, fuzzy
+msgid "Minute Input Actions"
+msgstr "Kies Lokaasje"
 
 msgid "Missing "
 msgstr ""
@@ -6426,6 +6683,16 @@ msgstr ""
 
 #
 #, fuzzy
+msgid "Movie Player Actions"
+msgstr "Tiidsbarren seleksje"
+
+#
+#, fuzzy
+msgid "Movie Selection Actions"
+msgstr "Kies Lokaasje"
+
+#
+#, fuzzy
 msgid "Movie list configuration"
 msgstr "Tuner ynstellingen"
 
@@ -6455,6 +6722,9 @@ msgid "Moving west..."
 msgstr ""
 
 msgid "Mozambique"
+msgstr ""
+
+msgid "Msg Box Actions"
 msgstr ""
 
 #
@@ -6559,6 +6829,11 @@ msgstr ""
 
 msgid "Navigate up/down with UP/DOWN buttons and page up/down with LEFT/RIGHT. EXIT to return to the help screen. OK to perform the action described in the currently highlighted help."
 msgstr ""
+
+#
+#, fuzzy
+msgid "Navigation Actions"
+msgstr "Kies Lokaasje"
 
 msgid "Nepal"
 msgstr ""
@@ -6955,6 +7230,11 @@ msgstr "No oan it ôfspieljen"
 msgid "Now, use the contrast setting to turn up the brightness of the background as much as possible, but make sure that you can still see the difference between the two brightest levels of shades.If you have done that, press OK."
 msgstr "No, feroare it helderens nivo en set it sa heech, mar wêz seker dat jo altiid nog it ferskil sjogge tusken de twa helderste skaadnivos.Binne jo klear, druk OK"
 
+#
+#, fuzzy
+msgid "Number Actions"
+msgstr "Kies Lokaasje"
+
 msgid "Number of channels shown in channel selection list"
 msgstr ""
 
@@ -7002,6 +7282,11 @@ msgstr "Ut"
 
 msgid "Offline decode delay (ms)"
 msgstr ""
+
+#
+#, fuzzy
+msgid "Ok Cancel Actions"
+msgstr "Kanaal seleksje"
 
 msgid "Oman"
 msgstr ""
@@ -7346,6 +7631,11 @@ msgstr ""
 
 msgid "Philippines"
 msgstr ""
+
+#
+#, fuzzy
+msgid "PiP Setup Actions"
+msgstr "Kies Lokaasje"
 
 #
 #, fuzzy
@@ -7812,6 +8102,9 @@ msgstr "Rotor ynstellingen"
 msgid "Positioner setup log"
 msgstr ""
 
+msgid "Power Key Actions"
+msgstr ""
+
 msgid "Power LED"
 msgstr ""
 
@@ -8183,6 +8476,11 @@ msgstr "Ram Disk"
 msgid "Random"
 msgstr ""
 
+#
+#, fuzzy
+msgid "Rass Interactive Actions"
+msgstr "Rass interaktief sjen litte"
+
 #, python-format
 msgid "Rating defined by broadcaster - %d"
 msgstr ""
@@ -8443,6 +8741,11 @@ msgstr ""
 #
 msgid "Remove new found flag"
 msgstr "Ferwiderje nij fun flagge"
+
+#
+#, fuzzy
+msgid "Remove plugin"
+msgstr "Ferwiderje ynstekker"
 
 #
 msgid "Remove plugins"
@@ -8872,6 +9175,9 @@ msgstr ""
 #
 msgid "Satellites"
 msgstr "Satellyten"
+
+msgid "Satlist Shortcut Action"
+msgstr ""
 
 #
 msgid "Sats"
@@ -9810,6 +10116,11 @@ msgstr "Ynstelle"
 
 #
 #, fuzzy
+msgid "Setup Actions"
+msgstr "Kies Lokaasje"
+
+#
+#, fuzzy
 msgid "Setup hard disk"
 msgstr "Hurde skiif"
 
@@ -9844,6 +10155,11 @@ msgstr ""
 
 msgid "Short filenames"
 msgstr ""
+
+#
+#, fuzzy
+msgid "Shortcut Actions"
+msgstr "Kies Lokaasje"
 
 #
 #, fuzzy
@@ -10283,6 +10599,9 @@ msgstr ""
 msgid "Skip jumping to live TV while timeshifting with plugins"
 msgstr ""
 
+msgid "Sleep Timer Editor Actions"
+msgstr ""
+
 #
 #, fuzzy
 msgid "Sleep timer"
@@ -10564,6 +10883,11 @@ msgstr "Paraatmode"
 #, fuzzy
 msgid "Standby / restart"
 msgstr "Paraatmode / Nijstart"
+
+#
+#, fuzzy
+msgid "Standby Actions"
+msgstr "Paraatmode"
 
 #
 #, fuzzy
@@ -11140,6 +11464,11 @@ msgstr ""
 msgid "Tanzania, United Republic of"
 msgstr ""
 
+#
+#, fuzzy
+msgid "Teletext Actions"
+msgstr "Kies Lokaasje"
+
 msgid "Teletext subtitle color"
 msgstr ""
 
@@ -11174,6 +11503,14 @@ msgstr ""
 msgid "Testscreens that are helpfull to fine-tune your display"
 msgstr ""
 
+#
+#, fuzzy
+msgid "Text Edit Actions"
+msgstr "EPG Seleksje"
+
+msgid "Text Entry Actions"
+msgstr ""
+
 msgid "Text View On"
 msgstr ""
 
@@ -11196,7 +11533,7 @@ msgstr ""
 
 msgid ""
 "Thank you for using the wizard. Your receiver is now ready for use.\n"
-"Press OK to start using your receiver."
+"Press Blue or OK to start using your receiver."
 msgstr ""
 
 #, python-format
@@ -11688,6 +12025,11 @@ msgstr "Tiidszone"
 msgid "Timer"
 msgstr "Tiidssjtoering"
 
+#
+#, fuzzy
+msgid "Timer Edit Actions"
+msgstr "Tiidsbarren seleksje"
+
 msgid "Timer Overview"
 msgstr ""
 
@@ -12036,6 +12378,9 @@ msgstr ""
 msgid "Tuvalu"
 msgstr ""
 
+msgid "Tv Radio Actions"
+msgstr ""
+
 #
 msgid "Two"
 msgstr "Twa"
@@ -12369,7 +12714,8 @@ msgid "Use the network wizard to configure your network\n"
 msgstr "Bruk de netwurk gûcheler om it netwurk yn te stellen\n"
 
 #
-msgid "Use the up/down keys on your remote control to select an option. After that, press OK."
+#, fuzzy
+msgid "Use the up/down keys on your remote control to select an option. After that, press Blue or OK."
 msgstr "Knoppen op en del brûke om in opsje te kiezen. Dêrnei druk Ok"
 
 #
@@ -12658,12 +13004,22 @@ msgstr ""
 
 #
 #, fuzzy
+msgid "Virtual Key Board Actions"
+msgstr "Virtueel Toetseboerd"
+
+#
+#, fuzzy
 msgid "Virtual KeyBoard Functions"
 msgstr "Virtueel Toetseboerd"
 
 #
 #, fuzzy
 msgid "Virtual KeyBoard Text:"
+msgstr "Virtueel Toetseboerd"
+
+#
+#, fuzzy
+msgid "Virtual Keyboard Actions"
 msgstr "Virtueel Toetseboerd"
 
 #
@@ -12830,7 +13186,7 @@ msgid ""
 "Welcome.\n"
 "\n"
 "This start wizard will guide you through the basic setup of your receiver.\n"
-"Press the OK button on your remote control to move to the next step."
+"Press the Blue or OK button on your remote control to move to the next step."
 msgstr ""
 
 #
@@ -12975,9 +13331,6 @@ msgstr ""
 msgid "When enabled, graphical DVB subtitles will be displayed at their original position."
 msgstr ""
 
-msgid "When enabled, graphical DVB subtitles will be displayed in yellow, instead of the original color."
-msgstr ""
-
 msgid "When enabled, http streams are descrambled on the server side. The (remote) client receiver does not have to do descrambling. Default on."
 msgstr ""
 
@@ -13097,6 +13450,11 @@ msgid "Where to save temporary timeshift recordings?"
 msgstr "Wêr moatte it opnimmen mei tiidsferskowing opslein wurde ?"
 
 #
+#, fuzzy
+msgid "Window Actions"
+msgstr "Kies Lokaasje"
+
+#
 msgid "Wireless LAN"
 msgstr ""
 
@@ -13145,6 +13503,11 @@ msgstr ""
 
 #
 #, fuzzy
+msgid "Wizard Actions"
+msgstr "Fideo ynstellingen"
+
+#
+#, fuzzy
 msgid "Wizard setup"
 msgstr "Fideo ynstellingen"
 
@@ -13177,9 +13540,6 @@ msgid "Year"
 msgstr "Jier"
 
 msgid "Yellow"
-msgstr ""
-
-msgid "Yellow DVB subtitles"
 msgstr ""
 
 #

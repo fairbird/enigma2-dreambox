@@ -3,7 +3,7 @@ from enigma import iPlayableService, eTimer, eDVBDB, eSize
 from Components.ServiceEventTracker import ServiceEventTracker
 from Components.ActionMap import NumberActionMap
 from Components.ConfigList import ConfigListScreen
-from Components.config import config, ConfigSubsection, getConfigListEntry, ConfigNothing, ConfigSelection, ConfigOnOff
+from Components.config import config, ConfigSlider, ConfigSubsection, getConfigListEntry, ConfigNothing, ConfigSelection, ConfigOnOff
 from Components.Label import Label
 from Components.Pixmap import Pixmap
 from Components.Sources.Boolean import Boolean
@@ -12,6 +12,7 @@ from Components.Sources.List import List
 from Components.Sources.Boolean import Boolean
 from Components.SystemInfo import BoxInfo
 from Components.UsageConfig import originalAudioTracks, visuallyImpairedCommentary
+from Components.VolumeControl import VolumeControl
 
 from Screens.InputBox import PinInput
 from Screens.MessageBox import MessageBox
@@ -268,6 +269,12 @@ class AudioSelection(ConfigListScreen, Screen):
 				self.settings.autovolume.addNotifier(self.changeAutoVolume, initial_call=False)
 				conflist.append(getConfigListEntry(_("Auto Volume Level"), self.settings.autovolume, None))
 
+			if config.hdmicec.enabled.value and config.hdmicec.volume_forwarding.value and VolumeControl.instance:
+				volumeCtrl = VolumeControl.instance.dvbVolumeControl
+				self.settings.volume = ConfigSlider(default=volumeCtrl.getVolume(), increment=1, limits=(0, 100))
+				self.settings.volume.addNotifier(self.changeVolume, initial_call=False)
+				conflist.append(getConfigListEntry(_("Volume"), self.settings.volume, None))
+
 			from Components.PluginComponent import plugins
 			from Plugins.Plugin import PluginDescriptor
 
@@ -392,6 +399,9 @@ class AudioSelection(ConfigListScreen, Screen):
 		if autovolume.value:
 			config.av.autovolume.value = autovolume.value
 		config.av.autovolume.save()
+
+	def changeVolume(self, volume):
+		VolumeControl.instance.dvbVolumeControl.setVolume(volume.value, volume.value)
 
 	def changeAC3Downmix(self, downmix):
 		if BoxInfo.getItem("machinebuild") in ('dm900', 'dm920', 'dm7080', 'dm800', 'dreamone', 'dreamtwo'):
@@ -641,7 +651,7 @@ class QuickSubtitlesConfigMenu(ConfigListScreen, Screen):
 			])
 		if sub[0] == 0:  # dvb
 			menu.extend([
-				getConfigMenuItem("dvb_subtitles_yellow"),
+				getConfigMenuItem("dvb_subtitles_color"),
 				getConfigMenuItem("dvb_subtitles_backtrans"),
 				getConfigMenuItem("dvb_subtitles_original_position"),
 				getConfigMenuItem("subtitle_position"),

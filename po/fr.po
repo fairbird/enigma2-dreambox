@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: enigma2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-12-15 13:08+0100\n"
-"PO-Revision-Date: 2024-12-15 13:13+0100\n"
+"POT-Creation-Date: 2024-12-20 11:32+0100\n"
+"PO-Revision-Date: 2024-12-20 12:02+0100\n"
 "Last-Translator: Pr2\n"
 "Language-Team: french\n"
 "Language: fr\n"
@@ -557,6 +557,9 @@ msgstr "=PAS DE FLUX (STREAM)\n"
 
 msgid "A"
 msgstr "A"
+
+msgid "A color filter can be used for better readability of DVB subtitles."
+msgstr "Un filtre de couleur peut être utilisé pour améliorer la lisibilité des sous-titres DVB."
 
 msgid "A completed recording timer is about to put your receiver in standby mode. Would you like to proceed?"
 msgstr "Un enregistrement terminé souhaite mettre votre récepteur en mode veille. Êtes-vous d’accord?"
@@ -1136,6 +1139,9 @@ msgstr "PID audio"
 #, python-format
 msgid "Audio PID%s, codec & lang"
 msgstr "PID audio %s - codec - lang"
+
+msgid "Audio Selection Actions"
+msgstr "Sélection audio actions"
 
 msgid "Audio auto volume level"
 msgstr "Niveau du volume audio automatique"
@@ -1733,6 +1739,15 @@ msgstr "Chaîne"
 msgid "Channel Info"
 msgstr "Info chaîne"
 
+msgid "Channel Select Base Actions"
+msgstr "Sélection chaîne de base actions"
+
+msgid "Channel Select Edit Actions"
+msgstr "Sélection chaîne éditer actions"
+
+msgid "Channel SelectEPG Actions"
+msgstr "Chaîne ChoisirEPG actions"
+
 msgid "Channel Selection"
 msgstr "Sélection des chaînes"
 
@@ -1861,6 +1876,9 @@ msgstr "Choisissez le tuner à configurer."
 msgid "Christmas Island"
 msgstr "L'île de noël"
 
+msgid "Ci Selection Actions"
+msgstr "CI sélection actions"
+
 msgid "Circular LNB"
 msgstr "LNB circulaire"
 
@@ -1922,6 +1940,9 @@ msgstr "Taux de codage LP"
 msgid "Codec & lang%s"
 msgstr "Codec & lang %s"
 
+msgid "Collapse"
+msgstr "Réduire"
+
 msgid "Collection name"
 msgstr "Nom de la collection"
 
@@ -1933,6 +1954,9 @@ msgstr "Colombie"
 
 msgid "Color"
 msgstr "Couleur"
+
+msgid "Color Actions"
+msgstr "Couleur actions"
 
 msgid "Color format"
 msgstr "Format de couleur"
@@ -1961,9 +1985,6 @@ msgstr "Interface Commune"
 msgid "Common Interface assignment"
 msgstr "Assignation Interface Commune"
 
-msgid "Common Setup Actions"
-msgstr "Actions de configuration courantes"
-
 msgid "Communication"
 msgstr "Communication"
 
@@ -1982,8 +2003,8 @@ msgstr "Complexe (autorise le mixages des pistes audio et aspects)"
 msgid "Composition of the recording filenames"
 msgstr "Composition noms de fichiers d'enregistrement"
 
-msgid "Compress"
-msgstr "Réduire"
+msgid "Config List Actions"
+msgstr "Liste de configuration actions"
 
 msgid "Config Scan Details"
 msgstr "Configurer les détails de la recherche"
@@ -2531,11 +2552,20 @@ msgstr "Comportement du curseur dans la liste des chaînes"
 msgid "Cut"
 msgstr "Couper"
 
+msgid "Cut List Editor Actions"
+msgstr "Éditeur de liste de coupe actions"
+
+msgid "Cutlist Seek Actions"
+msgstr "Recherche de la liste de coupe actions"
+
 msgid "Cutlist editor"
 msgstr "Editeur de montage"
 
 msgid "Cutlist editor..."
 msgstr "Éditeur monter/couper..."
+
+msgid "Cyan"
+msgstr "Cyan"
 
 msgid "Cyprus"
 msgstr "Chypre"
@@ -2588,6 +2618,9 @@ msgstr "Version pilote DVB: "
 msgid "DVB subtitle black transparency"
 msgstr "Transparence des sous-titres DVB"
 
+msgid "DVB subtitles color filter"
+msgstr "Filtre des couleur des sous-titres DVB"
+
 msgid "DVB type"
 msgstr "Type DVB"
 
@@ -2596,6 +2629,15 @@ msgstr "Graver le DVD"
 
 msgid "DVD Menu"
 msgstr "DVD Menu"
+
+msgid "DVD Player Actions"
+msgstr "Lecteur DVD actions"
+
+msgid "DVD Title List"
+msgstr "Liste titres DVD"
+
+msgid "DVD Toolbox"
+msgstr "Boite à outils DVD"
 
 msgid "DVD data format"
 msgstr "Format de données DVD"
@@ -2883,6 +2925,9 @@ msgstr "Retrait contour digital"
 msgid "Direct playback of linked titles without menu"
 msgstr "Lecture directe des titres liés sans menu"
 
+msgid "Direction Actions"
+msgstr "Direction actions"
+
 msgid "Directory"
 msgstr "Répertoire"
 
@@ -3005,6 +3050,9 @@ msgid ""
 msgstr ""
 "Voulez-vous vraiment vérifier le système de fichiers?\n"
 "Cela pourrait prendre beaucoup de temps!"
+
+msgid "Do you really want to clear this playlist?"
+msgstr "Voulez-vous vraiment supprimer cette liste de lecture?"
 
 #, python-format
 msgid "Do you really want to delete %s?"
@@ -3208,6 +3256,9 @@ msgstr "ENTER"
 
 msgid "EPG"
 msgstr "EPG"
+
+msgid "EPG Select Actions"
+msgstr "EPG sélectionner actions"
 
 msgid "EPG language selection 1"
 msgstr "Sélection de la langue EPG 1"
@@ -3602,6 +3653,12 @@ msgstr "Interface réseau Ethernet"
 
 msgid "Ethiopia"
 msgstr "Ethiopie"
+
+msgid "Event View Actions"
+msgstr "Affichage de l'événement actions"
+
+msgid "Event ViewEPG Actions"
+msgstr "Affichage de l'événement EPG actions"
 
 msgid "Event font size (relative to skin size)"
 msgstr "Taille de la police de l'événement (par rapport à la taille du skin)"
@@ -4102,6 +4159,9 @@ msgstr "Résolution plein écran"
 msgid "Fullbackup Images"
 msgstr "Sauvegarde complète des images"
 
+msgid "Function Key Actions"
+msgstr "Touche de fonction actions"
+
 msgid "Function of OK button"
 msgstr "Fonction de la touche OK"
 
@@ -4116,6 +4176,9 @@ msgstr "G"
 
 msgid "GB"
 msgstr "GB"
+
+msgid "GMEPG Select Actions"
+msgstr "GMEPG sélectionner actions"
 
 msgid "GREEN"
 msgstr "VERT"
@@ -4171,6 +4234,9 @@ msgstr "Ghana"
 
 msgid "Gibraltar"
 msgstr "Gibraltar"
+
+msgid "Global Actions"
+msgstr "Actions globales"
 
 msgid "Go down the list"
 msgstr "Aller en bas de la liste"
@@ -4400,6 +4466,9 @@ msgstr "Hébreu"
 msgid "Help"
 msgstr "Aide"
 
+msgid "Help Actions"
+msgstr "Aide actions"
+
 msgid "Help Screen"
 msgstr "Écran d'aide"
 
@@ -4477,6 +4546,9 @@ msgstr "Configurer Hotkey"
 
 msgid "Hotkey"
 msgstr "Hotkey"
+
+msgid "Hotkey Actions"
+msgstr "Hotkey actions"
 
 msgid "Hotkey Panic"
 msgstr "Hotkey panique"
@@ -4709,8 +4781,74 @@ msgstr "Barre d'information"
 msgid "Info bar timeout"
 msgstr "Délai d'affichage de la barre d'information"
 
+msgid "Infobar Actions"
+msgstr "Barre d'information actions"
+
+msgid "Infobar Audio Selection Actions"
+msgstr "Barre d'info sélection audio actions"
+
+msgid "Infobar Channel Selection"
+msgstr "Barre d'info des chaînes sélection"
+
+msgid "Infobar Cue Sheet Actions"
+msgstr "Feuille de repères de la barre d'info actions"
+
+msgid "Infobar Extensions"
+msgstr "Extensions de la barre d'info"
+
+msgid "Infobar Instant Record"
+msgstr "Barre d'info enregistrement instantané"
+
+msgid "Infobar Menu Actions"
+msgstr "Barre d'information menu actions"
+
+msgid "Infobar Movie List Actions"
+msgstr "Barre d'info de la liste de films actions"
+
+msgid "Infobar PiP Actions"
+msgstr "Barre d'information PiP actions"
+
+msgid "Infobar Rds Actions"
+msgstr "Barre d'information Rds actions"
+
+msgid "Infobar Red Button Actions"
+msgstr "Barre d'information bouton rouge actions"
+
+msgid "Infobar Seek Actions"
+msgstr "Barre d'info recherche actions"
+
+msgid "Infobar Show Hide Actions"
+msgstr "Barre d'info afficher masquer actions"
+
+msgid "Infobar Subservice Quickzap Actions"
+msgstr "Barre d'info sous-service ZapRapide actions"
+
+msgid "Infobar Subservice Selection Actions"
+msgstr "Barre d'info sélection des sous-services actions"
+
+msgid "Infobar Subtitle Selection Actions"
+msgstr "Barre d'info sélection des sous-titres actions"
+
+msgid "Infobar Teletext Actions"
+msgstr "Barre d'info télétexte actions"
+
+msgid "Infobar Timer Button Actions"
+msgstr "Bouton de minuterie d'Infobar actions"
+
+msgid "Infobar Timeshift Actions"
+msgstr "Barre d'info PauseDirect actions"
+
+msgid "Infobar Timeshift Activate Actions"
+msgstr "Barre d'info PauseDirect activer actions"
+
+msgid "Infobar Vmode Button Actions"
+msgstr "Bouton Vmode d'Infobar actions"
+
 msgid "Infobar frontend data source"
 msgstr "Source des données du frontend dans la barre d'information"
+
+msgid "InfobarEPG Actions"
+msgstr "Barre d'information EPG actions"
 
 msgid "Information"
 msgstr "Informations"
@@ -4757,6 +4895,15 @@ msgstr "Entrée"
 msgid "Input "
 msgstr "Entrée "
 
+msgid "Input Actions"
+msgstr "Entrée actions"
+
+msgid "Input Ascii Actions"
+msgstr "Entréé ASCII actions"
+
+msgid "Input Box Actions"
+msgstr "Entrée boîte actions"
+
 msgid "Input Stream ID"
 msgstr "Saisir le Stream ID"
 
@@ -4786,6 +4933,9 @@ msgstr "Installer extension locale"
 
 msgid "Install picons on"
 msgstr "Installer les picons sur"
+
+msgid "Install plugin"
+msgstr "Installation des plugins"
 
 msgid "Installation has completed."
 msgstr "L'installation est terminée."
@@ -4973,6 +5123,9 @@ msgstr "Evènements clés"
 msgid "Keyboard"
 msgstr "Clavier"
 
+msgid "Keyboard Input Actions"
+msgstr "Clavier d'entrée actions"
+
 msgid "Keyboard data entry"
 msgstr "Saisie de données au clavier"
 
@@ -5142,6 +5295,12 @@ msgid_plural "List version %(ver)d, found %(num)d channels"
 msgstr[0] "Liste version %(ver)d, %(num)d chaîne trouvée"
 msgstr[1] "Liste version %(ver)d, %(num)d chaînes trouvées"
 
+msgid "Listbox Actions"
+msgstr "Actions de la boîte de liste"
+
+msgid "Listbox Help Menu Actions"
+msgstr "Menu d'aide de la boîte de liste actions"
+
 msgid "Listen to the radio..."
 msgstr "Écouter la radio..."
 
@@ -5253,6 +5412,9 @@ msgstr "Macao"
 msgid "Madagascar"
 msgstr "Madagascar"
 
+msgid "Magenta"
+msgstr "Magenta"
+
 msgid "Main menu"
 msgstr "Menu principal"
 
@@ -5359,6 +5521,15 @@ msgstr "Peut-être parce qu’un enregistrement est en cours. Veuillez arrêter 
 msgid "Mayotte"
 msgstr "Mayotte"
 
+msgid "Media Player Actions"
+msgstr "Lecteur multimédia actions"
+
+msgid "Media Player Cue Sheet Actions"
+msgstr "Lecteur de média feuille de repère actions"
+
+msgid "Media Player Seek Actions"
+msgstr "Lecteur de média recherche actions"
+
 msgid "Media player"
 msgstr "Lecteur multimédia"
 
@@ -5382,6 +5553,9 @@ msgstr "Index mémoire"
 
 msgid "Menu"
 msgstr "Menu"
+
+msgid "Menu Actions"
+msgstr "Menu actions"
 
 msgid "Menu button function"
 msgstr "Fonction du bouton Menu"
@@ -5411,6 +5585,9 @@ msgstr "Age minimum %d ans"
 
 msgid "Minimum send interval"
 msgstr "Intervalle minimum d'envoi"
+
+msgid "Minute Input Actions"
+msgstr "Entrée des minutes actions"
 
 msgid "Missing "
 msgstr "Manquant "
@@ -5564,6 +5741,12 @@ msgstr "Déplacer vers l'indice de position"
 msgid "Movement"
 msgstr "Déplacement"
 
+msgid "Movie Player Actions"
+msgstr "Lecteur de films actions"
+
+msgid "Movie Selection Actions"
+msgstr "Sélection des films actions"
+
 msgid "Movie list configuration"
 msgstr "Configuration de la liste de films"
 
@@ -5590,6 +5773,9 @@ msgstr "Déplacement en cours vers l'ouest..."
 
 msgid "Mozambique"
 msgstr "Mozambique"
+
+msgid "Msg Box Actions"
+msgstr "Boîte de message actions"
 
 msgid "Multi EPG"
 msgstr "Multi EPG"
@@ -5674,6 +5860,9 @@ msgstr "Nauru"
 
 msgid "Navigate up/down with UP/DOWN buttons and page up/down with LEFT/RIGHT. EXIT to return to the help screen. OK to perform the action described in the currently highlighted help."
 msgstr "Naviguez vers le haut/bas avec les touches HAUT/BAS et paginez vers le haut/bas avec les touches GAUCHE/DROITE. EXIT pour revenir à l'écran d'aide. OK pour effectuer l'action décrite dans l'aide actuellement en surbrillance."
+
+msgid "Navigation Actions"
+msgstr "Navigation actions"
 
 msgid "Nepal"
 msgstr "Népal"
@@ -6005,6 +6194,9 @@ msgstr "Lecture en cours"
 msgid "Now, use the contrast setting to turn up the brightness of the background as much as possible, but make sure that you can still see the difference between the two brightest levels of shades.If you have done that, press OK."
 msgstr "Maintenant, utilisez les paramètres de contraste pour indiquer la luminosité du fond autant que possible, mais assurez-vous que vous pouvez toujours voir la différence entre les deux niveaux les plus lumineux des nuances. Si vous avez fait cela, appuyez sur OK."
 
+msgid "Number Actions"
+msgstr "Nombre actions"
+
 msgid "Number of channels shown in channel selection list"
 msgstr "Nombre de chaînes affichées dans la liste de sélection"
 
@@ -6046,6 +6238,9 @@ msgstr "Arrêt"
 
 msgid "Offline decode delay (ms)"
 msgstr "Délai décodage hors ligne (ms)"
+
+msgid "Ok Cancel Actions"
+msgstr "OK Annuler actions"
 
 msgid "Oman"
 msgstr "Oman"
@@ -6344,6 +6539,9 @@ msgstr "Pérou"
 
 msgid "Philippines"
 msgstr "Philippines"
+
+msgid "PiP Setup Actions"
+msgstr "Configuration PiP actions"
 
 msgid "PiP setup"
 msgstr "Paramètres PiP"
@@ -6719,6 +6917,9 @@ msgstr "Paramètres positionneur"
 msgid "Positioner setup log"
 msgstr "Log de la configuration du positionneur"
 
+msgid "Power Key Actions"
+msgstr "Bouton d'alimentation actions"
+
 msgid "Power LED"
 msgstr "LED d'alimentation"
 
@@ -7054,6 +7255,9 @@ msgstr "Disque RAM"
 msgid "Random"
 msgstr "Aléatoire"
 
+msgid "Rass Interactive Actions"
+msgstr "Rass interactif actions"
+
 #, python-format
 msgid "Rating defined by broadcaster - %d"
 msgstr "Classification définie par le diffuseur - %d"
@@ -7272,6 +7476,9 @@ msgstr "Supprimer les éléments de la corbeille après (jours)"
 
 msgid "Remove new found flag"
 msgstr "Supprimer le nouvel indicateur trouvé"
+
+msgid "Remove plugin"
+msgstr "Supprimer extension"
 
 msgid "Remove plugins"
 msgstr "Supprimer extensions"
@@ -7635,6 +7842,9 @@ msgstr "Longitude satellite:"
 
 msgid "Satellites"
 msgstr "Satellites"
+
+msgid "Satlist Shortcut Action"
+msgstr "Raccourci Satlist action"
 
 msgid "Sats"
 msgstr "Sats"
@@ -8412,6 +8622,9 @@ msgstr "Les paramètres peuvent être différents pour chaque répertoire (uniqu
 msgid "Setup"
 msgstr "Paramétrer"
 
+msgid "Setup Actions"
+msgstr "Configuration actions"
+
 msgid "Setup hard disk"
 msgstr "Configurer un disque dur"
 
@@ -8441,6 +8654,9 @@ msgstr "Décalage"
 
 msgid "Short filenames"
 msgstr "Noms de fichiers court"
+
+msgid "Shortcut Actions"
+msgstr "Raccourci actions"
 
 msgid "Show"
 msgstr "Afficher"
@@ -8812,6 +9028,9 @@ msgstr "Passer la vérification de la connexion Internet (désactive l'installat
 msgid "Skip jumping to live TV while timeshifting with plugins"
 msgstr "Eviter de basculer sur la TV en direct lors de la pause du direct avec plugin"
 
+msgid "Sleep Timer Editor Actions"
+msgstr "Arrêt automatique actions"
+
 msgid "Sleep timer"
 msgstr "Arrêt automatique"
 
@@ -9055,6 +9274,9 @@ msgstr "Veille"
 
 msgid "Standby / restart"
 msgstr "Veille / Redémarrage"
+
+msgid "Standby Actions"
+msgstr "Mise en veille actions"
 
 msgid "Standby LED"
 msgstr "LED en veille"
@@ -9495,7 +9717,7 @@ msgstr ""
 "\n"
 "Support: https://www.openpli.org/\n"
 "Traducteur: Pr2\n"
-"Dernière MÀJ: 15-12-2024"
+"Dernière MÀJ: 20-12-2024"
 
 msgid "TS file is too large for ISO9660 level 1!"
 msgstr "Fichier TS trop grand pour le niveau 1 ISO9660!"
@@ -9536,6 +9758,9 @@ msgstr "Tadjikistan"
 msgid "Tanzania, United Republic of"
 msgstr "Tanzanie (République unie de)"
 
+msgid "Teletext Actions"
+msgstr "Télétexte actions"
+
 msgid "Teletext subtitle color"
 msgstr "Couleur des sous-titres télétexte"
 
@@ -9563,6 +9788,12 @@ msgstr "Ecrans de test"
 msgid "Testscreens that are helpfull to fine-tune your display"
 msgstr "Ecran de tests qui sont utiles pour faire la mise au point de votre écran"
 
+msgid "Text Edit Actions"
+msgstr "Editeur de texte actoins"
+
+msgid "Text Entry Actions"
+msgstr "Entrée de texte actions"
+
 msgid "Text View On"
 msgstr "Afficher Texte Sur"
 
@@ -9584,10 +9815,10 @@ msgstr ""
 
 msgid ""
 "Thank you for using the wizard. Your receiver is now ready for use.\n"
-"Press OK to start using your receiver."
+"Press Blue or OK to start using your receiver."
 msgstr ""
 "Merci d'avoir utilisé l'assistant. Votre récepteur est maintenant prêt à être utilisé.\n"
-"Appuyez sur OK pour commencer à utiliser votre récepteur."
+"Appuyez sur Bleu ou OK pour commencer à utiliser votre récepteur."
 
 #, python-format
 msgid "The %d min remaining before the end of the event."
@@ -10055,6 +10286,9 @@ msgstr "Zone horaire"
 msgid "Timer"
 msgstr "Programmation"
 
+msgid "Timer Edit Actions"
+msgstr "Programmation éditer actions"
+
 msgid "Timer Overview"
 msgstr "Aperçu des programmations"
 
@@ -10336,6 +10570,9 @@ msgstr "Taille du pas de rotation"
 
 msgid "Tuvalu"
 msgstr "Tuvalu"
+
+msgid "Tv Radio Actions"
+msgstr "TV Radio actions"
 
 msgid "Two"
 msgstr "Deux"
@@ -10627,8 +10864,8 @@ msgstr "Utiliser l'assistant réseau pour configurer l'adaptateur réseau"
 msgid "Use the network wizard to configure your network\n"
 msgstr "Utiliser l'assistant réseau pour configurer votre réseau\n"
 
-msgid "Use the up/down keys on your remote control to select an option. After that, press OK."
-msgstr "Utiliser les boutons HAUT et BAS de votre télécommande pour sélectionner une option. Après cela, appuyez sur OK."
+msgid "Use the up/down keys on your remote control to select an option. After that, press Blue or OK."
+msgstr "Utiliser les boutons HAUT et BAS de votre télécommande pour sélectionner une option. Après cela, appuyez sur Bleu ou OK."
 
 msgid "Use the wizard to set up basic features"
 msgstr "Utiliser l'assistant pour les réglages de base"
@@ -10859,11 +11096,17 @@ msgstr "Îles Vierges (britanniques)"
 msgid "Virgin Islands (U.S.)"
 msgstr "Îles Vierges (USA)"
 
+msgid "Virtual Key Board Actions"
+msgstr "Clavier virtuel actions"
+
 msgid "Virtual KeyBoard Functions"
 msgstr "Fonctions du clavier virtuel"
 
 msgid "Virtual KeyBoard Text:"
 msgstr "Texte du clavier virtuel:"
+
+msgid "Virtual Keyboard Actions"
+msgstr "Clavier virtuel actions"
 
 msgid "Virtual keyboard"
 msgstr "Clavier virtuel"
@@ -11021,12 +11264,12 @@ msgid ""
 "Welcome.\n"
 "\n"
 "This start wizard will guide you through the basic setup of your receiver.\n"
-"Press the OK button on your remote control to move to the next step."
+"Press the Blue or OK button on your remote control to move to the next step."
 msgstr ""
 "Bienvenue.\n"
 "\n"
 "Cet assistant de démarrage vous guidera à travers la configuration de base de votre récepteur.\n"
-"Appuyez sur le bouton OK de votre télécommande pour passer à l'étape suivante."
+"Appuyez sur le bouton bleu ou OK de votre télécommande pour passer à l'étape suivante."
 
 msgid "Welcome..."
 msgstr "Bienvenue..."
@@ -11166,9 +11409,6 @@ msgstr "Lorsqu'elle est activée, les sous-titres graphiques DVB seront centrés
 msgid "When enabled, graphical DVB subtitles will be displayed at their original position."
 msgstr "Lorsqu'elle est activée, les sous-titres graphiques DVB seront affichés à leur position d'origine."
 
-msgid "When enabled, graphical DVB subtitles will be displayed in yellow, instead of the original color."
-msgstr "Lorsqu'elle est activée, les sous-titres graphiques DVB seront affichés en jaune, au lieu de la couleur d'origine."
-
 msgid "When enabled, http streams are descrambled on the server side. The (remote) client receiver does not have to do descrambling. Default on."
 msgstr "Lorsqu'elle est activée, les flux http sont décryptés du côté serveur. Le récepteur client (distant) n'aura pas a décrypter. Par défaut: actif."
 
@@ -11283,6 +11523,9 @@ msgstr "Lorsque le récepteur se réveille de veille ou de veille profonde, il e
 msgid "Where to save temporary timeshift recordings?"
 msgstr "Où sauver les enregistrements temporaires PauseDirect?"
 
+msgid "Window Actions"
+msgstr "Fenêtre actions"
+
 msgid "Wireless LAN"
 msgstr "LAN sans fil"
 
@@ -11325,6 +11568,9 @@ msgstr "Avec cette option, vous pouvez changer la couleur LED ou désactiver la 
 msgid "Without popup"
 msgstr "Sans le popup"
 
+msgid "Wizard Actions"
+msgstr "Assistant actions"
+
 msgid "Wizard setup"
 msgstr "Configuration de l'Assistant"
 
@@ -11355,9 +11601,6 @@ msgstr "Année"
 
 msgid "Yellow"
 msgstr "Jaune"
-
-msgid "Yellow DVB subtitles"
-msgstr "Sous-titres DVB jaune"
 
 msgid "Yellow button function"
 msgstr "Fonction du bouton jaune"

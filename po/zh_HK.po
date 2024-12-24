@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-12-15 13:08+0100\n"
+"POT-Creation-Date: 2024-12-20 11:32+0100\n"
 "PO-Revision-Date: \n"
 "Last-Translator: 王彪 <satfan@163.com>\n"
 "Language-Team: 中國\n"
@@ -554,6 +554,9 @@ msgstr ""
 
 msgid "A"
 msgstr "A"
+
+msgid "A color filter can be used for better readability of DVB subtitles."
+msgstr ""
 
 msgid "A completed recording timer is about to put your receiver in standby mode. Would you like to proceed?"
 msgstr ""
@@ -1129,6 +1132,10 @@ msgstr ""
 #, python-format
 msgid "Audio PID%s, codec & lang"
 msgstr ""
+
+#, fuzzy
+msgid "Audio Selection Actions"
+msgstr "選擇位置"
 
 msgid "Audio auto volume level"
 msgstr ""
@@ -1731,6 +1738,18 @@ msgid "Channel Info"
 msgstr ""
 
 #, fuzzy
+msgid "Channel Select Base Actions"
+msgstr "執行命令..."
+
+#, fuzzy
+msgid "Channel Select Edit Actions"
+msgstr "執行命令..."
+
+#, fuzzy
+msgid "Channel SelectEPG Actions"
+msgstr "執行命令..."
+
+#, fuzzy
 msgid "Channel Selection"
 msgstr "執行命令..."
 
@@ -1861,6 +1880,10 @@ msgstr ""
 msgid "Christmas Island"
 msgstr ""
 
+#, fuzzy
+msgid "Ci Selection Actions"
+msgstr "選擇位置"
+
 msgid "Circular LNB"
 msgstr ""
 
@@ -1923,6 +1946,9 @@ msgstr ""
 msgid "Codec & lang%s"
 msgstr ""
 
+msgid "Collapse"
+msgstr ""
+
 msgid "Collection name"
 msgstr "收藏名稱"
 
@@ -1936,6 +1962,10 @@ msgstr "色彩"
 #, fuzzy
 msgid "Color"
 msgstr "色彩"
+
+#, fuzzy
+msgid "Color Actions"
+msgstr "選擇位置"
 
 msgid "Color format"
 msgstr ""
@@ -1965,10 +1995,6 @@ msgstr "通用介面 (CI)"
 msgid "Common Interface assignment"
 msgstr ""
 
-#, fuzzy
-msgid "Common Setup Actions"
-msgstr "選擇位置"
-
 msgid "Communication"
 msgstr "通訊"
 
@@ -1988,8 +2014,8 @@ msgid "Composition of the recording filenames"
 msgstr ""
 
 #, fuzzy
-msgid "Compress"
-msgstr "按 OK"
+msgid "Config List Actions"
+msgstr "選擇位置"
 
 msgid "Config Scan Details"
 msgstr ""
@@ -2542,11 +2568,22 @@ msgstr ""
 msgid "Cut"
 msgstr "剪切"
 
+#, fuzzy
+msgid "Cut List Editor Actions"
+msgstr "剪輯編輯器..."
+
+#, fuzzy
+msgid "Cutlist Seek Actions"
+msgstr "字幕選擇"
+
 msgid "Cutlist editor"
 msgstr ""
 
 msgid "Cutlist editor..."
 msgstr "剪輯編輯器..."
+
+msgid "Cyan"
+msgstr ""
 
 msgid "Cyprus"
 msgstr ""
@@ -2601,6 +2638,9 @@ msgstr "新版本:"
 msgid "DVB subtitle black transparency"
 msgstr ""
 
+msgid "DVB subtitles color filter"
+msgstr ""
+
 msgid "DVB type"
 msgstr ""
 
@@ -2608,6 +2648,16 @@ msgid "DVD Burn"
 msgstr ""
 
 msgid "DVD Menu"
+msgstr ""
+
+#, fuzzy
+msgid "DVD Player Actions"
+msgstr "播放"
+
+msgid "DVD Title List"
+msgstr ""
+
+msgid "DVD Toolbox"
 msgstr ""
 
 msgid "DVD data format"
@@ -2905,6 +2955,10 @@ msgstr "數字等高線消除"
 msgid "Direct playback of linked titles without menu"
 msgstr "直接播放鏈結標題，不使用功能表"
 
+#, fuzzy
+msgid "Direction Actions"
+msgstr "選擇位置"
+
 msgid "Directory"
 msgstr "目錄"
 
@@ -3034,6 +3088,10 @@ msgid ""
 msgstr ""
 " 是否檢視檔系統?\n"
 "這將需要很長時間!"
+
+#, fuzzy
+msgid "Do you really want to clear this playlist?"
+msgstr " 是否刪除 %s?"
 
 #, python-format
 msgid "Do you really want to delete %s?"
@@ -3235,6 +3293,10 @@ msgstr ""
 
 msgid "EPG"
 msgstr ""
+
+#, fuzzy
+msgid "EPG Select Actions"
+msgstr "選擇位置"
 
 msgid "EPG language selection 1"
 msgstr ""
@@ -3626,6 +3688,12 @@ msgid "Ethernet network interface"
 msgstr ""
 
 msgid "Ethiopia"
+msgstr ""
+
+msgid "Event View Actions"
+msgstr ""
+
+msgid "Event ViewEPG Actions"
 msgstr ""
 
 msgid "Event font size (relative to skin size)"
@@ -4129,6 +4197,10 @@ msgstr ""
 msgid "Fullbackup Images"
 msgstr "安裝失敗"
 
+#, fuzzy
+msgid "Function Key Actions"
+msgstr "選擇位置"
+
 msgid "Function of OK button"
 msgstr ""
 
@@ -4144,6 +4216,10 @@ msgstr ""
 #, fuzzy
 msgid "GB"
 msgstr "RGB"
+
+#, fuzzy
+msgid "GMEPG Select Actions"
+msgstr "選擇位置"
 
 msgid "GREEN"
 msgstr ""
@@ -4200,6 +4276,9 @@ msgstr ""
 #, fuzzy
 msgid "Gibraltar"
 msgstr "媒體庫"
+
+msgid "Global Actions"
+msgstr ""
 
 msgid "Go down the list"
 msgstr ""
@@ -4437,6 +4516,10 @@ msgstr ""
 msgid "Help"
 msgstr ""
 
+#, fuzzy
+msgid "Help Actions"
+msgstr "選擇位置"
+
 msgid "Help Screen"
 msgstr ""
 
@@ -4515,6 +4598,10 @@ msgstr ""
 
 msgid "Hotkey"
 msgstr ""
+
+#, fuzzy
+msgid "Hotkey Actions"
+msgstr "選擇位置"
 
 msgid "Hotkey Panic"
 msgstr ""
@@ -4749,8 +4836,89 @@ msgstr ""
 msgid "Info bar timeout"
 msgstr ""
 
+#, fuzzy
+msgid "Infobar Actions"
+msgstr "資訊"
+
+#, fuzzy
+msgid "Infobar Audio Selection Actions"
+msgstr "選擇位置"
+
+#, fuzzy
+msgid "Infobar Channel Selection"
+msgstr "執行命令..."
+
+msgid "Infobar Cue Sheet Actions"
+msgstr ""
+
+#, fuzzy
+msgid "Infobar Extensions"
+msgstr "擴展"
+
+#, fuzzy
+msgid "Infobar Instant Record"
+msgstr "開始錄製？"
+
+#, fuzzy
+msgid "Infobar Menu Actions"
+msgstr "選擇位置"
+
+msgid "Infobar Movie List Actions"
+msgstr ""
+
+#, fuzzy
+msgid "Infobar PiP Actions"
+msgstr "資訊"
+
+#, fuzzy
+msgid "Infobar Rds Actions"
+msgstr "資訊"
+
+msgid "Infobar Red Button Actions"
+msgstr ""
+
+#, fuzzy
+msgid "Infobar Seek Actions"
+msgstr "選擇位置"
+
+msgid "Infobar Show Hide Actions"
+msgstr ""
+
+msgid "Infobar Subservice Quickzap Actions"
+msgstr ""
+
+#, fuzzy
+msgid "Infobar Subservice Selection Actions"
+msgstr "選擇位置"
+
+#, fuzzy
+msgid "Infobar Subtitle Selection Actions"
+msgstr "選擇位置"
+
+#, fuzzy
+msgid "Infobar Teletext Actions"
+msgstr "選擇位置"
+
+msgid "Infobar Timer Button Actions"
+msgstr ""
+
+#, fuzzy
+msgid "Infobar Timeshift Actions"
+msgstr "時光平移位置"
+
+#, fuzzy
+msgid "Infobar Timeshift Activate Actions"
+msgstr "時光平移位置"
+
+msgid "Infobar Vmode Button Actions"
+msgstr ""
+
 msgid "Infobar frontend data source"
 msgstr ""
+
+#, fuzzy
+msgid "InfobarEPG Actions"
+msgstr "資訊"
 
 msgid "Information"
 msgstr "資訊"
@@ -4799,6 +4967,16 @@ msgstr "輸入"
 msgid "Input "
 msgstr "輸入 1"
 
+#, fuzzy
+msgid "Input Actions"
+msgstr "輸入 1"
+
+msgid "Input Ascii Actions"
+msgstr ""
+
+msgid "Input Box Actions"
+msgstr ""
+
 msgid "Input Stream ID"
 msgstr ""
 
@@ -4830,6 +5008,10 @@ msgstr "安裝本地附件"
 
 msgid "Install picons on"
 msgstr ""
+
+#, fuzzy
+msgid "Install plugin"
+msgstr "正在安裝"
 
 msgid "Installation has completed."
 msgstr ""
@@ -5013,6 +5195,9 @@ msgstr "事件"
 msgid "Keyboard"
 msgstr "鍵盤佈局"
 
+msgid "Keyboard Input Actions"
+msgstr ""
+
 msgid "Keyboard data entry"
 msgstr ""
 
@@ -5188,6 +5373,13 @@ msgid_plural "List version %(ver)d, found %(num)d channels"
 msgstr[0] ""
 msgstr[1] ""
 
+#, fuzzy
+msgid "Listbox Actions"
+msgstr "位置"
+
+msgid "Listbox Help Menu Actions"
+msgstr ""
+
 msgid "Listen to the radio..."
 msgstr ""
 
@@ -5302,6 +5494,10 @@ msgstr ""
 msgid "Madagascar"
 msgstr ""
 
+#, fuzzy
+msgid "Magenta"
+msgstr "注意!"
+
 msgid "Main menu"
 msgstr "主功能表"
 
@@ -5409,6 +5605,16 @@ msgstr ""
 msgid "Mayotte"
 msgstr ""
 
+#, fuzzy
+msgid "Media Player Actions"
+msgstr "媒體播放器"
+
+msgid "Media Player Cue Sheet Actions"
+msgstr ""
+
+msgid "Media Player Seek Actions"
+msgstr ""
+
 msgid "Media player"
 msgstr "媒體播放器"
 
@@ -5432,6 +5638,10 @@ msgstr ""
 
 msgid "Menu"
 msgstr "功能表"
+
+#, fuzzy
+msgid "Menu Actions"
+msgstr "選擇位置"
 
 #, fuzzy
 msgid "Menu button function"
@@ -5463,6 +5673,10 @@ msgstr ""
 
 msgid "Minimum send interval"
 msgstr ""
+
+#, fuzzy
+msgid "Minute Input Actions"
+msgstr "選擇位置"
 
 msgid "Missing "
 msgstr ""
@@ -5629,6 +5843,14 @@ msgstr ""
 msgid "Movement"
 msgstr ""
 
+#, fuzzy
+msgid "Movie Player Actions"
+msgstr "電影位置"
+
+#, fuzzy
+msgid "Movie Selection Actions"
+msgstr "選擇位置"
+
 msgid "Movie list configuration"
 msgstr ""
 
@@ -5654,6 +5876,9 @@ msgid "Moving west..."
 msgstr ""
 
 msgid "Mozambique"
+msgstr ""
+
+msgid "Msg Box Actions"
 msgstr ""
 
 msgid "Multi EPG"
@@ -5743,6 +5968,10 @@ msgstr ""
 
 msgid "Navigate up/down with UP/DOWN buttons and page up/down with LEFT/RIGHT. EXIT to return to the help screen. OK to perform the action described in the currently highlighted help."
 msgstr ""
+
+#, fuzzy
+msgid "Navigation Actions"
+msgstr "選擇位置"
 
 msgid "Nepal"
 msgstr ""
@@ -6087,6 +6316,10 @@ msgstr ""
 msgid "Now, use the contrast setting to turn up the brightness of the background as much as possible, but make sure that you can still see the difference between the two brightest levels of shades.If you have done that, press OK."
 msgstr "現在，盡可能使用對比度設定出現的亮度背景，但是請確保您仍然可以看到色調的兩個最亮等級之間的不同。如果您已經完成了，按OK。"
 
+#, fuzzy
+msgid "Number Actions"
+msgstr "選擇位置"
+
 msgid "Number of channels shown in channel selection list"
 msgstr ""
 
@@ -6129,6 +6362,10 @@ msgstr "關閉"
 
 msgid "Offline decode delay (ms)"
 msgstr ""
+
+#, fuzzy
+msgid "Ok Cancel Actions"
+msgstr "執行命令..."
 
 msgid "Oman"
 msgstr ""
@@ -6433,6 +6670,10 @@ msgstr ""
 
 msgid "Philippines"
 msgstr ""
+
+#, fuzzy
+msgid "PiP Setup Actions"
+msgstr "選擇位置"
 
 msgid "PiP setup"
 msgstr ""
@@ -6817,6 +7058,9 @@ msgstr "極軸設定(DiSEqC 1.2)"
 msgid "Positioner setup log"
 msgstr ""
 
+msgid "Power Key Actions"
+msgstr ""
+
 msgid "Power LED"
 msgstr ""
 
@@ -7150,6 +7394,10 @@ msgstr ""
 msgid "Random"
 msgstr "隨機"
 
+#, fuzzy
+msgid "Rass Interactive Actions"
+msgstr "View Rass interactive..."
+
 #, python-format
 msgid "Rating defined by broadcaster - %d"
 msgstr ""
@@ -7370,6 +7618,10 @@ msgstr ""
 
 msgid "Remove new found flag"
 msgstr "移除新發現標記"
+
+#, fuzzy
+msgid "Remove plugin"
+msgstr "移除插件"
 
 msgid "Remove plugins"
 msgstr "移除插件"
@@ -7741,6 +7993,9 @@ msgstr ""
 
 msgid "Satellites"
 msgstr "衛星"
+
+msgid "Satlist Shortcut Action"
+msgstr ""
 
 msgid "Sats"
 msgstr ""
@@ -8551,6 +8806,10 @@ msgid "Setup"
 msgstr "設定"
 
 #, fuzzy
+msgid "Setup Actions"
+msgstr "選擇位置"
+
+#, fuzzy
 msgid "Setup hard disk"
 msgstr "硬碟"
 
@@ -8580,6 +8839,10 @@ msgstr ""
 
 msgid "Short filenames"
 msgstr ""
+
+#, fuzzy
+msgid "Shortcut Actions"
+msgstr "選擇位置"
 
 msgid "Show"
 msgstr ""
@@ -8960,6 +9223,9 @@ msgstr ""
 msgid "Skip jumping to live TV while timeshifting with plugins"
 msgstr ""
 
+msgid "Sleep Timer Editor Actions"
+msgstr ""
+
 msgid "Sleep timer"
 msgstr ""
 
@@ -9208,6 +9474,10 @@ msgstr "待機"
 
 msgid "Standby / restart"
 msgstr ""
+
+#, fuzzy
+msgid "Standby Actions"
+msgstr "待機"
 
 #, fuzzy
 msgid "Standby LED"
@@ -9699,6 +9969,10 @@ msgstr ""
 msgid "Tanzania, United Republic of"
 msgstr ""
 
+#, fuzzy
+msgid "Teletext Actions"
+msgstr "選擇位置"
+
 msgid "Teletext subtitle color"
 msgstr ""
 
@@ -9726,6 +10000,13 @@ msgstr ""
 msgid "Testscreens that are helpfull to fine-tune your display"
 msgstr ""
 
+#, fuzzy
+msgid "Text Edit Actions"
+msgstr "音頻選擇"
+
+msgid "Text Entry Actions"
+msgstr ""
+
 msgid "Text View On"
 msgstr ""
 
@@ -9747,7 +10028,7 @@ msgstr ""
 
 msgid ""
 "Thank you for using the wizard. Your receiver is now ready for use.\n"
-"Press OK to start using your receiver."
+"Press Blue or OK to start using your receiver."
 msgstr ""
 
 #, python-format
@@ -10179,6 +10460,10 @@ msgstr "時區"
 msgid "Timer"
 msgstr "計時器"
 
+#, fuzzy
+msgid "Timer Edit Actions"
+msgstr "計時器選擇"
+
 msgid "Timer Overview"
 msgstr ""
 
@@ -10467,6 +10752,9 @@ msgid "Turning step size"
 msgstr ""
 
 msgid "Tuvalu"
+msgstr ""
+
+msgid "Tv Radio Actions"
 msgstr ""
 
 msgid "Two"
@@ -10766,7 +11054,8 @@ msgstr ""
 msgid "Use the network wizard to configure your network\n"
 msgstr ""
 
-msgid "Use the up/down keys on your remote control to select an option. After that, press OK."
+#, fuzzy
+msgid "Use the up/down keys on your remote control to select an option. After that, press Blue or OK."
 msgstr "使用遙控 上/下 鍵選擇一個選項。在此之後按下 OK 。"
 
 msgid "Use the wizard to set up basic features"
@@ -10998,10 +11287,16 @@ msgstr ""
 msgid "Virgin Islands (U.S.)"
 msgstr ""
 
+msgid "Virtual Key Board Actions"
+msgstr ""
+
 msgid "Virtual KeyBoard Functions"
 msgstr ""
 
 msgid "Virtual KeyBoard Text:"
+msgstr ""
+
+msgid "Virtual Keyboard Actions"
 msgstr ""
 
 msgid "Virtual keyboard"
@@ -11148,7 +11443,7 @@ msgid ""
 "Welcome.\n"
 "\n"
 "This start wizard will guide you through the basic setup of your receiver.\n"
-"Press the OK button on your remote control to move to the next step."
+"Press the Blue or OK button on your remote control to move to the next step."
 msgstr ""
 
 msgid "Welcome..."
@@ -11289,9 +11584,6 @@ msgstr ""
 msgid "When enabled, graphical DVB subtitles will be displayed at their original position."
 msgstr ""
 
-msgid "When enabled, graphical DVB subtitles will be displayed in yellow, instead of the original color."
-msgstr ""
-
 msgid "When enabled, http streams are descrambled on the server side. The (remote) client receiver does not have to do descrambling. Default on."
 msgstr ""
 
@@ -11406,6 +11698,10 @@ msgstr ""
 msgid "Where to save temporary timeshift recordings?"
 msgstr "在哪里保存時光平移臨時錄製的內容?"
 
+#, fuzzy
+msgid "Window Actions"
+msgstr "選擇位置"
+
 msgid "Wireless LAN"
 msgstr "無線網WLAN"
 
@@ -11448,6 +11744,9 @@ msgstr ""
 msgid "Without popup"
 msgstr ""
 
+msgid "Wizard Actions"
+msgstr ""
+
 msgid "Wizard setup"
 msgstr ""
 
@@ -11477,9 +11776,6 @@ msgid "Year"
 msgstr "年"
 
 msgid "Yellow"
-msgstr ""
-
-msgid "Yellow DVB subtitles"
 msgstr ""
 
 #, fuzzy

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tuxbox-enigma 0.0.1-En-Th\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-12-15 13:08+0100\n"
+"POT-Creation-Date: 2024-12-20 11:32+0100\n"
 "PO-Revision-Date: 2010-04-08 18:13+0700\n"
 "Last-Translator: Tony - Thaidreambox\n"
 "Language-Team: Tony @ Thai Dreambox <tonyboyth@gmail.com>\n"
@@ -562,6 +562,9 @@ msgstr ""
 
 msgid "A"
 msgstr "A"
+
+msgid "A color filter can be used for better readability of DVB subtitles."
+msgstr ""
 
 msgid "A completed recording timer is about to put your receiver in standby mode. Would you like to proceed?"
 msgstr ""
@@ -1165,6 +1168,10 @@ msgstr ""
 #, python-format
 msgid "Audio PID%s, codec & lang"
 msgstr ""
+
+#, fuzzy
+msgid "Audio Selection Actions"
+msgstr "เลือกที่ที่จะสำรอง"
 
 msgid "Audio auto volume level"
 msgstr ""
@@ -1775,6 +1782,18 @@ msgid "Channel Info"
 msgstr ""
 
 #, fuzzy
+msgid "Channel Select Base Actions"
+msgstr "เลือกช่องรายการ"
+
+#, fuzzy
+msgid "Channel Select Edit Actions"
+msgstr "เลือกช่องรายการ"
+
+#, fuzzy
+msgid "Channel SelectEPG Actions"
+msgstr "เลือกช่องรายการ"
+
+#, fuzzy
 msgid "Channel Selection"
 msgstr "เลือกช่องรายการ"
 
@@ -1908,6 +1927,10 @@ msgstr ""
 msgid "Christmas Island"
 msgstr ""
 
+#, fuzzy
+msgid "Ci Selection Actions"
+msgstr "เลือกที่ที่จะสำรอง"
+
 msgid "Circular LNB"
 msgstr ""
 
@@ -1970,6 +1993,9 @@ msgstr ""
 msgid "Codec & lang%s"
 msgstr ""
 
+msgid "Collapse"
+msgstr ""
+
 msgid "Collection name"
 msgstr "ชื่อคอลเลคชั่น"
 
@@ -1983,6 +2009,10 @@ msgstr "ระบบสี"
 #, fuzzy
 msgid "Color"
 msgstr "ระบบสี"
+
+#, fuzzy
+msgid "Color Actions"
+msgstr "เลือกที่ที่จะสำรอง"
 
 #, fuzzy
 msgid "Color format"
@@ -2014,10 +2044,6 @@ msgstr "อินเตอร์เฟซพื้นฐาน"
 msgid "Common Interface assignment"
 msgstr "กำหนดอินเตอร์เฟซพื้นฐาน"
 
-#, fuzzy
-msgid "Common Setup Actions"
-msgstr "เลือกที่ที่จะสำรอง"
-
 msgid "Communication"
 msgstr "ติดต่อสื่อสาร"
 
@@ -2038,8 +2064,8 @@ msgid "Composition of the recording filenames"
 msgstr ""
 
 #, fuzzy
-msgid "Compress"
-msgstr "สำเร็จ"
+msgid "Config List Actions"
+msgstr "เลือกที่ที่จะสำรอง"
 
 msgid "Config Scan Details"
 msgstr ""
@@ -2614,11 +2640,22 @@ msgstr ""
 msgid "Cut"
 msgstr "ตัด"
 
+#, fuzzy
+msgid "Cut List Editor Actions"
+msgstr "ตัดต่อรายการ..."
+
+#, fuzzy
+msgid "Cutlist Seek Actions"
+msgstr "เลือกซับไตเติ้ล"
+
 msgid "Cutlist editor"
 msgstr ""
 
 msgid "Cutlist editor..."
 msgstr "ตัดต่อรายการ..."
+
+msgid "Cyan"
+msgstr ""
 
 msgid "Cyprus"
 msgstr ""
@@ -2674,6 +2711,9 @@ msgstr "เวอร์ชั่นใหม่:"
 msgid "DVB subtitle black transparency"
 msgstr ""
 
+msgid "DVB subtitles color filter"
+msgstr ""
+
 msgid "DVB type"
 msgstr ""
 
@@ -2682,6 +2722,18 @@ msgstr ""
 
 msgid "DVD Menu"
 msgstr ""
+
+#, fuzzy
+msgid "DVD Player Actions"
+msgstr "เครื่องเล่นดีวีดี"
+
+#, fuzzy
+msgid "DVD Title List"
+msgstr "รายการบนแผ่นดีวีดี"
+
+#, fuzzy
+msgid "DVD Toolbox"
+msgstr "เครื่องมือจัดการดีวีดี"
 
 msgid "DVD data format"
 msgstr ""
@@ -2989,6 +3041,10 @@ msgstr "Digital contour removal"
 msgid "Direct playback of linked titles without menu"
 msgstr "เล่นทันที ไม่ต้องแสดงเมนู"
 
+#, fuzzy
+msgid "Direction Actions"
+msgstr "เลือกที่ที่จะสำรอง"
+
 msgid "Directory"
 msgstr ""
 
@@ -3125,6 +3181,10 @@ msgid ""
 msgstr ""
 "ท่านแน่ใจหรือไม่ที่จะตรวจสอบระบบไฟล์?\n"
 "เนื่องจากจะใช้เวลานานมากกว่าจะแล้วเสร็จ!"
+
+#, fuzzy
+msgid "Do you really want to clear this playlist?"
+msgstr "ท่านต้องการที่จะลบ %s ออกจากระบบหรือไม่?"
 
 #, python-format
 msgid "Do you really want to delete %s?"
@@ -3330,6 +3390,10 @@ msgstr ""
 
 msgid "EPG"
 msgstr ""
+
+#, fuzzy
+msgid "EPG Select Actions"
+msgstr "เลือกผังรายการ"
 
 msgid "EPG language selection 1"
 msgstr ""
@@ -3727,6 +3791,14 @@ msgstr ""
 
 msgid "Ethiopia"
 msgstr ""
+
+#, fuzzy
+msgid "Event View Actions"
+msgstr "แสดงรายการ"
+
+#, fuzzy
+msgid "Event ViewEPG Actions"
+msgstr "แสดงรายการ"
 
 msgid "Event font size (relative to skin size)"
 msgstr ""
@@ -4238,6 +4310,10 @@ msgstr ""
 msgid "Fullbackup Images"
 msgstr "แฟรช"
 
+#, fuzzy
+msgid "Function Key Actions"
+msgstr "เลือกที่ที่จะสำรอง"
+
 msgid "Function of OK button"
 msgstr ""
 
@@ -4253,6 +4329,10 @@ msgstr ""
 #, fuzzy
 msgid "GB"
 msgstr "RGB"
+
+#, fuzzy
+msgid "GMEPG Select Actions"
+msgstr "เลือกผังรายการ"
 
 msgid "GREEN"
 msgstr ""
@@ -4311,6 +4391,9 @@ msgid "Ghana"
 msgstr ""
 
 msgid "Gibraltar"
+msgstr ""
+
+msgid "Global Actions"
 msgstr ""
 
 msgid "Go down the list"
@@ -4557,6 +4640,10 @@ msgstr ""
 msgid "Help"
 msgstr ""
 
+#, fuzzy
+msgid "Help Actions"
+msgstr "เลือกที่ที่จะสำรอง"
+
 msgid "Help Screen"
 msgstr ""
 
@@ -4636,6 +4723,10 @@ msgstr ""
 
 msgid "Hotkey"
 msgstr ""
+
+#, fuzzy
+msgid "Hotkey Actions"
+msgstr "เลือกที่ที่จะสำรอง"
 
 msgid "Hotkey Panic"
 msgstr ""
@@ -4877,8 +4968,88 @@ msgstr "แถบรายการ"
 msgid "Info bar timeout"
 msgstr "เวลาแสดงแถบรายการ"
 
+#, fuzzy
+msgid "Infobar Actions"
+msgstr "เวลาแสดงแถบรายการ"
+
+#, fuzzy
+msgid "Infobar Audio Selection Actions"
+msgstr "เลือกที่ที่จะสำรอง"
+
+#, fuzzy
+msgid "Infobar Channel Selection"
+msgstr "เลือกช่องรายการ"
+
+msgid "Infobar Cue Sheet Actions"
+msgstr ""
+
+#, fuzzy
+msgid "Infobar Extensions"
+msgstr "ส่วนเพิ่มเติม"
+
+#, fuzzy
+msgid "Infobar Instant Record"
+msgstr "บันทึกรายการ"
+
+#, fuzzy
+msgid "Infobar Menu Actions"
+msgstr "เวลาแสดงแถบรายการ"
+
+#, fuzzy
+msgid "Infobar Movie List Actions"
+msgstr "ตั้งค่า Tuner"
+
+#, fuzzy
+msgid "Infobar PiP Actions"
+msgstr "เวลาแสดงแถบรายการ"
+
+#, fuzzy
+msgid "Infobar Rds Actions"
+msgstr "เวลาแสดงแถบรายการ"
+
+msgid "Infobar Red Button Actions"
+msgstr ""
+
+#, fuzzy
+msgid "Infobar Seek Actions"
+msgstr "เลือกที่ที่จะสำรอง"
+
+msgid "Infobar Show Hide Actions"
+msgstr ""
+
+msgid "Infobar Subservice Quickzap Actions"
+msgstr ""
+
+#, fuzzy
+msgid "Infobar Subservice Selection Actions"
+msgstr "เลือกที่ที่จะสำรอง"
+
+#, fuzzy
+msgid "Infobar Subtitle Selection Actions"
+msgstr "เลือกที่ที่จะสำรอง"
+
+#, fuzzy
+msgid "Infobar Teletext Actions"
+msgstr "เลือกที่ที่จะสำรอง"
+
+msgid "Infobar Timer Button Actions"
+msgstr ""
+
+msgid "Infobar Timeshift Actions"
+msgstr ""
+
+msgid "Infobar Timeshift Activate Actions"
+msgstr ""
+
+msgid "Infobar Vmode Button Actions"
+msgstr ""
+
 msgid "Infobar frontend data source"
 msgstr ""
+
+#, fuzzy
+msgid "InfobarEPG Actions"
+msgstr "เวลาแสดงแถบรายการ"
 
 msgid "Information"
 msgstr "ข้อมูล"
@@ -4929,6 +5100,16 @@ msgstr "นำเข้า (Input)"
 msgid "Input "
 msgstr "นำเข้า (Input)"
 
+#, fuzzy
+msgid "Input Actions"
+msgstr "นำเข้า (Input)"
+
+msgid "Input Ascii Actions"
+msgstr ""
+
+msgid "Input Box Actions"
+msgstr ""
+
 msgid "Input Stream ID"
 msgstr ""
 
@@ -4961,6 +5142,10 @@ msgstr "ติดตั้งส่วนเพิ่มเติมจากใ
 
 msgid "Install picons on"
 msgstr ""
+
+#, fuzzy
+msgid "Install plugin"
+msgstr "กำลังติดตั้ง"
 
 #, fuzzy
 msgid "Installation has completed."
@@ -5159,6 +5344,10 @@ msgid "Keyboard"
 msgstr "แป้นพิมพ์"
 
 #, fuzzy
+msgid "Keyboard Input Actions"
+msgstr "แป้นพิมพ์จำลอง"
+
+#, fuzzy
 msgid "Keyboard data entry"
 msgstr "ตั้งค่าแป้นพิมพ์"
 
@@ -5341,6 +5530,13 @@ msgstr[0] ""
 msgstr[1] ""
 
 #, fuzzy
+msgid "Listbox Actions"
+msgstr "สถานที่"
+
+msgid "Listbox Help Menu Actions"
+msgstr ""
+
+#, fuzzy
 msgid "Listen to the radio..."
 msgstr "ฟังวิทยุ..."
 
@@ -5461,6 +5657,9 @@ msgstr ""
 msgid "Madagascar"
 msgstr ""
 
+msgid "Magenta"
+msgstr ""
+
 msgid "Main menu"
 msgstr "เมนูหลัก"
 
@@ -5572,6 +5771,16 @@ msgstr ""
 msgid "Mayotte"
 msgstr ""
 
+#, fuzzy
+msgid "Media Player Actions"
+msgstr "เล่นไฟล์"
+
+msgid "Media Player Cue Sheet Actions"
+msgstr ""
+
+msgid "Media Player Seek Actions"
+msgstr ""
+
 msgid "Media player"
 msgstr "เล่นไฟล์"
 
@@ -5596,6 +5805,10 @@ msgstr ""
 
 msgid "Menu"
 msgstr "เมนู"
+
+#, fuzzy
+msgid "Menu Actions"
+msgstr "เลือกที่ที่จะสำรอง"
 
 #, fuzzy
 msgid "Menu button function"
@@ -5627,6 +5840,10 @@ msgstr ""
 
 msgid "Minimum send interval"
 msgstr ""
+
+#, fuzzy
+msgid "Minute Input Actions"
+msgstr "เลือกที่ที่จะสำรอง"
 
 msgid "Missing "
 msgstr ""
@@ -5797,6 +6014,14 @@ msgid "Movement"
 msgstr ""
 
 #, fuzzy
+msgid "Movie Player Actions"
+msgstr "เลือกการตั้งเวลา"
+
+#, fuzzy
+msgid "Movie Selection Actions"
+msgstr "เลือกที่ที่จะสำรอง"
+
+#, fuzzy
 msgid "Movie list configuration"
 msgstr "ตั้งค่า Tuner"
 
@@ -5823,6 +6048,9 @@ msgid "Moving west..."
 msgstr ""
 
 msgid "Mozambique"
+msgstr ""
+
+msgid "Msg Box Actions"
 msgstr ""
 
 msgid "Multi EPG"
@@ -5912,6 +6140,10 @@ msgstr ""
 
 msgid "Navigate up/down with UP/DOWN buttons and page up/down with LEFT/RIGHT. EXIT to return to the help screen. OK to perform the action described in the currently highlighted help."
 msgstr ""
+
+#, fuzzy
+msgid "Navigation Actions"
+msgstr "เลือกที่ที่จะสำรอง"
 
 msgid "Nepal"
 msgstr ""
@@ -6263,6 +6495,10 @@ msgstr "กำลังเล่น"
 msgid "Now, use the contrast setting to turn up the brightness of the background as much as possible, but make sure that you can still see the difference between the two brightest levels of shades.If you have done that, press OK."
 msgstr "ตอนนี้.. ให้ปรับความชัดของหน้าจอโดยการเพิ่มความสว่างให้มากที่สุด แต่ต้องแน่ใจว่าเห็นความแตกต่างของสีที่สว่างที่สุด หากจบกระบวนการแล้วให้กดปุ่ม OK"
 
+#, fuzzy
+msgid "Number Actions"
+msgstr "เลือกที่ที่จะสำรอง"
+
 msgid "Number of channels shown in channel selection list"
 msgstr ""
 
@@ -6306,6 +6542,10 @@ msgstr "ปิด"
 
 msgid "Offline decode delay (ms)"
 msgstr ""
+
+#, fuzzy
+msgid "Ok Cancel Actions"
+msgstr "เลือกช่องรายการ"
 
 msgid "Oman"
 msgstr ""
@@ -6622,6 +6862,10 @@ msgstr ""
 
 msgid "Philippines"
 msgstr ""
+
+#, fuzzy
+msgid "PiP Setup Actions"
+msgstr "เลือกที่ที่จะสำรอง"
 
 #, fuzzy
 msgid "PiP setup"
@@ -7020,6 +7264,9 @@ msgstr "ตั้งค่าตัวขับจาน"
 msgid "Positioner setup log"
 msgstr ""
 
+msgid "Power Key Actions"
+msgstr ""
+
 msgid "Power LED"
 msgstr ""
 
@@ -7357,6 +7604,10 @@ msgstr "Ram Disk"
 msgid "Random"
 msgstr "แบบสุ่ม"
 
+#, fuzzy
+msgid "Rass Interactive Actions"
+msgstr "แสดง RASS แบบ Interactive"
+
 #, python-format
 msgid "Rating defined by broadcaster - %d"
 msgstr ""
@@ -7582,6 +7833,10 @@ msgstr ""
 
 msgid "Remove new found flag"
 msgstr "ลบเครื่องหมาย \"ใหม่\" ออก"
+
+#, fuzzy
+msgid "Remove plugin"
+msgstr "ลบ Plugin ออก"
 
 msgid "Remove plugins"
 msgstr "ลบ Plugin ออก"
@@ -7958,6 +8213,9 @@ msgstr ""
 
 msgid "Satellites"
 msgstr "ดาวเทียม"
+
+msgid "Satlist Shortcut Action"
+msgstr ""
 
 msgid "Sats"
 msgstr "ดาว"
@@ -8795,6 +9053,10 @@ msgid "Setup"
 msgstr "ตั้งค่า"
 
 #, fuzzy
+msgid "Setup Actions"
+msgstr "เลือกที่ที่จะสำรอง"
+
+#, fuzzy
 msgid "Setup hard disk"
 msgstr "ฮาร์ดดิสก์"
 
@@ -8826,6 +9088,10 @@ msgstr ""
 
 msgid "Short filenames"
 msgstr ""
+
+#, fuzzy
+msgid "Shortcut Actions"
+msgstr "เลือกที่ที่จะสำรอง"
 
 #, fuzzy
 msgid "Show"
@@ -9224,6 +9490,9 @@ msgstr ""
 msgid "Skip jumping to live TV while timeshifting with plugins"
 msgstr ""
 
+msgid "Sleep Timer Editor Actions"
+msgstr ""
+
 #, fuzzy
 msgid "Sleep timer"
 msgstr "ตั้งเวลาปิดเครื่อง"
@@ -9485,6 +9754,10 @@ msgstr "Standby"
 #, fuzzy
 msgid "Standby / restart"
 msgstr "ปิดเครื่อง"
+
+#, fuzzy
+msgid "Standby Actions"
+msgstr "Standby"
 
 #, fuzzy
 msgid "Standby LED"
@@ -9999,6 +10272,10 @@ msgstr ""
 msgid "Tanzania, United Republic of"
 msgstr ""
 
+#, fuzzy
+msgid "Teletext Actions"
+msgstr "เลือกที่ที่จะสำรอง"
+
 msgid "Teletext subtitle color"
 msgstr ""
 
@@ -10028,6 +10305,13 @@ msgstr ""
 msgid "Testscreens that are helpfull to fine-tune your display"
 msgstr ""
 
+#, fuzzy
+msgid "Text Edit Actions"
+msgstr "เลือกผังรายการ"
+
+msgid "Text Entry Actions"
+msgstr ""
+
 msgid "Text View On"
 msgstr ""
 
@@ -10051,7 +10335,7 @@ msgstr ""
 #, fuzzy
 msgid ""
 "Thank you for using the wizard. Your receiver is now ready for use.\n"
-"Press OK to start using your receiver."
+"Press Blue or OK to start using your receiver."
 msgstr ""
 "ขอบคุณที่ท่านใช้บริการตัวช่วยติดตั้ง\n"
 "กรุณากดปุ่ม OK เพื่อทำงานต่อ"
@@ -10502,6 +10786,10 @@ msgstr "เส้นแบ่งเวลา"
 msgid "Timer"
 msgstr "ตั้งเวลา"
 
+#, fuzzy
+msgid "Timer Edit Actions"
+msgstr "เลือกการตั้งเวลา"
+
 msgid "Timer Overview"
 msgstr ""
 
@@ -10800,6 +11088,9 @@ msgid "Turning step size"
 msgstr ""
 
 msgid "Tuvalu"
+msgstr ""
+
+msgid "Tv Radio Actions"
 msgstr ""
 
 msgid "Two"
@@ -11101,7 +11392,8 @@ msgstr "ใช้ตัวช่วยสำหรับตั้งค่าเ
 msgid "Use the network wizard to configure your network\n"
 msgstr "ใช้ตัวช่วยสำหรับตั้งค่าเครือข่าวย\n"
 
-msgid "Use the up/down keys on your remote control to select an option. After that, press OK."
+#, fuzzy
+msgid "Use the up/down keys on your remote control to select an option. After that, press Blue or OK."
 msgstr "ใช้ปุ่มขึ้นหรือลงบนรีโมทเพื่อเลือก จากนั้นกดปุ่ม OK"
 
 #, fuzzy
@@ -11351,11 +11643,19 @@ msgid "Virgin Islands (U.S.)"
 msgstr ""
 
 #, fuzzy
+msgid "Virtual Key Board Actions"
+msgstr "แป้นพิมพ์จำลอง"
+
+#, fuzzy
 msgid "Virtual KeyBoard Functions"
 msgstr "แป้นพิมพ์จำลอง"
 
 #, fuzzy
 msgid "Virtual KeyBoard Text:"
+msgstr "แป้นพิมพ์จำลอง"
+
+#, fuzzy
+msgid "Virtual Keyboard Actions"
 msgstr "แป้นพิมพ์จำลอง"
 
 #, fuzzy
@@ -11510,7 +11810,7 @@ msgid ""
 "Welcome.\n"
 "\n"
 "This start wizard will guide you through the basic setup of your receiver.\n"
-"Press the OK button on your remote control to move to the next step."
+"Press the Blue or OK button on your remote control to move to the next step."
 msgstr ""
 
 msgid "Welcome..."
@@ -11652,9 +11952,6 @@ msgstr ""
 msgid "When enabled, graphical DVB subtitles will be displayed at their original position."
 msgstr ""
 
-msgid "When enabled, graphical DVB subtitles will be displayed in yellow, instead of the original color."
-msgstr ""
-
 msgid "When enabled, http streams are descrambled on the server side. The (remote) client receiver does not have to do descrambling. Default on."
 msgstr ""
 
@@ -11771,6 +12068,10 @@ msgstr ""
 msgid "Where to save temporary timeshift recordings?"
 msgstr "ท่านต้องบันทึกไฟล์สำหรับควบคุมรายการสดไว้ที่ไหน?"
 
+#, fuzzy
+msgid "Window Actions"
+msgstr "เลือกที่ที่จะสำรอง"
+
 msgid "Wireless LAN"
 msgstr "แลนแบบไร้สาย"
 
@@ -11817,6 +12118,10 @@ msgid "Without popup"
 msgstr ""
 
 #, fuzzy
+msgid "Wizard Actions"
+msgstr "ตั้งค่าวีดีโอ"
+
+#, fuzzy
 msgid "Wizard setup"
 msgstr "ตั้งค่าวีดีโอ"
 
@@ -11846,9 +12151,6 @@ msgid "Year"
 msgstr "ปี"
 
 msgid "Yellow"
-msgstr ""
-
-msgid "Yellow DVB subtitles"
 msgstr ""
 
 #, fuzzy

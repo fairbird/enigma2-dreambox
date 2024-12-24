@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: enigma2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-12-15 13:08+0100\n"
+"POT-Creation-Date: 2024-12-20 11:32+0100\n"
 "PO-Revision-Date: 2020-05-16 18:44+0200\n"
 "Last-Translator: Baldur <bsveinsson@gmail.com>\n"
 "Language-Team: Polar Team/LT Team <baddi@oreind.is>\n"
@@ -608,6 +608,9 @@ msgstr ""
 
 msgid "A"
 msgstr "A"
+
+msgid "A color filter can be used for better readability of DVB subtitles."
+msgstr ""
 
 msgid "A completed recording timer is about to put your receiver in standby mode. Would you like to proceed?"
 msgstr ""
@@ -1258,6 +1261,10 @@ msgstr "Hljóð PID"
 msgid "Audio PID%s, codec & lang"
 msgstr ""
 
+#, fuzzy
+msgid "Audio Selection Actions"
+msgstr "Veldu stað fyrir afrit"
+
 msgid "Audio auto volume level"
 msgstr ""
 
@@ -1886,6 +1893,18 @@ msgid "Channel Info"
 msgstr ""
 
 #, fuzzy
+msgid "Channel Select Base Actions"
+msgstr "Rása val"
+
+#, fuzzy
+msgid "Channel Select Edit Actions"
+msgstr "Rása val"
+
+#, fuzzy
+msgid "Channel SelectEPG Actions"
+msgstr "Rása val"
+
+#, fuzzy
 msgid "Channel Selection"
 msgstr "Rása val"
 
@@ -2019,6 +2038,10 @@ msgstr ""
 msgid "Christmas Island"
 msgstr ""
 
+#, fuzzy
+msgid "Ci Selection Actions"
+msgstr "Veldu stað fyrir afrit"
+
 msgid "Circular LNB"
 msgstr ""
 
@@ -2082,6 +2105,9 @@ msgstr "Bitahraði LP"
 msgid "Codec & lang%s"
 msgstr ""
 
+msgid "Collapse"
+msgstr ""
+
 msgid "Collection name"
 msgstr "Nafn safns"
 
@@ -2095,6 +2121,10 @@ msgstr "Lita kerfi"
 #, fuzzy
 msgid "Color"
 msgstr "Lita kerfi"
+
+#, fuzzy
+msgid "Color Actions"
+msgstr "Veldu stað fyrir afrit"
 
 #, fuzzy
 msgid "Color format"
@@ -2126,10 +2156,6 @@ msgstr "Afruglara tengi"
 msgid "Common Interface assignment"
 msgstr "Stillingar afruglara tengis"
 
-#, fuzzy
-msgid "Common Setup Actions"
-msgstr "Veldu stað fyrir afrit"
-
 msgid "Communication"
 msgstr "Samskipti"
 
@@ -2150,8 +2176,8 @@ msgid "Composition of the recording filenames"
 msgstr "Samsetning nafna á upptökum"
 
 #, fuzzy
-msgid "Compress"
-msgstr "Allt"
+msgid "Config List Actions"
+msgstr "Veldu stað fyrir afrit"
 
 msgid "Config Scan Details"
 msgstr ""
@@ -2736,11 +2762,23 @@ msgstr ""
 msgid "Cut"
 msgstr "Klippa"
 
+#, fuzzy
+msgid "Cut List Editor Actions"
+msgstr "Klippingastjóri..."
+
+#
+#, fuzzy
+msgid "Cutlist Seek Actions"
+msgstr "Velja undirtexta"
+
 msgid "Cutlist editor"
 msgstr ""
 
 msgid "Cutlist editor..."
 msgstr "Klippingastjóri..."
+
+msgid "Cyan"
+msgstr ""
 
 msgid "Cyprus"
 msgstr ""
@@ -2798,6 +2836,9 @@ msgstr "Ný útgáfa:"
 msgid "DVB subtitle black transparency"
 msgstr ""
 
+msgid "DVB subtitles color filter"
+msgstr ""
+
 msgid "DVB type"
 msgstr ""
 
@@ -2806,6 +2847,21 @@ msgstr ""
 
 msgid "DVD Menu"
 msgstr ""
+
+#
+#, fuzzy
+msgid "DVD Player Actions"
+msgstr "DVD spilari"
+
+#
+#, fuzzy
+msgid "DVD Title List"
+msgstr "DVD titlaskrá"
+
+#
+#, fuzzy
+msgid "DVD Toolbox"
+msgstr "DVD miðla tól"
 
 msgid "DVD data format"
 msgstr ""
@@ -3152,6 +3208,10 @@ msgstr "Fjarlægja stafrænt contour"
 msgid "Direct playback of linked titles without menu"
 msgstr "Spila beint tengda titla án valmyndar"
 
+#, fuzzy
+msgid "Direction Actions"
+msgstr "Veldu stað fyrir afrit"
+
 msgid "Directory"
 msgstr ""
 
@@ -3311,6 +3371,11 @@ msgid ""
 msgstr ""
 "Viltu örugglega athuga skráarkerfi?\n"
 "Það tekur langan tíma!"
+
+#
+#, fuzzy
+msgid "Do you really want to clear this playlist?"
+msgstr "Viltu virkilega eyða %s?"
 
 #
 #, python-format
@@ -3539,6 +3604,11 @@ msgstr ""
 
 msgid "EPG"
 msgstr ""
+
+#
+#, fuzzy
+msgid "EPG Select Actions"
+msgstr "EPG val"
 
 msgid "EPG language selection 1"
 msgstr ""
@@ -3969,6 +4039,16 @@ msgstr "Ethernet netkort"
 
 msgid "Ethiopia"
 msgstr ""
+
+#
+#, fuzzy
+msgid "Event View Actions"
+msgstr "Skoða atriði"
+
+#
+#, fuzzy
+msgid "Event ViewEPG Actions"
+msgstr "Skoða atriði"
 
 msgid "Event font size (relative to skin size)"
 msgstr ""
@@ -4525,6 +4605,10 @@ msgstr ""
 msgid "Fullbackup Images"
 msgstr "Forritun"
 
+#, fuzzy
+msgid "Function Key Actions"
+msgstr "Veldu stað fyrir afrit"
+
 msgid "Function of OK button"
 msgstr ""
 
@@ -4541,6 +4625,11 @@ msgstr ""
 #, fuzzy
 msgid "GB"
 msgstr "RGB"
+
+#
+#, fuzzy
+msgid "GMEPG Select Actions"
+msgstr "EPG val"
 
 msgid "GREEN"
 msgstr ""
@@ -4608,6 +4697,9 @@ msgid "Ghana"
 msgstr ""
 
 msgid "Gibraltar"
+msgstr ""
+
+msgid "Global Actions"
 msgstr ""
 
 msgid "Go down the list"
@@ -4873,6 +4965,10 @@ msgstr ""
 msgid "Help"
 msgstr ""
 
+#, fuzzy
+msgid "Help Actions"
+msgstr "Veldu stað fyrir afrit"
+
 msgid "Help Screen"
 msgstr ""
 
@@ -4956,6 +5052,10 @@ msgstr ""
 
 msgid "Hotkey"
 msgstr ""
+
+#, fuzzy
+msgid "Hotkey Actions"
+msgstr "Veldu stað fyrir afrit"
 
 msgid "Hotkey Panic"
 msgstr ""
@@ -5214,8 +5314,97 @@ msgstr "Upplýsingar"
 msgid "Info bar timeout"
 msgstr "Tími upplýsingaborða"
 
+#
+#, fuzzy
+msgid "Infobar Actions"
+msgstr "Tími upplýsingaborða"
+
+#, fuzzy
+msgid "Infobar Audio Selection Actions"
+msgstr "Veldu stað fyrir afrit"
+
+#, fuzzy
+msgid "Infobar Channel Selection"
+msgstr "Rása val"
+
+msgid "Infobar Cue Sheet Actions"
+msgstr ""
+
+#
+#, fuzzy
+msgid "Infobar Extensions"
+msgstr "Viðbætur"
+
+#
+#, fuzzy
+msgid "Infobar Instant Record"
+msgstr "Skyndi upptaka"
+
+#
+#, fuzzy
+msgid "Infobar Menu Actions"
+msgstr "Tími upplýsingaborða"
+
+#, fuzzy
+msgid "Infobar Movie List Actions"
+msgstr "Handvirk stilling"
+
+#
+#, fuzzy
+msgid "Infobar PiP Actions"
+msgstr "Tími upplýsingaborða"
+
+#
+#, fuzzy
+msgid "Infobar Rds Actions"
+msgstr "Tími upplýsingaborða"
+
+msgid "Infobar Red Button Actions"
+msgstr ""
+
+#, fuzzy
+msgid "Infobar Seek Actions"
+msgstr "Veldu stað fyrir afrit"
+
+msgid "Infobar Show Hide Actions"
+msgstr ""
+
+msgid "Infobar Subservice Quickzap Actions"
+msgstr ""
+
+#, fuzzy
+msgid "Infobar Subservice Selection Actions"
+msgstr "Veldu stað fyrir afrit"
+
+#, fuzzy
+msgid "Infobar Subtitle Selection Actions"
+msgstr "Veldu stað fyrir afrit"
+
+#, fuzzy
+msgid "Infobar Teletext Actions"
+msgstr "Veldu stað fyrir afrit"
+
+msgid "Infobar Timer Button Actions"
+msgstr ""
+
+#, fuzzy
+msgid "Infobar Timeshift Actions"
+msgstr "Staður fyrir lifandi pásu"
+
+#, fuzzy
+msgid "Infobar Timeshift Activate Actions"
+msgstr "Staður fyrir lifandi pásu"
+
+msgid "Infobar Vmode Button Actions"
+msgstr ""
+
 msgid "Infobar frontend data source"
 msgstr ""
+
+#
+#, fuzzy
+msgid "InfobarEPG Actions"
+msgstr "Tími upplýsingaborða"
 
 #
 msgid "Information"
@@ -5271,6 +5460,17 @@ msgstr "Inntak"
 msgid "Input "
 msgstr "Inntak"
 
+#
+#, fuzzy
+msgid "Input Actions"
+msgstr "Inntak"
+
+msgid "Input Ascii Actions"
+msgstr ""
+
+msgid "Input Box Actions"
+msgstr ""
+
 msgid "Input Stream ID"
 msgstr ""
 
@@ -5307,6 +5507,11 @@ msgstr "Setja inn viðbót af boxi"
 
 msgid "Install picons on"
 msgstr ""
+
+#
+#, fuzzy
+msgid "Install plugin"
+msgstr "Set inn"
 
 #
 #, fuzzy
@@ -5527,6 +5732,11 @@ msgstr "Lyklaborð"
 
 #
 #, fuzzy
+msgid "Keyboard Input Actions"
+msgstr "Sýndar lyklaborð"
+
+#
+#, fuzzy
 msgid "Keyboard data entry"
 msgstr "Uppsetning lyklaborðs"
 
@@ -5735,6 +5945,14 @@ msgstr[1] ""
 
 #
 #, fuzzy
+msgid "Listbox Actions"
+msgstr "Staðsetning"
+
+msgid "Listbox Help Menu Actions"
+msgstr ""
+
+#
+#, fuzzy
 msgid "Listen to the radio..."
 msgstr "hlusta á útvarp...."
 
@@ -5869,6 +6087,9 @@ msgstr ""
 msgid "Madagascar"
 msgstr ""
 
+msgid "Magenta"
+msgstr ""
+
 #
 msgid "Main menu"
 msgstr "Aðalvalmynd"
@@ -5993,6 +6214,17 @@ msgid "Mayotte"
 msgstr ""
 
 #
+#, fuzzy
+msgid "Media Player Actions"
+msgstr "Spilari"
+
+msgid "Media Player Cue Sheet Actions"
+msgstr ""
+
+msgid "Media Player Seek Actions"
+msgstr ""
+
+#
 msgid "Media player"
 msgstr "Spilari"
 
@@ -6021,6 +6253,10 @@ msgstr ""
 #
 msgid "Menu"
 msgstr "Valmynd"
+
+#, fuzzy
+msgid "Menu Actions"
+msgstr "Veldu stað fyrir afrit"
 
 #, fuzzy
 msgid "Menu button function"
@@ -6056,6 +6292,10 @@ msgstr ""
 #, fuzzy
 msgid "Minimum send interval"
 msgstr "Guard interval"
+
+#, fuzzy
+msgid "Minute Input Actions"
+msgstr "Veldu stað fyrir afrit"
 
 msgid "Missing "
 msgstr ""
@@ -6252,6 +6492,14 @@ msgid "Movement"
 msgstr ""
 
 #, fuzzy
+msgid "Movie Player Actions"
+msgstr "Staðsetning bíómynda"
+
+#, fuzzy
+msgid "Movie Selection Actions"
+msgstr "Veldu stað fyrir afrit"
+
+#, fuzzy
 msgid "Movie list configuration"
 msgstr "Handvirk stilling"
 
@@ -6279,6 +6527,9 @@ msgid "Moving west..."
 msgstr ""
 
 msgid "Mozambique"
+msgstr ""
+
+msgid "Msg Box Actions"
 msgstr ""
 
 #
@@ -6382,6 +6633,10 @@ msgstr ""
 
 msgid "Navigate up/down with UP/DOWN buttons and page up/down with LEFT/RIGHT. EXIT to return to the help screen. OK to perform the action described in the currently highlighted help."
 msgstr ""
+
+#, fuzzy
+msgid "Navigation Actions"
+msgstr "Veldu stað fyrir afrit"
 
 msgid "Nepal"
 msgstr ""
@@ -6783,6 +7038,10 @@ msgstr "Spila núna"
 msgid "Now, use the contrast setting to turn up the brightness of the background as much as possible, but make sure that you can still see the difference between the two brightest levels of shades.If you have done that, press OK."
 msgstr "Notaðu núna skerpu (contrast) stillingar til að auka birtu bakgrunns eins mikið og hægt er en vertu samt viss um að sjá mun á björtustu tveim hlutum myndarinnar. Þegar þú hefur gert það ýttu þá á OK."
 
+#, fuzzy
+msgid "Number Actions"
+msgstr "Veldu stað fyrir afrit"
+
 msgid "Number of channels shown in channel selection list"
 msgstr ""
 
@@ -6830,6 +7089,10 @@ msgstr "Af"
 
 msgid "Offline decode delay (ms)"
 msgstr ""
+
+#, fuzzy
+msgid "Ok Cancel Actions"
+msgstr "Rása val"
 
 msgid "Oman"
 msgstr ""
@@ -7168,6 +7431,10 @@ msgstr ""
 
 msgid "Philippines"
 msgstr ""
+
+#, fuzzy
+msgid "PiP Setup Actions"
+msgstr "Veldu stað fyrir afrit"
 
 #
 #, fuzzy
@@ -7630,6 +7897,9 @@ msgstr "Uppsetning mótors"
 msgid "Positioner setup log"
 msgstr ""
 
+msgid "Power Key Actions"
+msgstr ""
+
 msgid "Power LED"
 msgstr ""
 
@@ -7999,6 +8269,11 @@ msgstr "Ram Diskur"
 msgid "Random"
 msgstr "Handahóf"
 
+#
+#, fuzzy
+msgid "Rass Interactive Actions"
+msgstr "Skoða gagnvirkt Útvarp"
+
 #, python-format
 msgid "Rating defined by broadcaster - %d"
 msgstr ""
@@ -8260,6 +8535,10 @@ msgstr ""
 #
 msgid "Remove new found flag"
 msgstr "Eyða merkingu um nýfundna rás"
+
+#, fuzzy
+msgid "Remove plugin"
+msgstr "Taka út íforrit"
 
 msgid "Remove plugins"
 msgstr "Taka út íforrit"
@@ -8682,6 +8961,9 @@ msgstr ""
 #
 msgid "Satellites"
 msgstr "Gervihnettir"
+
+msgid "Satlist Shortcut Action"
+msgstr ""
 
 msgid "Sats"
 msgstr "Gervihn."
@@ -9615,6 +9897,10 @@ msgstr ""
 msgid "Setup"
 msgstr "Uppsetning"
 
+#, fuzzy
+msgid "Setup Actions"
+msgstr "Veldu stað fyrir afrit"
+
 #
 #, fuzzy
 msgid "Setup hard disk"
@@ -9650,6 +9936,10 @@ msgstr ""
 
 msgid "Short filenames"
 msgstr "Stutt skráarnöfn"
+
+#, fuzzy
+msgid "Shortcut Actions"
+msgstr "Veldu stað fyrir afrit"
 
 #
 #, fuzzy
@@ -10087,6 +10377,9 @@ msgstr ""
 msgid "Skip jumping to live TV while timeshifting with plugins"
 msgstr ""
 
+msgid "Sleep Timer Editor Actions"
+msgstr ""
+
 #
 #, fuzzy
 msgid "Sleep timer"
@@ -10378,6 +10671,11 @@ msgstr "Biðstaða"
 #, fuzzy
 msgid "Standby / restart"
 msgstr "Biðstaða / Endurræsing"
+
+#
+#, fuzzy
+msgid "Standby Actions"
+msgstr "Biðstaða"
 
 #
 #, fuzzy
@@ -10961,6 +11259,10 @@ msgstr ""
 msgid "Tanzania, United Republic of"
 msgstr ""
 
+#, fuzzy
+msgid "Teletext Actions"
+msgstr "Veldu stað fyrir afrit"
+
 msgid "Teletext subtitle color"
 msgstr ""
 
@@ -10994,6 +11296,14 @@ msgstr ""
 msgid "Testscreens that are helpfull to fine-tune your display"
 msgstr ""
 
+#
+#, fuzzy
+msgid "Text Edit Actions"
+msgstr "EPG val"
+
+msgid "Text Entry Actions"
+msgstr ""
+
 msgid "Text View On"
 msgstr ""
 
@@ -11020,7 +11330,7 @@ msgstr ""
 #, fuzzy
 msgid ""
 "Thank you for using the wizard. Your receiver is now ready for use.\n"
-"Press OK to start using your receiver."
+"Press Blue or OK to start using your receiver."
 msgstr ""
 "Takk fyrir að nota álfinn.\n"
 "Ýttu á OK til að halda áfram."
@@ -11509,6 +11819,11 @@ msgstr "Tímabelti"
 msgid "Timer"
 msgstr "Tímastilling"
 
+#
+#, fuzzy
+msgid "Timer Edit Actions"
+msgstr "Tímastillinga val"
+
 msgid "Timer Overview"
 msgstr ""
 
@@ -11851,6 +12166,9 @@ msgstr ""
 msgid "Tuvalu"
 msgstr ""
 
+msgid "Tv Radio Actions"
+msgstr ""
+
 #
 msgid "Two"
 msgstr "Tveir"
@@ -12174,7 +12492,8 @@ msgid "Use the network wizard to configure your network\n"
 msgstr "Nota netkerfis álf til að stilla inn netkerfið\n"
 
 #
-msgid "Use the up/down keys on your remote control to select an option. After that, press OK."
+#, fuzzy
+msgid "Use the up/down keys on your remote control to select an option. After that, press Blue or OK."
 msgstr "Ýttu á up/niður takka á fjarstýringu til að velja. Ýttu svo á OK."
 
 #
@@ -12463,12 +12782,22 @@ msgstr ""
 
 #
 #, fuzzy
+msgid "Virtual Key Board Actions"
+msgstr "Sýndar lyklaborð"
+
+#
+#, fuzzy
 msgid "Virtual KeyBoard Functions"
 msgstr "Sýndar lyklaborð"
 
 #
 #, fuzzy
 msgid "Virtual KeyBoard Text:"
+msgstr "Sýndar lyklaborð"
+
+#
+#, fuzzy
+msgid "Virtual Keyboard Actions"
 msgstr "Sýndar lyklaborð"
 
 #
@@ -12634,7 +12963,7 @@ msgid ""
 "Welcome.\n"
 "\n"
 "This start wizard will guide you through the basic setup of your receiver.\n"
-"Press the OK button on your remote control to move to the next step."
+"Press the Blue or OK button on your remote control to move to the next step."
 msgstr ""
 
 #
@@ -12779,9 +13108,6 @@ msgstr ""
 msgid "When enabled, graphical DVB subtitles will be displayed at their original position."
 msgstr ""
 
-msgid "When enabled, graphical DVB subtitles will be displayed in yellow, instead of the original color."
-msgstr ""
-
 msgid "When enabled, http streams are descrambled on the server side. The (remote) client receiver does not have to do descrambling. Default on."
 msgstr ""
 
@@ -12900,6 +13226,10 @@ msgstr ""
 msgid "Where to save temporary timeshift recordings?"
 msgstr "Hvar á að vista tímabundnar tímafærslu upptökur?"
 
+#, fuzzy
+msgid "Window Actions"
+msgstr "Veldu stað fyrir afrit"
+
 #
 msgid "Wireless LAN"
 msgstr "­Þráðlaust net"
@@ -12950,6 +13280,11 @@ msgstr ""
 
 #
 #, fuzzy
+msgid "Wizard Actions"
+msgstr "Mynd uppsetning"
+
+#
+#, fuzzy
 msgid "Wizard setup"
 msgstr "Mynd uppsetning"
 
@@ -12982,9 +13317,6 @@ msgid "Year"
 msgstr "Ár"
 
 msgid "Yellow"
-msgstr ""
-
-msgid "Yellow DVB subtitles"
 msgstr ""
 
 #, fuzzy

@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: enigma2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-12-15 13:08+0100\n"
+"POT-Creation-Date: 2024-12-20 11:32+0100\n"
 "PO-Revision-Date: 2023-11-10 14:18+0100\n"
 "Last-Translator: Andrej Tobola <andrej.tobola@gmail.com>\n"
 "Language-Team: \n"
@@ -576,6 +576,9 @@ msgstr "=ŽIADNY STREAM\n"
 
 msgid "A"
 msgstr "A"
+
+msgid "A color filter can be used for better readability of DVB subtitles."
+msgstr ""
 
 msgid "A completed recording timer is about to put your receiver in standby mode. Would you like to proceed?"
 msgstr "Ukončený časovač nahrávania sa chystá prepnúť prijímač do pohotovostného režimu. Chcete pokračovať?"
@@ -1154,6 +1157,10 @@ msgstr "Zvukový PID"
 #, python-format
 msgid "Audio PID%s, codec & lang"
 msgstr "Audio PID%s, kodek a jazyk"
+
+#, fuzzy
+msgid "Audio Selection Actions"
+msgstr "Akcia voľby vzhľadu"
 
 msgid "Audio auto volume level"
 msgstr "Automatická úroveň hlasitosti zvuku"
@@ -1762,6 +1769,18 @@ msgid "Channel Info"
 msgstr "Informácie o stanici"
 
 #, fuzzy
+msgid "Channel Select Base Actions"
+msgstr "Voľba stanice"
+
+#, fuzzy
+msgid "Channel Select Edit Actions"
+msgstr "Voľba stanice"
+
+#, fuzzy
+msgid "Channel SelectEPG Actions"
+msgstr "Voľba stanice"
+
+#, fuzzy
 msgid "Channel Selection"
 msgstr "Voľba stanice"
 
@@ -1890,6 +1909,10 @@ msgstr "Vyberte, ktorý tuner chcete konfigurovať."
 msgid "Christmas Island"
 msgstr "Vianočné ostrový"
 
+#, fuzzy
+msgid "Ci Selection Actions"
+msgstr "Akcia voľby vzhľadu"
+
 msgid "Circular LNB"
 msgstr "Kruhový LNB"
 
@@ -1951,6 +1974,9 @@ msgstr "Rýchlosť LP"
 msgid "Codec & lang%s"
 msgstr "Kodek a jazyk%s"
 
+msgid "Collapse"
+msgstr ""
+
 msgid "Collection name"
 msgstr "Názov zostavy"
 
@@ -1962,6 +1988,10 @@ msgstr "Koumbia"
 
 msgid "Color"
 msgstr "Farba"
+
+#, fuzzy
+msgid "Color Actions"
+msgstr "Akcia voľby vzhľadu"
 
 msgid "Color format"
 msgstr "Formát farby"
@@ -1990,10 +2020,6 @@ msgstr "Common Interface modul"
 msgid "Common Interface assignment"
 msgstr "Priradenie CI"
 
-#, fuzzy
-msgid "Common Setup Actions"
-msgstr "Akcia voľby vzhľadu"
-
 msgid "Communication"
 msgstr "Komunikácia"
 
@@ -2012,8 +2038,9 @@ msgstr "Komplexné (umožňuje miešanie rôznych zvukových a obrazových form�
 msgid "Composition of the recording filenames"
 msgstr "Zloženie názvu súborov nahrávok"
 
-msgid "Compress"
-msgstr "Komprimovať"
+#, fuzzy
+msgid "Config List Actions"
+msgstr "Akcia voľby vzhľadu"
 
 msgid "Config Scan Details"
 msgstr "Detaily o konfigurácii skenovania"
@@ -2566,11 +2593,22 @@ msgstr "Prispôsobenie správania kurzoru v zozname staníc"
 msgid "Cut"
 msgstr "Strih"
 
+#, fuzzy
+msgid "Cut List Editor Actions"
+msgstr "Editor strihov"
+
+#, fuzzy
+msgid "Cutlist Seek Actions"
+msgstr "Editor strihov"
+
 msgid "Cutlist editor"
 msgstr "Editor strihov"
 
 msgid "Cutlist editor..."
 msgstr "Editor strihov..."
+
+msgid "Cyan"
+msgstr ""
 
 msgid "Cyprus"
 msgstr "Cyprus"
@@ -2623,6 +2661,10 @@ msgstr "Verzia DVB ovládača: "
 msgid "DVB subtitle black transparency"
 msgstr "Čierna priehľadnosť DVB titulkov"
 
+#, fuzzy
+msgid "DVB subtitles color filter"
+msgstr "Farba externých titulkov"
+
 msgid "DVB type"
 msgstr "Typ DVB"
 
@@ -2631,6 +2673,18 @@ msgstr "Napáliť DVD"
 
 msgid "DVD Menu"
 msgstr "Menu DVD"
+
+#, fuzzy
+msgid "DVD Player Actions"
+msgstr "DVD prehrávač"
+
+#, fuzzy
+msgid "DVD Title List"
+msgstr "Zoznam titulov DVD"
+
+#, fuzzy
+msgid "DVD Toolbox"
+msgstr "Nástroje pre DVD"
 
 msgid "DVD data format"
 msgstr "Formát dát na DVD"
@@ -2921,6 +2975,10 @@ msgstr "Odstránenie digitálnych obrysov"
 msgid "Direct playback of linked titles without menu"
 msgstr "Priame prehrávanie prepojených titulov bez menu"
 
+#, fuzzy
+msgid "Direction Actions"
+msgstr "Akcia voľby vzhľadu"
+
 msgid "Directory"
 msgstr "Zložka"
 
@@ -3044,6 +3102,10 @@ msgid ""
 msgstr ""
 "Naozaj chcete skontrolovať systém súborov?\n"
 "Môže to trvať dosť dlho!"
+
+#, fuzzy
+msgid "Do you really want to clear this playlist?"
+msgstr "Naozaj chcete zmazať %s?"
 
 #, python-format
 msgid "Do you really want to delete %s?"
@@ -3249,6 +3311,10 @@ msgstr ""
 
 msgid "EPG"
 msgstr "EPG - programový sprievodca"
+
+#, fuzzy
+msgid "EPG Select Actions"
+msgstr "Vyberte akciu"
 
 msgid "EPG language selection 1"
 msgstr "Voľba primárneho jazyka EPG"
@@ -3644,6 +3710,14 @@ msgstr "Rozhranie siete Eternet"
 
 msgid "Ethiopia"
 msgstr "Etiópia"
+
+#, fuzzy
+msgid "Event View Actions"
+msgstr "Menu zobrazenia programu"
+
+#, fuzzy
+msgid "Event ViewEPG Actions"
+msgstr "Menu zobrazenia programu"
 
 msgid "Event font size (relative to skin size)"
 msgstr "Veľkosť písma programu (v pomere k veľkosti vzhľadu)"
@@ -4146,6 +4220,10 @@ msgstr "Celoobrazovkové rozlíšenie"
 msgid "Fullbackup Images"
 msgstr "Kompletné zálohy systému"
 
+#, fuzzy
+msgid "Function Key Actions"
+msgstr "Funkcia tlačidla OK"
+
 msgid "Function of OK button"
 msgstr "Funkcia tlačidla OK"
 
@@ -4160,6 +4238,10 @@ msgstr "G"
 
 msgid "GB"
 msgstr "GB"
+
+#, fuzzy
+msgid "GMEPG Select Actions"
+msgstr "Vyberte akciu"
 
 msgid "GREEN"
 msgstr ""
@@ -4215,6 +4297,9 @@ msgstr "Ghana"
 
 msgid "Gibraltar"
 msgstr "Gibraltar"
+
+msgid "Global Actions"
+msgstr ""
 
 msgid "Go down the list"
 msgstr "Prechádzať v zozname nadol"
@@ -4446,6 +4531,10 @@ msgid "Help"
 msgstr ""
 
 #, fuzzy
+msgid "Help Actions"
+msgstr "Vyberte akciu"
+
+#, fuzzy
 msgid "Help Screen"
 msgstr "Pridržať obraz"
 
@@ -4523,6 +4612,10 @@ msgstr "Nastavenie klávesových skratiek"
 
 msgid "Hotkey"
 msgstr "Klávesové skratky"
+
+#, fuzzy
+msgid "Hotkey Actions"
+msgstr "vzdelávanie dospelých"
 
 msgid "Hotkey Panic"
 msgstr "Klávesová skratka tlačidla núdze"
@@ -4760,8 +4853,90 @@ msgstr "Informačný panel"
 msgid "Info bar timeout"
 msgstr "Doba zobrazenia informačnej lišty"
 
+#, fuzzy
+msgid "Infobar Actions"
+msgstr "Doba zobrazenia informačnej lišty"
+
+#, fuzzy
+msgid "Infobar Audio Selection Actions"
+msgstr "Akcia voľby vzhľadu"
+
+#, fuzzy
+msgid "Infobar Channel Selection"
+msgstr "Voľba stanice"
+
+msgid "Infobar Cue Sheet Actions"
+msgstr ""
+
+#, fuzzy
+msgid "Infobar Extensions"
+msgstr "Inštalovať rozšírenia"
+
+#, fuzzy
+msgid "Infobar Instant Record"
+msgstr "Okamžité nahrávanie"
+
+#, fuzzy
+msgid "Infobar Menu Actions"
+msgstr "Doba zobrazenia informačnej lišty"
+
+#, fuzzy
+msgid "Infobar Movie List Actions"
+msgstr "Konfigurácia zoznamu filmov"
+
+#, fuzzy
+msgid "Infobar PiP Actions"
+msgstr "Doba zobrazenia informačnej lišty"
+
+#, fuzzy
+msgid "Infobar Rds Actions"
+msgstr "Doba zobrazenia informačnej lišty"
+
+msgid "Infobar Red Button Actions"
+msgstr ""
+
+#, fuzzy
+msgid "Infobar Seek Actions"
+msgstr "Akcia voľby vzhľadu"
+
+msgid "Infobar Show Hide Actions"
+msgstr ""
+
+msgid "Infobar Subservice Quickzap Actions"
+msgstr ""
+
+#, fuzzy
+msgid "Infobar Subservice Selection Actions"
+msgstr "Akcia voľby vzhľadu"
+
+#, fuzzy
+msgid "Infobar Subtitle Selection Actions"
+msgstr "Akcia voľby vzhľadu"
+
+#, fuzzy
+msgid "Infobar Teletext Actions"
+msgstr "Akcia voľby vzhľadu"
+
+msgid "Infobar Timer Button Actions"
+msgstr ""
+
+#, fuzzy
+msgid "Infobar Timeshift Actions"
+msgstr "Umiestnenie časového posunu"
+
+#, fuzzy
+msgid "Infobar Timeshift Activate Actions"
+msgstr "Umiestnenie časového posunu"
+
+msgid "Infobar Vmode Button Actions"
+msgstr ""
+
 msgid "Infobar frontend data source"
 msgstr "Zdroj dát pre informačnú lištu"
+
+#, fuzzy
+msgid "InfobarEPG Actions"
+msgstr "Doba zobrazenia informačnej lišty"
 
 msgid "Information"
 msgstr "Informácie"
@@ -4808,6 +4983,16 @@ msgstr "Vstup"
 msgid "Input "
 msgstr "Vstup "
 
+#, fuzzy
+msgid "Input Actions"
+msgstr "Vstup "
+
+msgid "Input Ascii Actions"
+msgstr ""
+
+msgid "Input Box Actions"
+msgstr ""
+
 msgid "Input Stream ID"
 msgstr "Vstupný Stream ID"
 
@@ -4839,6 +5024,10 @@ msgstr "Inštalovať miestne rozšírenie"
 
 msgid "Install picons on"
 msgstr "Inštalovať picony do"
+
+#, fuzzy
+msgid "Install plugin"
+msgstr "Inštalujem"
 
 msgid "Installation has completed."
 msgstr "Inštalácia bola dokončená."
@@ -5027,6 +5216,10 @@ msgstr "Kľúčové udalosti"
 msgid "Keyboard"
 msgstr "Klávesnica"
 
+#, fuzzy
+msgid "Keyboard Input Actions"
+msgstr "Funkcie virtuálnej klávesnice"
+
 msgid "Keyboard data entry"
 msgstr "Vstupné údaje klávesnice"
 
@@ -5199,6 +5392,13 @@ msgstr[0] "Nájdený zoznam verzia %(ver)d, nájdená %(num)d stanica"
 msgstr[1] "Nájdený zoznam verzia %(ver)d, nájdené %(num)d stanice"
 msgstr[2] "Nájdený zoznam verzia %(ver)d, nájdených %(num)d staníc"
 
+#, fuzzy
+msgid "Listbox Actions"
+msgstr "Umiestnenie"
+
+msgid "Listbox Help Menu Actions"
+msgstr ""
+
 msgid "Listen to the radio..."
 msgstr "Počúvať rádio..."
 
@@ -5311,6 +5511,10 @@ msgstr "Makao"
 msgid "Madagascar"
 msgstr "Madagaskar"
 
+#, fuzzy
+msgid "Magenta"
+msgstr "Argentína"
+
 msgid "Main menu"
 msgstr "Hlavné menu"
 
@@ -5417,6 +5621,16 @@ msgstr "Práve sa nahráva. Zastavte nahrávanie pred nastavovaním motora."
 msgid "Mayotte"
 msgstr "Mayotte"
 
+#, fuzzy
+msgid "Media Player Actions"
+msgstr "Prehrávač médií"
+
+msgid "Media Player Cue Sheet Actions"
+msgstr ""
+
+msgid "Media Player Seek Actions"
+msgstr ""
+
 msgid "Media player"
 msgstr "Prehrávač médií"
 
@@ -5440,6 +5654,10 @@ msgstr "Index pamäťe"
 
 msgid "Menu"
 msgstr "Menu"
+
+#, fuzzy
+msgid "Menu Actions"
+msgstr "Akcia voľby vzhľadu"
 
 #, fuzzy
 msgid "Menu button function"
@@ -5470,6 +5688,10 @@ msgstr "Minimálny vek %d rokov"
 
 msgid "Minimum send interval"
 msgstr "Minimálny interval odosielania"
+
+#, fuzzy
+msgid "Minute Input Actions"
+msgstr "Zvoliť funkciu"
 
 msgid "Missing "
 msgstr "Chýbajúce "
@@ -5628,6 +5850,14 @@ msgstr "Otočené na východziu pozíciu"
 msgid "Movement"
 msgstr "Otáčanie motora"
 
+#, fuzzy
+msgid "Movie Player Actions"
+msgstr "Výber filmu"
+
+#, fuzzy
+msgid "Movie Selection Actions"
+msgstr "Akcia voľby vzhľadu"
+
 msgid "Movie list configuration"
 msgstr "Konfigurácia zoznamu filmov"
 
@@ -5654,6 +5884,9 @@ msgstr "Otáčam na západ..."
 
 msgid "Mozambique"
 msgstr "Mozambik"
+
+msgid "Msg Box Actions"
+msgstr ""
 
 msgid "Multi EPG"
 msgstr "Multi EPG"
@@ -5739,6 +5972,10 @@ msgstr "Nauru"
 
 msgid "Navigate up/down with UP/DOWN buttons and page up/down with LEFT/RIGHT. EXIT to return to the help screen. OK to perform the action described in the currently highlighted help."
 msgstr ""
+
+#, fuzzy
+msgid "Navigation Actions"
+msgstr "Akcia voľby vzhľadu"
 
 msgid "Nepal"
 msgstr "Nepál"
@@ -6072,6 +6309,10 @@ msgstr "Beží prehrávanie"
 msgid "Now, use the contrast setting to turn up the brightness of the background as much as possible, but make sure that you can still see the difference between the two brightest levels of shades.If you have done that, press OK."
 msgstr "Teraz kontrastom zvýšte svetlosť pozadia čo najviac, ale tak, aby ste stále rozlíšili dva najjasnejšie prúžky sivej. Keď skončíte, stlačte tlačidlo OK."
 
+#, fuzzy
+msgid "Number Actions"
+msgstr "vzdelávanie dospelých"
+
 msgid "Number of channels shown in channel selection list"
 msgstr "Počet staníc zobrazených v zozname staníc"
 
@@ -6114,6 +6355,10 @@ msgstr "Vypnúť"
 
 msgid "Offline decode delay (ms)"
 msgstr "Oneskorenie offline dekódovania (ms)"
+
+#, fuzzy
+msgid "Ok Cancel Actions"
+msgstr "Zrušiť vykonávanie?"
 
 msgid "Oman"
 msgstr "Omán"
@@ -6414,6 +6659,10 @@ msgstr "Peru"
 
 msgid "Philippines"
 msgstr "Filipíny"
+
+#, fuzzy
+msgid "PiP Setup Actions"
+msgstr "Akcia voľby vzhľadu"
 
 msgid "PiP setup"
 msgstr "Nastavenie PiP"
@@ -6791,6 +7040,9 @@ msgstr "Nastavenie motora"
 msgid "Positioner setup log"
 msgstr "Záznam nastavení pozicionéra"
 
+msgid "Power Key Actions"
+msgstr ""
+
 msgid "Power LED"
 msgstr "LED napájania"
 
@@ -7129,6 +7381,10 @@ msgstr "Ram disk"
 msgid "Random"
 msgstr "Náhodne"
 
+#, fuzzy
+msgid "Rass Interactive Actions"
+msgstr "Zobraziť RASS interaktívne..."
+
 #, python-format
 msgid "Rating defined by broadcaster - %d"
 msgstr "Hodnotenie poskytnuté vysielateľom - %d"
@@ -7347,6 +7603,10 @@ msgstr "Odstránenie položiek z koša po (dni)"
 
 msgid "Remove new found flag"
 msgstr "Odstrániť značku novonájdenej stanice"
+
+#, fuzzy
+msgid "Remove plugin"
+msgstr "Odstrániť doplnky"
 
 msgid "Remove plugins"
 msgstr "Odstrániť doplnky"
@@ -7712,6 +7972,9 @@ msgstr "Zemepísna dĺžka setelitu:"
 
 msgid "Satellites"
 msgstr "Satelity"
+
+msgid "Satlist Shortcut Action"
+msgstr ""
 
 msgid "Sats"
 msgstr "Sat."
@@ -8506,6 +8769,10 @@ msgstr "Nastavenie sa môže líšiť pre každú zložku samostatne (iba pre od
 msgid "Setup"
 msgstr "Nastavenie"
 
+#, fuzzy
+msgid "Setup Actions"
+msgstr "Akcia voľby vzhľadu"
+
 msgid "Setup hard disk"
 msgstr "Nastavenie pevného disku"
 
@@ -8535,6 +8802,10 @@ msgstr "Shift"
 
 msgid "Short filenames"
 msgstr "Krátke názvy súborov"
+
+#, fuzzy
+msgid "Shortcut Actions"
+msgstr "Vyberte akciu"
 
 msgid "Show"
 msgstr "Zobraziť"
@@ -8913,6 +9184,10 @@ msgstr "Prekočiť kontrolu dostupnosti internetu (zabráni automatickej inštal
 msgid "Skip jumping to live TV while timeshifting with plugins"
 msgstr "Preskočiť na živé televízne vysielanie počas časového posunu cez doplnky"
 
+#, fuzzy
+msgid "Sleep Timer Editor Actions"
+msgstr "Konfigurácie časovača vypnutia"
+
 msgid "Sleep timer"
 msgstr "Časovač vypnutia"
 
@@ -9157,6 +9432,10 @@ msgstr "Pohotovostný režim"
 
 msgid "Standby / restart"
 msgstr "Pohotovostný režim / Reštart"
+
+#, fuzzy
+msgid "Standby Actions"
+msgstr "Pohotovostný režim po "
 
 msgid "Standby LED"
 msgstr "LED v pohotovostnom režime"
@@ -9644,6 +9923,10 @@ msgstr "Tadžikistan"
 msgid "Tanzania, United Republic of"
 msgstr "Tanzánia, Spojená republika"
 
+#, fuzzy
+msgid "Teletext Actions"
+msgstr "Vyberte akciu"
+
 msgid "Teletext subtitle color"
 msgstr "Farba teletextových titulkov"
 
@@ -9671,6 +9954,13 @@ msgstr "Testovacie obrazce"
 msgid "Testscreens that are helpfull to fine-tune your display"
 msgstr "Testovacie obrazce pomáhajú jemné doladiť vašu obrazovku"
 
+#, fuzzy
+msgid "Text Edit Actions"
+msgstr "Upraviť výber"
+
+msgid "Text Entry Actions"
+msgstr ""
+
 msgid "Text View On"
 msgstr "Zapnúť prehliadač obrázkov"
 
@@ -9690,9 +9980,10 @@ msgstr ""
 "Ďakujeme, že ste použili sprievodcu.\n"
 "Pokračujte stlačením OK."
 
+#, fuzzy
 msgid ""
 "Thank you for using the wizard. Your receiver is now ready for use.\n"
-"Press OK to start using your receiver."
+"Press Blue or OK to start using your receiver."
 msgstr ""
 "Ďakujeme, že ste použili sprievodcu. Prijímač je teraz pripravený na použitie.\n"
 "Stlačte tlačidlo OK a začnite používať prijímač."
@@ -10161,6 +10452,10 @@ msgstr "Poloha časovej zóny"
 msgid "Timer"
 msgstr "Časovač"
 
+#, fuzzy
+msgid "Timer Edit Actions"
+msgstr "Výber časovača"
+
 msgid "Timer Overview"
 msgstr "Prehľad časovačov"
 
@@ -10445,6 +10740,10 @@ msgstr "Zmeniť veľkosť kroku pri ladení"
 
 msgid "Tuvalu"
 msgstr "Tuvalu"
+
+#, fuzzy
+msgid "Tv Radio Actions"
+msgstr "Výber zvuku"
 
 msgid "Two"
 msgstr "Dva"
@@ -10740,7 +11039,8 @@ msgstr "Použiť Sprievodcu nastavením siete na nastavenie zvoleného sieťové
 msgid "Use the network wizard to configure your network\n"
 msgstr "Na nastavenie siete použiť sprievodcu sieťou\n"
 
-msgid "Use the up/down keys on your remote control to select an option. After that, press OK."
+#, fuzzy
+msgid "Use the up/down keys on your remote control to select an option. After that, press Blue or OK."
 msgstr "Šípkami nahor alebo nadol na diaľkovom ovládači zvoľte možnosť. Potom stlačte tlačidlo OK."
 
 msgid "Use the wizard to set up basic features"
@@ -10971,11 +11271,19 @@ msgstr "Panenské ostrovy (Britské)"
 msgid "Virgin Islands (U.S.)"
 msgstr "Panenské ostrovy (Americké)"
 
+#, fuzzy
+msgid "Virtual Key Board Actions"
+msgstr "Funkcie virtuálnej klávesnice"
+
 msgid "Virtual KeyBoard Functions"
 msgstr "Funkcie virtuálnej klávesnice"
 
 msgid "Virtual KeyBoard Text:"
 msgstr "Text virtuálnej klávesnice:"
+
+#, fuzzy
+msgid "Virtual Keyboard Actions"
+msgstr "Funkcie virtuálnej klávesnice"
 
 msgid "Virtual keyboard"
 msgstr "Virtuálna klávesnica"
@@ -11129,11 +11437,12 @@ msgstr ""
 "\n"
 "Stlačením tlačidla OK spustite konfiguráciu siete"
 
+#, fuzzy
 msgid ""
 "Welcome.\n"
 "\n"
 "This start wizard will guide you through the basic setup of your receiver.\n"
-"Press the OK button on your remote control to move to the next step."
+"Press the Blue or OK button on your remote control to move to the next step."
 msgstr ""
 "Vitajte.\n"
 "\n"
@@ -11279,9 +11588,6 @@ msgstr "Ak je povolené, budú grafické DVB titulky vodorovne vycentrované."
 msgid "When enabled, graphical DVB subtitles will be displayed at their original position."
 msgstr "Ak je povolené, budú grafické DVB titulky zobrazované na svojej pôvodnej pozícii."
 
-msgid "When enabled, graphical DVB subtitles will be displayed in yellow, instead of the original color."
-msgstr "Ak je povolené, budú grafické DVB titulky zobrazované žltou farbou, namiesto pôvodnej farby."
-
 msgid "When enabled, http streams are descrambled on the server side. The (remote) client receiver does not have to do descrambling. Default on."
 msgstr "Ak je povolené, HTTP streamy sú dekódované na strane servera. Vzdialený klientsky prijímač nemusí dekódovať. Predvolené - zapnuté."
 
@@ -11397,6 +11703,10 @@ msgstr "Keď sa prijímač prebudí z pohotovostného režímu alebo z vypnutéh
 msgid "Where to save temporary timeshift recordings?"
 msgstr "Kam uložiť dočasné záznamy s posunom času?"
 
+#, fuzzy
+msgid "Window Actions"
+msgstr "Akcia voľby vzhľadu"
+
 msgid "Wireless LAN"
 msgstr "Bezdrôtová LAN"
 
@@ -11439,6 +11749,10 @@ msgstr "Táto voľba umožňuje prepnúť farbu LED alebo ju deaktivovať."
 msgid "Without popup"
 msgstr "Bez vyskakovacieho okna"
 
+#, fuzzy
+msgid "Wizard Actions"
+msgstr "Sprievodca nastavením"
+
 msgid "Wizard setup"
 msgstr "Sprievodca nastavením"
 
@@ -11469,9 +11783,6 @@ msgstr "Rok"
 
 msgid "Yellow"
 msgstr "Žlté"
-
-msgid "Yellow DVB subtitles"
-msgstr "Žlté DVB titulky"
 
 #, fuzzy
 msgid "Yellow button function"

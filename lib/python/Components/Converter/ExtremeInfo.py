@@ -3,7 +3,6 @@ from Components.Converter.Converter import Converter
 from Components.Element import cached
 from ServiceReference import ServiceReference
 from enigma import eServiceCenter, eServiceReference, iServiceInformation, eDVBFrontendParametersSatellite, eDVBFrontendParametersCable
-from string import upper
 import gettext
 from Components.Converter.Poll import Poll
 

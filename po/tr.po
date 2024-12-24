@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: OPENPLi\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-12-15 13:08+0100\n"
+"POT-Creation-Date: 2024-12-20 11:32+0100\n"
 "PO-Revision-Date: 2015-12-18 21:05+0200\n"
 "Last-Translator: Yetkin AYDIN <yetkina@gmail.com>\n"
 "Language-Team: http://www.hurforum.com <yetkina@gmail.com>\n"
@@ -553,6 +553,9 @@ msgstr ""
 
 msgid "A"
 msgstr "A"
+
+msgid "A color filter can be used for better readability of DVB subtitles."
+msgstr ""
 
 msgid "A completed recording timer is about to put your receiver in standby mode. Would you like to proceed?"
 msgstr "Kayıt süresi dolmuş. Alıcı bekleme konumuna geçecek. Şimdi yapılsın mı?"
@@ -1143,6 +1146,10 @@ msgstr "Ses PID"
 #, python-format
 msgid "Audio PID%s, codec & lang"
 msgstr ""
+
+#, fuzzy
+msgid "Audio Selection Actions"
+msgstr "Eylem seçimi"
 
 msgid "Audio auto volume level"
 msgstr ""
@@ -1748,6 +1755,18 @@ msgid "Channel Info"
 msgstr "Kanal Bilgisi"
 
 #, fuzzy
+msgid "Channel Select Base Actions"
+msgstr "Kanal Seçimi"
+
+#, fuzzy
+msgid "Channel Select Edit Actions"
+msgstr "Kanal Seçimi"
+
+#, fuzzy
+msgid "Channel SelectEPG Actions"
+msgstr "Kanal Seçimi"
+
+#, fuzzy
 msgid "Channel Selection"
 msgstr "Kanal Seçimi"
 
@@ -1884,6 +1903,10 @@ msgstr "Yapılandırmak için Tuner seçin."
 msgid "Christmas Island"
 msgstr ""
 
+#, fuzzy
+msgid "Ci Selection Actions"
+msgstr "Eylem seçimi"
+
 msgid "Circular LNB"
 msgstr "Dairesel LNB"
 
@@ -1946,6 +1969,9 @@ msgstr "LP Kod oranı"
 msgid "Codec & lang%s"
 msgstr ""
 
+msgid "Collapse"
+msgstr ""
+
 msgid "Collection name"
 msgstr "Koleksiyon adı"
 
@@ -1959,6 +1985,10 @@ msgstr "Renk formatı"
 #, fuzzy
 msgid "Color"
 msgstr "Renk formatı"
+
+#, fuzzy
+msgid "Color Actions"
+msgstr "Eylem seçimi"
 
 msgid "Color format"
 msgstr "Renk formatı"
@@ -1988,10 +2018,6 @@ msgstr "Kart/Modül"
 msgid "Common Interface assignment"
 msgstr "Kart/Modül Ayarları"
 
-#, fuzzy
-msgid "Common Setup Actions"
-msgstr "Eylem seçimi"
-
 msgid "Communication"
 msgstr "İletişim"
 
@@ -2011,8 +2037,8 @@ msgid "Composition of the recording filenames"
 msgstr "Kayıt işleminde dosya adı düzeni"
 
 #, fuzzy
-msgid "Compress"
-msgstr "Tamamlandı"
+msgid "Config List Actions"
+msgstr "Eylem seçimi"
 
 msgid "Config Scan Details"
 msgstr ""
@@ -2578,11 +2604,22 @@ msgstr "Kanal listesinde imleç davranışını özelleştir."
 msgid "Cut"
 msgstr "Kes"
 
+#, fuzzy
+msgid "Cut List Editor Actions"
+msgstr "Film düzenleyici..."
+
+#, fuzzy
+msgid "Cutlist Seek Actions"
+msgstr "Altyazı seçimi"
+
 msgid "Cutlist editor"
 msgstr ""
 
 msgid "Cutlist editor..."
 msgstr "Film düzenleyici..."
+
+msgid "Cyan"
+msgstr ""
 
 msgid "Cyprus"
 msgstr ""
@@ -2639,6 +2676,10 @@ msgstr "DVB sürücüleri: "
 msgid "DVB subtitle black transparency"
 msgstr "DVB altyazı siyah saydamlığı"
 
+#, fuzzy
+msgid "DVB subtitles color filter"
+msgstr "Harici Altyazı Rengi"
+
 msgid "DVB type"
 msgstr ""
 
@@ -2647,6 +2688,18 @@ msgstr ""
 
 msgid "DVD Menu"
 msgstr ""
+
+#, fuzzy
+msgid "DVD Player Actions"
+msgstr "DVD oynatıcı"
+
+#, fuzzy
+msgid "DVD Title List"
+msgstr "DVD parça listesi"
+
+#, fuzzy
+msgid "DVD Toolbox"
+msgstr "DVD medya araçları"
 
 msgid "DVD data format"
 msgstr "DVD veri biçimi"
@@ -2951,6 +3004,10 @@ msgstr "Sayısal çerçeve kaldırma"
 msgid "Direct playback of linked titles without menu"
 msgstr "Linklenmiş başlıkları menü olmadan hemen oynat."
 
+#, fuzzy
+msgid "Direction Actions"
+msgstr "Eylem seçimi"
+
 msgid "Directory"
 msgstr "Klasör"
 
@@ -3084,6 +3141,10 @@ msgid ""
 msgstr ""
 "Dosya sistemini kontrol etmek istiyor musunuz?\n"
 "Bu işlem çok uzun sürebilir!"
+
+#, fuzzy
+msgid "Do you really want to clear this playlist?"
+msgstr "%s 'i silmek istediğinizden emin misiniz?"
 
 #, python-format
 msgid "Do you really want to delete %s?"
@@ -3289,6 +3350,10 @@ msgstr ""
 
 msgid "EPG"
 msgstr "EPG"
+
+#, fuzzy
+msgid "EPG Select Actions"
+msgstr "Eylem seçimi"
 
 msgid "EPG language selection 1"
 msgstr "EPG Dil seçimi 1"
@@ -3691,6 +3756,14 @@ msgstr "Ağ arayüzü"
 
 msgid "Ethiopia"
 msgstr ""
+
+#, fuzzy
+msgid "Event View Actions"
+msgstr "Olay görüntüleme menüsü"
+
+#, fuzzy
+msgid "Event ViewEPG Actions"
+msgstr "Olay görüntüleme menüsü"
 
 msgid "Event font size (relative to skin size)"
 msgstr "Olay yazı tipi boyutu (arayüz ayarlarıyla aynı)"
@@ -4207,6 +4280,10 @@ msgstr "Tam görünüm çözünürlüğü"
 msgid "Fullbackup Images"
 msgstr "Flaş"
 
+#, fuzzy
+msgid "Function Key Actions"
+msgstr "OK tuşu fonksiyonu"
+
 msgid "Function of OK button"
 msgstr "OK tuşu fonksiyonu"
 
@@ -4222,6 +4299,10 @@ msgstr ""
 #, fuzzy
 msgid "GB"
 msgstr "RGB"
+
+#, fuzzy
+msgid "GMEPG Select Actions"
+msgstr "Eylem seçimi"
 
 msgid "GREEN"
 msgstr ""
@@ -4278,6 +4359,9 @@ msgid "Ghana"
 msgstr ""
 
 msgid "Gibraltar"
+msgstr ""
+
+msgid "Global Actions"
 msgstr ""
 
 msgid "Go down the list"
@@ -4520,6 +4604,10 @@ msgid "Help"
 msgstr ""
 
 #, fuzzy
+msgid "Help Actions"
+msgstr "Eylem seçimi"
+
+#, fuzzy
 msgid "Help Screen"
 msgstr "Ekranı dondur"
 
@@ -4599,6 +4687,10 @@ msgstr "Kısayol Tuşu Ayarla"
 
 msgid "Hotkey"
 msgstr "Kısayol Tuşu"
+
+#, fuzzy
+msgid "Hotkey Actions"
+msgstr "İleri Eğitim"
 
 msgid "Hotkey Panic"
 msgstr "Panik Tuşu"
@@ -4842,8 +4934,90 @@ msgstr "Bilgi çubuğu"
 msgid "Info bar timeout"
 msgstr "Bilgi çubuğu zaman aşımı"
 
+#, fuzzy
+msgid "Infobar Actions"
+msgstr "Bilgi çubuğu zaman aşımı"
+
+#, fuzzy
+msgid "Infobar Audio Selection Actions"
+msgstr "Eylem seçimi"
+
+#, fuzzy
+msgid "Infobar Channel Selection"
+msgstr "Kanal Seçimi"
+
+msgid "Infobar Cue Sheet Actions"
+msgstr ""
+
+#, fuzzy
+msgid "Infobar Extensions"
+msgstr "Eklenti yükle"
+
+#, fuzzy
+msgid "Infobar Instant Record"
+msgstr "Hızlı kayıt"
+
+#, fuzzy
+msgid "Infobar Menu Actions"
+msgstr "Bilgi çubuğu zaman aşımı"
+
+#, fuzzy
+msgid "Infobar Movie List Actions"
+msgstr "Film Listesi yapılandırması"
+
+#, fuzzy
+msgid "Infobar PiP Actions"
+msgstr "Bilgi çubuğu zaman aşımı"
+
+#, fuzzy
+msgid "Infobar Rds Actions"
+msgstr "Bilgi çubuğu zaman aşımı"
+
+msgid "Infobar Red Button Actions"
+msgstr ""
+
+#, fuzzy
+msgid "Infobar Seek Actions"
+msgstr "Eylem seçimi"
+
+msgid "Infobar Show Hide Actions"
+msgstr ""
+
+msgid "Infobar Subservice Quickzap Actions"
+msgstr ""
+
+#, fuzzy
+msgid "Infobar Subservice Selection Actions"
+msgstr "Eylem seçimi"
+
+#, fuzzy
+msgid "Infobar Subtitle Selection Actions"
+msgstr "Eylem seçimi"
+
+#, fuzzy
+msgid "Infobar Teletext Actions"
+msgstr "Eylem seçimi"
+
+msgid "Infobar Timer Button Actions"
+msgstr ""
+
+#, fuzzy
+msgid "Infobar Timeshift Actions"
+msgstr "Zaman kaydırıcı kayıt konumu"
+
+#, fuzzy
+msgid "Infobar Timeshift Activate Actions"
+msgstr "Zaman kaydırıcı kayıt konumu"
+
+msgid "Infobar Vmode Button Actions"
+msgstr ""
+
 msgid "Infobar frontend data source"
 msgstr "Bilgi çubuğu önyüz veri kaynağı"
+
+#, fuzzy
+msgid "InfobarEPG Actions"
+msgstr "Bilgi çubuğu zaman aşımı"
 
 msgid "Information"
 msgstr "Bilgi"
@@ -4892,6 +5066,16 @@ msgstr "Giriş"
 msgid "Input "
 msgstr "Giriş"
 
+#, fuzzy
+msgid "Input Actions"
+msgstr "Giriş"
+
+msgid "Input Ascii Actions"
+msgstr ""
+
+msgid "Input Box Actions"
+msgstr ""
+
 msgid "Input Stream ID"
 msgstr ""
 
@@ -4923,6 +5107,10 @@ msgstr "Yerel (lokal)'den eklenti yükle"
 
 msgid "Install picons on"
 msgstr "Pikon yükle"
+
+#, fuzzy
+msgid "Install plugin"
+msgstr "Kuruluyor"
 
 msgid "Installation has completed."
 msgstr "Kurulum tamamlandı."
@@ -5107,6 +5295,10 @@ msgid "Keyboard"
 msgstr "Klavye"
 
 #, fuzzy
+msgid "Keyboard Input Actions"
+msgstr "Sanal klavye"
+
+#, fuzzy
 msgid "Keyboard data entry"
 msgstr "Klavye ayarı"
 
@@ -5280,6 +5472,13 @@ msgid "List version %(ver)d, found %(num)d channel"
 msgid_plural "List version %(ver)d, found %(num)d channels"
 msgstr[0] "Liste versiyonu %(ver)d, %(num)d kanal dulundu"
 
+#, fuzzy
+msgid "Listbox Actions"
+msgstr "Konum"
+
+msgid "Listbox Help Menu Actions"
+msgstr ""
+
 msgid "Listen to the radio..."
 msgstr "Radyo dinleme..."
 
@@ -5396,6 +5595,9 @@ msgstr ""
 msgid "Madagascar"
 msgstr ""
 
+msgid "Magenta"
+msgstr ""
+
 msgid "Main menu"
 msgstr "Ana menü"
 
@@ -5503,6 +5705,16 @@ msgstr "Kayıt devam ediyor. Lütfen pozisyoner yapılandırmasını denemeden �
 msgid "Mayotte"
 msgstr ""
 
+#, fuzzy
+msgid "Media Player Actions"
+msgstr "Ortam Oynatıcı"
+
+msgid "Media Player Cue Sheet Actions"
+msgstr ""
+
+msgid "Media Player Seek Actions"
+msgstr ""
+
 msgid "Media player"
 msgstr "Ortam Oynatıcı"
 
@@ -5526,6 +5738,10 @@ msgstr "Hafıza indeksi"
 
 msgid "Menu"
 msgstr "Menü"
+
+#, fuzzy
+msgid "Menu Actions"
+msgstr "Eylem seçimi"
 
 #, fuzzy
 msgid "Menu button function"
@@ -5557,6 +5773,10 @@ msgstr "Yaş sınırı: %d Yaş"
 
 msgid "Minimum send interval"
 msgstr "Asgari gönderme aralığı"
+
+#, fuzzy
+msgid "Minute Input Actions"
+msgstr "Eylem seçimi"
 
 msgid "Missing "
 msgstr "Kayıp "
@@ -5724,6 +5944,14 @@ msgstr "Dizinindeki konuma taşınır"
 msgid "Movement"
 msgstr "Hareket"
 
+#, fuzzy
+msgid "Movie Player Actions"
+msgstr "Film Seçimi"
+
+#, fuzzy
+msgid "Movie Selection Actions"
+msgstr "Eylem seçimi"
+
 msgid "Movie list configuration"
 msgstr "Film Listesi yapılandırması"
 
@@ -5749,6 +5977,9 @@ msgid "Moving west..."
 msgstr "Batıya hareket..."
 
 msgid "Mozambique"
+msgstr ""
+
+msgid "Msg Box Actions"
 msgstr ""
 
 msgid "Multi EPG"
@@ -5838,6 +6069,10 @@ msgstr ""
 
 msgid "Navigate up/down with UP/DOWN buttons and page up/down with LEFT/RIGHT. EXIT to return to the help screen. OK to perform the action described in the currently highlighted help."
 msgstr ""
+
+#, fuzzy
+msgid "Navigation Actions"
+msgstr "Eylem seçimi"
 
 msgid "Nepal"
 msgstr ""
@@ -6183,6 +6418,10 @@ msgstr "Şimdi çalan"
 msgid "Now, use the contrast setting to turn up the brightness of the background as much as possible, but make sure that you can still see the difference between the two brightest levels of shades.If you have done that, press OK."
 msgstr "Şimdi, kontrast ayarlarını kullanarak arkazemin üzerinde, ekrandaki iki parlaklık tonunu ayırt edebilecek şekilde ve mümkün olduğunca parlaklık seviyesini arttırın. İşlemi tamamladıktan sonra OK tuşuna basın."
 
+#, fuzzy
+msgid "Number Actions"
+msgstr "İleri Eğitim"
+
 msgid "Number of channels shown in channel selection list"
 msgstr ""
 
@@ -6225,6 +6464,10 @@ msgstr "Kapalı"
 
 msgid "Offline decode delay (ms)"
 msgstr "Çevrimdışı kod çözme gecikmesi (ms)"
+
+#, fuzzy
+msgid "Ok Cancel Actions"
+msgstr "Kanal Seçimi"
 
 msgid "Oman"
 msgstr ""
@@ -6533,6 +6776,10 @@ msgstr ""
 
 msgid "Philippines"
 msgstr ""
+
+#, fuzzy
+msgid "PiP Setup Actions"
+msgstr "Eylem seçimi"
 
 msgid "PiP setup"
 msgstr "RiR kurulumu"
@@ -6922,6 +7169,9 @@ msgstr "Pozisyoner kurulumu"
 msgid "Positioner setup log"
 msgstr "Pozisyoner kurulum kayıtları"
 
+msgid "Power Key Actions"
+msgstr ""
+
 msgid "Power LED"
 msgstr ""
 
@@ -7260,6 +7510,10 @@ msgstr "Ram disk"
 msgid "Random"
 msgstr "Rasgele"
 
+#, fuzzy
+msgid "Rass Interactive Actions"
+msgstr "Etkileşimli RASS'ı göster"
+
 #, python-format
 msgid "Rating defined by broadcaster - %d"
 msgstr "Yayıncı tarafından tanımlanan Değerlendirme - %d"
@@ -7481,6 +7735,10 @@ msgstr "Çöp Kutusu öğelerini (gün) sonra kaldır"
 
 msgid "Remove new found flag"
 msgstr "Yeni bulundu işaretini kaldır"
+
+#, fuzzy
+msgid "Remove plugin"
+msgstr "Eklenti Sil"
 
 msgid "Remove plugins"
 msgstr "Eklenti Sil"
@@ -7856,6 +8114,9 @@ msgstr "Uydu Boylam:"
 
 msgid "Satellites"
 msgstr "Uydular"
+
+msgid "Satlist Shortcut Action"
+msgstr ""
 
 msgid "Sats"
 msgstr "Uydular"
@@ -8672,6 +8933,10 @@ msgid "Setup"
 msgstr "Kurulum"
 
 #, fuzzy
+msgid "Setup Actions"
+msgstr "Eylem seçimi"
+
+#, fuzzy
 msgid "Setup hard disk"
 msgstr "HDD"
 
@@ -8701,6 +8966,10 @@ msgstr ""
 
 msgid "Short filenames"
 msgstr "Kısa dosya adları"
+
+#, fuzzy
+msgid "Shortcut Actions"
+msgstr "Eylem seçimi"
 
 #, fuzzy
 msgid "Show"
@@ -9089,6 +9358,10 @@ msgstr "Internet bağlantı kontrolünü atla. (otomatik paket yükleme devre d�
 msgid "Skip jumping to live TV while timeshifting with plugins"
 msgstr ""
 
+#, fuzzy
+msgid "Sleep Timer Editor Actions"
+msgstr "Uyku Zamanlayıcı Yapılandırması"
+
 msgid "Sleep timer"
 msgstr "Uyku zamanlayıcı"
 
@@ -9340,6 +9613,10 @@ msgstr "Hazırda beklet"
 
 msgid "Standby / restart"
 msgstr "Kapatma"
+
+#, fuzzy
+msgid "Standby Actions"
+msgstr "Bekleme modunda"
 
 #, fuzzy
 msgid "Standby LED"
@@ -9847,6 +10124,10 @@ msgstr ""
 msgid "Tanzania, United Republic of"
 msgstr ""
 
+#, fuzzy
+msgid "Teletext Actions"
+msgstr "Eylem seçimi"
+
 msgid "Teletext subtitle color"
 msgstr "Teletext alt yazı rengi"
 
@@ -9874,6 +10155,13 @@ msgstr "Test Ekranı"
 msgid "Testscreens that are helpfull to fine-tune your display"
 msgstr "İnce ayar için test ekranı"
 
+#, fuzzy
+msgid "Text Edit Actions"
+msgstr "EPG Dil seçimi"
+
+msgid "Text Entry Actions"
+msgstr ""
+
 msgid "Text View On"
 msgstr ""
 
@@ -9894,9 +10182,10 @@ msgstr ""
 "Sihirbazını kullandığınız için teşekkür ederiz.\n"
 "Devam etmek için OK tuşuna basın."
 
+#, fuzzy
 msgid ""
 "Thank you for using the wizard. Your receiver is now ready for use.\n"
-"Press OK to start using your receiver."
+"Press Blue or OK to start using your receiver."
 msgstr ""
 "Sihirbazını kullandığınız için teşekkür ederiz. Alıcınız artık kullanıma hazırdır.\n"
 "Alıcınızı kullanmaya başlamak için OK tuşuna basın."
@@ -10365,6 +10654,10 @@ msgstr "Zaman dilimi"
 msgid "Timer"
 msgstr "Zamanlayıcı"
 
+#, fuzzy
+msgid "Timer Edit Actions"
+msgstr "Zamanlayıcı seçimi"
+
 msgid "Timer Overview"
 msgstr "Zamanlayıcı Özeti"
 
@@ -10659,6 +10952,10 @@ msgstr "Dönüş adım boyu"
 
 msgid "Tuvalu"
 msgstr ""
+
+#, fuzzy
+msgid "Tv Radio Actions"
+msgstr "Ses seçimi için"
 
 msgid "Two"
 msgstr "İki"
@@ -10962,7 +11259,8 @@ msgstr "Seçilen ağ bağdaştırıcısını yapılandırmak için ağ sihirbaz�
 msgid "Use the network wizard to configure your network\n"
 msgstr "Ağ yapılandırmak için ağ sihirbazını kullan\n"
 
-msgid "Use the up/down keys on your remote control to select an option. After that, press OK."
+#, fuzzy
+msgid "Use the up/down keys on your remote control to select an option. After that, press Blue or OK."
 msgstr "Bir seçeneği seçmek için uzaktan kumanda üzerindeki Aşağı/Yukarı tuşlarını kullanın. Bundan sonra, OK düğmesine basın."
 
 msgid "Use the wizard to set up basic features"
@@ -11201,11 +11499,19 @@ msgid "Virgin Islands (U.S.)"
 msgstr ""
 
 #, fuzzy
+msgid "Virtual Key Board Actions"
+msgstr "Sanal klavye"
+
+#, fuzzy
 msgid "Virtual KeyBoard Functions"
 msgstr "Sanal klavye"
 
 #, fuzzy
 msgid "Virtual KeyBoard Text:"
+msgstr "Sanal klavye"
+
+#, fuzzy
+msgid "Virtual Keyboard Actions"
 msgstr "Sanal klavye"
 
 msgid "Virtual keyboard"
@@ -11360,11 +11666,12 @@ msgstr ""
 "\n"
 "Ağ yapılandırmasını başlatmak için OK tuşuna basın."
 
+#, fuzzy
 msgid ""
 "Welcome.\n"
 "\n"
 "This start wizard will guide you through the basic setup of your receiver.\n"
-"Press the OK button on your remote control to move to the next step."
+"Press the Blue or OK button on your remote control to move to the next step."
 msgstr ""
 "Hoşgeldiniz.\n"
 "\n"
@@ -11514,9 +11821,6 @@ msgstr "Grafik DVB altyazı yatayda ortala."
 msgid "When enabled, graphical DVB subtitles will be displayed at their original position."
 msgstr "Grafik DVB altyazıyı orijinal konumunda görüntülenir."
 
-msgid "When enabled, graphical DVB subtitles will be displayed in yellow, instead of the original color."
-msgstr "Grafik DVB altyazı orjinal renginin yerine sarı renk içinde gösterilir."
-
 msgid "When enabled, http streams are descrambled on the server side. The (remote) client receiver does not have to do descrambling. Default on."
 msgstr "http akışları sunucu tarafında kodlanabilir. (Uzak) istemci alıcının akışı çözülmesine yardımcı olmak zorunda değildir."
 
@@ -11636,6 +11940,10 @@ msgstr ""
 msgid "Where to save temporary timeshift recordings?"
 msgstr "Geçici zaman bükücü kayıtları nereye yapılsın?"
 
+#, fuzzy
+msgid "Window Actions"
+msgstr "Eylem seçimi"
+
 msgid "Wireless LAN"
 msgstr "Kablosuz ağ WLAN"
 
@@ -11680,6 +11988,10 @@ msgid "Without popup"
 msgstr "Açılır Pencerede olmadan"
 
 #, fuzzy
+msgid "Wizard Actions"
+msgstr "Video ayarları"
+
+#, fuzzy
 msgid "Wizard setup"
 msgstr "Video ayarları"
 
@@ -11710,9 +12022,6 @@ msgstr "Yıl"
 
 msgid "Yellow"
 msgstr "Sarı"
-
-msgid "Yellow DVB subtitles"
-msgstr "Sarı DVB altyazı"
 
 #, fuzzy
 msgid "Yellow button function"
