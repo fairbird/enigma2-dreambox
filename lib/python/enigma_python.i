@@ -136,7 +136,7 @@ is usually caused by not marking PSignals as immutable.
  %fragment("t_out_helper"{Type},"header",
      fragment="t_output_helper") {}
  %typemap(argout,fragment="t_out_helper"{Type}) Type *OUTPUT, Type &OUTPUT
-   "$result = t_output_helper($result, (SWIG_NewPointerObj((void*)($1), $1_descriptor, 1)));"
+   "$result = SWIG_Python_AppendOutput($result, (SWIG_NewPointerObj((void*)($1), $1_descriptor, 1)), 1);"
 %enddef
 
 %define %typemap_output_ptr(Type)
@@ -147,7 +147,7 @@ is usually caused by not marking PSignals as immutable.
      fragment="t_output_helper") {}
  %typemap(argout,fragment="t_out_helper"{Type}) Type *OUTPUT, Type &OUTPUT
 		// generate None if smartpointer is NULL
-   "$result = t_output_helper($result, ((*$1) ? SWIG_NewPointerObj((void*)($1), $1_descriptor, 1) : (delete $1, Py_INCREF(Py_None), Py_None)));"
+   "$result = SWIG_Python_AppendOutput($result, ((*$1) ? SWIG_NewPointerObj((void*)($1), $1_descriptor, 1) : (delete $1, Py_INCREF(Py_None), Py_None)), 1);"
 %enddef
 
 

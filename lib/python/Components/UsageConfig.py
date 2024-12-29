@@ -1663,7 +1663,7 @@ def InitUsageConfig():
 	def setDVBSubtitleColor(configElement):
 		eSubtitleSettings.setDVBSubtitleColor(configElement.value)
 
-	config.subtitles.dvb_subtitles_color = ConfigSelection(default="0", choices=[("0", _("Off")), ("1", _("Yellow")), ("2", _("Green")), ("3", _("Magenta")), ("4", _("Cyan"))])
+	config.subtitles.dvb_subtitles_color = ConfigSelection(default=0, choices=[(0, _("Original")), (1, _("Yellow")), (2, _("Green")), (3, _("Magenta")), (4, _("Cyan"))])
 	config.subtitles.dvb_subtitles_color.addNotifier(setDVBSubtitleColor)
 
 	def setDVBSubtitleOriginalPosition(configElement):

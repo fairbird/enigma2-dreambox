@@ -194,7 +194,7 @@
 		<item level="0" text="Subtitle black transparency" description="Configure the transparency of the black background of subtitles.">config.subtitles.subtitles_backtrans</item>
 		<item level="2" text="Subtitle font size" description="Configure the font size of the subtitles.">config.subtitles.subtitle_fontsize</item>
 		<item level="2" text="Subtitle delay when timing lacks" description="Configure the subtitle delay when timing information is not available.">config.subtitles.subtitle_noPTSrecordingdelay</item>
-		<item level="0" text="DVB subtitles color filter" description="A color filter can be used for better readability of DVB subtitles.">config.subtitles.dvb_subtitles_color</item>
+		<item level="2" text="DVB subtitles color" description="A graphical DVB subtitles will be displayed in the selected color, instead of the original color.">config.subtitles.dvb_subtitles_color</item>
 		<item level="2" text="Use original DVB subtitle position" description="When enabled, graphical DVB subtitles will be displayed at their original position.">config.subtitles.dvb_subtitles_original_position</item>
 		<item level="2" text="Center DVB subtitles" description="When enabled, graphical DVB subtitles will be centered horizontally.">config.subtitles.dvb_subtitles_centered</item>
 		<item level="2" text="Subtitle delay when timing is bad" description="Configure an additional delay to improve subtitle synchronisation.">config.subtitles.subtitle_bad_timing_delay</item>
