@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from enigma import eDVBDB, getLinkedSlotID, eDVBResourceManager
+from enigma import eDVBDB, getLinkedSlotID, eDVBResourceManager, isFBCLink
 from Screens.Screen import Screen
 from Screens.Setup import Setup
 from Components.SystemInfo import BoxInfo
