@@ -62,7 +62,6 @@ private:
 	static eDVBRegisteredFrontend *GetTail(eDVBRegisteredFrontend *);
 	static void UpdateLNBSlotMask(int, int, bool);
 
-	bool IsFBCLink(int fe_id) const;
 	bool IsSameFBCSet(int, int) const;
 	bool IsRootFE(eDVBRegisteredFrontend *) const;
 	bool IsFEUsed(eDVBRegisteredFrontend *, bool) const;
@@ -89,6 +88,7 @@ public:
 	bool CanLink(eDVBRegisteredFrontend *) const;
 	void AddLink(eDVBRegisteredFrontend *, eDVBRegisteredFrontend *, bool) const;
 	void Unlink(eDVBRegisteredFrontend *) const;
+	bool IsFBCLink(int fe_id) const;
 };
 
 #endif
