@@ -2,9 +2,9 @@ name: Enigma2 Python3
 
 on:
   push:
-    branches: [ develop ]
+    branches: [ isFBCLink ]
   pull_request:
-    branches: [ develop ]
+    branches: [ isFBCLink ]
 
 jobs:
   build:
