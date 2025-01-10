@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import os
 import time
+from Components.config import config
 
 ECM_INFO = '/tmp/ecm.info'
 EMPTY_ECM_INFO = '', '0', '0', '0'

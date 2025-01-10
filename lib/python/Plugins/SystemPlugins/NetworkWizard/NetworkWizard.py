@@ -462,3 +462,12 @@ class NetworkWizard(Wizard, Rc):
 
 	def ChoicesSelectionMoved(self):
 		pass
+
+	def showIP(self):
+		try:
+			from netifaces import ifaddresses, AF_INET
+			ip = ifaddresses('eth0')[AF_INET][0]['addr']
+			old = self["text"].getText()
+			self["text"].setText(f"{_("IP address")} : {ip}\n{old}")
+		except Exception:
+			pass

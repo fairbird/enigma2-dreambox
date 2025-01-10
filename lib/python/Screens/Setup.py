@@ -108,12 +108,18 @@ class Setup(ConfigListScreen, Screen, HelpableScreen):
 				including = True
 
 	def addItem(self, element):
+		indent = parameters.get("SetupIndent", "  ") * int(element.get("indents", 0))
 		if self.pluginLanguageDomain:
-			itemText = dgettext(self.pluginLanguageDomain, x) if (x := element.get("text")) else "* fix me *"
+			itemText = indent + (dgettext(self.pluginLanguageDomain, x) if (x := element.get("text")) else "* fix me *")
 			itemDescription = dgettext(self.pluginLanguageDomain, x) if (x := element.get("description")) else ""
 		else:
-			itemText = _(x) if (x := element.get("text")) else "* fix me *"
+			itemText = indent + (_(x) if (x := element.get("text")) else "* fix me *")
 			itemDescription = _(x) if (x := element.get("description")) else ""
+		restart = element.get("restart", "").lower()
+		if restart == "gui" and not itemText.endswith("*"):  # Add "*" as restart indicator based on the restart attribute.
+			itemText = f"{itemText}*"
+		elif restart == "system" and not itemText.endswith("#"):  # Add "#" as reboot indicator based on the restart attribute.
+			itemText = f"{itemText}#"
 		item = eval(element.text or "")
 		if item == "":
 			self.list.append((self.formatItemText(itemText),))  # Add the comment line to the config list.
@@ -188,6 +194,9 @@ class Setup(ConfigListScreen, Screen, HelpableScreen):
 		if footnote is None:
 			if self.getCurrentEntry().endswith("*"):
 				self["footnote"].setText(_("* = Restart Required"))
+				self["footnote"].show()
+			elif self.getCurrentEntry().endswith("#"):
+				self["footnote"].setText(_("# = Reboot Required"))
 				self["footnote"].show()
 			else:
 				self["footnote"].setText("")

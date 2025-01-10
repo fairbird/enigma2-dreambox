@@ -33,6 +33,7 @@ config.crash.debugDVBTime = ConfigYesNo(default=False)
 config.crash.debugDVB = ConfigYesNo(default=False)
 config.crash.debugInternational = ConfigYesNo(default=False)
 config.crash.debugTeletext = ConfigYesNo(default=False)
+config.crash.debugStorage = ConfigYesNo(default=False)
 
 # config.plugins needs to be defined before InputDevice < HelpMenu < MessageBox < InfoBar.
 config.plugins = ConfigSubsection()
@@ -586,6 +587,9 @@ def runScreenTest():
 	processing = Processing(session)
 	enigma.eProfileWrite("Init:PowerKey")
 	power = PowerKey(session)
+
+	from Screens.SwapManager import SwapAutostart
+	SwapAutostart()
 
 	# we need session.scart to access it from within menu.xml
 	session.scart = AutoScartControl(session)

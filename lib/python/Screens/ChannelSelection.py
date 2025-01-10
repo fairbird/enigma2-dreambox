@@ -1518,9 +1518,6 @@ class ChannelSelectionBase(Screen):
 		self["key_yellow"] = Button(_("Provider"))
 		self["key_blue"] = Button(_("Favourites"))
 
-		self["key_menu"] = StaticText(_("MENU"))
-		self["key_info"] = StaticText(_("INFO"))
-
 		self["list"] = ServiceListLegacy(self) if config.channelSelection.screenStyle.value == "" or config.channelSelection.widgetStyle.value == "" else ServiceList(self)
 		self.servicelist = self["list"]
 
@@ -2749,6 +2746,9 @@ class ChannelSelectionRadio(ChannelSelectionBase, ChannelSelectionEdit, ChannelS
 
 		self.info = session.instantiateDialog(RadioInfoBar) # our simple infobar
 
+		self["key_menu"] = StaticText(_("MENU"))
+		self["key_info"] = StaticText(_("INFO"))
+
 		self["actions"] = ActionMap(["OkCancelActions", "TvRadioActions"],
 			{
 				"keyTV": self.cancel,
@@ -2900,6 +2900,10 @@ class SimpleChannelSelection(ChannelSelectionBase, SelectionEventInfo):
 		self["list"] = ServiceListLegacy(self)  # Force legacy list
 		self.servicelist = self["list"]
 		SelectionEventInfo.__init__(self)
+
+		self["key_menu"] = StaticText(_("MENU"))
+		self["key_info"] = StaticText(_("INFO"))
+
 		self["actions"] = ActionMap(["OkCancelActions", "TvRadioActions"],
 			{
 				"cancel": self.close,

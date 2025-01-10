@@ -54,7 +54,7 @@ class ImportChannels:
 					sleep(5)
 				elif "[Errno 113]" in str(e.reason) or "[Errno -2]" in str(e.reason):
 					try_counter += 1
-					if try_counter >= 3:
+					if try_counter >= 24:
 						print(f"[Import Channels] No route to host, name or service not known {url} tried {try_counter} time(s) and give up")
 						return {}
 					else:

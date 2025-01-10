@@ -19,7 +19,7 @@ msgid ""
 " Do you want to switch to Android ?"
 msgstr ""
 "\n"
-"Wollen Sie zu Android wechseln ?"
+"Wollen Sie zu Android wechseln?"
 
 msgid ""
 "\n"
@@ -123,7 +123,7 @@ msgstr "%(freespace)s %(percent)s freier Festplattenspeicher"
 
 #, python-format
 msgid "%.1f° E"
-msgstr "%.1f° E"
+msgstr "%.1f° O"
 
 #, python-format
 msgid "%.1f° W"
@@ -164,7 +164,7 @@ msgid "%H:%M"
 msgstr "%H:%M"
 
 msgid "%R"
-msgstr ""
+msgstr "%R"
 
 #. TRANSLATORS: full date representations short dayname daynum monthname long year in strftime() format! See 'man strftime'
 msgid "%a %e %B %Y"
@@ -176,7 +176,7 @@ msgstr "%a %e.%m."
 
 #. TRANSLATORS: long date representation short dayname daynum short monthname hour:minute in strftime() format! See 'man strftime'
 msgid "%a %e/%m  %-H:%M"
-msgstr "%a %e.%m.  %-H:%M"
+msgstr "%a %e.%m.,  %-H:%M"
 
 #, python-format
 msgid "%d MB"
@@ -276,8 +276,8 @@ msgstr[1] "%d Unterverzeichnisse"
 #, fuzzy, python-format
 msgid "%d week"
 msgid_plural "%d weeks"
-msgstr[0] "Wöchentlich"
-msgstr[1] "Wöchentlich"
+msgstr[0] "Woche"
+msgstr[1] "Wochen"
 
 #, python-format
 msgid "%d wireless network found!"
@@ -286,7 +286,7 @@ msgstr[0] "%d Funk-Netzwerk gefunden!"
 msgstr[1] "%d Funk-Netzwerke gefunden!"
 
 msgid "%d-%m"
-msgstr "%d-%m"
+msgstr "%d.%m."
 
 #, python-format
 msgid "%d.%02d. %02d:%02d"
@@ -372,13 +372,13 @@ msgstr[1] "%s Aktualisierungen verfügbar"
 
 #, python-format
 msgid "%s%s(Default: %s)"
-msgstr ""
+msgstr "%s%s(Voreinstellung: %s)"
 
 msgid "'Minimum send interval' needs to be enabled to use this option."
 msgstr "\"kleinstes Sendeintervall\" kann hier aktiviert werden."
 
 msgid "'Ping' is used for detection device on this address."
-msgstr ""
+msgstr "Gerät mit dieser Adresse wird mit Ping-Befehl detektiert."
 
 msgid "(VU+ type)"
 msgstr "(VU + Typ)"
@@ -407,17 +407,17 @@ msgid "(show optional DVD audio menu)"
 msgstr "(DVD-Tonmenü anzeigen, falls vorh.)"
 
 msgid "(unknown)"
-msgstr "(unbekannte)"
+msgstr "(unbekannt)"
 
 msgid "* = Restart Required"
-msgstr ""
+msgstr "* = Neustart notwendig"
 
 msgid "* Only available if more than one interface is active."
 msgstr "* Nur verfügbar, wenn mehr als ein Netzwerkadapter aktiv ist."
 
 msgctxt "Text list separator"
 msgid ", "
-msgstr ""
+msgstr ", "
 
 msgid "-NO SERVICE\n"
 msgstr "-KEIN SERVICE\n"
@@ -563,7 +563,7 @@ msgid "A"
 msgstr "A"
 
 msgid "A color filter can be used for better readability of DVB subtitles."
-msgstr ""
+msgstr "Ein Farbfilter kann für die bessere Lesbarkeit von DVB-Untertiteln aktiviert werden."
 
 msgid "A completed recording timer is about to put your receiver in standby mode. Would you like to proceed?"
 msgstr "Ein Aufnahmetimer will Ihren Receiver in den Standby-Modus schalten. Jetzt ausführen?"
@@ -582,7 +582,7 @@ msgid "A graphical EPG for all services of a specific bouquet"
 msgstr "Ein grafischer EPG für alle Dienste eines bestimmten Bouquets"
 
 msgid "A highlight on the remote control image shows which button the help refers to. If more than one button performs the indicated function, more than one highlight will be shown. Text below the list indicates whether the function is for a long press of the button(s)."
-msgstr ""
+msgstr "Eine Hervorhebung auf der Fernbedienungsgrafik zeigt an auf welche Taste sich die Hilfe bezieht. Wenn mehr als eine Taste die beschriebene Funktion hat gibt es mehrere Hervorhebungen. Der Text unterhalb der Liste zeigt an ob die Funktion einen langen Tastendruck erfordert."
 
 #, python-format
 msgid ""
@@ -790,7 +790,7 @@ msgid "Add service to favourites"
 msgstr "Kanal zu Favoriten hinzufügen"
 
 msgid "Add services to this bouquet?"
-msgstr "Zu Bouquet hinzufügen ?"
+msgstr "Zu Bouquet hinzufügen?"
 
 msgid "Add timer"
 msgstr "Timer setzen"
@@ -1083,10 +1083,10 @@ msgstr ""
 "Der Receiver wird danach neu gestartet!"
 
 msgid "Argentina"
-msgstr "Argentina"
+msgstr "Argentinien"
 
 msgid "Armenia"
-msgstr "Armenia"
+msgstr "Armenien"
 
 msgid "Artist"
 msgstr "Künstler"
@@ -1185,10 +1185,10 @@ msgid "Audio volume step size"
 msgstr "Audio-Lautstärke Schrittgröße"
 
 msgid "Australia"
-msgstr "Australia"
+msgstr "Australien"
 
 msgid "Australian"
-msgstr "Australien"
+msgstr "Australisch"
 
 msgid "Austria"
 msgstr "Österreich"
@@ -1245,7 +1245,7 @@ msgstr "Automatische Installation, bitte warten bis alle Pakete geupdated sind"
 
 #, fuzzy
 msgid "Automatic Language"
-msgstr "Automatische Suche"
+msgstr "Automatische Sprache"
 
 msgid "Automatic Scan"
 msgstr "Automatische Suche"
@@ -1578,7 +1578,7 @@ msgid "Cable"
 msgstr "Kabel"
 
 msgid "Cable Scan"
-msgstr "Kabel Suche"
+msgstr "Kabelsuche"
 
 #, python-format
 msgid "Cable scan executable utility not found '%s'!"
@@ -1603,10 +1603,10 @@ msgid "Calibrate"
 msgstr "Kalibrieren"
 
 msgid "Cambodia"
-msgstr "Cambodia"
+msgstr "Kambodscha"
 
 msgid "Cameroon"
-msgstr "Cameroon"
+msgstr "Kamerun"
 
 msgid "Can be used for different fps between external subtitles and video."
 msgstr "Kann für unterschiedliche fps-Werte zwischen externen Untertiteln und dem Video verwendet werden."
@@ -1719,7 +1719,7 @@ msgid "Central African Republic"
 msgstr "Zentralafrikanische Republik"
 
 msgid "Chad"
-msgstr "Chad"
+msgstr "Tschad"
 
 msgid "Change Language"
 msgstr "Sprache ändern"
@@ -1851,10 +1851,10 @@ msgid "China"
 msgstr "China"
 
 msgid "Chinese - Simplified"
-msgstr "Vereinfachtes Chinesisch"
+msgstr "Chinesisch (vereinfacht)"
 
 msgid "Chinese - Traditional"
-msgstr "Chinesische Tradition"
+msgstr "Chinesisch (traditionell)"
 
 msgid "Choose Tuner"
 msgstr "Wähle Tuner"
@@ -2729,7 +2729,7 @@ msgid "Default movie location"
 msgstr "Standard Filmlisten-Verzeichnis"
 
 msgid "Default settings"
-msgstr "Voreinstellungen"
+msgstr "Standard-Einstellungen"
 
 msgid "Default timer type"
 msgstr "Standard Timertyp"
@@ -2739,7 +2739,7 @@ msgstr "Voreinstellung+Picon"
 
 #, fuzzy, python-format
 msgid "Default: '%s'."
-msgstr "Standard"
+msgstr "Voreinstellung: '%s'."
 
 msgid "Define additional delay in milliseconds before start of http(s) streams, e.g. to connect a remote tuner, you use a complex system of DiSEqC."
 msgstr "Zusätzliche Verzögerung in Millisekunden vor dem Start von http(s)-Streams, z.B. um Verbindung zu Remote-Tuner aufzubauen oder bei einem komplexen DiSEqC-Setup."
@@ -2883,11 +2883,11 @@ msgstr "Gesendete HTTP-Streams entschlüsseln"
 
 #, fuzzy
 msgid "Descramble service via streamrelay port"
-msgstr "Empfangene HTTP-Streams entschlüsseln"
+msgstr "Port zum Entschlüsseln von empfangenen HTTP-Streams"
 
 #, fuzzy
 msgid "Descramble service via streamrelay url"
-msgstr "Empfangene HTTP-Streams entschlüsseln"
+msgstr "URL zum Entschlüsseln von empfangenen HTTP-Streams"
 
 msgid "Description"
 msgstr "Beschreibung"
@@ -2896,16 +2896,16 @@ msgid "Deselect"
 msgstr "Markierung aufheben"
 
 msgid "Destination of fallback remote receiver"
-msgstr "Reserve-Receiver auswählen"
+msgstr "Reserve-Tuner auswählen"
 
 msgid "Destination of fallback remote receiver for ATSC"
-msgstr "Bestimmungsort vom Reserve-Receiver für ATSC"
+msgstr "Bestimmungsort vom Reserve-Tuner für ATSC"
 
 msgid "Destination of fallback remote receiver for DVB-C"
-msgstr "Bestimmungsort vom Reserve-Receiver für DVB-C"
+msgstr "Bestimmungsort vom Reserve-Tuner für DVB-C"
 
 msgid "Destination of fallback remote receiver for DVB-T"
-msgstr "Bestimmungsort vom Reserve-Receiver für DVB-T"
+msgstr "Bestimmungsort vom Reserve-Tuner für DVB-T"
 
 msgid "Details for plugin: "
 msgstr "Details des Plugins: "
@@ -3211,7 +3211,7 @@ msgstr "Nicht speichern und Timeshift beenden"
 
 #, fuzzy
 msgid "Don't show default"
-msgstr "Als Standard setzen"
+msgstr "Voreinstellung nicht anzeigen"
 
 msgid "Don't stop current event but disable coming events"
 msgstr "Aktuelles Event nicht beenden, aber alle zukünftige Events deaktivieren"
@@ -3282,10 +3282,10 @@ msgid "Dynamic contrast"
 msgstr "Dynamischer Kontrast"
 
 msgid "E"
-msgstr "E"
+msgstr "O"
 
 msgid "ECM Info"
-msgstr " ECM Info "
+msgstr "ECM Info"
 
 msgid "EJECTCD"
 msgstr ""
@@ -3453,7 +3453,7 @@ msgid "Enable bouquet selection in multi-EPG"
 msgstr "Aktiviere die Bouquet-Auswahl im Multi-EPG"
 
 msgid "Enable fallback remote receiver"
-msgstr "Aktiviere Reserve-Receiver"
+msgstr "Aktiviere Reserve-Tuner"
 
 msgid "Enable favourites edit"
 msgstr "Favoriteneditor anschalten"
@@ -3480,7 +3480,7 @@ msgid "Enable power off timer"
 msgstr "Aktiviere Ausschalt-Timer"
 
 msgid "Enable remote enigma2 receiver to be tried to tune into services that cannot be tuned into locally (e.g. tuner is occupied or service type is unavailable on the local tuner. Specify complete URL including http:// and port number (normally ...:8001), e.g. http://second_box:8001."
-msgstr "Aktiviert einen Reserve-Receiver, der versucht wird wenn ein Sender lokal nicht empfangen werden kann. (z.B. wenn Tuner belegt oder Sender lokal nicht verfügbar ist). Angabe der kompletten URL inklusive http:// und Port-Nummer (normal ...:8001), z.B. http://zweite_box:8001 notwendig."
+msgstr "Aktiviert einen Reserve-Tuner, der versucht wird wenn ein Sender lokal nicht empfangen werden kann. (z.B. wenn Tuner belegt oder Sender lokal nicht verfügbar ist). Angabe der kompletten URL inklusive http:// und Port-Nummer (normal ...:8001), z.B. http://zweite_box:8001 notwendig."
 
 msgid "Enable teletext caching"
 msgstr "Aktiviere Teletext-Cache"
@@ -3696,10 +3696,10 @@ msgid "EtPortal"
 msgstr "EtPortal"
 
 msgid "Ethernet network interface"
-msgstr "Ethernet Netzwerkadapter"
+msgstr "LAN-Netzwerkadapter"
 
 msgid "Ethiopia"
-msgstr "Ethiopia"
+msgstr "Äthiopien"
 
 #, fuzzy
 msgid "Event View Actions"
@@ -3953,28 +3953,28 @@ msgid "Fallback Timer"
 msgstr "Reserve-Timer"
 
 msgid "Fallback remote receiver"
-msgstr "Reserve-Receiver"
+msgstr "Reserve-Tuner"
 
 msgid "Fallback remote receiver IP"
-msgstr "Reserve-Receiver IP"
+msgstr "Reserve-Tuner IP"
 
 msgid "Fallback remote receiver Port"
-msgstr "Reserve-Receiver Port"
+msgstr "Reserve-Tuner Port"
 
 msgid "Fallback remote receiver URL"
-msgstr "Reserve-Receiver URL"
+msgstr "Reserve-Tuner URL"
 
 msgid "Fallback remote receiver for ATSC"
-msgstr "Reserve-Receiver für ATSC"
+msgstr "Reserve-Tuner für ATSC"
 
 msgid "Fallback remote receiver for DVB-C"
-msgstr "Reserve-Receiver für DVB-C"
+msgstr "Reserve-Tuner für DVB-C"
 
 msgid "Fallback remote receiver for DVB-T"
-msgstr "Reserve-Receiver für DVB-T"
+msgstr "Reserve-Tuner für DVB-T"
 
 msgid "Fallback remote receiver setup"
-msgstr "Reserve-Receiver Einstellungen"
+msgstr "Reserve-Tuner Einstellungen"
 
 msgid "Fallback tuner setup"
 msgstr "Reserve-Tuner-Einstellung"
@@ -4664,7 +4664,7 @@ msgid "IP address"
 msgstr "IP-Adresse"
 
 msgid "IP of fallback remote receiver"
-msgstr "IP des Reserve-Receivers"
+msgstr "IP des Reserve-Tuners"
 
 msgid "ISO file is too large for this filesystem!"
 msgstr "Die ISO-Datei ist für dieses Dateisystem zu groß!"
@@ -7000,7 +7000,7 @@ msgid "Port D"
 msgstr "Port D"
 
 msgid "Port of fallback remote receiver"
-msgstr "Port des Reserve-Receivers"
+msgstr "Port des Reserve-Tuners"
 
 msgid "Port used by OpenWebif on tested box."
 msgstr ""
@@ -7745,7 +7745,7 @@ msgid "Restore backups"
 msgstr "Einstellungen wiederherstellen"
 
 msgid "Restore defaults"
-msgstr "Standard wiederherstellen"
+msgstr "Standardwerte wiederherstellen"
 
 msgid "Restore deleted images"
 msgstr "Gelöschte Images wiederherstellen"
@@ -8321,7 +8321,12 @@ msgid "Select how the satellite dish is set up. i.e. fixed dish, single LNB, DiS
 msgstr "Wählen Sie, wie die Satellitenschüssel eingerichtet wird. d.h. feste Schüssel, einzelner LNB, DiSEqC-Schalter, Positionierer usw."
 
 msgid "Select how you want your receiver to keep the correct time, either from the DVB transponder, or from the internet using NTP. Or use Auto, which will favour using NTP, but will fall back to transponder time when no internet connection is available."
-msgstr "Wähle die bevorzugte Zeitsynchronisation. Transponder ->DVB, Internet->NTP oder \"Auto\". Auswahl \"Auto\" favorisiert NTP und nutzt automatisch den Transponder falls kein Internet vorhanden ist."
+msgstr
+"Wähle die bevorzugte Methode zur Zeitsynchronisation."
+"\n"
+"Transponder-Zeit: Synchronisation über DVB (Sat, Kabel, Antenne)."
+"NTP: Synchronisation über NTP-Zeitserver im Internet."
+"Automatisch: Favorisiert NTP und nutzt automatisch die Transponder-Zeit falls kein Internet vorhanden ist."
 
 msgid "Select image"
 msgstr "Wähle Image"
@@ -8663,13 +8668,13 @@ msgid "Set action when movie playback is finished."
 msgstr "Aktion einstellen, wenn die Filmwiedergabe beendet ist."
 
 msgid "Set all hotkey to default?"
-msgstr "Alle Hotkeys auf standard setzen?"
+msgstr "Alle Hotkeys auf Standard-Einstellung zurücksetzen?"
 
 msgid "Set all the settings back as they were"
 msgstr ""
 
 msgid "Set alternative fallback tuners for DVB-T/C or ATSC"
-msgstr "Bestimme alternativen Reserve-Tuner für DVB-T / C oder ATSC"
+msgstr "Bestimme alternativen Reserve-Tuner für DVB-T/C oder ATSC"
 
 msgid "Set as startup service"
 msgstr "Als Anschalt-Kanal setzen"
@@ -8866,17 +8871,17 @@ msgstr "Verschlüsselung in Infoleiste anzeigen"
 
 #, fuzzy
 msgid "Show default after description"
-msgstr "Erweiterte Beschreibung anzeigen"
+msgstr "Voreinstellung hinter Beschreibung anzeigen"
 
 #, fuzzy
 msgid "Show default on new line"
-msgstr "Infozeile anzeigen"
+msgstr "Voreinstellung in neuer Zeile anzeigen"
 
 msgid "Show detailed event info"
 msgstr "Detailierte Sendungsinformation anzeigen"
 
 msgid "Show disabled timers (local only)"
-msgstr ""
+msgstr "Zeige deaktivierte Timer (nur lokal)"
 
 msgid "Show event details"
 msgstr "Sendungsdetails anzeigen"
@@ -9212,10 +9217,10 @@ msgid "Slovak"
 msgstr "Slowakisch"
 
 msgid "Slovakia"
-msgstr "Slovakia"
+msgstr "Slowakei"
 
 msgid "Slovenia"
-msgstr "Slovenia"
+msgstr "Slowenien"
 
 msgid "Slovenian"
 msgstr "Slowenisch"
@@ -9311,7 +9316,7 @@ msgid "Sort by"
 msgstr "Sortiere nach"
 
 msgid "Sort list to default and exit?"
-msgstr "Liste nach Standard sortieren und beenden?"
+msgstr "Liste nach Voreinstellung sortieren und beenden?"
 
 msgid "Sort list:"
 msgstr "Sortiere Liste:"
@@ -9327,7 +9332,7 @@ msgid "Sort order for setup entries"
 msgstr "Sortierreihenfolge für Setup-Einträge"
 
 msgid "Sort plugins list to default?"
-msgstr "Sortiere Erweiterungsliste nach Standard?"
+msgstr "Sortiere Erweiterungsliste nach Voreinstellung?"
 
 #. TRANSLATORS: This must fit into the header button in the EPG-List
 msgid "Sort time"
@@ -9349,16 +9354,16 @@ msgid "South"
 msgstr "Süd"
 
 msgid "South Africa"
-msgstr "South Africa"
+msgstr "SÜdafrika"
 
 msgid "South Georgia and the South Sandwich Islands"
 msgstr "South Georgia and the South Sandwich Islands"
 
 msgid "South Sudan"
-msgstr "South Sudan"
+msgstr "Südsudan"
 
 msgid "Spain"
-msgstr "Spain"
+msgstr "Spanien"
 
 msgid "Spanish"
 msgstr "Spanisch"
@@ -9450,15 +9455,15 @@ msgstr "Standby in"
 
 #, fuzzy
 msgid "Start CableScan"
-msgstr "Kabel Suche"
+msgstr "Kabelsuche starten"
 
 #, fuzzy
 msgid "Start Cablescan"
-msgstr "Test starten"
+msgstr "Kabelsuche starten"
 
 #, fuzzy
 msgid "Start Fastscan"
-msgstr "Fast-Scan"
+msgstr "Fast-Scan starten"
 
 #, fuzzy
 msgid "Start Sleeptimer"
@@ -9988,7 +9993,7 @@ msgid "The DVD standard doesn't support H.264 (HDTV) video streams. Do you want 
 msgstr "Der DVD-Standard unterstützt keine H.264 (HDTV) Videos. Soll stattdessen eine Daten-DVD im Receiver-Format (die nicht in einem herkömmlichen DVD-Player abspielbar ist) erstellt werden?"
 
 msgid "The IP address from the streamrelay server that is used to descramble services that can only be encrypted via streamrelay"
-msgstr ""
+msgstr "IP-Adresse des HTTP-Servers der verwendet wird um Sender zu entschlüsseln wenn Sender nur via streamrelay verschlüsselt werden können."
 
 msgid "The PIN code has been changed successfully."
 msgstr "Der PIN-Code wurde erfolgreich geändert."
@@ -10090,7 +10095,7 @@ msgid "The path %s already exists."
 msgstr "Der Pfad %s existiert bereits."
 
 msgid "The port from the streamrelay server that is used to descramble services that can only be encrypted via streamrelay"
-msgstr ""
+msgstr "Port des HTTP-Servers der verwendet wird um Sender zu entschlüsseln wenn Sender nur via streamrelay verschlüsselt werden können."
 
 #, python-format
 msgid "The results have been written to %s"
@@ -11021,7 +11026,7 @@ msgstr "Stromaufnahme messen"
 
 #, fuzzy
 msgid "Use skin default"
-msgstr "Als Standard setzen"
+msgstr "Skin-Voreinstellung verwenden"
 
 #, fuzzy
 msgid "Use the alternative screen"
@@ -11492,7 +11497,7 @@ msgstr "Wenn aktiviert, wird der Timer vom Reserve-Tuner importiert."
 
 #, fuzzy
 msgid "When enabled the timer from the fallback tuner is the default timer"
-msgstr "Wenn aktiviert, wird der Timer vom Reserve-Tuner importiert."
+msgstr "Wenn aktiviert, wird der Timer vom Reserve-Tuner zum Standard-Timer."
 
 msgid "When enabled then when you select a new channel in the channel selection the channel selection will not close. It will only close when you select the current playing service. This is a kind of preview mode"
 msgstr "Wenn aktiviert wird bei Auswahl eines neuen Senders in der Kanalauswahlliste diese nicht geschlossen. Die Kanalauswahlliste schließt nur wenn der aktuell laufende Sender ausgewählt wird. Das ist eine Art Vorschau-Modus."
@@ -12127,7 +12132,7 @@ msgid "additional cable of rotor"
 msgstr "zusätzliches Kabel für den Motor"
 
 msgid "adult movie"
-msgstr "Erwachsenenfilm/Drama"
+msgstr "Erwachsenenfilm"
 
 msgid "advanced"
 msgstr "Erweitert"
@@ -12290,7 +12295,7 @@ msgid "day"
 msgstr "Tag"
 
 msgid "default"
-msgstr "Standard"
+msgstr "Voreinstellung"
 
 msgid "delete cut"
 msgstr "Schnitt löschen"
@@ -12489,7 +12494,7 @@ msgid "help..."
 msgstr "Hilfe…"
 
 msgid "high"
-msgstr ""
+msgstr "hoch"
 
 msgid "horizontal"
 msgstr "Horizontal"
@@ -12604,7 +12609,7 @@ msgid "mins"
 msgstr "Minuten"
 
 msgid "module disabled"
-msgstr "deaktivierte Module"
+msgstr "Modul deaktiviert"
 
 msgid "month"
 msgstr "Monat"
@@ -12613,7 +12618,7 @@ msgid "motor sport"
 msgstr "Motorsport"
 
 msgid "motoring"
-msgstr "Motorsport"
+msgstr "Autos"
 
 msgid "move down to last entry"
 msgstr "Zum letzten Eintrag gehen"
@@ -12652,7 +12657,7 @@ msgid "new media"
 msgstr "Neue Medien"
 
 msgid "news magazine"
-msgstr "Nachrichtenmagazine"
+msgstr "Nachrichtensendung"
 
 msgid "news/current affairs (general)"
 msgstr "Nachrichten/Tagesgeschehen (Allgemein)"
@@ -12945,10 +12950,10 @@ msgid "soap/melodrama/folkloric"
 msgstr "Soap/Melodrama/Volkstümlich"
 
 msgid "social/political issues/economics (general)"
-msgstr "Soziale/Politische Angelegenheiten/Wirtschaft (Allgemein)"
+msgstr "Soziales/Politik/Wirtschaft (Allgemein)"
 
 msgid "social/spiritual sciences"
-msgstr "Sozial/Geisteswissenschaft"
+msgstr "Sozial-/Geisteswissenschaft"
 
 msgid "space"
 msgstr "frei"
@@ -13033,7 +13038,7 @@ msgid "true"
 msgstr "Ja"
 
 msgid "type"
-msgstr "typ"
+msgstr "Typ"
 
 msgid "unavailable"
 msgstr "Nicht verfügbar"
@@ -13054,7 +13059,7 @@ msgid "unknown service"
 msgstr "Unbekannter Kanal"
 
 msgid "untestable"
-msgstr "untestbar"
+msgstr "nicht testbar"
 
 msgid "until standby/restart"
 msgstr "Bis zum Standby/Neustart"
@@ -13075,13 +13080,13 @@ msgid "variety show"
 msgstr "Abwechslungsreiche Sendung"
 
 msgid "version"
-msgstr "version"
+msgstr "Version"
 
 msgid "vertical"
 msgstr "Vertikal"
 
 msgid "violet"
-msgstr "violett"
+msgstr "Violett"
 
 msgid "wait for ci..."
 msgstr "Warte auf CI…"
@@ -13120,7 +13125,7 @@ msgid "winter sport"
 msgstr "Wintersport"
 
 msgid "wireless network interface"
-msgstr "Funk Netzwerkadapter"
+msgstr "WLAN-Netzwerkadapter"
 
 #, python-format
 msgid "with %d error"

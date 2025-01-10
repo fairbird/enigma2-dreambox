@@ -9,8 +9,9 @@ from Components.Sources.StaticText import StaticText
 from enigma import ePoint, eSize, getDesktop
 
 config.misc.pluginlist = ConfigSubsection()
-config.misc.pluginlist.eventinfo_order = ConfigText(default="")
-config.misc.pluginlist.extension_order = ConfigText(default="")
+config.misc.pluginlist.eventinfoOrder = ConfigText(default="[]")
+config.misc.pluginlist.extensionOrder = ConfigText(default="[]")
+config.misc.pluginlist.fcBookmarksOrder = ConfigText(default=f"['{_("Storage Devices")}']")
 
 
 class ChoiceBox(Screen):

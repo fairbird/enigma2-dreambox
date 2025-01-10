@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from enigma import eDVBDB, getLinkedSlotID, eDVBResourceManager
+from enigma import eDVBDB, getLinkedSlotID, eDVBResourceManager, isFBCLink
 from Screens.Screen import Screen
 from Screens.Setup import Setup
 from Components.SystemInfo import BoxInfo
@@ -19,6 +19,7 @@ from Screens.AutoDiseqc import AutoDiseqc
 from Tools.BoundFunction import boundFunction
 from Tools.Directories import fileExists
 
+from skin import parameters
 from time import mktime, localtime, time
 from datetime import datetime
 
@@ -124,7 +125,7 @@ class NimSetup(Setup, ServiceStopScreen):
 		self.configModeATSC = self.externallyPowered = None
 
 		self.have_advanced = False
-		self.indent = "  %s" if self.nim.isCombined() else "%s"
+		self.indent = (parameters.get("SetupIndent", "  ") + "%s") if self.nim.isCombined() else "%s"
 		if not hasattr(self, "terrestrialCountriesEntry"):
 			self.terrestrialCountriesEntry = None
 		if not hasattr(self, "cableCountriesEntry"):
@@ -753,6 +754,20 @@ class NimSelection(Screen):
 		}, -2)
 		self.setTitle(_("Choose Tuner"))
 
+	def checkFBCLinks(self):
+		for x in nimmanager.nim_slots:
+			if self.showNim(x):
+				if x.isCompatible("DVB-S"):
+					slotid = x.slot
+					if isFBCLink(slotid):
+						link = getLinkedSlotID(slotid)
+						if link != -1:
+							linkNimConfig = nimmanager.getNimConfig(link).dvbs
+							if linkNimConfig.configMode.value == "nothing":
+								nimConfig = nimmanager.getNimConfig(slotid).dvbs
+								nimConfig.configMode.value = "nothing"  # Reset child if parent is "nothing"
+								nimConfig.configMode.save()
+
 	def exit(self):
 		self.close(True)
 
@@ -790,6 +805,7 @@ class NimSelection(Screen):
 					self.session.openWithCallback(boundFunction(self.NimSetupCB, self["nimlist"].getIndex()), self.resultclass, nim.slot)
 
 	def NimSetupCB(self, index=None):
+		self.checkFBCLinks()
 		self.updateList(index)
 
 	def showNim(self, nim):

@@ -48,7 +48,8 @@ class About(Screen):
 		# [WanWizard] Removed until we find a reliable way to determine the installation date
 		# AboutText += _("Installed: ") + about.getFlashDateString() + "\n"
 
-		EnigmaVersion = _("Enigma version: ") + about.getEnigmaVersionString()
+		EnigmaVersion = about.getEnigmaVersionString()
+		EnigmaVersion = "%s%s (%s)" % (_("Enigma version: "), EnigmaVersion[:10], EnigmaVersion[11:])
 		self["EnigmaVersion"] = StaticText(EnigmaVersion)
 		AboutText += "\n" + EnigmaVersion + "\n"
 
@@ -210,7 +211,7 @@ class CommitInfo(Screen):
 
 		# get the branch to display from the Enigma version
 		try:
-			branch = "?sha=" + about.getEnigmaVersionString().split("(")[1].split(")")[0].lower()
+			branch = f"?sha={about.getEnigmaBranchString()}"
 		except:
 			branch = ""
 		branch_e2plugins = "?sha=python3"

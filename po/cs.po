@@ -5188,7 +5188,7 @@ msgid "Hotkey"
 msgstr "Hotkey"
 
 msgid "Hotkey Actions"
-msgstr "Další funkc"
+msgstr ""
 
 msgid "Hotkey Panic"
 msgstr "Hotkey Panic"
@@ -10359,7 +10359,7 @@ msgstr "Výběr skinu"
 
 #
 msgid "Skin Selection Actions"
-msgstr "Akce pro výběr skinu"
+msgstr ""
 
 msgid "SkinSelector: Restart GUI"
 msgstr "Výběr skinu - restartovat rozhraní"
@@ -11167,7 +11167,7 @@ msgstr ""
 "Pro případné korekce můžete kontaktovat autora\n"
 "na výše uvedené adrese.\n"
 "\n"
-"®10.12.2024"
+"®23.12.2024"
 
 #
 msgid "TS file is too large for ISO9660 level 1!"

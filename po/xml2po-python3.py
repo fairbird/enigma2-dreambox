@@ -32,7 +32,7 @@ class parseXML(ContentHandler, LexicalHandler):
 				k = attrs[x]
 				if k.strip() != "" and not self.ishex.match(k):
 					if x == "context":
-						attrlist.add((re.sub(r"(\w)([A-Z])([a-z])", r"\1 \2\3", k), self.last_comment))
+						attrlist.add((re.sub(r"(?:(?=(?<=[^A-Z])[A-Z])|(?=Actions|Select))(?!(?<=Pi)P)", " ", k), self.last_comment))
 					else:
 						attrlist.add((k, self.last_comment))
 					self.last_comment = None

@@ -20,9 +20,10 @@ from Components.Label import Label
 from Components.ScrollLabel import ScrollLabel
 from Components.SystemInfo import BoxInfo
 from Components.config import config, ConfigBoolean, configfile
+from Tools.Directories import fileReadLines
 # from Screens.LocaleSelection import LocaleSelection
 from enigma import eConsoleAppContainer, eTimer, eActionMap
-
+from re import search
 import os
 
 config.misc.firstrun = ConfigBoolean(default=True)
@@ -31,6 +32,8 @@ config.misc.do_overscanwizard = ConfigBoolean(default=OverscanWizard and config.
 
 
 MODEL = BoxInfo.getItem("model")
+
+MODULE_NAME = __name__.split(".")[-1]
 
 
 class StartWizard(Wizard, Rc):
@@ -51,6 +54,19 @@ class StartWizard(Wizard, Rc):
 		config.misc.firstrun.value = 0
 		config.misc.firstrun.save()
 		configfile.save()
+
+
+	def hasPartitions(self):
+		partitions = fileReadLines("/proc/partitions", source=MODULE_NAME)
+		count = 0
+		black = BoxInfo.getItem("mtdblack")
+		for line in partitions:
+			parts = line.strip().split()
+			if parts:
+				device = parts[3]
+				if not device.startswith(black) and (search(r"^sd[a-z][1-9][\d]*$", device) or search(r"^mmcblk[\d]p[\d]*$", device)):
+					count += 1
+		return count > 0
 
 
 def setLanguageFromBackup(backupfile):

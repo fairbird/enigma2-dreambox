@@ -8,10 +8,12 @@ from Components.GUIComponent import GUIComponent
 from Components.Pixmap import Pixmap
 from Components.Sources.Boolean import Boolean
 from Components.Sources.StaticText import StaticText
+from Components.SystemInfo import getBoxDisplayName
 from Screens.ChoiceBox import ChoiceBox
 from Screens.MessageBox import MessageBox
-from Screens.Standby import QUIT_RESTART, TryQuitMainloop
+from Screens.Standby import QUIT_REBOOT, QUIT_RESTART, TryQuitMainloop
 from Screens.VirtualKeyBoard import VirtualKeyBoard
+from Tools.BoundFunction import boundFunction
 
 
 class ConfigList(GUIComponent):
@@ -159,17 +161,17 @@ class ConfigListScreen:
 			if "key_yellow" not in self and yellow_button:
 				self["key_yellow"] = StaticText(yellow_button.get('text', ''))
 				self["key_yellowActions"] = HelpableActionMap(self, ["ColorActions"], {
-					"yellow": (yellow_button['function'], yellow_button.get('helptext', _("Yellow button function"))),
+					"yellow": (yellow_button['function'], yellow_button.get('helptext', yellow_button.get('text', _("Yellow button function")))),
 				}, prio=1)
 			if "key_blue" not in self and blue_button:
 				self["key_blue"] = StaticText(blue_button.get('text', ''))
 				self["key_blueActions"] = HelpableActionMap(self, ["ColorActions"], {
-					"blue": (blue_button['function'], blue_button.get('helptext', _("Blue button function"))),
+					"blue": (blue_button['function'], blue_button.get('helptext', blue_button.get('text', _("Blue button function")))),
 				}, prio=1)
 			if "key_menu" not in self and menu_button:
 				self["key_menu"] = StaticText(menu_button.get('text', ''))
 				self["menuConfigActions"] = HelpableActionMap(self, "ConfigListActions", {
-					"menu": (menu_button['function'], menu_button.get('helptext', _("Menu button function"))),
+					"menu": (menu_button['function'], menu_button.get('helptext', menu_button.get('text', _("Menu button function")))),
 				}, prio=1)
 			self["fullUIActions"] = HelpableActionMap(self, ["ConfigListActions"], {
 				"cancel": (self.keyCancel, _("Cancel any changed settings and exit")),
@@ -411,25 +413,29 @@ class ConfigListScreen:
 	def keySave(self):
 		for notifier in self.onSave:
 			notifier()
-		if self.saveAll():
-			self.session.openWithCallback(self.restartConfirm, MessageBox, self.restartMsg, default=True, type=MessageBox.TYPE_YESNO)
+		quitData = self.saveAll()
+		if quitData:
+			self.session.openWithCallback(boundFunction(self.restartConfirm, quitData[0]), MessageBox, quitData[1], default=True, type=MessageBox.TYPE_YESNO)
 		else:
 			self.close()
 
-	def restartConfirm(self, result):
+	def restartConfirm(self, quitValue, result):
 		if result:
-			self.session.open(TryQuitMainloop, retvalue=QUIT_RESTART)
+			self.session.open(TryQuitMainloop, retvalue=quitValue)
 			self.close()
 
 	def saveAll(self):
-		restart = False
+		quitData = ()
 		for item in set(self["config"].list + self.manipulatedItems):
 			if len(item) > 1:
-				if item[0].endswith("*") and item[1].isChanged():
-					restart = True
+				if item[1].isChanged():
+					if item[0].endswith("*"):
+						quitData = (QUIT_RESTART, _("Restart GUI now?"))
+					elif item[0].endswith("#"):
+						quitData = (QUIT_REBOOT, _("Reboot %s %s now?") % getBoxDisplayName())
 				item[1].save()
 		configfile.save()
-		return restart
+		return quitData
 
 	def addSaveNotifier(self, notifier):
 		if callable(notifier):

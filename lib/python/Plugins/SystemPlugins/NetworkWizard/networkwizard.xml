@@ -78,6 +78,7 @@ self.condition = (self.InterfaceState == False )
                 <text value="Your internet connection is not working!\nPlease choose what you want to do next." />
                 <displaytext value="Please follow the instructions on the TV" />
                 <code>
+self.showIP()
 self.clearSelectedKeys()
 self.selectKey("OK")
 self.selectKey("UP")

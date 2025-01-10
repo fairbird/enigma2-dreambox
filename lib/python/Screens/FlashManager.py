@@ -1,6 +1,6 @@
 from json import load
 from os import W_OK, access, listdir, major, makedirs, minor, mkdir, sep, stat, statvfs, unlink, walk
-from os.path import basename, exists, isdir, isfile, islink, ismount, splitext, join
+from os.path import basename, exists, isdir, isfile, islink, ismount, splitext, join, getsize
 from shutil import rmtree
 from time import time
 from urllib.request import Request, urlopen
@@ -393,7 +393,7 @@ class FlashImage(Screen):
 		if choice:
 			def findMedia(paths):
 				def availableSpace(path):
-					if "/mmc" not in path and isdir(path) and access(path, W_OK):
+					if isdir(path) and access(path, W_OK):
 						try:
 							fs = statvfs(path)
 							return (fs.f_bavail * fs.f_frsize) / (1 << 20)
@@ -405,7 +405,7 @@ class FlashImage(Screen):
 					deviceID = stat(path).st_dev
 					return (major(deviceID), minor(deviceID)) in diskStats
 
-				diskStats = [(int(x[0]), int(x[1])) for x in [x.split()[0:3] for x in open("/proc/diskstats").readlines()] if x[2].startswith("sd")]
+				diskStats = [(int(x[0]), int(x[1])) for x in [x.split()[0:3] for x in open("/proc/diskstats").readlines()] if x[2].startswith("sd") or x[2].startswith("mmc")]
 				for path in paths:
 					if isdir(path) and checkIfDevice(path, diskStats) and availableSpace(path) > 500:
 						return (path, True)
@@ -510,6 +510,13 @@ class FlashImage(Screen):
 
 	def postFlashActionCallback(self, choice):
 		if choice:
+			knownFlagFiles = ("settings", "plugins", "noplugins", "slow", "fast", "turbo")
+			for directory in listdir("/media"):  # Remove known flag files from devices other than /media/hdd.
+				if directory not in ("audiocd", "autofs", "hdd"):
+					for flagFile in knownFlagFiles:
+						flagPath = join("/media", directory, "images/config", flagFile)
+						if isfile(flagPath) and getsize(flagPath) == 0:
+							unlink(flagPath)
 			rootFolder = "/media/hdd/images/config"
 			if choice != "abort" and not self.recordCheck:
 				self.recordCheck = True
@@ -555,9 +562,8 @@ class FlashImage(Screen):
 								if fileName == config.plugins.softwaremanager.restoremode.value:
 									if not exists(path):
 										open(path, "w").close()
-								else:
-									if exists(path):
-										unlink(path)
+								elif exists(path):
+									unlink(path)
 						except OSError as err:
 							print("[FlashManager] postFlashActionCallback Error %d: Failed to create restore mode flag file '%s'!  (%s)" % (err.errno, path, err.strerror))
 				self.startDownload()

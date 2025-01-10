@@ -237,6 +237,7 @@ dist_install_DATA =     ask.png \
     repzaprecclock_post.svg \
     repzaprecclock_pre.svg \
     repzaprecclock_prepost.svg \
+    SwapManager.png \
     timer_autotimer.svg \
     timer_done.svg \
     timer_off.svg \

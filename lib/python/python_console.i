@@ -234,6 +234,12 @@ eConsolePy_kill(eConsolePy* self)
 	Py_RETURN_NONE;
 }
 
+	static PyObject *
+	eConsolePy_waitPID(eConsolePy* self)
+	{
+		return PyLong_FromLong(self->cont->waitPID());
+	}
+
 static PyObject *
 eConsolePy_sendCtrlC(eConsolePy* self)
 {
@@ -314,7 +320,10 @@ static PyMethodDef eConsolePy_methods[] = {
 	 (char*)"set input file"
 	},
 	{(char*)"getPID", (PyCFunction)eConsolePy_getPID, METH_NOARGS,
-	 (char*)"execute command"
+	 (char*)"get PID"
+	},
+	{(char*)"waitPID", (PyCFunction)eConsolePy_waitPID, METH_NOARGS,
+	 (char*)"wait"
 	},
 	{(char*)"kill", (PyCFunction)eConsolePy_kill, METH_NOARGS,
 	 (char*)"kill application"

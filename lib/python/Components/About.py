@@ -108,12 +108,13 @@ def getEnigmaVersionString():
 	enigma_version = enigma.getEnigmaVersionString()
 	if '-(no branch)' in enigma_version:
 		enigma_version = enigma_version[:-12]
-	enigma_version = enigma_version.rsplit("-", enigma_version.count("-") - 2)
-	if len(enigma_version) == 3:
-		enigma_version = enigma_version[0] + " (" + enigma_version[2] + "-" + enigma_version[1] + ")"
-	else:
-		enigma_version = enigma_version[0] + " (" + enigma_version[1] + ")"
 	return enigma_version
+
+
+#maybe in future it is better to swig the branch string - for now I retrieve it from the VersionString
+def getEnigmaBranchString():
+	import enigma
+	return enigma.getEnigmaVersionString()[11:]
 
 
 def getGStreamerVersionString():

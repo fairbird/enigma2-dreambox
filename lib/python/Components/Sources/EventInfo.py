@@ -3,7 +3,7 @@ from time import time
 
 from Components.PerServiceDisplay import PerServiceBase
 from Components.Element import cached
-from enigma import iPlayableService, iServiceInformation, eServiceReference, eEPGCache, eServiceCenter
+from enigma import iPlayableService, iServiceInformation, eServiceReference, eEPGCache, eServiceCenter, eTimer
 from Components.Sources.Source import Source
 
 
@@ -128,6 +128,8 @@ class EventInfo(PerServiceBase, Source):
 			}, with_event=True)
 		self.now_or_next = now_or_next
 		self.epgQuery = eEPGCache.getInstance().lookupEventTime
+		self.refreshTimer = eTimer()
+		self.refreshTimer.callback.append(self.gotEventPoll)
 		self.__service = None
 
 	@cached
@@ -145,12 +147,17 @@ class EventInfo(PerServiceBase, Source):
 				refstr = info.getInfoString(iServiceInformation.sServiceref) if isPtr else self.__service.toString()
 				ret = self.epgQuery(eServiceReference(refstr), -1, self.now_or_next and 1 or 0)
 				if not ret and refstr.split(':')[0] in ['4097', '5001', '5002', '5003']:  # No EPG Try to get Meta
-					ev = pServiceEvent(info, self.now_or_next, service)
-					if ev.getEventName:
-						return ev
+					serviceEvent = pServiceEvent(info, self.now_or_next, service)
+					if serviceEvent.getEventName():
+						return serviceEvent
+					else:
+						self.refreshTimer.start(1000, True)  # This is only a workaround
 		return ret
 
 	event = property(getEvent)
+
+	def gotEventPoll(self):
+		self.gotEvent(iPlayableService.evUpdatedEventInfo)
 
 	def gotEvent(self, what):
 		if what == iPlayableService.evEnd:
