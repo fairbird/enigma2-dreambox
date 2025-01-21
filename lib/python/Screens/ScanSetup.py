@@ -639,7 +639,7 @@ class ScanSetup(ConfigListScreen, Screen, CableTransponderSearchSupport, Terrest
 		self.statusTimer.callback.append(self.updateStatus)
 
 		self.list = []
-		ConfigListScreen.__init__(self, self.list, fullUI=True)
+		ConfigListScreen.__init__(self, self.list, on_change=self.newConfig, fullUI=True)
 		self["introduction"] = Label("")
 		if self.scan_nims.value == "":
 			self["introduction"].text = _("Nothing to scan! Setup your tuner and try again.")
@@ -1270,23 +1270,6 @@ class ScanSetup(ConfigListScreen, Screen, CableTransponderSearchSupport, Terrest
 		self.scan_terrestrial_binary_scan = ConfigYesNo(default=False)
 
 		return True
-
-	def keyLeft(self):
-		ConfigListScreen.keyLeft(self)
-		self.newConfig()
-
-	def keyRight(self):
-		ConfigListScreen.keyRight(self)
-		self.newConfig()
-
-	def handleKeyFileCallback(self, answer):
-		ConfigListScreen.handleKeyFileCallback(self, answer)
-		self.newConfig()
-
-	def keySelectionCallback(self, answer):
-		if answer:
-			ConfigListScreen.keySelectionCallback(self, answer)
-			self.newConfig()
 
 	def updateStatus(self):
 		print("updatestatus")
