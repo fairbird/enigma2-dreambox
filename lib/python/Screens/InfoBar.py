@@ -158,6 +158,87 @@ class InfoBar(InfoBarBase, InfoBarShowHide,
 		self.session.open(MoviePlayer, ref, slist=self.servicelist, lastservice=self.session.nav.getCurrentlyPlayingServiceOrGroup(), infobar=self)
 
 
+def setAudioTrack(service):
+	try:
+		from Tools.ISO639 import LanguageCodes as langC
+		tracks = service and service.audioTracks()
+		nTracks = tracks and tracks.getNumberOfTracks() or 0
+		if not nTracks:
+			return
+		idx = 0
+		trackList = []
+		for i in list(range(nTracks)):
+			audioInfo = tracks.getTrackInfo(i)
+			lang = audioInfo.getLanguage()
+			if lang in langC:
+				lang = langC[lang][0]
+			desc = audioInfo.getDescription()
+			track = idx, lang, desc
+			idx += 1
+			trackList += [track]
+		seltrack = tracks.getCurrentTrack()
+		# we need default selected language from image
+		# to set the audiotrack if "config.autolanguage.audio_autoselect...values" are not set
+		from Components.International import international
+		syslang = international.getLanguage()
+		syslang = langC[syslang][0]
+		if (config.autolanguage.audio_autoselect1.value or config.autolanguage.audio_autoselect2.value or config.autolanguage.audio_autoselect3.value or config.autolanguage.audio_autoselect4.value) != "---":
+			audiolang = [config.autolanguage.audio_autoselect1.value, config.autolanguage.audio_autoselect2.value, config.autolanguage.audio_autoselect3.value, config.autolanguage.audio_autoselect4.value]
+			caudiolang = True
+		else:
+			audiolang = syslang
+			caudiolang = False
+		useAc3 = config.autolanguage.audio_defaultac3.value
+		if useAc3:
+			matchedAc3 = tryAudioTrack(tracks, audiolang, caudiolang, trackList, seltrack, useAc3)
+			if matchedAc3:
+				return
+			matchedMpeg = tryAudioTrack(tracks, audiolang, caudiolang, trackList, seltrack, False)
+			if matchedMpeg:
+				return
+			tracks.selectTrack(0)    # fallback to track 1(0)
+			return
+		else:
+			matchedMpeg = tryAudioTrack(tracks, audiolang, caudiolang, trackList, seltrack, False)
+			if matchedMpeg:
+				return
+			matchedAc3 = tryAudioTrack(tracks, audiolang, caudiolang, trackList, seltrack, useAc3)
+			if matchedAc3:
+				return
+			tracks.selectTrack(0)    # fallback to track 1(0)
+	except Exception as e:
+		print("[MoviePlayer] audioTrack exception:\n" + str(e))
+
+
+def tryAudioTrack(tracks, audiolang, caudiolang, trackList, seltrack, useAc3):
+	for entry in audiolang:
+		if caudiolang:
+			# we need here more replacing for other language, or new configs with another list !!!
+			# choice gives only the value, never the description
+			# so we can also make some changes in "config.py" to get the description too, then we dont need replacing here !
+			entry = entry.replace('eng qaa Englisch', 'English').replace('deu ger', 'German')
+		for x in trackList:
+			if entry == x[1] and seltrack == x[0]:
+				if useAc3:
+					if x[2].startswith('AC'):
+						print("[MoviePlayer] audio track is current selected track: " + str(x))
+						return True
+				else:
+					print("[MoviePlayer] audio track is current selected track: " + str(x))
+					return True
+			elif entry == x[1] and seltrack != x[0]:
+				if useAc3:
+					if x[2].startswith('AC'):
+						print("[MoviePlayer] audio track match: " + str(x))
+						tracks.selectTrack(x[0])
+						return True
+				else:
+					print("[MoviePlayer] audio track match: " + str(x))
+					tracks.selectTrack(x[0])
+					return True
+	return False
+
+
 class MoviePlayer(InfoBarBase, InfoBarShowHide, InfoBarMenu, InfoBarSeek, InfoBarShowMovies, InfoBarInstantRecord, InfoBarVmodeButton, InfoBarResolutionSelection, InfoBarAspectSelection,
 		InfoBarAudioSelection, InfoBarNotifications, InfoBarServiceNotifications, InfoBarPVRState,
 		InfoBarCueSheetSupport, InfoBarMoviePlayerSummarySupport, InfoBarSubtitleSupport, Screen, InfoBarTeletextPlugin,

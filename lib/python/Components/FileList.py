@@ -3,7 +3,7 @@ from os import R_OK, access, listdir, lstat, sep
 from os.path import basename, dirname, exists, isdir, islink, join as pathjoin, normpath, realpath, splitext
 from re import compile
 
-from enigma import BT_SCALE, BT_VALIGN_CENTER, RT_HALIGN_LEFT, RT_VALIGN_CENTER, eListboxPythonMultiContent, eServiceCenter, eServiceReference, eServiceReferenceFS, gFont
+from enigma import BT_SCALE, BT_VALIGN_CENTER, RT_HALIGN_LEFT, RT_VALIGN_CENTER, eListboxPythonMultiContent, eServiceCenter, eServiceReference, gFont
 
 from skin import fonts, parameters
 from Components.Harddisk import harddiskmanager
@@ -256,7 +256,7 @@ class FileListBase(MenuList):
 					self.fileList.append(self.fileListComponent(name=partition.description, path=pathjoin(path, ""), isDir=True, isLink=False, selected=selected, dirIcon=None))
 		elif self.useServiceRef and directory:
 			# Don't use "eServiceReference(string)" constructor as it doesn't allow ":" in the directory name.
-			root = eServiceReference(eServiceReference.idFile, eServiceReference.noFlags, eServiceReferenceFS.directory)
+			root = eServiceReference.fromDirectory(directory)
 			root.setPath(pathjoin(directory, ""))
 			if self.additionalExtensions:
 				root.setName(self.additionalExtensions)
