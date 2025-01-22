@@ -201,7 +201,7 @@ def loadSkin(filename, scope=SCOPE_SKINS, desktop=getDesktop(GUI_SKIN_ID), scree
 
 
 def reloadSkins():
-	global colors, domScreens, fonts, menus, parameters, setups, switchPixmap
+	global colors, domScreens, fonts, menus, menuicons, parameters, screens, setups, switchPixmap
 	domScreens.clear()
 	colors.clear()
 	colors = {
