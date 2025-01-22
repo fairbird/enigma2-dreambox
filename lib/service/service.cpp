@@ -39,56 +39,17 @@ RESULT eServiceReference::parseNameAndProviderFromName(std::string &sourceName, 
 
 eServiceReference::eServiceReference(const std::string &string)
 {
-	const char *c = string.c_str();
-	int pathl = 0;
-
+	const char *c=string.c_str();
+	int pathl=0;
 	number = 0;
 
-	if (string.empty())
-	{
+	if (!string.length())
 		type = idInvalid;
-		return;
-	}
-
-	if (isalpha(*c))
+	else if ( sscanf(c, "%d:%d:%x:%x:%x:%x:%x:%x:%x:%x:%n", &type, &flags, &data[0], &data[1], &data[2], &data[3], &data[4], &data[5], &data[6], &data[7], &pathl) < 8 )
 	{
-		eDebug("[eServiceReference] May be unencoded URL: %s", c);
-		const char *colon = strchr(c, ':');
-		if ((colon) && !strncmp(colon, "://", 3))
-		{
-			type = idServiceMP3;
-			memset(data, 0, sizeof(data));
-			/* Allow space separated name */
-			const char *space = strchr(colon, ' ');
-			if (space)
-			{
-				path.assign(c, space - c);
-				name = space + 1;
-			}
-			else
-			{
-				path = string;
-				name = string;
-			}
-
-			std::string res_name = "";
-			std::string res_provider = "";
-			eServiceReference::parseNameAndProviderFromName(name, res_name, res_provider);
-			name = res_name;
-			prov = res_provider;
-
-			eDebug("[eServiceReference] URL=%s name=%s", path.c_str(), name.c_str());
-			return;
-		}
-	}
-
-	int ret = sscanf(c, "%d:%d:%x:%x:%x:%x:%x:%x:%x:%x:%n", &type, &flags, &data[0], &data[1], &data[2], &data[3], &data[4], &data[5], &data[6], &data[7], &pathl);
-	if (ret < 8 )
-	{
-		memset(data, 0, sizeof(data));
-		ret = sscanf(c, "%d:%d:%x:%x:%x:%x:%n", &type, &flags, &data[0], &data[1], &data[2], &data[3], &pathl);
+		memset( data, 0, sizeof(data) );
 		eDebug("[eServiceReference] find old format eServiceReference string");
-		if (ret < 2)
+		if ( sscanf(c, "%d:%d:%x:%x:%x:%x:%n", &type, &flags, &data[0], &data[1], &data[2], &data[3], &pathl) < 2 )
 			type = idInvalid;
 	}
 
@@ -127,8 +88,10 @@ eServiceReference::eServiceReference(const std::string &string)
 		{
 			path=pathstr;
 		}
+
 		path = urlDecode(path);
 		name = urlDecode(name);
+
 		if(!name.empty())
 		{
 			std::string res_name = "";
