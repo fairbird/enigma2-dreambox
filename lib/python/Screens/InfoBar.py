@@ -147,11 +147,11 @@ class InfoBar(InfoBarBase, InfoBarShowHide,
 		if service is None:
 			if ref and not self.session.nav.getCurrentlyPlayingServiceOrGroup():
 				self.session.nav.playService(ref)
-		elif type(service) is eServiceReference:
+		elif service.valid():
 			from Components.ParentalControl import parentalControl
 			if parentalControl.isServicePlayable(service, self.openMoviePlayer):
 				self.openMoviePlayer(service)
-		elif service == True:
+		elif service is True:
 			self.showMovies()
 
 	def openMoviePlayer(self, ref):
@@ -615,14 +615,14 @@ class MoviePlayer(InfoBarBase, InfoBarShowHide, InfoBarMenu, InfoBarSeek, InfoBa
 		self.movieselection_dlg = self.session.openWithCallback(self.movieSelected, Screens.MovieSelection.MovieSelection, ref)
 
 	def movieSelected(self, service):
-		if type(service) is eServiceReference:
+		if service.valid():
 			if self.cur_service and self.cur_service != service:
 				resumePointsInstance.setResumePoint(self.session)
 			self.cur_service = service
 			self.is_closing = False
 			self.session.nav.playService(service)
 			self.returning = False
-		elif service == True:
+		elif service is True:
 			self.showMovies()
 		elif self.returning:
 			self.close()
