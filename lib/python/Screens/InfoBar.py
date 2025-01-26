@@ -615,7 +615,7 @@ class MoviePlayer(InfoBarBase, InfoBarShowHide, InfoBarMenu, InfoBarSeek, InfoBa
 		self.movieselection_dlg = self.session.openWithCallback(self.movieSelected, Screens.MovieSelection.MovieSelection, ref)
 
 	def movieSelected(self, service):
-		if service.valid():
+		if service is not None and service.valid():
 			if self.cur_service and self.cur_service != service:
 				resumePointsInstance.setResumePoint(self.session)
 			self.cur_service = service
