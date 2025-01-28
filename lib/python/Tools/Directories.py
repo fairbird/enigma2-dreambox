@@ -181,6 +181,7 @@ def resolveFilename(scope, base="", path_prefix=None):
 			skinResolveList = addIfExists([
 				join(scopeConfig, skin),
 				join(scopeConfig, "skin_common"),
+				scopeConfig,  # Can we deprecate top level of SCOPE_CONFIG directory to allow a clean up?
 				join(scopeGUISkin, skin),
 				join(scopeGUISkin, f"skin_fallback_{getDesktop(0).size().height()}"),
 				join(scopeGUISkin, "skin_default"),
@@ -195,6 +196,7 @@ def resolveFilename(scope, base="", path_prefix=None):
 			lcdskinResolveList = addIfExists([
 				join(scopeConfig, "display", skin),
 				join(scopeConfig, "display", "skin_common"),
+				scopeConfig,  # Can we deprecate top level of SCOPE_CONFIG directory to allow a clean up?
 				join(scopeLCDSkin, skin),
 				join(scopeLCDSkin, f"skin_fallback_{getDesktop(1).size().height()}"),
 				join(scopeLCDSkin, "skin_default"),
@@ -217,6 +219,7 @@ def resolveFilename(scope, base="", path_prefix=None):
 				resolveList.append(join(scopeConfig, "display", display))
 			resolveList.append(join(scopeConfig, "skin_common", "fonts"))
 			resolveList.append(join(scopeConfig, "skin_common"))
+			resolveList.append(scopeConfig)  # Can we deprecate top level of SCOPE_CONFIG directory to allow a clean up?
 			resolveList.append(join(scopeGUISkin, skin, "fonts"))
 			resolveList.append(join(scopeGUISkin, skin))
 			resolveList.append(join(scopeGUISkin, "skin_default", "fonts"))
