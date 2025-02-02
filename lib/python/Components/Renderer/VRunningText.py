@@ -187,7 +187,10 @@ class VRunningText(Renderer):
 				#self.instance.fillRect( eRect(0, 0, self.W, self.H), self.bcolor )
 				self.instance.clear(self.bcolor)
 		else:
-			self.txtext = self.source.text or ""
+			try:
+				self.txtext = self.source.text or ""
+			except:
+				self.txtext = ""
 			if self.instance:
 				if not self.calcMoving():
 					self.drawText(self.X, self.Y)
