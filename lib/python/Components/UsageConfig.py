@@ -1774,7 +1774,7 @@ def InitUsageConfig():
 	])
 	config.subtitles.ai_connection_speed.addNotifier(setAiConnectionSpeed)
 
-	langsAI = ['af', 'sq', 'am', 'ar', 'hy', 'az', 'eu', 'be', 'bn', 'bs', 'bg', 'ca', 'zh', 'co', 'hr', 'cs', 'da', 'nl', 'en', 'eo', 'fr', 'fi', 'fy', 'gl', 'ka', 'de', 'el', 'ht', 'ha', 'hu', 'is', 'ig', 'ga', 'it', 'ja', 'jv', 'kn', 'kk', 'km', 'rw', 'ko', 'ku', 'ky', 'lo', 'la', 'lv', 'lt', 'lb', 'mk', 'mg', 'ms', 'mt', 'mi', 'mr', 'mn', 'no', 'ny', 'or', 'ps', 'fa', 'pl', 'pt', 'ro', 'ru', 'sm', 'gd', 'sr', 'st', 'sn', 'sk', 'sl', 'so', 'es', 'su', 'sw', 'sv', 'tl', 'tg', 'te', 'th', 'tr', 'tk', 'uk', 'ur', 'ug', 'uz', 'cy', 'xh', 'yi', 'yo', 'zu']
+	langsAI = ['af', 'am', 'ar', 'hy', 'az', 'eu', 'be', 'bn', 'bs', 'bg', 'ca', 'zh', 'co', 'hr', 'cs', 'da', 'nl', 'en', 'eo', 'fr', 'fi', 'fy', 'gl', 'ka', 'de', 'el', 'ht', 'ha', 'hu', 'is', 'ig', 'ga', 'it', 'ja', 'jv', 'kn', 'kk', 'km', 'rw', 'ko', 'ku', 'ky', 'lo', 'la', 'lv', 'lt', 'lb', 'mk', 'mg', 'ms', 'mt', 'mi', 'mr', 'mn', 'no', 'ny', 'or', 'ps', 'fa', 'pl', 'pt', 'ro', 'ru', 'sm', 'gd', 'sr', 'st', 'sn', 'sk', 'sl', 'so', 'es', 'su', 'sw', 'sv', 'tl', 'tg', 'te', 'th', 'tr', 'tk', 'uk', 'ur', 'ug', 'uz', 'cy', 'xh', 'yi', 'yo', 'zu']
 	langsAI = [(x, international.LANGUAGE_DATA[x][1]) for x in langsAI]
 	langsAI.append(("zh-CN", _("Chinese (Simplified)")))
 	langsAI.append(("ceb", _("Cebuano")))
