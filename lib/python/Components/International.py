@@ -9,8 +9,8 @@ from Tools.Directories import SCOPE_CONFIG, SCOPE_LANGUAGE, fileReadLines, resol
 
 # In this code the following meanings are used:
 # 	Language: An official language as recognized by ISO, eg "en" for English.
-# 	Country: An official country as recognized by ISO, eg "AU" for Australia.
-# 	Locale: An official language as spoken in a country, eg "en_AU" for English (Australian).
+# 	Country: An official country as recognized by ISO, eg "en" for Australia.
+# 	Locale: An official language as spoken in a country, eg "en" for English (English).
 
 MODULE_NAME = __name__.split(".")[-1]
 
@@ -27,7 +27,7 @@ textdomain("enigma2")
 class International:
 	# This is the list of all locales built for OpenATV. If any locales are added or removed then this list should be updated!
 	# The list of available locales rarely changes so this has been done to optimize the speed of starting Enigma2.
-	DEFINED_LOCALES = ["ar", "bg", "ca", "cs", "da", "de", "el", "en", "en_AU", "en_GB", "es", "et", "fa", "fi", "fr", "fy", "he", "hr", "hu", "id", "is", "it", "ku", "lt", "lv", "nb", "nl", "nn", "pl", "pt", "pt_BR", "ro", "ru", "sk", "sl", "sq", "sr", "sv", "ta", "th", "tr", "uk", "vi", "zh_CN", "zh_HK"]
+	DEFINED_LOCALES = ["ar", "bg", "ca", "cs", "da", "de", "el", "en", "es", "et", "fa", "fi", "fr", "fy", "he", "hr", "hu", "id", "is", "it", "ku", "lt", "lv", "nb", "nl", "nn", "pl", "pt", "pt_BR", "ro", "ru", "sk", "sl", "sq", "sr", "sv", "ta", "th", "tr", "uk", "vi", "zh_CN", "zh_HK"]
 	LOCALE_TEMPLATE = "enigma2-locale-%s"
 	PERMANENT_LOCALES = [ "en_US", "de_DE","fr_FR"]
 
@@ -103,7 +103,7 @@ class International:
 		"dz": ("Dzongkha", _("Dzongkha"), "རྫོང་ཁ", "", "", ("BT",)),
 		"ee": ("Ewe", _("Ewe"), "Eʋegbe", "", "", ()),
 		"el": ("Greek", _("Greek"), "Ελληνικά", "ISO-8859-7", "", ("GR", "CY")),
-		"en": ("English", _("English"), "English", "ISO-8859-15", "", ("US", "AG", "AU", "BW", "BZ", "CA", "DK", "GB", "HK", "IE", "IL", "IN", "JM", "KH", "NG", "NZ", "PH", "SC", "SG", "TT", "ZA", "ZM", "ZW")),
+		"en": ("English", _("English"), "English", "ISO-8859-15", "", ("US", "AG", "BW", "BZ", "CA", "DK", "HK", "IE", "IL", "IN", "JM", "KH", "NG", "NZ", "PH", "SC", "SG", "TT", "ZA", "ZM", "ZW")),
 		"eo": ("Esperanto", _("Esperanto"), "Esperanto", "", "", ()),
 		"es": ("Spanish / Castilian", _("Spanish / Castilian"), "Español", "ISO-8859-15", "", ("ES", "AR", "BO", "CL", "CO", "CR", "CU", "DO", "EC", "GT", "HN", "MX", "NI", "PA", "PE", "PR", "PY", "SV", "US", "UY", "VE")),
 		"et": ("Estonian", _("Estonian"), "Eesti / Eesti keel", "ISO-8859-15", "", ("EE",)),
@@ -278,7 +278,6 @@ class International:
 		"AR": ("ARG", "032", "Argentina", _("Argentina"), "Argentina"),
 		"AS": ("ASM", "016", "American Samoa", _("American Samoa"), "Amerika Sāmoa"),
 		"AT": ("AUT", "040", "Austria", _("Austria"), "Österreich"),
-		"AU": ("AUS", "036", "Australia", _("Australia"), "Australia"),
 		"AW": ("ABW", "533", "Aruba", _("Aruba"), "Aruba"),
 		"AX": ("ALA", "248", "Aland Islands", _("Aland Islands"), "Åland Islands"),
 		"AZ": ("AZE", "031", "Azerbaijan", _("Azerbaijan"), "Azərbaycan"),
@@ -343,7 +342,6 @@ class International:
 		"FO": ("FRO", "234", "Faroe Islands", _("Faroe Islands"), "Føroyar"),
 		"FR": ("FRA", "250", "France", _("France"), "Française"),
 		"GA": ("GAB", "266", "Gabon", _("Gabon"), "Gabonaise"),
-		"GB": ("GBR", "826", "United Kingdom", _("United Kingdom"), "United Kingdom"),
 		"GD": ("GRD", "308", "Grenada", _("Grenada"), "Grenada"),
 		"GE": ("GEO", "268", "Georgia", _("Georgia"), "საქართველო"),
 		"GF": ("GUF", "254", "French Guiana", _("French Guiana"), "Guyane"),
