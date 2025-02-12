@@ -191,7 +191,10 @@ class RunningText(Renderer):
 				self.scroll_label.setText("")
 		else:
 			if self.mShown:
-				self.txtext = self.source.text or ""
+				try:
+					self.txtext = self.source.text or ""
+				except:
+					self.txtext = ""
 				if self.instance and not self.calcMoving():
 					self.scroll_label.resize(eSize(self.W, self.H))
 					self.moveLabel(self.X, self.Y)

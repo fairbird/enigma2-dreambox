@@ -464,7 +464,7 @@ class HarddiskManager:
 		# Remove old mounts
 		self.debugPrint("refreshMountPoints")
 		for partition in self.partitions:
-			if partition.mountpoint and partition.mountpoint != "/":
+			if partition.device and partition.mountpoint and partition.mountpoint != "/":
 				newMountpoint = self.getMountpoint(partition.device)
 				if partition.mountpoint != newMountpoint:
 					self.debugPrint(f"remove mountpoint old: {partition.mountpoint} / new: {newMountpoint}")
@@ -473,7 +473,7 @@ class HarddiskManager:
 
 		# Add new mount
 		for partition in self.partitions:
-			if partition.mountpoint != "/":
+			if partition.device and partition.mountpoint != "/":
 				newMountpoint = self.getMountpoint(partition.device)
 				self.debugPrint(f"add mountpoint old: {partition.mountpoint} / new: {newMountpoint}")
 				if newMountpoint and partition.mountpoint != newMountpoint:
@@ -524,7 +524,7 @@ class HarddiskManager:
 		partitions = []
 		try:
 			if exists(join(devpath, "removable")):
-				removable = bool(int(readFile(join(devpath, "removable"))))
+				removable = bool(int(readFile(join(devpath, "removable"))))  #TODO: This needs to be improved because some internal disks have removable = 1
 			if exists(join(devpath, "dev")):
 				dev = int(readFile(join(devpath, "dev")).split(":")[0])
 			else:
@@ -586,7 +586,14 @@ class HarddiskManager:
 					device = eventData["DEVNAME"].replace("/dev/", "")
 					shortDevice = device[:7] if device.startswith("mmcblk") else sub(r"[\d]", "", device)
 					removable = fileReadLine(f"/sys/block/{shortDevice}/removable", source=MODULE_NAME)
-					eventData["SORT"] = 0 if ("pci" in eventData["DEVPATH"] or "ahci" in eventData["DEVPATH"]) and removable == "0" else 1
+					internal = ("pci" in eventData["DEVPATH"] or "ahci" in eventData["DEVPATH"])
+					if internal and removable == "1":  # This is probably a driver bug
+						for physdevprefix, pdescription in list(getDeviceDB().items()):
+							if eventData["DEVPATH"].startswith(physdevprefix) and "SATA" in pdescription:
+								removable = "0"  # Force removable to 0 if SATA
+						if removable == "1":
+							print("[Harddisk] Warning! internal and removable = 1")
+					eventData["SORT"] = 0 if internal or removable == "0" else 1
 					devices.append(eventData)
 				remove(fileName)
 
@@ -807,7 +814,7 @@ class HarddiskManager:
 		hwdescription = ""
 		for physdevprefix, pdescription in list(getDeviceDB().items()):
 			if phys.startswith(physdevprefix):
-				hwdescription = pdescription
+				hwdescription = _(pdescription)
 
 		label = fileReadLine(f"/dev/label/{dev}", default="", source=MODULE_NAME)
 		if label:

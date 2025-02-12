@@ -138,7 +138,7 @@ class AutoDiseqc(ConfigListScreen, Screen):
 			eDVBFrontendParametersSatellite.Inversion_Off,
 			235,
 			eDVBFrontendParametersSatellite.System_DVB_S,
-			eDVBFrontendParametersSatellite.Modulation_Auto,
+			eDVBFrontendParametersSatellite.Modulation_QPSK,
 			eDVBFrontendParametersSatellite.RollOff_auto,
 			eDVBFrontendParametersSatellite.Pilot_Unknown,
 			eDVBFrontendParametersSatellite.No_Stream_Id_Filter,

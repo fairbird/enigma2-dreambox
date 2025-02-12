@@ -27,7 +27,7 @@
 
 #include <dvbsi++/ca_program_map_section.h>
 
-char* eDVBCISlot::readInputCI(int tuner_no)
+char* eDVBCISlot::readInputCI(int NimNumber)
 {
 	char id1[] = "NIM Socket";
 	char id2[] = "Input_Name";
@@ -48,7 +48,7 @@ char* eDVBCISlot::readInputCI(int tuner_no)
 
 			p += strlen(id1);
 			p += strcspn(p, keys1);
-			if (*p && strtol(p, 0, 0) == tuner_no)
+			if (*p && strtol(p, 0, 0) == NimNumber)
 				break;
 		}
 
@@ -81,11 +81,27 @@ char* eDVBCISlot::readInputCI(int tuner_no)
 	return inputName;
 }
 
-std::string eDVBCISlot::getTunerLetterDM(int tuner_no)
+std::string eDVBCISlot::getTunerLetterDM(int NimNumber)
 {
-	char *srcCI = readInputCI(tuner_no);
-	if (srcCI) return std::string(srcCI);
-	return eDVBCISlot::getTunerLetter(tuner_no);
+	char *srcCI = readInputCI(NimNumber);
+	if (srcCI)
+	{
+		std::string ret = std::string(srcCI);
+		free(srcCI);
+#ifdef HAVE_DM_FBC
+		if (ret.size() == 1)
+		{
+			int corr = 1;
+			if (NimNumber > 7)
+			{
+				corr = -7;
+			}
+			return ret + std::to_string(NimNumber + corr);
+		}
+#endif	
+		return ret;
+	}
+	return eDVBCISlot::getTunerLetter(NimNumber);
 }
 
 eDVBCIInterfaces *eDVBCIInterfaces::instance = 0;

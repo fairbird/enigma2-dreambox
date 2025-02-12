@@ -64,7 +64,7 @@ config.skin.FallbackFont = ConfigSelection(default="fallback.font", choices=[("f
 config.skin.autorefresh = ConfigEnableDisable(default=False)
 currentPrimarySkin = None
 currentDisplaySkin = None
-callbacks = []
+onLoadCallbacks = []
 runCallbacks = False
 
 
@@ -81,7 +81,7 @@ runCallbacks = False
 # E.g. "MySkin/skin_display.xml"
 #
 def InitSkins():
-	global currentPrimarySkin, currentDisplaySkin, resolutions
+	global currentPrimarySkin, currentDisplaySkin, resolutions, runCallbacks
 	# #################################################################################################
 	if isfile("/etc/.restore_skins"):
 		unlink("/etc/.restore_skins")
@@ -101,7 +101,6 @@ def InitSkins():
 			except Exception as err:
 				print(f"[Skin] RESTORE_SKIN: Error occurred!  ({err})")
 	# #################################################################################################
-	runCallbacks = False
 	# Add the emergency skin.  This skin should provide enough functionality
 	# to enable basic GUI functions to work.
 	loadSkin(EMERGENCY_SKIN, scope=SCOPE_GUISKIN, desktop=getDesktop(GUI_SKIN_ID), screenID=GUI_SKIN_ID)
@@ -151,7 +150,11 @@ def InitSkins():
 	if resolution[0] and resolution[1]:
 		gMainDC.getInstance().setResolution(resolution[0], resolution[1])
 		getDesktop(GUI_SKIN_ID).resize(eSize(resolution[0], resolution[1]))
-	runCallbacks = True
+	if not runCallbacks:
+		runCallbacks = True
+		for method in onLoadCallbacks:
+			if callable(method):
+				method()
 	# Load all XML templates.
 	reloadSkinTemplates()
 
@@ -193,16 +196,12 @@ def loadSkin(filename, scope=SCOPE_SKINS, desktop=getDesktop(GUI_SKIN_ID), scree
 						print(f"[Skin] This skin has a windowstyle for screen ID='{scrnID}'.")
 			# Element is not a screen or windowstyle element so no need for it any longer.
 		print(f"[Skin] Loading skin file '{filename}' complete.")
-		if runCallbacks:
-			for method in callbacks:
-				if method:
-					method()
 		return True
 	return False
 
 
 def reloadSkins():
-	global colors, domScreens, fonts, menus, parameters, setups, switchPixmap
+	global colors, domScreens, fonts, menus, menuicons, parameters, screens, setups, switchPixmap
 	domScreens.clear()
 	colors.clear()
 	colors = {
@@ -264,15 +263,13 @@ def reloadSkinTemplates(clear=False):
 
 
 def addCallback(callback):
-	global callbacks
-	if callback not in callbacks:
-		callbacks.append(callback)
+	if callback not in onLoadCallbacks:
+		onLoadCallbacks.append(callback)
 
 
 def removeCallback(callback):
-	global callbacks
-	if callback in callbacks:
-		callbacks.remove(callback)
+	if callback in onLoadCallbacks:
+		onLoadCallbacks.remove(callback)
 
 
 def getParentSize(object, desktop):
@@ -1942,7 +1939,7 @@ class TemplateParser():
 	def collectColors(self, attributes, widgetColors=None):
 		if widgetColors is None:
 			widgetColors = ()
-		for color in ("backgroundColor", "backgroundColorMarked", "backgroundColorMarkedAndSelected", "backgroundColorSelected", "borderColor", "foregroundColor", "foregroundColorMarked", "foregroundColorMarkedAndSelected", "foregroundColorSelected") + widgetColors:
+		for color in ("backgroundColor", "backgroundColorMarked", "backgroundColorMarkedAndSelected", "backgroundColorSelected", "borderColor", "borderColorSelected", "foregroundColor", "foregroundColorMarked", "foregroundColorMarkedAndSelected", "foregroundColorSelected") + widgetColors:
 			translatedColor = self.resolveColor(attributes.get(color))
 			if translatedColor is not None:
 				attributes[color] = translatedColor
@@ -1995,6 +1992,9 @@ class TemplateParser():
 			return []
 		if itemIndex and excludeItemIndexes and itemIndex in excludeItemIndexes:
 			return []
+		if pos == "fill":
+			pos = "0,0"
+			size = f"{context.w},{context.h}"
 		if pos is not None:
 			pos, size = context.parse(pos, size, None)
 			skinAttributes.append(("position", pos))
@@ -2021,7 +2021,11 @@ class TemplateParser():
 			print(f"[TemplateParser] processPanel DEBUG: Position={widget.attrib.get("position")}, Size={widget.attrib.get("size")}.")
 			print(f"[TemplateParser] processPanel DEBUG: Parent x={context.x}, width={context.w}.")
 		position = widget.attrib.get("position")
-		if "left" in position or "right" in position:
+		if position == "fill":
+			position = [0, 0]
+			widget.attrib["position"] = "0,0"
+			widget.attrib["size"] = f"{context.w},{context.h}"
+		elif "left" in position or "right" in position:
 			pos = position.split(",")
 			top = 0
 			if len(pos) == 2 and pos[0] in ("left", "right") and pos[1].isdigit():
@@ -2241,7 +2245,8 @@ def readSkin(screen, skin, names, desktop):
 					args = {
 						"scale": context.scale,
 						"dom": widgetTemplates,
-						"size": widget.attrib.get("size")
+						"itemHeight": int(widget.attrib.get("itemHeight", 0)),
+						"itemWidth": int(widget.attrib.get("itemWidth", 0))
 					}
 					connection = converterClass(args)
 					connection.connect(source)

@@ -11,6 +11,9 @@ dist_install_DATA =     ask.png \
     dmm_logo.png \
     dish_scan.png \
     dish.png \
+    dev_usbstick.png \
+    dev_mmc.png \
+    dev_hdd.png \
     DVI.png \
     epgclock_add.png \
     epgclock_autotimer.png \

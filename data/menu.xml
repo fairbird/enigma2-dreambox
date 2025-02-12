@@ -45,12 +45,17 @@
 				<menu key="update" weight="0" level="0" text="Check update Settings">
 					<item key="check_update" level="0"><setup id="checkupdate"/></item>
 				</menu>
-				<menu key="video" level="0" text="Audio &amp; Video">
-					<item key="av_setup" level="0"><setup id="avsetup"/></item>
-					<item key="subtitle_setup" level="2" text="Subtitle Setup" weight="20"><setup id="subtitlesetup" /></item>
-					<item key="autolanguage_setup" level="0" text="Auto Language Setup"><setup id="autolanguagesetup"/></item>
-					<item key="osdsetup" level="1" text="OSD Calibration" weight="50" requires="OSDCalibration"><screen module="OSDCalibration" screen="OSDCalibration" /></item>
-					<item key="setup_osd3d" level="2" text="OSD 3D Settings" weight="60" requires="OSD3DCalibration"><screen module="OSDCalibration" screen="OSD3DCalibration" /></item>
+				<menu key="Audio/Video" level="0" text="Audio &amp; Video">
+					<menu key="video" level="0" text="Video Settings">
+						<item key="av_setup" text="Video Setup" level="0"><setup id="video_setup"/></item>
+						<item key="osdsetup" level="1" text="OSD Calibration" weight="50" requires="OSDCalibration"><screen module="OSDCalibration" screen="OSDCalibration" /></item>
+						<item key="setup_osd3d" level="2" text="OSD 3D Settings" weight="60" requires="OSD3DCalibration"><screen module="OSDCalibration" screen="OSD3DCalibration" /></item>
+					</menu>
+					<menu key="audio" level="1" text="Audio Settings">
+						<item key="au_setup" text="Audio Setup" level="0"><setup id="audio_setup"/></item>
+						<item key="subtitle_setup" level="2" text="Subtitle Setup"><setup id="subtitlesetup" /></item>
+						<item key="autolanguage_setup" level="1" text="Auto Language Setup"><setup id="autolanguagesetup"/></item>
+					</menu>
 				</menu>
 				<menu key="gui" level="0" text="GUI Settings">
 					<item key="locale_setup" level="0" text="Locale / Language Settings"><screen module="LocaleSelection"/></item>

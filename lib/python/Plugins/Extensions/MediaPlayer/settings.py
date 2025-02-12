@@ -1,19 +1,27 @@
 # -*- coding: utf-8 -*-
-from Screens.Screen import Screen
 from Components.FileList import FileList
 from Components.Sources.StaticText import StaticText
-from Components.MediaPlayer import PlayList
-from Components.config import config, ConfigYesNo, ConfigDirectory
-from Components.ConfigList import ConfigListScreen
+from Components.config import config, ConfigSubsection, ConfigText, ConfigYesNo, ConfigDirectory, NoSave
 from Components.ActionMap import ActionMap
+from Screens.Screen import Screen
+from Screens.Setup import Setup
 
-config.mediaplayer.repeat = ConfigYesNo(default=False)
-config.mediaplayer.savePlaylistOnExit = ConfigYesNo(default=True)
-config.mediaplayer.saveDirOnExit = ConfigYesNo(default=False)
-config.mediaplayer.defaultDir = ConfigDirectory()
-config.mediaplayer.sortPlaylists = ConfigYesNo(default=False)
-config.mediaplayer.alwaysHideInfoBar = ConfigYesNo(default=True)
-config.mediaplayer.onMainMenu = ConfigYesNo(default=False)
+
+def Load_defaults():
+	config.mediaplayer = ConfigSubsection()
+	config.mediaplayer.repeat = ConfigYesNo(default=False)
+	config.mediaplayer.savePlaylistOnExit = ConfigYesNo(default=True)
+	config.mediaplayer.saveDirOnExit = ConfigYesNo(default=False)
+	config.mediaplayer.defaultDir = ConfigDirectory()
+	config.mediaplayer.sortPlaylists = ConfigYesNo(default=False)
+	config.mediaplayer.alwaysHideInfoBar = ConfigYesNo(default=True)
+	config.mediaplayer.onMainMenu = ConfigYesNo(default=False)
+
+	config.mediaplayer.useAlternateUserAgent = NoSave(ConfigYesNo(default=False))
+	config.mediaplayer.alternateUserAgent = NoSave(ConfigText(default="HbbTV/1.1.1 (+PVR+RTSP+DL; Sonic; TV44; 1.32.455; 2.002) Bee/3.5"))
+
+
+Load_defaults()
 
 
 class DirectoryBrowser(Screen):
@@ -22,7 +30,6 @@ class DirectoryBrowser(Screen):
 		Screen.__init__(self, session, enableHelp=True)
 		# for the skin: first try MediaPlayerDirectoryBrowser, then FileBrowser, this allows individual skinning
 		self.skinName = ["MediaPlayerDirectoryBrowser", "FileBrowser"]
-		self.setTitle(_("Directory browser"))
 
 		self["key_red"] = StaticText(_("Cancel"))
 		self["key_green"] = StaticText(_("Use"))
@@ -37,6 +44,10 @@ class DirectoryBrowser(Screen):
 				"ok": self.ok,
 				"cancel": self.exit
 			})
+		self.onLayoutFinish.append(self.layoutFinished)
+
+	def layoutFinished(self):
+		self.setTitle(_("Directory browser"))
 
 	def ok(self):
 		if self.filelist.canDescent():
@@ -48,53 +59,29 @@ class DirectoryBrowser(Screen):
 				self.filelist.descent()
 				self.close(self["filelist"].getCurrentDirectory())
 		else:
-				self.close(self["filelist"].getFilename())
+			self.close(self["filelist"].getFilename())
 
 	def exit(self):
 		self.close(False)
 
 
-class MediaPlayerSettings(ConfigListScreen, Screen):
-
+class MediaPlayerSetup(Setup):
 	def __init__(self, session, parent):
-		Screen.__init__(self, session)
-		# for the skin: first try MediaPlayerSettings, then Setup, this allows individual skinning
-		self.skinName = ["MediaPlayerSettings", "Setup"]
-		self.setTitle(_("Edit settings"))
-
-		ConfigListScreen.__init__(self, [], session, fullUI=True)
+		Setup.__init__(self, session, setup="MediaPlayer", plugin="Extensions/MediaPlayer")
 		self.parent = parent
-		self.initConfigList()
-		config.mediaplayer.saveDirOnExit.addNotifier(self.initConfigList)
 
-		self["setupActions"] = ActionMap(["SetupActions"],
-		{
-			"ok": self.ok,
-		}, -2)
-
-	def initConfigList(self, element=None):
-		print("[initConfigList]", element)
-		try:
-			self.list = []
-			self.list.append((_("Repeat playlist"), config.mediaplayer.repeat))
-			self.list.append((_("Save playlist on exit"), config.mediaplayer.savePlaylistOnExit))
-			self.list.append((_("Save last directory on exit"), config.mediaplayer.saveDirOnExit))
-			if not config.mediaplayer.saveDirOnExit.getValue():
-				self.list.append((_("Start directory"), config.mediaplayer.defaultDir))
-			self.list.append((_("Sorting of playlists"), config.mediaplayer.sortPlaylists))
-			self.list.append((_("Always hide infobar"), config.mediaplayer.alwaysHideInfoBar))
-			self.list.append((_("Show media player on main menu"), config.mediaplayer.onMainMenu))
-			self["config"].setList(self.list)
-		except KeyError:
-			print("keyError")
-
-	def ok(self):
+	def keySelect(self):
 		if self["config"].getCurrent()[1] == config.mediaplayer.defaultDir:
 			self.session.openWithCallback(self.DirectoryBrowserClosed, DirectoryBrowser, self.parent.filelist.getCurrentDirectory())
-		else:
-			self.keySave()
+			return
+		Setup.keySelect(self)
+
+	def keySave(self):
+		if config.mediaplayer.defaultDir.value == "None":
+			config.mediaplayer.defaultDir.value = ""
+		Setup.keySave(self)
 
 	def DirectoryBrowserClosed(self, path):
 		print("PathBrowserClosed:" + str(path))
-		if path != False:
+		if path:
 			config.mediaplayer.defaultDir.setValue(path)

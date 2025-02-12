@@ -282,9 +282,15 @@ class EPGSelection(Screen):
 		service = cur[1]
 		if event is not None:
 			if self.type != EPG_TYPE_SIMILAR:
-				self.session.open(EventViewSimple, event, service, self.eventViewCallback, self.openSimilarList, parent=self.parent)
+				try:
+					self.session.open(EventViewSimple, event, service, self.eventViewCallback, self.openSimilarList, parent=self.parent)
+				except:
+					self.session.open(EventViewSimple, event, service, self.eventViewCallback, self.openSimilarList)
 			else:
-				self.session.open(EventViewSimple, event, service, self.eventViewCallback, parent=self.parent)
+				try:
+					self.session.open(EventViewSimple, event, service, self.eventViewCallback, parent=self.parent)
+				except:
+					self.session.open(EventViewSimple, event, service, self.eventViewCallback)
 
 	def openSimilarList(self, eventid, refstr):
 		self.session.open(EPGSelection, refstr, None, eventid)

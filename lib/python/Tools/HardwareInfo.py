@@ -4,7 +4,6 @@ from Tools.Directories import fileReadLine
 
 MODULE_NAME = __name__.split(".")[-1]
 hw_info = None
-model = BoxInfo.getItem("model")
 
 
 class HardwareInfo:
@@ -20,14 +19,20 @@ class HardwareInfo:
 		if hw_info:
 			return
 		hw_info = self
+
+		# Version
 		self.device_version = fileReadLine("/proc/stb/info/version", "", source=MODULE_NAME).strip()
+		# Revision
 		self.device_revision = fileReadLine("/proc/stb/info/board_revision", "", source=MODULE_NAME).strip()
-		self.device_name = model
+		# Name ... bit odd, but history prevails
+		self.device_name = fileReadLine("/proc/stb/info/model", "", source=MODULE_NAME).strip()
+
+		# standard values
+		self.machine_name = BoxInfo.getItem("machinebuild") # This contains the value where the image is buld from
+		self.device_model = BoxInfo.getItem("model") # This may contain more information about the specific model
 		self.device_brandname = BoxInfo.getItem("brand")
-		self.device_model = model
-		self.device_model = self.device_model or self.device_name
-		self.device_hw = self.device_model
-		self.machine_name = self.device_model
+		self.device_hw = BoxInfo.getItem("displaymodel")
+
 		if self.device_revision:
 			self.device_string = "%s (%s-%s)" % (self.device_hw, self.device_revision, self.device_version)
 		elif self.device_version:

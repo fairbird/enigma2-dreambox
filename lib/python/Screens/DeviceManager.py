@@ -75,6 +75,8 @@ class StorageDeviceAction(Setup):
 	ACTION_WIPE = 4
 	ACTION_FORMAT = 5
 	ACTION_LABEL = 6
+	ACTION_IGNORE = 7
+	ACTION_ACTIVATE = 8
 
 	def __init__(self, session, storageDevice, action, actionText):
 		self.storageDevice = storageDevice
@@ -298,7 +300,7 @@ class StorageDeviceManager():
 				unknownList.append(deviceData)
 		if config.crash.debugStorage.value:
 			print(f"[DeviceManager] DEBUG deviceList:\n{deviceList}\nunknownList:\n{unknownList}")
-		return deviceList, unknownList
+		return deviceList, unknownList if config.usage.showUnknownDevices.value else []
 
 	def createDevice(self, device, isPartition, mounts, swapDevices, partitions, knownDevices, fstab):
 		def getDeviceTypeModel():
@@ -321,7 +323,7 @@ class StorageDeviceManager():
 		deviceLocation = ""
 		for physdevprefix, pdescription in list(getDeviceDB().items()):
 			if physdev.startswith(physdevprefix):
-				deviceLocation = pdescription
+				deviceLocation = _(pdescription)
 
 		deviceMounts = []
 		mounts = [x for x in mounts if EXPANDER_MOUNT not in x[1]]
@@ -396,10 +398,12 @@ class StorageDeviceManager():
 							fstabMountPoint = fstabData[0]
 
 			description = []
-			if not isPartition:
+			if isPartition:
+				description.append(f"{_("Mount point")}: {mountP}\t{_("File system")}: {fsType}")
+			else:
 				description.append(f"{_("Path")}: {physdev}")
-			if deviceLocation:
-				description.append(f"{_("Position")}: {deviceLocation}")
+				if deviceLocation:
+					description.append(f"{_("Position")}: {deviceLocation}")
 			description = "\n".join(description)
 			deviceData = {
 				"name": model,
@@ -451,7 +455,7 @@ class DeviceManager(Screen):
 
 	MOUNT = "/bin/mount"
 	UMOUNT = "/bin/umount"
-	SWAPON = "/sbin/swapom"
+	SWAPON = "/sbin/swapon"
 	SWAPOFF = "/sbin/swapoff"
 
 	LIST_SELECTION = 0
@@ -503,26 +507,26 @@ class DeviceManager(Screen):
 			<widget source="global.CurrentTime" render="Label" position="820,66" size="240,30" font="Regular;20" noWrap="1" halign="right" valign="bottom" foregroundColor="#00FFFFFF" backgroundColor="#1A0F0F0F" transparent="1">
 				<convert type="ClockToText">Format:%e. %B</convert>
 			</widget>
-			<ePixmap pixmap="buttons/key_red2.png" position="53,645" size="45,45" alphatest="blend" objectTypes="key_red,Button,Label" transparent="1" />
-			<widget source="key_red" render="Pixmap" pixmap="buttons/key_red2.png" position="53,645" size="45,45" alphatest="blend" objectTypes="key_red,StaticText" transparent="1">
+			<ePixmap pixmap="buttons/key_red3.png" position="53,645" size="45,45" alphatest="blend" objectTypes="key_red,Button,Label" transparent="1" />
+			<widget source="key_red" render="Pixmap" pixmap="buttons/key_red3.png" position="53,645" size="45,45" alphatest="blend" objectTypes="key_red,StaticText" transparent="1">
 			<convert type="ConditionalShowHide" />
 			</widget>
 			<widget name="key_red" position="105,647" size="200,35" noWrap="1" zPosition="+1" valign="center" font="Regular;28" halign="left" backgroundColor="#1A0F0F0F" foregroundColor="#00FFFFFF" objectTypes="key_red,Button,Label" transparent="1" />
 			<widget source="key_red" render="Label" position="105,647" size="200,35" noWrap="1" zPosition="+1" valign="center" font="Regular;28" halign="left" backgroundColor="#1A0F0F0F" foregroundColor="#00FFFFFF" objectTypes="key_red,StaticText" transparent="1" />
-			<ePixmap pixmap="buttons/key_green2.png" position="327,645" size="45,45" alphatest="blend" objectTypes="key_green,Button,Label" transparent="1" />
-			<widget source="key_green" render="Pixmap" pixmap="buttons/key_green2.png" position="327,645" size="45,45" alphatest="blend" objectTypes="key_green,StaticText" transparent="1">
+			<ePixmap pixmap="buttons/key_green3.png" position="327,645" size="45,45" alphatest="blend" objectTypes="key_green,Button,Label" transparent="1" />
+			<widget source="key_green" render="Pixmap" pixmap="buttons/key_green3.png" position="327,645" size="45,45" alphatest="blend" objectTypes="key_green,StaticText" transparent="1">
 				<convert type="ConditionalShowHide" />
 			</widget>
 			<widget name="key_green" position="380,647" size="200,40" noWrap="1" zPosition="+1" valign="center" font="Regular;28" halign="left" backgroundColor="#1A0F0F0F" foregroundColor="#00FFFFFF" objectTypes="key_green,Button,Label" transparent="1" />
 			<widget source="key_green" render="Label" position="380,647" size="200,40" noWrap="1" zPosition="+1" valign="center" font="Regular;28" halign="left" backgroundColor="#1A0F0F0F" foregroundColor="#00FFFFFF" objectTypes="key_green,StaticText" transparent="1" />
-			<ePixmap pixmap="buttons/key_yellow2.png" position="602,645" size="45,45" alphatest="blend" objectTypes="key_yellow,Button,Label" transparent="1" />
-			<widget source="key_yellow" render="Pixmap" pixmap="buttons/key_yellow2.png" position="602,645" size="45,45" alphatest="blend" objectTypes="key_yellow,StaticText" transparent="1">
+			<ePixmap pixmap="buttons/key_yellow3.png" position="602,645" size="45,45" alphatest="blend" objectTypes="key_yellow,Button,Label" transparent="1" />
+			<widget source="key_yellow" render="Pixmap" pixmap="buttons/key_yellow3.png" position="602,645" size="45,45" alphatest="blend" objectTypes="key_yellow,StaticText" transparent="1">
 				<convert type="ConditionalShowHide" />
 			</widget>
 			<widget name="key_yellow" position="654,647" size="200,40" noWrap="1" zPosition="+1" valign="center" font="Regular;28" halign="left" backgroundColor="#1A0F0F0F" foregroundColor="#00FFFFFF" objectTypes="key_yellow,Button,Label" transparent="1" />
 			<widget source="key_yellow" render="Label" position="654,647" size="200,40" noWrap="1" zPosition="+1" valign="center" font="Regular;28" halign="left" backgroundColor="#1A0F0F0F" foregroundColor="#00FFFFFF" objectTypes="key_yellow,StaticText" transparent="1" />
-			<ePixmap pixmap="buttons/key_blue2.png" position="876,645" size="45,45" alphatest="blend" objectTypes="key_blue,Button,Label" transparent="1" />
-			<widget source="key_blue" render="Pixmap" pixmap="buttons/key_blue2.png" position="876,645" size="45,45" alphatest="blend" objectTypes="key_blue,StaticText" transparent="1">
+			<ePixmap pixmap="buttons/key_blue3.png" position="876,645" size="45,45" alphatest="blend" objectTypes="key_blue,Button,Label" transparent="1" />
+			<widget source="key_blue" render="Pixmap" pixmap="buttons/key_blue3.png" position="876,645" size="45,45" alphatest="blend" objectTypes="key_blue,StaticText" transparent="1">
 				<convert type="ConditionalShowHide" />
 			</widget>
 			<widget name="key_blue" position="929,647" size="200,40" noWrap="1" zPosition="+1" valign="center" font="Regular;28" halign="left" backgroundColor="#1A0F0F0F" foregroundColor="#00FFFFFF" objectTypes="key_blue,Button,Label" transparent="1" />
@@ -557,26 +561,26 @@ class DeviceManager(Screen):
 			<widget source="global.CurrentTime" render="Label" position="1400,81" size="240,41" font="Regular;24" noWrap="1" halign="right" valign="bottom" foregroundColor="#00FFFFFF" backgroundColor="#1A0F0F0F" transparent="1">
 				<convert type="ClockToText">Format:%e. %B</convert>
 			</widget>
-			<ePixmap pixmap="buttons/key_red2.png" position="53,953" size="45,45" alphatest="blend" objectTypes="key_red,Button,Label" transparent="1" />
-			<widget source="key_red" render="Pixmap" pixmap="buttons/key_red2.png" position="53,953" size="45,45" alphatest="blend" objectTypes="key_red,StaticText" transparent="1">
+			<ePixmap pixmap="buttons/key_red3.png" position="53,953" size="45,45" alphatest="blend" objectTypes="key_red,Button,Label" transparent="1" />
+			<widget source="key_red" render="Pixmap" pixmap="buttons/key_red3.png" position="53,953" size="45,45" alphatest="blend" objectTypes="key_red,StaticText" transparent="1">
 			<convert type="ConditionalShowHide" />
 			</widget>
 			<widget name="key_red" position="105,957" size="255,45" noWrap="1" zPosition="+1" valign="center" font="Regular;30" halign="left" backgroundColor="#1A0F0F0F" foregroundColor="#00FFFFFF" objectTypes="key_red,Button,Label" transparent="1" />
 			<widget source="key_red" render="Label" position="105,957" size="255,45" noWrap="1" zPosition="+1" valign="center" font="Regular;30" halign="left" backgroundColor="#1A0F0F0F" foregroundColor="#00FFFFFF" objectTypes="key_red,StaticText" transparent="1" />
-			<ePixmap pixmap="buttons/key_green2.png" position="327,953" size="45,45" alphatest="blend" objectTypes="key_green,Button,Label" transparent="1" />
-			<widget source="key_green" render="Pixmap" pixmap="buttons/key_green2.png" position="327,953" size="45,45" alphatest="blend" objectTypes="key_green,StaticText" transparent="1">
+			<ePixmap pixmap="buttons/key_green3.png" position="327,953" size="45,45" alphatest="blend" objectTypes="key_green,Button,Label" transparent="1" />
+			<widget source="key_green" render="Pixmap" pixmap="buttons/key_green3.png" position="327,953" size="45,45" alphatest="blend" objectTypes="key_green,StaticText" transparent="1">
 				<convert type="ConditionalShowHide" />
 			</widget>
 			<widget name="key_green" position="380,957" size="255,45" noWrap="1" zPosition="+1" valign="center" font="Regular;30" halign="left" backgroundColor="#1A0F0F0F" foregroundColor="#00FFFFFF" objectTypes="key_green,Button,Label" transparent="1" />
 			<widget source="key_green" render="Label" position="380,957" size="255,45" noWrap="1" zPosition="+1" valign="center" font="Regular;30" halign="left" backgroundColor="#1A0F0F0F" foregroundColor="#00FFFFFF" objectTypes="key_green,StaticText" transparent="1" />
-			<ePixmap pixmap="buttons/key_yellow2.png" position="602,953" size="45,45" alphatest="blend" objectTypes="key_yellow,Button,Label" transparent="1" />
-			<widget source="key_yellow" render="Pixmap" pixmap="buttons/key_yellow2.png" position="602,953" size="45,45" alphatest="blend" objectTypes="key_yellow,StaticText" transparent="1">
+			<ePixmap pixmap="buttons/key_yellow3.png" position="602,953" size="45,45" alphatest="blend" objectTypes="key_yellow,Button,Label" transparent="1" />
+			<widget source="key_yellow" render="Pixmap" pixmap="buttons/key_yellow3.png" position="602,953" size="45,45" alphatest="blend" objectTypes="key_yellow,StaticText" transparent="1">
 				<convert type="ConditionalShowHide" />
 			</widget>
 			<widget name="key_yellow" position="654,957" size="255,45" noWrap="1" zPosition="+1" valign="center" font="Regular;30" halign="left" backgroundColor="#1A0F0F0F" foregroundColor="#00FFFFFF" objectTypes="key_yellow,Button,Label" transparent="1" />
 			<widget source="key_yellow" render="Label" position="654,957" size="255,45" noWrap="1" zPosition="+1" valign="center" font="Regular;30" halign="left" backgroundColor="#1A0F0F0F" foregroundColor="#00FFFFFF" objectTypes="key_yellow,StaticText" transparent="1" />
-			<ePixmap pixmap="buttons/key_blue2.png" position="876,953" size="45,45" alphatest="blend" objectTypes="key_blue,Button,Label" transparent="1" />
-			<widget source="key_blue" render="Pixmap" pixmap="buttons/key_blue2.png" position="876,953" size="45,45" alphatest="blend" objectTypes="key_blue,StaticText" transparent="1">
+			<ePixmap pixmap="buttons/key_blue3.png" position="876,953" size="45,45" alphatest="blend" objectTypes="key_blue,Button,Label" transparent="1" />
+			<widget source="key_blue" render="Pixmap" pixmap="buttons/key_blue3.png" position="876,953" size="45,45" alphatest="blend" objectTypes="key_blue,StaticText" transparent="1">
 				<convert type="ConditionalShowHide" />
 			</widget>
 			<widget name="key_blue" position="929,957" size="255,45" noWrap="1" zPosition="+1" valign="center" font="Regular;30" halign="left" backgroundColor="#1A0F0F0F" foregroundColor="#00FFFFFF" objectTypes="key_blue,Button,Label" transparent="1" />
@@ -613,7 +617,9 @@ class DeviceManager(Screen):
 			"menu": (self.keyMenu, _("Hard Disk Settings")),
 			"red": (self.close, _("Close the Device Manager screen")),
 			"green": (self.keyActions, _("Select an action for the current device")),
-			"yellow": (self.keyMountPoints, _("Select a permanent mount point for all devices")),
+			"yellow": (self.keyMountPoints, _("Select a permanent mount point for all devices"))
+		}, prio=0, description=_("Device Manager Actions"))
+		self["blueActions"] = HelpableActionMap(self, ["ColorActions"], {
 			"blue": (self.keyBlue, _("Toggle a temporary mount for the current device"))
 		}, prio=0, description=_("Device Manager Actions"))
 		self.needReboot = False
@@ -692,21 +698,22 @@ class DeviceManager(Screen):
 					description = ""
 				self["key_green"].setText(_("Action"))
 				if storageDevice.get("FlashExpander"):
-					self["key_blue"].setText("")
+					blueText = ""
 				elif storageDevice.get("fsType") == "swap":
-					self["key_blue"].setText(_("Off") if storageDevice.get("swapState") else _("On"))
+					blueText = _("Off") if storageDevice.get("swapState") else _("On")
 				elif storageDevice.get("isPartition"):
-					if storageDevice.get("fstabMountPoint"):
-						self["key_blue"].setText("")
-					elif ":None" in storageDevice.get("knownDevice"):
-						self["key_blue"].setText(_("Activate"))
+					if storageDevice.get("fstabMountPoint") or ":None" in storageDevice.get("knownDevice"):
+						blueText = ""
 					else:
-						self["key_blue"].setText(_("Unmount") if storageDevice.get("isMounted") else _("Mount"))
+						blueText = _("Unmount") if storageDevice.get("isMounted") else _("Mount")
 				elif storageDevice.get("isUnknown"):
-					self["key_blue"].setText("")
+					blueText = ""
 					self["key_green"].setText(_("Remove"))
 				else:
-					self["key_blue"].setText("")
+					blueText = ""
+
+				self["blueActions"].setEnabled(blueText != "")
+				self["key_blue"].setText(blueText)
 
 				for callback in self.onChangedEntry:
 					if callback and callable(callback):
@@ -782,6 +789,7 @@ class DeviceManager(Screen):
 		current = self["devicelist"].getCurrent()
 		if current:
 			storageDevice = current[self.LIST_DATA]
+			knownDevice = storageDevice.get("knownDevice")
 			if storageDevice.get("fsType") == "swap":
 				def swapCallback(data, retVal, extraArgs):
 					if retVal:
@@ -791,29 +799,22 @@ class DeviceManager(Screen):
 					self.updateDevices()
 				command = self.SWAPOFF if storageDevice.get("swapState") else self.SWAPON
 				self.console.ePopen([command, command, storageDevice.get("devicePoint")], swapCallback)
-			elif storageDevice.get("isPartition") and not storageDevice.get("fstabMountPoint"):
-				knownDevice = storageDevice.get("knownDevice")
-				if ":None" in knownDevice:
-					knownDevices = fileReadLines("/etc/udev/known_devices", [], source=MODULE_NAME)
-					if knownDevice in knownDevices:
-						knownDevices.remove(knownDevice)
-					fileWriteLines("/etc/udev/known_devices", knownDevices, source=MODULE_NAME)
+			elif storageDevice.get("isPartition") and not (storageDevice.get("fstabMountPoint") or ":None" in knownDevice):
+				devicePoint = storageDevice.get("devicePoint")
+				if storageDevice.get("isMounted"):
+					self.console.ePopen([self.UMOUNT, self.UMOUNT, storageDevice.get("mountPoint")])
+					mounts = getProcMountsNew()
+					for parts in mounts:
+						if parts[1] == storageDevice.get("mountPoint"):
+							self.session.open(MessageBox, _("Can't unmount partition, make sure it is not being used for swap or record/time shift paths"), MessageBox.TYPE_INFO)
+					cleanMediaDirs()
 				else:
-					devicePoint = storageDevice.get("devicePoint")
-					if storageDevice.get("isMounted"):
-						self.console.ePopen([self.UMOUNT, self.UMOUNT, storageDevice.get("mountPoint")])
-						mounts = getProcMountsNew()
-						for parts in mounts:
-							if parts[1] == storageDevice.get("mountPoint"):
-								self.session.open(MessageBox, _("Can't unmount partition, make sure it is not being used for swap or record/time shift paths"), MessageBox.TYPE_INFO)
-						cleanMediaDirs()
-					else:
-						title = _("Select the new mount point for: '%s'") % storageDevice.get("model")
-						fstab = fileReadLines("/etc/fstab", default=[], source=MODULE_NAME)
-						label = storageDevice.get("label")
-						device = storageDevice.get("device")
-						list = [(f"/media/{x}", f"/media/{x}") for x in self.storageDevices.getMountPoints(storageDevice.get("deviceType"), fstab, onlyPossible=True) + [device, label]]
-						self.session.openWithCallback(keyBlueCallback, ChoiceBox, list=list, keys=[], windowTitle=title)
+					title = _("Select the new mount point for: '%s'") % storageDevice.get("model")
+					fstab = fileReadLines("/etc/fstab", default=[], source=MODULE_NAME)
+					label = storageDevice.get("label")
+					device = storageDevice.get("device")
+					list = [(f"/media/{x}", f"/media/{x}") for x in self.storageDevices.getMountPoints(storageDevice.get("deviceType"), fstab, onlyPossible=True) + [device, label]]
+					self.session.openWithCallback(keyBlueCallback, ChoiceBox, list=list, keys=[], windowTitle=title)
 				self.updateDevices()
 
 	def updateDevices(self):
@@ -907,7 +908,18 @@ class DeviceManager(Screen):
 			self.currentAction = action
 			options = {"debug": True} if config.crash.debugStorage.value else {}
 			if action:
-				if action == StorageDeviceAction.ACTION_LABEL:
+				if action == StorageDeviceAction.ACTION_IGNORE:
+					knownDevices = fileReadLines("/etc/udev/known_devices", [], source=MODULE_NAME)
+					knownDevices = [item for item in knownDevices if storageDevice.UUID not in item]
+					knownDevices.append(f"{storageDevice.UUID}:None")
+					fileWriteLines("/etc/udev/known_devices", knownDevices, source=MODULE_NAME)
+					self.updateDevices()
+				elif action == StorageDeviceAction.ACTION_ACTIVATE:
+					knownDevices = fileReadLines("/etc/udev/known_devices", [], source=MODULE_NAME)
+					knownDevices = [item for item in knownDevices if storageDevice.UUID not in item]
+					fileWriteLines("/etc/udev/known_devices", knownDevices, source=MODULE_NAME)
+					self.updateDevices()
+				elif action == StorageDeviceAction.ACTION_LABEL:
 					self.session.openWithCallback(renameCallback, VirtualKeyBoard, title=_("Please enter the new name:"), text=storageDevice.label)
 				elif action in (StorageDeviceAction.ACTION_FORMAT, StorageDeviceAction.ACTION_INITIALIZE):
 					self.session.openWithCallback(keyActionsSetupCallback, StorageDeviceAction, storageDevice, action, _("Format Storage Device"))
@@ -965,6 +977,12 @@ class DeviceManager(Screen):
 					choiceList.append((_("Convert file system ext3 to ext4"), StorageDeviceAction.ACTION_EXT4CONVERSION))
 				if "ntfs" not in storageDevice.fsType and storageDevice.fsType in fileSystems:  # NTFS not supported yet becaue you need to unmount
 					choiceList.append((_("Rename"), StorageDeviceAction.ACTION_LABEL))
+
+				if storageDevice.UUID:
+					if ":None" in storageDevice.knownDevice:
+						choiceList.append((_("Activate this device"), StorageDeviceAction.ACTION_ACTIVATE))
+					else:
+						choiceList.append((_("Permanently ignore this device"), StorageDeviceAction.ACTION_IGNORE))
 			else:
 				choiceList = [
 					(_("Cancel"), 0),
@@ -1055,10 +1073,10 @@ class DeviceManagerMountPoints(Setup):
 			choiceList.append((devMount, devMount))
 			choiceList.append(("", "Custom"))
 			self.mountPoints.append(NoSave(ConfigSelection(default=defaultMountpoint, choices=choiceList)))
-			self.customMountPoints.append(NoSave(ConfigText()))
+			self.customMountPoints.append(NoSave(ConfigText(fixed_size=False)))
 			fileSystemChoices = [(x, x) for x in fileSystems]
 			self.fileSystems.append(NoSave(ConfigSelection(default=fileSystems[0], choices=fileSystemChoices)))
-			self.options.append(NoSave(ConfigText("defaults")))
+			self.options.append(NoSave(ConfigText(default="defaults", fixed_size=False)))
 
 		Setup.__init__(self, session=session, setup="DeviceManagerMountPoints")
 		self.setTitle(_("Select the mount points"))

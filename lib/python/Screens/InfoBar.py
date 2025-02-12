@@ -147,15 +147,96 @@ class InfoBar(InfoBarBase, InfoBarShowHide,
 		if service is None:
 			if ref and not self.session.nav.getCurrentlyPlayingServiceOrGroup():
 				self.session.nav.playService(ref)
-		elif type(service) is eServiceReference:
+		elif isinstance(service, bool) and service:
+			self.showMovies()
+		else:
 			from Components.ParentalControl import parentalControl
 			if parentalControl.isServicePlayable(service, self.openMoviePlayer):
 				self.openMoviePlayer(service)
-		elif service == True:
-			self.showMovies()
 
 	def openMoviePlayer(self, ref):
 		self.session.open(MoviePlayer, ref, slist=self.servicelist, lastservice=self.session.nav.getCurrentlyPlayingServiceOrGroup(), infobar=self)
+
+
+def setAudioTrack(service):
+	try:
+		from Tools.ISO639 import LanguageCodes as langC
+		tracks = service and service.audioTracks()
+		nTracks = tracks and tracks.getNumberOfTracks() or 0
+		if not nTracks:
+			return
+		idx = 0
+		trackList = []
+		for i in list(range(nTracks)):
+			audioInfo = tracks.getTrackInfo(i)
+			lang = audioInfo.getLanguage()
+			if lang in langC:
+				lang = langC[lang][0]
+			desc = audioInfo.getDescription()
+			track = idx, lang, desc
+			idx += 1
+			trackList += [track]
+		seltrack = tracks.getCurrentTrack()
+		# we need default selected language from image
+		# to set the audiotrack if "config.autolanguage.audio_autoselect...values" are not set
+		from Components.International import international
+		syslang = international.getLanguage()
+		syslang = langC[syslang][0]
+		if (config.autolanguage.audio_autoselect1.value or config.autolanguage.audio_autoselect2.value or config.autolanguage.audio_autoselect3.value or config.autolanguage.audio_autoselect4.value) != "---":
+			audiolang = [config.autolanguage.audio_autoselect1.value, config.autolanguage.audio_autoselect2.value, config.autolanguage.audio_autoselect3.value, config.autolanguage.audio_autoselect4.value]
+			caudiolang = True
+		else:
+			audiolang = syslang
+			caudiolang = False
+		useAc3 = config.autolanguage.audio_defaultac3.value
+		if useAc3:
+			matchedAc3 = tryAudioTrack(tracks, audiolang, caudiolang, trackList, seltrack, useAc3)
+			if matchedAc3:
+				return
+			matchedMpeg = tryAudioTrack(tracks, audiolang, caudiolang, trackList, seltrack, False)
+			if matchedMpeg:
+				return
+			tracks.selectTrack(0)    # fallback to track 1(0)
+			return
+		else:
+			matchedMpeg = tryAudioTrack(tracks, audiolang, caudiolang, trackList, seltrack, False)
+			if matchedMpeg:
+				return
+			matchedAc3 = tryAudioTrack(tracks, audiolang, caudiolang, trackList, seltrack, useAc3)
+			if matchedAc3:
+				return
+			tracks.selectTrack(0)    # fallback to track 1(0)
+	except Exception as e:
+		print("[MoviePlayer] audioTrack exception:\n" + str(e))
+
+
+def tryAudioTrack(tracks, audiolang, caudiolang, trackList, seltrack, useAc3):
+	for entry in audiolang:
+		if caudiolang:
+			# we need here more replacing for other language, or new configs with another list !!!
+			# choice gives only the value, never the description
+			# so we can also make some changes in "config.py" to get the description too, then we dont need replacing here !
+			entry = entry.replace('eng qaa Englisch', 'English').replace('deu ger', 'German')
+		for x in trackList:
+			if entry == x[1] and seltrack == x[0]:
+				if useAc3:
+					if x[2].startswith('AC'):
+						print("[MoviePlayer] audio track is current selected track: " + str(x))
+						return True
+				else:
+					print("[MoviePlayer] audio track is current selected track: " + str(x))
+					return True
+			elif entry == x[1] and seltrack != x[0]:
+				if useAc3:
+					if x[2].startswith('AC'):
+						print("[MoviePlayer] audio track match: " + str(x))
+						tracks.selectTrack(x[0])
+						return True
+				else:
+					print("[MoviePlayer] audio track match: " + str(x))
+					tracks.selectTrack(x[0])
+					return True
+	return False
 
 
 class MoviePlayer(InfoBarBase, InfoBarShowHide, InfoBarMenu, InfoBarSeek, InfoBarShowMovies, InfoBarInstantRecord, InfoBarVmodeButton, InfoBarResolutionSelection, InfoBarAspectSelection,
@@ -201,14 +282,17 @@ class MoviePlayer(InfoBarBase, InfoBarShowHide, InfoBarMenu, InfoBarSeek, InfoBa
 		self.servicelist = slist
 		self.infobar = infobar
 		self.lastservice = lastservice or session.nav.getCurrentlyPlayingServiceOrGroup()
-		path = splitext(service.getPath())[0]
+
+		path = service and service.getPath() and splitext(service.getPath())[0] or ""
 		subs = []
-		for sub in ("srt", "ass", "ssa"):
-			subs = glob("%s*.%s" % (path, sub))
-			if subs:
-				break
+		if path:
+			for sub in ("srt", "ass", "ssa"):
+				subs = glob("%s*.%s" % (path, sub))
+				if subs:
+					break
 		if subs:
 			service.setSubUri(subs[0])  # Support currently only one external sub
+
 		session.nav.playService(service)
 		self.cur_service = service
 		self.returning = False
@@ -531,15 +615,15 @@ class MoviePlayer(InfoBarBase, InfoBarShowHide, InfoBarMenu, InfoBarSeek, InfoBa
 		self.movieselection_dlg = self.session.openWithCallback(self.movieSelected, Screens.MovieSelection.MovieSelection, ref)
 
 	def movieSelected(self, service):
-		if type(service) is eServiceReference:
+		if isinstance(service, bool) and service:
+			self.showMovies()
+		elif service is not None:
 			if self.cur_service and self.cur_service != service:
 				resumePointsInstance.setResumePoint(self.session)
 			self.cur_service = service
 			self.is_closing = False
 			self.session.nav.playService(service)
 			self.returning = False
-		elif service == True:
-			self.showMovies()
 		elif self.returning:
 			self.close()
 		else:

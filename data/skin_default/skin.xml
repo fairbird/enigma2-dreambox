@@ -1622,7 +1622,7 @@ self.autoResize()
 		<ePixmap pixmap="buttons/blue.png" position="700,213" size="25,25" alphatest="blend" scale="1"/>
 		<widget source="key_blue" render="Label" position="740,213" size="130,25" font="Regular;20" foregroundColor="infobar-frgrnd" backgroundColor="infobar_collab_back" halign="left" transparent="1" zPosition="1"/>
 	</screen>
-	<screen name="EventViewSimple" position="center,460" size="980,250" backgroundColor="transparent" flags="wfNoBorder">
+	<!--<screen name="EventViewSimple" position="center,460" size="980,250" backgroundColor="transparent" flags="wfNoBorder">
 		<ePixmap position="0,0" zPosition="-1" size="980,250" pixmap="infobar/event-info-bg.png"/>
 		<widget source="Title" render="Label" position="50,8" size="400,30" font="Boldit;30" valign="center" halign="left" noWrap="1" foregroundColor="infobar_service_frgrnd" backgroundColor="infobar-bkgrnd" transparent="1"/>
 		<ePixmap pixmap="icons/clock.png" position="820,12" zPosition="1" size="20,20" alphatest="blend"/>
@@ -1635,7 +1635,7 @@ self.autoResize()
 		<widget name="datetime" position="510,14" size="250,22" font="Regular;22" foregroundColor="infobar-frgrnd" backgroundColor="infobar-bkgrnd" transparent="1" noWrap="1" valign="top" halign="left"/>
 		<widget name="duration" position="760,14" size="150,22" font="Regular;22" foregroundColor="infobar-frgrnd" backgroundColor="infobar-bkgrnd" transparent="1" noWrap="1" valign="top" halign="left"/>
 		<widget name="FullDescription" position="55,50" size="870,140" font="Regular;22" foregroundColor="infobar-frgrnd" backgroundColor="infobar_sunken" transparent="1"/>
-	</screen>
+	</screen> -->
 		<!-- Graphical Multi EPG -->
 	<screen name="GraphMultiEPG" position="center,center" size="560,435" title="Electronic Program Guide">
 		<ePixmap pixmap="buttons/red.png" position="0,0" size="140,40" alphaTest="on"/>
@@ -2358,10 +2358,10 @@ except Exception as e:
 		<widget name="videomode" position="10,10" size="230,40" font="Regular;23" halign="left"/>
 	</screen>
 	<screen name="VirtualKeyBoard" position="center,center" size="650,375" zPosition="99">
-		<ePixmap pixmap="buttons/vkey_text.png" position="5,35" zPosition="-4" size="640,50" alphatest="on"/>
+		<!--ePixmap pixmap="buttons/vkey_text.png" position="5,35" zPosition="-4" size="640,50" alphatest="on"/-->
 		<widget name="header" position="10,10" size="630,25" font="Regular;20" transparent="1" noWrap="1" conditional="header"/>
 		<widget name="prompt" position="10,10" size="630,25" font="Regular;20" transparent="1" noWrap="1" conditional="prompt"/>
-		<widget name="text" position="10,35" size="630,50" font="Regular;40" transparent="1" noWrap="1" halign="right" valign="center"/>
+		<widget name="text" position="10,28" size="630,50" font="Regular;35" transparent="1" noWrap="1" valign="center"/>
 		<widget name="list" position="10,100" size="630,225" selectionDisabled="1" foregroundColor="window-fg" backgroundColor="#001c2c5c" transparent="1"/>
 		<widget name="locale" position="10,350" size="480,25" font="Regular;20" transparent="1" conditional="locale"/>
 		<widget name="mode" position="580,350" size="60,25" font="Regular;20" halign="right" transparent="1" conditional="mode"/>

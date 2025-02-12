@@ -18,7 +18,7 @@ class VideoSetup(ConfigListScreen, Screen):
 		Screen.__init__(self, session)
 		# for the skin: first try VideoSetup, then Setup, this allows individual skinning
 		self.skinName = ["VideoSetup", "Setup"]
-		self.setTitle(_("A/V settings"))
+		self.setTitle(_("Video Settings"))
 		self.hw = hw
 		self.onChangedEntry = []
 
@@ -56,7 +56,6 @@ class VideoSetup(ConfigListScreen, Screen):
 		level = config.usage.setup_level.index
 
 		self.list = []
-		self.list.append((_(" ____________________________  Video Settings  ____________________________ "), ))
 		self.list.append((_("Video output"), config.av.videoport, _("Configures which video output connector will be used.")))
 
 		# if we have modes for this port:
@@ -110,52 +109,6 @@ class VideoSetup(ConfigListScreen, Screen):
 				self.list.append((_("WSS on 4:3"), config.av.wss, _("When enabled, content with an aspect ratio of 4:3 will be stretched to fit the screen.")))
 				if BoxInfo.getItem("ScartSwitch"):
 					self.list.append((_("Auto scart switching"), config.av.vcrswitch, _("When enabled, your receiver will detect activity on the VCR SCART input.")))
-
-		if level >= 1:
-			self.list.append((_(" ____________________________  Audio Settings  ____________________________ "), ))
-			self.list.append((_("Volume steps"), config.volumeControl.pressStep, _("Select the size of the volume step when the VOLUME buttons are pressed.")))
-			self.list.append((_("Long press volume steps"), config.volumeControl.longStep, _("Select the size of the volume steps when the VOLUME buttons are held down.")))
-			self.list.append((_("Volume/Mute display timer"), config.volumeControl.hideTimer, _("Select how long, in seconds, that the volume and mute displays are shown before they automatically hide.")))
-			if BoxInfo.getItem("CanDownmixAC3"):
-				self.list.append((_("AC3 downmix"), config.av.downmix_ac3, _("Configure whether multi channel sound tracks should be downmixed to stereo.")))
-			if BoxInfo.getItem("CanAC3plusTranscode"):
-				self.list.append((_("AC3 plus transcoding"), config.av.transcodeac3plus, _("Choose whether AC3 Plus sound tracks should be transcoded to AC3.")))
-			if BoxInfo.getItem("CanDownmixDTS"):
-				self.list.append((_("DTS downmix"), config.av.downmix_dts, _("Configure whether multi channel sound tracks should be downmixed to stereo.")))
-			if BoxInfo.getItem("CanDTSHD"):
-				self.list.append((_("DTS/DTS-HD HR/DTS-HD MA/DTS:X"), config.av.dtshd, _("Choose whether DTS channel sound tracks should be downmixed or transcoded.")))
-			if BoxInfo.getItem("CanWMAPRO"):
-				self.list.append((_("WMA Pro"), config.av.wmapro, _("Choose whether WMA Pro channel sound tracks should be downmixed or transcoded.")))
-			if BoxInfo.getItem("CanDownmixAAC"):
-				self.list.append((_("AAC downmix"), config.av.downmix_aac, _("Configure whether multi channel sound tracks should be downmixed to stereo.")))
-			if BoxInfo.getItem("CanDownmixAACPlus"):
-				self.list.append((_("AAC plus downmix"), config.av.downmix_aacplus, _("Configure whether multi channel sound tracks should be downmixed to stereo.")))
-			if BoxInfo.getItem("HDMIAudioSource"):
-				self.list.append((_("Audio Source"), config.av.hdmi_audio_source, _("Choose whether multi channel sound tracks should be convert to PCM, SPDIF or Bluetooth.")))
-			if BoxInfo.getItem("CanAACTranscode"):
-				self.list.append((_("AAC transcoding"), config.av.transcodeaac, _("Choose whether AAC sound tracks should be transcoded.")))
-			self.list.extend((
-				(_("General AC3 delay"), config.av.generalAC3delay, _("Configure the general audio delay of Dolby Digital sound tracks.")),
-				(_("General PCM delay"), config.av.generalPCMdelay, _("Configure the general audio delay of stereo sound tracks."))
-			))
-			if BoxInfo.getItem("CanPcmMultichannel"):
-				self.list.append((_("Multichannel PCM"), config.av.multichannel_pcm, _("Configure whether multi channel PCM sound should be enabled.")))
-			if BoxInfo.getItem("HasAutoVolume") or BoxInfo.getItem("HasAutoVolumeLevel"):
-				self.list.append((_("Audio auto volume level"), BoxInfo.getItem("HasAutoVolume") and config.av.autovolume or config.av.autovolumelevel, _("This option allows you can to set the auto volume level.")))
-			if BoxInfo.getItem("Has3DSurround"):
-				self.list.append((_("3D surround"), config.av.surround_3d, _("This option allows you to enable 3D surround sound.")))
-				if BoxInfo.getItem("Has3DSpeaker") and config.av.surround_3d.value != "none":
-					self.list.append((_("3D surround speaker position"), config.av.speaker_3d, _("This option allows you to change the virtuell loadspeaker position.")))
-			if BoxInfo.getItem("Has3DSurroundSpeaker"):
-				self.list.append((_("3D surround speaker position"), config.av.surround_3d_speaker, _("This option allows you to disable or change the virtuell loadspeaker position.")))
-				if BoxInfo.getItem("Has3DSurroundSoftLimiter") and config.av.surround_3d_speaker.value != "disabled":
-					self.list.append((_("3D surround softlimiter"), config.av.surround_softlimiter_3d, _("This option allows you to enable 3D surround softlimiter.")))
-			if BoxInfo.getItem("CanAudioDelay"):
-				self.list.append((_("General audio delay"), config.av.audiodelay, _("This option configures the general audio delay.")))
-			if BoxInfo.getItem("CanBTAudio"):
-				self.list.append((_("Enable BT audio"), config.av.btaudio, _("This option allows you to switch audio to BT speakers.")))
-			if BoxInfo.getItem("CanBTAudioDelay"):
-				self.list.append((_("General BT audio delay"), config.av.btaudiodelay, _("This option configures the general audio delay for BT speakers.")))
 
 		if not isinstance(config.av.scaler_sharpness, ConfigNothing) and not isPluginInstalled("VideoEnhancement"):
 			self.list.append((_("Scaler sharpness"), config.av.scaler_sharpness, _("Configure the sharpness of the video scaling.")))
@@ -258,7 +211,7 @@ def startSetup(menuid):
 	if menuid != "video":
 		return []
 
-	return [(_("A/V settings"), videoSetupMain, "av_setup", 40)]
+	return [(_("Video Setup"), videoSetupMain, "av_setup", 40)]
 
 
 def VideoWizard(*args, **kwargs):

@@ -1,6 +1,32 @@
 <setupxml>
-	<setup key="avsetup">
+	<setup key="video_setup" title="Video Settings">
 		<!-- this is just a placeholder, the Videomode plugin implements this submenu -->
+	</setup>
+	<setup key="audio_setup" title="Audio Settings" level="1" showOpenWebif="1">
+		<item level="1" text="Volume steps" description="Select the size of the volume step when the VOLUME buttons are pressed.">config.volumeControl.pressStep</item>
+		<item level="1" text="Long press volume steps" description="Select the size of the volume steps when the VOLUME buttons are held down.">config.volumeControl.longStep</item>
+		<item level="1" text="Volume/Mute display timer" description="Select how long, in seconds, that the volume and mute displays are shown before they automatically hide.">config.volumeControl.hideTimer</item>
+		<item level="1" text="AC3 downmix" description="Choose whether AC3 sound tracks should be downmixed to stereo." requires="CanDownmixAC3">config.av.downmix_ac3</item>
+		<item level="1" text="AC3 plus transcoding" description="Choose whether AC3 Plus sound tracks should be transcoded to AC3." requires="CanAC3plusTranscode">config.av.transcodeac3plus</item>
+		<item level="1" text="DTS downmix" description="Choose whether DTS channel sound tracks should be downmixed to stereo." requires="CanDownmixDTS">config.av.downmix_dts</item>
+		<item level="1" text="DTS/DTS-HD HR/DTS-HD MA/DTS:X" description="Choose whether DTS channel sound tracks should be downmixed or transcoded." requires="CanDTSHD">config.av.dtshd</item>
+		<item level="1" text="WMA Pro" description="Choose whether WMA Pro channel sound tracks should be downmixed or transcoded." requires="CanWMAPRO">config.av.wmapro</item>
+		<item level="1" text="AAC downmix" description="Choose whether multi channel sound tracks should be downmixed to stereo." requires="CanDownmixAAC">config.av.downmix_aac</item>
+		<item level="1" text="AAC plus downmix" description="Configure whether multi channel sound tracks should be downmixed to stereo." requires="CanDownmixAACPlus">config.av.downmix_aacplus</item>
+		<item level="1" text="Audio Source" description="Choose whether multi channel sound tracks should be convert to PCM, SPDIF or Bluetooth." requires="HDMIAudioSource">config.av.hdmi_audio_source</item>
+		<item level="1" text="AAC transcoding" description="Choose whether AAC sound tracks should be transcoded." requires="CanAACTranscode">config.av.transcodeaac</item>
+		<item level="1" text="General AC3 delay" description="This option configures the general audio delay of Dolby Digital sound tracks.">config.av.generalAC3delay</item>
+		<item level="1" text="General PCM delay" description="This option configures the general audio delay of stereo sound tracks.">config.av.generalPCMdelay</item>
+		<item level="1" text="Multichannel PCM" description="Configure whether multi channel PCM sound should be enabled." requires="CanPcmMultichannel">config.av.multichannel_pcm</item>
+		<item level="1" text="Audio Auto Volume Level" description="This option configures you can set Auto Volume Level." requires="HasAutoVolume">config.av.autovolume</item>
+		<item level="1" text="Audio Auto Volume Level" description="This option configures you can set Auto Volume Level." requires="HasAutoVolumeLevel">config.av.autovolumelevel</item>
+		<item level="1" text="3D Surround" description="This option allows you to enable 3D Surround Sound." requires="Has3DSurround">config.av.surround_3d</item>
+		<item level="1" text="3D Surround Speaker Position" description="This option allows you to change the virtual loudspeaker position." requires="Has3DSpeaker" conditional="config.av.surround_3d.value != 'none'">config.av.speaker_3d</item>
+		<item level="1" text="3D surround speaker position" description="This option allows you to change the virtual loudspeaker position." requires="Has3DSurroundSpeaker" conditional="config.av.surround_3d.value != 'none'">config.av.surround_3d_speaker</item>
+		<item level="1" text="3D surround softlimiter" description="This option allows you to enable 3D surround softlimiter." requires="Has3DSurroundSoftLimiter" conditional="config.av.surround_3d_speaker.value != 'none'">config.av.surround_softlimiter_3d</item>
+		<item level="1" text="General audio delay" description="This option configures the general audio delay." requires="CanAudioDelay">config.av.audiodelay</item>
+		<item level="1" text="Enable BT audio" description="This option allows you to switch audio to BT speakers." requires="CanBTAudio">config.av.btaudio</item>
+		<item level="1" text="General BT Audio delay" description="This option configures the general audio delay for BT Speakers." requires="CanBTAudioDelay">config.av.btaudiodelay</item>
 	</setup>
 	<setup key="checkupdate" title="Check update Settings">
 		<item level="1" text="check for firmware updates every" description="Choose the time to check for update avilable every...">config.updatecheck.check_update_notifier</item>
@@ -13,7 +39,7 @@
 		<item level="1" text="Show setup default values" description="In Setup screens choose whether to show the default value of the selected item in the description field.">config.usage.setupShowDefault</item>
 		<item level="1" text="Show screen path" description="This option allows you to show the full screen path leading to the current screen.">config.usage.showScreenPath</item>
 		<item level="1" text="Sort Extension Menu" description="Select the sort order of the Extension Menu entries.">config.usage.sortExtensionslist</item>
-		<item level="1" text="Virtual keyboard skin" description="You can select the skin of virtual keyboard.">config.misc.virtualkeyBoardstyle</item>
+		<item level="1" text="Virtual keyboard skin *" description="You can select the skin of virtual keyboard.">config.misc.virtualkeyBoardstyle</item>
 		<item level="0" text="Show menu or plugin numbers" description="This option allows you to show menu and/or plugin number quick links.">config.usage.menu_show_numbers</item>
 		<item level="2" text="Show softcam setup in extensions menu" description="This option allows you to add the softcam setup in the extensions menu." requires="HasSoftcamInstalled">config.misc.softcam_setup.extension_menu</item>
 		<item level="1" text="Zap key delay for channel number input" description="In live view wait this many seconds after a numeric key press before assuming the required channel number has been entered. Default: 5 seconds. Setting zero will require confirmation with 'OK'. ">config.misc.zapkey_delay</item>
@@ -115,6 +141,7 @@
 		<item level="1" text="Show positioner position" requires="isRotorTuner" description="Configure whether or not a rotor position will be displayed on the infobar">config.misc.showrotorposition</item>
 		<item level="1" text="Position of completed timers in timerlist" description="Configure where completed timers show up in the timer list.">config.usage.timerlist_finished_timer_position</item>
 		<item level="0" text="Info bar timeout" description="Configure for how long the infobar will remain visible after activation.">config.usage.infobar_timeout</item>
+		<item level="0" text="Show InfoBar picons" description="Option to disable picons on the Infobar.">config.usage.showpicon</item>
 		<item level="0" text="Enable infobar fade-out" description="Fade the infobar when hiding">config.usage.show_infobar_do_dimming</item>
 		<item level="0" text="Infobar fade-out speed" description="Configure the infobar fading speed">config.usage.show_infobar_dimming_speed</item>
 		<item level="2" text="Show infobar on channel change" description="When enabled, the infobar will be displayed when changing channels.">config.usage.show_infobar_on_zap</item>
@@ -180,11 +207,12 @@
 	</setup>
 	<setup key="subtitlesetup" title="Subtitle settings">
 		<if requires="AISubs">
-			<item level="2" text="AI-Powered translation enabled" description="Enable AI-Powered translation for all teletext and DVB subtitles.">config.subtitles.ai_enabled</item>
-			<item level="2" text="AI-Powered translation language" description="Configure the AI-Powered translation language.">config.subtitles.ai_translate_to</item>
-			<item level="2" text="AI-Powered translation subscription code" description="Enter your subscription code, the unified code for trail is 15.">config.subtitles.ai_subscription_code</item>
-			<item level="2" text="AI-Powered translation color" description="Configure the color of the AI-Powered translations.">config.subtitles.ai_subtitle_colors</item>
-			<item level="2" text="AI-Powered Translation optimization" description="The AI-Powered Translation service will be optimized to provide the best performance based on the the Internet connection speed selected.">config.subtitles.ai_connection_speed</item>
+			<item level="2" text="AI translation enabled" description="Enable AI-Powered translation for all teletext and DVB subtitles.">config.subtitles.ai_enabled</item>
+			<item level="2" text="AI translation language" description="Configure the AI-Powered translation language.">config.subtitles.ai_translate_to</item>
+			<item level="2" text="AI translation color" description="Configure the color of the AI-Powered translations.">config.subtitles.ai_subtitle_colors</item>
+			<item level="2" text="AI Translation optimization" description="The AI-Powered Translation service will be optimized to provide the best performance based on the the Internet connection speed selected.">config.subtitles.ai_connection_speed</item>
+			<item level="2" text="AI translation subscription code" description="Enter your subscription code, the unified code for trail is 15.">config.subtitles.ai_subscription_code</item>
+			<item level="2" text="AI Translation mode" description="The AI mode used for translating languages. You can choose the one that gives the most accurate translation for your target language.">config.subtitles.ai_mode</item>
 		</if>
 		<item level="0" text="Teletext subtitle color" description="Configure the color of the teletext subtitles.">config.subtitles.ttx_subtitle_colors</item>
 		<item level="2" text="Use original teletext position" description="When enabled, teletext subtitles will be displayed at their original position.">config.subtitles.ttx_subtitle_original_position</item>
@@ -344,6 +372,7 @@
 		<item level="0" text="Hard disk standby after" description="Configure the hard disk drive to go to standby after the specified idle time.">config.usage.hdd_standby</item>
 		<item level="0" text="Hard disk standby in box standby after" description="Configure the hard disk drive to go to standby after the specified idle time when the box is in standby.">config.usage.hdd_standby_in_standby</item>
 		<item level="0" text="Use Harddisk Hardware Standby Timer" description="Option to enable the Hardware Standby Timer.">config.usage.hdd_timer</item>
+		<item level="2" text="Show unknown devices" description="Enable this option to show unknown storage devices in device manager.">config.usage.showUnknownDevices</item>
 	</setup>
 	<setup key="HDMIRecord" title="HDMI Recording Setup">
 		<item level="0" text="Bitrate" description="The bitrate of the video encoder. Larger value improves quality and increases file size.">config.hdmirecord.bitrate</item>

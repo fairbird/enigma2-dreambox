@@ -97,7 +97,7 @@ def InitUsageConfig():
 		(2, _("IPv4 only")),
 		(3, _("IPv6 only"))
 	])
-	config.usage.dnsSuffix = ConfigText(default="")
+	config.usage.dnsSuffix = ConfigText(default="", fixed_size=False)
 	config.usage.dnsRotate = ConfigYesNo(default=False)
 	config.usage.subnetwork = ConfigYesNo(default=True)
 	config.usage.subnetwork_cable = ConfigYesNo(default=True)
@@ -176,6 +176,7 @@ def InitUsageConfig():
 	config.usage.servicelist_number_of_services = ConfigSelection(default="by skin", choices=choicelist)
 	config.usage.servicelist_number_of_services.addNotifier(refreshServiceList)
 	config.usage.multiepg_ask_bouquet = ConfigYesNo(default=False)
+	config.usage.showpicon = ConfigYesNo(default=True)
 
 	# New ServiceList
 	config.channelSelection = ConfigSubsection()
@@ -270,6 +271,7 @@ def InitUsageConfig():
 	config.usage.hdd_standby = ConfigSelection(default="300", choices=choiceList)
 	config.usage.hdd_standby_in_standby = ConfigSelection(default="-1", choices=[("-1", _("Same as in active"))] + choiceList)
 	config.usage.hdd_timer = ConfigYesNo(default=False)
+	config.usage.showUnknownDevices = ConfigYesNo(default=False)
 	config.usage.output_12V = ConfigSelection(default="do not change", choices=[
 		("do not change", _("Do not change")), ("off", _("Off")), ("on", _("On"))])
 
@@ -1626,6 +1628,7 @@ def InitUsageConfig():
 		eSubtitleSettings.setSubtitleBacktrans(configElement.value)
 
 	choiceList = [
+		(-1, _("Original")),
 		(0, _("No transparency")),
 		(12, "5%"),
 		(25, "10%"),
@@ -1645,7 +1648,7 @@ def InitUsageConfig():
 	def setDVBSubtitleBacktrans(configElement):
 		eSubtitleSettings.setDVBSubtitleBacktrans(configElement.value)
 
-	config.subtitles.dvb_subtitles_backtrans = ConfigSelection(default=0, choices=choiceList)
+	config.subtitles.dvb_subtitles_backtrans = ConfigSelection(default=-1, choices=choiceList)
 	config.subtitles.dvb_subtitles_backtrans.addNotifier(setDVBSubtitleBacktrans)
 
 	choiceList = []
@@ -1771,7 +1774,7 @@ def InitUsageConfig():
 	])
 	config.subtitles.ai_connection_speed.addNotifier(setAiConnectionSpeed)
 
-	langsAI = ['af', 'sq', 'am', 'ar', 'hy', 'az', 'eu', 'be', 'bn', 'bs', 'bg', 'ca', 'zh', 'co', 'hr', 'cs', 'da', 'nl', 'en', 'eo', 'fr', 'fi', 'fy', 'gl', 'ka', 'de', 'el', 'ht', 'ha', 'hu', 'is', 'ig', 'ga', 'it', 'ja', 'jv', 'kn', 'kk', 'km', 'rw', 'ko', 'ku', 'ky', 'lo', 'la', 'lv', 'lt', 'lb', 'mk', 'mg', 'ms', 'mt', 'mi', 'mr', 'mn', 'no', 'ny', 'or', 'ps', 'fa', 'pl', 'pt', 'ro', 'ru', 'sm', 'gd', 'sr', 'st', 'sn', 'sk', 'sl', 'so', 'es', 'su', 'sw', 'sv', 'tl', 'tg', 'te', 'th', 'tr', 'tk', 'uk', 'ur', 'ug', 'uz', 'cy', 'xh', 'yi', 'yo', 'zu']
+	langsAI = ['af', 'am', 'ar', 'hy', 'az', 'eu', 'be', 'bn', 'bs', 'bg', 'ca', 'zh', 'co', 'hr', 'cs', 'da', 'nl', 'en', 'eo', 'fr', 'fi', 'fy', 'gl', 'ka', 'de', 'el', 'ht', 'ha', 'hu', 'is', 'ig', 'ga', 'it', 'ja', 'jv', 'kn', 'kk', 'km', 'rw', 'ko', 'ku', 'ky', 'lo', 'la', 'lv', 'lt', 'lb', 'mk', 'mg', 'ms', 'mt', 'mi', 'mr', 'mn', 'no', 'ny', 'or', 'ps', 'fa', 'pl', 'pt', 'ro', 'ru', 'sm', 'gd', 'sr', 'st', 'sn', 'sk', 'sl', 'so', 'es', 'su', 'sw', 'sv', 'tl', 'tg', 'te', 'th', 'tr', 'tk', 'uk', 'ur', 'ug', 'uz', 'cy', 'xh', 'yi', 'yo', 'zu']
 	langsAI = [(x, international.LANGUAGE_DATA[x][1]) for x in langsAI]
 	langsAI.append(("zh-CN", _("Chinese (Simplified)")))
 	langsAI.append(("ceb", _("Cebuano")))
@@ -1781,6 +1784,7 @@ def InitUsageConfig():
 	langsAI.append(("ar_eg", _("Arabic (Egyptian)")))
 	langsAI.append(("ar_ma", _("Arabic (Moroccan)")))
 	langsAI.append(("ar_sy", _("Arabic (Syro-Lebanese)")))
+	langsAI.append(("ar_iq", _("Arabic (Iraq)")))
 	langsAI.append(("ar_tn", _("Arabic (Tunisian)")))
 	langsAI.sort(key=lambda x: x[1])
 
@@ -1796,6 +1800,11 @@ def InitUsageConfig():
 
 	config.subtitles.ai_translate_to = ConfigSelection(default=default, choices=langsAI)
 	config.subtitles.ai_translate_to.addNotifier(setAiTranslateTo)
+
+	def setAiMode(configElement):
+		eSubtitleSettings.setAiMode(configElement.value)
+	config.subtitles.ai_mode = ConfigSelection(default=1, choices=[(x, f"{_("Mode")} {x}") for x in range(1, 4)])
+	config.subtitles.ai_mode.addNotifier(setAiMode)
 	# AI end
 
 	config.autolanguage = ConfigSubsection()

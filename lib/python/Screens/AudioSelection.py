@@ -263,7 +263,7 @@ class AudioSelection(ConfigListScreen, Screen):
 				self.settings.surround_3d_speaker.addNotifier(self.change3DSurroundSpeaker, initial_call=False)
 				conflist.append(getConfigListEntry(_("3D Surround Speaker Position"), self.settings.surround_3d_speaker, None))
 
-			if BoxInfo.getItem("CanAutoVolume"):
+			if BoxInfo.getItem("HasAutoVolume"):
 				choice_list = [("none", _("Off")), ("hdmi", _("HDMI")), ("spdif", _("SPDIF")), ("dac", _("DAC"))]
 				self.settings.autovolume = ConfigSelection(choices=choice_list, default=config.av.autovolume.value)
 				self.settings.autovolume.addNotifier(self.changeAutoVolume, initial_call=False)
@@ -336,7 +336,6 @@ class AudioSelection(ConfigListScreen, Screen):
 							description = types[x[2]]
 						except:
 							description = _("unknown") + ": %s" % x[2]
-						number = str(int(number) + 1)
 
 					streams.append((x, "", number, description, language, selected))
 					idx += 1
