@@ -2358,10 +2358,10 @@ except Exception as e:
 		<widget name="videomode" position="10,10" size="230,40" font="Regular;23" halign="left"/>
 	</screen>
 	<screen name="VirtualKeyBoard" position="center,center" size="650,375" zPosition="99">
-		<ePixmap pixmap="buttons/vkey_text.png" position="5,35" zPosition="-4" size="640,50" alphatest="on"/>
+		<!--ePixmap pixmap="buttons/vkey_text.png" position="5,35" zPosition="-4" size="640,50" alphatest="on"/-->
 		<widget name="header" position="10,10" size="630,25" font="Regular;20" transparent="1" noWrap="1" conditional="header"/>
 		<widget name="prompt" position="10,10" size="630,25" font="Regular;20" transparent="1" noWrap="1" conditional="prompt"/>
-		<widget name="text" position="10,35" size="630,50" font="Regular;40" transparent="1" noWrap="1" halign="right" valign="center"/>
+		<widget name="text" position="10,28" size="630,50" font="Regular;35" transparent="1" noWrap="1" valign="center"/>
 		<widget name="list" position="10,100" size="630,225" selectionDisabled="1" foregroundColor="window-fg" backgroundColor="#001c2c5c" transparent="1"/>
 		<widget name="locale" position="10,350" size="480,25" font="Regular;20" transparent="1" conditional="locale"/>
 		<widget name="mode" position="580,350" size="60,25" font="Regular;20" halign="right" transparent="1" conditional="mode"/>
