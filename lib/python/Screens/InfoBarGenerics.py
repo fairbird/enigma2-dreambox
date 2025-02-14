@@ -4160,7 +4160,7 @@ class InfoBarHdmi2:
 				self.session.pip.servicePath = self.servicelist.getCurrentServicePath()
 			elif BoxInfo.getItem("HasHDMIinPiP"):
 				curref = self.session.pip.getCurrentService()
-				if curref and curref.type != eServiceReference.idServiceHDMIIn:
+				if curref and curref.type != 8192:
 					self.session.pip.playService(eServiceReference('8192:0:1:0:0:0:0:0:0:0:'))
 					self.session.pip.servicePath = self.servicelist.getCurrentServicePath()
 				else:
@@ -4171,7 +4171,7 @@ class InfoBarHdmi2:
 		if not self.LongButtonPressed:
 			slist = self.servicelist
 			curref = self.session.nav.getCurrentlyPlayingServiceOrGroup()
-			if curref and curref.type != eServiceReference.idServiceHDMIIn:
+			if curref and curref.type != 8192:
 				self.session.nav.playService(eServiceReference('8192:0:1:0:0:0:0:0:0:0:'))
 			else:
 				self.session.nav.playService(slist.servicelist.getCurrent())

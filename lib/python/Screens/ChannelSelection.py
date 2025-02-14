@@ -1108,6 +1108,8 @@ class ChannelSelectionEdit:
 	def addHDMIIn(self, name):
 		current = self.servicelist.getCurrent()
 		mutableList = self.getMutableList()
+		cnt = 0
+		str = '1:64:%d:0:0:0:0:0:0:0::%s' % (cnt, name)
 		ref = eServiceReference(str)
 		ref.setName(name)
 		if mutableList and current and current.valid():
