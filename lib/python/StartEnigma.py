@@ -418,9 +418,9 @@ class Session:
 			self.summary.show()
 
 	def doShutdown(self):
-		for function in self.onShutdown:
-			if callable(function):
-				function()
+		for callback in self.onShutdown:
+			if callable(callback):
+				callback()
 
 	def reloadDialogs(self):
 		for dlg in self.allDialogs:
@@ -646,8 +646,6 @@ def runScreenTest():
 	enigma.eProfileWrite("nav shutdown")
 	session.nav.shutdown()
 	session.doShutdown()
-
-	VolumeControl.instance.saveVolumeState()
 
 	enigma.eProfileWrite("configfile.save")
 	configfile.save()
