@@ -62,7 +62,6 @@ class CurrentService(PerServiceBase, Source):
 		self.ref = ref
 
 	serviceref = property(getCurrentServiceRef, setCurrentServiceRef)
-	serviceref = property(getCurrentServiceRef, setCurrentServiceRef)
 
 	def newService(self, ref):
 		if ref and isinstance(ref, bool):
