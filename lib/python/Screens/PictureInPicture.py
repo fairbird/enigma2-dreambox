@@ -1,12 +1,10 @@
-# -*- coding: utf-8 -*-
 from Screens.Screen import Screen
 from Screens.Dish import Dishpip
 from enigma import ePoint, eSize, eRect, eServiceCenter, getBestPlayableServiceReference, eServiceReference, eTimer
 from Components.SystemInfo import BoxInfo
 from Components.VideoWindow import VideoWindow
-from Components.Sources.StreamService import StreamServiceList
 from Components.config import config, ConfigPosition, ConfigSelection
-from Tools.Notifications import AddPopup, RemovePopup
+from Tools import Notifications
 from Screens.MessageBox import MessageBox
 
 MAX_X = 720
@@ -22,7 +20,7 @@ def timedStopPipPigMode():
 		if BoxInfo.getItem("hasPIPVisibleProc"):
 			open(BoxInfo.getItem("hasPIPVisibleProc"), "w").write("1")
 		elif hasattr(InfoBar.instance.session, "pip"):
-			InfoBar.instance.session.pip.relocate()
+			InfoBar.instance.session.pip.playService(InfoBar.instance.session.pip.currentService)
 	global PipPigModeEnabled
 	PipPigModeEnabled = False
 
@@ -40,10 +38,7 @@ def PipPigMode(value):
 				if BoxInfo.getItem("hasPIPVisibleProc"):
 					open(BoxInfo.getItem("hasPIPVisibleProc"), "w").write("0")
 				else:
-					import skin
-					x, y, w, h = skin.parameters.get("PipHidePosition", (16, 16, 16, 16))
-					pip = InfoBar.instance.session.pip
-					pip.moveAndResizeToHidePosition(x, y, w, h)
+					InfoBar.instance.session.pip.pipservice = False
 				PipPigModeEnabled = True
 		else:
 			PipPigModeTimer.start(100, True)
@@ -71,7 +66,7 @@ class PictureInPicture(Screen):
 		if BoxInfo.getItem("VideoDestinationConfigurable"):
 			self.choicelist.append(("cascade", _("Cascade PiP")))
 			self.choicelist.append(("split", _("Splitscreen")))
-			self.choicelist.append(("byside", _("Side by side")))
+			self.choicelist.append(("byside", _("Side by Side")))
 		self.choicelist.append(("bigpig", _("Big PiP")))
 		if BoxInfo.getItem("HasExternalPIP"):
 			self.choicelist.append(("external", _("External PiP")))
@@ -84,8 +79,7 @@ class PictureInPicture(Screen):
 		self.onLayoutFinish.append(self.LayoutFinished)
 
 	def __del__(self):
-		if hasattr(self, "pipservice"):
-			del self.pipservice
+		del self.pipservice
 		self.setExternalPiP(False)
 		self.setSizePosMainWindow()
 		if hasattr(self, "dishpipActive") and self.dishpipActive is not None:
@@ -107,7 +101,6 @@ class PictureInPicture(Screen):
 	def move(self, x, y):
 		config.av.pip.value[0] = x
 		config.av.pip.value[1] = y
-		config.av.pip.save()
 		w = config.av.pip.value[2]
 		h = config.av.pip.value[3]
 		if config.av.pip_mode.value == "cascade":
@@ -122,6 +115,7 @@ class PictureInPicture(Screen):
 		elif config.av.pip_mode.value in "bigpig external":
 			x = 0
 			y = 0
+		config.av.pip.save()
 		self.instance.move(ePoint(x, y))
 
 	def resize(self, w, h):
@@ -152,11 +146,6 @@ class PictureInPicture(Screen):
 	def setSizePosMainWindow(self, x=0, y=0, w=0, h=0):
 		if BoxInfo.getItem("VideoDestinationConfigurable"):
 			self["video"].instance.setFullScreenPosition(eRect(x, y, w, h))
-
-	def moveAndResizeToHidePosition(self, x, y, w, h):
-		self.instance.move(ePoint(x, y))
-		self.instance.resize(eSize(*(w, h)))
-		self["video"].instance.resize(eSize(*(w, h)))
 
 	def setExternalPiP(self, onoff):
 		if BoxInfo.getItem("HasExternalPIP"):
@@ -190,25 +179,16 @@ class PictureInPicture(Screen):
 		return self.choicelist[config.av.pip_mode.index][1]
 
 	def playService(self, service):
-		RemovePopup("ZapPipError")
 		if service is None:
 			return False
 		from Screens.InfoBarGenerics import streamrelay
 		ref, isStreamRelay = streamrelay.streamrelayChecker(self.resolveAlternatePipService(service))
 		if ref:
-			if BoxInfo.getItem("CanNotDoSimultaneousTranscodeAndPIP") and StreamServiceList:
-				self.pipservice = None
-				self.currentService = None
-				self.currentServiceReference = None
+			if self.isPlayableForPipService(ref):
+				print("playing pip service", ref and ref.toString())
+			else:
 				if not config.usage.hide_zap_errors.value:
-					AddPopup(text="PiP...\n" + _("Connected transcoding, limit - no PiP!"), type=MessageBox.TYPE_ERROR, timeout=5, id="ZapPipError")
-				return False
-			if ref.toString().startswith("4097"):
-				#Change to service type 1 and try to play a stream as type 1
-				ref = eServiceReference("1" + ref.toString()[4:])
-			if not self.isPlayableForPipService(ref):
-				if not config.usage.hide_zap_errors.value:
-					AddPopup(text="PiP...\n" + _("No free tuner!"), type=MessageBox.TYPE_ERROR, timeout=5, id="ZapPipError")
+					Notifications.AddPopup(text=_("No free tuner!"), type=MessageBox.TYPE_ERROR, timeout=5, id="ZapPipError")
 				return False
 			self.pipservice = eServiceCenter.getInstance().play(ref)
 			if self.pipservice and not self.pipservice.setTarget(1, True):
@@ -217,15 +197,13 @@ class PictureInPicture(Screen):
 				self.pipservice.start()
 				self.currentService = service
 				self.currentServiceReference = ref
-				print("[PictureInPicture] playing pip service", ref and ref.toString())
 				return True
 			else:
 				self.pipservice = None
 				self.currentService = None
 				self.currentServiceReference = None
-				print("[PictureInPicture] error play pip service", ref and ref.toString())
 				if not config.usage.hide_zap_errors.value:
-					AddPopup(text=_("Incorrect service type for Picture in Picture!"), type=MessageBox.TYPE_ERROR, timeout=5, id="ZapPipError")
+					Notifications.AddPopup(text=_("Incorrect type service for PiP!"), type=MessageBox.TYPE_ERROR, timeout=5, id="ZapPipError")
 		return False
 
 	def getCurrentService(self):
