@@ -270,7 +270,6 @@ class InfoBarStreamRelay:
 	data = property(__getData, __setData)
 
 	def streamrelayChecker(self, playref):
-		is_stream_relay = False
 		playrefstring = playref.toCompareString()
 		if "%3a//" not in playrefstring and playrefstring in self.__services:
 			url = f'http://{".".join("%d" % d for d in config.misc.softcam_streamrelay_url.value)}:{config.misc.softcam_streamrelay_port.value}/'
@@ -279,10 +278,10 @@ class InfoBarStreamRelay:
 			else:
 				playrefmod = playrefstring
 			playref = eServiceReference("%s%s%s:%s" % (playrefmod, url.replace(":", "%3a"), playrefstring.replace(":", "%3a"), ServiceReference(playref).getServiceName()))
-			is_stream_relay = True
 			print(f"[{self.__class__.__name__}] Play service {playref.toCompareString()} via streamrelay")
 			playref.setAlternativeUrl(playrefstring)
-		return playref, is_stream_relay
+			return playref, True
+		return playref, False
 
 	def checkService(self, service):
 		return service and service.toCompareString() in self.__services
