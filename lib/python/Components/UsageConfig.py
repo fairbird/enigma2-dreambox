@@ -492,7 +492,7 @@ def InitUsageConfig():
 
 	config.usage.screenSaverStartTimer = ConfigSelection(default=0, choices=[(0, _("Disabled"))] + [(x, _("%d Seconds") % x) for x in (5, 10, 20, 30, 40, 50)] + [(x * 60, ngettext("%d Minute", "%d Minutes", x) % x) for x in (1, 5, 10, 15, 20, 30, 45, 60)])
 	config.usage.screenSaverMoveTimer = ConfigSelection(default=10, choices=[(x, ngettext("%d Second", "%d Seconds", x) % x) for x in range(1, 61)])
-
+	config.usage.movieSelectionInMenu = ConfigYesNo(False)
 	config.usage.check_timeshift = ConfigYesNo(default=True)
 
 	choicelist = [("0", _("Disabled"))]

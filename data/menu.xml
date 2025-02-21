@@ -32,7 +32,7 @@
 			<item key="about_screen" level="0" text="About"><screen module="About"/></item>
 			<item key="streaming_clients_info_screen" level="2" text="Streaming clients info"><screen module="StreamingClientsInfo"/></item>
 		</menu>
-
+		<item key="movie_selection" level="0" text="Movie Selection" weight="8" conditional="config.usage.movieSelectionInMenu.value"><screen module="MovieSelection" screen="MovieSelection" /></item>
 		<item key="plugin_selection" level="0" text="Plugin Browser"><screen module="PluginBrowser" screen="PluginBrowser"/></item>
 		<menu key="setup" level="0" text="Setup" flushConfigOnClose="1">
 			<menu key="scan" weight="7" level="0" text="Tuners &amp; Scanning">
