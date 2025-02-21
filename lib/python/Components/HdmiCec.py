@@ -76,6 +76,12 @@ config.hdmicec.tv_wakeup_detection = ConfigSelection(
 	"activity": _("Any activity"),
 	},
 	default="streamrequest")
+config.hdmicec.advanced_settings = ConfigYesNo(default=False)
+config.hdmicec.deepstandby_waitfortimesync = ConfigYesNo(default=True)
+config.hdmicec.tv_wakeup_zaptimer = ConfigYesNo(default=True)
+config.hdmicec.tv_wakeup_zapandrecordtimer = ConfigYesNo(default=True)
+config.hdmicec.tv_wakeup_wakeuppowertimer = ConfigYesNo(default=True)
+config.hdmicec.check_tv_state = ConfigYesNo(default=False)
 config.hdmicec.tv_wakeup_command = ConfigSelection(
 	choices={
 	"imageview": _("Image View On"),

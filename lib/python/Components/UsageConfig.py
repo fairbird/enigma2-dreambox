@@ -2081,6 +2081,11 @@ def preferredTunerChoicesUpdate(update=False):
 			atsc_nims.append((str(slot.slot), slot.getSlotName()))
 		nims.append((str(slot.slot), slot.getSlotName()))
 
+	config.workaround = ConfigSubsection()
+	config.workaround.deeprecord = ConfigYesNo(default=False)
+	config.workaround.wakeuptime = ConfigSelectionNumber(default=5, stepwidth=1, min=0, max=30, wraparound=True)
+	config.workaround.wakeupwindow = ConfigSelectionNumber(default=5, stepwidth=5, min=5, max=60, wraparound=True)
+
 	config.usage.menutype = ConfigSelection(default="standard", choices=[
 		("horzanim", _("Horizontal menu")),
 		("horzicon", _("Horizontal icons")),
