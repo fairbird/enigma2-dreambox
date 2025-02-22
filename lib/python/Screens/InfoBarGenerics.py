@@ -3424,6 +3424,7 @@ class InfoBarResolutionSelection:
 				if videoMode[1] == "exit" or videoMode[1] == "" or videoMode[1] == "auto":
 					self.ExGreen_toggleGreen()
 				if videoMode[1] != "auto":
+					from Plugins.SystemPlugins.Videomode.VideoHardware import video_hw
 					video_hw.setVideoModeDirect(videoMode[1])
 					self.ExGreen_doHide()
 		else:
