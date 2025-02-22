@@ -2684,9 +2684,9 @@ class InfoBarPiP:
 				self.session.pip.setAnimationMode(0)
 				self.session.pip.show()
 				if isStandardInfoBar(self):
-					newservice = self.lastPiPService or self.session.nav.getCurrentlyPlayingServiceReference() or self.servicelist.servicelist.getCurrent()
+					newservice = self.lastPiPService or self.session.nav.getCurrentlyPlayingServiceReference() or self.servicelist.getCurrentSelection()
 				else:
-					newservice = self.lastPiPService or self.servicelist.servicelist.getCurrent()
+					newservice = self.lastPiPService or self.servicelist.getCurrentSelection()
 				if self.session.pip.playService(newservice):
 					self.session.pipshown = True
 					self.session.pip.servicePath = self.servicelist.getCurrentServicePath()

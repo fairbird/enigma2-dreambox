@@ -565,32 +565,6 @@ class MoviePlayer(InfoBarBase, InfoBarShowHide, InfoBarMenu, InfoBarSeek, InfoBa
 				slist.moveDown()
 			slist.zap(enable_pipzap=True)
 
-	def showPiP(self):
-		slist = self.servicelist
-		if self.session.pipshown:
-			if slist and slist.dopipzap:
-				slist.togglePipzap()
-			if self.session.pipshown:
-				del self.session.pip
-				self.session.pipshown = False
-		elif slist:
-			from Screens.PictureInPicture import PictureInPicture
-			self.session.pip = self.session.instantiateDialog(PictureInPicture)
-			self.session.pip.show()
-			if self.session.pip.playService(slist.getCurrentSelection()):
-				self.session.pipshown = True
-				self.session.pip.servicePath = slist.getCurrentServicePath()
-			else:
-				self.session.pipshown = False
-				del self.session.pip
-
-	def movePiP(self):
-		if self.session.pipshown:
-			InfoBarPiP.movePiP(self)
-
-	def swapPiP(self):
-		pass
-
 	def showDefaultEPG(self):
 		self.infobar and self.infobar.showMultiEPG()
 
