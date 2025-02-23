@@ -29,6 +29,8 @@
 		<key id="KEY_9" mapto="seek:90" flags="m" />
 		<key id="KEY_PREVIOUS" mapto="seek:-300" flags="m" />
 		<key id="KEY_NEXT" mapto="seek:300" flags="m" />
+		<key id="KEY_CHANNELDOWN" mapto="seek:-1800" flags="m" />
+		<key id="KEY_CHANNELUP" mapto="seek:1800" flags="m" />
 	</map>
 
 	<map context="CutListEditorActions">
