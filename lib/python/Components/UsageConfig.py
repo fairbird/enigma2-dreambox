@@ -280,11 +280,11 @@ def InitUsageConfig():
 		("swapstop", _("Move PiP to main picture")), ("stop", _("Stop PiP"))])
 	config.usage.pip_hideOnExit = ConfigSelection(default="without popup", choices=[
 		("no", _("no")), ("popup", _("With popup")), ("without popup", _("Without popup"))])
-	choicelist = [("-1", _("Disabled")), ("0", _("No timeout"))]
-	for i in [60, 300, 600, 900, 1800, 2700, 3600]:
-		m = i / 60
-		choicelist.append((str(i), ngettext("%d minute", "%d minutes", m) % m))
-	config.usage.pip_last_service_timeout = ConfigSelection(default="0", choices=choicelist)
+	choiceList = [
+		("-1", _("Disabled")),
+		("0", _("No timeout"))
+	] + [(str(x * 60), ngettext("%d Minute", "%d Minutes", x) % x) for x in (1, 5, 10, 15, 30, 45, 60)]
+	config.usage.pip_last_service_timeout = ConfigSelection(default="-1", choices=choiceList)
 
 	if not exists(resolveFilename(SCOPE_HDD)):
 		try:
@@ -1169,6 +1169,7 @@ def InitUsageConfig():
 	config.epg.cacheloadtimer = ConfigSelectionNumber(default = 24, stepwidth = 1, min = 1, max = 24, wraparound = True)
 	config.epg.cachesavetimer = ConfigSelectionNumber(default = 24, stepwidth = 1, min = 1, max = 24, wraparound = True)
 
+	config.osd = ConfigSubsection()
 	if BoxInfo.getItem("AmlogicFamily"):
 		from Plugins.SystemPlugins.Videomode.VideoHardware import video_hw
 		limits = [int(x) for x in video_hw.getWindowsAxis().split()]
@@ -1197,6 +1198,8 @@ def InitUsageConfig():
 		("mode1", _("Mode 1")),
 		("mode2", _("Mode 2"))
 	])
+
+	config.osd.language = ConfigText(default=config.misc.locale.value)
 
 	hddchoises = [('/etc/enigma2/', 'Internal Flash')]
 	for p in harddiskmanager.getMountedPartitions():
