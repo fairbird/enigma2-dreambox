@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+from os import W_OK, access, listdir, mkdir, rename, rmdir, stat
 from Screens.Screen import Screen
 from Components.Button import Button
 from Components.ActionMap import HelpableActionMap, ActionMap, NumberActionMap
@@ -30,7 +32,7 @@ import Screens.InfoBar
 from Tools.NumericalTextInput import NumericalTextInput, MAP_SEARCH_UPCASE
 from Tools.Directories import resolveFilename, SCOPE_HDD
 from Tools.BoundFunction import boundFunction
-import Tools.Trashcan
+from Tools.Trashcan import TRASHCAN, TrashInfo, cleanAll, createTrashcan, getTrashcan, createTrashFolder
 import NavigationInstance
 import RecordTimer
 
@@ -107,15 +109,14 @@ def getPreferredTagEditor():
 def isTrashFolder(ref):
 	if not config.usage.movielist_trashcan.value or not ref.flags & eServiceReference.mustDescent:
 		return False
-	path = os.path.realpath(ref.getPath())
-	return path.endswith('.Trash') and path.startswith(Tools.Trashcan.getTrashFolder(path))
+	return os.path.realpath(ref.getPath()).endswith(TRASHCAN) or os.path.realpath(ref.getPath()).endswith(f"{TRASHCAN}/")
 
 
 def isInTrashFolder(ref):
 	if not config.usage.movielist_trashcan.value or not ref.flags & eServiceReference.mustDescent:
 		return False
 	path = os.path.realpath(ref.getPath())
-	return path.startswith(Tools.Trashcan.getTrashFolder(path))
+	return path.startswith(getTrashcan(path))
 
 
 def isSimpleFile(item):
@@ -279,6 +280,10 @@ class MovieBrowserConfiguration(Setup):
 
 	def createSetup(self):
 		configList = [
+			(_("Use 'Trash' in movie list"), config.usage.movielist_trashcan, _("When enabled, deleted recordings are moved to the trashcan, instead of being deleted immediately.")),
+			(_("Purge 'Trash' after (days)"), config.usage.movielist_trashcan_days, _("Configure the number of days after which items are automatically removed from the trashcan.")),
+			(_("Clean network 'Trash"), config.usage.movielist_trashcan_network_clean, _("When enabled, network trashcans are probed for cleaning.")),
+			(_("Space to reserve for recordings (GB)"), config.usage.movielist_trashcan_reserve, _("Configure the minimum amount of disk space to be available for recordings. When the amount of space drops below this value, deleted items will be removed from the trashcan.")),
 			(_("Sort"), self.cfg.moviesort, _("You can set sorting type for items in movielist.")),
 			(_("Show extended description"), self.cfg.description, _("You can enable if will be displayed extended EPG description for item.")),
 			(_("Type"), self.cfg.listtype, _("Set movielist type.")),
@@ -570,6 +575,7 @@ class MovieSelection(Screen, HelpableScreen, SelectionEventInfo, InfoBarBase, Pr
 		self["movie_sort"].hide()
 
 		self["freeDiskSpace"] = self.diskinfo = DiskInfo(config.movielist.last_videodir.value, DiskInfo.FREE, update=False)
+		self["TrashcanSize"] = self.trashinfo = TrashInfo(config.movielist.last_videodir.value)
 
 		self["NumberActions"] = NumberActionMap(["NumberActions", "InputAsciiActions"],
 			{
@@ -1368,8 +1374,13 @@ class MovieSelection(Screen, HelpableScreen, SelectionEventInfo, InfoBarBase, Pr
 			config.movielist.last_videodir.save()
 			self.setCurrentRef(path)
 			self["freeDiskSpace"].path = path
+			self["TrashcanSize"].update(path)
+		else:
+			self["TrashcanSize"].update(config.movielist.last_videodir.value)
 		if self.reload_sel is None:
 			self.reload_sel = self.getCurrent()
+		if config.usage.movielist_trashcan.value and access(config.movielist.last_videodir.value, W_OK):
+			trash = createTrashcan(config.movielist.last_videodir.value)
 		self["list"].reload(self.current_ref, self.selected_tags)
 		self.updateTags()
 		title = _("Recorded files...")
@@ -1440,6 +1451,7 @@ class MovieSelection(Screen, HelpableScreen, SelectionEventInfo, InfoBarBase, Pr
 				self.loadLocalSettings()
 				self.setCurrentRef(res)
 				self["freeDiskSpace"].path = res
+				self["TrashcanSize"].update(res)
 				if selItem:
 					self.reloadList(home=True, sel=selItem)
 				else:
@@ -1895,7 +1907,7 @@ class MovieSelection(Screen, HelpableScreen, SelectionEventInfo, InfoBarBase, Pr
 						# Move the files to the trash can in a way that their CTIME is
 						# set to "now". A simple move would not correctly update the
 						# ctime, and hence trigger a very early purge.
-						trash = Tools.Trashcan.createTrashFolder(cur_path)
+						trash = createTrashFolder(cur_path)
 						trash = os.path.join(trash, os.path.split(cur_path)[1])
 						os.mkdir(trash)
 						for root, dirnames, filenames in os.walk(cur_path):
@@ -1977,7 +1989,7 @@ class MovieSelection(Screen, HelpableScreen, SelectionEventInfo, InfoBarBase, Pr
 						return
 			if config.usage.movielist_trashcan.value:
 				try:
-					trash = Tools.Trashcan.createTrashFolder(cur_path)
+					trash = createTrashFolder(cur_path)
 					# Also check whether we're INSIDE the trash, then it's a purge.
 					if cur_path.startswith(trash):
 						msg = _("Deleted items") + "\n"
@@ -2045,7 +2057,7 @@ class MovieSelection(Screen, HelpableScreen, SelectionEventInfo, InfoBarBase, Pr
 		item = self.getCurrentSelection()
 		current = item[0]
 		cur_path = os.path.realpath(current.getPath())
-		Tools.Trashcan.cleanAll(cur_path)
+		cleanAll(cur_path)
 
 	def showNetworkSetup(self):
 		from Screens import NetworkSetup
@@ -2063,6 +2075,9 @@ class MovieSelection(Screen, HelpableScreen, SelectionEventInfo, InfoBarBase, Pr
 	def hideActionFeedback(self):
 		print("[ML] hide feedback")
 		self.diskinfo.update()
+		current = self.getCurrent()
+		if current is not None:
+			self.trashinfo.update(current.getPath())
 
 	def can_gohome(self, item):
 		return True

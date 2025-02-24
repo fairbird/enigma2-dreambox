@@ -18,7 +18,7 @@ from Tools.CIHelper import cihelper
 from Tools.Directories import SCOPE_CONFIG, getRecordingFilename, resolveFilename
 from Tools.Notifications import AddNotification, AddNotificationWithCallback, AddPopup
 from Tools.XMLTools import stringToXML
-from Tools.Trashcan import instance as trashcan_instance
+from Tools import Trashcan
 
 import timer
 import xml.etree.ElementTree
@@ -435,12 +435,12 @@ class RecordTimerEntry(timer.TimerEntry):
 					except Exception as e:
 						AddNotification(MessageBox, _("Timer recording failed. No space left on device!\n"), type=MessageBox.TYPE_ERROR, timeout=0)
 						print("[TIMER] Error:", e)
-					# Give the Trashcan a chance to clean up
+					# Give the Trashcan a chance to clean up. Need try/except as Trashcan.instance may not exist
+					# for a missed recording started at boot-time.
 					try:
-						trashcan_instance.cleanIfIdle(self.Filename)
-					except Exception as e:
-						print("[TIMER] Failed to call Trashcan.instance.cleanIfIdle()")
-						print("[TIMER] Error:", e)
+						Trashcan.instance.cleanIfIdle()
+					except Exception as err:
+						print(f"[RecordTimer] Error: Failed to call Trashcan.instance.cleanIfIdle!  ({str(err)})")
 				# fine. it worked, resources are allocated.
 				self.next_activation = self.begin
 				self.backoff = 0
@@ -568,19 +568,15 @@ class RecordTimerEntry(timer.TimerEntry):
 						if cur_ref and self.rec_ref == cur_ref:
 							self.background_zap = cur_ref
 
+				self.log_tuner(11, "Start recording.")
 				record_res = self.record_service.start()
 				self.setRecordingPreferredTuner(setdefault=True)
 				if record_res:
-					self.log(13, "start recording error: %d" % record_res)
+					self.log(13, f"Start recording error {record_res}!")
 					self.do_backoff()
-					# retry
-					self.begin = time() + self.backoff
+					# Retry.
+					self.begin = int(time()) + self.backoff
 					return False
-
-				# Tell the trashcan we started recording. The trashcan gets events,
-				# but cannot tell what the associated path is.
-				trashcan_instance.markDirty(self.Filename)
-				self.log_tuner(11, "start")
 				return True
 
 		elif next_state == self.StateEnded:

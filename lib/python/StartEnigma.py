@@ -584,9 +584,9 @@ def runScreenTest():
 	# we need session.scart to access it from within menu.xml
 	session.scart = AutoScartControl(session)
 
-	enigma.eProfileWrite("Init:Trashcan")
-	import Tools.Trashcan
-	Tools.Trashcan.init(session)
+	enigma.eProfileWrite("InitTrashcan")
+	from Tools.Trashcan import initTrashcan
+	initTrashcan(session)
 
 	enigma.eProfileWrite("RunReactor")
 	enigma.eProfileDone()
