@@ -3295,36 +3295,35 @@ class InfoBarAspectSelection:
 	STATE_RESOLUTION = 2
 
 	def __init__(self):
-		self["AspectSelectionAction"] = HelpableActionMap(self, ["InfobarAspectSelectionActions"], {
-			"aspectSelection": (self.ExGreen_toggleGreen, _("Aspect ratio list")),
+		self["AspectSelectionAction"] = HelpableActionMap(self, "InfobarAspectSelectionActions", {
+			"aspectSelection": (self.ExGreen_toggleGreen, _("Aspect list...")),
 		}, prio=0, description=_("Aspect Ratio Actions"))
-
 		self.__ExGreen_state = self.STATE_HIDDEN
 
 	def ExGreen_doAspect(self):
-		print("do self.STATE_ASPECT")
+		print("[InfoBarGenerics] do self.STATE_ASPECT")
 		self.__ExGreen_state = self.STATE_ASPECT
 		self.aspectSelection()
 
 	def ExGreen_doResolution(self):
-		print("do self.STATE_RESOLUTION")
+		print("[InfoBarGenerics] do self.STATE_RESOLUTION")
 		self.__ExGreen_state = self.STATE_RESOLUTION
 		self.resolutionSelection()
 
 	def ExGreen_doHide(self):
-		print("do self.STATE_HIDDEN")
+		print("[InfoBarGenerics] do self.STATE_HIDDEN")
 		self.__ExGreen_state = self.STATE_HIDDEN
 
 	def ExGreen_toggleGreen(self, arg=""):
-		print(self.__ExGreen_state)
+		print("[InfoBarGenerics] toggleGreen:", self.__ExGreen_state)
 		if self.__ExGreen_state == self.STATE_HIDDEN:
-			print("self.STATE_HIDDEN")
+			print("[InfoBarGenerics] self.STATE_HIDDEN")
 			self.ExGreen_doAspect()
 		elif self.__ExGreen_state == self.STATE_ASPECT:
-			print("self.STATE_ASPECT")
+			print("[InfoBarGenerics] self.STATE_ASPECT")
 			self.ExGreen_doResolution()
 		elif self.__ExGreen_state == self.STATE_RESOLUTION:
-			print("self.STATE_RESOLUTION")
+			print("[InfoBarGenerics] self.STATE_RESOLUTION")
 			self.ExGreen_doHide()
 
 	def aspectSelection(self):
@@ -3335,8 +3334,8 @@ class InfoBarAspectSelection:
 				("--", ""),
 				(_("Normal"), "0"),
 				(_("Full Stretch"), "1"),
-				(_("4:3"), "2"),
-				(_("16:9"), "3"),
+				("4:3", "2"),
+				("16:9", "3"),
 				(_("Non-Linear"), "4"),
 				(_("Normal No ScaleUp"), "5"),
 				(_("4:3 Ignore"), "6"),
@@ -3349,9 +3348,15 @@ class InfoBarAspectSelection:
 				(_("16:9 Combined"), "13")
 			]
 		else:
+			aspectSwitchList = []
+			if config.av.aspectswitch.enabled.value:
+				for aspect in range(5):
+					aspectSwitchList.append((iAVSwitch.ASPECT_SWITCH_MSG[aspect], str(aspect + 100)))
+				aspectSwitchList.append(("--", ""))
 			aspectList = [
 				(_("Resolution"), "resolution"),
-				("--", ""),
+				("--", "")
+			] + aspectSwitchList + [
 				(_("4:3 Letterbox"), "0"),
 				(_("4:3 PanScan"), "1"),
 				(_("16:9"), "2"),
@@ -3367,17 +3372,17 @@ class InfoBarAspectSelection:
 			if aspectList[item][1] == aspect:
 				selection = item
 				break
-		self.session.openWithCallback(self.aspectSelected, ChoiceBox, title=_("Please select an aspect ratio..."), list=aspectList, selection=selection, keys=keys)
+		self.session.openWithCallback(self.aspectSelected, ChoiceBox, title=_("Please select an aspect ratio..."), list=aspectList, keys=keys, selection=selection)
 
 	def aspectSelected(self, aspect):
-		if not aspect is None:
+		if aspect is not None:
 			if isinstance(aspect[1], str):
 				if aspect[1] == "":
 					self.ExGreen_doHide()
 				elif aspect[1] == "resolution":
 					self.ExGreen_toggleGreen()
 				else:
-					iAVSwitch.setAspectRatio(int(aspect[1]))
+					avSwitch.setAspectRatio(int(aspect[1]))
 					self.ExGreen_doHide()
 		else:
 			self.ExGreen_doHide()

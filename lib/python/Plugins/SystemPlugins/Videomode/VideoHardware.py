@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from enigma import eAVControl, getDesktop
-from Components.config import config, ConfigSlider, ConfigSelection, ConfigSubDict, ConfigYesNo, ConfigEnableDisable, ConfigOnOff, ConfigSubsection, ConfigSelectionNumber, ConfigBoolean, ConfigNothing, NoSave
+from Components.config import config, ConfigSlider, ConfigSelection, ConfigSubDict, ConfigInteger, ConfigYesNo, ConfigEnableDisable, ConfigOnOff, ConfigSubsection, ConfigSelectionNumber, ConfigBoolean, ConfigNothing, NoSave
 from Components.SystemInfo import BoxInfo
 from Components.Console import Console
 from Tools.CList import CList
@@ -267,6 +267,18 @@ class VideoHardware:
 					ratelist.append((rate, rate))
 				config.av.videorate[mode] = ConfigSelection(choices=ratelist)
 		config.av.videoport = ConfigSelection(default="HDMI", choices=lst)
+		config.av.aspectswitch = ConfigSubsection()
+		config.av.aspectswitch.enabled = ConfigYesNo(default=False)
+		defaults = (  # The preset values for the offset heights.
+			0,
+			62,  # 1.85:1
+			100,  # 2.00:1
+			144,  # 2.21:1
+			170  # 2.35:1
+		)
+		config.av.aspectswitch.offsets = ConfigSubDict()
+		for aspect in range(5):
+			config.av.aspectswitch.offsets[str(aspect)] = ConfigInteger(default=defaults[aspect], limits=(0, 170))
 
 	def isPortAvailable(self, port):  # Fix me!
 		return True

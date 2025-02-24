@@ -19,22 +19,7 @@ class AVSwitch:
 		eAVControl.getInstance().setAspect(configElement.value, 1)
 
 	def setAspectRatio(self, value):
-		if value < 100:
-			eAVControl.getInstance().setAspectRatio(value)
-		else:  # Aspect Switcher
-			value -= 100
-			offset = config.av.aspectswitch.offsets[str(value)].value
-			newheight = 576 - offset
-			newtop = offset // 2
-			if value:
-				newwidth = 720
-			else:
-				newtop = 0
-				newwidth = 0
-				newheight = 0
-
-			eAVControl.getInstance().setAspectRatio(2)  # 16:9
-			eAVControl.getInstance().setVideoSize(newtop, 0, newwidth, newheight)
+		return avSwitch.setAspectRatio(value)
 
 	def setColorFormat(self, value):
 		eAVSwitch.getInstance().setColorFormat(value)
@@ -208,9 +193,22 @@ def InitAVSwitch():
 		iAVSwitch.setColorFormat(map[configElement.value])
 	config.av.colorformat.addNotifier(setColorFormat)
 
-	def setAspectRatio(configElement):
-		map = {"4_3_letterbox": 0, "4_3_panscan": 1, "16_9": 2, "16_9_always": 3, "16_10_letterbox": 4, "16_10_panscan": 5, "16_9_letterbox": 6}
-		iAVSwitch.setAspectRatio(map[configElement.value])
+	def setAspectRatio(self, value):
+		if value < 100:
+			eAVControl.getInstance().setAspectRatio(value)
+		else:  # Aspect switcher.
+			value -= 100
+			offset = config.av.aspectswitch.offsets[str(value)].value
+			newTop = offset // 2
+			newHeight = 576 - offset
+			if value:
+				newWidth = 720
+			else:
+				newTop = 0
+				newWidth = 0
+				newHeight = 0
+			eAVControl.getInstance().setAspectRatio(2)  # 16:9.
+			eAVControl.getInstance().setVideoSize(newTop, 0, newWidth, newHeight)
 
 	def setSystem(configElement):
 		map = {"pal": 0, "ntsc": 1, "multinorm": 2}
@@ -220,7 +218,6 @@ def InitAVSwitch():
 		iAVSwitch.setAspectWSS()
 
 	# this will call the "setup-val" initial
-	config.av.aspectratio.addNotifier(setAspectRatio)
 	config.av.tvsystem.addNotifier(setSystem)
 	config.av.wss.addNotifier(setWSS)
 
