@@ -58,8 +58,7 @@ from pickle import load as pickle_load, dump as pickle_dump, HIGHEST_PROTOCOL as
 
 from RecordTimer import RecordTimerEntry, RecordTimer, findSafeRecordPath
 
-from Components.AVSwitch import AVSwitch
-iAVSwitch = AVSwitch()
+from Components.AVSwitch import iAVSwitch
 
 # hack alert!
 from Screens.Menu import MainMenu, mdom
@@ -3350,8 +3349,9 @@ class InfoBarAspectSelection:
 		else:
 			aspectSwitchList = []
 			if config.av.aspectswitch.enabled.value:
+				from Plugins.SystemPlugins.Videomode.VideoHardware import video_hw
 				for aspect in range(5):
-					aspectSwitchList.append((iAVSwitch.ASPECT_SWITCH_MSG[aspect], str(aspect + 100)))
+					aspectSwitchList.append((video_hw.ASPECT_SWITCH_MSG[aspect], str(aspect + 100)))
 				aspectSwitchList.append(("--", ""))
 			aspectList = [
 				(_("Resolution"), "resolution"),
@@ -3382,7 +3382,7 @@ class InfoBarAspectSelection:
 				elif aspect[1] == "resolution":
 					self.ExGreen_toggleGreen()
 				else:
-					avSwitch.setAspectRatio(int(aspect[1]))
+					iAVSwitch.setAspectRatio(int(aspect[1]))
 					self.ExGreen_doHide()
 		else:
 			self.ExGreen_doHide()
