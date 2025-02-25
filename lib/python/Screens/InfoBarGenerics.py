@@ -2489,6 +2489,7 @@ class InfoBarExtensions:
 				"extensions": (self.showExtensionSelection, _("Show extensions...")),
 		},prio=1, description=_("Extension Actions"))  # Lower priority.
 		self.addExtension(extension=self.getOScamInfo, type=InfoBarExtensions.EXTENSION_LIST)
+		self.addExtension(extension=self.getLogManager, type=InfoBarExtensions.EXTENSION_LIST)
 
 	def getOSname(self):
 		return _("OScam/Ncam Info")
@@ -2498,6 +2499,19 @@ class InfoBarExtensions:
 			return [((boundFunction(self.getOSname), boundFunction(self.openOScamInfo), lambda: True), None)] or []
 		else:
 			return []
+
+	def getLMname(self):
+		return _("Log Manager")
+
+	def getLogManager(self):
+		if config.logmanager.showinextensions.value:
+			return [((boundFunction(self.getLMname), boundFunction(self.openLogManager), lambda: True), None)]
+		else:
+			return []
+
+	def openLogManager(self):
+		from Screens.LogManager import LogManager
+		self.session.open(LogManager)
 
 	def openSoftcamSetup(self):
 		from Screens.SoftcamSetup import SoftcamSetup
