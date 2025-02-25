@@ -319,7 +319,7 @@ BoxInfo.setItem("DefaultDisplayBrightness", MACHINEBUILD in ("dm900", "dm920", "
 BoxInfo.setItem("3DMode", fileCheck("/proc/stb/fb/3dmode") or fileCheck("/proc/stb/fb/primary/3d"))
 BoxInfo.setItem("3DZNorm", fileCheck("/proc/stb/fb/znorm") or fileCheck("/proc/stb/fb/primary/zoffset"))
 BoxInfo.setItem("HasQuadpip", fileCheck("/proc/stb/video/decodermode"))
-BoxInfo.setItem("Blindscan_t2_available", fileCheck("/proc/stb/info/vuMODEL") and MODEL.startswith("vu"))
+BoxInfo.setItem("Blindscan_t2_available", fileCheck("/proc/stb/info/vumodel") and MODEL.startswith("vu"))
 BoxInfo.setItem("RcTypeChangable", not (MODEL in ("gbquad4k", "gbue4k", "et8500") or MODEL.startswith("et7")) and pathExists("/proc/stb/ir/rc/type"))
 BoxInfo.setItem("HasFullHDSkinSupport", MODEL not in ("et4000", "et5000", "sh1", "hd500c", "hd1100", "xp1000", "lc"))
 BoxInfo.setItem("HasBypassEdidChecking", fileCheck("/proc/stb/hdmi/bypass_edid_checking"))
