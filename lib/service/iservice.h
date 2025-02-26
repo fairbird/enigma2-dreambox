@@ -23,7 +23,7 @@ public:
 		idFile,
 		idServiceM2TS= 0x0003,	//    3
 		idUser=0x1000,
-		idServiceMP3=0x1001
+		idServiceMP3=0x1001,
 		idServiceDVD= 0x1111,	// 4369
 	};
 	int type;
