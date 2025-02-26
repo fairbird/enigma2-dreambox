@@ -1466,7 +1466,7 @@ RESULT eDVBServicePlay::start()
 		filename.erase(filename.length()-2, 2);
 		filename+="eit";
 		ePtr<eServiceEvent> event = new eServiceEvent;
-		if (!event->parseFrom(filename, (service.getTransportStreamID().get()<<16)|service.getOriginalNetworkID().get()))
+		if (!event->parseFrom(filename, (service.getTransportStreamID().get()<<16)|service.getOriginalNetworkID().get(), service.getServiceID().get()))
 		{
 			ePtr<eServiceEvent> empty;
 			m_event_handler.inject(event, 0);
