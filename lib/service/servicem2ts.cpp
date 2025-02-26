@@ -160,7 +160,7 @@ RESULT eStaticServiceM2TSInformation::getEvent(const eServiceReference &ref, ePt
 		std::string filename = ref.path;
 		filename.erase(filename.length()-4, 2);
 		filename+="eit";
-		if (!event->parseFrom(filename, (m_parser.m_ref.getTransportStreamID().get()<<16)|m_parser.m_ref.getOriginalNetworkID().get()))
+		if (!event->parseFrom(filename, (m_parser.m_ref.getTransportStreamID().get()<<16)|m_parser.m_ref.getOriginalNetworkID().get(), m_parser.m_ref.getServiceID().get()))
 		{
 			evt = event;
 			return 0;
@@ -305,7 +305,8 @@ sync:
 						int add_offs = (x - 4);
 						eDebug("[eM2TSFile] sync found at pos %d, sync_offset is now %d, old was %d", x, add_offs + m_sync_offset, m_sync_offset);
 						m_sync_offset += add_offs;
-						goto sync;
+						// FIXME do not use goto
+						goto sync; // NOSONAR
 					}
 				}
 			}
@@ -367,19 +368,19 @@ RESULT eServiceFactoryM2TS::play(const eServiceReference &ref, ePtr<iPlayableSer
 
 RESULT eServiceFactoryM2TS::record(const eServiceReference &ref, ePtr<iRecordableService> &ptr)
 {
-	ptr=0;
+	ptr = nullptr;
 	return -1;
 }
 
 RESULT eServiceFactoryM2TS::list(const eServiceReference &ref, ePtr<iListableService> &ptr)
 {
-	ptr=0;
+	ptr = nullptr;
 	return -1;
 }
 
 RESULT eServiceFactoryM2TS::info(const eServiceReference &ref, ePtr<iStaticServiceInformation> &ptr)
 {
-	ptr=new eStaticServiceM2TSInformation(ref);
+	ptr = new eStaticServiceM2TSInformation(ref);
 	return 0;
 }
 
