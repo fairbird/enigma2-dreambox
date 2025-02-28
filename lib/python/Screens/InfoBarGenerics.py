@@ -39,6 +39,7 @@ from ServiceReference import ServiceReference, getStreamRelayRef, isPlayableForC
 
 from Tools.ASCIItranslit import legacyEncode
 from Tools.Directories import fileExists, fileReadLines, fileWriteLines, fileReadLinesISO, getRecordingFilename, moveFiles
+from Tools.ServiceReference import hdmiInServiceRef
 from keyids import KEYFLAGS, KEYIDS, KEYIDNAMES
 from Tools.Notifications import AddPopup, AddNotificationWithCallback, current_notifications, lock, notificationAdded, notifications, RemovePopup
 
@@ -4151,14 +4152,14 @@ class InfoBarHDMI:
 	def HDMIInLong(self):
 		if not hasattr(self.session, "pip") and not self.session.pipshown:
 			self.session.pip = self.session.instantiateDialog(PictureInPicture)
-			self.session.pip.playService(eServiceReference('8192:0:1:0:0:0:0:0:0:0:'))
+			self.session.pip.playService(hdmiInServiceRef())
 			self.session.pip.show()
 			self.session.pipshown = True
 			self.session.pip.servicePath = self.servicelist.getCurrentServicePath()
 		elif BoxInfo.getItem("HasHDMIinPiP"):
 			curref = self.session.pip.getCurrentService()
-			if curref and curref.type != 8192:
-				self.session.pip.playService(eServiceReference('8192:0:1:0:0:0:0:0:0:0:'))
+			if curref and curref.type != eServiceReference.idServiceHDMIIn:
+				self.session.pip.playService(hdmiInServiceRef())
 				self.session.pip.servicePath = self.servicelist.getCurrentServicePath()
 			else:
 				self.session.pipshown = False
@@ -4167,8 +4168,8 @@ class InfoBarHDMI:
 	def HDMIIn(self):
 		slist = self.servicelist
 		curref = self.session.nav.getCurrentlyPlayingServiceOrGroup()
-		if curref and curref.type != 8192:
-			self.session.nav.playService(eServiceReference('8192:0:1:0:0:0:0:0:0:0:'))
+		if curref and curref.type != eServiceReference.idServiceHDMIIn:
+			self.session.nav.playService(hdmiInServiceRef())
 		else:
 			self.session.nav.playService(slist.servicelist.getCurrent())
 
@@ -4182,15 +4183,15 @@ class InfoBarHDMI:
 		if not hasattr(self.session, "pip") and not self.session.pipshown:
 			self.hdmi_enabled_pip = True
 			self.session.pip = self.session.instantiateDialog(PictureInPicture)
-			self.session.pip.playService(eServiceReference('8192:0:1:0:0:0:0:0:0:0:'))
+			self.session.pip.playService(hdmiInServiceRef())
 			self.session.pip.show()
 			self.session.pipshown = True
 			self.session.pip.servicePath = self.servicelist.getCurrentServicePath()
 		else:
 			curref = self.session.pip.getCurrentService()
-			if curref and curref.type != 8192:
+			if curref and curref.type != eServiceReference.idServiceHDMIIn:
 				self.hdmi_enabled_pip = True
-				self.session.pip.playService(eServiceReference('8192:0:1:0:0:0:0:0:0:0:'))
+				self.session.pip.playService(hdmiInServiceRef())
 				self.session.pip.servicePath = self.servicelist.getCurrentServicePath()
 			else:
 				self.hdmi_enabled_pip = False
@@ -4200,9 +4201,9 @@ class InfoBarHDMI:
 	def HDMIInFull(self):
 		slist = self.servicelist
 		curref = self.session.nav.getCurrentlyPlayingServiceOrGroup()
-		if curref and curref.type != 8192:
+		if curref and curref.type != eServiceReference.idServiceHDMIIn:
 			self.hdmi_enabled_full = True
-			self.session.nav.playService(eServiceReference('8192:0:1:0:0:0:0:0:0:0:'))
+			self.session.nav.playService(hdmiInServiceRef())
 		else:
 			self.hdmi_enabled_full = False
 			self.session.nav.playService(slist.servicelist.getCurrent())
