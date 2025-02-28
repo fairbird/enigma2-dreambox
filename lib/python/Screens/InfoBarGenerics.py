@@ -4301,7 +4301,7 @@ class InfoBarHandleBsod:
 			txt += _("(Attention: There will be a restart after %d crashes.)") % maxbs
 			if writelog:
 				txt += "\n" + "-" * 80 + "\n"
-				txt += _("A crash log was %s created in '%s'") % ((_("not"), '')[int(writelog)], config.crash.debugPath.value)
+				txt += _("A crash log was %s created in '%s'") % ((_("not"), '')[int(writelog)], config.crash.debug_path.value)
 			#if not writelog:
 			#	txt += "\n" + "-"*80 + "\n"
 			#	txt += _("(It is set that '%s' crash logs are displayed and written.\nInfo: It will always write the first, last but one and lastest crash log.)") % str(int(config.crash.bsodhide.value) or _("Never"))

@@ -24,8 +24,8 @@ from Tools.Directories import fileReadLines
 MODULE_NAME = __name__.split(".")[-1]
 
 
-CRASH_LOG_PATTERN = r"^.*-enigma\d?-crash\.log$"
-DEBUG_LOG_PATTERN = r"^.*-enigma\d?-debug\.log$"
+CRASH_LOG_PATTERN = "Enigma2_crash_"
+DEBUG_LOG_PATTERN = "Enigma2_debug_"
 
 
 def get_size(start_path=None):
@@ -98,7 +98,7 @@ class LogManagerPoller:
 
 	def JobTrim(self):
 		filename = ""
-		for filename in glob(config.crash.debugPath.value + '*.log'):
+		for filename in glob(config.crash.debug_path.value + '*.log'):
 			try:
 				if getsize(filename) > (config.crash.debugloglimit.value * 1024 * 1024):
 					fh = open(filename, 'rb+')
@@ -131,7 +131,7 @@ class LogManagerPoller:
 			matches.append('/home/root/logs')
 		else:
 			#small JobTrash (in selected log file dir only) twice a day
-			matches.append(config.crash.debugPath.value)
+			matches.append(config.crash.debug_path.value)
 
 		print("[LogManager] found following log's: %s" % matches)
 		if matches:
@@ -209,11 +209,11 @@ class LogManager(Screen):
 		self.onChangedEntry = []
 		self.sentsingle = ""
 		self.selectedFiles = config.logmanager.sentfiles.value
-		self.defaultDir = config.crash.debugPath.value
+		self.defaultDir = config.crash.debug_path.value
 		self.matchingPattern = CRASH_LOG_PATTERN
 		self.filelist = MultiFileSelectList(self.selectedFiles, self.defaultDir, showDirectories=False, matchingPattern=self.matchingPattern)
 		self["list"] = self.filelist
-		self["LogsSize"] = self.logsinfo = LogInfo(config.crash.debugPath.value, LogInfo.USED, update=False)
+		self["LogsSize"] = self.logsinfo = LogInfo(config.crash.debug_path.value, LogInfo.USED, update=False)
 		self.onLayoutFinish.append(self.layoutFinished)
 		if self.selectionChanged not in self["list"].onSelectionChanged:
 			self["list"].onSelectionChanged.append(self.selectionChanged)
@@ -229,7 +229,7 @@ class LogManager(Screen):
 			cb(name, "")
 
 	def layoutFinished(self):
-		self["LogsSize"].update(config.crash.debugPath.value)
+		self["LogsSize"].update(config.crash.debug_path.value)
 		idx = 0
 		self["list"].moveToIndex(idx)
 		self.setTitle(self.defaultDir)
@@ -265,7 +265,7 @@ class LogManager(Screen):
 			self.selectedFiles = self["list"].getSelectedList()
 
 	def changelogtype(self):
-		self["LogsSize"].update(config.crash.debugPath.value)
+		self["LogsSize"].update(config.crash.debug_path.value)
 		if self.logtype == 'crashlogs':
 			self["key_red"].setText(_("Crash Logs"))
 			self.logtype = 'debuglogs'
@@ -333,7 +333,7 @@ class LogManager(Screen):
 			if exists(path):
 				remove(path)
 			self["list"].changeDir(self.defaultDir)
-			self["LogsSize"].update(config.crash.debugPath.value)
+			self["LogsSize"].update(config.crash.debug_path.value)
 
 
 class LogManagerViewLog(Screen):
@@ -396,7 +396,7 @@ class LogInfo(VariableText, GUIComponent):
 		GUIComponent.__init__(self)
 		VariableText.__init__(self)
 		self.type = type
-# 		self.path = config.crash.debugPath.value
+# 		self.path = config.crash.debug_path.value
 		if update:
 			self.update(path)
 

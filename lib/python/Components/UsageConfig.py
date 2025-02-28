@@ -1320,7 +1320,7 @@ def InitUsageConfig():
 	config.crash.coredump = ConfigYesNo(default=False)
 
 	def updateDebugPath(configElement):
-		debugPath = config.crash.debugPath.value
+		debugPath = config.crash.debug_path.value
 		try:
 			makedirs(debugPath, 0o755, exist_ok=True)
 		except OSError as err:
@@ -1330,14 +1330,14 @@ def InitUsageConfig():
 	for partition in harddiskmanager.getMountedPartitions():
 		if exists(partition.mountpoint) and partition.mountpoint != "/":
 			choiceList.append((pathjoin(partition.mountpoint, "logs", ""), normpath(partition.mountpoint)))
-	config.crash.debugPath = ConfigSelection(default="/home/root/logs/", choices=choiceList)
-	config.crash.debugPath.addNotifier(updateDebugPath, immediate_feedback=False)
+	config.crash.debug_path = ConfigSelection(default="/home/root/logs/", choices=choiceList)
+	config.crash.debug_path.addNotifier(updateDebugPath, immediate_feedback=False)
 
 	crashlogheader = _("We are really sorry. Your receiver encountered "
 		"a software problem, and needs to be restarted.\n"
 		"Please send the logfile %senigma2_crash_xxxxxx.log to https://github.com/fairbird/enigma2-dreambox.\n"
 		"Your receiver restarts in 10 seconds!\n"
-		"Component: enigma2") % config.crash.debugPath.value
+		"Component: enigma2") % config.crash.debug_path.value
 	config.crash.debug_text = ConfigText(default=crashlogheader, fixed_size=False)
 	config.crash.skin_error_crash = ConfigYesNo(default=True)
 
