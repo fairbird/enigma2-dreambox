@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from enigma import eServiceReference, eServiceReferenceDVB, eServiceCenter, getBestPlayableServiceReference
 from Components.config import config
 import NavigationInstance
