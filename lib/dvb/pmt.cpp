@@ -25,11 +25,14 @@
 #include <dvbsi++/simple_application_boundary_descriptor.h>
 #include <dvbsi++/transport_protocol_descriptor.h>
 #include <dvbsi++/application_name_descriptor.h>
+#include <dvbsi++/application_profile.h>
+#include <dvbsi++/application_descriptor.h>
 
 int eDVBServicePMTHandler::m_debug = -1;
 
 eDVBServicePMTHandler::eDVBServicePMTHandler()
-	:m_ca_servicePtr(0), m_dvb_scan(0), m_decode_demux_num(0xFF), m_no_pat_entry_delay(eTimer::create())
+	:m_last_channel_state(-1), m_ca_servicePtr(0), m_dvb_scan(0), m_decode_demux_num(0xFF),
+	m_no_pat_entry_delay(eTimer::create()), m_have_cached_program(false)
 {
 	m_use_decode_demux = 0;
 	m_pmt_pid = -1;
@@ -39,6 +42,7 @@ eDVBServicePMTHandler::eDVBServicePMTHandler()
 	m_pmt_ready = false;
 	if(eDVBServicePMTHandler::m_debug < 0)
 		eDVBServicePMTHandler::m_debug = eSimpleConfig::getBool("config.crash.debugDVB", false) ? 1 : 0;
+
 	eDVBResourceManager::getInstance(m_resourceManager);
 	CONNECT(m_PAT.tableReady, eDVBServicePMTHandler::PATready);
 	CONNECT(m_AIT.tableReady, eDVBServicePMTHandler::AITready);
@@ -205,6 +209,13 @@ void eDVBServicePMTHandler::PMTready(int error)
 void eDVBServicePMTHandler::sendEventNoPatEntry()
 {
 	serviceEvent(eventNoPATEntry);
+
+	ePtr<iDVBFrontend> fe;
+	if (!m_channel->getFrontend(fe))
+	{
+		eDVBFrontend *frontend = (eDVBFrontend*)&(*fe);
+		frontend->checkRetune();
+	}
 }
 
 void eDVBServicePMTHandler::PATready(int)
@@ -218,7 +229,11 @@ void eDVBServicePMTHandler::PATready(int)
 		int pmtpid_single = -1;
 		int pmtpid = -1;
 		int cnt=0;
-		std::vector<ProgramAssociationSection*>::const_iterator i;
+		int tsid=-1;
+		std::vector<ProgramAssociationSection*>::const_iterator i = ptr->getSections().begin();
+		tsid = (*i)->getTableIdExtension(); // in PAT this is the transport stream id
+		if(eDVBServicePMTHandler::m_debug)
+			eDebug("[eDVBServicePMTHandler] PAT TSID: 0x%04x (%d)", tsid, tsid);
 		for (i = ptr->getSections().begin(); pmtpid == -1 && i != ptr->getSections().end(); ++i)
 		{
 			const ProgramAssociationSection &pat = **i;
@@ -529,12 +544,6 @@ int eDVBServicePMTHandler::getProgramInfo(program &program)
 					}
 				}
 			}
-
-			if (autoaudio_languages.empty() && program.audioStreams[i].type == audioStream::atMPEG && first_mpeg == -1)
-			{
-				first_mpeg = i;
-			}
-
 			if (!as->language_code.empty())
 			{
 				int x = 1;
