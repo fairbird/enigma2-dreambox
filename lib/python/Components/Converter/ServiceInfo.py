@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from os import path
 
 from enigma import eAVControl, eServiceReference, iPlayableService, iServiceInformation
@@ -10,6 +11,50 @@ from Tools.Transponder import ConvertToHumanReadable
 
 MODULE_NAME = __name__.split(".")[-1]
 WIDESCREEN = [1, 3, 4, 7, 8, 11, 12, 15, 16]  # This is imported into InfoBarGenerics.py!
+
+
+def StdAudioDesc(description):
+	if not description:
+		return ""
+
+	REPLACEMENTS = (
+		("A_", ""),
+		("AC-3", "AC3"),
+		("(ATSC A/52)", ""),
+		("(ATSC A/52B)", ""),
+		("MPEG-1 Layer 2 (MP2)", "MP2"),
+		(" Layer 2 (MP2)", ""),
+		(" Layer 3 (MP3)", "MP3"),
+		("-1", ""),
+		("-2", ""),
+		("2-", ""),
+		("MPEG-4 AAC", "AAC"),
+		("-4 AAC", "AAC"),
+		("4-AAC", "HE-AAC"),
+		("audio", ""),
+		("/L3", ""),
+		("/mpeg", "AAC"),
+		("/x-", ""),
+		("raw", "Dolby TrueHD"),
+		("E-AC3", "AC3+"),
+		("EAC3", "AC3+"),
+		("IPCM", "AC3"),
+		("LPCM", "AC3+"),
+		("AAC_PLUS", "AAC+"),
+		("AAC_LATM", "AAC"),
+		("WMA/PRO", "WMA Pro"),
+		("MPEG", "MPEG1 Layer II"),
+		("MPEG1 Layer II AAC", "AAC"),
+		("MPEG1 Layer IIAAC", "AAC"),
+		("MPEG1 Layer IIMP3", "MP3"),
+	)
+
+	for orig, repl in REPLACEMENTS:
+		description = description.replace(orig, repl)
+	return description
+
+def getVideoHeight(info):
+	return info.getInfo(iServiceInformation.sVideoHeight)
 
 
 class ServiceInfo(Converter):
@@ -68,12 +113,11 @@ class ServiceInfo(Converter):
 	VIDEO_INFO_ASPECT = 4
 	VIDEO_INFO_GAMMA = 5
 
-	def __init__(self, argument):
-		Converter.__init__(self, argument)
+	def __init__(self, type):
+		Converter.__init__(self, type)
 		# Poll.__init__(self)
 		# self.poll_interval = 10000
 		# self.poll_enabled = True
-		self.argument = argument
 		self.token, self.interestingEvents = {
 			"AudioPid": (self.APID, (iPlayableService.evUpdatedInfo,)),
 			"AudioTracksAvailable": (self.AUDIOTRACKS_AVAILABLE, (iPlayableService.evUpdatedInfo,)),
@@ -101,14 +145,14 @@ class ServiceInfo(Converter):
 			"IsMultichannel": (self.IS_MULTICHANNEL, (iPlayableService.evUpdatedInfo,)),
 			"IsNotWidescreen": (self.IS_NOT_WIDESCREEN, (iPlayableService.evVideoSizeChanged,)),
 			"IsSD": (self.IS_SD, (iPlayableService.evVideoSizeChanged,)),
-			# "IsSDAndNotWidescreen": (self.IS_SD_AND_NOT_WIDESCREEN, (iPlayableService.evVideoSizeChanged, iPlayableService.evUpdatedInfo)),
-			# "IsSDAndWidescreen": (self.IS_SD_AND_WIDESCREEN, (iPlayableService.evVideoSizeChanged, iPlayableService.evUpdatedInfo)),
+			"IsSDAndNotWidescreen": (self.IS_SD_AND_NOT_WIDESCREEN, (iPlayableService.evVideoSizeChanged, iPlayableService.evUpdatedInfo)),
+			"IsSDAndWidescreen": (self.IS_SD_AND_WIDESCREEN, (iPlayableService.evVideoSizeChanged, iPlayableService.evUpdatedInfo)),
 			"IsSDR": (self.IS_SDR, (iPlayableService.evVideoSizeChanged, iPlayableService.evVideoGammaChanged)),
 			"IsStereo": (self.IS_STEREO, (iPlayableService.evUpdatedInfo,)),
 			"IsStream": (self.IS_STREAM, (iPlayableService.evUpdatedInfo,)),
-			# "IsVideoAVC": (self.IS_VIDEO_AVC, (iPlayableService.evUpdatedInfo,)),
-			# "IsVideoHEVC": (self.IS_VIDEO_HEVC, (iPlayableService.evUpdatedInfo,)),
-			# "IsVideoMPEG2": (self.IS_VIDEO_MPEG2, (iPlayableService.evUpdatedInfo,)),
+			"IsVideoAVC": (self.IS_VIDEO_AVC, (iPlayableService.evUpdatedInfo,)),
+			"IsVideoHEVC": (self.IS_VIDEO_HEVC, (iPlayableService.evUpdatedInfo,)),
+			"IsVideoMPEG2": (self.IS_VIDEO_MPEG2, (iPlayableService.evUpdatedInfo,)),
 			"IsWidescreen": (self.IS_WIDESCREEN, (iPlayableService.evVideoSizeChanged,)),
 			"OnId": (self.ONID, (iPlayableService.evUpdatedInfo,)),
 			"PcrPid": (self.PCRPID, (iPlayableService.evUpdatedInfo,)),
@@ -125,9 +169,9 @@ class ServiceInfo(Converter):
 			"VideoHeight": (self.YRES, (iPlayableService.evVideoSizeChanged,)),
 			"VideoInfo": (self.VIDEO_INFORMATION, (iPlayableService.evVideoSizeChanged, iPlayableService.evVideoFramerateChanged, iPlayableService.evVideoProgressiveChanged, iPlayableService.evUpdatedInfo)),
 			"VideoPid": (self.VPID, (iPlayableService.evUpdatedInfo,)),
-			# "VideoSize": (self.VIDEO_SIZE, (iPlayableService.evVideoSizeChanged,)),
+			"VideoSize": (self.VIDEO_SIZE, (iPlayableService.evVideoSizeChanged,)),
 			"VideoWidth": (self.XRES, (iPlayableService.evVideoSizeChanged,)),
-		}.get(argument)
+		}[type]
 		self.instanceInfoBarSubserviceSelection = None
 
 	@cached

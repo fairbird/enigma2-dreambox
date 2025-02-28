@@ -38,7 +38,7 @@ from Screens.UnhandledKey import UnhandledKey
 from ServiceReference import ServiceReference, getStreamRelayRef, isPlayableForCur
 
 from Tools.ASCIItranslit import legacyEncode
-from Tools.Directories import fileExists, fileReadLines, fileWriteLines, fileReadLinesISO, getRecordingFilename, moveFiles
+from Tools.Directories import SCOPE_CONFIG, SCOPE_SKINS, fileExists, fileReadLines, fileWriteLines, fileReadLinesISO, getRecordingFilename, moveFiles, resolveFilename
 from Tools.ServiceReference import hdmiInServiceRef
 from keyids import KEYFLAGS, KEYIDS, KEYIDNAMES
 from Tools.Notifications import AddPopup, AddNotificationWithCallback, current_notifications, lock, notificationAdded, notifications, RemovePopup
@@ -3157,12 +3157,20 @@ class InfoBarAudioSelection:
 			self.audioDownmixToggle(False)
 
 
+# Subservice processing.
+#
+instanceInfoBarSubserviceSelection = None
+
+
 class InfoBarSubserviceSelection:
 	def __init__(self):
+		global instanceInfoBarSubserviceSelection
+		instanceInfoBarSubserviceSelection = self
+		self.subservicesGroups = self.loadSubservicesGroups()
 		self["SubserviceSelectionAction"] = HelpableActionMap(self, ["InfobarSubserviceSelectionActions"],
 			{
 				"subserviceSelection": (self.subserviceSelection, _("Subservice list...")),
-			})
+			}, prio=0, description=_("Subservice Actions"))
 
 		self["SubserviceQuickzapAction"] = HelpableActionMap(self, ["InfobarSubserviceQuickzapActions"],
 			{
@@ -3180,6 +3188,60 @@ class InfoBarSubserviceSelection:
 
 	def __removeNotifications(self):
 		self.session.nav.event.remove(self.checkSubservicesAvail)
+
+	def loadSubservicesGroups(self):
+		subservicesGroups = []
+		groupedServicesFile = resolveFilename(SCOPE_CONFIG, "groupedservices")
+		if not isfile(groupedServicesFile):
+			groupedServicesFile = resolveFilename(SCOPE_SKINS, "groupedservices")
+			if not isfile(groupedServicesFile):
+				groupedServicesFile = None
+				print("[InfoBarGenerics] No 'groupedservices' file found so no subservices are available.")
+		if groupedServicesFile:
+			subservicesGroups = [list(g) for k, g in itertools.groupby([line.split("#")[0].strip() for line in fileReadLines(groupedServicesFile, [], source=MODULE_NAME)], lambda x: not x) if not k]
+			count = len(subservicesGroups)
+			print(f"[InfoBarGenerics] {count} subservice group{'' if count == 1 else 's'} loaded from '{groupedServicesFile}'.")
+		return subservicesGroups
+
+	def getSubserviceGroups(self):
+		return self.subservicesGroups
+
+	def hasActiveSubservicesForCurrentService(self, serviceReference):
+		if serviceReference and "%3a" not in serviceReference:
+			serviceReference = ":".join(serviceReference.split(":")[:11])
+		if config.usage.showInfoBarSubservices.value == 1:
+			subservices = self.getActiveSubservicesForCurrentService(serviceReference)
+		elif config.usage.showInfoBarSubservices.value == 2:
+			subservices = self.getPossibleSubservicesForCurrentService(serviceReference)
+		else:
+			subservices = None
+		return bool(subservices and len(subservices) > 1)
+
+	def getActiveSubservicesForCurrentService(self, serviceReference):
+		transmissionPaused = [
+			"Sendepause"  # This is for German TV.
+		]
+		activeSubservices = []
+		if config.usage.showInfoBarSubservices.value and serviceReference:
+			possibleSubservices = self.getPossibleSubservicesForCurrentService(serviceReference)
+			epgCache = eEPGCache.getInstance()
+			for subservice in possibleSubservices:
+				events = epgCache.lookupEvent(["T", (subservice, 0, -1)])
+				if events and len(events) == 1:
+					title = events[0][0]
+					if title and not any([x for x in transmissionPaused if x in title]):
+						activeSubservices.append(subservice)
+				elif config.usage.showInfoBarSubservices.value == 2:
+					activeSubservices.append(subservice)
+		return activeSubservices
+
+	def getPossibleSubservicesForCurrentService(self, serviceReference):
+		possibleSubservices = []
+		if serviceReference and self.subservicesGroups:
+			possibleSubserviceGroups = [x for x in self.subservicesGroups if serviceReference in x]
+			if possibleSubserviceGroups:
+				possibleSubservices = possibleSubserviceGroups[0]  # If the service is in multiple groups should we return more options?
+		return possibleSubservices
 
 	def checkSubservicesAvail(self):
 		serviceRef = self.session.nav.getCurrentlyPlayingServiceReference()
