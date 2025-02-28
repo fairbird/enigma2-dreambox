@@ -683,6 +683,7 @@ int eDVBFrontend::openFrontend()
 				ioctlMeasureEval("DTV_ENUM_DELSYS");
 			}
 			else
+			{
 				eWarning("[eDVBFrontend] ioctl FE_GET_PROPERTY/DTV_ENUM_DELSYS failed: %m");
 #else
 			/* no DTV_ENUM_DELSYS support */
