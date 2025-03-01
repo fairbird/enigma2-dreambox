@@ -475,7 +475,7 @@ class ChannelContextMenu(Screen):
 		if self.removeFunction and self.csel.servicelist.getCurrent() and self.csel.servicelist.getCurrent().valid():
 			if self.csel.confirmRemove:
 				list = [(_("yes"), True), (_("no"), False), (_("yes") + " " + _("and never ask in this session again"), "never")]
-				self.session.openWithCallback(self.removeFunction, MessageBox, _("Are you sure to remove this entry?") + "\n%s" % self.getCurrentSelectionName(), list=list)
+				self.session.openWithCallback(self.removeFunction, MessageBox, f"{_('Are you sure to remove this entry?')}\n{self.getCurrentSelectionName()}", list=list)
 			else:
 				self.removeFunction(True)
 		else:
@@ -513,7 +513,7 @@ class ChannelContextMenu(Screen):
 			for file in os.listdir("/etc/enigma2/"):
 				if file.startswith("userbouquet") and file.endswith(".del"):
 					file = "/etc/enigma2/" + file
-					print("permantly remove file ", file)
+					print(f"[ChannelSelection] Permanently remove file '{file}'.")
 					os.remove(file)
 			self.close()
 
@@ -521,7 +521,7 @@ class ChannelContextMenu(Screen):
 		for file in os.listdir("/etc/enigma2/"):
 			if file.startswith("userbouquet") and file.endswith(".del"):
 				file = "/etc/enigma2/" + file
-				print("restore file ", file[:-4])
+				print(f"[ChannelSelection] Restore file '{file[:-4]}'.")
 				os.rename(file, file[:-4])
 		eDVBDBInstance = eDVBDB.getInstance()
 		eDVBDBInstance.setLoadUnlinkedUserbouquets(1)
@@ -1155,7 +1155,7 @@ class ChannelSelectionEdit:
 				if mutableAlternatives:
 					mutableAlternatives.setListName(name)
 					if mutableAlternatives.addService(cur_service.ref):
-						print("add", cur_service.ref.toString(), "to new alternatives failed")
+						print(f"[ChannelSelection] Add '{cur_service.ref.toString()}' to new alternatives failed!")
 					mutableAlternatives.flushChanges()
 					self.servicelist.addService(new_ref.ref, True)
 					self.servicelist.removeCurrent()
@@ -1168,7 +1168,7 @@ class ChannelSelectionEdit:
 				else:
 					print("get mutable list for new created alternatives failed")
 			else:
-				print("add", str, "to", cur_root.getServiceName(), "failed")
+				print(f"[ChannelSelection] Add '{str}' to '{cur_root.getServiceName()}' failed!")
 		else:
 			print("bouquetlist is not editable")
 
@@ -1193,7 +1193,7 @@ class ChannelSelectionEdit:
 					if services is not None:
 						for service in services:
 							if mutableBouquet.addService(service):
-								print("add", service.toString(), "to new bouquet failed")
+								print(f"[ChannelSelection] Add '{service.toString()}' to new bouquet failed!")
 					mutableBouquet.flushChanges()
 				else:
 					print("get mutable list for new created bouquet failed")
@@ -1251,7 +1251,7 @@ class ChannelSelectionEdit:
 
 	def removeBouquet(self):
 		refstr = self.getCurrentSelection().toString()
-		print("removeBouquet", refstr)
+		print(f"[ChannelSelection] removeBouquet {refstr}")
 		pos = refstr.find('FROM BOUQUET "')
 		filename = None
 		self.removeCurrentService(bouquet=True)
@@ -1602,7 +1602,7 @@ class ChannelSelectionBase(Screen):
 		self.instanceInfoBarSubserviceSelection = None
 
 	def compileTitle(self):
-		self.setTitle("%s%s%s%s" % (self.maintitle, self.modetitle, self.functiontitle, self.servicetitle))
+		self.setTitle(f"{self.maintitle}{self.modetitle}{self.functiontitle}{self.servicetitle}")
 
 	def getBouquetNumOffset(self, bouquet):
 		if not config.usage.multibouquet.value:
@@ -1661,30 +1661,25 @@ class ChannelSelectionBase(Screen):
 		self.rootChanged = True
 		self.buildTitleString()
 
-	def removeModeStr(self, str):
-		if self.mode == MODE_TV:
-			pos = str.find(_(" (TV)"))
-		else:
-			pos = str.find(_(" (Radio)"))
-		if pos != -1:
-			return str[:pos]
-		return str
-
-	def getServiceName(self, ref):
-		str = self.removeModeStr(ServiceReference(ref).getServiceName())
-		if 'bouquets' in str.lower():
+	def getServiceName(self, serviceReference):
+		serviceNameTmp = ServiceReference(serviceReference).getServiceName()
+		serviceName = serviceNameTmp.replace(_("(TV)") if self.mode == MODE_TV else _("(Radio)"), "").replace("  ", " ").strip()
+		print(f"[ChannelSelection] getServiceName DEBUG: Service Name Before='{serviceNameTmp}', After='{serviceName}'.")
+		if "bouquets" in serviceName.lower():
 			return _("User bouquets")
-		if not str:
-			pathstr = ref.getPath()
-			if 'FROM PROVIDERS' in pathstr:
-				return _("Provider")
-			if 'FROM SATELLITES' in pathstr:
+		if not serviceName:
+			servicePath = serviceReference.getPath()
+			if "FROM PROVIDERS" in servicePath:
+				return _("Providers")
+			if "FROM SATELLITES" in servicePath:
 				return _("Satellites")
-			if ') ORDER BY name' in pathstr:
-				return _("All")
+			if "ORDER BY name" in servicePath:
+				return _("All Services")
 			if self.isSubservices(serviceReference):
 				return _("Subservices")
-		return str if config.usage.multibouquet.value else _("Favorites")
+		elif serviceName == "favourites" and not config.usage.multibouquet.value:  # Translate single bouquet favourites
+			return _("Bouquets")
+		return serviceName
 
 	def buildTitleString(self):
 		self.servicetitle = ""
@@ -1770,7 +1765,7 @@ class ChannelSelectionBase(Screen):
 
 	def showAllServices(self):
 		if not self.pathChangeDisabled:
-			ref = serviceRefAppendPath(self.service_types_ref, 'FROM SATELLITES ORDER BY satellitePosition')
+			ref = serviceRefAppendPath(self.service_types_ref, "ORDER BY name")
 			if not self.preEnterPath(ref.toString()):
 				currentRoot = self.getRoot()
 				if currentRoot is None or currentRoot != ref:
@@ -1782,11 +1777,10 @@ class ChannelSelectionBase(Screen):
 
 	def showSatellites(self, changeMode=False):
 		if not self.pathChangeDisabled:
-			refstr = '%s FROM SATELLITES ORDER BY satellitePosition' % (self.service_types)
+			ref = serviceRefAppendPath(self.service_types_ref, "FROM SATELLITES ORDER BY satellitePosition")
 			if not self.preEnterPath(ref.toString()):
 				justSet = False
 				prev = None
-
 				if self.isBasePathEqual(ref):
 					if self.isPrevPathEqual(ref):
 						justSet = True
@@ -1809,7 +1803,7 @@ class ChannelSelectionBase(Screen):
 					if not servicelist is None:
 						while True:
 							service = servicelist.getNext()
-							if not service.valid(): #check if end of list
+							if not service.valid():  # Check if end of list.
 								break
 							unsigned_orbpos = service.getUnsignedData(4) >> 16
 							orbpos = service.getData(4) >> 16
@@ -1817,28 +1811,28 @@ class ChannelSelectionBase(Screen):
 								orbpos += 3600
 							if "FROM PROVIDER" in service.getPath():
 								service_type = self.showSatDetails and _("Providers")
-							elif ("flags == %d" % (FLAG_SERVICE_NEW_FOUND)) in service.getPath():
+							elif (f"flags == {FLAG_SERVICE_NEW_FOUND}") in service.getPath():
 								service_type = self.showSatDetails and _("New")
 							else:
 								service_type = _("Services")
 							if service_type:
-								if unsigned_orbpos == 0xFFFF: #Cable
+								if unsigned_orbpos == 0xFFFF:  # Cable.
 									service_name = _("Cable")
-									addCableAndTerrestrialLater.append(("%s - %s" % (service_name, service_type), service.toString()))
-								elif unsigned_orbpos == 0xEEEE: #Terrestrial
+									addCableAndTerrestrialLater.append((f"{service_name} - {service_type}", service.toString()))
+								elif unsigned_orbpos == 0xEEEE:  # Terrestrial.
 									service_name = _("Terrestrial")
-									addCableAndTerrestrialLater.append(("%s - %s" % (service_name, service_type), service.toString()))
+									addCableAndTerrestrialLater.append((f"{service_name} - {service_type}", service.toString()))
 								else:
 									try:
 										service_name = str(nimmanager.getSatDescription(orbpos))
-									except:
-										if orbpos > 1800: # west
+									except Exception:
+										if orbpos > 1800:  # West.
 											orbpos = 3600 - orbpos
 											h = _("W")
 										else:
 											h = _("E")
-										service_name = ("%d.%d" + h) % (orbpos / 10, orbpos % 10)
-									service.setName("%s - %s" % (service_name, service_type))
+										service_name = f"{orbpos // 10}.{orbpos % 10}{h}"
+									service.setName(f"{service_name} - {service_type}")
 									self.servicelist.addService(service)
 						cur_ref = self.session.nav.getCurrentlyPlayingServiceReference()
 						self.servicelist.sort()
@@ -1846,9 +1840,9 @@ class ChannelSelectionBase(Screen):
 							# pos = self.service_types.rfind(":")  # DEBUG NOTE: This doesn't appear to be used.
 							ref = eServiceReference(self.service_types_ref)
 							path = '(channelID == %08x%04x%04x) && %s ORDER BY name' % (
-								cur_ref.getUnsignedData(4), # NAMESPACE
-								cur_ref.getUnsignedData(2), # TSID
-								cur_ref.getUnsignedData(3), # ONID
+								cur_ref.getUnsignedData(4),  # NAMESPACE
+								cur_ref.getUnsignedData(2),  # TSID
+								cur_ref.getUnsignedData(3),  # ONID
 								self.service_types_ref.getPath())
 							ref.setPath(path)
 							ref.setName(_("Current transponder"))
