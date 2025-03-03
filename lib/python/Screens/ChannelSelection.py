@@ -2761,7 +2761,7 @@ class ChannelSelection(ChannelSelectionBase, ChannelSelectionEdit, ChannelSelect
 		selected_ref = self.getCurrentSelection()
 		if selected_ref and current_ref and selected_ref.getChannelNum() != current_ref.getChannelNum():
 			oldref = self.session.nav.currentlyPlayingServiceReference
-			if oldref and selected_ref == oldref or (oldref != current_ref and selected_ref == current_ref):
+			if oldref and (selected_ref == oldref or (oldref != current_ref and selected_ref == current_ref)):
 				self.session.nav.currentlyPlayingServiceOrGroup = selected_ref
 				self.session.nav.pnav.navEvent(iPlayableService.evStart)
 		if self.dopipzap:
