@@ -474,12 +474,12 @@ class Troubleshoot(Screen):
 		self.close()
 
 	def getDebugFilesList(self):
-		return [x for x in sorted(glob.glob("/home/root/enigma.*.debuglog"), key=lambda x: os.path.isfile(x) and os.path.getmtime(x))]
+		home_root = "/home/root/logs/Enigma2_debug_*.log"
+		return [x for x in sorted(glob.glob("/mnt/hdd/logs/Enigma2_debug_*.log"), key=lambda x: os.path.isfile(x) and os.path.getmtime(x))] + (os.path.isfile(home_root) and [home_root] or [])
 
 	def getLogFilesList(self):
-		home_root = "/home/root/enigma2_crash.log"
-		tmp = "/tmp/enigma2_crash.log"
-		return [x for x in sorted(glob.glob("/mnt/hdd/*.log"), key=lambda x: os.path.isfile(x) and os.path.getmtime(x))] + (os.path.isfile(home_root) and [home_root] or []) + (os.path.isfile(tmp) and [tmp] or [])
+		home_root = "/home/root/logs/Enigma2_crash_*.log"
+		return [x for x in sorted(glob.glob("/mnt/hdd/logs/Enigma2_crash_*.log"), key=lambda x: os.path.isfile(x) and os.path.getmtime(x))] + (os.path.isfile(home_root) and [home_root] or [])
 
 	def updateOptions(self):
 		self.titles = ["dmesg", "ifconfig", "df", "top", "ps", "messages", "enigma info", "BoxInfo"]
