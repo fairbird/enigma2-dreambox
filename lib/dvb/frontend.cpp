@@ -3325,60 +3325,62 @@ std::string eDVBFrontend::getCapabilities()
 {
 	std::stringstream ss;
 
-	ss << "DVB API version: " << m_dvbversion / 256 << "." << m_dvbversion % 256 << std::endl;
-	ss << "Frontend: " << fe_info.name << std::endl;
+	ss << "DVB API version:" << m_dvbversion / 256 << "." << m_dvbversion % 256 << std::endl;
+	ss << "Frontend:" << fe_info.name << std::endl;
 
 	int k = fe_info.type ? 1 : 1000;
 
 	ss << "Frequency:";
-	ss << " min " <<  formatHz(fe_info.frequency_min * k);
-	ss << " max " << formatHz(fe_info.frequency_max * k);
-	ss << " stepsize " << formatHz(fe_info.frequency_stepsize * k);
-	ss << " tolerance " << formatHz(fe_info.frequency_tolerance * k) << std::endl;
+	ss << "min=" <<  formatHz(fe_info.frequency_min * k);
+	ss << ",max=" << formatHz(fe_info.frequency_max * k);
+	ss << ",stepsize=" << formatHz(fe_info.frequency_stepsize * k);
+	ss << ",tolerance=" << formatHz(fe_info.frequency_tolerance * k) << std::endl;
 
 	ss << "Symbolrate:";
-	ss << " min " << formatNumber(fe_info.symbol_rate_min, "Bauds");
-	ss << " max " << formatNumber(fe_info.symbol_rate_max, "Bauds");
-	ss << " tolerance " << formatHz(fe_info.symbol_rate_tolerance) << std::endl;
+	ss << "min=" << formatNumber(fe_info.symbol_rate_min, "Bauds");
+	ss << ",max=" << formatNumber(fe_info.symbol_rate_max, "Bauds");
+	ss << ",tolerance=" << formatHz(fe_info.symbol_rate_tolerance) << std::endl;
 
 	ss << "Capabilities:";
-	if (fe_info.caps == FE_IS_STUPID)			ss << " stupid FE";
-	if (fe_info.caps &  FE_CAN_INVERSION_AUTO)		ss << " auto inversion";
-	if (fe_info.caps &  FE_CAN_FEC_1_2)			ss << " FEC 1/2";
-	if (fe_info.caps &  FE_CAN_FEC_2_3)			ss << " FEC 2/3";
-	if (fe_info.caps &  FE_CAN_FEC_3_4)			ss << " FEC 3/4";
-	if (fe_info.caps &  FE_CAN_FEC_4_5)			ss << " FEC 4/5";
-	if (fe_info.caps &  FE_CAN_FEC_5_6)			ss << " FEC 5/6";
-	if (fe_info.caps &  FE_CAN_FEC_6_7)			ss << " FEC 6/7";
-	if (fe_info.caps &  FE_CAN_FEC_7_8)			ss << " FEC 7/8";
-	if (fe_info.caps &  FE_CAN_FEC_8_9)			ss << " FEC 8/9";
-	if (fe_info.caps &  FE_CAN_FEC_AUTO)			ss << " FEC AUTO";
-	if (fe_info.caps &  FE_CAN_QPSK)			ss << " QPSK";
-	if (fe_info.caps &  FE_CAN_QAM_16)			ss << " QAM 16";
-	if (fe_info.caps &  FE_CAN_QAM_32)			ss << " QAM 32";
-	if (fe_info.caps &  FE_CAN_QAM_64)			ss << " QAM 64";
-	if (fe_info.caps &  FE_CAN_QAM_128)			ss << " QAM 128";
-	if (fe_info.caps &  FE_CAN_QAM_256)			ss << " QAM 256";
-	if (fe_info.caps &  FE_CAN_QAM_AUTO)			ss << " QAM AUTO";
-	if (fe_info.caps &  FE_CAN_TRANSMISSION_MODE_AUTO)	ss << " auto transmission mode";
-	if (fe_info.caps &  FE_CAN_BANDWIDTH_AUTO)             	ss << " auto bandwidth";
-	if (fe_info.caps &  FE_CAN_GUARD_INTERVAL_AUTO)		ss << " auto guard interval";
-	if (fe_info.caps &  FE_CAN_HIERARCHY_AUTO)		ss << " auto hierarchy";
-	if (fe_info.caps &  FE_CAN_8VSB)			ss << " FE_CAN_8VSB";
-	if (fe_info.caps &  FE_CAN_16VSB)			ss << " FE_CAN_16VSB";
-	if (fe_info.caps &  FE_HAS_EXTENDED_CAPS)		ss << " FE_HAS_EXTENDED_CAPS";
+
+	if (fe_info.caps == FE_IS_STUPID)			ss << "stupid FE,";
+	if (fe_info.caps &  FE_CAN_INVERSION_AUTO)		ss << "auto inversion,";
+	if (fe_info.caps &  FE_CAN_FEC_1_2)			ss << "FEC 1/2,";
+	if (fe_info.caps &  FE_CAN_FEC_2_3)			ss << "FEC 2/3,";
+	if (fe_info.caps &  FE_CAN_FEC_3_4)			ss << "FEC 3/4,";
+	if (fe_info.caps &  FE_CAN_FEC_4_5)			ss << "FEC 4/5,";
+	if (fe_info.caps &  FE_CAN_FEC_5_6)			ss << "FEC 5/6,";
+	if (fe_info.caps &  FE_CAN_FEC_6_7)			ss << "FEC 6/7,";
+	if (fe_info.caps &  FE_CAN_FEC_7_8)			ss << "FEC 7/8,";
+	if (fe_info.caps &  FE_CAN_FEC_8_9)			ss << "FEC 8/9,";
+	if (fe_info.caps &  FE_CAN_FEC_AUTO)			ss << "FEC AUTO,";
+	if (fe_info.caps &  FE_CAN_QPSK)			ss << "QPSK,";
+	if (fe_info.caps &  FE_CAN_QAM_16)			ss << "QAM 16,";
+	if (fe_info.caps &  FE_CAN_QAM_32)			ss << "QAM 32,";
+	if (fe_info.caps &  FE_CAN_QAM_64)			ss << "QAM 64,";
+	if (fe_info.caps &  FE_CAN_QAM_128)			ss << "QAM 128,";
+	if (fe_info.caps &  FE_CAN_QAM_256)			ss << "QAM 256,";
+	if (fe_info.caps &  FE_CAN_QAM_AUTO)			ss << "QAM AUTO,";
+	if (fe_info.caps &  FE_CAN_TRANSMISSION_MODE_AUTO)	ss << "auto transmission mode,";
+	if (fe_info.caps &  FE_CAN_BANDWIDTH_AUTO)             	ss << "auto bandwidth,";
+	if (fe_info.caps &  FE_CAN_GUARD_INTERVAL_AUTO)		ss << "auto guard interval,";
+	if (fe_info.caps &  FE_CAN_HIERARCHY_AUTO)		ss << "auto hierarchy,";
+	if (fe_info.caps &  FE_CAN_8VSB)			ss << "FE_CAN_8VSB,";
+	if (fe_info.caps &  FE_CAN_16VSB)			ss << "FE_CAN_16VSB,";
+	if (fe_info.caps &  FE_HAS_EXTENDED_CAPS)		ss << "FE_HAS_EXTENDED_CAPS,";
 #ifdef HAVE_OLDE2_API
 #if defined FE_CAN_MULTISTREAM
-	if (fe_info.caps &  FE_CAN_MULTISTREAM)			ss << " FE_CAN_MULTISTREAM";
+	if (fe_info.caps &  FE_CAN_MULTISTREAM)			ss << "FE_CAN_MULTISTREAM,";
 #endif
 #else
-	if (fe_info.caps &  FE_CAN_MULTISTREAM)			ss << " FE_CAN_MULTISTREAM";
+	if (fe_info.caps &  FE_CAN_MULTISTREAM)			ss << "FE_CAN_MULTISTREAM,";
 #endif
-	if (fe_info.caps &  FE_CAN_TURBO_FEC)			ss << " FE_CAN_TURBO_FEC";
-	if (fe_info.caps &  FE_CAN_2G_MODULATION)		ss << " FE_CAN_2G_MODULATION";
-	if (fe_info.caps &  FE_NEEDS_BENDING)			ss << " FE_NEEDS_BENDING";
-	if (fe_info.caps &  FE_CAN_RECOVER)			ss << " FE_CAN_RECOVER";
-	if (fe_info.caps &  FE_CAN_MUTE_TS)			ss << " FE_CAN_MUTE_TS";
+	if (fe_info.caps &  FE_CAN_TURBO_FEC)			ss << "FE_CAN_TURBO_FEC,";
+	if (fe_info.caps &  FE_CAN_2G_MODULATION)		ss << "FE_CAN_2G_MODULATION,";
+	if (fe_info.caps &  FE_NEEDS_BENDING)			ss << "FE_NEEDS_BENDING,";
+	if (fe_info.caps &  FE_CAN_RECOVER)			ss << "FE_CAN_RECOVER,";
+	if (fe_info.caps &  FE_CAN_MUTE_TS)			ss << "FE_CAN_MUTE_TS,";
+
 	ss << std::endl;
 
 	ss << "Delivery Systems:";
@@ -3389,38 +3391,38 @@ std::string eDVBFrontend::getCapabilities()
 
 		switch (it->first)
 		{
-		case SYS_ATSC:		ss << " ATSC"; break;
-		case SYS_ATSCMH:	ss << " ATSCMH"; break;
-		case SYS_CMMB:		ss << " CMBB"; break;
-		case SYS_DAB:		ss << " DAB"; break;
-		case SYS_DSS:		ss << " DSS"; break;
-		case SYS_DVBC_ANNEX_B:	ss << " DVBC_ANNEX_B"; break;
-		case SYS_DVBH:		ss << " DVBH"; break;
-		case SYS_DVBS:		ss << " DVBS"; break;
-		case SYS_DVBS2:		ss << " DVBS2"; break;
-		case SYS_DVBT:		ss << " DVBT"; break;
-		case SYS_ISDBC:		ss << " ISDBC"; break;
-		case SYS_ISDBS:		ss << " ISDBS"; break;
-		case SYS_ISDBT:		ss << " ISDBT"; break;
-		case SYS_UNDEFINED:	ss << " UNDEFINED"; break;
-		case SYS_DVBC_ANNEX_A:	ss << " DVBC_ANNEX_A"; break;
+			case SYS_ATSC:		ss << "ATSC"; break;
+			case SYS_ATSCMH:	ss << "ATSCMH"; break;
+			case SYS_CMMB:		ss << "CMBB"; break;
+			case SYS_DAB:		ss << "DAB"; break;
+			case SYS_DSS:		ss << "DSS"; break;
+			case SYS_DVBC_ANNEX_B:	ss << "DVBC_ANNEX_B"; break;
+			case SYS_DVBH:		ss << "DVBH"; break;
+			case SYS_DVBS:		ss << "DVBS"; break;
+			case SYS_DVBS2:		ss << "DVBS2"; break;
+			case SYS_DVBT:		ss << "DVBT"; break;
+			case SYS_ISDBC:		ss << "ISDBC"; break;
+			case SYS_ISDBS:		ss << "ISDBS"; break;
+			case SYS_ISDBT:		ss << "ISDBT"; break;
+			case SYS_UNDEFINED:	ss << "UNDEFINED"; break;
+			case SYS_DVBC_ANNEX_A:	ss << "DVBC_ANNEX_A"; break;
 #ifdef HAVE_OLDE2_API
 #if DVB_API_VERSION > 5 || DVB_API_VERSION == 5 && DVB_API_VERSION_MINOR >= 6
-		case SYS_DVBC_ANNEX_C:	ss << " DVBC_ANNEX_C"; break;
-		case SYS_TURBO:		ss << " TURBO"; break;
-		case SYS_DTMB:		ss << " DTMB"; break;
+			case SYS_DVBC_ANNEX_C:	ss << "DVBC_ANNEX_C"; break;
+			case SYS_TURBO:		ss << "TURBO"; break;
+			case SYS_DTMB:		ss << "DTMB"; break;
 #else
-		case SYS_DMBTH:		ss << " DMBTH"; break;
+			case SYS_DMBTH:		ss << "DMBTH"; break;
 #endif
 #else
-		case SYS_DVBC_ANNEX_C:	ss << " DVBC_ANNEX_C"; break;
-		case SYS_TURBO:		ss << " TURBO"; break;
-		case SYS_DTMB:		ss << " DTMB"; break;
+			case SYS_DVBC_ANNEX_C:	ss << "DVBC_ANNEX_C"; break;
+			case SYS_TURBO:		ss << "TURBO"; break;
+			case SYS_DTMB:		ss << "DTMB"; break;
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(6,4,0)
-		case SYS_DVBC2:		ss << " DVBC2"; break;
+			case SYS_DVBC2:		ss << "DVBC2"; break;
 #endif
 #endif
-		case SYS_DVBT2:		ss << " DVBT2"; break;
+			case SYS_DVBT2:		ss << "DVBT2"; break;
 		}
 	}
 

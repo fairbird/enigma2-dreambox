@@ -159,6 +159,13 @@ def getBoxDisplayName():  # This function returns a tuple like ("BRANDNAME", "BO
 	return (DISPLAYBRAND, DISPLAYMODEL)
 
 
+def getDemodVersion():
+	version = None
+	if fileExists("/proc/stb/info/nim_firmware_version"):
+		version = fileReadLine("/proc/stb/info/nim_firmware_version")
+	return version and version.strip()
+
+
 def getNumVideoDecoders():
 	numVideoDecoders = 0
 	while fileExists(f"/dev/dvb/adapter0/video{numVideoDecoders}", "f"):

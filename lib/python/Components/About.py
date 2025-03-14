@@ -118,11 +118,8 @@ def getEnigmaBranchString():
 
 
 def getGStreamerVersionString():
-	try:
-		gst = [x.split("Version: ") for x in open(glob("/var/lib/opkg/info/gstreamer[0-9].[0-9].control")[0], "r") if x.startswith("Version:")][0]
-		return "%s" % gst[1].split("+")[0].split("-")[0].replace("\n", "")
-	except:
-		return _("Not Installed")
+	from enigma import getGStreamerVersionString
+	return getGStreamerVersionString()
 
 
 def getffmpegVersionString():
@@ -241,6 +238,14 @@ def getChipSetString():
 		return str(chipset.lower().replace('\n', '').replace('bcm', '').replace('brcm', '').replace('sti', ''))
 
 
+def getFlashType():
+	if BoxInfo.getItem("SmallFlash"):
+		return _("Small - Tiny image")
+	elif BoxInfo.getItem("MiddleFlash"):
+		return _("Middle - Lite image")
+	return _("Normal - Standard image")
+
+
 def getCPUBrand():
 	if BoxInfo.getItem("AmlogicFamily"):
 		return _("Amlogic")
@@ -304,6 +309,15 @@ def getDriverInstalledDate():
 
 def getPythonVersionString():
 	return "%s.%s.%s" % (version_info.major, version_info.minor, version_info.micro)
+
+
+def getopensslVersionString():
+	lines = fileReadLines("/var/lib/opkg/info/openssl.control", source=MODULE_NAME)
+	if lines:
+		for line in lines:
+			if line[0:8] == "Version:":
+				return line[9:].split("+")[0]
+	return _("Not Installed")
 
 
 def getOpenSSLVersion():
