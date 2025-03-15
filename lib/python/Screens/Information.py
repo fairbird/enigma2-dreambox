@@ -90,15 +90,20 @@ try:
 except IndexError:
 	branch = ""
 branch_e2plugins = "?sha=python3"
+
+API_GITHUB = 0
+API_GITLAB = 1
+
 commitLogs = [
-	("Enigma2", f"https://api.github.com/repos/fairbird/enigma2-dreambox/commits{branch}"),
-	("Openpli Oe Core", f"https://api.github.com/repos/fairbird/openpli-dreambox-oe-core/commits{branch}"),
-	("Enigma2 Plugins", f"https://api.github.com/repos/openpli/enigma2-plugins/commits{branch_e2plugins}"),
-	("Enigma2 Binary Plugins", f"https://api.github.com/repos/openpli/enigma2-binary-plugins/commits{branch_e2plugins}"),
-	("Aio Grab", "https://api.github.com/repos/oe-alliance/aio-grab/commits"),
-	("Plugin EPGImport", "https://api.github.com/repos/E2OpenPlugins/e2openplugin-OpenWebif/commits"),
-	("Skin PLi HD", "https://api.github.com/repos/fairbird/skin-PLiHD/commits"),
-	("OpenWebif", "https://api.github.com/repos/E2OpenPlugins/e2openplugin-OpenWebif/commits")
+	("Enigma2", API_GITHUB, f"https://api.github.com/repos/fairbird/enigma2-dreambox/commits{branch}"),
+	("Openpli Oe Core", API_GITHUB, f"https://api.github.com/repos/fairbird/openpli-dreambox-oe-core/commits{branch}"),
+	("Enigma2 Plugins", API_GITHUB, f"https://api.github.com/repos/openpli/enigma2-plugins/commits{branch_e2plugins}"),
+	("Enigma2 Binary Plugins", API_GITHUB, f"https://api.github.com/repos/openpli/enigma2-binary-plugins/commits{branch_e2plugins}"),
+	("Aio Grab", API_GITHUB, "https://api.github.com/repos/oe-alliance/aio-grab/commits"),
+	("Plugin EPGImport", API_GITHUB, "https://api.github.com/repos/E2OpenPlugins/e2openplugin-OpenWebif/commits"),
+	("Skin PLi HD", API_GITHUB, "https://api.github.com/repos/fairbird/skin-PLiHD/commits"),
+	("OpenWebif", API_GITHUB, "https://api.github.com/repos/E2OpenPlugins/e2openplugin-OpenWebif/commits"),
+	("Hans settings", API_GITLAB, "https://gitlab.openpli.org/api/v4/projects/5/repository/commits")
 ]
 BoxInfo.setItem("InformationCommitLogs", commitLogs)
 #
@@ -350,7 +355,8 @@ class CommitInformation(InformationBase):
 	def fetchInformation(self):  # Should we limit the number of fetches per minute?
 		self.informationTimer.stop()
 		name = self.commitLogs[self.commitLogIndex][0]
-		url = self.commitLogs[self.commitLogIndex][1]
+		git = self.commitLogs[self.commitLogIndex][1]
+		url = self.commitLogs[self.commitLogIndex][2]
 		if url is None:
 			info = [_("There are no repositories defined so commit logs are unavailable!")]
 		else:
@@ -360,10 +366,15 @@ class CommitInformation(InformationBase):
 					log = loads(fd.read())
 				info = []
 				for data in log:
-					date = datetime.strptime(data["commit"]["committer"]["date"], "%Y-%m-%dT%H:%M:%SZ").strftime(f"{config.usage.date.daylong.value} {config.usage.time.long.value}")
-					author = data["commit"]["author"]["name"]
-					# committer = data["commit"]["committer"]["name"]
-					message = [x.rstrip() for x in data["commit"]["message"].split("\n")]
+					if git == API_GITHUB:
+						date = datetime.strptime(data["commit"]["committer"]["date"], "%Y-%m-%dT%H:%M:%SZ").strftime(f"{config.usage.date.daylong.value} {config.usage.time.long.value}")
+						author = data["commit"]["author"]["name"]
+						# committer = data["commit"]["committer"]["name"]
+						message = [x.rstrip() for x in data["commit"]["message"].split("\n")]
+					elif git == API_GITLAB:
+						date = datetime.strptime(data['committed_date'], '%Y-%m-%dT%H:%M:%S.000%z').strftime(f"{config.usage.date.daylong.value} {config.usage.time.long.value}")
+						author = data['author_name']
+						message = [x.rstrip() for x in data["title"].split("\n")]
 					if info:
 						info.append("")
 					# info.append(_("Date: %s   Author: %s   Commit by: %s") % (date, author, committer))
