@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: enigma2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-12-20 11:32+0100\n"
+"POT-Creation-Date: 2025-03-16 15:41+0100\n"
 "PO-Revision-Date: 2024-12-06 17:39+0100\n"
 "Last-Translator: kueken\n"
 "Language-Team: OpenPLi\n"
@@ -402,6 +402,10 @@ msgstr "(leer)"
 
 msgid "(not activated)"
 msgstr "(nicht aktiviert)"
+
+#, fuzzy
+msgid "(old model)"
+msgstr "3D-Modus"
 
 msgid "(show optional DVD audio menu)"
 msgstr "(DVD-Tonmenü anzeigen, falls vorh.)"
@@ -1274,9 +1278,6 @@ msgstr "Verfügbare Formatierungsvariablen"
 msgid "Available locales are:"
 msgstr "Verfügbare Gebietsschemas sind:"
 
-msgid "Axas E4HD Ultra"
-msgstr "Axas E4HD Ultra"
-
 msgid "Azerbaijan"
 msgstr "Azerbaijan"
 
@@ -1476,6 +1477,13 @@ msgstr "Botswana"
 #, fuzzy
 msgid "Bottom"
 msgstr "Unten"
+
+#, fuzzy
+msgid "Bouquet down"
+msgstr "Lautstärke veringern"
+
+msgid "Bouquet up"
+msgstr ""
 
 msgid "Bouvet Island"
 msgstr "Bouvet Island"
@@ -1748,6 +1756,10 @@ msgstr "Schrittweite ändern"
 msgid "Change timer"
 msgstr "Timer ändern"
 
+#, fuzzy
+msgid "Change view mode"
+msgstr "Timer ändern"
+
 msgid "Channel"
 msgstr "Kanal"
 
@@ -1759,11 +1771,11 @@ msgid "Channel Select Base Actions"
 msgstr "Kanalliste"
 
 #, fuzzy
-msgid "Channel Select Edit Actions"
+msgid "Channel Select EPG Actions"
 msgstr "Kanalliste"
 
 #, fuzzy
-msgid "Channel SelectEPG Actions"
+msgid "Channel Select Edit Actions"
 msgstr "Kanalliste"
 
 #, fuzzy
@@ -2425,6 +2437,10 @@ msgstr "Konsultieren Sie das Datenblatt Ihres Motors für diese Information oder
 msgid "Content does not fit on DVD!"
 msgstr "Inhalt passt nicht auf die DVD!"
 
+#, fuzzy
+msgid "Context Menu"
+msgstr "Kanal-Kontextmenü"
+
 msgid "Continue"
 msgstr "Weiter"
 
@@ -2664,18 +2680,6 @@ msgstr "DVD Brennen"
 msgid "DVD Menu"
 msgstr "DVD Menü"
 
-#, fuzzy
-msgid "DVD Player Actions"
-msgstr "DVD-Player"
-
-#, fuzzy
-msgid "DVD Title List"
-msgstr "DVD Titelliste"
-
-#, fuzzy
-msgid "DVD Toolbox"
-msgstr "DVD Medien-Toolbox"
-
 msgid "DVD data format"
 msgstr "DVD Format"
 
@@ -2693,6 +2697,18 @@ msgstr "DVD Titelliste"
 
 msgid "DVDPlayer"
 msgstr "DVD-Player"
+
+#, fuzzy
+msgid "DVDPlayer Actions"
+msgstr "DVD-Player"
+
+#, fuzzy
+msgid "DVDTitle List"
+msgstr "DVD Titelliste"
+
+#, fuzzy
+msgid "DVDToolbox"
+msgstr "DVD Medien-Toolbox"
 
 msgid "Danish"
 msgstr "Dänisch"
@@ -3706,7 +3722,7 @@ msgid "Event View Actions"
 msgstr "Sendungsübersicht Menü"
 
 #, fuzzy
-msgid "Event ViewEPG Actions"
+msgid "Event View EPG Actions"
 msgstr "Sendungsübersicht Menü"
 
 msgid "Event font size (relative to skin size)"
@@ -3856,9 +3872,6 @@ msgstr "Zusätzliche Startzeit, um den Inaktivitäts-Ausschalt-Timer zu ignorier
 
 msgid "F"
 msgstr "F"
-
-msgid "F1/F3/F4/F4-TURBO"
-msgstr "F1/F3/F4/F4-TURBO"
 
 msgid "FAILED"
 msgstr "FEHLGESCHLAGEN"
@@ -4423,12 +4436,6 @@ msgstr "HD"
 msgid "HD list"
 msgstr "HD Liste"
 
-msgid "HD2400"
-msgstr "HD2400"
-
-msgid "HD60/HD66SE/Multibox/Multibox SE"
-msgstr "HD60/Multibox/Multibox SE"
-
 msgid "HDMI"
 msgstr "HDMI"
 
@@ -4462,9 +4469,6 @@ msgstr "HDMI"
 
 msgid "HDR10 support"
 msgstr "HDR10 Unterstützung"
-
-msgid "HDx1/HD1xxx/HD5x0C/VS1x00/et7x00/et8500/et7000mini"
-msgstr "HDx1/HD1xxx/HD5x0C/VS1x00/et7x00/et8500/et7000mini"
 
 msgid "HELP"
 msgstr "HILFE"
@@ -4642,10 +4646,6 @@ msgstr "I"
 
 msgid "I do not want to perform any service scans"
 msgstr "Ich will keine Service-Scans durchführen"
-
-#, fuzzy
-msgid "I55SE/H7(new model)/H9(new model)/H9COMBO/H9TWIN/H9SE/H9COMBOSE/H10/H11/H17"
-msgstr "Zgemma H7(neues Modell)/H9(neues Modell)/H9COMBO/H9TWIN/H10/H11"
 
 msgid "IDLE"
 msgstr "FREI"
@@ -4859,6 +4859,10 @@ msgid "Infobar Cue Sheet Actions"
 msgstr ""
 
 #, fuzzy
+msgid "Infobar EPG Actions"
+msgstr "Infoleiste-Anzeigedauer"
+
+#, fuzzy
 msgid "Infobar Extensions"
 msgstr "Installiere Plugins (Erweiterungen)"
 
@@ -4923,10 +4927,6 @@ msgstr ""
 
 msgid "Infobar frontend data source"
 msgstr "Infoleiste Frontend Datenquelle"
-
-#, fuzzy
-msgid "InfobarEPG Actions"
-msgstr "Infoleiste-Anzeigedauer"
 
 msgid "Information"
 msgstr "Informationen"
@@ -5161,7 +5161,15 @@ msgstr ""
 msgid "Jump to next marked position"
 msgstr "Springe zur nächsten Markerposition"
 
+#, fuzzy
+msgid "Jump to next marker"
+msgstr "Springe zur nächsten Markerposition"
+
 msgid "Jump to previous marked position"
+msgstr "Springe zur vorherigen Markerposition"
+
+#, fuzzy
+msgid "Jump to previous marker"
 msgstr "Springe zur vorherigen Markerposition"
 
 #. TRANSLATORS: (aspect ratio policy: scale as close to fullscreen as possible)
@@ -5770,6 +5778,10 @@ msgstr "Liste nach unten durchgehen"
 msgid "Move down a screen"
 msgstr "Zum letzten Eintrag gehen"
 
+#, fuzzy
+msgid "Move down in bouquet list"
+msgstr "Liste nach unten durchgehen"
+
 msgid "Move east"
 msgstr "Drehen nach Osten"
 
@@ -5826,6 +5838,10 @@ msgstr "Zur Index Position bewegt"
 
 msgid "Move up a screen"
 msgstr ""
+
+#, fuzzy
+msgid "Move up in bouquet list"
+msgstr "Bouqueteditieren beenden"
 
 msgid "Move west"
 msgstr "Drehen nach Westen"
@@ -6459,10 +6475,6 @@ msgstr "Andere Untertitel & Sprachen"
 msgid "Other buttons will jump to the help for that button, if there is help."
 msgstr ""
 
-#, fuzzy
-msgid "Other functions"
-msgstr "Weiterbildung"
-
 msgid "Output"
 msgstr "Ausgabe"
 
@@ -6547,9 +6559,6 @@ msgstr ""
 msgid "PREVIOUSSONG"
 msgstr ""
 
-msgid "PULSe 4K(mini)"
-msgstr "PULSe 4K(mini)"
-
 #, fuzzy
 msgid "PVR"
 msgstr "OVR"
@@ -6565,6 +6574,14 @@ msgstr "Paketverwaltung"
 
 msgid "Packet manager"
 msgstr "Paketmanager"
+
+#, fuzzy
+msgid "Page down"
+msgstr "Kanal +"
+
+#, fuzzy
+msgid "Page up"
+msgstr "Benutzereinstellungen"
 
 msgid "Pakistan"
 msgstr "Pakistan"
@@ -6651,12 +6668,12 @@ msgstr "Peru"
 msgid "Philippines"
 msgstr "Philippines"
 
-#, fuzzy
-msgid "PiP Setup Actions"
-msgstr "Skin Auswahl Aktionen"
-
 msgid "PiP setup"
 msgstr "Bild im Bild (PiP) - Einstellung"
+
+#, fuzzy
+msgid "PiPSetup Actions"
+msgstr "Skin Auswahl Aktionen"
 
 msgid "Picon"
 msgstr "Picon"
@@ -7366,6 +7383,10 @@ msgstr ""
 
 msgid "Radio"
 msgstr "Radio"
+
+#, fuzzy
+msgid "Radio mode"
+msgstr "3D-Modus"
 
 msgid "Ram disk"
 msgstr "Ramdisk"
@@ -8126,6 +8147,10 @@ msgstr "Suche"
 msgid "Search east"
 msgstr "Östlich suchen"
 
+#, fuzzy
+msgid "Search in SMS mode"
+msgstr "Kanal Titel Modus"
+
 msgid "Search west"
 msgstr "Westlich suchen"
 
@@ -8221,6 +8246,10 @@ msgstr "Wählen Sie “Ja”, um das %s-Band in Ihre Suche einzubeziehen."
 
 msgid "Select 'yes' to only send the DiSEqC command when changing from one satellite to another, or select 'no' for the DiSEqC command to be resent on every zap."
 msgstr "Wählen Sie “Ja”, um nur den DiSEqC-Befehl zu senden, wenn Sie von einem Satelliten zu einem anderen wechseln, oder wählen Sie “Nein”, damit der DiSEqC-Befehl bei jedem Zappen erneut gesendet wird."
+
+#, fuzzy
+msgid "Select Audio"
+msgstr "CAID auswählen"
 
 msgid "Select CAId"
 msgstr "CAID auswählen"
@@ -8321,12 +8350,9 @@ msgid "Select how the satellite dish is set up. i.e. fixed dish, single LNB, DiS
 msgstr "Wählen Sie, wie die Satellitenschüssel eingerichtet wird. d.h. feste Schüssel, einzelner LNB, DiSEqC-Schalter, Positionierer usw."
 
 msgid "Select how you want your receiver to keep the correct time, either from the DVB transponder, or from the internet using NTP. Or use Auto, which will favour using NTP, but will fall back to transponder time when no internet connection is available."
-msgstr
-"Wähle die bevorzugte Methode zur Zeitsynchronisation."
-"\n"
-"Transponder-Zeit: Synchronisation über DVB (Sat, Kabel, Antenne)."
-"NTP: Synchronisation über NTP-Zeitserver im Internet."
-"Automatisch: Favorisiert NTP und nutzt automatisch die Transponder-Zeit falls kein Internet vorhanden ist."
+msgstr ""
+"Wähle die bevorzugte Methode zur Zeitsynchronisation.\n"
+"Transponder-Zeit: Synchronisation über DVB (Sat, Kabel, Antenne).NTP: Synchronisation über NTP-Zeitserver im Internet.Automatisch: Favorisiert NTP und nutzt automatisch die Transponder-Zeit falls kein Internet vorhanden ist."
 
 msgid "Select image"
 msgstr "Wähle Image"
@@ -8360,6 +8386,10 @@ msgstr "Wählen Sie eine Bildwiederholfrequenz"
 
 msgid "Select satellites"
 msgstr "Wähle Satelliten"
+
+#, fuzzy
+msgid "Select service"
+msgstr "Filmauswahl"
 
 #, fuzzy
 msgid "Select service name"
@@ -8805,6 +8835,10 @@ msgstr "Wähle Vorgang"
 msgid "Show"
 msgstr "Anzeigen"
 
+#, fuzzy
+msgid "Show All Services"
+msgstr "Senderliste anzeigen"
+
 msgid "Show Audioselection"
 msgstr "Ton-Auswahl anzeigen"
 
@@ -8820,11 +8854,23 @@ msgstr "EPG für aktuellen Kanal anzeigen…"
 msgid "Show EPG..."
 msgstr "EPG anzeigen…"
 
+#, fuzzy
+msgid "Show Favorites"
+msgstr "Favoriten-Liste anzeigen"
+
 msgid "Show InfoBar"
 msgstr "Infoleiste anzeigen"
 
 msgid "Show PiP"
 msgstr "PiP (Bild in Bild) anzeigen"
+
+#, fuzzy
+msgid "Show Providers"
+msgstr "Filme anzeigen"
+
+#, fuzzy
+msgid "Show Satellites"
+msgstr "Senderliste anzeigen"
 
 msgid "Show True/False as graphical switch"
 msgstr "Zeige Ja/Nein als grafischen Schalter"
@@ -9895,6 +9941,10 @@ msgstr "SENDERSUCHE"
 msgid "TV"
 msgstr ""
 
+#, fuzzy
+msgid "TV mode"
+msgstr "Testmodus"
+
 msgid "TV physical address report"
 msgstr "TV physikalischer Adressenverkündung"
 
@@ -10047,7 +10097,7 @@ msgstr ""
 msgid "The number of steps to change the volume on the device the keys are forwarded to."
 msgstr "Die Anzahl der Schritte zum Ändern der Lautstärke auf dem Gerät, an das die Tasten weitergeleitet werden."
 
-msgid "The order and grouping of the help information list can be controlled using MENU>Setup>User Interface>Settings>Sort order for help screen."
+msgid "The order and grouping of the help information list can be controlled using MENU>Setup>User Interface>Settings>Sort order for help screen or pressing long help"
 msgstr ""
 
 msgid ""
@@ -10560,6 +10610,10 @@ msgstr "Toggle LCD LiveTV"
 msgid "Toggle PiPzap"
 msgstr "Toggle PiPzap"
 
+#, fuzzy
+msgid "Toggle TV Radio mode"
+msgstr "Schalte TV/Radio Modus"
+
 msgid "Toggle TV/RADIO mode"
 msgstr "Schalte TV/Radio Modus"
 
@@ -10571,6 +10625,10 @@ msgstr "Die gestrichelte Flickerlinie für diesen Service umschalten"
 
 msgid "Toggle infoBar"
 msgstr "Schalte Infoleiste"
+
+#, fuzzy
+msgid "Toggle movemode"
+msgstr "Video-Modus umstellen"
 
 msgid "Toggle new text inserts before or overwrites existing text"
 msgstr "Schaltet neue Texteinfügungen vor oder überschreibt vorhandenen Text"
@@ -11129,9 +11187,6 @@ msgstr ""
 
 msgid "VOL-"
 msgstr ""
-
-msgid "VU+"
-msgstr "VU+"
 
 msgid "Valid ONID/TSID look at www.lyngsat.com..."
 msgstr "funktionierende ONID/TSID suche bei www.lyngsat.com..."
@@ -11879,6 +11934,10 @@ msgstr "Sie können das ausgewählte Verzeichnis als “root” -Verzeichnis fü
 msgid "You can set sorting type for items in movielist."
 msgstr "Sie können den Sortiertyp für die Einträge in der Filmliste festlegen."
 
+#, fuzzy, python-format
+msgid "You can't update the software because %s can not be reached."
+msgstr "Der Status des aktuellen Images konnte nicht überprüft werden, da %s nicht erreicht werden kann."
+
 msgid "You cannot delete this!"
 msgstr "Löschen nicht möglich!"
 
@@ -12063,6 +12122,10 @@ msgstr "Zap-Modus"
 msgid "Zap to"
 msgstr "Umschalten"
 
+#, fuzzy
+msgid "Zap to channel number"
+msgstr "Springe zu Kapitel nach Nummer"
+
 msgid "Zap to selected channel"
 msgstr "Schalte zum ausgewählten Sender um"
 
@@ -12082,15 +12145,6 @@ msgstr "Zapped zum Timerdienst %s als PiP!"
 #, python-format
 msgid "Zapped to timer service %s!"
 msgstr "Zapped zum Timerdienst %s!"
-
-msgid "Zgemma H.S/H.2S/H.2H/H5/H7(old model)"
-msgstr "Zgemma H.S/H.2S/H.2H/H5/H7(altes Modell)"
-
-msgid "Zgemma H9(old model)/I55Plus/H8"
-msgstr "Zgemma H9(altes Modell)/i55 Plus/h8"
-
-msgid "Zgemma Star S/2S/H1/H2"
-msgstr "Zgemma Star S/2S/H1/H2"
 
 msgid "Zimbabwe"
 msgstr "Simbabwe"
@@ -12374,21 +12428,6 @@ msgstr "Fehler beim Starten des Scans"
 
 msgid "error while scanning"
 msgstr "Fehler während Suche"
-
-msgid "et4000"
-msgstr "et4000"
-
-msgid "et5000/et6000"
-msgstr "et5000/et6000"
-
-msgid "et8000/et10000"
-msgstr "et8000/et10000"
-
-msgid "et9000/et9100"
-msgstr "et9000/et9100"
-
-msgid "et9200/et9500/et6500"
-msgstr "et9200/et9500/et6500"
 
 msgid "execute cuts (requires MovieCut plugin)"
 msgstr "Filmschnitt ausführen (benötigt MovieCut Plugin)"
@@ -13144,9 +13183,6 @@ msgstr "mit Tuner Namen"
 
 msgid "with_errors"
 msgstr "mit_Fehlern"
-
-msgid "xp1000"
-msgstr "xp1000"
 
 msgid "yellow"
 msgstr "Gelb"

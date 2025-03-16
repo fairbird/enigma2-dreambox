@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: enigma2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-12-20 11:32+0100\n"
+"POT-Creation-Date: 2025-03-16 15:41+0100\n"
 "PO-Revision-Date: 2024-03-09 11:25+0100\n"
 "Last-Translator: Oriol Pellicer <oriol@elsud.org>\n"
 "Language-Team: angelodos angelo2807@hotmail.com\n"
@@ -427,6 +427,10 @@ msgstr "(buit)"
 
 msgid "(not activated)"
 msgstr "(no activat)"
+
+#, fuzzy
+msgid "(old model)"
+msgstr "Mode 3D"
 
 #
 msgid "(show optional DVD audio menu)"
@@ -1405,9 +1409,6 @@ msgstr "Variables de format disponibles"
 msgid "Available locales are:"
 msgstr "Els locals disponibles són:"
 
-msgid "Axas E4HD Ultra"
-msgstr "Axas E4HD Ultra"
-
 msgid "Azerbaijan"
 msgstr "Azerbaidjan"
 
@@ -1630,6 +1631,13 @@ msgstr "Botswana"
 #, fuzzy
 msgid "Bottom"
 msgstr "inferior"
+
+#, fuzzy
+msgid "Bouquet down"
+msgstr "Abaixar volum"
+
+msgid "Bouquet up"
+msgstr ""
 
 msgid "Bouvet Island"
 msgstr "Illa Bouvet"
@@ -1925,6 +1933,10 @@ msgstr "Canviar la mida de pas"
 msgid "Change timer"
 msgstr "Canviar el programador"
 
+#, fuzzy
+msgid "Change view mode"
+msgstr "Canviar el programador"
+
 #
 msgid "Channel"
 msgstr "Canal"
@@ -1939,12 +1951,12 @@ msgstr "Selecció de canal"
 
 #
 #, fuzzy
-msgid "Channel Select Edit Actions"
+msgid "Channel Select EPG Actions"
 msgstr "Selecció de canal"
 
 #
 #, fuzzy
-msgid "Channel SelectEPG Actions"
+msgid "Channel Select Edit Actions"
 msgstr "Selecció de canal"
 
 #
@@ -2655,6 +2667,11 @@ msgstr "Consulta la fitxa específica del motor per a aquesta informació o bé 
 msgid "Content does not fit on DVD!"
 msgstr "El contingut no cap en DVD!"
 
+#
+#, fuzzy
+msgid "Context Menu"
+msgstr "Menú contextual de canal"
+
 msgid "Continue"
 msgstr "Continuar"
 
@@ -2916,21 +2933,6 @@ msgstr "Gravació de DVD"
 msgid "DVD Menu"
 msgstr "Menú de DVD"
 
-#
-#, fuzzy
-msgid "DVD Player Actions"
-msgstr "Reproductor de DVD"
-
-#
-#, fuzzy
-msgid "DVD Title List"
-msgstr "Llista de títols de DVD"
-
-#
-#, fuzzy
-msgid "DVD Toolbox"
-msgstr "Caixa d’eines multimèdia de DVD"
-
 msgid "DVD data format"
 msgstr "Format de dades de DVD"
 
@@ -2953,6 +2955,21 @@ msgstr "Llista de títols de DVD"
 #
 msgid "DVDPlayer"
 msgstr "Reproductor de DVD"
+
+#
+#, fuzzy
+msgid "DVDPlayer Actions"
+msgstr "Reproductor de DVD"
+
+#
+#, fuzzy
+msgid "DVDTitle List"
+msgstr "Llista de títols de DVD"
+
+#
+#, fuzzy
+msgid "DVDToolbox"
+msgstr "Caixa d’eines multimèdia de DVD"
 
 #
 msgid "Danish"
@@ -4094,7 +4111,7 @@ msgstr "Menú de visualització d’esdeveniments"
 
 #
 #, fuzzy
-msgid "Event ViewEPG Actions"
+msgid "Event View EPG Actions"
 msgstr "Menú de visualització d’esdeveniments"
 
 msgid "Event font size (relative to skin size)"
@@ -4266,9 +4283,6 @@ msgstr "Temps de d'inici addicional per ignorar el programador de suspensió per
 
 msgid "F"
 msgstr "F"
-
-msgid "F1/F3/F4/F4-TURBO"
-msgstr "F1/F3/F4/F4-TURBO"
 
 msgid "FAILED"
 msgstr "HA FALLAT"
@@ -4883,12 +4897,6 @@ msgstr "HD"
 msgid "HD list"
 msgstr "Llista en HD"
 
-msgid "HD2400"
-msgstr "HD2400"
-
-msgid "HD60/HD66SE/Multibox/Multibox SE"
-msgstr "HD60/HD66SE/Multibox/Multibox SE"
-
 msgid "HDMI"
 msgstr "HDMI"
 
@@ -4923,9 +4931,6 @@ msgstr "HDMI"
 
 msgid "HDR10 support"
 msgstr "Suport per HDR10"
-
-msgid "HDx1/HD1xxx/HD5x0C/VS1x00/et7x00/et8500/et7000mini"
-msgstr "HDx1/HD1xxx/HD5x0C/VS1x00/et7x00/et8500/et7000mini"
 
 msgid "HELP"
 msgstr "AJUDA"
@@ -5117,10 +5122,6 @@ msgstr "I"
 #
 msgid "I do not want to perform any service scans"
 msgstr "No vull fer cap escaneig de serveis"
-
-#, fuzzy
-msgid "I55SE/H7(new model)/H9(new model)/H9COMBO/H9TWIN/H9SE/H9COMBOSE/H10/H11/H17"
-msgstr "I55SE/H7(nou model)/H9(nou model)/H9COMBO/H9TWIN/H9SE/H9COMBOSE/H10/H11"
 
 msgid "IDLE"
 msgstr "INACTIU"
@@ -5349,6 +5350,11 @@ msgstr "Selecció de canal"
 msgid "Infobar Cue Sheet Actions"
 msgstr ""
 
+#
+#, fuzzy
+msgid "Infobar EPG Actions"
+msgstr "Temps d’espera de la barra d’informació"
+
 #, fuzzy
 msgid "Infobar Extensions"
 msgstr "Instal·lar extensions"
@@ -5425,11 +5431,6 @@ msgstr ""
 
 msgid "Infobar frontend data source"
 msgstr "Font de dades del frontend de la barra d'informació"
-
-#
-#, fuzzy
-msgid "InfobarEPG Actions"
-msgstr "Temps d’espera de la barra d’informació"
 
 #
 msgid "Information"
@@ -5695,7 +5696,17 @@ msgid "Jump to next marked position"
 msgstr "Saltar a la següent posició marcada"
 
 #
+#, fuzzy
+msgid "Jump to next marker"
+msgstr "Saltar a la següent posició marcada"
+
+#
 msgid "Jump to previous marked position"
+msgstr "Saltar a l'anterior posició marcada"
+
+#
+#, fuzzy
+msgid "Jump to previous marker"
 msgstr "Saltar a l'anterior posició marcada"
 
 #. TRANSLATORS: (aspect ratio policy: scale as close to fullscreen as possible)
@@ -6387,6 +6398,10 @@ msgstr "Baixar per la llista"
 msgid "Move down a screen"
 msgstr "baixar fins a l’última entrada"
 
+#, fuzzy
+msgid "Move down in bouquet list"
+msgstr "Baixar per la llista"
+
 #
 msgid "Move east"
 msgstr "Moure a l'est"
@@ -6446,6 +6461,11 @@ msgstr "S’ha desplaçat a la posició a l’índex"
 
 msgid "Move up a screen"
 msgstr ""
+
+#
+#, fuzzy
+msgid "Move up in bouquet list"
+msgstr "Finalitzar edició de bouquets"
 
 #
 msgid "Move west"
@@ -7158,10 +7178,6 @@ msgstr "Altres subtítols i idiomes"
 msgid "Other buttons will jump to the help for that button, if there is help."
 msgstr ""
 
-#, fuzzy
-msgid "Other functions"
-msgstr "educació superior"
-
 msgid "Output"
 msgstr "Sortida"
 
@@ -7251,9 +7267,6 @@ msgstr "ANTERIOR"
 msgid "PREVIOUSSONG"
 msgstr "ANTERIOR"
 
-msgid "PULSe 4K(mini)"
-msgstr "PULSe 4K(mini)"
-
 #, fuzzy
 msgid "PVR"
 msgstr "OVR"
@@ -7272,6 +7285,14 @@ msgstr "Gestió de paquets"
 #
 msgid "Packet manager"
 msgstr "Gestor de paquets"
+
+#, fuzzy
+msgid "Page down"
+msgstr "Zapejar cap avall"
+
+#, fuzzy
+msgid "Page up"
+msgstr "Configuració d’ús"
 
 msgid "Pakistan"
 msgstr "Pakistan"
@@ -7367,13 +7388,13 @@ msgid "Philippines"
 msgstr "Filipines"
 
 #
-#, fuzzy
-msgid "PiP Setup Actions"
-msgstr "Accions de selecció de skin"
-
-#
 msgid "PiP setup"
 msgstr "Configuració de PiP"
+
+#
+#, fuzzy
+msgid "PiPSetup Actions"
+msgstr "Accions de selecció de skin"
 
 msgid "Picon"
 msgstr "Picon"
@@ -8182,6 +8203,10 @@ msgstr ""
 #
 msgid "Radio"
 msgstr "Ràdio"
+
+#, fuzzy
+msgid "Radio mode"
+msgstr "Mode 3D"
 
 #
 msgid "Ram disk"
@@ -9050,6 +9075,11 @@ msgid "Search east"
 msgstr "Cercar a l'est"
 
 #
+#, fuzzy
+msgid "Search in SMS mode"
+msgstr "Mode de títol de servei"
+
+#
 msgid "Search west"
 msgstr "Cercar a l'oest"
 
@@ -9154,6 +9184,11 @@ msgstr "Selecciona “sí” per incloure la banda %s a la cerca."
 
 msgid "Select 'yes' to only send the DiSEqC command when changing from one satellite to another, or select 'no' for the DiSEqC command to be resent on every zap."
 msgstr "Selecciona “sí” per enviar només l'ordre de DiSEqC quan canviïs d’un satèl·lit a un altre, o bé selecciona “no” per a que l'ordre DiSEqC es torni a enviar a cada zàping."
+
+#
+#, fuzzy
+msgid "Select Audio"
+msgstr "Seleccionar CAid"
 
 #
 msgid "Select CAId"
@@ -9313,6 +9348,11 @@ msgstr "Seleccionar la freqüència d'actualització"
 
 msgid "Select satellites"
 msgstr "Seleccionar satèl·lits"
+
+#
+#, fuzzy
+msgid "Select service"
+msgstr "Seleccionar pel·lícula"
 
 #
 #, fuzzy
@@ -9803,6 +9843,10 @@ msgstr "Seleccionar acció"
 msgid "Show"
 msgstr "Espectacle"
 
+#, fuzzy
+msgid "Show All Services"
+msgstr "Mostrar llista de serveis"
+
 msgid "Show Audioselection"
 msgstr "Mostrar audioselecció"
 
@@ -9820,11 +9864,23 @@ msgstr "Mostrar EPG al canal actual…"
 msgid "Show EPG..."
 msgstr "Mostrar EPG…"
 
+#, fuzzy
+msgid "Show Favorites"
+msgstr "Mostrar llista de preferits"
+
 msgid "Show InfoBar"
 msgstr "Mostra barra d'informació"
 
 msgid "Show PiP"
 msgstr "Mostrar PiP"
+
+#, fuzzy
+msgid "Show Providers"
+msgstr "Mostrar pel·lícules"
+
+#, fuzzy
+msgid "Show Satellites"
+msgstr "Mostrar llista de satèl·lits"
 
 msgid "Show True/False as graphical switch"
 msgstr "Mostrar Cert/Fals com interruptor gràfic"
@@ -10994,6 +11050,11 @@ msgstr "SINTONITZANT"
 msgid "TV"
 msgstr ""
 
+#
+#, fuzzy
+msgid "TV mode"
+msgstr "Mode de prova"
+
 msgid "TV physical address report"
 msgstr "Informe d’adreça física de TV"
 
@@ -11159,7 +11220,7 @@ msgstr ""
 msgid "The number of steps to change the volume on the device the keys are forwarded to."
 msgstr "El número de passos per canviar el volum del dispositiu al qual s'envien els botons."
 
-msgid "The order and grouping of the help information list can be controlled using MENU>Setup>User Interface>Settings>Sort order for help screen."
+msgid "The order and grouping of the help information list can be controlled using MENU>Setup>User Interface>Settings>Sort order for help screen or pressing long help"
 msgstr ""
 
 msgid ""
@@ -11717,6 +11778,10 @@ msgstr "Commutar TV en directe a la pantalla LCD"
 msgid "Toggle PiPzap"
 msgstr "Commutar PiPzap"
 
+#, fuzzy
+msgid "Toggle TV Radio mode"
+msgstr "Commutar mode de TV / RÀDIO"
+
 msgid "Toggle TV/RADIO mode"
 msgstr "Commutar mode de TV / RÀDIO"
 
@@ -11729,6 +11794,11 @@ msgstr "Commutar línia intermitent discontínua per a aquest servei"
 
 msgid "Toggle infoBar"
 msgstr "Commutar barra d'informació"
+
+#
+#, fuzzy
+msgid "Toggle movemode"
+msgstr "Commutar el mode de vídeo"
 
 msgid "Toggle new text inserts before or overwrites existing text"
 msgstr "Commutar noves insercions de text abans o sobreescriure el text existent"
@@ -12349,9 +12419,6 @@ msgstr ""
 
 msgid "VOL-"
 msgstr ""
-
-msgid "VU+"
-msgstr "VU+"
 
 msgid "Valid ONID/TSID look at www.lyngsat.com..."
 msgstr "Consulta un ONID / TSID vàlid a www.lyngsat.com…"
@@ -13152,6 +13219,10 @@ msgstr "Pots definir el directori seleccionat com a directori “arrel” per al
 msgid "You can set sorting type for items in movielist."
 msgstr "Podeu definir el tipus d’ordenació dels elements a la llista de pel·lícules."
 
+#, fuzzy, python-format
+msgid "You can't update the software because %s can not be reached."
+msgstr "No s'ha pogut comprovar l’estat de la imatge actual perquè no es pot arribar a %s."
+
 #
 msgid "You cannot delete this!"
 msgstr "Això no es pot eliminar!"
@@ -13343,6 +13414,10 @@ msgstr "Mode de zàping"
 msgid "Zap to"
 msgstr "Zapejar cap a"
 
+#, fuzzy
+msgid "Zap to channel number"
+msgstr "saltar a capítol per número"
+
 msgid "Zap to selected channel"
 msgstr "Zapejar cap al canal seleccionat"
 
@@ -13363,15 +13438,6 @@ msgstr "S'ha canviat al servei de programació %s com a Picture in Picture!"
 #, python-format
 msgid "Zapped to timer service %s!"
 msgstr "S’ha canviat al servei de programació %s!"
-
-msgid "Zgemma H.S/H.2S/H.2H/H5/H7(old model)"
-msgstr "Zgemma H.S/H.2S/H.2H/H5/H7(model antic)"
-
-msgid "Zgemma H9(old model)/I55Plus/H8"
-msgstr "Zgemma H9(model antic)/I55Plus/H8"
-
-msgid "Zgemma Star S/2S/H1/H2"
-msgstr "Zgemma Star S/2S/H1/H2"
 
 msgid "Zimbabwe"
 msgstr "Zimbabwe"
@@ -13689,21 +13755,6 @@ msgstr "error al començar l'escaneig"
 
 msgid "error while scanning"
 msgstr "error durant l'escaneig"
-
-msgid "et4000"
-msgstr "et4000"
-
-msgid "et5000/et6000"
-msgstr "et5000/et6000"
-
-msgid "et8000/et10000"
-msgstr "et8000/et10000"
-
-msgid "et9000/et9100"
-msgstr "et9000/et9100"
-
-msgid "et9200/et9500/et6500"
-msgstr "et9200/et9500/et6500"
 
 msgid "execute cuts (requires MovieCut plugin)"
 msgstr "executar talls (requereix el plugin de MovieCut)"
@@ -14560,9 +14611,6 @@ msgstr "amb nom del sintonitzador"
 
 msgid "with_errors"
 msgstr "amb_errors"
-
-msgid "xp1000"
-msgstr "xp1000"
 
 #
 msgid "yellow"

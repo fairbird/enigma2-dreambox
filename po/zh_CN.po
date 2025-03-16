@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: enigma2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-12-20 11:32+0100\n"
+"POT-Creation-Date: 2025-03-16 15:41+0100\n"
 "PO-Revision-Date: 2025-01-20 11:41+0800\n"
 "Last-Translator: Mark Stone <Mark@kram.com>\n"
 "Language-Team: \n"
@@ -400,6 +400,10 @@ msgstr "（空白）"
 
 msgid "(not activated)"
 msgstr "（未激活）"
+
+#, fuzzy
+msgid "(old model)"
+msgstr "3D 模式"
 
 msgid "(show optional DVD audio menu)"
 msgstr "（显示可选的 DVD 音频菜单）"
@@ -1268,9 +1272,6 @@ msgstr "可用的格式变量"
 msgid "Available locales are:"
 msgstr "可用的区域设置包括："
 
-msgid "Axas E4HD Ultra"
-msgstr "Axas E4HD Ultra"
-
 msgid "Azerbaijan"
 msgstr "阿塞拜疆"
 
@@ -1467,6 +1468,13 @@ msgstr "博茨瓦纳"
 
 msgid "Bottom"
 msgstr "底部"
+
+#, fuzzy
+msgid "Bouquet down"
+msgstr "减小音量"
+
+msgid "Bouquet up"
+msgstr ""
 
 msgid "Bouvet Island"
 msgstr "布韦岛"
@@ -1735,6 +1743,10 @@ msgstr "更改步长"
 msgid "Change timer"
 msgstr "更改定时器"
 
+#, fuzzy
+msgid "Change view mode"
+msgstr "更改定时器"
+
 msgid "Channel"
 msgstr "频道"
 
@@ -1744,11 +1756,12 @@ msgstr "频道信息"
 msgid "Channel Select Base Actions"
 msgstr "频道选择基本操作"
 
+#, fuzzy
+msgid "Channel Select EPG Actions"
+msgstr "频道选择 EPG 操作"
+
 msgid "Channel Select Edit Actions"
 msgstr "频道选择编辑操作"
-
-msgid "Channel SelectEPG Actions"
-msgstr "频道选择 EPG 操作"
 
 msgid "Channel Selection"
 msgstr "频道选择"
@@ -2396,6 +2409,10 @@ msgstr "请查阅您的电机规格表以获取此信息，或保留默认设置
 msgid "Content does not fit on DVD!"
 msgstr "内容不适合 DVD！"
 
+#, fuzzy
+msgid "Context Menu"
+msgstr "频道上下文菜单"
+
 msgid "Continue"
 msgstr "继续"
 
@@ -2632,15 +2649,6 @@ msgstr "烧录 DVD"
 msgid "DVD Menu"
 msgstr "DVD 菜单"
 
-msgid "DVD Player Actions"
-msgstr "DVD 播放器操作"
-
-msgid "DVD Title List"
-msgstr "DVD 标题列表"
-
-msgid "DVD Toolbox"
-msgstr "DVD 工具箱"
-
 msgid "DVD data format"
 msgstr "DVD 数据格式"
 
@@ -2658,6 +2666,18 @@ msgstr "DVD 标题列表"
 
 msgid "DVDPlayer"
 msgstr "DVD 播放器"
+
+#, fuzzy
+msgid "DVDPlayer Actions"
+msgstr "DVD 播放器操作"
+
+#, fuzzy
+msgid "DVDTitle List"
+msgstr "DVD 标题列表"
+
+#, fuzzy
+msgid "DVDToolbox"
+msgstr "DVD 工具箱"
 
 msgid "Danish"
 msgstr "丹麦语"
@@ -3659,7 +3679,8 @@ msgstr "埃塞俄比亚"
 msgid "Event View Actions"
 msgstr "事件查看操作"
 
-msgid "Event ViewEPG Actions"
+#, fuzzy
+msgid "Event View EPG Actions"
 msgstr "事件查看 EPG 操作"
 
 msgid "Event font size (relative to skin size)"
@@ -3809,9 +3830,6 @@ msgstr "忽略不活动睡眠定时器的额外启动时间"
 
 msgid "F"
 msgstr "F"
-
-msgid "F1/F3/F4/F4-TURBO"
-msgstr "F1/F3/F4/F4-TURBO"
 
 msgid "FAILED"
 msgstr "失败"
@@ -4371,12 +4389,6 @@ msgstr "高清"
 msgid "HD list"
 msgstr "高清列表"
 
-msgid "HD2400"
-msgstr "HD2400"
-
-msgid "HD60/HD66SE/Multibox/Multibox SE"
-msgstr "HD60/HD66SE/Multibox/Multibox SE"
-
 msgid "HDMI"
 msgstr "HDMI"
 
@@ -4409,9 +4421,6 @@ msgstr "HDMI-In"
 
 msgid "HDR10 support"
 msgstr "HDR10 支持"
-
-msgid "HDx1/HD1xxx/HD5x0C/VS1x00/et7x00/et8500/et7000mini"
-msgstr "HDx1/HD1xxx/HD5x0C/VS1x00/et7x00/et8500/et7000迷你"
 
 msgid "HELP"
 msgstr "帮助"
@@ -4586,9 +4595,6 @@ msgstr "I"
 
 msgid "I do not want to perform any service scans"
 msgstr "我不想执行任何频道扫描"
-
-msgid "I55SE/H7(new model)/H9(new model)/H9COMBO/H9TWIN/H9SE/H9COMBOSE/H10/H11/H17"
-msgstr "I55SE/H7(new model)/H9(new model)/H9COMBO/H9TWIN/H9SE/H9COMBOSE/H10/H11/H17"
 
 msgid "IDLE"
 msgstr "闲置"
@@ -4797,6 +4803,10 @@ msgstr "信息栏频道选择"
 msgid "Infobar Cue Sheet Actions"
 msgstr "信息栏提示表操作"
 
+#, fuzzy
+msgid "Infobar EPG Actions"
+msgstr "信息栏 EPG 操作"
+
 msgid "Infobar Extensions"
 msgstr "信息栏扩展"
 
@@ -4850,9 +4860,6 @@ msgstr "信息栏视频模式按钮操作"
 
 msgid "Infobar frontend data source"
 msgstr "信息栏前端数据源"
-
-msgid "InfobarEPG Actions"
-msgstr "信息栏 EPG 操作"
 
 msgid "Information"
 msgstr "信息"
@@ -5082,7 +5089,15 @@ msgstr "跳转到列表中的最后一项或文本末尾"
 msgid "Jump to next marked position"
 msgstr "跳转到下一个标记位置"
 
+#, fuzzy
+msgid "Jump to next marker"
+msgstr "跳转到下一个标记位置"
+
 msgid "Jump to previous marked position"
+msgstr "跳转到上一个标记位置"
+
+#, fuzzy
+msgid "Jump to previous marker"
 msgstr "跳转到上一个标记位置"
 
 #. TRANSLATORS: (aspect ratio policy: scale as close to fullscreen as possible)
@@ -5679,6 +5694,10 @@ msgstr "下移一行"
 msgid "Move down a screen"
 msgstr "下移一屏"
 
+#, fuzzy
+msgid "Move down in bouquet list"
+msgstr "下移一行"
+
 msgid "Move east"
 msgstr "东移"
 
@@ -5732,6 +5751,10 @@ msgstr "上移一行"
 
 msgid "Move up a screen"
 msgstr "上移一屏"
+
+#, fuzzy
+msgid "Move up in bouquet list"
+msgstr "结束频道群编辑"
 
 msgid "Move west"
 msgstr "西移"
@@ -6354,9 +6377,6 @@ msgstr "其他字幕和语言"
 msgid "Other buttons will jump to the help for that button, if there is help."
 msgstr "如果有帮助，其他按钮将跳转到该按钮的帮助。"
 
-msgid "Other functions"
-msgstr "其他功能"
-
 msgid "Output"
 msgstr "输出"
 
@@ -6441,9 +6461,6 @@ msgstr "PREVIOUS"
 msgid "PREVIOUSSONG"
 msgstr "PREVIOUSSONG"
 
-msgid "PULSe 4K(mini)"
-msgstr "PULSe 4K(mini)"
-
 msgid "PVR"
 msgstr "PVR"
 
@@ -6458,6 +6475,14 @@ msgstr "数据包管理"
 
 msgid "Packet manager"
 msgstr "数据包管理器"
+
+#, fuzzy
+msgid "Page down"
+msgstr "向下换台"
+
+#, fuzzy
+msgid "Page up"
+msgstr "使用设置"
 
 msgid "Pakistan"
 msgstr "巴基斯坦"
@@ -6544,11 +6569,12 @@ msgstr "秘鲁"
 msgid "Philippines"
 msgstr "菲律宾"
 
-msgid "PiP Setup Actions"
-msgstr "画中画设置操作"
-
 msgid "PiP setup"
 msgstr "画中画设置"
+
+#, fuzzy
+msgid "PiPSetup Actions"
+msgstr "画中画设置操作"
 
 msgid "Picon"
 msgstr "频道图标"
@@ -7252,6 +7278,10 @@ msgstr "右"
 
 msgid "Radio"
 msgstr "广播"
+
+#, fuzzy
+msgid "Radio mode"
+msgstr "3D 模式"
 
 msgid "Ram disk"
 msgstr "RAM 磁盘"
@@ -8006,6 +8036,10 @@ msgstr "搜索"
 msgid "Search east"
 msgstr "向东搜索"
 
+#, fuzzy
+msgid "Search in SMS mode"
+msgstr "频道标题模式"
+
 msgid "Search west"
 msgstr "向西搜索"
 
@@ -8101,6 +8135,10 @@ msgstr "选择“是”以在搜索中包括 %s 频段。"
 
 msgid "Select 'yes' to only send the DiSEqC command when changing from one satellite to another, or select 'no' for the DiSEqC command to be resent on every zap."
 msgstr "选择“是”，仅在从一颗卫星切换到另一颗卫星时发送 DiSEqC 命令，或选择“否”，在每次切换时重新发送 DiSEqC 命令。"
+
+#, fuzzy
+msgid "Select Audio"
+msgstr "选择 CAID"
 
 msgid "Select CAId"
 msgstr "选择 CAID"
@@ -8234,6 +8272,10 @@ msgstr "选择刷新率"
 
 msgid "Select satellites"
 msgstr "选择卫星"
+
+#, fuzzy
+msgid "Select service"
+msgstr "选择频道"
 
 msgid "Select service name"
 msgstr "选择频道名称"
@@ -8665,6 +8707,10 @@ msgstr "快捷操作"
 msgid "Show"
 msgstr "显示"
 
+#, fuzzy
+msgid "Show All Services"
+msgstr "显示频道列表"
+
 msgid "Show Audioselection"
 msgstr "显示音频选择"
 
@@ -8680,11 +8726,23 @@ msgstr "显示当前频道的 EPG..."
 msgid "Show EPG..."
 msgstr "显示 EPG..."
 
+#, fuzzy
+msgid "Show Favorites"
+msgstr "显示收藏夹列表"
+
 msgid "Show InfoBar"
 msgstr "显示信息栏"
 
 msgid "Show PiP"
 msgstr "显示画中画"
+
+#, fuzzy
+msgid "Show Providers"
+msgstr "显示电影"
+
+#, fuzzy
+msgid "Show Satellites"
+msgstr "显示卫星列表"
 
 msgid "Show True/False as graphical switch"
 msgstr "以图形开关形式显示 是/否"
@@ -9733,6 +9791,10 @@ msgstr "调谐"
 msgid "TV"
 msgstr "电视"
 
+#, fuzzy
+msgid "TV mode"
+msgstr "测试模式"
+
 msgid "TV physical address report"
 msgstr "电视物理地址报告"
 
@@ -9883,7 +9945,8 @@ msgstr ""
 msgid "The number of steps to change the volume on the device the keys are forwarded to."
 msgstr "转发按键的设备上音量变化的步数。"
 
-msgid "The order and grouping of the help information list can be controlled using MENU>Setup>User Interface>Settings>Sort order for help screen."
+#, fuzzy
+msgid "The order and grouping of the help information list can be controlled using MENU>Setup>User Interface>Settings>Sort order for help screen or pressing long help"
 msgstr "帮助信息列表的顺序和分组可以通过 菜单 > 设置 > 用户界面 > 设置 > 帮助屏幕排序顺序进行控制。"
 
 msgid ""
@@ -10390,6 +10453,10 @@ msgstr "切换液晶显示屏实时电视"
 msgid "Toggle PiPzap"
 msgstr "切换画中画频道"
 
+#, fuzzy
+msgid "Toggle TV Radio mode"
+msgstr "切换电视/广播模式"
+
 msgid "Toggle TV/RADIO mode"
 msgstr "切换电视/广播模式"
 
@@ -10401,6 +10468,10 @@ msgstr "切换此频道的虚线闪烁行"
 
 msgid "Toggle infoBar"
 msgstr "切换信息栏"
+
+#, fuzzy
+msgid "Toggle movemode"
+msgstr "切换视频模式"
 
 msgid "Toggle new text inserts before or overwrites existing text"
 msgstr "切换新文本是在现有文本前插入还是覆盖现有文本"
@@ -10949,9 +11020,6 @@ msgstr "VOL+"
 
 msgid "VOL-"
 msgstr "VOL-"
-
-msgid "VU+"
-msgstr "VU+"
 
 msgid "Valid ONID/TSID look at www.lyngsat.com..."
 msgstr "有效 ONID/TSID 请查看 www.lyngsat.com..."
@@ -11685,6 +11753,10 @@ msgstr "您可以将所选目录设置为影片播放器的“根”目录。"
 msgid "You can set sorting type for items in movielist."
 msgstr "您可以为影片列表中的项目设置排序类型。"
 
+#, fuzzy, python-format
+msgid "You can't update the software because %s can not be reached."
+msgstr "无法检查当前镜像的状态，因为无法访问 %s。"
+
 msgid "You cannot delete this!"
 msgstr "无法删除此项！"
 
@@ -11867,6 +11939,10 @@ msgstr "换台模式"
 msgid "Zap to"
 msgstr "切换到"
 
+#, fuzzy
+msgid "Zap to channel number"
+msgstr "按章节编号跳转"
+
 msgid "Zap to selected channel"
 msgstr "切换到所选频道"
 
@@ -11886,15 +11962,6 @@ msgstr "切换到定时器频道 %s 作为画中画！"
 #, python-format
 msgid "Zapped to timer service %s!"
 msgstr "切换到定时器频道 %s！"
-
-msgid "Zgemma H.S/H.2S/H.2H/H5/H7(old model)"
-msgstr "Zgemma H.S/H.2S/H.2H/H5/H7(旧型号)"
-
-msgid "Zgemma H9(old model)/I55Plus/H8"
-msgstr "Zgemma H9(旧型号)/I55Plus/H8"
-
-msgid "Zgemma Star S/2S/H1/H2"
-msgstr "Zgemma Star S/2S/H1/H2"
 
 msgid "Zimbabwe"
 msgstr "津巴布韦"
@@ -12178,21 +12245,6 @@ msgstr "启动扫描时出错"
 
 msgid "error while scanning"
 msgstr "扫描时出错"
-
-msgid "et4000"
-msgstr "et4000"
-
-msgid "et5000/et6000"
-msgstr "et5000/et6000"
-
-msgid "et8000/et10000"
-msgstr "et8000/et10000"
-
-msgid "et9000/et9100"
-msgstr "et9000/et9100"
-
-msgid "et9200/et9500/et6500"
-msgstr "et9200/et9500/et6500"
 
 msgid "execute cuts (requires MovieCut plugin)"
 msgstr "执行剪辑（需要 MovieCut 插件）"
@@ -12945,9 +12997,6 @@ msgstr "带调谐器名称"
 
 msgid "with_errors"
 msgstr "有错误"
-
-msgid "xp1000"
-msgstr "xp1000"
 
 msgid "yellow"
 msgstr "黄色"

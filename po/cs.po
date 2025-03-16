@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: OpenPLi enigma2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-12-20 11:32+0100\n"
+"POT-Creation-Date: 2025-03-16 15:41+0100\n"
 "PO-Revision-Date: \n"
 "Last-Translator: IMS <ims@openpli.org>\n"
 "Language-Team: PLi <ims@openpli.org>\n"
@@ -439,6 +439,11 @@ msgstr "(prázdné)"
 
 msgid "(not activated)"
 msgstr "(neaktivován)"
+
+#
+#, fuzzy
+msgid "(old model)"
+msgstr "3D mód"
 
 #
 msgid "(show optional DVD audio menu)"
@@ -1457,9 +1462,6 @@ msgstr "Použitelný formát proměnných"
 msgid "Available locales are:"
 msgstr "Použitelné lokalizace:"
 
-msgid "Axas E4HD Ultra"
-msgstr "Axas E4HD Ultra"
-
 msgid "Azerbaijan"
 msgstr "Ázerbájdžán"
 
@@ -1681,6 +1683,13 @@ msgstr "Botswana"
 
 msgid "Bottom"
 msgstr "Dole"
+
+#, fuzzy
+msgid "Bouquet down"
+msgstr "Zeslabit zvuk"
+
+msgid "Bouquet up"
+msgstr ""
 
 msgid "Bouvet Island"
 msgstr "Bouvetův ostrov"
@@ -1977,6 +1986,11 @@ msgid "Change timer"
 msgstr "Změnit časovač"
 
 #
+#, fuzzy
+msgid "Change view mode"
+msgstr "Změnit časovač"
+
+#
 msgid "Channel"
 msgstr "Kanál"
 
@@ -1988,11 +2002,12 @@ msgid "Channel Select Base Actions"
 msgstr ""
 
 #
-msgid "Channel Select Edit Actions"
-msgstr ""
+#, fuzzy
+msgid "Channel Select EPG Actions"
+msgstr "Výběr programu"
 
 #
-msgid "Channel SelectEPG Actions"
+msgid "Channel Select Edit Actions"
 msgstr ""
 
 #
@@ -2717,6 +2732,11 @@ msgstr "Tyto informace získáte ve specifikačním listu Vašeho motoru nebo po
 msgid "Content does not fit on DVD!"
 msgstr "Obsah se nevejde na DVD!"
 
+#
+#, fuzzy
+msgid "Context Menu"
+msgstr "Menu seznamu programů"
+
 msgid "Continue"
 msgstr "Pokračovat"
 
@@ -2990,18 +3010,6 @@ msgstr "Vypálit DVD"
 msgid "DVD Menu"
 msgstr "DVD Menu"
 
-#
-msgid "DVD Player Actions"
-msgstr ""
-
-#
-msgid "DVD Title List"
-msgstr ""
-
-#
-msgid "DVD Toolbox"
-msgstr ""
-
 msgid "DVD data format"
 msgstr "DVD datový formát"
 
@@ -3024,6 +3032,21 @@ msgstr "DVD seznam titulů"
 #
 msgid "DVDPlayer"
 msgstr "DVD přehrávač"
+
+#
+#, fuzzy
+msgid "DVDPlayer Actions"
+msgstr "DVD přehrávač"
+
+#
+#, fuzzy
+msgid "DVDTitle List"
+msgstr "DVD seznam titulů"
+
+#
+#, fuzzy
+msgid "DVDToolbox"
+msgstr "DVD media nástroje"
 
 #
 msgid "Danish"
@@ -4197,8 +4220,7 @@ msgstr "Etiopie"
 msgid "Event View Actions"
 msgstr ""
 
-#
-msgid "Event ViewEPG Actions"
+msgid "Event View EPG Actions"
 msgstr ""
 
 msgid "Event font size (relative to skin size)"
@@ -4371,9 +4393,6 @@ msgstr "Začátek dalšího úseku ignorování časovače neaktivity"
 
 msgid "F"
 msgstr "F"
-
-msgid "F1/F3/F4/F4-TURBO"
-msgstr "F1/F3/F4/F4-TURBO"
 
 msgid "FAILED"
 msgstr "FAILED"
@@ -4996,12 +5015,6 @@ msgstr "HD"
 msgid "HD list"
 msgstr "Seznam HD"
 
-msgid "HD2400"
-msgstr "HD2400"
-
-msgid "HD60/HD66SE/Multibox/Multibox SE"
-msgstr "HD60/HD66SE/Multibox/Multibox SE"
-
 msgid "HDMI"
 msgstr "HDMI"
 
@@ -5036,9 +5049,6 @@ msgstr "HDMI-In"
 
 msgid "HDR10 support"
 msgstr "Podpora HDR10"
-
-msgid "HDx1/HD1xxx/HD5x0C/VS1x00/et7x00/et8500/et7000mini"
-msgstr "Gold"
 
 msgid "HELP"
 msgstr "HELP"
@@ -5230,9 +5240,6 @@ msgstr "I"
 #
 msgid "I do not want to perform any service scans"
 msgstr "Nechci provést žádné vyhledání programů"
-
-msgid "I55SE/H7(new model)/H9(new model)/H9COMBO/H9TWIN/H9SE/H9COMBOSE/H10/H11/H17"
-msgstr "I55SE/H7(nový model)/H9(nový model)/H9COMBO/H9TWIN/H9SE/H9COMBOSE/H10/H11/H17"
 
 msgid "IDLE"
 msgstr "IDLE"
@@ -5465,6 +5472,11 @@ msgid "Infobar Cue Sheet Actions"
 msgstr ""
 
 #
+#, fuzzy
+msgid "Infobar EPG Actions"
+msgstr "Doba po které skrývat infobar"
+
+#
 msgid "Infobar Extensions"
 msgstr ""
 
@@ -5528,10 +5540,6 @@ msgstr ""
 
 msgid "Infobar frontend data source"
 msgstr "Zdroj Infobar frontend dat"
-
-#
-msgid "InfobarEPG Actions"
-msgstr ""
 
 #
 msgid "Information"
@@ -5804,7 +5812,17 @@ msgid "Jump to next marked position"
 msgstr "Na další označenou pozici"
 
 #
+#, fuzzy
+msgid "Jump to next marker"
+msgstr "Na další označenou pozici"
+
+#
 msgid "Jump to previous marked position"
+msgstr "Na předchozí označenou pozici"
+
+#
+#, fuzzy
+msgid "Jump to previous marker"
 msgstr "Na předchozí označenou pozici"
 
 #
@@ -6500,6 +6518,11 @@ msgid "Move down a screen"
 msgstr "Posunout o obrazovku dolů"
 
 #
+#, fuzzy
+msgid "Move down in bouquet list"
+msgstr "Posunout o řádek dolů"
+
+#
 msgid "Move east"
 msgstr "Přetočit východně"
 
@@ -6559,6 +6582,11 @@ msgstr "Posunout o řádek nahoru"
 
 msgid "Move up a screen"
 msgstr "Posunout o obrazovku nahoru"
+
+#
+#, fuzzy
+msgid "Move up in bouquet list"
+msgstr "Ukončit úpravu přehledu"
 
 #
 msgid "Move west"
@@ -7278,9 +7306,6 @@ msgstr "Ostatní titulky a jazyky"
 msgid "Other buttons will jump to the help for that button, if there is help."
 msgstr "Ostatní tlačítka přejdou na nápovědu k danému tlačítku, pokud je k dispozici."
 
-msgid "Other functions"
-msgstr "Další funkce"
-
 #
 msgid "Output"
 msgstr "Výstup"
@@ -7371,9 +7396,6 @@ msgstr "PREVIOUS"
 msgid "PREVIOUSSONG"
 msgstr "PREVIOUSSONG"
 
-msgid "PULSe 4K(mini)"
-msgstr "PULSe 4K(mini)"
-
 msgid "PVR"
 msgstr "PVR"
 
@@ -7391,6 +7413,14 @@ msgstr "Správa doplňků"
 #
 msgid "Packet manager"
 msgstr "Správce doplňků"
+
+#, fuzzy
+msgid "Page down"
+msgstr "Přepnout dolů"
+
+#, fuzzy
+msgid "Page up"
+msgstr "Přizpůsobení"
 
 msgid "Pakistan"
 msgstr "Pakistán"
@@ -7487,12 +7517,13 @@ msgid "Philippines"
 msgstr "Filipíny"
 
 #
-msgid "PiP Setup Actions"
-msgstr ""
-
-#
 msgid "PiP setup"
 msgstr "Nastavení PiP"
+
+#
+#, fuzzy
+msgid "PiPSetup Actions"
+msgstr "Zvolte akci"
 
 msgid "Picon"
 msgstr "Pikona"
@@ -8329,6 +8360,11 @@ msgstr "RIGHT"
 #
 msgid "Radio"
 msgstr "Rádio"
+
+#
+#, fuzzy
+msgid "Radio mode"
+msgstr "3D mód"
 
 #
 msgid "Ram disk"
@@ -9207,6 +9243,10 @@ msgstr "Vyhledat"
 msgid "Search east"
 msgstr "Hledat východně"
 
+#, fuzzy
+msgid "Search in SMS mode"
+msgstr "Názvy programů"
+
 #
 msgid "Search west"
 msgstr "Hledat západně"
@@ -9313,6 +9353,11 @@ msgstr "Zvolte 'Ano', chcete-li zahrnout pásmo %s do Vašeho prohledávání."
 
 msgid "Select 'yes' to only send the DiSEqC command when changing from one satellite to another, or select 'no' for the DiSEqC command to be resent on every zap."
 msgstr "Zvolte 'Ano', chcete-li posílat příkaz DiSEqC pouze při přechodu z jednoho satelitu na druhý. Zvolte 'Ne' chcete-li aby příkaz DiSEqC byl posílán při každém přepnutí."
+
+#
+#, fuzzy
+msgid "Select Audio"
+msgstr "Vyberte CAId"
 
 #
 msgid "Select CAId"
@@ -9473,6 +9518,11 @@ msgstr "Vyberte obnovovací frekvenci"
 #
 msgid "Select satellites"
 msgstr "Vyberte satelity"
+
+#
+#, fuzzy
+msgid "Select service"
+msgstr "Zvolte program"
 
 msgid "Select service name"
 msgstr "Zvolte název programu"
@@ -9957,6 +10007,10 @@ msgstr ""
 msgid "Show"
 msgstr "Zobrazit"
 
+#, fuzzy
+msgid "Show All Services"
+msgstr "Přehled programů"
+
 msgid "Show Audioselection"
 msgstr "Nastavení zvuku"
 
@@ -9974,11 +10028,23 @@ msgstr "Zobrazovat EPG pro aktuální kanál..."
 msgid "Show EPG..."
 msgstr "Zobrazit EPG..."
 
+#, fuzzy
+msgid "Show Favorites"
+msgstr "Oblíbené"
+
 msgid "Show InfoBar"
 msgstr "Zobrazit infobar"
 
 msgid "Show PiP"
 msgstr "Zobrazit PiP"
+
+#, fuzzy
+msgid "Show Providers"
+msgstr "Nahrané soubory"
+
+#, fuzzy
+msgid "Show Satellites"
+msgstr "Ukázat přehled satelitů"
 
 msgid "Show True/False as graphical switch"
 msgstr "Používat grafický přepínač"
@@ -11185,6 +11251,11 @@ msgstr "TUNING"
 msgid "TV"
 msgstr "TV"
 
+#
+#, fuzzy
+msgid "TV mode"
+msgstr "Testovací mód"
+
 msgid "TV physical address report"
 msgstr "Ohlášení fyzické adresy TV"
 
@@ -11348,7 +11419,8 @@ msgstr ""
 msgid "The number of steps to change the volume on the device the keys are forwarded to."
 msgstr "Počet kroků potřebných ke změně hlasitosti na vzdáleném zařízení."
 
-msgid "The order and grouping of the help information list can be controlled using MENU>Setup>User Interface>Settings>Sort order for help screen."
+#, fuzzy
+msgid "The order and grouping of the help information list can be controlled using MENU>Setup>User Interface>Settings>Sort order for help screen or pressing long help"
 msgstr "Pořadí a seskupení seznamu v nápovědě lze nastavovat pomocí 'Řazení položek nápovědy' v Přizpůsobení."
 
 msgid ""
@@ -11906,6 +11978,10 @@ msgstr "Přepínat LCD LiveTV"
 msgid "Toggle PiPzap"
 msgstr "Přepínat PIPzap"
 
+#, fuzzy
+msgid "Toggle TV Radio mode"
+msgstr "Přepínat TV/RADIO mód"
+
 msgid "Toggle TV/RADIO mode"
 msgstr "Přepínat TV/RADIO mód"
 
@@ -11918,6 +11994,11 @@ msgstr "Přepínat blikající linku pro tento program"
 
 msgid "Toggle infoBar"
 msgstr "Přepínat infobar"
+
+#
+#, fuzzy
+msgid "Toggle movemode"
+msgstr "Přepínat video mód"
 
 msgid "Toggle new text inserts before or overwrites existing text"
 msgstr "Přepínání mezi vkládáním a přepisováním"
@@ -12544,9 +12625,6 @@ msgstr "VOL+"
 
 msgid "VOL-"
 msgstr "VOL-"
-
-msgid "VU+"
-msgstr "VU+"
 
 msgid "Valid ONID/TSID look at www.lyngsat.com..."
 msgstr "Platné ONID/TSID najdete na www.lyngsat.com"
@@ -13358,6 +13436,11 @@ msgid "You can set sorting type for items in movielist."
 msgstr "Můžete nastavit způsob třídění v seznamu filmů."
 
 #
+#, fuzzy, python-format
+msgid "You can't update the software because %s can not be reached."
+msgstr "Stav aktuálního image nemohl být ověřen z důvodu nedostupnosti %s."
+
+#
 msgid "You cannot delete this!"
 msgstr "Toto nemůžete smazat!"
 
@@ -13551,6 +13634,10 @@ msgstr "Zap mód"
 msgid "Zap to"
 msgstr "Přepnout na"
 
+#, fuzzy
+msgid "Zap to channel number"
+msgstr "přeskočit na kapitolu podle čísla"
+
 msgid "Zap to selected channel"
 msgstr "Přepnout na vybraný kanál"
 
@@ -13570,15 +13657,6 @@ msgstr "Program %s přepnut časovačem do PiP!"
 #, python-format
 msgid "Zapped to timer service %s!"
 msgstr "Přepnuto časovačem na program %s!"
-
-msgid "Zgemma H.S/H.2S/H.2H/H5/H7(old model)"
-msgstr "Zgemma H.S/H.2S/H.2H/H5/H7(starý model)"
-
-msgid "Zgemma H9(old model)/I55Plus/H8"
-msgstr "Zgemma H9(starý model)/I55Plus/H8"
-
-msgid "Zgemma Star S/2S/H1/H2"
-msgstr "Zgemma Star S/2S/H1/H2"
 
 msgid "Zimbabwe"
 msgstr "Zimbabwe"
@@ -13905,21 +13983,6 @@ msgstr "chyba při začátku prohledávání"
 
 msgid "error while scanning"
 msgstr "chyba při vyhledávání"
-
-msgid "et4000"
-msgstr "et4000"
-
-msgid "et5000/et6000"
-msgstr "et5000/et6000"
-
-msgid "et8000/et10000"
-msgstr "et8000/et10000"
-
-msgid "et9000/et9100"
-msgstr "et9000/et9100"
-
-msgid "et9200/et9500/et6500"
-msgstr "et9200/et9500/et6500"
 
 msgid "execute cuts (requires MovieCut plugin)"
 msgstr "provést střihy (vyžaduje MovieCut plugin)"
@@ -14797,9 +14860,6 @@ msgstr "s názvem tuneru"
 
 msgid "with_errors"
 msgstr "s_chybami"
-
-msgid "xp1000"
-msgstr "xp1000"
 
 #
 msgid "yellow"

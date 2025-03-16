@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: enigma2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-12-20 11:32+0100\n"
+"POT-Creation-Date: 2025-03-16 15:41+0100\n"
 "PO-Revision-Date: 2011-04-14 00:02+0200\n"
 "Last-Translator: majevica <jovanovic@gmx.ch>\n"
 "Language-Team: veselin & majevica CRNABERZA <jovanovic@gmx.ch>\n"
@@ -437,6 +437,11 @@ msgstr "(prazno)"
 
 msgid "(not activated)"
 msgstr ""
+
+#
+#, fuzzy
+msgid "(old model)"
+msgstr "Mod Napona"
 
 #
 msgid "(show optional DVD audio menu)"
@@ -1477,9 +1482,6 @@ msgstr "Mogući promenljivi format "
 msgid "Available locales are:"
 msgstr "Mogući promenljivi format "
 
-msgid "Axas E4HD Ultra"
-msgstr ""
-
 msgid "Azerbaijan"
 msgstr ""
 
@@ -1709,6 +1711,14 @@ msgid "Botswana"
 msgstr ""
 
 msgid "Bottom"
+msgstr ""
+
+#
+#, fuzzy
+msgid "Bouquet down"
+msgstr "isključi "
+
+msgid "Bouquet up"
 msgstr ""
 
 msgid "Bouvet Island"
@@ -1997,6 +2007,11 @@ msgid "Change timer"
 msgstr ""
 
 #
+#, fuzzy
+msgid "Change view mode"
+msgstr "Promeni veličinu koraka"
+
+#
 msgid "Channel"
 msgstr "Kanal"
 
@@ -2010,12 +2025,12 @@ msgstr "Izbor kanala"
 
 #
 #, fuzzy
-msgid "Channel Select Edit Actions"
+msgid "Channel Select EPG Actions"
 msgstr "Izbor kanala"
 
 #
 #, fuzzy
-msgid "Channel SelectEPG Actions"
+msgid "Channel Select Edit Actions"
 msgstr "Izbor kanala"
 
 #
@@ -2771,6 +2786,11 @@ msgid "Content does not fit on DVD!"
 msgstr "Sadržaj ne staje na DVD!"
 
 #
+#, fuzzy
+msgid "Context Menu"
+msgstr "Meni liste kanala"
+
+#
 msgid "Continue"
 msgstr "Nastaviti"
 
@@ -3051,21 +3071,6 @@ msgstr ""
 msgid "DVD Menu"
 msgstr ""
 
-#
-#, fuzzy
-msgid "DVD Player Actions"
-msgstr "DVD plejer"
-
-#
-#, fuzzy
-msgid "DVD Title List"
-msgstr "DVD lista naslova"
-
-#
-#, fuzzy
-msgid "DVD Toolbox"
-msgstr "DVD medij alati"
-
 msgid "DVD data format"
 msgstr ""
 
@@ -3092,6 +3097,21 @@ msgstr "DVD lista naslova"
 #, fuzzy
 msgid "DVDPlayer"
 msgstr "DVD plejer"
+
+#
+#, fuzzy
+msgid "DVDPlayer Actions"
+msgstr "DVD plejer"
+
+#
+#, fuzzy
+msgid "DVDTitle List"
+msgstr "DVD lista naslova"
+
+#
+#, fuzzy
+msgid "DVDToolbox"
+msgstr "DVD medij alati"
 
 #
 msgid "Danish"
@@ -4274,7 +4294,7 @@ msgstr "Pregled događaja"
 
 #
 #, fuzzy
-msgid "Event ViewEPG Actions"
+msgid "Event View EPG Actions"
 msgstr "Pregled događaja"
 
 msgid "Event font size (relative to skin size)"
@@ -4457,9 +4477,6 @@ msgid "Extra start time to ignore inactivity sleeptimer"
 msgstr ""
 
 msgid "F"
-msgstr ""
-
-msgid "F1/F3/F4/F4-TURBO"
 msgstr ""
 
 msgid "FAILED"
@@ -5104,12 +5121,6 @@ msgstr "D"
 msgid "HD list"
 msgstr ""
 
-msgid "HD2400"
-msgstr ""
-
-msgid "HD60/HD66SE/Multibox/Multibox SE"
-msgstr ""
-
 msgid "HDMI"
 msgstr ""
 
@@ -5145,9 +5156,6 @@ msgstr ""
 #, fuzzy
 msgid "HDR10 support"
 msgstr "nije podržano"
-
-msgid "HDx1/HD1xxx/HD5x0C/VS1x00/et7x00/et8500/et7000mini"
-msgstr ""
 
 msgid "HELP"
 msgstr ""
@@ -5351,9 +5359,6 @@ msgstr ""
 #, fuzzy
 msgid "I do not want to perform any service scans"
 msgstr "Želite li napraviti skeniranje kanala?"
-
-msgid "I55SE/H7(new model)/H9(new model)/H9COMBO/H9TWIN/H9SE/H9COMBOSE/H10/H11/H17"
-msgstr ""
 
 msgid "IDLE"
 msgstr ""
@@ -5586,6 +5591,11 @@ msgstr ""
 
 #
 #, fuzzy
+msgid "Infobar EPG Actions"
+msgstr "Vreme trajanja info trake"
+
+#
+#, fuzzy
 msgid "Infobar Extensions"
 msgstr "Proširenja"
 
@@ -5661,11 +5671,6 @@ msgstr ""
 
 msgid "Infobar frontend data source"
 msgstr ""
-
-#
-#, fuzzy
-msgid "InfobarEPG Actions"
-msgstr "Vreme trajanja info trake"
 
 #
 msgid "Information"
@@ -5952,7 +5957,17 @@ msgstr "skoči do sledeće označene pozicije"
 
 #
 #, fuzzy
+msgid "Jump to next marker"
+msgstr "skoči do sledeće označene pozicije"
+
+#
+#, fuzzy
 msgid "Jump to previous marked position"
+msgstr "skoči do predhodne označene pozicije"
+
+#
+#, fuzzy
+msgid "Jump to previous marker"
 msgstr "skoči do predhodne označene pozicije"
 
 #
@@ -6689,6 +6704,11 @@ msgid "Move down a screen"
 msgstr "Pomeri dole na poslednji unos"
 
 #
+#, fuzzy
+msgid "Move down in bouquet list"
+msgstr "Pomeri dole na poslednji unos"
+
+#
 msgid "Move east"
 msgstr "Pokreći na istok"
 
@@ -6758,6 +6778,11 @@ msgstr ""
 
 msgid "Move up a screen"
 msgstr ""
+
+#
+#, fuzzy
+msgid "Move up in bouquet list"
+msgstr "Završi uređivanje buketa"
 
 #
 msgid "Move west"
@@ -7508,11 +7533,6 @@ msgstr ""
 msgid "Other buttons will jump to the help for that button, if there is help."
 msgstr ""
 
-#
-#, fuzzy
-msgid "Other functions"
-msgstr "Izaberite snimljenu lokaciju"
-
 msgid "Output"
 msgstr ""
 
@@ -7603,9 +7623,6 @@ msgstr ""
 msgid "PREVIOUSSONG"
 msgstr ""
 
-msgid "PULSe 4K(mini)"
-msgstr ""
-
 msgid "PVR"
 msgstr ""
 
@@ -7623,6 +7640,12 @@ msgstr "Rukovanje paketima"
 #
 msgid "Packet manager"
 msgstr "Menadžer paketa"
+
+msgid "Page down"
+msgstr ""
+
+msgid "Page up"
+msgstr ""
 
 msgid "Pakistan"
 msgstr ""
@@ -7732,13 +7755,13 @@ msgstr ""
 
 #
 #, fuzzy
-msgid "PiP Setup Actions"
-msgstr "Izaberite snimljenu lokaciju"
+msgid "PiP setup"
+msgstr "SuS postavke"
 
 #
 #, fuzzy
-msgid "PiP setup"
-msgstr "SuS postavke"
+msgid "PiPSetup Actions"
+msgstr "Izaberite snimljenu lokaciju"
 
 msgid "Picon"
 msgstr ""
@@ -8573,6 +8596,11 @@ msgstr ""
 
 #
 msgid "Radio"
+msgstr "Radio"
+
+#
+#, fuzzy
+msgid "Radio mode"
 msgstr "Radio"
 
 #
@@ -9479,6 +9507,11 @@ msgid "Search east"
 msgstr "Pretraži istok"
 
 #
+#, fuzzy
+msgid "Search in SMS mode"
+msgstr "Izaberi video mod"
+
+#
 msgid "Search west"
 msgstr "Pretraži zapad"
 
@@ -9586,6 +9619,11 @@ msgstr ""
 
 msgid "Select 'yes' to only send the DiSEqC command when changing from one satellite to another, or select 'no' for the DiSEqC command to be resent on every zap."
 msgstr ""
+
+#
+#, fuzzy
+msgid "Select Audio"
+msgstr "Izaberite CAId"
 
 #
 #, fuzzy
@@ -9761,6 +9799,11 @@ msgstr "Izaberi vreme osvežavanja"
 
 msgid "Select satellites"
 msgstr ""
+
+#
+#, fuzzy
+msgid "Select service"
+msgstr "Odaberi film"
 
 #
 #, fuzzy
@@ -10289,6 +10332,11 @@ msgstr "Izaberite snimljenu lokaciju"
 msgid "Show"
 msgstr "Prikaži info"
 
+#
+#, fuzzy
+msgid "Show All Services"
+msgstr "Zameni kanale"
+
 msgid "Show Audioselection"
 msgstr ""
 
@@ -10308,11 +10356,26 @@ msgstr "Prikaži info traku pri promeni događaja"
 msgid "Show EPG..."
 msgstr "prikaži EPG..."
 
+#
+#, fuzzy
+msgid "Show Favorites"
+msgstr "Favoriti"
+
 msgid "Show InfoBar"
 msgstr ""
 
 msgid "Show PiP"
 msgstr ""
+
+#
+#, fuzzy
+msgid "Show Providers"
+msgstr "Provajderi"
+
+#
+#, fuzzy
+msgid "Show Satellites"
+msgstr "Sateliti"
 
 msgid "Show True/False as graphical switch"
 msgstr ""
@@ -11584,6 +11647,11 @@ msgstr ""
 msgid "TV"
 msgstr ""
 
+#
+#, fuzzy
+msgid "TV mode"
+msgstr "Test način"
+
 msgid "TV physical address report"
 msgstr ""
 
@@ -11756,7 +11824,7 @@ msgstr ""
 msgid "The number of steps to change the volume on the device the keys are forwarded to."
 msgstr ""
 
-msgid "The order and grouping of the help information list can be controlled using MENU>Setup>User Interface>Settings>Sort order for help screen."
+msgid "The order and grouping of the help information list can be controlled using MENU>Setup>User Interface>Settings>Sort order for help screen or pressing long help"
 msgstr ""
 
 msgid ""
@@ -12319,6 +12387,11 @@ msgstr ""
 msgid "Toggle PiPzap"
 msgstr ""
 
+#
+#, fuzzy
+msgid "Toggle TV Radio mode"
+msgstr "Izaberi video mod"
+
 msgid "Toggle TV/RADIO mode"
 msgstr ""
 
@@ -12332,6 +12405,11 @@ msgstr ""
 
 msgid "Toggle infoBar"
 msgstr ""
+
+#
+#, fuzzy
+msgid "Toggle movemode"
+msgstr "Izaberi video mod"
 
 msgid "Toggle new text inserts before or overwrites existing text"
 msgstr ""
@@ -12983,9 +13061,6 @@ msgid "VOL+"
 msgstr ""
 
 msgid "VOL-"
-msgstr ""
-
-msgid "VU+"
 msgstr ""
 
 msgid "Valid ONID/TSID look at www.lyngsat.com..."
@@ -13809,6 +13884,10 @@ msgstr ""
 msgid "You can set sorting type for items in movielist."
 msgstr "Ubaciti dužinu filma u listi filmova"
 
+#, python-format
+msgid "You can't update the software because %s can not be reached."
+msgstr ""
+
 #
 msgid "You cannot delete this!"
 msgstr "Ne možete ovo obrisati!"
@@ -13979,6 +14058,9 @@ msgstr ""
 msgid "Zap to"
 msgstr ""
 
+msgid "Zap to channel number"
+msgstr ""
+
 msgid "Zap to selected channel"
 msgstr ""
 
@@ -13999,15 +14081,6 @@ msgstr ""
 #, fuzzy, python-format
 msgid "Zapped to timer service %s!"
 msgstr "Pomeri gore na prvi unos"
-
-msgid "Zgemma H.S/H.2S/H.2H/H5/H7(old model)"
-msgstr ""
-
-msgid "Zgemma H9(old model)/I55Plus/H8"
-msgstr ""
-
-msgid "Zgemma Star S/2S/H1/H2"
-msgstr ""
 
 msgid "Zimbabwe"
 msgstr ""
@@ -14332,21 +14405,6 @@ msgid "error starting scan"
 msgstr ""
 
 msgid "error while scanning"
-msgstr ""
-
-msgid "et4000"
-msgstr ""
-
-msgid "et5000/et6000"
-msgstr ""
-
-msgid "et8000/et10000"
-msgstr ""
-
-msgid "et9000/et9100"
-msgstr ""
-
-msgid "et9200/et9500/et6500"
 msgstr ""
 
 msgid "execute cuts (requires MovieCut plugin)"
@@ -15230,9 +15288,6 @@ msgid "with tuner name"
 msgstr ""
 
 msgid "with_errors"
-msgstr ""
-
-msgid "xp1000"
 msgstr ""
 
 #

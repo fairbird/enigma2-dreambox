@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: enigma2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-12-20 11:32+0100\n"
+"POT-Creation-Date: 2025-03-16 15:41+0100\n"
 "PO-Revision-Date: 2021-03-06\n"
 "Last-Translator: LinuxSTV\n"
 "Language-Team: \n"
@@ -407,6 +407,10 @@ msgstr "(kosong)"
 
 msgid "(not activated)"
 msgstr "(tidak diaktifkan)"
+
+#, fuzzy
+msgid "(old model)"
+msgstr "mode 3d"
 
 msgid "(show optional DVD audio menu)"
 msgstr "(perlihatkan menu audio DVD yang bisa dipilih)"
@@ -1306,9 +1310,6 @@ msgstr "Variabel format tersedia"
 msgid "Available locales are:"
 msgstr "Locale yang tersedia:"
 
-msgid "Axas E4HD Ultra"
-msgstr ""
-
 msgid "Azerbaijan"
 msgstr "Azerbaijan"
 
@@ -1512,6 +1513,13 @@ msgstr "Boswana"
 #, fuzzy
 msgid "Bottom"
 msgstr "bawah"
+
+#, fuzzy
+msgid "Bouquet down"
+msgstr "Kecilkan suara"
+
+msgid "Bouquet up"
+msgstr ""
 
 msgid "Bouvet Island"
 msgstr "Pulau Buvet"
@@ -1790,6 +1798,10 @@ msgstr "Ubah ukuran langkah"
 msgid "Change timer"
 msgstr "Ubah pewaktu"
 
+#, fuzzy
+msgid "Change view mode"
+msgstr "Ubah pewaktu"
+
 msgid "Channel"
 msgstr "Kanal"
 
@@ -1801,11 +1813,11 @@ msgid "Channel Select Base Actions"
 msgstr "Pilihan kanal"
 
 #, fuzzy
-msgid "Channel Select Edit Actions"
+msgid "Channel Select EPG Actions"
 msgstr "Pilihan kanal"
 
 #, fuzzy
-msgid "Channel SelectEPG Actions"
+msgid "Channel Select Edit Actions"
 msgstr "Pilihan kanal"
 
 #, fuzzy
@@ -2486,6 +2498,10 @@ msgstr "Periksa lembar spek penggerak anda untuk informasi ini, atau biarkan set
 msgid "Content does not fit on DVD!"
 msgstr "Isi tidak muat pada DVD!"
 
+#, fuzzy
+msgid "Context Menu"
+msgstr "Menu keadaan kanal"
+
 msgid "Continue"
 msgstr "Lanjut"
 
@@ -2735,18 +2751,6 @@ msgstr "Bakar DVD"
 msgid "DVD Menu"
 msgstr "Menu DVD"
 
-#, fuzzy
-msgid "DVD Player Actions"
-msgstr "Pemutar DVD"
-
-#, fuzzy
-msgid "DVD Title List"
-msgstr "Daftar judul DVD"
-
-#, fuzzy
-msgid "DVD Toolbox"
-msgstr "Peralatan media DVD"
-
 msgid "DVD data format"
 msgstr "Format data DVD"
 
@@ -2765,6 +2769,18 @@ msgstr "Daftar judul DVD"
 #, fuzzy
 msgid "DVDPlayer"
 msgstr "Pemutar DVD"
+
+#, fuzzy
+msgid "DVDPlayer Actions"
+msgstr "Pemutar DVD"
+
+#, fuzzy
+msgid "DVDTitle List"
+msgstr "Daftar judul DVD"
+
+#, fuzzy
+msgid "DVDToolbox"
+msgstr "Peralatan media DVD"
 
 msgid "Danish"
 msgstr "Denmark"
@@ -3831,7 +3847,7 @@ msgid "Event View Actions"
 msgstr "Menu lihat acara"
 
 #, fuzzy
-msgid "Event ViewEPG Actions"
+msgid "Event View EPG Actions"
 msgstr "Menu lihat acara"
 
 msgid "Event font size (relative to skin size)"
@@ -3985,9 +4001,6 @@ msgstr "Waktu mulai tambahan untuk mengambaikan pewaktu tidur yg tidak aktif"
 
 msgid "F"
 msgstr "F"
-
-msgid "F1/F3/F4/F4-TURBO"
-msgstr "F1/F3/F4/F4-TURBO"
 
 msgid "FAILED"
 msgstr "Gagal"
@@ -4582,12 +4595,6 @@ msgstr "D"
 msgid "HD list"
 msgstr "daftar HD"
 
-msgid "HD2400"
-msgstr "HD2400"
-
-msgid "HD60/HD66SE/Multibox/Multibox SE"
-msgstr ""
-
 msgid "HDMI"
 msgstr ""
 
@@ -4623,9 +4630,6 @@ msgstr ""
 #, fuzzy
 msgid "HDR10 support"
 msgstr "mendukung HDR10"
-
-msgid "HDx1/HD1xxx/HD5x0C/VS1x00/et7x00/et8500/et7000mini"
-msgstr "HDx1/HD1xxx/HD5x0C/VS1x00/et7x00/et8500/et7000mini"
 
 msgid "HELP"
 msgstr "TOLONG"
@@ -4810,10 +4814,6 @@ msgstr "I"
 #, fuzzy
 msgid "I do not want to perform any service scans"
 msgstr "Saya tidak ingin melakukan pelacakan layanan apapun"
-
-#, fuzzy
-msgid "I55SE/H7(new model)/H9(new model)/H9COMBO/H9TWIN/H9SE/H9COMBOSE/H10/H11/H17"
-msgstr "Zgemma H7(model baru)/H9(new model)/H9COMBO/H9TWIN/H10"
 
 msgid "IDLE"
 msgstr "DIAM"
@@ -5034,6 +5034,10 @@ msgid "Infobar Cue Sheet Actions"
 msgstr ""
 
 #, fuzzy
+msgid "Infobar EPG Actions"
+msgstr "Batas waktu bilah info"
+
+#, fuzzy
 msgid "Infobar Extensions"
 msgstr "Pasang ekstensi"
 
@@ -5098,10 +5102,6 @@ msgstr ""
 
 msgid "Infobar frontend data source"
 msgstr "Sumber data frontend pada bilah info"
-
-#, fuzzy
-msgid "InfobarEPG Actions"
-msgstr "Batas waktu bilah info"
 
 msgid "Information"
 msgstr "Informasi"
@@ -5341,7 +5341,15 @@ msgstr ""
 msgid "Jump to next marked position"
 msgstr "Lompat ke letak ditandai berikutnya"
 
+#, fuzzy
+msgid "Jump to next marker"
+msgstr "Lompat ke letak ditandai berikutnya"
+
 msgid "Jump to previous marked position"
+msgstr "Lompat ke posisi ditandai sebelumnya"
+
+#, fuzzy
+msgid "Jump to previous marker"
 msgstr "Lompat ke posisi ditandai sebelumnya"
 
 #. TRANSLATORS: (aspect ratio policy: scale as close to fullscreen as possible)
@@ -5962,6 +5970,10 @@ msgstr "Menuju bawah daftar"
 msgid "Move down a screen"
 msgstr "gerak ke bawah menuju entri terakhir"
 
+#, fuzzy
+msgid "Move down in bouquet list"
+msgstr "Menuju bawah daftar"
+
 msgid "Move east"
 msgstr "Bergerak ke timur"
 
@@ -6030,6 +6042,10 @@ msgstr "Bergerak ke posisi pada indeks"
 
 msgid "Move up a screen"
 msgstr ""
+
+#, fuzzy
+msgid "Move up in bouquet list"
+msgstr "Akhiri ubah buket"
 
 msgid "Move west"
 msgstr "Bergerak ke barat"
@@ -6681,10 +6697,6 @@ msgstr "Terjemahan & bhs lain"
 msgid "Other buttons will jump to the help for that button, if there is help."
 msgstr ""
 
-#, fuzzy
-msgid "Other functions"
-msgstr "edukasi lanjut"
-
 msgid "Output"
 msgstr "Keluaran"
 
@@ -6770,9 +6782,6 @@ msgstr ""
 msgid "PREVIOUSSONG"
 msgstr ""
 
-msgid "PULSe 4K(mini)"
-msgstr ""
-
 #, fuzzy
 msgid "PVR"
 msgstr "OVR"
@@ -6788,6 +6797,14 @@ msgstr "Pengelolaan Paket"
 
 msgid "Packet manager"
 msgstr "Pengelola Paket"
+
+#, fuzzy
+msgid "Page down"
+msgstr "Zap bawah"
+
+#, fuzzy
+msgid "Page up"
+msgstr "Pengaturan Penggunaan"
 
 msgid "Pakistan"
 msgstr "Pakistan"
@@ -6877,12 +6894,12 @@ msgstr "Peru"
 msgid "Philippines"
 msgstr "Filipina"
 
-#, fuzzy
-msgid "PiP Setup Actions"
-msgstr "Pilih tindakan"
-
 msgid "PiP setup"
 msgstr "Atur PiP"
+
+#, fuzzy
+msgid "PiPSetup Actions"
+msgstr "Pilih tindakan"
 
 msgid "Picon"
 msgstr "Pikon"
@@ -7603,6 +7620,10 @@ msgstr ""
 
 msgid "Radio"
 msgstr "Radio"
+
+#, fuzzy
+msgid "Radio mode"
+msgstr "mode 3d"
 
 msgid "Ram disk"
 msgstr "Ram disk"
@@ -8381,6 +8402,10 @@ msgstr "Mencari"
 msgid "Search east"
 msgstr "Cari di timur"
 
+#, fuzzy
+msgid "Search in SMS mode"
+msgstr "Mode judul layanan"
+
 msgid "Search west"
 msgstr "Cari di barat"
 
@@ -8476,6 +8501,10 @@ msgstr "Pilih 'ya' untuk menyertakan pita %s dalam pencarian anda."
 
 msgid "Select 'yes' to only send the DiSEqC command when changing from one satellite to another, or select 'no' for the DiSEqC command to be resent on every zap."
 msgstr "Pilih 'ya' untuk hanya mengirim perintah DiSEqC ketika mengganti dari satu satelit ke lainnya, atau pilih 'tidak' agar perintah DiSEqC dikirim ulang pada setiap zap (ganti kanal)."
+
+#, fuzzy
+msgid "Select Audio"
+msgstr "Pilih CAId"
 
 msgid "Select CAId"
 msgstr "Pilih CAId"
@@ -8618,6 +8647,10 @@ msgstr "Pilih rerata penyegaran"
 
 msgid "Select satellites"
 msgstr "Pilih satelit"
+
+#, fuzzy
+msgid "Select service"
+msgstr "Pilih film"
 
 #, fuzzy
 msgid "Select service name"
@@ -9081,6 +9114,10 @@ msgstr "Pilih tindakan"
 msgid "Show"
 msgstr "Tampilkan"
 
+#, fuzzy
+msgid "Show All Services"
+msgstr "Tampilkan daftar layanan"
+
 msgid "Show Audioselection"
 msgstr "Tampilkan pilihan Audio"
 
@@ -9096,11 +9133,23 @@ msgstr "Tampilkan EPG pada kanal sekarang..."
 msgid "Show EPG..."
 msgstr "Tampilkan EPG..."
 
+#, fuzzy
+msgid "Show Favorites"
+msgstr "Tampilkan daftar favorit"
+
 msgid "Show InfoBar"
 msgstr "Tampilkan Bilah info"
 
 msgid "Show PiP"
 msgstr "Tampilkan PiP"
+
+#, fuzzy
+msgid "Show Providers"
+msgstr "Tampilkan film"
+
+#, fuzzy
+msgid "Show Satellites"
+msgstr "Tampilkan daftar layanan"
 
 msgid "Show True/False as graphical switch"
 msgstr "Tampilkan Benar/Salah sbg saklar grafis"
@@ -10203,6 +10252,10 @@ msgstr "MENALA"
 msgid "TV"
 msgstr ""
 
+#, fuzzy
+msgid "TV mode"
+msgstr "Mode pengetesan"
+
 msgid "TV physical address report"
 msgstr "Laporan alamat fisik TV"
 
@@ -10356,7 +10409,7 @@ msgstr ""
 msgid "The number of steps to change the volume on the device the keys are forwarded to."
 msgstr ""
 
-msgid "The order and grouping of the help information list can be controlled using MENU>Setup>User Interface>Settings>Sort order for help screen."
+msgid "The order and grouping of the help information list can be controlled using MENU>Setup>User Interface>Settings>Sort order for help screen or pressing long help"
 msgstr ""
 
 msgid ""
@@ -10877,6 +10930,10 @@ msgstr "Alihkan LiveTV LCD"
 msgid "Toggle PiPzap"
 msgstr "Alihkan PIPzap"
 
+#, fuzzy
+msgid "Toggle TV Radio mode"
+msgstr "Alihkan mode TV/RADIO"
+
 msgid "Toggle TV/RADIO mode"
 msgstr "Alihkan mode TV/RADIO"
 
@@ -10888,6 +10945,10 @@ msgstr "Alihkan garis berkedip putus-putus untuk layanan ini"
 
 msgid "Toggle infoBar"
 msgstr "Alihkan Bilah info"
+
+#, fuzzy
+msgid "Toggle movemode"
+msgstr "Pilih mode video"
 
 msgid "Toggle new text inserts before or overwrites existing text"
 msgstr "Alihkan teks baru, sisipkan sebelum atau timpa teks yg ada"
@@ -11469,9 +11530,6 @@ msgstr ""
 
 msgid "VOL-"
 msgstr ""
-
-msgid "VU+"
-msgstr "VU+"
 
 msgid "Valid ONID/TSID look at www.lyngsat.com..."
 msgstr ""
@@ -12237,6 +12295,10 @@ msgstr "Anda bisa mengatur direktori terpilih sebagai direktori 'root' untuk pem
 msgid "You can set sorting type for items in movielist."
 msgstr "Anda bisa mengatur jenis pilah untuk item di daftarfilm."
 
+#, fuzzy, python-format
+msgid "You can't update the software because %s can not be reached."
+msgstr "Status image saat ini tidak bisa diperiksa karena %s tidak bisa dijangkau."
+
 msgid "You cannot delete this!"
 msgstr "Anda tidak bisa menghapus ini!"
 
@@ -12423,6 +12485,10 @@ msgstr "Mode zap"
 msgid "Zap to"
 msgstr "Zap ke"
 
+#, fuzzy
+msgid "Zap to channel number"
+msgstr "lompat ke bab berdasarkan nomor"
+
 msgid "Zap to selected channel"
 msgstr "Zap ke kanal dipilih"
 
@@ -12443,16 +12509,6 @@ msgstr "Zap ke layanan pewaktu %s sebagai PiP!"
 #, fuzzy, python-format
 msgid "Zapped to timer service %s!"
 msgstr "Zap ke layanan pewaktu %s!"
-
-msgid "Zgemma H.S/H.2S/H.2H/H5/H7(old model)"
-msgstr "Zgemma H.S/H.2S/H.2H/H5/H7(model lama)"
-
-#, fuzzy
-msgid "Zgemma H9(old model)/I55Plus/H8"
-msgstr "Zgemma H9(model lama)/I55Plus"
-
-msgid "Zgemma Star S/2S/H1/H2"
-msgstr "Zgemma Star S/2S/H1/H2"
 
 msgid "Zimbabwe"
 msgstr "Zimbabwe"
@@ -12744,21 +12800,6 @@ msgstr "gagal memulai pindaian"
 
 msgid "error while scanning"
 msgstr "gagal saat memindai"
-
-msgid "et4000"
-msgstr "et4000"
-
-msgid "et5000/et6000"
-msgstr "et5000/et6000"
-
-msgid "et8000/et10000"
-msgstr "et8000/et10000"
-
-msgid "et9000/et9100"
-msgstr "et9000/et9100"
-
-msgid "et9200/et9500/et6500"
-msgstr "et9200/et9500/et6500"
 
 msgid "execute cuts (requires MovieCut plugin)"
 msgstr "eksekusi pemotongan (memerlukan plugin MovieCut)"
@@ -13545,9 +13586,6 @@ msgstr "dgn nama penala"
 
 msgid "with_errors"
 msgstr "dgn_kesalahan"
-
-msgid "xp1000"
-msgstr "xp1000"
 
 msgid "yellow"
 msgstr "kuning"

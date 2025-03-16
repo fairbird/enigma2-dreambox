@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openpli\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-12-20 11:32+0100\n"
+"POT-Creation-Date: 2025-03-16 15:41+0100\n"
 "PO-Revision-Date: 2019-04-03 06:49+0300\n"
 "Last-Translator: \n"
 "Language-Team: Raivo, Henkka, eesatfan, rimas, zeros\\n faas, sateks, valgekotkas, tigekala, rootsikunn\\n kain, i70, mustkass, pelmeen, Scott\\n <digi-tv.ee>\n"
@@ -400,6 +400,10 @@ msgstr "(tühi)"
 
 msgid "(not activated)"
 msgstr "(aktiveerimata)"
+
+#, fuzzy
+msgid "(old model)"
+msgstr "3d režiim"
 
 msgid "(show optional DVD audio menu)"
 msgstr "(näita DVD valikulist audio-menüüd)"
@@ -1287,9 +1291,6 @@ msgstr "Võimalikud vormingu muutujad"
 msgid "Available locales are:"
 msgstr "Võimalikud vormingu muutujad"
 
-msgid "Axas E4HD Ultra"
-msgstr ""
-
 msgid "Azerbaijan"
 msgstr "Aserbaidžaan"
 
@@ -1490,6 +1491,13 @@ msgstr "Botswana"
 #, fuzzy
 msgid "Bottom"
 msgstr "all"
+
+#, fuzzy
+msgid "Bouquet down"
+msgstr "Vaiksemaks"
+
+msgid "Bouquet up"
+msgstr ""
 
 msgid "Bouvet Island"
 msgstr "Bouvet saar"
@@ -1748,6 +1756,10 @@ msgstr "Muuda sammu suurust"
 msgid "Change timer"
 msgstr "Muuda taimerit"
 
+#, fuzzy
+msgid "Change view mode"
+msgstr "Muuda taimerit"
+
 msgid "Channel"
 msgstr "Kanal"
 
@@ -1759,11 +1771,11 @@ msgid "Channel Select Base Actions"
 msgstr "Kanali valik"
 
 #, fuzzy
-msgid "Channel Select Edit Actions"
+msgid "Channel Select EPG Actions"
 msgstr "Kanali valik"
 
 #, fuzzy
-msgid "Channel SelectEPG Actions"
+msgid "Channel Select Edit Actions"
 msgstr "Kanali valik"
 
 #, fuzzy
@@ -2434,6 +2446,10 @@ msgstr "Seda infot otsi ajami spetsifikatsioonilehelt või kasuta vaikeväärtus
 msgid "Content does not fit on DVD!"
 msgstr "Sisu ei mahu DVD-le!"
 
+#, fuzzy
+msgid "Context Menu"
+msgstr "Kanali kontekstimenüü"
+
 msgid "Continue"
 msgstr "Jätka"
 
@@ -2679,18 +2695,6 @@ msgstr "DVD kirjutamine"
 msgid "DVD Menu"
 msgstr "DVD menüü"
 
-#, fuzzy
-msgid "DVD Player Actions"
-msgstr "DVD mängija"
-
-#, fuzzy
-msgid "DVD Title List"
-msgstr "DVD nimekiri "
-
-#, fuzzy
-msgid "DVD Toolbox"
-msgstr "DVD tööriistad"
-
 msgid "DVD data format"
 msgstr "DVD andmevorming"
 
@@ -2709,6 +2713,18 @@ msgstr "DVD nimekiri "
 #, fuzzy
 msgid "DVDPlayer"
 msgstr "DVD mängija"
+
+#, fuzzy
+msgid "DVDPlayer Actions"
+msgstr "DVD mängija"
+
+#, fuzzy
+msgid "DVDTitle List"
+msgstr "DVD nimekiri "
+
+#, fuzzy
+msgid "DVDToolbox"
+msgstr "DVD tööriistad"
 
 msgid "Danish"
 msgstr "Taani"
@@ -3743,7 +3759,7 @@ msgid "Event View Actions"
 msgstr "Saateinfo menüü"
 
 #, fuzzy
-msgid "Event ViewEPG Actions"
+msgid "Event View EPG Actions"
 msgstr "Saateinfo menüü"
 
 msgid "Event font size (relative to skin size)"
@@ -3896,9 +3912,6 @@ msgstr "Lisatud alustamise aeg tegevusetuse unetaimeri vältimiseks"
 
 msgid "F"
 msgstr "F"
-
-msgid "F1/F3/F4/F4-TURBO"
-msgstr "F1/F3/F4/F4-TURBO"
 
 msgid "FAILED"
 msgstr "NURJUS"
@@ -4477,12 +4490,6 @@ msgstr "D"
 msgid "HD list"
 msgstr "HD nimekiri"
 
-msgid "HD2400"
-msgstr "HD2400"
-
-msgid "HD60/HD66SE/Multibox/Multibox SE"
-msgstr ""
-
 msgid "HDMI"
 msgstr ""
 
@@ -4516,10 +4523,6 @@ msgstr ""
 
 msgid "HDR10 support"
 msgstr "HDR10 tugi"
-
-#, fuzzy
-msgid "HDx1/HD1xxx/HD5x0C/VS1x00/et7x00/et8500/et7000mini"
-msgstr "HD11/HD51/HD1100/HD1200/HD1265/HD1500/HD500C/HD530C/VS1000/VS1500/et7x00/et8500/et7000mini"
 
 msgid "HELP"
 msgstr ""
@@ -4699,9 +4702,6 @@ msgstr "I"
 
 msgid "I do not want to perform any service scans"
 msgstr "Ei soovi mingeid teenuse otsinguid"
-
-msgid "I55SE/H7(new model)/H9(new model)/H9COMBO/H9TWIN/H9SE/H9COMBOSE/H10/H11/H17"
-msgstr ""
 
 msgid "IDLE"
 msgstr "JÕUDEOLEKUS"
@@ -4917,6 +4917,10 @@ msgid "Infobar Cue Sheet Actions"
 msgstr ""
 
 #, fuzzy
+msgid "Infobar EPG Actions"
+msgstr "Inforiba kuvamise aeg"
+
+#, fuzzy
 msgid "Infobar Extensions"
 msgstr "Paigalda laiendused"
 
@@ -4981,10 +4985,6 @@ msgstr ""
 
 msgid "Infobar frontend data source"
 msgstr "Inforiba sisendandmete allikas"
-
-#, fuzzy
-msgid "InfobarEPG Actions"
-msgstr "Inforiba kuvamise aeg"
 
 msgid "Information"
 msgstr "Info"
@@ -5220,7 +5220,15 @@ msgstr ""
 msgid "Jump to next marked position"
 msgstr "Mine järgmise märgini"
 
+#, fuzzy
+msgid "Jump to next marker"
+msgstr "Mine järgmise märgini"
+
 msgid "Jump to previous marked position"
+msgstr "Mine eelmise märgini"
+
+#, fuzzy
+msgid "Jump to previous marker"
 msgstr "Mine eelmise märgini"
 
 #. TRANSLATORS: (aspect ratio policy: scale as close to fullscreen as possible)
@@ -5827,6 +5835,10 @@ msgstr "Liigu nimekirjas alla"
 msgid "Move down a screen"
 msgstr "liigu viimasele reale"
 
+#, fuzzy
+msgid "Move down in bouquet list"
+msgstr "Liigu nimekirjas alla"
+
 msgid "Move east"
 msgstr "Liiguta itta"
 
@@ -5889,6 +5901,10 @@ msgstr "Liigutatud indeksi asendisse"
 
 msgid "Move up a screen"
 msgstr ""
+
+#, fuzzy
+msgid "Move up in bouquet list"
+msgstr "Salvesta muudatused ja välju"
 
 msgid "Move west"
 msgstr "Liiguta läände"
@@ -6533,10 +6549,6 @@ msgstr "Subtiitrite seaded"
 msgid "Other buttons will jump to the help for that button, if there is help."
 msgstr ""
 
-#, fuzzy
-msgid "Other functions"
-msgstr "edasine haridus"
-
 msgid "Output"
 msgstr "Väljund"
 
@@ -6621,9 +6633,6 @@ msgstr ""
 msgid "PREVIOUSSONG"
 msgstr ""
 
-msgid "PULSe 4K(mini)"
-msgstr ""
-
 msgid "PVR"
 msgstr ""
 
@@ -6638,6 +6647,14 @@ msgstr "Pakkide haldamine"
 
 msgid "Packet manager"
 msgstr "Paketi haldur"
+
+#, fuzzy
+msgid "Page down"
+msgstr "Kanalivahetus +"
+
+#, fuzzy
+msgid "Page up"
+msgstr "Kasutuse seadistus"
 
 msgid "Pakistan"
 msgstr "Pakistan"
@@ -6726,12 +6743,12 @@ msgstr "Peruu"
 msgid "Philippines"
 msgstr "Filipiinid"
 
-#, fuzzy
-msgid "PiP Setup Actions"
-msgstr "Vali tegevus"
-
 msgid "PiP setup"
 msgstr "PiP seaded"
+
+#, fuzzy
+msgid "PiPSetup Actions"
+msgstr "Vali tegevus"
 
 msgid "Picon"
 msgstr "Kanalilogo"
@@ -7444,6 +7461,10 @@ msgstr ""
 
 msgid "Radio"
 msgstr "Raadio"
+
+#, fuzzy
+msgid "Radio mode"
+msgstr "3d režiim"
 
 msgid "Ram disk"
 msgstr "RAM-ketas"
@@ -8211,6 +8232,10 @@ msgstr "Otsing"
 msgid "Search east"
 msgstr "Otsi idast"
 
+#, fuzzy
+msgid "Search in SMS mode"
+msgstr "Kanalinime kuju"
+
 msgid "Search west"
 msgstr "Otsi läänest"
 
@@ -8308,6 +8333,10 @@ msgstr "Määra 'jah', kaasamaks otsingusse %s sagedusala."
 
 msgid "Select 'yes' to only send the DiSEqC command when changing from one satellite to another, or select 'no' for the DiSEqC command to be resent on every zap."
 msgstr "Valides 'jah', saadetakse DiSEqC käsk vahetades ühelt satelliidilt teisele, valides 'ei', saadetakse DiSEqC käsk igal kanalivahetusel."
+
+#, fuzzy
+msgid "Select Audio"
+msgstr "Vali CAId"
 
 msgid "Select CAId"
 msgstr "Vali CAId"
@@ -8444,6 +8473,10 @@ msgstr "Vali värskendussagedus"
 
 msgid "Select satellites"
 msgstr "Vali satelliidid"
+
+#, fuzzy
+msgid "Select service"
+msgstr "Vali film"
 
 #, fuzzy
 msgid "Select service name"
@@ -8904,6 +8937,10 @@ msgstr "Vali tegevus"
 msgid "Show"
 msgstr "Näita PiP"
 
+#, fuzzy
+msgid "Show All Services"
+msgstr "Näita kanalinimekirja"
+
 msgid "Show Audioselection"
 msgstr "Näita helivalikut"
 
@@ -8919,11 +8956,23 @@ msgstr "Kanali saatekava"
 msgid "Show EPG..."
 msgstr "Näita saatekava..."
 
+#, fuzzy
+msgid "Show Favorites"
+msgstr "Näita lemmikute nimekirja"
+
 msgid "Show InfoBar"
 msgstr "Näita inforiba"
 
 msgid "Show PiP"
 msgstr "Näita PiP"
+
+#, fuzzy
+msgid "Show Providers"
+msgstr "Näita filme"
+
+#, fuzzy
+msgid "Show Satellites"
+msgstr "Näita kanalinimekirja"
 
 msgid "Show True/False as graphical switch"
 msgstr "SEES/VÄLJAS kuvamine graafilise lülitina"
@@ -10016,6 +10065,10 @@ msgstr "HÄÄLESTUS"
 msgid "TV"
 msgstr ""
 
+#, fuzzy
+msgid "TV mode"
+msgstr "Testpilt"
+
 msgid "TV physical address report"
 msgstr "TV füüsilise aadressi raport"
 
@@ -10168,7 +10221,7 @@ msgstr ""
 msgid "The number of steps to change the volume on the device the keys are forwarded to."
 msgstr ""
 
-msgid "The order and grouping of the help information list can be controlled using MENU>Setup>User Interface>Settings>Sort order for help screen."
+msgid "The order and grouping of the help information list can be controlled using MENU>Setup>User Interface>Settings>Sort order for help screen or pressing long help"
 msgstr ""
 
 msgid ""
@@ -10698,6 +10751,10 @@ msgstr "Lülita LCD LiveTV"
 msgid "Toggle PiPzap"
 msgstr "Lülita PiP valikut"
 
+#, fuzzy
+msgid "Toggle TV Radio mode"
+msgstr "Vaheta TV/RADIO vahel"
+
 msgid "Toggle TV/RADIO mode"
 msgstr "Vaheta TV/RADIO vahel"
 
@@ -10709,6 +10766,10 @@ msgstr "Vaheta võbeleva katkendjoonega joon selle teenuse puhul"
 
 msgid "Toggle infoBar"
 msgstr "Lülita inforiba"
+
+#, fuzzy
+msgid "Toggle movemode"
+msgstr "Vali video töörežiim"
 
 msgid "Toggle new text inserts before or overwrites existing text"
 msgstr ""
@@ -11280,9 +11341,6 @@ msgstr ""
 
 msgid "VOL-"
 msgstr ""
-
-msgid "VU+"
-msgstr "VU+"
 
 msgid "Valid ONID/TSID look at www.lyngsat.com..."
 msgstr ""
@@ -12042,6 +12100,10 @@ msgstr ""
 msgid "You can set sorting type for items in movielist."
 msgstr ""
 
+#, fuzzy, python-format
+msgid "You can't update the software because %s can not be reached."
+msgstr "Praeguse image seisu ei saa kontrollida, kuna %s ei ole kättesaadav."
+
 msgid "You cannot delete this!"
 msgstr "Seda ei saa kustutada!"
 
@@ -12226,6 +12288,10 @@ msgstr "Kanalivahetus"
 msgid "Zap to"
 msgstr "Mine"
 
+#, fuzzy
+msgid "Zap to channel number"
+msgstr "hüppa peatükile numbri järgi"
+
 msgid "Zap to selected channel"
 msgstr "Mine valitud kanalile"
 
@@ -12245,16 +12311,6 @@ msgstr "Salvestatud taimeri teenusesse %s nagu PiP!"
 #, python-format
 msgid "Zapped to timer service %s!"
 msgstr "Salvestatud taimeri teenusesse %s!"
-
-#, fuzzy
-msgid "Zgemma H.S/H.2S/H.2H/H5/H7(old model)"
-msgstr "Zgemma H.S/H.2S/H.2H/H5/H7"
-
-msgid "Zgemma H9(old model)/I55Plus/H8"
-msgstr ""
-
-msgid "Zgemma Star S/2S/H1/H2"
-msgstr "Zgemma Star S/2S/H1/H2"
 
 msgid "Zimbabwe"
 msgstr "Zimbabwe"
@@ -12545,23 +12601,6 @@ msgstr "otsingu alustamise viga"
 
 msgid "error while scanning"
 msgstr "viga otsingu teostamisel"
-
-msgid "et4000"
-msgstr "et4000"
-
-#, fuzzy
-msgid "et5000/et6000"
-msgstr "et5000/6000"
-
-msgid "et8000/et10000"
-msgstr "et8000/et10000"
-
-msgid "et9000/et9100"
-msgstr "et9000/et9100"
-
-#, fuzzy
-msgid "et9200/et9500/et6500"
-msgstr "et9200/9500/6500"
 
 msgid "execute cuts (requires MovieCut plugin)"
 msgstr "teosta lõiked (nõuab MovieCut laiendust)"
@@ -13340,9 +13379,6 @@ msgstr "koos tuuneri nimega"
 
 msgid "with_errors"
 msgstr "vigadega"
-
-msgid "xp1000"
-msgstr "xp1000"
 
 msgid "yellow"
 msgstr "kollane"

@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: OpenPLI Enigma2 Official Greek Translation\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-12-20 11:32+0100\n"
+"POT-Creation-Date: 2025-03-16 15:41+0100\n"
 "PO-Revision-Date: \n"
 "Last-Translator: MCelliotG <mcelliotg@gmail.com>\n"
 "Language-Team: MCelliotG <mcelliotg@gmail.com>\n"
@@ -402,6 +402,10 @@ msgstr "(κενό)"
 
 msgid "(not activated)"
 msgstr "(μη ενεργό)"
+
+#, fuzzy
+msgid "(old model)"
+msgstr "Λειτουργία 3D"
 
 msgid "(show optional DVD audio menu)"
 msgstr "(εμφάνιση προαιρετικού μενού ήχου DVD)"
@@ -1266,9 +1270,6 @@ msgstr "Διαθέσιμα εναλλακτικά φορμά"
 msgid "Available locales are:"
 msgstr "Οι διαθέσιμες τοπικές ρυθμίσεις είναι:"
 
-msgid "Axas E4HD Ultra"
-msgstr "Axas E4HD Ultra"
-
 msgid "Azerbaijan"
 msgstr "Αζερμπαϊτζάν"
 
@@ -1468,6 +1469,13 @@ msgstr "Μποτσουάνα"
 #, fuzzy
 msgid "Bottom"
 msgstr "κάτω"
+
+#, fuzzy
+msgid "Bouquet down"
+msgstr "Μείωση έντασης ήχου"
+
+msgid "Bouquet up"
+msgstr ""
 
 msgid "Bouvet Island"
 msgstr "Μπουβέ"
@@ -1740,6 +1748,10 @@ msgstr "Αλλαγή μεγέθους βήματος"
 msgid "Change timer"
 msgstr "Αλλαγή χρονοδιακόπτη"
 
+#, fuzzy
+msgid "Change view mode"
+msgstr "Αλλαγή χρονοδιακόπτη"
+
 msgid "Channel"
 msgstr "Κανάλι"
 
@@ -1751,11 +1763,11 @@ msgid "Channel Select Base Actions"
 msgstr "Επιλογή καναλιού"
 
 #, fuzzy
-msgid "Channel Select Edit Actions"
+msgid "Channel Select EPG Actions"
 msgstr "Επιλογή καναλιού"
 
 #, fuzzy
-msgid "Channel SelectEPG Actions"
+msgid "Channel Select Edit Actions"
 msgstr "Επιλογή καναλιού"
 
 #, fuzzy
@@ -2413,6 +2425,10 @@ msgstr "Συμβουλευτείτε τον πίνακα χαρακτηριστ�
 msgid "Content does not fit on DVD!"
 msgstr "Το περιεχόμενο δεν χωράει σε DVD!"
 
+#, fuzzy
+msgid "Context Menu"
+msgstr "Μενού λίστας καναλιών"
+
 msgid "Continue"
 msgstr "Συνέχεια"
 
@@ -2652,18 +2668,6 @@ msgstr "Εγγραφή DVD"
 msgid "DVD Menu"
 msgstr "Μενού DVD"
 
-#, fuzzy
-msgid "DVD Player Actions"
-msgstr "Αναπαραγωγός DVD"
-
-#, fuzzy
-msgid "DVD Title List"
-msgstr "Λίστα τίτλων DVD"
-
-#, fuzzy
-msgid "DVD Toolbox"
-msgstr "Εργαλειοθήκη πολυμέσων DVD"
-
 msgid "DVD data format"
 msgstr "Φορμά δεδομένων DVD"
 
@@ -2681,6 +2685,18 @@ msgstr "Λίστα τίτλων DVD"
 
 msgid "DVDPlayer"
 msgstr "Αναπαραγωγός DVD"
+
+#, fuzzy
+msgid "DVDPlayer Actions"
+msgstr "Αναπαραγωγός DVD"
+
+#, fuzzy
+msgid "DVDTitle List"
+msgstr "Λίστα τίτλων DVD"
+
+#, fuzzy
+msgid "DVDToolbox"
+msgstr "Εργαλειοθήκη πολυμέσων DVD"
 
 msgid "Danish"
 msgstr "Δανικά"
@@ -3691,7 +3707,7 @@ msgid "Event View Actions"
 msgstr "Μενού προγραμμάτων"
 
 #, fuzzy
-msgid "Event ViewEPG Actions"
+msgid "Event View EPG Actions"
 msgstr "Μενού προγραμμάτων"
 
 msgid "Event font size (relative to skin size)"
@@ -3841,9 +3857,6 @@ msgstr "Πρόσθετος χρόνος εκκίνησης για αγνόηση
 
 msgid "F"
 msgstr "F"
-
-msgid "F1/F3/F4/F4-TURBO"
-msgstr "F1/F3/F4/F4-TURBO"
 
 msgid "FAILED"
 msgstr "ΑΠΟΤΥΧΙΑ"
@@ -4408,12 +4421,6 @@ msgstr "HD"
 msgid "HD list"
 msgstr "Λίστα HD"
 
-msgid "HD2400"
-msgstr "HD2400"
-
-msgid "HD60/HD66SE/Multibox/Multibox SE"
-msgstr "HD60/HD66SE/Multibox/Multibox SE"
-
 msgid "HDMI"
 msgstr "HDMI"
 
@@ -4447,9 +4454,6 @@ msgstr "HDMI"
 
 msgid "HDR10 support"
 msgstr "Υποστήριξη HDR10"
-
-msgid "HDx1/HD1xxx/HD5x0C/VS1x00/et7x00/et8500/et7000mini"
-msgstr "HDx1/HD1xxx/HD5x0C/VS1x00/et7x00/et8500/et7000mini"
 
 msgid "HELP"
 msgstr "ΒΟΗΘΕΙΑ"
@@ -4627,10 +4631,6 @@ msgstr "I"
 
 msgid "I do not want to perform any service scans"
 msgstr "Δεν θέλω να γίνει καμία ανίχνευση για υπηρεσίες"
-
-#, fuzzy
-msgid "I55SE/H7(new model)/H9(new model)/H9COMBO/H9TWIN/H9SE/H9COMBOSE/H10/H11/H17"
-msgstr "I55SE/H7(νέο μοντέλο)/H9(νέο μοντέλο)/H9COMBO/H9TWIN/H9SE/H9COMBOSE/H10/H11"
 
 msgid "IDLE"
 msgstr "ΑΔΡΑΝΕΙΑ"
@@ -4844,6 +4844,10 @@ msgid "Infobar Cue Sheet Actions"
 msgstr ""
 
 #, fuzzy
+msgid "Infobar EPG Actions"
+msgstr "Χρόνος εμφάνισης πληροφοριών"
+
+#, fuzzy
 msgid "Infobar Extensions"
 msgstr "Εγκατάσταση επεκτάσεων"
 
@@ -4908,10 +4912,6 @@ msgstr ""
 
 msgid "Infobar frontend data source"
 msgstr "Πηγή δεδομένων tuner στη μπάρα πληροφοριών"
-
-#, fuzzy
-msgid "InfobarEPG Actions"
-msgstr "Χρόνος εμφάνισης πληροφοριών"
 
 msgid "Information"
 msgstr "Πληροφορίες"
@@ -5146,7 +5146,15 @@ msgstr ""
 msgid "Jump to next marked position"
 msgstr "Μετάβαση στην επόμενη μαρκαρισμένη θέση"
 
+#, fuzzy
+msgid "Jump to next marker"
+msgstr "Μετάβαση στην επόμενη μαρκαρισμένη θέση"
+
 msgid "Jump to previous marked position"
+msgstr "Μετάβαση στην προηγούμενη μαρκαρισμένη θέση"
+
+#, fuzzy
+msgid "Jump to previous marker"
 msgstr "Μετάβαση στην προηγούμενη μαρκαρισμένη θέση"
 
 #. TRANSLATORS: (aspect ratio policy: scale as close to fullscreen as possible)
@@ -5755,6 +5763,10 @@ msgstr "Μετάβαση προς τα κάτω"
 msgid "Move down a screen"
 msgstr "μετάβαση στο τελευταίο στοιχείο"
 
+#, fuzzy
+msgid "Move down in bouquet list"
+msgstr "Μετάβαση προς τα κάτω"
+
 msgid "Move east"
 msgstr "Κίνηση ανατολικά"
 
@@ -5811,6 +5823,10 @@ msgstr "Κίνηση στην αποθηκευμένη θέση"
 
 msgid "Move up a screen"
 msgstr ""
+
+#, fuzzy
+msgid "Move up in bouquet list"
+msgstr "Tέλος επεξεργασίας μπουκέτου"
 
 msgid "Move west"
 msgstr "Κίνηση δυτικά"
@@ -6442,10 +6458,6 @@ msgstr "Άλλοι υπότιτλοι και γλώσσες"
 msgid "Other buttons will jump to the help for that button, if there is help."
 msgstr ""
 
-#, fuzzy
-msgid "Other functions"
-msgstr "ανώτερη εκπαίδευση"
-
 msgid "Output"
 msgstr "Έξοδος"
 
@@ -6530,9 +6542,6 @@ msgstr ""
 msgid "PREVIOUSSONG"
 msgstr ""
 
-msgid "PULSe 4K(mini)"
-msgstr "PULSe 4K(mini)"
-
 #, fuzzy
 msgid "PVR"
 msgstr "OVR"
@@ -6548,6 +6557,14 @@ msgstr "Διαχείριση πακέτων"
 
 msgid "Packet manager"
 msgstr "Διαχείριση πακέτων"
+
+#, fuzzy
+msgid "Page down"
+msgstr "Ζάπινγκ προς τα κάτω"
+
+#, fuzzy
+msgid "Page up"
+msgstr "Ρυθμίσεις χρήσης"
 
 msgid "Pakistan"
 msgstr "Πακιστάν"
@@ -6634,12 +6651,12 @@ msgstr "Περού"
 msgid "Philippines"
 msgstr "Φιλιππίνες"
 
-#, fuzzy
-msgid "PiP Setup Actions"
-msgstr "Ενέργειες επιλογής θέματος"
-
 msgid "PiP setup"
 msgstr "Ρύθμιση PiP"
+
+#, fuzzy
+msgid "PiPSetup Actions"
+msgstr "Ενέργειες επιλογής θέματος"
 
 msgid "Picon"
 msgstr "Λογότυπο (picon)"
@@ -7348,6 +7365,10 @@ msgstr ""
 
 msgid "Radio"
 msgstr "Ραδιόφωνο"
+
+#, fuzzy
+msgid "Radio mode"
+msgstr "Λειτουργία 3D"
 
 msgid "Ram disk"
 msgstr "Δίσκος RAM"
@@ -8107,6 +8128,10 @@ msgstr "Αναζήτηση"
 msgid "Search east"
 msgstr "Αναζήτηση ανατολικά"
 
+#, fuzzy
+msgid "Search in SMS mode"
+msgstr "Λειτουργία τίτλου υπηρεσίας"
+
 msgid "Search west"
 msgstr "Αναζήτηση δυτικά"
 
@@ -8202,6 +8227,10 @@ msgstr "Επιλέξτε 'ναι' για να συμπεριλάβετε την 
 
 msgid "Select 'yes' to only send the DiSEqC command when changing from one satellite to another, or select 'no' for the DiSEqC command to be resent on every zap."
 msgstr "Επιλέξτε 'ναι' για να αποστέλλεται η εντολή DiSEqC κατά την αλλαγή δορυφόρου ή επιλέξτε 'όχι' για να αποστέλλεται η εντολή DiSEqC σε κάθε ζάπινγκ."
+
+#, fuzzy
+msgid "Select Audio"
+msgstr "Επιλογή CAId"
 
 msgid "Select CAId"
 msgstr "Επιλογή CAId"
@@ -8336,6 +8365,10 @@ msgstr "Επιλογή ρυθμού ανανέωσης"
 
 msgid "Select satellites"
 msgstr "Επιλογή δορυφόρων"
+
+#, fuzzy
+msgid "Select service"
+msgstr "Επιλογή ταινίας"
 
 #, fuzzy
 msgid "Select service name"
@@ -8781,6 +8814,10 @@ msgstr "Επιλογή ενέργειας"
 msgid "Show"
 msgstr "Εμφάνιση"
 
+#, fuzzy
+msgid "Show All Services"
+msgstr "Εμφάνιση λίστας υπηρεσιών"
+
 msgid "Show Audioselection"
 msgstr "Εμφάνιση επιλογής ήχου"
 
@@ -8796,11 +8833,23 @@ msgstr "Εμφάνιση EPG για το τρέχον κανάλι..."
 msgid "Show EPG..."
 msgstr "Εμφάνιση EPG..."
 
+#, fuzzy
+msgid "Show Favorites"
+msgstr "Εμφάνιση λίστας αγαπημένων"
+
 msgid "Show InfoBar"
 msgstr "Εμφάνιση μπάρας πληροφοριών"
 
 msgid "Show PiP"
 msgstr "Εμφάνιση PiP"
+
+#, fuzzy
+msgid "Show Providers"
+msgstr "Εμφάνιση ταινιών"
+
+#, fuzzy
+msgid "Show Satellites"
+msgstr "Εμφάνιση λίστας δορυφόρων"
 
 msgid "Show True/False as graphical switch"
 msgstr "Εμφάνιση Αληθές/Ψευδές ως γραφικός διακόπτης"
@@ -9869,6 +9918,10 @@ msgstr "ΣΥΝΤΟΝΙΣΜΟΣ"
 msgid "TV"
 msgstr ""
 
+#, fuzzy
+msgid "TV mode"
+msgstr "Κατάσταση ελέγχου"
+
 msgid "TV physical address report"
 msgstr "Φυσική διεύθυνση τηλεόρασης"
 
@@ -10020,7 +10073,7 @@ msgstr ""
 msgid "The number of steps to change the volume on the device the keys are forwarded to."
 msgstr "Αριθμός βημάτων για αλλαγή του ήχου στη συσκευή όπου προωθούνται τα πλήκτρα."
 
-msgid "The order and grouping of the help information list can be controlled using MENU>Setup>User Interface>Settings>Sort order for help screen."
+msgid "The order and grouping of the help information list can be controlled using MENU>Setup>User Interface>Settings>Sort order for help screen or pressing long help"
 msgstr ""
 
 msgid ""
@@ -10530,6 +10583,10 @@ msgstr "Ενεργοποίηση ζωντανής TV στην LCD"
 msgid "Toggle PiPzap"
 msgstr "Ενεργοποίηση ζάπινγκ PiP"
 
+#, fuzzy
+msgid "Toggle TV Radio mode"
+msgstr "Εναλλαγή λειτουργίας TV/ΡΑΔΙΟΦΩΝΟ"
+
 msgid "Toggle TV/RADIO mode"
 msgstr "Εναλλαγή λειτουργίας TV/ΡΑΔΙΟΦΩΝΟ"
 
@@ -10541,6 +10598,10 @@ msgstr "Εναλλαγή διακεκομμένης τρεμοσβηνόμενη
 
 msgid "Toggle infoBar"
 msgstr "Ενεργοποίηση μπάρας πληροφοριών"
+
+#, fuzzy
+msgid "Toggle movemode"
+msgstr "Εναλλαγή λειτουργίας βίντεο"
 
 msgid "Toggle new text inserts before or overwrites existing text"
 msgstr "Εναλλαγή νέων εισαγωγών κειμένου πριν ή αντικατάσταση υπάρχοντος κειμένου"
@@ -11099,9 +11160,6 @@ msgstr ""
 
 msgid "VOL-"
 msgstr ""
-
-msgid "VU+"
-msgstr "VU+"
 
 msgid "Valid ONID/TSID look at www.lyngsat.com..."
 msgstr "Για έγκυρες τιμές των ONID/TSID ανατρέξτε στο www.lyngsat.com..."
@@ -11844,6 +11902,10 @@ msgstr "Μπορείτε να ορίσετε τον επιλεγμένο φάκ�
 msgid "You can set sorting type for items in movielist."
 msgstr "Μπορείτε να ορίσετε τον τύπο ταξινόμησης των στοιχείων στη λίστα ταινιών."
 
+#, fuzzy, python-format
+msgid "You can't update the software because %s can not be reached."
+msgstr "Η κατάσταση του τρέχοντος image δεν μπορεί να ελεγχθεί επειδή ήταν αδύνατη η επικοινωνία με το %s."
+
 msgid "You cannot delete this!"
 msgstr "Δεν μπορείτε να διαγράψετε αυτό!"
 
@@ -12025,6 +12087,10 @@ msgstr "Λειτουργία μετάβασης"
 msgid "Zap to"
 msgstr "Μετάβαση σε"
 
+#, fuzzy
+msgid "Zap to channel number"
+msgstr "μετάβαση στο κεφάλαιο με αριθμό"
+
 msgid "Zap to selected channel"
 msgstr "Μετάβαση στο επιλεγμένο κανάλι"
 
@@ -12044,15 +12110,6 @@ msgstr "Έγινε μετάβαση στην υπηρεσία %s ως PiP!"
 #, python-format
 msgid "Zapped to timer service %s!"
 msgstr "Έγινε μετάβαση στην υπηρεσία χρονοδιακόπτη %s!"
-
-msgid "Zgemma H.S/H.2S/H.2H/H5/H7(old model)"
-msgstr "Zgemma H.S/H.2S/H.2H/H5/H7(παλιό μοντέλο)"
-
-msgid "Zgemma H9(old model)/I55Plus/H8"
-msgstr "Zgemma H9(παλιό μοντέλο)/I55Plus/H8"
-
-msgid "Zgemma Star S/2S/H1/H2"
-msgstr "Zgemma Star S/2S/H1/H2"
 
 msgid "Zimbabwe"
 msgstr "Ζιμπάμπουε"
@@ -12336,21 +12393,6 @@ msgstr "σφάλμα έναρξης ανίχνευσης"
 
 msgid "error while scanning"
 msgstr "σφάλμα κατά την ανίχνευση"
-
-msgid "et4000"
-msgstr "et4000"
-
-msgid "et5000/et6000"
-msgstr "et5000/et6000"
-
-msgid "et8000/et10000"
-msgstr "et8000/et10000"
-
-msgid "et9000/et9100"
-msgstr "et9000/et9100"
-
-msgid "et9200/et9500/et6500"
-msgstr "et9200/et9500/et6500"
 
 msgid "execute cuts (requires MovieCut plugin)"
 msgstr "εκτέλεση περικοπών (απαιτείται το πρόσθετο MovieCut)"
@@ -13106,9 +13148,6 @@ msgstr "με όνομα tuner"
 
 msgid "with_errors"
 msgstr "με_σφάλματα"
-
-msgid "xp1000"
-msgstr "xp1000"
 
 msgid "yellow"
 msgstr "κίτρινο"

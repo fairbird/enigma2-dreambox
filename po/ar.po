@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: enigma2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-02 14:05+0100\n"
-"POT-Creation-Date: 2024-12-20 11:32+0100\n"
+"POT-Creation-Date: 2025-03-16 15:41+0100\n"
 "PO-Revision-Date: \n"
 "Last-Translator: RAED - Fairbirb <rrrr53@hotmail.com>\n"
 "Language-Team: \n"
@@ -452,6 +452,10 @@ msgstr "(فارغ)"
 
 msgid "(not activated)"
 msgstr "غير مرتبط"
+
+#, fuzzy
+msgid "(old model)"
+msgstr "شكل التنقل"
 
 msgid "(show optional DVD audio menu)"
 msgstr "(عرض قائمة صوت ديفيدي إختياريه)"
@@ -1314,9 +1318,6 @@ msgstr "متغيرات التهئية المتاحه"
 msgid "Available locales are:"
 msgstr "المشاركات المتوفرة:"
 
-msgid "Axas E4HD Ultra"
-msgstr ""
-
 msgid "Azerbaijan"
 msgstr "أذربيجان"
 
@@ -1513,6 +1514,13 @@ msgstr "بوتسوانا"
 
 msgid "Bottom"
 msgstr "أسفل"
+
+#, fuzzy
+msgid "Bouquet down"
+msgstr "يسار الصفحة"
+
+msgid "Bouquet up"
+msgstr ""
 
 msgid "Bouvet Island"
 msgstr "جزيرة بوفيت"
@@ -1787,6 +1795,10 @@ msgstr "تغيير مقاس الخطوه"
 msgid "Change timer"
 msgstr "تغيير المؤقت"
 
+#, fuzzy
+msgid "Change view mode"
+msgstr "تغيير المؤقت"
+
 msgid "Channel"
 msgstr "قناة"
 
@@ -1798,11 +1810,11 @@ msgid "Channel Select Base Actions"
 msgstr "إجراءات أساسية لاختيار القناة"
 
 #, fuzzy
-msgid "Channel Select Edit Actions"
+msgid "Channel Select EPG Actions"
 msgstr "تحرير إجراءات تحديد القناة"
 
 #, fuzzy
-msgid "Channel SelectEPG Actions"
+msgid "Channel Select Edit Actions"
 msgstr "إجراءات دليل البرامج الإلكتروني لاختيار القناة"
 
 #, fuzzy
@@ -2441,6 +2453,10 @@ msgstr "أطلع على ملصق مواصفات النظام المتحرك له
 msgid "Content does not fit on DVD!"
 msgstr "المحتوى لا يناسب ديفيدي!"
 
+#, fuzzy
+msgid "Context Menu"
+msgstr "سياق صفحة قائمة القنوات"
+
 msgid "Continue"
 msgstr "إستمرار"
 
@@ -2671,18 +2687,6 @@ msgstr "DVD حرق"
 msgid "DVD Menu"
 msgstr "قائمة"
 
-#, fuzzy
-msgid "DVD Player Actions"
-msgstr "مشغل الديفيدي"
-
-#, fuzzy
-msgid "DVD Title List"
-msgstr "قائمة عناوين الديفيدي"
-
-#, fuzzy
-msgid "DVD Toolbox"
-msgstr "أدوات مشغل الديفيدي"
-
 msgid "DVD data format"
 msgstr "صيغة بيانات الديفيدي"
 
@@ -2700,6 +2704,18 @@ msgstr "قائمة عناوين الديفيدي"
 
 msgid "DVDPlayer"
 msgstr "مشغل الديفيدي"
+
+#, fuzzy
+msgid "DVDPlayer Actions"
+msgstr "مشغل الديفيدي"
+
+#, fuzzy
+msgid "DVDTitle List"
+msgstr "قائمة عناوين الديفيدي"
+
+#, fuzzy
+msgid "DVDToolbox"
+msgstr "أدوات مشغل الديفيدي"
 
 msgid "Danish"
 msgstr "الدنماركية"
@@ -3720,7 +3736,7 @@ msgid "Event View Actions"
 msgstr "قائمه عرض الحدث"
 
 #, fuzzy
-msgid "Event ViewEPG Actions"
+msgid "Event View EPG Actions"
 msgstr "قائمه عرض الحدث"
 
 msgid "Event font size (relative to skin size)"
@@ -3870,9 +3886,6 @@ msgstr "وقت بدء إضافي لتجاهل أداة النوم غير الن�
 
 msgid "F"
 msgstr "F1"
-
-msgid "F1/F3/F4/F4-TURBO"
-msgstr "F1/F3/F4/F4-TURBO"
 
 msgid "FAILED"
 msgstr "فشل"
@@ -4434,12 +4447,6 @@ msgstr "كيبل عالي الوضوح"
 msgid "HD list"
 msgstr "قائمة عالية الوضوح"
 
-msgid "HD2400"
-msgstr "HD2400"
-
-msgid "HD60/HD66SE/Multibox/Multibox SE"
-msgstr ""
-
 msgid "HDMI Colordepth"
 msgstr "عمق ألوان كيبل عالي الوضوح"
 
@@ -4469,9 +4476,6 @@ msgstr ""
 
 msgid "HDR10 support"
 msgstr "دعم مشاركة الملفات على الشبكة المحلية"
-
-msgid "HDx1/HD1xxx/HD5x0C/VS1x00/et7x00/et8500/et7000mini"
-msgstr "HDx1/HD1xxx/HD5x0C/VS1x00/et7x00/et8500/et7000mini"
 
 msgid "HISTORY"
 msgstr "تاريخ"
@@ -4649,9 +4653,6 @@ msgstr "عناون الايبي"
 
 msgid "I do not want to perform any service scans"
 msgstr "هل تريد عمل بحث؟"
-
-msgid "I55SE/H7(new model)/H9(new model)/H9COMBO/H9TWIN/H9SE/H9COMBOSE/H10/H11/H17"
-msgstr ""
 
 msgid "IDLE"
 msgstr "IDLE"
@@ -4867,6 +4868,10 @@ msgid "Infobar Cue Sheet Actions"
 msgstr "إجراءات ورقة شريط المعلومات"
 
 #, fuzzy
+msgid "Infobar EPG Actions"
+msgstr "وقت ظهور شريط المعلومات"
+
+#, fuzzy
 msgid "Infobar Extensions"
 msgstr "ملحقات شريط المعلومات"
 
@@ -4931,10 +4936,6 @@ msgstr "إجراءات زر وضع شريط المعلومات"
 
 msgid "Infobar frontend data source"
 msgstr "مصدر بيانات الواجهة الأمامية في شريط المعلومات"
-
-#, fuzzy
-msgid "InfobarEPG Actions"
-msgstr "إجراءات شريط معلومات الدليل البرامج الإلكتروني"
 
 msgid "Information"
 msgstr "معلومات"
@@ -5173,7 +5174,13 @@ msgstr "انتقل إلى العنصر الأخير في القائمة أو ن�
 msgid "Jump to next marked position"
 msgstr "الإنتقال إلى الوضع القادم المحدد"
 
+msgid "Jump to next marker"
+msgstr "الإنتقال إلى الوضع القادم المحدد"
+
 msgid "Jump to previous marked position"
+msgstr "الرجوع إلى الوضع السابق المحدد"
+
+msgid "Jump to previous marker"
 msgstr "الرجوع إلى الوضع السابق المحدد"
 
 msgid "Jump to the currently active locale/language"
@@ -5846,6 +5853,9 @@ msgstr "انتقل إلى المكان في الفهرس"
 msgid "Move up a screen"
 msgstr "تحريك الشاشة لأعلى"
 
+msgid "Move up in bouquet list"
+msgstr "إنتهاء تحرير الباقة"
+
 msgid "Move west"
 msgstr "تحرك للغرب"
 
@@ -6475,10 +6485,6 @@ msgstr "إعدادات الترجمة"
 msgid "Other buttons will jump to the help for that button, if there is help."
 msgstr "ستنتقل الأزرار الأخرى إلى المساعدة الخاصة بهذا الزر، إذا كانت هناك مساعدة."
 
-#, fuzzy
-msgid "Other functions"
-msgstr "مزيد من التعليم"
-
 msgid "Output"
 msgstr "الإخراج"
 
@@ -6563,9 +6569,6 @@ msgstr "سابق"
 msgid "PREVIOUSSONG"
 msgstr "الأغنية السابقة"
 
-msgid "PULSe 4K(mini)"
-msgstr "PULSe 4K(mini)"
-
 msgid "PVR"
 msgstr "مسجل فيديو رقمي"
 
@@ -6580,6 +6583,12 @@ msgstr "التحكم فى الحزم"
 
 msgid "Packet manager"
 msgstr "المتحكم فى الحزم"
+
+msgid "Page down"
+msgstr "أنتقل للاسفل"
+
+msgid "Page up"
+msgstr "اعداد الاستخدام"
 
 msgid "Pakistan"
 msgstr "باكستان"
@@ -6663,12 +6672,11 @@ msgstr "بيرو"
 msgid "Philippines"
 msgstr "الفليبين"
 
-#, fuzzy
-msgid "PiP Setup Actions"
-msgstr "حدد الاجراء"
-
 msgid "PiP setup"
 msgstr "ضبط السكن"
+
+msgid "PiPSetup Actions"
+msgstr "حدد الاجراء"
 
 msgid "Picon"
 msgstr "الايقونة"
@@ -7378,6 +7386,10 @@ msgstr "يمين"
 
 msgid "Radio"
 msgstr "القنوات الاذاعية"
+
+#, fuzzy
+msgid "Radio mode"
+msgstr "شكل التنقل"
 
 msgid "Ram disk"
 msgstr "قرص ذاكرة الوصول العشوائي"
@@ -8147,6 +8159,10 @@ msgstr "جاري البحث"
 msgid "Search east"
 msgstr "البحث شرقا"
 
+#, fuzzy
+msgid "Search in SMS mode"
+msgstr "وضع عنوان الخدمة"
+
 msgid "Search west"
 msgstr "بحث غربا"
 
@@ -8242,6 +8258,10 @@ msgstr "حدد ' نعم ' ليشمل النطاق %s في بحثك."
 
 msgid "Select 'yes' to only send the DiSEqC command when changing from one satellite to another, or select 'no' for the DiSEqC command to be resent on every zap."
 msgstr "اختر 'نعم' لإرسال الأمر الدايزك فقط عند التغيير من قمر صناعي إلى آخر ، أو اختر 'لا' لأمر 'الدايزك' للاستياء من كل تنقل."
+
+#, fuzzy
+msgid "Select Audio"
+msgstr "أختيار كايد"
 
 msgid "Select CAId"
 msgstr "أختيار كايد"
@@ -8373,6 +8393,10 @@ msgstr "أختار معدل التحديث"
 
 msgid "Select satellites"
 msgstr "اختيار الأقمار الصناعية"
+
+#, fuzzy
+msgid "Select service"
+msgstr "أختار الفيلم"
 
 #, fuzzy
 msgid "Select service name"
@@ -8818,6 +8842,10 @@ msgstr "إجراءات الاختصار"
 msgid "Show"
 msgstr "عرض سجل"
 
+#, fuzzy
+msgid "Show All Services"
+msgstr "عرض قائمة القنوات"
+
 msgid "Show Audioselection"
 msgstr "عرض الترجمة المختارة"
 
@@ -8833,11 +8861,23 @@ msgstr "عرض دليل البرامج الإلكتروني للقناة الح�
 msgid "Show EPG..."
 msgstr "عرض دليل البرامج الإلكترونية..."
 
+#, fuzzy
+msgid "Show Favorites"
+msgstr "عرض قائمة المفضلات"
+
 msgid "Show InfoBar"
 msgstr "عرض المعلومات"
 
 msgid "Show PiP"
 msgstr "عرض خاصية قناة داخل قناة"
+
+#, fuzzy
+msgid "Show Providers"
+msgstr "عرض الأفلام"
+
+#, fuzzy
+msgid "Show Satellites"
+msgstr "عرض قائمة القنوات"
 
 msgid "Show True/False as graphical switch"
 msgstr "عرض الصح/خطأ كتبديل المخطط البياني"
@@ -9887,6 +9927,10 @@ msgstr "ضبط"
 msgid "TV"
 msgstr "تلفزيون"
 
+#, fuzzy
+msgid "TV mode"
+msgstr "وضع الاختبار"
+
 msgid "TV physical address report"
 msgstr "تقرير عناوين التلفزيون التفاعلية"
 
@@ -10037,7 +10081,7 @@ msgstr ""
 msgid "The number of steps to change the volume on the device the keys are forwarded to."
 msgstr ".عدد الخطوات لتغيير مستوى الصوت على الجهاز الذي تتم إعادة توجيه المفاتيح إليه"
 
-msgid "The order and grouping of the help information list can be controlled using MENU>Setup>User Interface>Settings>Sort order for help screen."
+msgid "The order and grouping of the help information list can be controlled using MENU>Setup>User Interface>Settings>Sort order for help screen or pressing long help"
 msgstr "يمكن التحكم في ترتيب وتجميع قائمة معلومات المساعدة باستخدام القائمة>الإعداد>واجهة المستخدم>الإعدادات>ترتيب الفرز لشاشة المساعدة."
 
 msgid ""
@@ -10545,6 +10589,10 @@ msgstr "تبديل شاشة العرض إلى شاشة تلفزيون مباشر
 msgid "Toggle PiPzap"
 msgstr "تبديل للتنقل بين خاصية قناة داخل قناة"
 
+#, fuzzy
+msgid "Toggle TV Radio mode"
+msgstr "أختار صيغة بث الفديو"
+
 msgid "Toggle TV/RADIO mode"
 msgstr "TV/RADIO mode تبديل"
 
@@ -10556,6 +10604,10 @@ msgstr "تغطية وبث هذه القناة متقطعة ومتذبذبة"
 
 msgid "Toggle infoBar"
 msgstr "infoBar تبديل"
+
+#, fuzzy
+msgid "Toggle movemode"
+msgstr "أختار صيغة بث الفديو"
 
 msgid "Toggle new text inserts before or overwrites existing text"
 msgstr "تبديل إدخالات النص الجديد قبل النص الموجود أو الكتابة فوقه"
@@ -11122,9 +11174,6 @@ msgstr "\"+الصوت\""
 
 msgid "VOL-"
 msgstr "-الصوت"
-
-msgid "VU+"
-msgstr "الفوبلس"
 
 msgid "Valid ONID/TSID look at www.lyngsat.com..."
 msgstr "...www.lyngsat.com صالحة على ONID/TSID نظرة"
@@ -11868,6 +11917,10 @@ msgstr ".يمكنك تعيين الدليل المحدد كدليل 'جذر' ل�
 msgid "You can set sorting type for items in movielist."
 msgstr "نعم ، والعودة إلى قائمه الأفلام"
 
+#, python-format
+msgid "You can't update the software because %s can not be reached."
+msgstr ""
+
 msgid "You cannot delete this!"
 msgstr "لايمكنك مسح هذه!"
 
@@ -12046,6 +12099,10 @@ msgstr "شكل التنقل"
 msgid "Zap to"
 msgstr "إنتقل إلى"
 
+#, fuzzy
+msgid "Zap to channel number"
+msgstr "إستخدم البحث السريع بأرقام القنوات"
+
 msgid "Zap to selected channel"
 msgstr "الإنتقال إلى القناة التالية"
 
@@ -12064,15 +12121,6 @@ msgstr "إنتقل إلى قناة المؤقت %s برغم عمل قناة دا
 
 msgid "Zapped to timer service %s!"
 msgstr "!%s تم الانتقال إلى قناة المؤقت"
-
-msgid "Zgemma H.S/H.2S/H.2H/H5/H7(old model)"
-msgstr "Zgemma H.S/H.2S/H.2H/H5/H7(old model)"
-
-msgid "Zgemma H9(old model)/I55Plus/H8"
-msgstr "Zgemma H9(old model)/I55Plus/H8"
-
-msgid "Zgemma Star S/2S/H1/H2"
-msgstr "Zgemma Star S/2S/H1/H2"
 
 msgid "Zimbabwe"
 msgstr "زيمبابوي"
@@ -12345,21 +12393,6 @@ msgstr "خطأ في بداية البحث"
 msgid "error while scanning"
 msgstr "خطأ أثناء البحث"
 
-msgid "et4000"
-msgstr "et4000"
-
-msgid "et5000/et6000"
-msgstr "et5000/6000"
-
-msgid "et8000/et10000"
-msgstr "et8000/et10000"
-
-msgid "et9000/et9100"
-msgstr "et9000/et9100"
-
-msgid "et9200/et9500/et6500"
-msgstr "et9200/9500/6500"
-
 msgid "execute cuts (requires MovieCut plugin)"
 msgstr "(MovieCut يتطلب البرنامج المساعد) تنفيذ التخفيضات"
 
@@ -12591,6 +12624,9 @@ msgstr "السيارات"
 
 msgid "move down to last entry"
 msgstr "أنتقل للأسفل إلى الإدخال السابق"
+
+msgid "Move down in bouquet list"
+msgstr "الانتقال إلى أخر القائمة"
 
 msgid "move down to next entry"
 msgstr "أنتقل للأسفل إلى الإدخال التالي"
@@ -13102,9 +13138,6 @@ msgstr "مع اسم المؤالف"
 
 msgid "with_errors"
 msgstr "مع الأخطاء"
-
-msgid "xp1000"
-msgstr "XP1000"
 
 msgid "yellow"
 msgstr "أصفر"

@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: enigma2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-12-20 11:32+0100\n"
+"POT-Creation-Date: 2025-03-16 15:41+0100\n"
 "PO-Revision-Date: 2024-12-12 17:09+0200\n"
 "Last-Translator: Dimitrij <Dima-73@inbox.lv>\n"
 "Language-Team: openPLi Dimitrij\n"
@@ -413,6 +413,10 @@ msgstr "(пусто)"
 
 msgid "(not activated)"
 msgstr "(не активирован)"
+
+#, fuzzy
+msgid "(old model)"
+msgstr "Режим 3D"
 
 msgid "(show optional DVD audio menu)"
 msgstr "(показать дополнительное DVD аудио меню)"
@@ -1282,9 +1286,6 @@ msgstr "Доступные форматы переменных"
 msgid "Available locales are:"
 msgstr "Доступными локалями являются:"
 
-msgid "Axas E4HD Ultra"
-msgstr "Axas E4HD Ultra"
-
 msgid "Azerbaijan"
 msgstr "Azerbaijan"
 
@@ -1482,6 +1483,13 @@ msgstr "Botswana"
 msgid "Bottom"
 msgstr "Снизу"
 
+#, fuzzy
+msgid "Bouquet down"
+msgstr "Снижение громкости"
+
+msgid "Bouquet up"
+msgstr ""
+
 msgid "Bouvet Island"
 msgstr "Bouvet Island"
 
@@ -1540,7 +1548,6 @@ msgstr "Обход HDMI EDID проверки"
 
 msgid "C"
 msgstr "C"
-
 
 msgctxt "Abbreviation of \"Configurable\""
 msgid "C"
@@ -1749,6 +1756,10 @@ msgstr "Изменение размера шага"
 msgid "Change timer"
 msgstr "Изменить таймер"
 
+#, fuzzy
+msgid "Change view mode"
+msgstr "Изменить таймер"
+
 msgid "Channel"
 msgstr "Канал"
 
@@ -1758,11 +1769,12 @@ msgstr "Информация канала"
 msgid "Channel Select Base Actions"
 msgstr "Базовые действия селектора каналов"
 
+#, fuzzy
+msgid "Channel Select EPG Actions"
+msgstr "Действия EPG селектора каналов"
+
 msgid "Channel Select Edit Actions"
 msgstr "Действия редактирования селектора каналов"
-
-msgid "Channel SelectEPG Actions"
-msgstr "Действия EPG селектора каналов"
 
 msgid "Channel Selection"
 msgstr "Селектор каналов"
@@ -2410,6 +2422,10 @@ msgstr "Для получения этой информации обратите
 msgid "Content does not fit on DVD!"
 msgstr "Контент не соответствует DVD!"
 
+#, fuzzy
+msgid "Context Menu"
+msgstr "Контекстное меню селектора каналов"
+
 msgid "Continue"
 msgstr "Продолжить"
 
@@ -2646,15 +2662,6 @@ msgstr "Запись на DVD"
 msgid "DVD Menu"
 msgstr "DVD меню"
 
-msgid "DVD Player Actions"
-msgstr "Действия DVD плеера"
-
-msgid "DVD Title List"
-msgstr "DVD список названий"
-
-msgid "DVD Toolbox"
-msgstr "DVD - утилиты медиа"
-
 msgid "DVD data format"
 msgstr "DVD -формат данных"
 
@@ -2672,6 +2679,18 @@ msgstr "DVD список названий"
 
 msgid "DVDPlayer"
 msgstr "DVD плеер"
+
+#, fuzzy
+msgid "DVDPlayer Actions"
+msgstr "Действия DVD плеера"
+
+#, fuzzy
+msgid "DVDTitle List"
+msgstr "DVD список названий"
+
+#, fuzzy
+msgid "DVDToolbox"
+msgstr "DVD - утилиты медиа"
 
 msgid "Danish"
 msgstr "Датский"
@@ -3674,7 +3693,8 @@ msgstr "Ethiopia"
 msgid "Event View Actions"
 msgstr "Действия обзора события"
 
-msgid "Event ViewEPG Actions"
+#, fuzzy
+msgid "Event View EPG Actions"
 msgstr "Действия просмотра EPG события"
 
 msgid "Event font size (relative to skin size)"
@@ -3824,9 +3844,6 @@ msgstr "Начало экстра периода времени игнориро
 
 msgid "F"
 msgstr "F"
-
-msgid "F1/F3/F4/F4-TURBO"
-msgstr "F1/F3/F4/F4-TURBO"
 
 msgid "FAILED"
 msgstr "ОШИБКА"
@@ -4386,12 +4403,6 @@ msgstr "HD"
 msgid "HD list"
 msgstr "HD лист"
 
-msgid "HD2400"
-msgstr "HD2400"
-
-msgid "HD60/HD66SE/Multibox/Multibox SE"
-msgstr "HD60/HD66SE/Multibox/Multibox SE"
-
 msgid "HDMI"
 msgstr "HDMI"
 
@@ -4424,9 +4435,6 @@ msgstr "HDMI-In"
 
 msgid "HDR10 support"
 msgstr "HDR10 поддержка"
-
-msgid "HDx1/HD1xxx/HD5x0C/VS1x00/et7x00/et8500/et7000mini"
-msgstr "HDx1/HD1xxx/HD5x0C/VS1x00/et7x00/et8500/et7000mini"
 
 msgid "HELP"
 msgstr "HELP"
@@ -4601,9 +4609,6 @@ msgstr "I"
 
 msgid "I do not want to perform any service scans"
 msgstr "Я не хочу выполнять никакое сканирование"
-
-msgid "I55SE/H7(new model)/H9(new model)/H9COMBO/H9TWIN/H9SE/H9COMBOSE/H10/H11/H17"
-msgstr "I55SE/H7(новая модель)/H9(новая модель)/H9COMBO/H9TWIN/H9SE/H9COMBOSE/H10/H11/H17"
 
 msgid "IDLE"
 msgstr "ОЖИДАНИЕ"
@@ -4814,6 +4819,10 @@ msgstr "Инфобар- селектор каналов"
 msgid "Infobar Cue Sheet Actions"
 msgstr "Действия реплик инфобара"
 
+#, fuzzy
+msgid "Infobar EPG Actions"
+msgstr "Действия EPG инфобара"
+
 msgid "Infobar Extensions"
 msgstr "Дополнения инфобара"
 
@@ -4867,9 +4876,6 @@ msgstr "Действия кнопки Vmode инфобара"
 
 msgid "Infobar frontend data source"
 msgstr "Источник данных интерфейса в инфобаре"
-
-msgid "InfobarEPG Actions"
-msgstr "Действия EPG инфобара"
 
 msgid "Information"
 msgstr "Информация"
@@ -5097,7 +5103,15 @@ msgstr "Перейти к последнему элементу списка и�
 msgid "Jump to next marked position"
 msgstr "Перейти к следующей метке"
 
+#, fuzzy
+msgid "Jump to next marker"
+msgstr "Перейти к следующей метке"
+
 msgid "Jump to previous marked position"
+msgstr "Перейти к предыдущей метке"
+
+#, fuzzy
+msgid "Jump to previous marker"
 msgstr "Перейти к предыдущей метке"
 
 #. TRANSLATORS: (aspect ratio policy: scale as close to fullscreen as possible)
@@ -5695,6 +5709,10 @@ msgstr "Перейти вниз списка"
 msgid "Move down a screen"
 msgstr "переместить вниз к последней записи"
 
+#, fuzzy
+msgid "Move down in bouquet list"
+msgstr "Перейти вниз списка"
+
 msgid "Move east"
 msgstr "Перемещение на восток"
 
@@ -5748,6 +5766,10 @@ msgstr "Перейти на строку вверх"
 
 msgid "Move up a screen"
 msgstr "Перейти на экран вверх"
+
+#, fuzzy
+msgid "Move up in bouquet list"
+msgstr "Закончить редактирование букета"
 
 msgid "Move west"
 msgstr "Перемещение на запад"
@@ -6372,9 +6394,6 @@ msgstr "Другие субтитры & язык"
 msgid "Other buttons will jump to the help for that button, if there is help."
 msgstr "Другие кнопки перейдут к справке по этой кнопке, если таковая имеется."
 
-msgid "Other functions"
-msgstr "Дальнейшие функции"
-
 msgid "Output"
 msgstr "Выход"
 
@@ -6459,9 +6478,6 @@ msgstr "ПРЕДЫДУЩИЙ"
 msgid "PREVIOUSSONG"
 msgstr "PREVIOUSSONG"
 
-msgid "PULSe 4K(mini)"
-msgstr "PULSe 4K(mini)"
-
 msgid "PVR"
 msgstr "PVR"
 
@@ -6476,6 +6492,14 @@ msgstr "Управление пакетами"
 
 msgid "Packet manager"
 msgstr "Менеджер пакетов"
+
+#, fuzzy
+msgid "Page down"
+msgstr "Переключить канал вниз"
+
+#, fuzzy
+msgid "Page up"
+msgstr "Индивидуальные настройки"
 
 msgid "Pakistan"
 msgstr "Pakistan"
@@ -6562,11 +6586,12 @@ msgstr "Peru"
 msgid "Philippines"
 msgstr "Philippines"
 
-msgid "PiP Setup Actions"
-msgstr "Действия настройки PiP"
-
 msgid "PiP setup"
 msgstr "Настройки PiP"
+
+#, fuzzy
+msgid "PiPSetup Actions"
+msgstr "Действия настройки PiP"
 
 msgid "Picon"
 msgstr "Пикон"
@@ -7269,6 +7294,10 @@ msgstr "RIGHT"
 
 msgid "Radio"
 msgstr "Радио"
+
+#, fuzzy
+msgid "Radio mode"
+msgstr "Режим 3D"
 
 msgid "Ram disk"
 msgstr "Ram диск"
@@ -8026,6 +8055,10 @@ msgstr "Поиск"
 msgid "Search east"
 msgstr "Поиск на востоке"
 
+#, fuzzy
+msgid "Search in SMS mode"
+msgstr "Режим названия сервиса"
+
 msgid "Search west"
 msgstr "Поиск на западе"
 
@@ -8121,6 +8154,10 @@ msgstr "Выберите 'да' ,что бы включить диапазон %
 
 msgid "Select 'yes' to only send the DiSEqC command when changing from one satellite to another, or select 'no' for the DiSEqC command to be resent on every zap."
 msgstr "Выберите 'да', чтобы отправлять команду DiSEqC только при переходе с одного спутника на другой или выберите 'нет', чтобы команда DiSEqC посылалась при каждом переключении."
+
+#, fuzzy
+msgid "Select Audio"
+msgstr "Выбор CAId"
 
 msgid "Select CAId"
 msgstr "Выбор CAId"
@@ -8254,6 +8291,10 @@ msgstr "Выберите частоту обновления"
 
 msgid "Select satellites"
 msgstr "Выбор спутников"
+
+#, fuzzy
+msgid "Select service"
+msgstr "Выбор сервиса"
 
 msgid "Select service name"
 msgstr "Выбор названия сервиса"
@@ -8685,6 +8726,10 @@ msgstr "Действия ярлыков"
 msgid "Show"
 msgstr "Показать"
 
+#, fuzzy
+msgid "Show All Services"
+msgstr "Показать список сервисов"
+
 msgid "Show Audioselection"
 msgstr "Показать аудио меню"
 
@@ -8700,11 +8745,23 @@ msgstr "Показать EPG текущего канала..."
 msgid "Show EPG..."
 msgstr "Показать EPG..."
 
+#, fuzzy
+msgid "Show Favorites"
+msgstr "Показать список фаворитов"
+
 msgid "Show InfoBar"
 msgstr "Показать инфобар"
 
 msgid "Show PiP"
 msgstr "Показать PiP"
+
+#, fuzzy
+msgid "Show Providers"
+msgstr "Показать видео"
+
+#, fuzzy
+msgid "Show Satellites"
+msgstr "Показать список спутников"
 
 msgid "Show True/False as graphical switch"
 msgstr "Использовать графический переключатель"
@@ -9753,6 +9810,10 @@ msgstr "НАСТРОЙКА СИГНАЛА"
 msgid "TV"
 msgstr "TV"
 
+#, fuzzy
+msgid "TV mode"
+msgstr "Режим теста"
+
 msgid "TV physical address report"
 msgstr "Оповещение физического адреса ТВ"
 
@@ -9832,7 +9893,6 @@ msgstr ""
 "Спасибо Вам за использование мастера настройки.\n"
 "Пожалуйста, нажмите ОК для продолжения."
 
-
 msgid ""
 "Thank you for using the wizard. Your receiver is now ready for use.\n"
 "Press Blue or OK to start using your receiver."
@@ -9904,7 +9964,8 @@ msgstr ""
 msgid "The number of steps to change the volume on the device the keys are forwarded to."
 msgstr "Количество шагов для изменения громкости на устройстве, на которое идет команда."
 
-msgid "The order and grouping of the help information list can be controlled using MENU>Setup>User Interface>Settings>Sort order for help screen."
+#, fuzzy
+msgid "The order and grouping of the help information list can be controlled using MENU>Setup>User Interface>Settings>Sort order for help screen or pressing long help"
 msgstr "Порядок и группировку списка справочной информации можно контролировать с помощью МЕНЮ>Настройка>Пользовательский интерфейс>Настройки>Порядок сортировки для экрана помощи."
 
 msgid ""
@@ -10409,6 +10470,10 @@ msgstr "Смена LCD LiveTV"
 msgid "Toggle PiPzap"
 msgstr "Смена Pipzap"
 
+#, fuzzy
+msgid "Toggle TV Radio mode"
+msgstr "Переключатель ТВ/РАДИО режима"
+
 msgid "Toggle TV/RADIO mode"
 msgstr "Переключатель ТВ/РАДИО режима"
 
@@ -10420,6 +10485,10 @@ msgstr "Показать/скрыть мигающую строку для эт�
 
 msgid "Toggle infoBar"
 msgstr "Смена инфобаров"
+
+#, fuzzy
+msgid "Toggle movemode"
+msgstr "Смена видеорежима"
 
 msgid "Toggle new text inserts before or overwrites existing text"
 msgstr "Переключить новые текстовые вставки до или перезаписать существующий текст"
@@ -10970,9 +11039,6 @@ msgstr "VOL+"
 msgid "VOL-"
 msgstr "VOL-"
 
-msgid "VU+"
-msgstr "VU+"
-
 msgid "Valid ONID/TSID look at www.lyngsat.com..."
 msgstr "Необходимые ONID/TSID, ищите на www.lyngsat.com..."
 
@@ -11274,7 +11340,6 @@ msgstr ""
 "Если вы хотите подключить Ваш ресивер к интернету, этот мастер настройки проведет Вас через основные настройки сети Вашего ресивера.\n"
 "\n"
 "Нажмите ОК для начала настройки сети."
-
 
 msgid ""
 "Welcome.\n"
@@ -11706,6 +11771,10 @@ msgstr "Вы можете установить выбранный каталог
 msgid "You can set sorting type for items in movielist."
 msgstr "Вы можете установить тип сортировки для элементов в списке видео."
 
+#, fuzzy, python-format
+msgid "You can't update the software because %s can not be reached."
+msgstr "Статус текущей бета версии не может быть проверен,одна из причин, %s не отвечает."
+
 msgid "You cannot delete this!"
 msgstr "Вы не можете удалить это!"
 
@@ -11888,6 +11957,10 @@ msgstr "Режимы экрана при переключении"
 msgid "Zap to"
 msgstr "Переключить на"
 
+#, fuzzy
+msgid "Zap to channel number"
+msgstr "перейти к разделу по номеру"
+
 msgid "Zap to selected channel"
 msgstr "Переключение на выбраный канал"
 
@@ -11907,15 +11980,6 @@ msgstr "Таймер - переключено на сервис %s как PiP!"
 #, python-format
 msgid "Zapped to timer service %s!"
 msgstr "Таймер - переключено на сервис %s!"
-
-msgid "Zgemma H.S/H.2S/H.2H/H5/H7(old model)"
-msgstr "Zgemma H.S/H.2S/H.2H/H5/H7(старая модель)"
-
-msgid "Zgemma H9(old model)/I55Plus/H8"
-msgstr "Zgemma H9(старая модель)/i55Plus/H8"
-
-msgid "Zgemma Star S/2S/H1/H2"
-msgstr "Zgemma Star S/2S/H1/H2"
 
 msgid "Zimbabwe"
 msgstr "Zimbabwe"
@@ -12199,21 +12263,6 @@ msgstr "ошибка при старте сканирования"
 
 msgid "error while scanning"
 msgstr "ошибка при сканировании"
-
-msgid "et4000"
-msgstr "et4000"
-
-msgid "et5000/et6000"
-msgstr "et5000/et6000"
-
-msgid "et8000/et10000"
-msgstr "et8000/et10000"
-
-msgid "et9000/et9100"
-msgstr "et9000/et9100"
-
-msgid "et9200/et9500/et6500"
-msgstr "et9200/et9500/et6500"
 
 msgid "execute cuts (requires MovieCut plugin)"
 msgstr "выполнить сокращения (необходим плагин MovieCut)"
@@ -12967,9 +13016,6 @@ msgstr "с именем тюнера"
 
 msgid "with_errors"
 msgstr "с ошибками"
-
-msgid "xp1000"
-msgstr "xp1000"
 
 msgid "yellow"
 msgstr "желтый"
