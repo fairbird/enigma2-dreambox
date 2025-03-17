@@ -441,9 +441,8 @@ msgid "(not activated)"
 msgstr "(neaktivován)"
 
 #
-#, fuzzy
 msgid "(old model)"
-msgstr "3D mód"
+msgstr "(starý model)"
 
 #
 msgid "(show optional DVD audio menu)"
@@ -1684,12 +1683,11 @@ msgstr "Botswana"
 msgid "Bottom"
 msgstr "Dole"
 
-#, fuzzy
 msgid "Bouquet down"
-msgstr "Zeslabit zvuk"
+msgstr "Přehled dolů"
 
 msgid "Bouquet up"
-msgstr ""
+msgstr "Přehled nahorů"
 
 msgid "Bouvet Island"
 msgstr "Bouvetův ostrov"
@@ -1986,9 +1984,8 @@ msgid "Change timer"
 msgstr "Změnit časovač"
 
 #
-#, fuzzy
 msgid "Change view mode"
-msgstr "Změnit časovač"
+msgstr "Změnit režim prohlížení"
 
 #
 msgid "Channel"
@@ -2002,9 +1999,8 @@ msgid "Channel Select Base Actions"
 msgstr ""
 
 #
-#, fuzzy
 msgid "Channel Select EPG Actions"
-msgstr "Výběr programu"
+msgstr ""
 
 #
 msgid "Channel Select Edit Actions"
@@ -2733,9 +2729,8 @@ msgid "Content does not fit on DVD!"
 msgstr "Obsah se nevejde na DVD!"
 
 #
-#, fuzzy
 msgid "Context Menu"
-msgstr "Menu seznamu programů"
+msgstr "Kontextové menu"
 
 msgid "Continue"
 msgstr "Pokračovat"
@@ -3034,19 +3029,16 @@ msgid "DVDPlayer"
 msgstr "DVD přehrávač"
 
 #
-#, fuzzy
 msgid "DVDPlayer Actions"
-msgstr "DVD přehrávač"
+msgstr ""
 
 #
-#, fuzzy
 msgid "DVDTitle List"
-msgstr "DVD seznam titulů"
+msgstr "Seznam DVD titulů"
 
 #
-#, fuzzy
 msgid "DVDToolbox"
-msgstr "DVD media nástroje"
+msgstr ""
 
 #
 msgid "Danish"
@@ -5472,9 +5464,8 @@ msgid "Infobar Cue Sheet Actions"
 msgstr ""
 
 #
-#, fuzzy
 msgid "Infobar EPG Actions"
-msgstr "Doba po které skrývat infobar"
+msgstr ""
 
 #
 msgid "Infobar Extensions"
@@ -5812,7 +5803,6 @@ msgid "Jump to next marked position"
 msgstr "Na další označenou pozici"
 
 #
-#, fuzzy
 msgid "Jump to next marker"
 msgstr "Na další označenou pozici"
 
@@ -5821,7 +5811,6 @@ msgid "Jump to previous marked position"
 msgstr "Na předchozí označenou pozici"
 
 #
-#, fuzzy
 msgid "Jump to previous marker"
 msgstr "Na předchozí označenou pozici"
 
@@ -6518,9 +6507,8 @@ msgid "Move down a screen"
 msgstr "Posunout o obrazovku dolů"
 
 #
-#, fuzzy
 msgid "Move down in bouquet list"
-msgstr "Posunout o řádek dolů"
+msgstr "Posunout v přehledu dolů"
 
 #
 msgid "Move east"
@@ -6584,9 +6572,8 @@ msgid "Move up a screen"
 msgstr "Posunout o obrazovku nahoru"
 
 #
-#, fuzzy
 msgid "Move up in bouquet list"
-msgstr "Ukončit úpravu přehledu"
+msgstr "Posunout v přehledu nahoru"
 
 #
 msgid "Move west"
@@ -7414,13 +7401,11 @@ msgstr "Správa doplňků"
 msgid "Packet manager"
 msgstr "Správce doplňků"
 
-#, fuzzy
 msgid "Page down"
-msgstr "Přepnout dolů"
+msgstr "O stránku dolů"
 
-#, fuzzy
 msgid "Page up"
-msgstr "Přizpůsobení"
+msgstr "O stránku nahoru"
 
 msgid "Pakistan"
 msgstr "Pakistán"
@@ -7521,9 +7506,8 @@ msgid "PiP setup"
 msgstr "Nastavení PiP"
 
 #
-#, fuzzy
 msgid "PiPSetup Actions"
-msgstr "Zvolte akci"
+msgstr ""
 
 msgid "Picon"
 msgstr "Pikona"
@@ -8362,9 +8346,8 @@ msgid "Radio"
 msgstr "Rádio"
 
 #
-#, fuzzy
 msgid "Radio mode"
-msgstr "3D mód"
+msgstr "Rádio mód"
 
 #
 msgid "Ram disk"
@@ -9243,9 +9226,8 @@ msgstr "Vyhledat"
 msgid "Search east"
 msgstr "Hledat východně"
 
-#, fuzzy
 msgid "Search in SMS mode"
-msgstr "Názvy programů"
+msgstr "Hledat v SMS módu"
 
 #
 msgid "Search west"
@@ -9355,9 +9337,8 @@ msgid "Select 'yes' to only send the DiSEqC command when changing from one satel
 msgstr "Zvolte 'Ano', chcete-li posílat příkaz DiSEqC pouze při přechodu z jednoho satelitu na druhý. Zvolte 'Ne' chcete-li aby příkaz DiSEqC byl posílán při každém přepnutí."
 
 #
-#, fuzzy
 msgid "Select Audio"
-msgstr "Vyberte CAId"
+msgstr "Výběr zvuku"
 
 #
 msgid "Select CAId"
@@ -9520,9 +9501,8 @@ msgid "Select satellites"
 msgstr "Vyberte satelity"
 
 #
-#, fuzzy
 msgid "Select service"
-msgstr "Zvolte program"
+msgstr "Výběr programu"
 
 msgid "Select service name"
 msgstr "Zvolte název programu"
@@ -10007,9 +9987,8 @@ msgstr ""
 msgid "Show"
 msgstr "Zobrazit"
 
-#, fuzzy
 msgid "Show All Services"
-msgstr "Přehled programů"
+msgstr "Zobrazit všechny programy"
 
 msgid "Show Audioselection"
 msgstr "Nastavení zvuku"
@@ -10028,9 +10007,8 @@ msgstr "Zobrazovat EPG pro aktuální kanál..."
 msgid "Show EPG..."
 msgstr "Zobrazit EPG..."
 
-#, fuzzy
 msgid "Show Favorites"
-msgstr "Oblíbené"
+msgstr "Zobrazit oblíbené"
 
 msgid "Show InfoBar"
 msgstr "Zobrazit infobar"
@@ -10038,13 +10016,11 @@ msgstr "Zobrazit infobar"
 msgid "Show PiP"
 msgstr "Zobrazit PiP"
 
-#, fuzzy
 msgid "Show Providers"
-msgstr "Nahrané soubory"
+msgstr "Zobrazit poskytovatele"
 
-#, fuzzy
 msgid "Show Satellites"
-msgstr "Ukázat přehled satelitů"
+msgstr "Zobrazit satelity"
 
 msgid "Show True/False as graphical switch"
 msgstr "Používat grafický přepínač"
@@ -11233,7 +11209,7 @@ msgstr ""
 "Pro případné korekce můžete kontaktovat autora\n"
 "na výše uvedené adrese.\n"
 "\n"
-"®23.12.2024"
+"®17.3.2025"
 
 #
 msgid "TS file is too large for ISO9660 level 1!"
@@ -11252,9 +11228,8 @@ msgid "TV"
 msgstr "TV"
 
 #
-#, fuzzy
 msgid "TV mode"
-msgstr "Testovací mód"
+msgstr "TV mód"
 
 msgid "TV physical address report"
 msgstr "Ohlášení fyzické adresy TV"
@@ -11419,7 +11394,6 @@ msgstr ""
 msgid "The number of steps to change the volume on the device the keys are forwarded to."
 msgstr "Počet kroků potřebných ke změně hlasitosti na vzdáleném zařízení."
 
-#, fuzzy
 msgid "The order and grouping of the help information list can be controlled using MENU>Setup>User Interface>Settings>Sort order for help screen or pressing long help"
 msgstr "Pořadí a seskupení seznamu v nápovědě lze nastavovat pomocí 'Řazení položek nápovědy' v Přizpůsobení."
 
@@ -11978,9 +11952,8 @@ msgstr "Přepínat LCD LiveTV"
 msgid "Toggle PiPzap"
 msgstr "Přepínat PIPzap"
 
-#, fuzzy
 msgid "Toggle TV Radio mode"
-msgstr "Přepínat TV/RADIO mód"
+msgstr "Přepínat TV/Rádio mód"
 
 msgid "Toggle TV/RADIO mode"
 msgstr "Přepínat TV/RADIO mód"
@@ -11996,9 +11969,8 @@ msgid "Toggle infoBar"
 msgstr "Přepínat infobar"
 
 #
-#, fuzzy
 msgid "Toggle movemode"
-msgstr "Přepínat video mód"
+msgstr "Přepínat režim přesunu"
 
 msgid "Toggle new text inserts before or overwrites existing text"
 msgstr "Přepínání mezi vkládáním a přepisováním"
@@ -13436,9 +13408,9 @@ msgid "You can set sorting type for items in movielist."
 msgstr "Můžete nastavit způsob třídění v seznamu filmů."
 
 #
-#, fuzzy, python-format
+#, python-format
 msgid "You can't update the software because %s can not be reached."
-msgstr "Stav aktuálního image nemohl být ověřen z důvodu nedostupnosti %s."
+msgstr "Nelze aktualizovat software, protože %s není dostupný."
 
 #
 msgid "You cannot delete this!"
@@ -13634,9 +13606,8 @@ msgstr "Zap mód"
 msgid "Zap to"
 msgstr "Přepnout na"
 
-#, fuzzy
 msgid "Zap to channel number"
-msgstr "přeskočit na kapitolu podle čísla"
+msgstr "Přepnout na číslo kanálu"
 
 msgid "Zap to selected channel"
 msgstr "Přepnout na vybraný kanál"
