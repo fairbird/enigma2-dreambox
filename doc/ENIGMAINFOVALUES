@@ -1,23 +1,23 @@
-Based on enigma.info produced in oe-alliance branch 5.4 builds
---------------------------------------------------------------
+Based on enigma.info produced in oe-alliance branch 5.4 builds, adapted for OpenPLi use
+---------------------------------------------------------------------------------------
 
 architecture: string, from $DEFAULTTUNE, set in meta-brands/machine.conf, current oe-alliance choices: mips32el / cortexa15hf-neon-vfpv4 / cortexa7hf-vfp
 avjack: bool, from MACHINE_FEATURES
-blindscanbinary: string, from $BLINDSCAN_BINARY, set in meta-oe/conf/machine/box-hardware.inc
-brand: string, manufacturer, set in meta-brands, normally lower case
-ci: bool, from MACHINE_FEATURES
+blindscanbinary: string, from $BLINDSCAN_BINARY, set in meta-openpli/conf/machine/box-hardware.inc
+brand: string, manufacturer, set via the BRAND_OEM variable in the "machine" .conf file in the BSP, in lowercase. Note, this is the OEM manufacturer, which may be different from the manufacturer name on the box !
+ci: bool, True if "ci" is defined in MACHINE_FEATURES, False otherwise
 compiledate: string, containing 8 digits, representing a date in format YYYYMMDD
-dboxlcd: bool, from MACHINE_FEATURES
+dboxlcd: bool, True if "textlcd" is defined in MACHINE_FEATURES, False otherwise
 developername: string, distro name in lower case, from DEVELOPER_NAME ?= "${DISTRO_NAME}" in box-hardware.inc, $DISTRO_NAME, set in <distro>.conf
-displaybrand: string, manufacturer for display purposes, set in meta-brands
-displaydistro: string, free election of distro author, distro name for display purposes, set in <distro>.conf
-displaymodel: string, machine model name for display purposes, set in meta-brands
+displaybrand: string, manufacturer for display purposes, set via the MACHINE_BRAND variable in the "machine" .conf file in the BSP, in the case used by the manufacturer
+displaydistro: string, set hardcoded to "OpenPLi" in enigma-info.bb
+displaymodel: string, box model name for display purposes, set via the MACHINE_NAME variable in the "machine" .conf file in the BSP, in the case used by the manufacturer
 displaytype: string, type of front panel display, from MACHINE_FEATURES
-distro: string, free election of distro author, should be lower case, from $DISTRO_NAME, set in <distro>.conf
+distro: string, distro name in lower case, from DISTRO_NAME, defaults to "openpli" in openpli-common.conf
 driversdate: string, containing 8 digits, representing a date in format YYYYMMDD or "N/A"
 dvi: bool, from MACHINE_FEATURES
-feedsurl: string, from $DISTRO_FEED_URI, set in <distro>.conf
-fhdskin: bool, has 'skins1080" in from MACHINE_FEATURES
+feedsurl: string, from $DISTRO_FEED_URI, set in openpli-common.conf if not set already
+fhdskin: bool, True if "skin1080" is defined in MACHINE_FEATURES, False otherwise
 fpu: string, set in openembedded-core/meta/conf/machine/include/arm/arch-arm
 friendlyfamily: string, set in box-hardware.inc, FRIENDLY_FAMILY ?= "${MACHINE} ${BUILDMACHINE}"
 hdmi: bool, from MACHINE_FEATURES
@@ -26,46 +26,46 @@ hdmihdin: bool, from MACHINE_FEATURES
 hdmistandbymode: int, 0 or 1, from MACHINE_FEATURES, set in box-hardware.inc
 imagebuild: string, free election of distro author, from $BUILD_VERSION, set in <distro>.conf
 imagedevbuild: string, free election of distro author, from $DEVELOPER_BUILD_VERSION, set in <distro>.conf (default '001' set in layer-conf)
-imagedir: string, set in meta-brands, e.g. 'vuplus/ultimo4k'
-imagefs: string, set in meta-brands, e.g. 'tar.bz2 '
-imagetype: string, free election of distro author, from $DISTRO_TYPE, set on the command line, e.g. 'MACHINE=$machine DISTRO=$distro DISTRO_TYPE=$distro_type make image'
-imageversion: string, free election of distro author, from DISTRO_VERSION, set in <distro>.conf
-imglanguage: string, from $LANGUAGECHECK, based on flash size, set in meta-oe/conf/machine/box-hardware.inc
-imgrevision: string, default is the same as 'imagebuild'
+imagedir: string, set in the "machine" .conf file in the BSP as IMAGEDIR, e.g. 'uclan/ustym4kpro'
+imagefs: string, set in the "machine" .conf file in the BSP as IMAGE_FSTYPES, e.g. 'tar.bz2'. Multiple types are space-separated.
+imagetype: string, for release images, the word "release", for other images, the word "rev"
 imgversion=: string, default is the same as 'imageversion'
-kernel: string, from $KERNEL_VERSION, set in meta-brands
-kexecmb: bool, from MACHINE_FEATURES
-kernelfile: string, from $KERNEL_FILE, set in meta-brands
-machinebuild: string, from $MACHINEBUILD, from env data.py [inheritFromOS]
-mediaservice: string, from MACHINE_FEATURES, set in set in meta-oe/conf/machine/box-hardware.inc, "${@bb.utils.contains("MACHINE_FEATURES", "himedia", "servicehisilicon" , "servicegstreamer", d)}" 
+imglanguage: string, from $LANGUAGECHECK, based on flash size, set in meta-openpli/conf/machine/box-hardware.inc
+imgrevision: string, default is the same as 'imagebuild'
+imageversion: string, derived from DISTRO_VERSION (anything before the first dash found), which is set to "homebuild" in openpli-common.conf
+kernel: string, from $KERNEL_VERSION, determined by the machine config in the BSP
+kexecmb: bool, True if "kexecmb" is defined in MACHINE_FEATURES, False otherwise
+kernelfile: string, from $KERNEL_FILE, set in the machine config in the BSP
+machinebuild: string, from $MACHINE, may be modified to be OE-A compatible in enigma-info.bb
+mediaservice: string, from PREFERRED_PROVIDER_virtual/enigma2-mediaservice in the machine config in the BSP, defaults to "servicemp3" in openpli-common.conf
 middleflash: bool, from MACHINE_FEATURES
-mkubifs: string, from $MKUBIFS_ARGS, set in meta-brands
-model: string, from $MACHINE, from env data.py [inheritFromOS]
-mtdbootfs: string, from $MTD_BOOTFS, set in meta-brands
-mtdkernel: string, from $MTD_KERNEL, set in meta-brands
-mtdrootfs: string, from $MTD_ROOTFS, set in meta-brands
-multilib: bool, from MACHINE_FEATURES
-multitranscoding: bool, from MACHINE_FEATURES
-oe: string, from $OE_VER, set in layer.conf, e.g. 'OE-Alliance 5.4'
-platform: string, from $STB_PLATFORM, set in meta-oe/conf/machine/box-hardware.inc, default: STB_PLATFORM ?= "${MACHINE}"
+mkubifs: string, from $MKUBIFS_ARGS, set in the machine config in the BSP
+model: string, from $MACHINE
+mtdbootfs: string, from $MTD_BOOTFS, set in the machine config in the BSP
+mtdkernel: string, from $MTD_KERNEL, set in the machine config in the BSP
+mtdrootfs: string, from $MTD_ROOTFS, set in the machine config in the BSP
+multilib: bool, set hardcoded to "False"
+multitranscoding: bool, True if "multitranscoding" is defined in MACHINE_FEATURES, False otherwise
+oe: string, Yocto name and version, determined from the OE branch being used to build the image, e.g. "Hardknott (3.3.6)"
+platform: string, from $STB_PLATFORM, set in meta-openpli/conf/machine/box-hardware.inc, default: STB_PLATFORM ?= "${MACHINE}"
 python: string, from $PYTHON_BASEVERSION, e.g. '3.12'
 rca: bool, from MACHINE_FEATURES
-rcidnum: int, from $RCIDNUM, set in meta-oe/conf/machine/box-hardware.inc
-rcname: string, from $RCNAME, set in meta-brands, default from meta-oe/conf/machine/box-hardware.inc, RCNAME ??= "dmm1"
-rctype: int, from $RCTYPE, set in meta-brands, default from meta-oe/conf/machine/box-hardware.inc, RCTYPE ??= "0"
-rootfile: string, from $ROOTFS_FILE, set in meta-brands
+rcidnum: int, from $RCIDNUM, set in meta-openpli/conf/machine/box-hardware.inc
+rcname: string, from $RCNAME, not used in OpenPLi, defaults to "dmm1"
+rctype: int, from $RCTYPE, set in the machine config in the BSP, defaults to 0
+rootfile: string, from $ROOTFS_FILE, set in the machine config in the BSP
 scart: bool, from MACHINE_FEATURES
 noscartswitch: bool, from MACHINE_FEATURES
 scartyuv: bool, from MACHINE_FEATURES
 smallflash: bool, from MACHINE_FEATURES
-socfamily='bcm7376'
+socfamily: string, from $SOC_FAMILY, set in the machine config in the BSP
 svideo: bool, from MACHINE_FEATURES
-timerwakeupmode: int, from MACHINE_FEATURES, set in meta-oe/conf/machine/box-hardware.inc, "${@bb.utils.contains_any("MACHINE_FEATURES", "TIMERWAKEUP", "1", "0", d)}"
+timerwakeupmode: int, from MACHINE_FEATURES, set in meta-openpli/conf/machine/box-hardware.inc, "${@bb.utils.contains_any("MACHINE_FEATURES", "TIMERWAKEUP", "1", "0", d)}"
 transcoding: bool, from MACHINE_FEATURES
-ubinize: string, from $UBINIZE_ARGS, set in meta-brands
-vfdsymbol: bool, from MACHINE_FEATURES
-wol: bool, from MACHINE_FEATURES
-wwol: bool, from MACHINE_FEATURES
+ubinize: string, from $UBINIZE_ARGS, set in the machine config in the BSP
+vfdsymbol: bool, True if "vfdsymbol" is defined in MACHINE_FEATURES, False otherwise
+wol: bool, True if "wol" is defined in MACHINE_FEATURES, False otherwise
+ wwol: bool, True if "wwol" is defined in MACHINE_FEATURES, False otherwise
 yocto: string, e.g '4.1', from openembedded-core git, git describe --match=yocto* | cut -d '-' -f 2
-yuv: bool, from MACHINE_FEATURES
-checksum: checksum of the above items in this file
+yuv: bool, True if "YuV" is defined in MACHINE_FEATURES, False otherwise
+checksum: MD5 checksum of the above items in this file
