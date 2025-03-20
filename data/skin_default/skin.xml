@@ -451,7 +451,7 @@
 		<ePixmap pixmap="buttons/blue.png" position="630,118" size="25,25" alphatest="blend" scale="1"/>
 		<widget name="key_blue" position="665,118" size="150,25" font="Regular;20" foregroundColor="menu-buttons-frgrnd" backgroundColor="infobar_collab_back" halign="left" transparent="1" zPosition="1"/>
 	</screen>
-	<screen name="SecondInfoBar" flags="wfNoBorder" position="center,360" size="974,350" backgroundColor="transparent">
+	<screen name="SecondInfoBar2" flags="wfNoBorder" position="center,360" size="974,350" backgroundColor="transparent">
 		<ePixmap position="0,0" size="974,350" pixmap="infobar/2ndinfobareventinfo.png" alphatest="on" zPosition="-1"/>
 		<widget name="channel" position="25,15" size="925,140" font="Regular;22" foregroundColor="infobar_service_frgrnd" backgroundColor="infobar_sunken" transparent="1" valign="top" zPosition="2"/>
 		<widget name="epg_description" position="25,40" size="925,125" font="Regular;22" foregroundColor="infobar-frgrnd" backgroundColor="infobar_sunken" transparent="1" valign="top" zPosition="2"/>
