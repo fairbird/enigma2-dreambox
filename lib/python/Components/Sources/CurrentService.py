@@ -1,4 +1,4 @@
-from enigma import iPlayableService
+from enigma import iPlayableService, eServiceCenter
 
 from Components.Element import cached
 from Components.PerServiceDisplay import PerServiceBase
@@ -23,6 +23,8 @@ class CurrentService(PerServiceBase, Source):
 		}, with_event=True)
 		self.navcore = navcore
 		self.ref = None
+		self.info = None
+		self.onManualNewService = []
 
 	def serviceEvent(self, event):
 		self.changed((self.CHANGED_SPECIFIC, event))
@@ -52,6 +54,19 @@ class CurrentService(PerServiceBase, Source):
 		return NavigationInstance.instance.currentBouquetName if NavigationInstance.instance is not None else ""
 
 	currentBouquetName = property(getCurrentBouquetName)
+
+	def newService(self, ref):
+		if ref and isinstance(ref, bool):
+			self.info = None
+		elif ref:
+			self.info = eServiceCenter.getInstance().info(ref)
+		else:
+			self.info = None
+
+		for x in self.onManualNewService:
+			x()
+
+		self.changed((self.CHANGED_SPECIFIC, iPlayableService.evStart))
 
 	def destroy(self):
 		PerServiceBase.destroy(self)
