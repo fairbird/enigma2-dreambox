@@ -2,7 +2,7 @@ from Components.Addons.GUIAddon import GUIAddon
 
 from enigma import eListbox, eListboxPythonMultiContent, gFont, RT_HALIGN_LEFT, RT_VALIGN_CENTER, getDesktop, eSize
 
-from skin import applySkinFactor, parseFont, parseColor, parseScale
+from skin import parseFont, parseColor, parseScale
 
 from Components.MultiContent import MultiContentEntryText, MultiContentEntryPixmapAlphaBlend
 from Components.Label import Label
@@ -18,7 +18,7 @@ class MainMenu(GUIAddon):
 		self.l.setItemHeight(self.itemHeight)
 		self.l.setItemWidth(self.itemWidth)
 		self.orientation = eListbox.orVertical
-		self.font = gFont("Regular", applySkinFactor(22))
+		self.font = gFont("Regular", 22)
 		self.iconSize = 0
 		self.foregroundColor = 0xffffff
 		self.foregroundColorSelected = 0xffffff
