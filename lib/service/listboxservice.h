@@ -30,6 +30,7 @@ public:
 	int getNextBeginningWithChar(char c);
 	int getPrevMarkerPos();
 	int getNextMarkerPos();
+	int getCurrentSelectionIndex() { return cursorResolve(m_cursor_number); }
 	eSize getItemSize() { return m_itemsize; }
 	int getListSize() { return m_size_visible; }
 
