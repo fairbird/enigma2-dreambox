@@ -30,6 +30,8 @@ public:
 	int getNextBeginningWithChar(char c);
 	int getPrevMarkerPos();
 	int getNextMarkerPos();
+	eSize getItemSize() { return m_itemsize; }
+	int getListSize() { return m_size_visible; }
 
 		/* support for marked services */
 	void initMarked();
@@ -180,7 +182,7 @@ private:
 	list::iterator m_cursor, m_saved_cursor;
 
 	int m_cursor_number, m_saved_cursor_number, m_saved_cursor_line;
-	int m_size;
+	int m_size, m_size_visible;
 
 	eSize m_itemsize;
 	ePtr<iServiceHandler> m_service_center;
