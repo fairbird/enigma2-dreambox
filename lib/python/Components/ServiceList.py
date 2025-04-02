@@ -728,6 +728,12 @@ class ServiceListLegacy(ServiceListBase):
 		def nonplayableMargins(value):
 			self.l.setNonplayableMargins(int(value))
 
+		def sidesMargin(value):
+			self.sidesMargin = int(value)
+
+		def textSeparator(value):
+			self.l.setTextSeparator(value)
+
 		def itemsDistances(value):
 			self.itemsDistances = int(value)
 			self.l.setItemsDistances(self.itemsDistances)
