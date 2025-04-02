@@ -220,6 +220,7 @@ private:
 	int m_items_distances;
 
 	std::string m_progress_unit;
+	std::string m_separator;
 	int m_numbering_mode;
 };
 
