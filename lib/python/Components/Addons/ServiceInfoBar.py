@@ -1,5 +1,5 @@
 from enigma import eListbox, eListboxPythonMultiContent, BT_ALIGN_CENTER, iPlayableService, iRecordableService, eServiceReference, iServiceInformation, gFont, RT_HALIGN_LEFT, RT_VALIGN_CENTER, RT_VALIGN_TOP, RT_HALIGN_CENTER, eTimer, getDesktop, eSize, eStreamServer
-from skin import parseScale, parseColor, parseFont, parameters
+from skin import parseScale2, parseColor, parseFont, parameters
 
 from Components.Addons.GUIAddon import GUIAddon
 from Components.Converter.PliExtraInfo import createCurrentCaidLabel
@@ -327,7 +327,7 @@ class ServiceInfoBar(GUIAddon):
 			if attrib == "pixmapsDisabled":
 				self.pixmapsDisabled = dict(item.split(':') for item in value.split(','))
 			elif attrib == "spacing":
-				self.spacing = parseScale(value)
+				self.spacing = parseScale2(value)
 			elif attrib == "alignment":
 				self.alignment = value
 			elif attrib == "orientation":
@@ -343,7 +343,7 @@ class ServiceInfoBar(GUIAddon):
 			elif attrib == "separatorLineColor":
 				self.foreColor = parseColor(value).argb()
 			elif attrib == "separatorLineThickness":
-				self.separatorLineThickness = parseScale(value)
+				self.separatorLineThickness = parseScale2(value)
 			elif attrib == "autoresizeMode":
 				self.autoresizeMode = value
 			elif attrib == "font":

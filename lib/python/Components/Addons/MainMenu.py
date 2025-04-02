@@ -2,7 +2,7 @@ from Components.Addons.GUIAddon import GUIAddon
 
 from enigma import eListbox, eListboxPythonMultiContent, gFont, RT_HALIGN_LEFT, RT_VALIGN_CENTER, getDesktop, eSize
 
-from skin import parseFont, parseColor, parseScale
+from skin import parseFont, parseColor, parseScale2
 
 from Components.MultiContent import MultiContentEntryText, MultiContentEntryPixmapAlphaBlend
 from Components.Label import Label
@@ -84,13 +84,13 @@ class MainMenu(GUIAddon):
 		self.l.setFont(0, self.font)
 
 	def setMinWidth(self, value):
-		self.minWidth = parseScale(value)
+		self.minWidth = parseScale2(value)
 
 	def setMaxWidth(self, value):
-		self.maxWidth = parseScale(value)
+		self.maxWidth = parseScale2(value)
 
 	def setIconSize(self, value):
-		self.iconSize = parseScale(value)
+		self.iconSize = parseScale2(value)
 
 	def setForegroundColor(self, value):
 		self.foregroundColor = parseColor(value).argb()
@@ -102,11 +102,11 @@ class MainMenu(GUIAddon):
 		self.backgroundColor = parseColor(value).argb()
 
 	def setItemWidth(self, value):
-		self.itemWidth = parseScale(value)
+		self.itemWidth = parseScale2(value)
 		self.l.setItemWidth(self.itemWidth)
 
 	def setItemHeight(self, value):
-		self.itemHeight = parseScale(value)
+		self.itemHeight = parseScale2(value)
 		self.l.setItemHeight(self.itemHeight)
 
 	def postWidgetCreate(self, instance):
@@ -142,15 +142,15 @@ class MainMenu(GUIAddon):
 			elif attrib == "backgroundColor":
 				self.backgroundColor = parseColor(value).argb()
 			elif attrib == "iconSize":
-				self.iconSize = parseScale(value)
+				self.iconSize = parseScale2(value)
 			elif attrib == "minWidth":
-				self.minWidth = parseScale(value)
+				self.minWidth = parseScale2(value)
 			elif attrib == "maxWidth":
-				self.maxWidth = parseScale(value)
+				self.maxWidth = parseScale2(value)
 			elif attrib == "itemWidth":
-				self.itemWidth = parseScale(value)
+				self.itemWidth = parseScale2(value)
 			elif attrib == "itemHeight":
-				self.itemHeight = parseScale(value)
+				self.itemHeight = parseScale2(value)
 			else:
 				attribs.append((attrib, value))
 		self.skinAttributes = attribs
