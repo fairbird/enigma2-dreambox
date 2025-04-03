@@ -2190,6 +2190,7 @@ config.servicelist.startupmode = ConfigText(default="tv")
 
 
 class ChannelSelection(ChannelSelectionBase, ChannelSelectionEdit, ChannelSelectionEPG, SelectionEventInfo):
+	instance = None
 
 	def __init__(self, session):
 		ChannelSelectionBase.__init__(self, session)
@@ -2212,6 +2213,9 @@ class ChannelSelection(ChannelSelectionBase, ChannelSelectionEdit, ChannelSelect
 				iPlayableService.evStart: self.__evServiceStart,
 				iPlayableService.evEnd: self.__evServiceEnd
 			})
+
+		if not ChannelSelection.instance:  # Use only the first instance of ChannelSelection
+			ChannelSelection.instance = self
 
 		self.startServiceRef = None
 
@@ -2336,13 +2340,28 @@ class ChannelSelection(ChannelSelectionBase, ChannelSelectionEdit, ChannelSelect
 				self.setModeRadio()
 		else:
 			self.setModeTv()
+		
+		standbyScreen = None
+		doPlay = False
+		if self == ChannelSelection.instance and Screens.Standby.inStandby:  # Find Standby screen if already inStandby.
+			for screen in self.session.allDialogs:
+				if screen.__class__.__name__ == "Standby":
+					standbyScreen = screen
+					break
+
 		lastservice = eServiceReference(self.lastservice.value)
 		if lastservice.valid():
+			if standbyScreen:
+				standbyScreen.prev_running_service = lastservice  # Save the last service in Standby screen.
+				standbyScreen.correctChannelNumber = True
+			elif self == ChannelSelection.instance:
+				doPlay = True  # Do real playback only for the first instance and only if not in Standby
+
 			if self.isSubservices():
-				self.zap(ref=lastservice)
+				self.zap(ref=lastservice, doPlay=doPlay)
 				self.enterSubservices()
 			else:
-				self.zap()
+				self.zap(doPlay=doPlay)
 
 	def channelSelected(self, doClose=True):
 		ref = self.getCurrentSelection()
@@ -2440,23 +2459,23 @@ class ChannelSelection(ChannelSelectionBase, ChannelSelectionEdit, ChannelSelect
 		if enable_pipzap and self.dopipzap:
 			ref = self.session.pip.getCurrentService()
 			if ref is None or ref != nref:
-				if nref:
-					if not checkParentalControl or Components.ParentalControl.parentalControl.isServicePlayable(nref, boundFunction(self.zap, enable_pipzap=True, checkParentalControl=False)):
-						zap_res = self.session.pip.playService(nref)
-						if zap_res == 1:
-							self.__evServiceStart()
-							self.showPipzapMessage()
-							self.setCurrentSelection(nref)
-						elif zap_res == 2:
-							self.retryServicePlayTimer = eTimer()
-							self.retryServicePlayTimer.callback.append(boundFunction(self.zap, enable_pipzap=True, checkParentalControl=False))
-							self.retryServicePlayTimer.start(config.misc.softcam_streamrelay_delay.value, True)
+				nref = self.session.pip.resolveAlternatePipService(nref)
+				if nref and (not checkParentalControl or parentalControl.isServicePlayable(nref, boundFunction(self.zap, enable_pipzap=True, checkParentalControl=False))):
+					zap_res = self.session.pip.playService(nref)
+					if zap_res == 1:
+						self.__evServiceStart()
+						self.showPipzapMessage()
+					elif zap_res == 2:
+						self.retryServicePlayTimer = eTimer()
+						self.retryServicePlayTimer.callback.append(boundFunction(self.zap, enable_pipzap=True, checkParentalControl=False))
+						self.retryServicePlayTimer.start(config.misc.softcam_streamrelay_delay.value, True)
 				else:
 					self.setStartRoot(self.curRoot)
 					self.setCurrentSelection(ref)
 		elif ref is None or ref != nref:
 			Screens.InfoBar.InfoBar.instance.checkTimeshiftRunning(boundFunction(self.zapCheckTimeshiftCallback, enable_pipzap, preview_zap, nref, doPlay))
 		elif not preview_zap:
+			self.lastroot.value = ""  # force save root.
 			self.saveRoot()
 			self.saveChannel(nref)
 			config.servicelist.lastmode.save()
@@ -2466,7 +2485,7 @@ class ChannelSelection(ChannelSelectionBase, ChannelSelectionEdit, ChannelSelect
 			self.rootChanged = False
 			self.revertMode = None
 
-	def zapCheckTimeshiftCallback(self, preview_zap, nref, doPlay, answer):
+	def zapCheckTimeshiftCallback(self, enable_pipzap, preview_zap, nref, doPlay, answer):
 		if answer:
 			self.new_service_played = True
 			if doPlay:
@@ -3139,6 +3158,7 @@ class ChannelSelectionSetup(Setup):
 				for index, dialog in enumerate(session.dialog_stack):
 					if isinstance(dialog[0], ChannelSelection):
 						oldDialogIndex = (index, dialog[1])
+				ChannelSelection.instance = None
 				InfoBarInstance.servicelist = session.instantiateDialog(ChannelSelection)
 				InfoBarInstance.servicelist.summaries = oldSummarys
 				InfoBarInstance.servicelist.isTmp = False
