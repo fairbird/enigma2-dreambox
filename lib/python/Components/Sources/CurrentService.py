@@ -27,6 +27,7 @@ class CurrentService(PerServiceBase, Source):
 		self.onManualNewService = []
 
 	def serviceEvent(self, event):
+		self.info = None
 		self.changed((self.CHANGED_SPECIFIC, event))
 
 	@cached
@@ -40,14 +41,24 @@ class CurrentService(PerServiceBase, Source):
 
 	@cached
 	def getCurrentServiceRef(self):
-		if self.ref:
-			return self.ref
-		return NavigationInstance.instance.getCurrentlyPlayingServiceOrGroup() if NavigationInstance.instance is not None else None
+		if NavigationInstance.instance is not None:
+			return NavigationInstance.instance.getCurrentServiceReferenceOriginal()
+		return None
 
-	def setCurrentServiceRef(self, ref):
-		self.ref = ref
+	serviceref = property(getCurrentServiceRef)
 
-	serviceref = property(getCurrentServiceRef, setCurrentServiceRef)  # TODO: serviceRef
+	def newService(self, ref):
+		if ref and isinstance(ref, bool):
+			self.info = None
+		elif ref:
+			self.info = eServiceCenter.getInstance().info(ref)
+		else:
+			self.info = None
+
+		for x in self.onManualNewService:
+			x()
+
+		self.changed((self.CHANGED_SPECIFIC, iPlayableService.evStart))
 
 	@cached
 	def getCurrentBouquetName(self):
