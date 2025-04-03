@@ -594,9 +594,9 @@ def parseParameter(value):
 		return colors[value].argb()
 	elif value.find(";") != -1:  # Font.
 		(font, size) = (x.strip() for x in value.split(";", 1))
-		return [font, parseScale2(size)]
+		return [font, parseScale(size)]
 	else:  # Integer.
-		return parseScale2(value)
+		return parseScale(value)
 
 
 def parsePixmap(path, desktop):
@@ -667,7 +667,7 @@ def parseValuePair(value, scale, object=None, desktop=None, size=None):
 	return (xValue, yValue)
 
 
-def parseScale2(s):
+def parseScale(s):
 	orig = s
 	try:
 		val = int(s)
@@ -681,7 +681,7 @@ def parseScale2(s):
 	return val
 
 
-def parseScale(value):
+def parseScale2(value):
 	options = {
 		"none": 0,
 		"0": 0,  # Legacy scale option.
@@ -1147,7 +1147,7 @@ class AttributeParser:
 		pass
 
 	def scale(self, value):
-		self.guiObject.setPixmapScale(parseScale(value))
+		self.guiObject.setPixmapScale(parseScale2(value))
 
 	def scaleFlags(self, value):  # This is a temporary patch until the code and skins using this attribute is updated.
 		self.scale(value)
@@ -2006,7 +2006,7 @@ class TemplateParser():
 		attributes["_flags"] = horizontalAlignments.get(attributes.get("horizontalAlignment"), 1) + verticalAlignments.get(attributes.get("verticalAlignment"), 0) + wraps.get(attributes.get("wrap"), 0)
 		if attributes["type"] == "pixmap":
 			attributes["pixmapType"] = pixmapTypes.get(attributes.get("alpha", ""), eListboxPythonMultiContent.TYPE_PIXMAP)
-			attributes["pixmapFlags"] = parseScale(attributes.get("scale", "off"))
+			attributes["pixmapFlags"] = parseScale2(attributes.get("scale", "off"))
 		if "cornerRadius" in attributes:
 			attributes["_radius"] = parseRadius(attributes.get("cornerRadius"))
 		foregroundGradient = attributes.get("foregroundGradient")

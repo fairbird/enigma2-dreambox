@@ -2,7 +2,7 @@ from Components.Addons.GUIAddon import GUIAddon
 
 from enigma import eListbox, eListboxPythonMultiContent, BT_ALIGN_CENTER
 
-from skin import parseScale2
+from skin import parseScale
 
 from Components.MultiContent import MultiContentEntryPixmapAlphaBlend
 from Components.Sources.Boolean import Boolean
@@ -88,7 +88,7 @@ class ButtonSequence(GUIAddon):
 			if attrib == "pixmaps":
 				self.pixmaps = dict(item.split(':') for item in value.split(','))
 			elif attrib == "spacing":
-				self.spacing = parseScale2(value)
+				self.spacing = parseScale(value)
 			elif attrib == "alignment":
 				self.alignment = value
 			elif attrib == "orientation":

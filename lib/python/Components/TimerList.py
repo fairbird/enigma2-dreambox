@@ -149,7 +149,7 @@ class TimerList(GUIComponent):
 			self.backupColorSel = int(value)
 
 		def sidesMargin(value):
-			self.sidesMargin = parseScale(value)
+			self.sidesMargin = int(value)
 
 		for (attrib, value) in list(self.skinAttributes):
 			try:
