@@ -51,6 +51,9 @@ config.misc.plugin_style = ConfigSelection(default="list", choices=[
 	("grid5", _("View as grid 5")),
 	("grid6", _("View as grid 6"))])
 
+# Enable numbers in Plugin Browser (Do not move it to other file)
+config.misc.menu_show_numbers = ConfigYesNo(default=False)
+
 # New VirtualkeyBoard Style
 config.misc.virtualkeyBoardstyle = ConfigSelection(default="new", choices=[
 	("new", _("New style")),

@@ -363,7 +363,7 @@ class PluginBrowser(Screen, ProtectedScreen):
 				self.list.append(PluginEntryComponent(plugin[0], self.listWidth))
 				pluginlist.remove(plugin[0])
 		self.list = self.list + [PluginEntryComponent(plugin, self.listWidth) for plugin in pluginlist]
-		if config.usage.menu_show_numbers.value in ("menu&plugins", "plugins") or showHelp:
+		if config.misc.menu_show_numbers.value or showHelp:
 			for x in enumerate(self.list):
 				tmp = list(x[1][1])
 				tmp[7] = "%s %s" % (x[0] + 1, tmp[7])
@@ -371,7 +371,7 @@ class PluginBrowser(Screen, ProtectedScreen):
 		self["list"].l.setList(self.list)
 
 	def showHelp(self):
-		if config.usage.menu_show_numbers.value not in ("menu&plugins", "plugins"):
+		if config.misc.menu_show_numbers.value:
 			self.help = not self.help
 			self.updateList(self.help)
 
@@ -878,7 +878,7 @@ class PluginBrowserNew(Screen):
 				self.list.append(PluginEntryComponent(plugin[0], self.listWidth))
 				pluginlist.remove(plugin[0])
 		self.list = self.list + [PluginEntryComponent(plugin, self.listWidth) for plugin in pluginlist]
-		if config.usage.menu_show_numbers.value in ("menu&plugins", "plugins") or showHelp:
+		if config.misc.menu_show_numbers.value or showHelp:
 			for x in enumerate(self.list):
 				tmp = list(x[1][1])
 				tmp[7] = "%s %s" % (x[0] + 1, tmp[7])
@@ -886,7 +886,7 @@ class PluginBrowserNew(Screen):
 		self["list"].l.setList(self.list)
 
 	def showHelp(self):
-		if config.usage.menu_show_numbers.value not in ("menu&plugins", "plugins"):
+		if config.misc.menu_show_numbers.value:
 			self.help = not self.help
 			self.updateList(self.help)
 

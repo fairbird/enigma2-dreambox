@@ -1,8 +1,8 @@
 <setupxml>
-	<setup key="video_setup" title="Video Settings">
+	<setup key="Video_setup" title="Video Settings">
 		<!-- this is just a placeholder, the Videomode plugin implements this submenu -->
 	</setup>
-	<setup key="audio_setup" title="Audio Settings" level="1" showOpenWebif="1">
+	<setup key="Audio_setup" title="Audio Settings" level="1" showOpenWebif="1">
 		<item level="1" text="Volume steps" description="Select the size of the volume step when the VOLUME buttons are pressed.">config.volumeControl.pressStep</item>
 		<item level="1" text="Long press volume steps" description="Select the size of the volume steps when the VOLUME buttons are held down.">config.volumeControl.longStep</item>
 		<item level="1" text="Volume/Mute display timer" description="Select how long, in seconds, that the volume and mute displays are shown before they automatically hide.">config.volumeControl.hideTimer</item>
@@ -28,19 +28,19 @@
 		<item level="1" text="Enable BT audio" description="This option allows you to switch audio to BT speakers." requires="CanBTAudio">config.av.btaudio</item>
 		<item level="1" text="General BT Audio delay" description="This option configures the general audio delay for BT Speakers." requires="CanBTAudioDelay">config.av.btaudiodelay</item>
 	</setup>
-	<setup key="checkupdate" title="Check update Settings">
+	<setup key="Checkupdate" title="Check update Settings">
 		<item level="1" text="check for firmware updates every" description="Choose the time to check for update avilable every...">config.updatecheck.check_update_notifier</item>
 		<item level="1" text="check for firmware updates on start" description="Enable/Disable check for update after reboot or restart box.">config.updatecheck.check_update_on_boot</item>
 	</setup>
-	<setup key="usage" title="Customize">
-		<item level="0" text="Show Main Menu as" description="Choose style of main menus" >config.usage.menutype</item>
-		<item level="1" text="Sort order for menu entries" description="This option allows you to hide and sort menu entries. When selecting user you can change order and hide menu items via the blue button. With the user defined hidden the blue button is not shown in the menus">config.usage.menu_sort_mode</item>
+	<setup key="Usage" title="Customize">
+		<item level="0" text="Menu style" description="Select the display design for menus.">config.usage.menuType</item>
+		<item level="0" text="Menu entry style" description="Select the display options for each menu entry item. If menu numbers are available then the number buttons can be used to select the numbered menu entries directly." requires="config.usage.menuType" value="standard">config.usage.menuEntryStyle</item>
+		<item level="0" text="Menu entry sort order" description="Select the sort order of the menu entries. User defined also allows the menu entries to be hidden.">config.usage.menuSortOrder</item>
 		<item level="1" text="Sort order for setup entries" description="This option allows you to alphabetically sort setup menu entries.">config.usage.sort_settings</item>
 		<item level="1" text="Show setup default values" description="In Setup screens choose whether to show the default value of the selected item in the description field.">config.usage.setupShowDefault</item>
 		<item level="1" text="Show screen path" description="This option allows you to show the full screen path leading to the current screen.">config.usage.showScreenPath</item>
 		<item level="1" text="Sort Extension Menu" description="Select the sort order of the Extension Menu entries.">config.usage.sortExtensionslist</item>
 		<item level="1" text="Virtual keyboard skin" description="You can select the skin of virtual keyboard." restart="gui">config.misc.virtualkeyBoardstyle</item>
-		<item level="0" text="Show menu or plugin numbers" description="This option allows you to show menu and/or plugin number quick links.">config.usage.menu_show_numbers</item>
 		<item level="2" text="Show softcam setup in extensions menu" description="This option allows you to add the softcam setup in the extensions menu." requires="HasSoftcamInstalled">config.misc.softcam_setup.extension_menu</item>
 		<item level="1" text="Zap key delay for channel number input" description="In live view wait this many seconds after a numeric key press before assuming the required channel number has been entered. Default: 5 seconds. Setting zero will require confirmation with 'OK'. ">config.misc.zapkey_delay</item>
 		<item level="1" text="History buttons mode" description="Configure the function of the &lt;  &gt; buttons.">config.usage.historymode</item>
@@ -137,7 +137,7 @@
 		<item level="2" text="Auto play last service in radio mode" conditional="not config.usage.e1like_radio_mode.value" description="When enabled, it will automatically play to the last saved radio service when switching to radio mode.">config.usage.e1like_radio_mode_last_play</item>
 		<item text="AutoRefresh" description="Enable autorefresh templates." requires="CanRefreshTemplates">config.skin.autorefresh</item>
 	</setup>
-	<setup key="userinterface" title="User interface">
+	<setup key="UserInterface" title="User interface">
 		<item level="1" text="Enable blinking" description="Enable blink functionality for some areas like record icon.">config.usage.enable_blinking</item>
 		<item level="1" text="Show animation while busy" description="Show busy indicator when the system is busy.">config.usage.show_spinner</item>
 		<item level="1" text="Show positioner movement" requires="isRotorTuner" description="Configure whether or not an icon should be shown when your motorized dish is moving.">config.usage.showdish</item>
@@ -213,7 +213,7 @@
 		<item level="2" text="Stream Relay port" description="Port number for the Stream Relay server used to descramble services that can only be decrypted via Stream Relay.">config.misc.softcam_streamrelay_port</item>
 		<item level="2" text="Stream Relay switch delay" description="Select the delay to use when closing a Stream Relay service before reallocating the tuner for another service. Using '0' is only recommended for boxes with multiple satellite tuners.">config.misc.softcam_streamrelay_delay</item>
 	</setup>
-	<setup key="subtitlesetup" title="Subtitle settings">
+	<setup key="Subtitlesetup" title="Subtitle settings">
 		<if requires="AISubs">
 			<item level="2" text="AI translation enabled" description="Enable AI-Powered translation for all teletext and DVB subtitles.">config.subtitles.ai_enabled</item>
 			<item level="2" text="AI translation language" description="Configure the AI-Powered translation language.">config.subtitles.ai_translate_to</item>
@@ -244,7 +244,7 @@
 		<item level="2" text="HI-cleanup for external subtitles" description="Remove texts for the hearing impaired from external subtitles (instrumental music or environmental sounds, e.g., when a doorbell rings or a gun shot is heard).">config.subtitles.pango_subtitle_removehi</item>
 		<item level="2" text="Automatically turn on external subtitles" description="When enabled, external subtitles will be always turned on for playback movie.">config.subtitles.pango_autoturnon</item>
 	</setup>
-	<setup key="autolanguagesetup" title="Auto language selection">
+	<setup key="Autolanguagesetup" title="Auto language selection">
 		<item level="0" text="Audio language selection 1" description="Configure the first audio language (highest priority).">config.autolanguage.audio_autoselect1</item>
 		<item level="0" text="Audio language selection 2" conditional="config.autolanguage.audio_autoselect1.value" description="Configure the second audio language.">config.autolanguage.audio_autoselect2</item>
 		<item level="1" text="Audio language selection 3" conditional="config.autolanguage.audio_autoselect2.value" description="Configure the third audio language.">config.autolanguage.audio_autoselect3</item>
@@ -295,6 +295,7 @@
 	<setup key="PluginBrowser" title="Plugin Browser Settings" showOpenWebif="1">
 		<item level="0" text="Plugin Browser layout" description="Select the layout of the installed plugins in the Plugin Browser screen. NOTE: The change is not immediate but will be seen when Plugin Browser is restarted!" restart="gui">config.misc.plugin_style</item>
 		<item level="0" text="Picon install location" description="Select the location where the picon files will be installed.">config.usage.piconInstallLocation</item>
+		<item level="0" text="Enable numbers" description="This option to enable numbers in Plugin Browser">config.misc.menu_show_numbers</item>
 		<item level="0" text="Show Driver packages" description="Select 'Yes' to show driver packages in the Download Plugins screen.">config.pluginfilter.drivers</item>
 		<item level="0" text="Show Extension packages" description="Select 'Yes' to show extensions packages in the Download Plugins screen.">config.pluginfilter.extensions</item>
 		<item level="0" text="Show System Plugin packages" description="Select 'Yes' to show system plugin packages in the Download Plugins screen.">config.pluginfilter.systemplugins</item>
@@ -368,7 +369,7 @@
 		<item level="2" text="Use timeshift seekbar while timeshifting?" description="If set to 'yes', allows you to use the seekbar to jump to a point within the event.">config.timeshift.showinfobar</item>
 		-->
 	</setup>
-	<setup key="accesslevel" title="User Mode">
+	<setup key="Accesslevel" title="User Mode">
 		<item level="0" text="Setup mode" description="Configure which access level to use for the configuration menu. Expert level gives access to all items.">config.usage.setup_level</item>
 	</setup>
 	<setup key="FlashExpander" title="Flash Expander">
@@ -429,7 +430,7 @@
 		<item level="2" text="e-Mail address" description="Enter your email address to send a copy of the log to.">config.logmanager.useremail</item>
 		<item level="2" text="Send yourself a copy ?" description="Allows you to send a copy of the log to yourself.">config.logmanager.usersendcopy</item>-->
 	</setup>
-	<setup key="network" title="Network setup">
+	<setup key="Network" title="Network setup">
 		<item text="Use DHCP" description="When enabled, use DHCP for the IP configuration.">config.network.dhcp</item>
 		<item text="IP address" description="Configure the IP address.">config.network.ip</item>
 		<item text="Netmask" description="Configure the netmask.">config.network.netmask</item>
@@ -461,7 +462,7 @@
 	<setup key="keyboard" title="Keyboard setup">
 		<item level="0" text="Keyboard map">config.keyboard.keymap</item>
 	</setup>
-	<setup key="osd" title="OSD settings">
+	<setup key="Osd" title="OSD settings">
 		<item text="Alpha">config.osd.alpha</item>
 		<item text="Teletext alpha">config.osd.alpha_teletext</item>
 		<item text="Brightness">config.osd.bright</item>
@@ -537,7 +538,7 @@
 		<item level="0" text="Locales to be displayed" description="Display the base locales or all locales for a language.">config.locales.packageLocales</item>
 		<item level="0" text="Locale list sort order" description="Sort order for the language list.">config.locales.localesSortBy</item>
 	</setup>
-	<setup key="satconfig" title="Satellite dish setup">
+	<setup key="Satconfig" title="Satellite dish setup">
 		<item text="Tuner slot" description="Choose which tuner to configure.">config.sat.tunerslot</item>
 		<item text="Configuration mode" description="Configure the tuner mode.">config.sat.configmode</item>
 		<item text="DiSEqC" description="Configure the DiSEqC mode for this LNB.">config.sat.diseqc</item>
@@ -545,7 +546,7 @@
 		<item text="Latitude" description="Configure the latitude of your location.">config.sat.diseqcb</item>
 		<item text="Use power measurement" description="When enabled, measure power consumption to detect when the rotor stops turning (when supported by the tuner)." >config.sat.diseqcc</item>
 	</setup>
-	<setup key="wizardsetup" title="Wizard setup">
+	<setup key="Wizardsetup" title="Wizard setup">
 		<item level="0" text="Setup mode" description="Configure which access level to use for the configuration menu. Expert level gives access to all items.">config.usage.setup_level</item>
 		<item level="0" text="Numbering mode" description="Select 'Unique numbering' to assign unique numbers for every service in every bouquet. Use 'Bouquets start at 1' to start numbering each bouquet from 1. Use 'LCN numbering' to use consistent service LCNs where ever that service is used.">config.usage.numberMode</item>
 		<item level="0" text="Show picons in channel selection list" description="Configure if service picons will be shown in the channel selection list.">config.channelSelection.showPicon</item>

@@ -252,8 +252,6 @@ def InitUsageConfig():
 	config.usage.show_spinner = ConfigYesNo(default=True)
 	config.usage.enable_blinking = ConfigYesNo(default=False)
 	config.usage.menu_sort_weight = ConfigDictionarySet(default={"mainmenu": {"submenu": {}}})
-	config.usage.menu_sort_mode = ConfigSelection(default="default", choices=[("a_z", _("alphabetical")), ("default", _("Default")), ("user", _("user defined")), ("user_hidden", _("user defined hidden"))])
-	config.usage.menu_show_numbers = ConfigSelection(default="no", choices=[("no", _("no")), ("menu&plugins", _("in menu and plugins")), ("menu", _("in menu only")), ("plugins", _("in plugins only"))])
 	config.usage.showScreenPath = ConfigSelection(default="small", choices=[("off", _("Disabled")), ("small", _("Small")), ("large", _("Large"))])
 	config.usage.enable_tt_caching = ConfigYesNo(default=True)
 	config.usage.sort_settings = ConfigYesNo(default=False)
@@ -2093,10 +2091,23 @@ def preferredTunerChoicesUpdate(update=False):
 	config.workaround.wakeuptime = ConfigSelectionNumber(default=5, stepwidth=1, min=0, max=30, wraparound=True)
 	config.workaround.wakeupwindow = ConfigSelectionNumber(default=5, stepwidth=5, min=5, max=60, wraparound=True)
 
-	config.usage.menutype = ConfigSelection(default="standard", choices=[
+	config.usage.menuType = ConfigSelection(default="standard", choices=[
 		("horzanim", _("Horizontal menu")),
 		("horzicon", _("Horizontal icons")),
 		("standard", _("Standard menu"))
+	])
+
+	config.usage.menuEntryStyle = ConfigSelection(default="text", choices=[
+		("text", _("Entry text only")),
+		("number", _("Entry number and text")),
+		("image", _("Entry image and text")),
+		("both", _("Entry image, number and text")),
+	])
+
+	config.usage.menuSortOrder = ConfigSelection(default="user", choices=[
+		("alpha", _("Alphabetical")),
+		("default", _("Default")),
+		("user", _("User defined"))
 	])
 
 	if not update:
