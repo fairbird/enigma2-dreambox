@@ -223,7 +223,7 @@ class ChannelContextMenu(Screen):
 		if not (current_sel_path or current_sel_flags & (eServiceReference.isDirectory | eServiceReference.isMarker)) or current_sel_flags & eServiceReference.isGroup:
 			append_when_current_valid(current, menu, (_("Show transponder info"), self.showServiceInformations), level=2)
 		if self.subservices and not csel.isSubservices():
-			appendWhenValid(current, menu, (_("Show Subservices Of Active Service"), self.showSubservices), key="4")
+			append_when_current_valid(current, menu, (_("Show Subservices Of Active Service"), self.showSubservices), key="4")
 		if csel.bouquet_mark_edit == OFF and not csel.entry_marked:
 			if not self.inBouquetRootList:
 				isPlayable = not (current_sel_flags & (eServiceReference.isMarker | eServiceReference.isDirectory))
@@ -266,9 +266,9 @@ class ChannelContextMenu(Screen):
 								append_when_current_valid(current, menu, (_("Do center DVB subs on this service"), self.addCenterDVBSubsFlag), level=2)
 					if BoxInfo.getItem("AISubs"):
 						if eDVBDB.getInstance().getFlag(eServiceReference(current.toString())) & FLAG_NO_AI_TRANSLATION:
-							appendWhenValid(current, menu, (_("Translate Subs On This Service"), self.removeNoAITranslationFlag))
+							append_when_current_valid(current, menu, (_("Translate Subs On This Service"), self.removeNoAITranslationFlag))
 						else:
-							appendWhenValid(current, menu, (_("Don't Translate Subs On This Service"), self.addNoAITranslationFlag))
+							append_when_current_valid(current, menu, (_("Don't Translate Subs On This Service"), self.addNoAITranslationFlag))
 					if not csel.isSubservices():
 						if haveBouquets:
 							bouquets = self.csel.getBouquetList()
