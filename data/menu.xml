@@ -56,7 +56,7 @@
 			</menu>
 			<menu key="system" weight="5" level="0" text="System">
 				<item key="check_update" level="0" text="Check update Settings" weight="0"><setup setupKey="Checkupdate" /></item>
-				<menu key="Audio/Video" level="0" text="Audio &amp; Video">
+				<menu key="AudioVideo" level="0" text="Audio &amp; Video">
 					<menu key="video" level="0" text="Video Settings">
 						<item key="av_setup" text="Video Setup" level="0"><setup setupKey="Video_setup"/></item>
 						<item key="osdsetup" level="1" text="OSD Calibration" weight="50" requires="OSDCalibration"><screen module="OSDCalibration" screen="OSDCalibration" /></item>
