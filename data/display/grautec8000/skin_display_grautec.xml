@@ -150,7 +150,7 @@
 
 <!--MenuSummary-->
 <screen name="MenuSummary" position="0,0" size="400,240">
-	<widget source="parent.title" render="Label" position="2,35" size="396,52" font="LCD1;52" horizontalAlignment="center" foregroundColor="oled1" backgroundColor="#000000"/>
+	<widget source="parent.Title" render="Label" position="2,35" size="396,52" font="LCD1;52" horizontalAlignment="center" foregroundColor="oled1" backgroundColor="#000000"/>
 	<ePixmap pixmap="/usr/share/enigma2/display/progress-lcd2.png" zPosition="1" position="2,100" size="396,3" />
 	<widget source="parent.menu" render="Label" position="2,115" size="396,100" font="LCD1;52" horizontalAlignment="center">
 		<convert type="StringListSelection"/>
@@ -262,7 +262,7 @@
 <screen name="IMDbLCDScreen" position="0,0" size="400,240">
 	<widget name="headline" position="4,35" size="392,52" font="LCD1;52" horizontalAlignment="center"/>
 	<ePixmap pixmap="/usr/share/enigma2/display/progress-lcd2.png" zPosition="1" position="2,105" size="396,3" />
-	<widget source="parent.title" render="Label" position="3,115" size="394,115" font="LCD1;52" horizontalAlignment="center">
+	<widget source="parent.Title" render="Label" position="3,115" size="394,115" font="LCD1;52" horizontalAlignment="center">
 	</widget>
 	<widget source="session.RecordState" render="FixedLabel" text=" " position="399,239" zPosition="2" size="1,1" font="LCD1;1" horizontalAlignment="left" verticalAlignment="top" foregroundColor="white" backgroundColor="#FF0000">
 		<convert type="ConditionalShowHide">Blink</convert>
@@ -518,7 +518,7 @@
 <!--PicPlayerSummary-->
 <screen name="PicPlayerSummary" position="0,0" size="400,240">
 	<ePixmap pixmap="/usr/share/enigma2/display/icon_picplayer.png" zPosition="1" position="0,25" size="400,100" />
-	<widget source="parent.title" render="Label" position="2,130" size="396,50" font="LCD1;52" horizontalAlignment="center" verticalAlignment="top" foregroundColor="oled1" backgroundColor="#000000" />
+	<widget source="parent.Title" render="Label" position="2,130" size="396,50" font="LCD1;52" horizontalAlignment="center" verticalAlignment="top" foregroundColor="oled1" backgroundColor="#000000" />
 	<widget source="parent.lcdinfo" render="Label" position="2,185" size="396,50" font="LCD1;52" horizontalAlignment="center" verticalAlignment="top" />
 </screen>
 
@@ -529,7 +529,7 @@
 
 <!--gDesktopSummary-->
 <screen name="gDesktopSummary" position="0,0" size="400,240">
-	<widget source="parent.title" render="Label" position="2,35" size="396,52" font="LCD1;52" horizontalAlignment="center" foregroundColor="oled1" backgroundColor="#000000" />
+	<widget source="parent.Title" render="Label" position="2,35" size="396,52" font="LCD1;52" horizontalAlignment="center" foregroundColor="oled1" backgroundColor="#000000" />
 	<ePixmap pixmap="/usr/share/enigma2/display/progress-lcd2.png" zPosition="1" position="2,100" size="396,3" />
 	<widget source="parent.lcdinfo" render="Label" position="2,115" size="396,105" font="LCD1;52" horizontalAlignment="center"/>
 	<widget source="session.RecordState" render="FixedLabel" text=" " position="399,239" zPosition="2" size="1,1" font="LCD1;1" horizontalAlignment="left" verticalAlignment="top" foregroundColor="white" backgroundColor="#FF0000">

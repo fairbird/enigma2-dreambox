@@ -1,5 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <skin>
+	<colors>
+		<color name="oled1" value="#00adff2f" /> <!--Schriftfarbe Menue gelbgruen-->
+		<color name="oled2" value="#00ffffff" /> <!--Schriftfarbe Textroller-->
+		<color name="oled3" value="#00adff2f" /> <!--Schriftfarbe Uhrzeit usw.-->
+		<color name="oled4" value="#00adff2f" /> <!--Schriftfarbe Sender-->
+		<color name="oled5" value="#00ffffff" /> <!--Schriftfarbe Sendung-->
+		<color name="oled6" value="#00adff2f" /> <!--Schriftfarbe Sender Kanalliste-->
+		<color name="oled7" value="#00ff2525" /> <!--Schriftfarbe Uhr Standby-->
+	</colors>
 	<windowstyle id="1" type="skinned">
 		<color color="#000000" name="Background"/>
 		<color color="#ffffff" name="LabelForeground"/>
@@ -198,18 +207,19 @@
 
 <!-- menus-->
 	<screen name="MenuSummary" position="fill">
-		<widget source="parent.title" render="Label" position="top" size="*,61" font="FdLcD;50" horizontalAlignment="center" verticalAlignment="top" />
-		<widget source="parent.menu" render="Label" position="top" size="*,53" font="FdLcD;26" horizontalAlignment="left" verticalAlignment="center">
+		<widget font="FdLcD;52" halign="center" position="12,15" render="Label" size="386,52" source="parent.Title" />
+		<widget font="FdLcD;52" halign="center" foregroundColor="oled1" position="12,95" render="Label" size="386,145" source="parent.menu">
 			<convert type="StringListSelection" />
 		</widget>
 	</screen>
 
 <!-- setup-->
 	<screen name="SetupSummary" position="fill">
-		<widget source="SetupTitle" render="Label" position="top" size="*,61" font="FdLcD;50" horizontalAlignment="left" />
-		<widget source="SetupEntry" render="Label" position="top" size="*,51" font="FdLcD;25" horizontalAlignment="left" />
-		<widget source="SetupValue" render="Label" position="top" size="*,51" font="FdLcD;25" horizontalAlignment="left" />
+		<widget source="SetupTitle" render="Label" position="top" size="*,61" font="FdLcD;50" horizontalAlignment="center"/>
+		<widget source="SetupEntry" render="Label" foregroundColor="oled6" position="top" size="*,51" font="FdLcD;25" horizontalAlignment="left" />
+		<widget source="SetupValue" render="Label" foregroundColor="oled7" position="top" size="*,51" font="FdLcD;27" horizontalAlignment="left" />
 	</screen>
+
 
 <!-- misc-->
 	<screen name="SimpleSummary" position="fill">
@@ -383,7 +393,7 @@
 		<panel name="SummaryClockPanel" />
 	</screen>
 	<screen name="SoftwareUpdateChanges_summary" position="0,0" size="400,240">
-		<widget source="parent.title_summary" render="Label" position="0,0" size="160,15" font="FdLcD;15" horizontalAlignment="left" noWrap="1" />
+		<widget source="parent.Title_summary" render="Label" position="0,0" size="160,15" font="FdLcD;15" horizontalAlignment="left" noWrap="1" />
 		<widget source="parent.text_summary" render="Label" position="0,16" size="400,54" font="FdLcD;12" horizontalAlignment="left" transparent="1" />
 		<panel name="SummaryIconsPanel" />
 	</screen>

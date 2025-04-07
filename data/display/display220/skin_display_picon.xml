@@ -1,6 +1,15 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!--suppress XmlUnboundNsPrefix, XmlUnboundNsPrefix -->
 <skin>
+	<colors>
+		<color name="oled1" value="#00adff2f" /> <!--Schriftfarbe Menue gelbgruen-->
+		<color name="oled2" value="#00ffffff" /> <!--Schriftfarbe Textroller-->
+		<color name="oled3" value="#00adff2f" /> <!--Schriftfarbe Uhrzeit usw.-->
+		<color name="oled4" value="#00adff2f" /> <!--Schriftfarbe Sender-->
+		<color name="oled5" value="#00ffffff" /> <!--Schriftfarbe Sendung-->
+		<color name="oled6" value="#00adff2f" /> <!--Schriftfarbe Sender Kanalliste-->
+		<color name="oled7" value="#00ff2525" /> <!--Schriftfarbe Uhr Standby-->
+	</colors>
 	<windowstyle id="1" type="skinned">
 		<color color="#000000" name="Background"/>
 		<color color="#ffffff" name="LabelForeground"/>
@@ -99,17 +108,17 @@
 
 <!-- menus-->
 	<screen name="MenuSummary" position="fill">
-		<widget source="parent.title" render="Label" foregroundColor="#FFFF00" position="top" size="*,61" font="FdLcD;30" horizontalAlignment="center" verticalAlignment="top" />
-		<widget source="parent.menu" render="Label" position="top" size="*,53" font="FdLcD;26" horizontalAlignment="center" verticalAlignment="center">
+		<widget font="FdLcD;52" halign="center" position="12,15" render="Label" size="386,52" source="parent.Title" />
+		<widget font="FdLcD;52" halign="center" foregroundColor="oled1" position="12,95" render="Label" size="386,145" source="parent.menu">
 			<convert type="StringListSelection" />
 		</widget>
 	</screen>
 
 <!-- setup-->
-	<screen name="SetupSummary" position="0,0" size="220,176">
-		<widget source="SetupTitle" render="Label" position="0,0" foregroundColor="#FFFF00" size="220,25" font="FdLcD;24" horizontalAlignment="center" verticalAlignment="center" />
-		<widget source="SetupEntry" render="Label" position="0,26" size="220,50" font="FdLcD;24" horizontalAlignment="center" verticalAlignment="center" />
-		<widget source="SetupValue" render="Label" position="0,78" size="220,50" font="FdLcD;22" horizontalAlignment="center" verticalAlignment="top" />
+	<screen name="SetupSummary" position="fill">
+		<widget source="SetupTitle" render="Label" position="top" size="*,61" font="FdLcD;50" horizontalAlignment="center"/>
+		<widget source="SetupEntry" render="Label" foregroundColor="oled6" position="top" size="*,51" font="FdLcD;25" horizontalAlignment="left" />
+		<widget source="SetupValue" render="Label" foregroundColor="oled7" position="top" size="*,51" font="FdLcD;27" horizontalAlignment="left" />
 	</screen>
 
 <!-- Blindscan-->

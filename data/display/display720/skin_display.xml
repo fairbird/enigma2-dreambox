@@ -2,6 +2,15 @@
 <!--  Skin: LCD from Magic by MiLo -->
 <!-- Skin is for et8500 LCD/TFT without panel widgets -->
 <skin>
+	<colors>
+		<color name="oled1" value="#00adff2f" /> <!--Schriftfarbe Menue gelbgruen-->
+		<color name="oled2" value="#00ffffff" /> <!--Schriftfarbe Textroller-->
+		<color name="oled3" value="#00adff2f" /> <!--Schriftfarbe Uhrzeit usw.-->
+		<color name="oled4" value="#00adff2f" /> <!--Schriftfarbe Sender-->
+		<color name="oled5" value="#00ffffff" /> <!--Schriftfarbe Sendung-->
+		<color name="oled6" value="#00adff2f" /> <!--Schriftfarbe Sender Kanalliste-->
+		<color name="oled7" value="#00ff2525" /> <!--Schriftfarbe Uhr Standby-->
+	</colors>
 	<windowstyle id="1" type="skinned">
 		<color color="#000000" name="Background"/>
 		<color color="#ffffff" name="LabelForeground"/>
@@ -124,7 +133,7 @@
 
 <!-- menus-->
 	<screen name="MenuSummary" position="0,0" size="720,576">
-		<widget source="parent.title" render="Label" position="15,20" foregroundColor="#e5b243" size="670,120" font="FdLcD;70" horizontalAlignment="center" verticalAlignment="top" noWrap="1" />
+		<widget source="parent.Title" render="Label" position="15,20" foregroundColor="#e5b243" size="670,120" font="FdLcD;70" horizontalAlignment="center" verticalAlignment="top" noWrap="1" />
 		<widget source="parent.menu" render="Label" position="20,190" size="670,200" font="FdLcD;60" horizontalAlignment="center" verticalAlignment="top">
 			<convert type="StringListSelection" />
 		</widget>

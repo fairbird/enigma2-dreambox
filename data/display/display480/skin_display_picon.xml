@@ -1,5 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <skin>
+	<colors>
+		<color name="oled1" value="#00adff2f" /> <!--Schriftfarbe Menue gelbgruen-->
+		<color name="oled2" value="#00ffffff" /> <!--Schriftfarbe Textroller-->
+		<color name="oled3" value="#00adff2f" /> <!--Schriftfarbe Uhrzeit usw.-->
+		<color name="oled4" value="#00adff2f" /> <!--Schriftfarbe Sender-->
+		<color name="oled5" value="#00ffffff" /> <!--Schriftfarbe Sendung-->
+		<color name="oled6" value="#00adff2f" /> <!--Schriftfarbe Sender Kanalliste-->
+		<color name="oled7" value="#00ff2525" /> <!--Schriftfarbe Uhr Standby-->
+	</colors>
 	<windowstyle id="1" type="skinned">
 		<color color="#000000" name="Background"/>
 		<color color="#ffffff" name="LabelForeground"/>
@@ -380,7 +389,7 @@
 
 <!-- menus-->
 	<screen name="MenuSummary" position="fill">
-		<widget source="parent.title" render="Label" position="top" size="*,105" font="FdLcD;38" foregroundColor="#87CEFA" horizontalAlignment="center" verticalAlignment="center" />
+		<widget source="parent.Title" render="Label" position="top" size="*,105" font="FdLcD;38" foregroundColor="#87CEFA" horizontalAlignment="center" verticalAlignment="center" />
 		<eLabel position="top" size="*,1" backgroundColor="white" />
 		<widget source="parent.menu" render="Label" position="top" size="*,115" font="FdLcD;38" horizontalAlignment="center" verticalAlignment="center">
 			<convert type="StringListSelection" />
@@ -396,7 +405,7 @@
 
 <!-- Metrix-Menu -->
 	<screen name="MainSettingsView_summary" position="5,0" size="471,320">
-		<widget source="parent.titleText" render="Label" position="0,0" size="471,237" font="FdLcD;35" foregroundColor="#87CEFA" horizontalAlignment="center" verticalAlignment="center" />
+		<widget source="parent.TitleText" render="Label" position="0,0" size="471,237" font="FdLcD;35" foregroundColor="#87CEFA" horizontalAlignment="center" verticalAlignment="center" />
 		<panel name="SummaryClockPanel" />
 	</screen>
 
@@ -613,7 +622,7 @@
 		<widget source="parent.status" render="Label" position="0,277" size="471,43" font="FdLcD;28" horizontalAlignment="left" transparent="1" />
 	</screen>
 	<screen name="SoftwareUpdateChanges_summary" position="5,0" size="471,320">
-		<widget source="parent.title_summary" render="Label" position="0,0" size="471,35" font="FdLcD;24" foregroundColor="#87CEFA" horizontalAlignment="center" noWrap="1" />
+		<widget source="parent.Title_summary" render="Label" position="0,0" size="471,35" font="FdLcD;24" foregroundColor="#87CEFA" horizontalAlignment="center" noWrap="1" />
 		<widget source="parent.text_summary" render="Label" position="0,37" size="471,283" font="FdLcD;24" horizontalAlignment="left" transparent="1" />
 	</screen>
 	<screen name="WizardSummary" position="5,0" size="471,320">
