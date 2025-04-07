@@ -105,20 +105,22 @@
 		</widget>
 	</screen>
 
-<!-- main-->
-	<!-- menus-->
-	<screen name="MenuSummary" position="0,0" size="480,320">
-		<widget source="parent.Title" render="Label" position="0,5" size="480,70" font="FdLcD;55" horizontalAlignment="center" verticalAlignment="center" foregroundColor="#FFFF00" />
-		<widget source="parent.menu" render="Label" position="0,90" size="480,90" font="FdLcD;40" horizontalAlignment="center" verticalAlignment="center">
+<!-- menus-->
+	<screen name="MenuSummary" position="fill">
+		<widget source="parent.Title" render="Label" position="top" size="*,119" font="FdLcD;38" foregroundColor="#87CEFA" horizontalAlignment="center" verticalAlignment="center" />
+		<eLabel position="top" size="*,1" backgroundColor="white" />
+		<widget source="parent.menu" render="Label" position="top" size="*,119" font="FdLcD;38" horizontalAlignment="center" verticalAlignment="center">
 			<convert type="StringListSelection" />
 		</widget>
 	</screen>
 
 <!-- setup-->
-	<screen name="SetupSummary" position="0,0" size="480,320">
-		<widget source="SetupTitle" render="Label" position="0,5" size="480,70" font="FdLcD;55" horizontalAlignment="center" verticalAlignment="center" foregroundColor="#FFFF00" />
-		<widget source="SetupEntry" render="Label" position="0,90" size="480,90" font="FdLcD;40" horizontalAlignment="center" verticalAlignment="center" />
-		<widget source="SetupValue" render="Label" position="0,200" size="480,70" font="FdLcD;40" horizontalAlignment="center" verticalAlignment="center" />
+	<screen name="SetupSummary" position="fill">
+		<widget source="SetupTitle" render="Label" position="top" size="*,85" font="FdLcD;38" foregroundColor="#87CEFA" horizontalAlignment="left"  verticalAlignment="center" />
+		<eLabel position="top" size="*,1" backgroundColor="white" />
+		<widget source="SetupEntry" render="Label" position="top" size="*,95" font="FdLcD;25" horizontalAlignment="left" verticalAlignment="center" />
+		<eLabel position="top" size="*,1" backgroundColor="white" />
+		<widget source="SetupValue" render="Label" position="top" size="*,65" font="FdLcD;25" foregroundColor="#F4FA58" horizontalAlignment="left" verticalAlignment="center" />
 	</screen>
 
 	<!-- InfoBar - Box is turned on -->

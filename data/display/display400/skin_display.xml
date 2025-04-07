@@ -207,17 +207,20 @@
 
 <!-- menus-->
 	<screen name="MenuSummary" position="fill">
-		<widget font="FdLcD;52" halign="center" position="12,15" render="Label" size="386,52" source="parent.Title" />
-		<widget font="FdLcD;52" halign="center" foregroundColor="oled1" position="12,95" render="Label" size="386,145" source="parent.menu">
+		<widget source="parent.Title" render="Label" position="top" size="*,119" font="FdLcD;38" foregroundColor="#87CEFA" horizontalAlignment="center" verticalAlignment="center" />
+		<eLabel position="top" size="*,1" backgroundColor="white" />
+		<widget source="parent.menu" render="Label" position="top" size="*,119" font="FdLcD;38" horizontalAlignment="center" verticalAlignment="center">
 			<convert type="StringListSelection" />
 		</widget>
 	</screen>
 
 <!-- setup-->
 	<screen name="SetupSummary" position="fill">
-		<widget source="SetupTitle" render="Label" position="top" size="*,61" font="FdLcD;50" horizontalAlignment="center"/>
-		<widget source="SetupEntry" render="Label" foregroundColor="oled6" position="top" size="*,51" font="FdLcD;25" horizontalAlignment="left" />
-		<widget source="SetupValue" render="Label" foregroundColor="oled7" position="top" size="*,51" font="FdLcD;27" horizontalAlignment="left" />
+		<widget source="SetupTitle" render="Label" position="top" size="*,85" font="FdLcD;38" foregroundColor="#87CEFA" horizontalAlignment="left"  verticalAlignment="center" />
+		<eLabel position="top" size="*,1" backgroundColor="white" />
+		<widget source="SetupEntry" render="Label" position="top" size="*,95" font="FdLcD;25" horizontalAlignment="left" verticalAlignment="center" />
+		<eLabel position="top" size="*,1" backgroundColor="white" />
+		<widget source="SetupValue" render="Label" position="top" size="*,65" font="FdLcD;25" foregroundColor="#F4FA58" horizontalAlignment="left" verticalAlignment="center" />
 	</screen>
 
 
