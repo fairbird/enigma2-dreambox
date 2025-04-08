@@ -1,6 +1,7 @@
 installdir = $(datadir)/enigma2/skin_default/buttons
 
-dist_install_DATA = blue_pressed.png \
+dist_install_DATA = blank.png \
+    blue_pressed.png \
     blue.png \
     button_blue_off.png \
     button_blue.png \
@@ -12,6 +13,7 @@ dist_install_DATA = blue_pressed.png \
     button_yellow.png \
     green-big.png \
     green.png \
+    icon1.png \
     key_0.png \
     key_1.png \
     key_2.png \
