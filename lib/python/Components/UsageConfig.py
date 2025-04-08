@@ -2091,6 +2091,8 @@ def preferredTunerChoicesUpdate(update=False):
 	config.workaround.wakeuptime = ConfigSelectionNumber(default=5, stepwidth=1, min=0, max=30, wraparound=True)
 	config.workaround.wakeupwindow = ConfigSelectionNumber(default=5, stepwidth=5, min=5, max=60, wraparound=True)
 
+	config.usage.showicons = ConfigYesNo(default=True)
+
 	config.usage.menuType = ConfigSelection(default="standard", choices=[
 		("horzanim", _("Horizontal menu")),
 		("horzicon", _("Horizontal icons")),

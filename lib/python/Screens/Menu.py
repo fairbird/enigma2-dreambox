@@ -440,7 +440,8 @@ class Menu(Screen, ProtectedScreen):
 	def selectionChanged(self):
 		current = self["menu"].getCurrent()
 		if current:
-			self["menuimage"].instance.setPixmap(current[WIDGET_IMAGE])
+			if config.usage.showicons.value:
+				self["menuimage"].instance.setPixmap(current[WIDGET_IMAGE])
 			self["description"].setText(current[WIDGET_DESCRIPTION])
 			if self.sortMode:
 				self["key_yellow"].setText(_("Show") if self.subMenuSort.getConfigValue(current[WIDGET_KEY], "hidden") else _("Hide"))

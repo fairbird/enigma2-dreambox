@@ -35,6 +35,7 @@
 	<setup key="Usage" title="Customize">
 		<item level="0" text="Menu style" description="Select the display design for menus.">config.usage.menuType</item>
 		<item level="0" text="Menu entry style" description="Select the display options for each menu entry item. If menu numbers are available then the number buttons can be used to select the numbered menu entries directly." requires="config.usage.menuType" value="standard">config.usage.menuEntryStyle</item>
+		<item level="0" text="Menu icons" description="This option allows you to show icons of menu." requires="config.usage.menuType" value="standard">config.usage.showicons</item>
 		<item level="0" text="Menu entry sort order" description="Select the sort order of the menu entries. User defined also allows the menu entries to be hidden.">config.usage.menuSortOrder</item>
 		<item level="1" text="Sort order for setup entries" description="This option allows you to alphabetically sort setup menu entries.">config.usage.sort_settings</item>
 		<item level="1" text="Show setup default values" description="In Setup screens choose whether to show the default value of the selected item in the description field.">config.usage.setupShowDefault</item>
