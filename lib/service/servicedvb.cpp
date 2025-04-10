@@ -1119,12 +1119,18 @@ eDVBServicePlay::eDVBServicePlay(const eServiceReference &ref, eDVBService *serv
 	m_subtitle_sync_timer(eTimer::create(eApp)),
 	m_nownext_timer(eTimer::create(eApp))
 {
+#ifdef PASSTHROUGH_FIX
+	m_passthrough_fix_timer = eTimer::create(eApp);
+#endif
 	if (connect_event)
 		CONNECT(m_service_handler.serviceEvent, eDVBServicePlay::serviceEvent);
 	CONNECT(m_service_handler_timeshift.serviceEvent, eDVBServicePlay::serviceEventTimeshift);
 	CONNECT(m_event_handler.m_eit_changed, eDVBServicePlay::gotNewEvent);
 	CONNECT(m_subtitle_sync_timer->timeout, eDVBServicePlay::checkSubtitleTiming);
 	CONNECT(m_nownext_timer->timeout, eDVBServicePlay::updateEpgCacheNowNext);
+#ifdef PASSTHROUGH_FIX
+	CONNECT(m_passthrough_fix_timer->timeout, eDVBServicePlay::forcePassthrough);
+#endif
 }
 
 eDVBServicePlay::~eDVBServicePlay()
@@ -1154,6 +1160,14 @@ eDVBServicePlay::~eDVBServicePlay()
 	}
 	if (m_subtitle_widget) m_subtitle_widget->destroy();
 }
+
+#ifdef PASSTHROUGH_FIX
+void eDVBServicePlay::forcePassthrough()
+{
+	eTrace("[eDVBServicePlay] Setting 'passthrough' to force correct operation");
+	CFile::writeStr("/proc/stb/audio/ac3", "passthrough");
+}
+#endif
 
 void eDVBServicePlay::gotNewEvent(int error)
 {
@@ -2350,14 +2364,15 @@ int eDVBServicePlay::selectAudioStream(int i)
 		return -4;
 	}
 
-#ifdef PASSTHROUGHT_FIX
+#ifdef PASSTHROUGH_FIX
 	if (apidtype == eDVBPMTParser::audioStream::atAC3 || apidtype == eDVBPMTParser::audioStream::atAAC || apidtype == eDVBPMTParser::audioStream::atDDP) {
 		// Check if the audio type is AC3, AAC, or DDP and ensure passthrough mode is set correctly.
 		std::string pass = CFile::read("/proc/stb/audio/ac3");
 		if(pass.find("passthrough") != std::string::npos)
 		{
-			eTrace("[eDVBServicePlay] Setting 'passthrough' to force correct operation");
-			CFile::writeStr("/proc/stb/audio/ac3", "passthrough");
+			int shortAudioDelay = eSimpleConfig::getInt("config.av.passthrough_fix_short", 100);
+			m_passthrough_fix_timer->stop();
+			m_passthrough_fix_timer->start(shortAudioDelay, true);
 		}
 	}
 #endif

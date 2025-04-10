@@ -418,6 +418,9 @@ BoxInfo.setItem("FrontpanelLEDFadeControl", fileExists("/proc/stb/fp/led_fade"))
 # AI
 BoxInfo.setItem("AISubs", fileExists("/etc/init.d/aisocket"))
 
+# Vu+ EAC3Fix
+BoxInfo.setItem("VuEAC3Fix", MODEL in ("vuultimo4k", "vuduo4kse"))
+
 # Dont't sort.
 BoxInfo.setMutableItem("SeekStatePlay", False)
 BoxInfo.setMutableItem("StatePlayPause", False)

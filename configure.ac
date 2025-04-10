@@ -274,6 +274,10 @@ if test `echo "$BOXTYPE" | cut -b 1-2` == "vu"; then
 	AC_DEFINE(FORCE_ADVANCED_REMOTE, 1,[define to fixup the input device identification when the remote control is actually an 'advanced' remote (with play/forward/rewind keys)])
 fi
 
+if "$BOXTYPE" == "vuultimo4k" -o "$BOXTYPE" == "vuduo4kse"; then
+	AC_DEFINE(PASSTHROUGH_FIX, 1 ,[define when passthrough is not entirely supported by drivers (usually Vu+)])
+fi
+
 AC_ARG_WITH(libsdl,
 	AS_HELP_STRING([--with-libsdl],[use libsdl, yes or no]),
 	[with_libsdl=$withval],[with_libsdl=no])
