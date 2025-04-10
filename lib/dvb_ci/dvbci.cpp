@@ -32,7 +32,7 @@ char* eDVBCISlot::readInputCI(int NimNumber)
 	char id1[] = "NIM Socket";
 	char id2[] = "Input_Name";
 	char keys1[] = "1234567890";
-	char keys2[] = "12ABCDabcd";
+	char keys2[] = "123456789ABCDabcd";
 	char *inputName = 0;
 	char buf[256];
 	FILE *f;
@@ -88,17 +88,6 @@ std::string eDVBCISlot::getTunerLetterDM(int NimNumber)
 	{
 		std::string ret = std::string(srcCI);
 		free(srcCI);
-#ifdef HAVE_DM_FBC
-		if (ret.size() == 1)
-		{
-			int corr = 1;
-			if (NimNumber > 7)
-			{
-				corr = -7;
-			}
-			return ret + std::to_string(NimNumber + corr);
-		}
-#endif	
 		return ret;
 	}
 	return eDVBCISlot::getTunerLetter(NimNumber);

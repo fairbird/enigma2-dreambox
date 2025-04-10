@@ -220,7 +220,7 @@ fi
 
 if test "$BOXTYPE" == "dm900" -o "$BOXTYPE" == "dm920"; then
 	AC_DEFINE(DM9X0_LCD, 1,[define when we need to move lcd text a bit to the right])
-#	AC_DEFINE(HAVE_DM_FBC, 1,[define for dm900 and dm920])
+	AC_DEFINE(HAVE_DM_FBC, 1,[define for dm900 and dm920])
 fi
 
 if test "$BOXTYPE" == "dreamone" -o "$BOXTYPE" == "dreamtwo"; then
