@@ -918,7 +918,7 @@ class NimSelection(Screen):
 					text = _("Tuner is not supported")
 				if x.isCompatible("DVB-T") and ("DVB-T" in (text + x.friendly_full_description) or "/T" in (text + x.friendly_full_description)) and _("Disabled") not in text and hasattr(nimConfig, "terrestrial_5V") and nimConfig.terrestrial_5V.value:
 					text += _(" (+5 volt terrestrial)")
-				self.list.append((slotid, x.friendly_full_description, text or nimConfig.configMode.value, x))
+				self.list.append((slotid, x.friendly_full_description_compressed if x.isCompatible("DVB-C") and x.isFBCTuner() else x.friendly_full_description, text or nimConfig.configMode.value, x))
 		self["nimlist"].setList(self.list)
 		self["nimlist"].updateList(self.list)
 		if index is not None:
