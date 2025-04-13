@@ -1,5 +1,5 @@
 from enigma import eListbox, eListboxPythonMultiContent, BT_ALIGN_CENTER, iPlayableService, iRecordableService, eServiceReference, iServiceInformation, gFont, RT_HALIGN_LEFT, RT_VALIGN_CENTER, RT_VALIGN_TOP, RT_HALIGN_CENTER, eTimer, getDesktop, eSize, eStreamServer
-from skin import parseScale, applySkinFactor, parseColor, parseFont, parameters
+from skin import parseScale, parseColor, parseFont, parameters
 
 from Components.Addons.GUIAddon import GUIAddon
 from Components.Converter.PliExtraInfo import createCurrentCaidLabel
@@ -32,7 +32,7 @@ class ServiceInfoBar(GUIAddon):
 		self.l.setBuildFunc(self.buildEntry)
 		self.l.setItemHeight(36)
 		self.l.setItemWidth(36)
-		self.spacing = applySkinFactor(10)
+		self.spacing = 10
 		self.orientations = {"orHorizontal": eListbox.orHorizontal, "orVertical": eListbox.orVertical}
 		self.orientation = eListbox.orHorizontal
 		self.alignment = "left"

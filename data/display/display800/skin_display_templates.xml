@@ -1,5 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <skin>
+	<colors>
+		<color name="oled1" value="#00adff2f" /> <!--Schriftfarbe Menue gelbgruen-->
+		<color name="oled2" value="#00ffffff" /> <!--Schriftfarbe Textroller-->
+		<color name="oled3" value="#00adff2f" /> <!--Schriftfarbe Uhrzeit usw.-->
+		<color name="oled4" value="#00adff2f" /> <!--Schriftfarbe Sender-->
+		<color name="oled5" value="#00ffffff" /> <!--Schriftfarbe Sendung-->
+		<color name="oled6" value="#00adff2f" /> <!--Schriftfarbe Sender Kanalliste-->
+		<color name="oled7" value="#00ff2525" /> <!--Schriftfarbe Uhr Standby-->
+	</colors>
 	<!-- ## ANALOGUE CLOCK ## -->
 	<screen name="AnalogueClock">
 		<ePixmap pixmap="/usr/share/enigma2/display/skin_default/analogclock.png" position="186,32" size="800,480" transparent="1" alphaTest="on" />
@@ -16,7 +25,7 @@
 
 	<!-- ## DEFAULT ## -->
 	<screen name="LCDTitle">
-		<widget source="parent.title" render="Label" position="40,50" size="720,110" foregroundColor="white" font="FdLcD;85" horizontalAlignment="center" verticalAlignment="center" zPosition="2" />
+		<widget source="parent.Title" render="Label" position="40,50" size="720,110" foregroundColor="white" font="FdLcD;85" horizontalAlignment="center" verticalAlignment="center" zPosition="2" />
 	</screen>
 	<screen name="LCDTitle2">
 		<widget source="parent.Title" render="Label" position="40,50" size="720,110" foregroundColor="white" font="FdLcD;85" horizontalAlignment="center" verticalAlignment="center" zPosition="2" />

@@ -11,6 +11,7 @@ install_PYTHON = \
 	Navigation.py \
 	NavigationInstance.py \
 	RecordTimer.py \
+	Scheduler.py \
 	ServiceReference.py \
 	skin.py \
 	StartEnigma.py \

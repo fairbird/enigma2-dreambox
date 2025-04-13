@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tuxbox-enigma 0.0.1-En-Th\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-12-20 11:32+0100\n"
+"POT-Creation-Date: 2025-03-16 15:41+0100\n"
 "PO-Revision-Date: 2010-04-08 18:13+0700\n"
 "Last-Translator: Tony - Thaidreambox\n"
 "Language-Team: Tony @ Thai Dreambox <tonyboyth@gmail.com>\n"
@@ -399,6 +399,10 @@ msgstr "(ว่าง)"
 
 msgid "(not activated)"
 msgstr ""
+
+#, fuzzy
+msgid "(old model)"
+msgstr "Voltage mode"
 
 msgid "(show optional DVD audio menu)"
 msgstr "(เมนูเสียงของดีวีดี)"
@@ -1306,9 +1310,6 @@ msgstr "รูปแบบที่ใช้งานได้"
 msgid "Available locales are:"
 msgstr "รูปแบบที่ใช้งานได้"
 
-msgid "Axas E4HD Ultra"
-msgstr ""
-
 msgid "Azerbaijan"
 msgstr ""
 
@@ -1512,6 +1513,13 @@ msgid "Botswana"
 msgstr ""
 
 msgid "Bottom"
+msgstr ""
+
+#, fuzzy
+msgid "Bouquet down"
+msgstr "[แก้ไขกลุ่มรายการ]"
+
+msgid "Bouquet up"
 msgstr ""
 
 msgid "Bouvet Island"
@@ -1775,6 +1783,10 @@ msgstr "เปลี่ยน Step"
 msgid "Change timer"
 msgstr ""
 
+#, fuzzy
+msgid "Change view mode"
+msgstr "เปลี่ยน Step"
+
 msgid "Channel"
 msgstr "ช่อง"
 
@@ -1786,11 +1798,11 @@ msgid "Channel Select Base Actions"
 msgstr "เลือกช่องรายการ"
 
 #, fuzzy
-msgid "Channel Select Edit Actions"
+msgid "Channel Select EPG Actions"
 msgstr "เลือกช่องรายการ"
 
 #, fuzzy
-msgid "Channel SelectEPG Actions"
+msgid "Channel Select Edit Actions"
 msgstr "เลือกช่องรายการ"
 
 #, fuzzy
@@ -2475,6 +2487,10 @@ msgstr ""
 msgid "Content does not fit on DVD!"
 msgstr "เนื้อหาเกินความจุแผ่นดีวีดี"
 
+#, fuzzy
+msgid "Context Menu"
+msgstr "เมนูช่องรายการ"
+
 msgid "Continue"
 msgstr "ทำต่อ"
 
@@ -2723,18 +2739,6 @@ msgstr ""
 msgid "DVD Menu"
 msgstr ""
 
-#, fuzzy
-msgid "DVD Player Actions"
-msgstr "เครื่องเล่นดีวีดี"
-
-#, fuzzy
-msgid "DVD Title List"
-msgstr "รายการบนแผ่นดีวีดี"
-
-#, fuzzy
-msgid "DVD Toolbox"
-msgstr "เครื่องมือจัดการดีวีดี"
-
 msgid "DVD data format"
 msgstr ""
 
@@ -2756,6 +2760,18 @@ msgstr "รายการบนแผ่นดีวีดี"
 #, fuzzy
 msgid "DVDPlayer"
 msgstr "เครื่องเล่นดีวีดี"
+
+#, fuzzy
+msgid "DVDPlayer Actions"
+msgstr "เครื่องเล่นดีวีดี"
+
+#, fuzzy
+msgid "DVDTitle List"
+msgstr "รายการบนแผ่นดีวีดี"
+
+#, fuzzy
+msgid "DVDToolbox"
+msgstr "เครื่องมือจัดการดีวีดี"
 
 msgid "Danish"
 msgstr "ภาษาเดนมาร์ก"
@@ -3797,7 +3813,7 @@ msgid "Event View Actions"
 msgstr "แสดงรายการ"
 
 #, fuzzy
-msgid "Event ViewEPG Actions"
+msgid "Event View EPG Actions"
 msgstr "แสดงรายการ"
 
 msgid "Event font size (relative to skin size)"
@@ -3957,9 +3973,6 @@ msgid "Extra start time to ignore inactivity sleeptimer"
 msgstr ""
 
 msgid "F"
-msgstr ""
-
-msgid "F1/F3/F4/F4-TURBO"
 msgstr ""
 
 msgid "FAILED"
@@ -4538,12 +4551,6 @@ msgstr "D"
 msgid "HD list"
 msgstr ""
 
-msgid "HD2400"
-msgstr ""
-
-msgid "HD60/HD66SE/Multibox/Multibox SE"
-msgstr ""
-
 msgid "HDMI"
 msgstr ""
 
@@ -4576,9 +4583,6 @@ msgid "HDMI-In"
 msgstr ""
 
 msgid "HDR10 support"
-msgstr ""
-
-msgid "HDx1/HD1xxx/HD5x0C/VS1x00/et7x00/et8500/et7000mini"
 msgstr ""
 
 msgid "HELP"
@@ -4766,9 +4770,6 @@ msgstr ""
 #, fuzzy
 msgid "I do not want to perform any service scans"
 msgstr "ท่านต้องการค้นหารายการหรือไม่?"
-
-msgid "I55SE/H7(new model)/H9(new model)/H9COMBO/H9TWIN/H9SE/H9COMBOSE/H10/H11/H17"
-msgstr ""
 
 msgid "IDLE"
 msgstr ""
@@ -4984,6 +4985,10 @@ msgid "Infobar Cue Sheet Actions"
 msgstr ""
 
 #, fuzzy
+msgid "Infobar EPG Actions"
+msgstr "เวลาแสดงแถบรายการ"
+
+#, fuzzy
 msgid "Infobar Extensions"
 msgstr "ส่วนเพิ่มเติม"
 
@@ -5046,10 +5051,6 @@ msgstr ""
 
 msgid "Infobar frontend data source"
 msgstr ""
-
-#, fuzzy
-msgid "InfobarEPG Actions"
-msgstr "เวลาแสดงแถบรายการ"
 
 msgid "Information"
 msgstr "ข้อมูล"
@@ -5300,7 +5301,15 @@ msgid "Jump to next marked position"
 msgstr "ไปส่วนต่อไป"
 
 #, fuzzy
+msgid "Jump to next marker"
+msgstr "ไปส่วนต่อไป"
+
+#, fuzzy
 msgid "Jump to previous marked position"
+msgstr "ไปส่วนก่อนหน้า"
+
+#, fuzzy
+msgid "Jump to previous marker"
 msgstr "ไปส่วนก่อนหน้า"
 
 #. TRANSLATORS: (aspect ratio policy: scale as close to fullscreen as possible)
@@ -5939,6 +5948,10 @@ msgstr "ย้ายลงไปท้ายสุด"
 msgid "Move down a screen"
 msgstr "ย้ายลงไปท้ายสุด"
 
+#, fuzzy
+msgid "Move down in bouquet list"
+msgstr "ย้ายลงไปท้ายสุด"
+
 msgid "Move east"
 msgstr "เคลื่อนไปทางทิศตะวันออก"
 
@@ -6000,6 +6013,10 @@ msgstr ""
 
 msgid "Move up a screen"
 msgstr ""
+
+#, fuzzy
+msgid "Move up in bouquet list"
+msgstr "จบการแก้ไขกลุ่มรายการ"
 
 msgid "Move west"
 msgstr "เคลื่อนไปทางทิศตะวันตก"
@@ -6660,10 +6677,6 @@ msgstr ""
 msgid "Other buttons will jump to the help for that button, if there is help."
 msgstr ""
 
-#, fuzzy
-msgid "Other functions"
-msgstr "เลือกที่ที่จะสำรอง"
-
 msgid "Output"
 msgstr ""
 
@@ -6751,9 +6764,6 @@ msgstr ""
 msgid "PREVIOUSSONG"
 msgstr ""
 
-msgid "PULSe 4K(mini)"
-msgstr ""
-
 msgid "PVR"
 msgstr ""
 
@@ -6768,6 +6778,12 @@ msgstr "จัดการส่วนประกอบ"
 
 msgid "Packet manager"
 msgstr "ตัวจัดการส่วนประกอบ"
+
+msgid "Page down"
+msgstr ""
+
+msgid "Page up"
+msgstr ""
 
 msgid "Pakistan"
 msgstr ""
@@ -6864,12 +6880,12 @@ msgid "Philippines"
 msgstr ""
 
 #, fuzzy
-msgid "PiP Setup Actions"
-msgstr "เลือกที่ที่จะสำรอง"
-
-#, fuzzy
 msgid "PiP setup"
 msgstr "ตั้งค่า PiP"
+
+#, fuzzy
+msgid "PiPSetup Actions"
+msgstr "เลือกที่ที่จะสำรอง"
 
 msgid "Picon"
 msgstr ""
@@ -7595,6 +7611,10 @@ msgid "RIGHT"
 msgstr ""
 
 msgid "Radio"
+msgstr "วิทยุ"
+
+#, fuzzy
+msgid "Radio mode"
 msgstr "วิทยุ"
 
 #, fuzzy
@@ -8381,6 +8401,10 @@ msgstr "ค้นหาทางทิศตะวันออก"
 msgid "Search east"
 msgstr "ค้นหาทางทิศตะวันออก"
 
+#, fuzzy
+msgid "Search in SMS mode"
+msgstr "เลือกโหมดวีดีโอ"
+
 msgid "Search west"
 msgstr "ค้นหาทางทิศตะวันตก"
 
@@ -8480,6 +8504,10 @@ msgstr ""
 
 msgid "Select 'yes' to only send the DiSEqC command when changing from one satellite to another, or select 'no' for the DiSEqC command to be resent on every zap."
 msgstr ""
+
+#, fuzzy
+msgid "Select Audio"
+msgstr "เลือก CAId"
 
 #, fuzzy
 msgid "Select CAId"
@@ -8630,6 +8658,10 @@ msgstr "เลือกอัตราการปรับหน้าจอ"
 
 msgid "Select satellites"
 msgstr ""
+
+#, fuzzy
+msgid "Select service"
+msgstr "เลือกภาพยนต์"
 
 #, fuzzy
 msgid "Select service name"
@@ -9097,6 +9129,10 @@ msgstr "เลือกที่ที่จะสำรอง"
 msgid "Show"
 msgstr "แสดงข้อมูล"
 
+#, fuzzy
+msgid "Show All Services"
+msgstr "สลับบริการ"
+
 msgid "Show Audioselection"
 msgstr ""
 
@@ -9114,11 +9150,23 @@ msgstr "แสดงแถบรายการเมื่อมีการเ
 msgid "Show EPG..."
 msgstr "แสดงผังรายการ (EPG)"
 
+#, fuzzy
+msgid "Show Favorites"
+msgstr "รายการโปรด"
+
 msgid "Show InfoBar"
 msgstr ""
 
 msgid "Show PiP"
 msgstr ""
+
+#, fuzzy
+msgid "Show Providers"
+msgstr "ผู้ให้บริการ"
+
+#, fuzzy
+msgid "Show Satellites"
+msgstr "ดาวเทียม"
 
 msgid "Show True/False as graphical switch"
 msgstr ""
@@ -10246,6 +10294,10 @@ msgstr ""
 msgid "TV"
 msgstr ""
 
+#, fuzzy
+msgid "TV mode"
+msgstr "โหมดทดสอบ"
+
 msgid "TV physical address report"
 msgstr ""
 
@@ -10397,7 +10449,7 @@ msgstr "ยังไม่ได้ติดตั้งปลั๊กอิน
 msgid "The number of steps to change the volume on the device the keys are forwarded to."
 msgstr ""
 
-msgid "The order and grouping of the help information list can be controlled using MENU>Setup>User Interface>Settings>Sort order for help screen."
+msgid "The order and grouping of the help information list can be controlled using MENU>Setup>User Interface>Settings>Sort order for help screen or pressing long help"
 msgstr ""
 
 msgid ""
@@ -10899,6 +10951,10 @@ msgstr ""
 msgid "Toggle PiPzap"
 msgstr ""
 
+#, fuzzy
+msgid "Toggle TV Radio mode"
+msgstr "เลือกโหมดวีดีโอ"
+
 msgid "Toggle TV/RADIO mode"
 msgstr ""
 
@@ -10911,6 +10967,10 @@ msgstr ""
 
 msgid "Toggle infoBar"
 msgstr ""
+
+#, fuzzy
+msgid "Toggle movemode"
+msgstr "เลือกโหมดวีดีโอ"
 
 msgid "Toggle new text inserts before or overwrites existing text"
 msgstr ""
@@ -11490,9 +11550,6 @@ msgid "VOL+"
 msgstr ""
 
 msgid "VOL-"
-msgstr ""
-
-msgid "VU+"
 msgstr ""
 
 msgid "Valid ONID/TSID look at www.lyngsat.com..."
@@ -12243,6 +12300,10 @@ msgstr ""
 msgid "You can set sorting type for items in movielist."
 msgstr "โหลดความยาวของภาพยนต์"
 
+#, python-format
+msgid "You can't update the software because %s can not be reached."
+msgstr ""
+
 msgid "You cannot delete this!"
 msgstr "ท่านไม่สามารถลบรายการนี้ได้!"
 
@@ -12399,6 +12460,9 @@ msgstr ""
 msgid "Zap to"
 msgstr ""
 
+msgid "Zap to channel number"
+msgstr ""
+
 msgid "Zap to selected channel"
 msgstr ""
 
@@ -12418,15 +12482,6 @@ msgstr ""
 #, fuzzy, python-format
 msgid "Zapped to timer service %s!"
 msgstr "ย้ายไปบนสุด"
-
-msgid "Zgemma H.S/H.2S/H.2H/H5/H7(old model)"
-msgstr ""
-
-msgid "Zgemma H9(old model)/I55Plus/H8"
-msgstr ""
-
-msgid "Zgemma Star S/2S/H1/H2"
-msgstr ""
 
 msgid "Zimbabwe"
 msgstr ""
@@ -12714,21 +12769,6 @@ msgid "error starting scan"
 msgstr ""
 
 msgid "error while scanning"
-msgstr ""
-
-msgid "et4000"
-msgstr ""
-
-msgid "et5000/et6000"
-msgstr ""
-
-msgid "et8000/et10000"
-msgstr ""
-
-msgid "et9000/et9100"
-msgstr ""
-
-msgid "et9200/et9500/et6500"
 msgstr ""
 
 msgid "execute cuts (requires MovieCut plugin)"
@@ -13502,9 +13542,6 @@ msgid "with tuner name"
 msgstr ""
 
 msgid "with_errors"
-msgstr ""
-
-msgid "xp1000"
 msgstr ""
 
 msgid "yellow"

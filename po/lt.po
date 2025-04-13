@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PLi enigma2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-12-20 11:32+0100\n"
+"POT-Creation-Date: 2025-03-16 15:41+0100\n"
 "PO-Revision-Date: 2022-10-23 15:37+0300\n"
 "Last-Translator: Audronis <adga45@gmail.com>\n"
 "Language-Team: Adga (C) <adga45@gmail.com>\n"
@@ -416,6 +416,10 @@ msgstr "(tuščias)"
 
 msgid "(not activated)"
 msgstr "(neaktyvuota)"
+
+#, fuzzy
+msgid "(old model)"
+msgstr "3D režimas"
 
 msgid "(show optional DVD audio menu)"
 msgstr "(rodyti pasirinktinį DVD garso meniu)"
@@ -1285,9 +1289,6 @@ msgstr "Galimi kintami formatai"
 msgid "Available locales are:"
 msgstr "Galimos vietos:"
 
-msgid "Axas E4HD Ultra"
-msgstr "Axas E4HD Ultra"
-
 msgid "Azerbaijan"
 msgstr "Azerbaidžanas"
 
@@ -1488,6 +1489,13 @@ msgstr "Botsvana"
 #, fuzzy
 msgid "Bottom"
 msgstr "apačia"
+
+#, fuzzy
+msgid "Bouquet down"
+msgstr "Patildyti"
+
+msgid "Bouquet up"
+msgstr ""
 
 msgid "Bouvet Island"
 msgstr "Buveto sala"
@@ -1761,6 +1769,10 @@ msgstr "Keisti žingsnio dydį"
 msgid "Change timer"
 msgstr "Keisti laikmatį"
 
+#, fuzzy
+msgid "Change view mode"
+msgstr "Keisti laikmatį"
+
 msgid "Channel"
 msgstr "Kanalas"
 
@@ -1772,11 +1784,11 @@ msgid "Channel Select Base Actions"
 msgstr "Kanalo pasirinkimas"
 
 #, fuzzy
-msgid "Channel Select Edit Actions"
+msgid "Channel Select EPG Actions"
 msgstr "Kanalo pasirinkimas"
 
 #, fuzzy
-msgid "Channel SelectEPG Actions"
+msgid "Channel Select Edit Actions"
 msgstr "Kanalo pasirinkimas"
 
 #, fuzzy
@@ -2434,6 +2446,10 @@ msgstr "Šios informacijos ieškokite savo variklio techninių duomenų lape, ar
 msgid "Content does not fit on DVD!"
 msgstr "Turinys netelpa į DVD!"
 
+#, fuzzy
+msgid "Context Menu"
+msgstr "Kanalo kontekstinis meniu"
+
 msgid "Continue"
 msgstr "Tęsti"
 
@@ -2674,18 +2690,6 @@ msgstr "DVD įrašymas"
 msgid "DVD Menu"
 msgstr "DVD meniu"
 
-#, fuzzy
-msgid "DVD Player Actions"
-msgstr "DVD grotuvas"
-
-#, fuzzy
-msgid "DVD Title List"
-msgstr "DVD pavadinimų sąrašas"
-
-#, fuzzy
-msgid "DVD Toolbox"
-msgstr "DVD media rinkinys"
-
 msgid "DVD data format"
 msgstr "DVD duomenų formatas"
 
@@ -2703,6 +2707,18 @@ msgstr "DVD pavadinimų sąrašas"
 
 msgid "DVDPlayer"
 msgstr "DVD grotuvas"
+
+#, fuzzy
+msgid "DVDPlayer Actions"
+msgstr "DVD grotuvas"
+
+#, fuzzy
+msgid "DVDTitle List"
+msgstr "DVD pavadinimų sąrašas"
+
+#, fuzzy
+msgid "DVDToolbox"
+msgstr "DVD media rinkinys"
 
 msgid "Danish"
 msgstr "Danų"
@@ -3719,7 +3735,7 @@ msgid "Event View Actions"
 msgstr "Įvykių peržiūros meniu"
 
 #, fuzzy
-msgid "Event ViewEPG Actions"
+msgid "Event View EPG Actions"
 msgstr "Įvykių peržiūros meniu"
 
 msgid "Event font size (relative to skin size)"
@@ -3870,9 +3886,6 @@ msgstr "Papildomo laiko miego laikmačio neaktyvumo ignoravimui pradžia"
 
 msgid "F"
 msgstr "F"
-
-msgid "F1/F3/F4/F4-TURBO"
-msgstr "F1/F3/F4/F4-TURBO"
 
 msgid "FAILED"
 msgstr "NEPAVYKO"
@@ -4433,12 +4446,6 @@ msgstr "HD"
 msgid "HD list"
 msgstr "HD sąrašas"
 
-msgid "HD2400"
-msgstr "HD2400"
-
-msgid "HD60/HD66SE/Multibox/Multibox SE"
-msgstr "HD60/HD66SE/Multibox/Multibox SE"
-
 msgid "HDMI"
 msgstr "HDMI"
 
@@ -4472,9 +4479,6 @@ msgstr "HDMI"
 
 msgid "HDR10 support"
 msgstr "HDR10 palaikymas"
-
-msgid "HDx1/HD1xxx/HD5x0C/VS1x00/et7x00/et8500/et7000mini"
-msgstr "HDx1/HD1xxx/HD5x0C/VS1x00/et7x00/et8500/et7000mini"
 
 msgid "HELP"
 msgstr "PAGALBA"
@@ -4652,10 +4656,6 @@ msgstr "I"
 
 msgid "I do not want to perform any service scans"
 msgstr "Aš nenoriu atlikti jokių kanalų paieškos"
-
-#, fuzzy
-msgid "I55SE/H7(new model)/H9(new model)/H9COMBO/H9TWIN/H9SE/H9COMBOSE/H10/H11/H17"
-msgstr "I55SE/H7(naujas modelis)/H9(naujas modelis)/H9COMBO/H9TWIN/H9SE/H9COMBOSE/H10/H11"
 
 msgid "IDLE"
 msgstr "NENAUDOJAMAS"
@@ -4871,6 +4871,10 @@ msgid "Infobar Cue Sheet Actions"
 msgstr ""
 
 #, fuzzy
+msgid "Infobar EPG Actions"
+msgstr "Infojuosta išsijungs po"
+
+#, fuzzy
 msgid "Infobar Extensions"
 msgstr "Įdiekite išplėtimus"
 
@@ -4935,10 +4939,6 @@ msgstr ""
 
 msgid "Infobar frontend data source"
 msgstr "Info juostos išorinės sąsajos duomenų šaltinis"
-
-#, fuzzy
-msgid "InfobarEPG Actions"
-msgstr "Infojuosta išsijungs po"
 
 msgid "Information"
 msgstr "Informacija"
@@ -5174,7 +5174,15 @@ msgstr ""
 msgid "Jump to next marked position"
 msgstr "Peršokti į sekančią pažymėtą poziciją"
 
+#, fuzzy
+msgid "Jump to next marker"
+msgstr "Peršokti į sekančią pažymėtą poziciją"
+
 msgid "Jump to previous marked position"
+msgstr "Peršokti į ankstesnę pažymėtą poziciją"
+
+#, fuzzy
+msgid "Jump to previous marker"
 msgstr "Peršokti į ankstesnę pažymėtą poziciją"
 
 #. TRANSLATORS: (aspect ratio policy: scale as close to fullscreen as possible)
@@ -5780,6 +5788,10 @@ msgstr "Sąrašu žemyn"
 msgid "Move down a screen"
 msgstr "perkelti žemyn prie paskutinio įrašo"
 
+#, fuzzy
+msgid "Move down in bouquet list"
+msgstr "Sąrašu žemyn"
+
 msgid "Move east"
 msgstr "Sukti į rytus"
 
@@ -5836,6 +5848,10 @@ msgstr "Pasukta į poziciją ties žyme"
 
 msgid "Move up a screen"
 msgstr ""
+
+#, fuzzy
+msgid "Move up in bouquet list"
+msgstr "Baigti paketų redagavimą"
 
 msgid "Move west"
 msgstr "Sukti į vakarus"
@@ -6469,10 +6485,6 @@ msgstr "Kiti subtitrai ir kalba"
 msgid "Other buttons will jump to the help for that button, if there is help."
 msgstr ""
 
-#, fuzzy
-msgid "Other functions"
-msgstr "aukštasis mokslas"
-
 msgid "Output"
 msgstr "Išvestis"
 
@@ -6557,9 +6569,6 @@ msgstr ""
 msgid "PREVIOUSSONG"
 msgstr ""
 
-msgid "PULSe 4K(mini)"
-msgstr "PULSe 4K(mini)"
-
 #, fuzzy
 msgid "PVR"
 msgstr "OVR"
@@ -6575,6 +6584,14 @@ msgstr "Paketų valdymas"
 
 msgid "Packet manager"
 msgstr "Paketų valdymas"
+
+#, fuzzy
+msgid "Page down"
+msgstr "Perjungti žemyn"
+
+#, fuzzy
+msgid "Page up"
+msgstr "Naudojimo nustatymas"
 
 msgid "Pakistan"
 msgstr "Pakistanas"
@@ -6662,12 +6679,12 @@ msgstr "Peru"
 msgid "Philippines"
 msgstr "Filipinai"
 
-#, fuzzy
-msgid "PiP Setup Actions"
-msgstr "Temos pasirinkimo veiksmai"
-
 msgid "PiP setup"
 msgstr "PiP sąranka"
+
+#, fuzzy
+msgid "PiPSetup Actions"
+msgstr "Temos pasirinkimo veiksmai"
 
 msgid "Picon"
 msgstr "Logotipas"
@@ -7371,6 +7388,10 @@ msgstr ""
 
 msgid "Radio"
 msgstr "Radijas"
+
+#, fuzzy
+msgid "Radio mode"
+msgstr "3D režimas"
 
 msgid "Ram disk"
 msgstr "Operatyvinė atmintis"
@@ -8132,6 +8153,10 @@ msgstr "Paieška"
 msgid "Search east"
 msgstr "Ieškoti rytų"
 
+#, fuzzy
+msgid "Search in SMS mode"
+msgstr "Kanalo pavadinimo režimas"
+
 msgid "Search west"
 msgstr "Vakarų paieška"
 
@@ -8227,6 +8252,10 @@ msgstr "Pasirinkite \"taip\", kad įtrauktumėte %s juostą savo paieškoje."
 
 msgid "Select 'yes' to only send the DiSEqC command when changing from one satellite to another, or select 'no' for the DiSEqC command to be resent on every zap."
 msgstr "Pasirinkite 'taip', jei tik siunčiate DiSEqC komandą, kad pakeisti iš vieno palydovo į kitą, arba pasirinkite 'ne', kad DiSEqC komanda būtų pakartotinai persiųsta kiekviename perjungime."
+
+#, fuzzy
+msgid "Select Audio"
+msgstr "Pasirinkite CAId"
 
 msgid "Select CAId"
 msgstr "Pasirinkite CAId"
@@ -8362,6 +8391,10 @@ msgstr "Pasirinkite atnaujinimo dažnį"
 
 msgid "Select satellites"
 msgstr "Pasirinkite palydovus"
+
+#, fuzzy
+msgid "Select service"
+msgstr "Pasirinkite filmą"
 
 #, fuzzy
 msgid "Select service name"
@@ -8809,6 +8842,10 @@ msgstr "Pasirinkite veiksmą"
 msgid "Show"
 msgstr "﻿Rodyti"
 
+#, fuzzy
+msgid "Show All Services"
+msgstr "Rodyti kanalų sąrašą"
+
 msgid "Show Audioselection"
 msgstr "Rodyti garso pasirinkimus"
 
@@ -8824,11 +8861,23 @@ msgstr "Rodyti šio kanalo EPG..."
 msgid "Show EPG..."
 msgstr "Rodyti EPG..."
 
+#, fuzzy
+msgid "Show Favorites"
+msgstr "Rodyti mėgstamų sąrašą"
+
 msgid "Show InfoBar"
 msgstr "Rodyti info juostą"
 
 msgid "Show PiP"
 msgstr "Rodyti PiP"
+
+#, fuzzy
+msgid "Show Providers"
+msgstr "Rodyti filmus"
+
+#, fuzzy
+msgid "Show Satellites"
+msgstr "Rodyti palydovų sąrašą"
 
 msgid "Show True/False as graphical switch"
 msgstr "Rodyti teisinga/klaidinga kaip grafinį jungiklį"
@@ -9898,6 +9947,10 @@ msgstr "DERINIMA"
 msgid "TV"
 msgstr ""
 
+#, fuzzy
+msgid "TV mode"
+msgstr "Tikrinimo režimas"
+
 msgid "TV physical address report"
 msgstr "TV fizinio adreso ataskaita"
 
@@ -10049,7 +10102,7 @@ msgstr ""
 msgid "The number of steps to change the volume on the device the keys are forwarded to."
 msgstr "Veiksmų, kaip pakeisti garsumą įrenginyje, į kurį persiunčiami klavišai, skaičius."
 
-msgid "The order and grouping of the help information list can be controlled using MENU>Setup>User Interface>Settings>Sort order for help screen."
+msgid "The order and grouping of the help information list can be controlled using MENU>Setup>User Interface>Settings>Sort order for help screen or pressing long help"
 msgstr ""
 
 msgid ""
@@ -10559,6 +10612,10 @@ msgstr "Perjungti transliaciją į LCD"
 msgid "Toggle PiPzap"
 msgstr "Perjungti PiP jungimą"
 
+#, fuzzy
+msgid "Toggle TV Radio mode"
+msgstr "Perjungti TV / Radijas režimus"
+
 msgid "Toggle TV/RADIO mode"
 msgstr "Perjungti TV / Radijas režimus"
 
@@ -10570,6 +10627,10 @@ msgstr "Perjungti punktyrinę, mirgančią liniją šiam kanalui"
 
 msgid "Toggle infoBar"
 msgstr "Perjungti info juostą"
+
+#, fuzzy
+msgid "Toggle movemode"
+msgstr "Perjungti vaizdo režimą"
 
 msgid "Toggle new text inserts before or overwrites existing text"
 msgstr "Įjunkite naujus teksto įterpimus prieš esamą tekstą arba perrašykite jį"
@@ -11129,9 +11190,6 @@ msgstr ""
 
 msgid "VOL-"
 msgstr ""
-
-msgid "VU+"
-msgstr "VU+"
 
 msgid "Valid ONID/TSID look at www.lyngsat.com..."
 msgstr "Galiojantis ONID/TSID žiūrėti į www.lyngsat.com..."
@@ -11876,6 +11934,10 @@ msgstr "Jūs galite nustatyti pasirinktą katalogą, kaip filmo grotuvo pagrindi
 msgid "You can set sorting type for items in movielist."
 msgstr "Jūs galite nustatyti filmų sąrašo elementų rūšiavimo tipą."
 
+#, fuzzy, python-format
+msgid "You can't update the software because %s can not be reached."
+msgstr "Dabartinio atvaizdo statuso negalima patikrinti, nes %s yra nepasiekiamas."
+
 msgid "You cannot delete this!"
 msgstr "Jūs negalite to ištrinti!"
 
@@ -12058,6 +12120,10 @@ msgstr "Perjungimo būdas"
 msgid "Zap to"
 msgstr "Perjungti į"
 
+#, fuzzy
+msgid "Zap to channel number"
+msgstr "peršokti į skyrių pagal numerį"
+
 msgid "Zap to selected channel"
 msgstr "Perjungti į pasirinktą kanalą"
 
@@ -12077,15 +12143,6 @@ msgstr "Perjungta į laikmačio kanalą %s kaip PiP!"
 #, python-format
 msgid "Zapped to timer service %s!"
 msgstr "Perjungta į laikmačio kanalą %s!"
-
-msgid "Zgemma H.S/H.2S/H.2H/H5/H7(old model)"
-msgstr "Zgemma H.S/H.2S/H.2H/H5/H7(senas modelis)"
-
-msgid "Zgemma H9(old model)/I55Plus/H8"
-msgstr "Zgemma H9(senas modelis)/I55Plus/H8"
-
-msgid "Zgemma Star S/2S/H1/H2"
-msgstr "Zgemma Star S/2S/H1/H2"
 
 msgid "Zimbabwe"
 msgstr "Zimbabvė"
@@ -12369,21 +12426,6 @@ msgstr "klaida paleidžiant nuskaitymą"
 
 msgid "error while scanning"
 msgstr "klaida, skenuojant"
-
-msgid "et4000"
-msgstr "et4000"
-
-msgid "et5000/et6000"
-msgstr "et5000/et6000"
-
-msgid "et8000/et10000"
-msgstr "et8000/et10000"
-
-msgid "et9000/et9100"
-msgstr "et9000/et9100"
-
-msgid "et9200/et9500/et6500"
-msgstr "et9200/et9500/et6500"
 
 msgid "execute cuts (requires MovieCut plugin)"
 msgstr "vykdyti iškirpimus (reikia MovieCut priedo)"
@@ -13140,9 +13182,6 @@ msgstr "su imtuvo pavadinimu"
 
 msgid "with_errors"
 msgstr "su klaidomis"
-
-msgid "xp1000"
-msgstr "xp1000"
 
 msgid "yellow"
 msgstr "geltona"

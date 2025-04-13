@@ -159,6 +159,13 @@ def getBoxDisplayName():  # This function returns a tuple like ("BRANDNAME", "BO
 	return (DISPLAYBRAND, DISPLAYMODEL)
 
 
+def getDemodVersion():
+	version = None
+	if fileExists("/proc/stb/info/nim_firmware_version"):
+		version = fileReadLine("/proc/stb/info/nim_firmware_version")
+	return version and version.strip()
+
+
 def getNumVideoDecoders():
 	numVideoDecoders = 0
 	while fileExists(f"/dev/dvb/adapter0/video{numVideoDecoders}", "f"):
@@ -313,12 +320,13 @@ BoxInfo.setItem("LcdLiveTV", fileCheck("/proc/stb/fb/sd_detach") or fileCheck("/
 BoxInfo.setItem("LcdLiveTVMode", fileCheck("/proc/stb/lcd/mode"))
 BoxInfo.setItem("LcdLiveDecoder", fileCheck("/proc/stb/lcd/live_decoder"))
 BoxInfo.setItem("LCDMiniTV", fileExists("/proc/stb/lcd/mode"))
+BoxInfo.setItem("LCDSKIN", fileExists("/usr/share/enigma2/display"))
 BoxInfo.setItem("ConfigDisplay", BoxInfo.getItem("FrontpanelDisplay"))
 BoxInfo.setItem("DefaultDisplayBrightness", MACHINEBUILD in ("dm900", "dm920", "dreamone", "dreamtwo") and 8 or 5)
 BoxInfo.setItem("3DMode", fileCheck("/proc/stb/fb/3dmode") or fileCheck("/proc/stb/fb/primary/3d"))
 BoxInfo.setItem("3DZNorm", fileCheck("/proc/stb/fb/znorm") or fileCheck("/proc/stb/fb/primary/zoffset"))
 BoxInfo.setItem("HasQuadpip", fileCheck("/proc/stb/video/decodermode"))
-BoxInfo.setItem("Blindscan_t2_available", fileCheck("/proc/stb/info/vuMODEL") and MODEL.startswith("vu"))
+BoxInfo.setItem("Blindscan_t2_available", fileCheck("/proc/stb/info/vumodel") and MODEL.startswith("vu"))
 BoxInfo.setItem("RcTypeChangable", not (MODEL in ("gbquad4k", "gbue4k", "et8500") or MODEL.startswith("et7")) and pathExists("/proc/stb/ir/rc/type"))
 BoxInfo.setItem("HasFullHDSkinSupport", MODEL not in ("et4000", "et5000", "sh1", "hd500c", "hd1100", "xp1000", "lc"))
 BoxInfo.setItem("HasBypassEdidChecking", fileCheck("/proc/stb/hdmi/bypass_edid_checking"))
@@ -349,6 +357,8 @@ BoxInfo.setItem("HasHDMI-CEC", BoxInfo.getItem("hdmi") and fileExists(resolveFil
 BoxInfo.setItem("HasYPbPr", MODEL in ("dm8000", "et5000", "et6000", "et6500", "et9000", "et9200", "et9500", "et10000", "formuler1", "mbtwinplus", "spycat", "vusolo", "vuduo", "vuduo2", "vuultimo"))
 BoxInfo.setItem("HasScart", MODEL in ("dm8000", "et4000", "et6500", "et8000", "et9000", "et9200", "et9500", "et10000", "formuler1", "hd1100", "hd1200", "hd1265", "hd2400", "vusolo", "vusolo2", "vuduo", "vuduo2", "vuultimo", "vuuno", "xp1000"))
 BoxInfo.setItem("HasSVideo", MODEL in ("dm8000"))
+BoxInfo.setItem("ArchIsARM64", ARCHITECTURE == "aarch64" or "64" in ARCHITECTURE)
+BoxInfo.setItem("ArchIsARM", ARCHITECTURE.startswith(("arm", "cortex")))
 BoxInfo.setItem("RecoveryMode", fileCheck("/proc/stb/fp/boot_mode") or MODEL in ("dreamone", "dreamtwo"))
 BoxInfo.setItem("AmlogicFamily", SOC_FAMILY.startswith(("aml", "meson")) or fileExists("/proc/device-tree/amlogic-dt-id") or fileExists("/usr/bin/amlhalt") or fileExists("/sys/module/amports"))
 BoxInfo.setItem("HasComposite", MODEL not in ("i55", "gbquad4k", "gbue4k", "hd1500", "osnino", "osninoplus", "purehd", "purehdse", "revo4k", "vusolo4k", "vuzero4k", "vuduo4k", "vuduo4kse", "vuuno4k", "vuuno4kse", "vuultimo4k"))
@@ -406,7 +416,10 @@ BoxInfo.setItem("FrontpanelLEDColorControl", fileExists("/proc/stb/fp/led_color"
 BoxInfo.setItem("FrontpanelLEDFadeControl", fileExists("/proc/stb/fp/led_fade"))
 
 # AI
-BoxInfo.setItem("AISubs", False)
+BoxInfo.setItem("AISubs", fileExists("/etc/init.d/aisocket"))
+
+# Vu+ EAC3Fix
+BoxInfo.setItem("VuEAC3Fix", MODEL in ("vuultimo4k", "vuduo4kse"))
 
 # Dont't sort.
 BoxInfo.setMutableItem("SeekStatePlay", False)

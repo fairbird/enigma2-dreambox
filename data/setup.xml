@@ -1,12 +1,18 @@
 <setupxml>
-	<setup key="video_setup" title="Video Settings">
+	<setup key="Video_setup" title="Video Settings">
 		<!-- this is just a placeholder, the Videomode plugin implements this submenu -->
 	</setup>
-	<setup key="audio_setup" title="Audio Settings" level="1" showOpenWebif="1">
+	<setup key="Audio_setup" title="Audio Settings" level="1" showOpenWebif="1">
 		<item level="1" text="Volume steps" description="Select the size of the volume step when the VOLUME buttons are pressed.">config.volumeControl.pressStep</item>
 		<item level="1" text="Long press volume steps" description="Select the size of the volume steps when the VOLUME buttons are held down.">config.volumeControl.longStep</item>
 		<item level="1" text="Volume/Mute display timer" description="Select how long, in seconds, that the volume and mute displays are shown before they automatically hide.">config.volumeControl.hideTimer</item>
-		<item level="1" text="AC3 downmix" description="Choose whether AC3 sound tracks should be downmixed to stereo." requires="CanDownmixAC3">config.av.downmix_ac3</item>
+		<if requires="CanDownmixAC3">
+			<item level="1" text="AC3 downmix" description="Choose whether AC3 sound tracks should be downmixed to stereo.">config.av.downmix_ac3</item>
+			<if requires="VuEAC3Fix" conditional="config.av.downmix_ac3.value == 'passthrough'">
+				<item level="1" text="Passthrough audio handling delay AC3" description="Used to specify delay when switching between services and AC3 passthrough is enabled.">config.av.passthrough_fix_short</item>
+				<item level="1" text="Passthrough audio handling delay AC3+" description="Used to specify delay when switching between services and AC3+/Atmos passthrough is enabled.">config.av.passthrough_fix_long</item>
+			</if>
+		</if>
 		<item level="1" text="AC3 plus transcoding" description="Choose whether AC3 Plus sound tracks should be transcoded to AC3." requires="CanAC3plusTranscode">config.av.transcodeac3plus</item>
 		<item level="1" text="DTS downmix" description="Choose whether DTS channel sound tracks should be downmixed to stereo." requires="CanDownmixDTS">config.av.downmix_dts</item>
 		<item level="1" text="DTS/DTS-HD HR/DTS-HD MA/DTS:X" description="Choose whether DTS channel sound tracks should be downmixed or transcoded." requires="CanDTSHD">config.av.dtshd</item>
@@ -28,19 +34,20 @@
 		<item level="1" text="Enable BT audio" description="This option allows you to switch audio to BT speakers." requires="CanBTAudio">config.av.btaudio</item>
 		<item level="1" text="General BT Audio delay" description="This option configures the general audio delay for BT Speakers." requires="CanBTAudioDelay">config.av.btaudiodelay</item>
 	</setup>
-	<setup key="checkupdate" title="Check update Settings">
+	<setup key="Checkupdate" title="Check update Settings">
 		<item level="1" text="check for firmware updates every" description="Choose the time to check for update avilable every...">config.updatecheck.check_update_notifier</item>
 		<item level="1" text="check for firmware updates on start" description="Enable/Disable check for update after reboot or restart box.">config.updatecheck.check_update_on_boot</item>
 	</setup>
-	<setup key="usage" title="Customize">
-		<item level="0" text="Show Main Menu as" description="Choose style of main menus" >config.usage.menutype</item>
-		<item level="1" text="Sort order for menu entries" description="This option allows you to hide and sort menu entries. When selecting user you can change order and hide menu items via the blue button. With the user defined hidden the blue button is not shown in the menus">config.usage.menu_sort_mode</item>
+	<setup key="Usage" title="Customize">
+		<item level="0" text="Menu style" description="Select the display design for menus.">config.usage.menuType</item>
+		<item level="0" text="Menu entry style" description="Select the display options for each menu entry item. If menu numbers are available then the number buttons can be used to select the numbered menu entries directly." requires="config.usage.menuType" value="standard">config.usage.menuEntryStyle</item>
+		<item level="0" text="Menu icons" description="This option allows you to show icons of menu." requires="config.usage.menuType" value="standard">config.usage.showicons</item>
+		<item level="0" text="Menu entry sort order" description="Select the sort order of the menu entries. User defined also allows the menu entries to be hidden.">config.usage.menuSortOrder</item>
 		<item level="1" text="Sort order for setup entries" description="This option allows you to alphabetically sort setup menu entries.">config.usage.sort_settings</item>
 		<item level="1" text="Show setup default values" description="In Setup screens choose whether to show the default value of the selected item in the description field.">config.usage.setupShowDefault</item>
 		<item level="1" text="Show screen path" description="This option allows you to show the full screen path leading to the current screen.">config.usage.showScreenPath</item>
 		<item level="1" text="Sort Extension Menu" description="Select the sort order of the Extension Menu entries.">config.usage.sortExtensionslist</item>
-		<item level="1" text="Virtual keyboard skin *" description="You can select the skin of virtual keyboard.">config.misc.virtualkeyBoardstyle</item>
-		<item level="0" text="Show menu or plugin numbers" description="This option allows you to show menu and/or plugin number quick links.">config.usage.menu_show_numbers</item>
+		<item level="1" text="Virtual keyboard skin" description="You can select the skin of virtual keyboard." restart="gui">config.misc.virtualkeyBoardstyle</item>
 		<item level="2" text="Show softcam setup in extensions menu" description="This option allows you to add the softcam setup in the extensions menu." requires="HasSoftcamInstalled">config.misc.softcam_setup.extension_menu</item>
 		<item level="1" text="Zap key delay for channel number input" description="In live view wait this many seconds after a numeric key press before assuming the required channel number has been entered. Default: 5 seconds. Setting zero will require confirmation with 'OK'. ">config.misc.zapkey_delay</item>
 		<item level="1" text="History buttons mode" description="Configure the function of the &lt;  &gt; buttons.">config.usage.historymode</item>
@@ -70,6 +77,9 @@
 		<item level="2" text="Fan operation" description="Configure how the fan should operate" requires="Fan">config.usage.fan</item>
 		<item level="2" text="Fan speed" description="Configure the speed of the fan" requires="FanPWM">config.usage.fanspeed</item>
 		<item level="2" text="Wake On LAN" description="When enabled the set top box is able to wakeup on LAN" requires="WakeOnLAN">config.usage.wakeOnLAN</item>
+		<item level="2" text="Wake up time before a timer begins [mins]" description="The default settings are 5 minutes earlier to wake up from deep standby. It possibly may be necessary to change this. (e.g.: the actual wake-up time is inaccurate or to late, waiting to a network-drive, etc.)">config.workaround.wakeuptime</item>
+		<item level="1" text="Use workaround for wake up from deep-standby" description="If enabled, using a time window to detect a wake up from deep standby by a timer. Default setting ist disabled and used a special signal from the receiver. But some devices set a wrong or none signal and the wake up detection can fails.">config.workaround.deeprecord</item>
+		<item level="2" text="Time window for detection of the wake up by a timer [mins]" description="The default settings are wake up time - 5 minutes and timer begin time + 5 minutes. This setting changed the time window before the wake up time. So can be detected a wake up by a timer even at very early starting receivers." requires="config.workaround.deeprecord">config.workaround.wakeupwindow</item>
 		<item level="1" text="Startup to Standby" description="Startup the set top box in standby">config.usage.startup_to_standby</item>
 		<item level="2" text="Config resolution of pictures" description="Select in which resolution pictures are displayed with picture viewer or movie player.">config.usage.pic_resolution</item>
 		<item level="2" text="Ignore DVB-S namespace sub network" description="On valid ONIDs, ignore frequency sub network part">config.usage.subnetwork</item>
@@ -134,7 +144,7 @@
 		<item level="2" text="Auto play last service in radio mode" conditional="not config.usage.e1like_radio_mode.value" description="When enabled, it will automatically play to the last saved radio service when switching to radio mode.">config.usage.e1like_radio_mode_last_play</item>
 		<item text="AutoRefresh" description="Enable autorefresh templates." requires="CanRefreshTemplates">config.skin.autorefresh</item>
 	</setup>
-	<setup key="userinterface" title="User interface">
+	<setup key="UserInterface" title="User interface">
 		<item level="1" text="Enable blinking" description="Enable blink functionality for some areas like record icon.">config.usage.enable_blinking</item>
 		<item level="1" text="Show animation while busy" description="Show busy indicator when the system is busy.">config.usage.show_spinner</item>
 		<item level="1" text="Show positioner movement" requires="isRotorTuner" description="Configure whether or not an icon should be shown when your motorized dish is moving.">config.usage.showdish</item>
@@ -142,20 +152,25 @@
 		<item level="1" text="Position of completed timers in timerlist" description="Configure where completed timers show up in the timer list.">config.usage.timerlist_finished_timer_position</item>
 		<item level="0" text="Info bar timeout" description="Configure for how long the infobar will remain visible after activation.">config.usage.infobar_timeout</item>
 		<item level="0" text="Show InfoBar picons" description="Option to disable picons on the Infobar.">config.usage.showpicon</item>
+		<item level="0" text="Show picon background color" description="This option allows you choose the background color of transparent picons.">config.usage.show_picon_bkgrn</item>
+		<item level="0" text="Show picon folder name" description="This option allows you choose the name of folder picons." restart="gui">config.picon.foldername</item>
 		<item level="0" text="Enable infobar fade-out" description="Fade the infobar when hiding">config.usage.show_infobar_do_dimming</item>
 		<item level="0" text="Infobar fade-out speed" description="Configure the infobar fading speed">config.usage.show_infobar_dimming_speed</item>
 		<item level="2" text="Show infobar on channel change" description="When enabled, the infobar will be displayed when changing channels.">config.usage.show_infobar_on_zap</item>
 		<item level="2" text="Show infobar on skip forward/backward" description="When enabled, the infobar will be displayed when skipping forwards/backwards during media playback.">config.usage.show_infobar_on_skip</item>
 		<item level="2" text="Show infobar on event change" description="When enabled, the infobar will be displayed when a new event starts.">config.usage.show_infobar_on_event_change</item>
 		<item level="0" text="Show second infobar" description="Configure whether (and for how long) a second infobar will be shown when OK is pressed twice. The second infobar contains additional information about the current channel.">config.usage.show_second_infobar</item>
+		<item level="2" text="Show extra spacing in Information" description="Enable to add some extra spacing to the Information screens. This can improve readability.">config.usage.informationExtraSpacing</item>
+		<item level="0" text="Show Movie Selection in Main Menu" description="Select 'Yes' to show the 'Movie Selection' entry in the Main Menu. This can provide access to the Movie Selection screen when there is no assigned button on the remote control." restart="gui">config.usage.movieSelectionInMenu</item>
 		<item level="1" text="Show screen saver" description="Select the duration of inactivity before the screen saver will be displayed.">config.usage.screenSaverStartTimer</item>
 		<item level="2" text="Screen saver movement" description="Select how long the screen saver image will stay in the same location on the screen before it will be moved." conditional="config.usage.screenSaverStartTimer.value">config.usage.screenSaverMoveTimer</item>
+		<item level="2" text="Show all Information screens" description="Enable this option to show all the available Information screens in the Information menu item list.">config.usage.informationShowAllMenuScreens</item>
 		<item level="0" text="Show time remaining/elapsed" description="This option allows you choose how to display remaining time, or elapsed time, or both.">config.usage.swap_time_remaining_on_osd</item>
 		<item level="0" text="Show time elapsed as positive" description="This option allows you choose how to display elapsed time as + or -">config.usage.elapsed_time_positive_osd</item>
 		<item level="0" text="Show transponder remaining/elapsed as" description="This option allows you to choose how to display the remaining/elapsed time for live TV.">config.usage.swap_time_display_on_osd</item>
+		<item level="0" text="Show subservices *" description="This option allows you choose the option for Subservice indicator or selection.">config.usage.showInfoBarSubservices</item>
 		<item level="0" text="Media playback Remaining/Elapsed as" description="This option allows you to choose how to display the remaining/elapsed time for media playback.">config.usage.swap_media_time_display_on_osd</item>
 		<item level="2" text="Hide zap errors" description="When enabled, error messages related to zapping will not be shown.">config.usage.hide_zap_errors</item>
-		<item level="0" text="Show picon background color" description="This option allows you choose the background color of transparent picons.">config.usage.show_picon_bkgrn</item>
 		<item level="2" text="Show crypto info in infobar" conditional="parameters.get('hasInfobarCryptoInfo', True)" description="When enabled, encryption info will be shown in the infobar (when supported by the skin).">config.usage.show_cryptoinfo</item>
 		<item level="2" text="Hide softcam servername" description="Select 'Yes' to hide the server name and IP address of the server.">config.misc.softcam_hideServerName</item>
 		<item level="2" text="Infobar frontend data source" description="Configure the source of the frontend data as shown on the infobars. 'Settings' is as stored on the settings. 'Tuner' is as reported by the tuner.">config.usage.infobar_frontend_source</item>
@@ -205,7 +220,7 @@
 		<item level="2" text="Stream Relay port" description="Port number for the Stream Relay server used to descramble services that can only be decrypted via Stream Relay.">config.misc.softcam_streamrelay_port</item>
 		<item level="2" text="Stream Relay switch delay" description="Select the delay to use when closing a Stream Relay service before reallocating the tuner for another service. Using '0' is only recommended for boxes with multiple satellite tuners.">config.misc.softcam_streamrelay_delay</item>
 	</setup>
-	<setup key="subtitlesetup" title="Subtitle settings">
+	<setup key="Subtitlesetup" title="Subtitle settings">
 		<if requires="AISubs">
 			<item level="2" text="AI translation enabled" description="Enable AI-Powered translation for all teletext and DVB subtitles.">config.subtitles.ai_enabled</item>
 			<item level="2" text="AI translation language" description="Configure the AI-Powered translation language.">config.subtitles.ai_translate_to</item>
@@ -236,7 +251,7 @@
 		<item level="2" text="HI-cleanup for external subtitles" description="Remove texts for the hearing impaired from external subtitles (instrumental music or environmental sounds, e.g., when a doorbell rings or a gun shot is heard).">config.subtitles.pango_subtitle_removehi</item>
 		<item level="2" text="Automatically turn on external subtitles" description="When enabled, external subtitles will be always turned on for playback movie.">config.subtitles.pango_autoturnon</item>
 	</setup>
-	<setup key="autolanguagesetup" title="Auto language selection">
+	<setup key="Autolanguagesetup" title="Auto language selection">
 		<item level="0" text="Audio language selection 1" description="Configure the first audio language (highest priority).">config.autolanguage.audio_autoselect1</item>
 		<item level="0" text="Audio language selection 2" conditional="config.autolanguage.audio_autoselect1.value" description="Configure the second audio language.">config.autolanguage.audio_autoselect2</item>
 		<item level="1" text="Audio language selection 3" conditional="config.autolanguage.audio_autoselect2.value" description="Configure the third audio language.">config.autolanguage.audio_autoselect3</item>
@@ -273,8 +288,9 @@
 		<item level="2" text="Slow motion speeds" description="Configure the slow motion speeds.">config.seek.speeds_slowmotion</item>
 		<item level="2" text="Initial fast forward speed" description="Configure the initial fast forward speed. When you press the fast forward button, winding will start at this speed.">config.seek.enter_forward</item>
 		<item level="2" text="Initial rewind speed" description="Configure the initial rewind speed. When you press the rewind button, winding will start at this speed.">config.seek.enter_backward</item>
-		<item level="1" text="Use trash can in movielist" description="When enabled, deleted recordings are moved to the trash can, instead of being deleted immediately.">config.usage.movielist_trashcan</item>
-		<item level="1" text="Remove items from trash can after (days)" description="Configure the number of days after which items are automaticaly removed from the trash can.">config.usage.movielist_trashcan_days</item>
+		<item level="1" text="Use 'Trash' in movie list" description="When enabled, deleted recordings are moved to the trashcan, instead of being deleted immediately.">config.usage.movielist_trashcan</item>
+		<item level="1" text="Purge 'Trash' after (days)" description="Configure the number of days after which items are automatically removed from the trashcan.">config.usage.movielist_trashcan_days</item>
+		<item level="1" text="Clean network 'Trash'" description="When enabled, network trashcans are probed for cleaning.">config.usage.movielist_trashcan_network_clean</item>
 		<item level="2" text="Background delete option" description="Configure on which devices the background delete option should be used.">config.misc.erase_flags</item>
 		<item level="2" text="Background delete speed" description="Configure the speed of the background deletion process. Lower speed will consume less hard disk drive performance.">config.misc.erase_speed</item>
 		<!--
@@ -284,8 +300,9 @@
 		-->
 	</setup>
 	<setup key="PluginBrowser" title="Plugin Browser Settings" showOpenWebif="1">
-		<item level="0" text="Plugin Browser layout *" description="Select the layout of the installed plugins in the Plugin Browser screen. NOTE: The change is not immediate but will be seen when Plugin Browser is restarted!">config.misc.plugin_style</item>
+		<item level="0" text="Plugin Browser layout" description="Select the layout of the installed plugins in the Plugin Browser screen. NOTE: The change is not immediate but will be seen when Plugin Browser is restarted!" restart="gui">config.misc.plugin_style</item>
 		<item level="0" text="Picon install location" description="Select the location where the picon files will be installed.">config.usage.piconInstallLocation</item>
+		<item level="0" text="Enable numbers" description="This option to enable numbers in Plugin Browser">config.misc.menu_show_numbers</item>
 		<item level="0" text="Show Driver packages" description="Select 'Yes' to show driver packages in the Download Plugins screen.">config.pluginfilter.drivers</item>
 		<item level="0" text="Show Extension packages" description="Select 'Yes' to show extensions packages in the Download Plugins screen.">config.pluginfilter.extensions</item>
 		<item level="0" text="Show System Plugin packages" description="Select 'Yes' to show system plugin packages in the Download Plugins screen.">config.pluginfilter.systemplugins</item>
@@ -334,7 +351,7 @@
 		<item level="2" text="Limit character set for recording filenames" description="Limit the characters that can be used in recording filenames to (7 bit) ascii. This ensures compatibility with operating systems or file systems with limited character sets.">config.recording.ascii_filenames</item>
 		<item level="2" text="Composition of the recording filenames" description="Configure how recording filenames are constructed.">config.recording.filename_composition</item>
 		<item level="1" text="Remove completed timers after (days)" description="Configure the number of days old timers are kept before they are automatically removed from the timer list.">config.recording.keep_timers</item>
-		<item level="1" text="Disk space to reserve for recordings (in GB)" description="Configure the minimum amount of disk space to be available for recordings. When the amount of space drops below this value, deleted items will be removed from the trash can.">config.usage.movielist_trashcan_reserve</item>
+		<item level="1" text="Space to reserve for recordings (GB)" description="Configure the minimum amount of disk space to be available for recordings. When the amount of space drops below this value, deleted items will be removed from the trashcan.">config.usage.movielist_trashcan_reserve</item>
 		<item level="2" text="Always include ECM in recordings" description="Always include ECM messages in recordings. This overrides the individual timer settings globally. It allows recordings to be always decrypted afterwards (sometimes called offline decoding), if supported by your device. Default: off.">config.recording.always_ecm</item>
 		<item level="2" text="Never decrypt while recording" description="Never decrypt the content while recording. This overrides the individual timer settings globally. If enabled, recordings are stored in crypted presentation and must be decrypted afterwards (sometimes called offline decoding). Default: off.">config.recording.never_decrypt</item>
 		<item level="2" text="Offline decode delay (ms)" requires="HasOfflineDecoding" description="Configure the offline decoding delay in milliseconds. The configured delay is observed at each control word parity change.">config.recording.offline_decode_delay</item>
@@ -359,7 +376,7 @@
 		<item level="2" text="Use timeshift seekbar while timeshifting?" description="If set to 'yes', allows you to use the seekbar to jump to a point within the event.">config.timeshift.showinfobar</item>
 		-->
 	</setup>
-	<setup key="accesslevel" title="User Mode">
+	<setup key="Accesslevel" title="User Mode">
 		<item level="0" text="Setup mode" description="Configure which access level to use for the configuration menu. Expert level gives access to all items.">config.usage.setup_level</item>
 	</setup>
 	<setup key="FlashExpander" title="Flash Expander">
@@ -383,18 +400,19 @@
 		<item level="1" text="Aspect ratio" description="The aspect ratio of the recording.">config.hdmirecord.aspectratio</item>
 	</setup>
 	<setup key="Logs" title="Logs Setup">
-		<item level="2" text="Logs location" description="Choose the location for crash and debuglogs.">config.crash.debugPath</item>
+		<item level="2" text="Logs location" description="Choose the location for crash and debuglogs.">config.crash.debug_path</item>
 		<item level="2" text="Handle Python crashes" description="Try to prevent reboots for software errors and maintain of the availability for the receiver.">config.crash.bsodpython</item>
 		<item level="2" text="Show crash info on screen and write crash log for x times" description="If 'never', will write crash log despite that for the first crash." requires="config.crash.bsodpython">config.crash.bsodhide</item>
 		<item level="2" text="Restart GUI after x crashes" description="If 'never', will force restart despite that after 100 crashes." requires="config.crash.bsodpython">config.crash.bsodmax</item>
-		<item level="2" text="Enable debug log *" description="Allows you to enable the debug log. They contain very detailed information of everything the system does.">config.crash.debugLevel</item>
-		<item level="2" text="Include international data *" description="Enable this option to add international language and country load information detected during system boot to the debug log file.">config.crash.debugInternational</item>
-		<item level="2" text="Include MultiBoot data *" description="Enable this option to add MultiBoot information detected during system boot to the debug log file.">config.crash.debugMultiBoot</item>
+		<item level="2" text="Enable debug log" description="Allows you to enable the debug log. They contain very detailed information of everything the system does." restart="gui">config.crash.debugLevel</item>
+		<item level="2" text="Include international data" description="Enable this option to add international language and country load information detected during system boot to the debug log file." restart="gui">config.crash.debugInternational</item>
+		<item level="2" text="Include MultiBoot data" description="Enable this option to add MultiBoot information detected during system boot to the debug log file." restart="gui">config.crash.debugMultiBoot</item>
 		<item level="2" text="Include keyboard data" description="Enable this option to add keyboard key map data to the debug log file.">config.crash.debugKeyboards</item>
 		<item level="2" text="Include remote control data" description="Enable this option to add remote control data to the debug log file.">config.crash.debugRemoteControls</item>
 		<item level="2" text="Include action map data" description="Enable this option to add action map / remote control mapping data to the debug log file.">config.crash.debugActionMaps</item>
 		<item level="2" text="Include screen load data" description="Enable this option to add screen names and resolution data to the debug log file.">config.crash.debugScreens</item>
 		<item level="2" text="Include opkg output data" description="Enable this option to add opkg output data to the debug log file.">config.crash.debugOpkg</item>
+		<item level="2" text="Include timer data" description="Enable this option to add timer debugging data to the debug log file.">config.crash.debugTimers</item>
 		<item level="2" text="Include DVB scan data" description="Enable this option to add extra DVB scan data to the debug log file.">config.crash.debugDVBScan</item>
 		<item level="2" text="Include DVB timesync data" description="Enable this option to add extra DVB time sync data to the debug log file.">config.crash.debugDVBTime</item>
 		<item level="2" text="Include DVB details" description="Enable this option to add extra DVB details to the debug log file.">config.crash.debugDVB</item>
@@ -406,20 +424,20 @@
 		<item level="2" text="Maximum space used (MB)" description="If logs are using the set maximum space used the eldest will be deleted.">config.crash.sizeloglimit</item>
 		<item level="2" text="Crash at skin error for debug reasons" description="Select 'No' to only write a log message to the debug log file.">config.crash.skin_error_crash</item>
 		<item level="2" text="Log python stack trace on spinner" description="Set to yes for debugging the root cause of a spinner.">config.crash.pystackonspinner</item>
-		<item level="2" text="Debug log time format *" description="This sets the prefix for each line in the debug log. The 'Boot time' is the number of seconds since your device was last booted.">config.crash.debugTimeFormat</item>
-		<item level="2" text="Enable GStreamer debug log *" description="Allows you to enable the GStreamer debug log. They contain very detailed information of everything the GStreamer system does.">config.crash.gstdebug</item>
+		<item level="2" text="Debug log time format" description="This sets the prefix for each line in the debug log. The 'Boot time' is the number of seconds since your device was last booted." restart="gui">config.crash.debugTimeFormat</item>
+		<item level="2" text="Enable GStreamer debug log" description="Allows you to enable the GStreamer debug log. They contain very detailed information of everything the GStreamer system does." restart="gui">config.crash.gstdebug</item>
 		<if conditional="config.crash.gstdebug.value">
-			<item level="2" text="GStreamer debug log category *" description="Only log debug information of GStreamer category. * means all categories.">config.crash.gstdebugcategory</item>
-			<item level="2" text="GStreamer debug log level *" description="Detail of GStreamer log">config.crash.gstdebuglevel</item>
+			<item level="2" text="GStreamer debug log category" description="Only log debug information of GStreamer category. * means all categories." restart="gui">config.crash.gstdebugcategory</item>
+			<item level="2" text="GStreamer debug log level" description="Detail of GStreamer log" restart="gui">config.crash.gstdebuglevel</item>
 		</if>
-		<item level="2" text="Enable GStreamer pipeline graphs *" description="Allows you to enable the GStreamer pipeline graphs. These are .dot files that describe the topology of your pipeline, along with the caps negotiated in each link.">config.crash.gstdot</item>
-		<item level="2" text="Enable core dumps *" description="Core dumps are helpful for developers in case of a FATAL SIGNAL crash in the C++ code. Typical core dump size is 110 MB so adjust maximum space used and choose proper location.">config.crash.coredump</item>
-		<item level="2" text="Enable twisted log *" description="Allows you to enable the twisted log. They contain very detailed information of everything the twisted does. ('/tmp/twisted.log')">config.misc.enabletwistedlog</item>
+		<item level="2" text="Enable GStreamer pipeline graphs" description="Allows you to enable the GStreamer pipeline graphs. These are .dot files that describe the topology of your pipeline, along with the caps negotiated in each link." restart="gui">config.crash.gstdot</item>
+		<item level="2" text="Enable core dumps" description="Core dumps are helpful for developers in case of a FATAL SIGNAL crash in the C++ code. Typical core dump size is 110 MB so adjust maximum space used and choose proper location." restart="gui">config.crash.coredump</item>
+		<item level="2" text="Enable twisted log" description="Allows you to enable the twisted log. They contain very detailed information of everything the twisted does. ('/tmp/twisted.log')" restart="gui">config.misc.enabletwistedlog</item>
 		<!--<item level="2" text="User name" description="Enter your forum user name, to make it easier trace logs.">config.logmanager.user</item>
 		<item level="2" text="e-Mail address" description="Enter your email address to send a copy of the log to.">config.logmanager.useremail</item>
 		<item level="2" text="Send yourself a copy ?" description="Allows you to send a copy of the log to yourself.">config.logmanager.usersendcopy</item>-->
 	</setup>
-	<setup key="network" title="Network setup">
+	<setup key="Network" title="Network setup">
 		<item text="Use DHCP" description="When enabled, use DHCP for the IP configuration.">config.network.dhcp</item>
 		<item text="IP address" description="Configure the IP address.">config.network.ip</item>
 		<item text="Netmask" description="Configure the netmask.">config.network.netmask</item>
@@ -451,7 +469,7 @@
 	<setup key="keyboard" title="Keyboard setup">
 		<item level="0" text="Keyboard map">config.keyboard.keymap</item>
 	</setup>
-	<setup key="osd" title="OSD settings">
+	<setup key="Osd" title="OSD settings">
 		<item text="Alpha">config.osd.alpha</item>
 		<item text="Teletext alpha">config.osd.alpha_teletext</item>
 		<item text="Brightness">config.osd.bright</item>
@@ -487,8 +505,10 @@
 		<item level="1" requires="LCDMiniTV" text="Show PIP in the front panel display" description="You can display PIP with or without OSD menu">config.lcd.modepip</item>
 		<item level="1" requires="LCDMiniTV" text="Set framerate for MiniTV" description="Lower framerate save CPU time">config.lcd.fpsminitv</item>
 		<item level="2" requires="LCDMiniTV" text="Screenshot of LCD in /tmp" description="Enable screenshot of LCD in /tmp">config.lcd.screenshot</item>
-		<item level="1" text="REC symbol in use" description="Enable blinking REC symbol on the LCD display">config.usage.blinking_rec_symbol_during_recording</item>
-		<item level="1" text="REC symbol in Standby" description="In the Standby record on the LCD display">config.usage.blinking_display_clock_during_recording</item>
+		<if requires="LCDSKIN">
+			<item level="1" text="REC Symbol in use" description="Enable blinking rec symbol on the LCD Display.">config.usage.blinking_rec_symbol_during_recording</item>
+			<item level="1" text="REC Symbol in Standby" description="Enable blinking rec symbol on the LCD Display in Standby.">config.usage.blinking_display_clock_during_recording</item>
+		</if>
 		<item level="1" requires="ConfigDisplay" text="Scrolling speed (software renderer)" description="Set the scrolling speed of text on the front panel display, this is used by software renderer in some skins.">config.lcd.scroll_speed</item>
 		<item level="1" requires="ConfigDisplay" text="Scrolling delay (software renderer)" description="Set the delay time between repeated loops, this is used by software renderer in some skins.">config.lcd.scroll_delay</item>
 		<item level="0" requires="ConfigDisplay" text="Power On Display" description="This option allows you to Power Off the display.">config.lcd.power</item>
@@ -525,7 +545,7 @@
 		<item level="0" text="Locales to be displayed" description="Display the base locales or all locales for a language.">config.locales.packageLocales</item>
 		<item level="0" text="Locale list sort order" description="Sort order for the language list.">config.locales.localesSortBy</item>
 	</setup>
-	<setup key="satconfig" title="Satellite dish setup">
+	<setup key="Satconfig" title="Satellite dish setup">
 		<item text="Tuner slot" description="Choose which tuner to configure.">config.sat.tunerslot</item>
 		<item text="Configuration mode" description="Configure the tuner mode.">config.sat.configmode</item>
 		<item text="DiSEqC" description="Configure the DiSEqC mode for this LNB.">config.sat.diseqc</item>
@@ -533,7 +553,7 @@
 		<item text="Latitude" description="Configure the latitude of your location.">config.sat.diseqcb</item>
 		<item text="Use power measurement" description="When enabled, measure power consumption to detect when the rotor stops turning (when supported by the tuner)." >config.sat.diseqcc</item>
 	</setup>
-	<setup key="wizardsetup" title="Wizard setup">
+	<setup key="Wizardsetup" title="Wizard setup">
 		<item level="0" text="Setup mode" description="Configure which access level to use for the configuration menu. Expert level gives access to all items.">config.usage.setup_level</item>
 		<item level="0" text="Numbering mode" description="Select 'Unique numbering' to assign unique numbers for every service in every bouquet. Use 'Bouquets start at 1' to start numbering each bouquet from 1. Use 'LCN numbering' to use consistent service LCNs where ever that service is used.">config.usage.numberMode</item>
 		<item level="0" text="Show picons in channel selection list" description="Configure if service picons will be shown in the channel selection list.">config.channelSelection.showPicon</item>

@@ -30,6 +30,9 @@ public:
 	int getNextBeginningWithChar(char c);
 	int getPrevMarkerPos();
 	int getNextMarkerPos();
+	int getCurrentSelectionIndex() { return cursorResolve(m_cursor_number); }
+	eSize getItemSize() { return m_itemsize; }
+	int getListSize() { return m_size_visible; }
 
 		/* support for marked services */
 	void initMarked();
@@ -108,6 +111,7 @@ public:
 	void setProgressbarBorderWidth(int value) { m_progressbar_border_width = value; }
 	void setNonplayableMargins(int value) { m_nonplayable_margins = value; }
 	void setItemsDistances(int value) { m_items_distances = value; }
+	void setTextSeparator(const std::string &string) { m_separator = string; }
 
 	void setProgressUnit(const std::string &string) { m_progress_unit = string; }
 	void setNumberingMode(int numberingMode) { m_numbering_mode = numberingMode; }
@@ -180,7 +184,7 @@ private:
 	list::iterator m_cursor, m_saved_cursor;
 
 	int m_cursor_number, m_saved_cursor_number, m_saved_cursor_line;
-	int m_size;
+	int m_size, m_size_visible;
 
 	eSize m_itemsize;
 	ePtr<iServiceHandler> m_service_center;
@@ -216,6 +220,7 @@ private:
 	int m_items_distances;
 
 	std::string m_progress_unit;
+	std::string m_separator;
 	int m_numbering_mode;
 };
 

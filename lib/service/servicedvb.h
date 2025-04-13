@@ -21,7 +21,7 @@ class eServiceFactoryDVB: public iServiceHandler
 public:
 	eServiceFactoryDVB();
 	virtual ~eServiceFactoryDVB();
-	enum { id = 0x1 };
+	enum { id = eServiceReference::idDVB };
 
 		// iServiceHandler
 	RESULT play(const eServiceReference &, ePtr<iPlayableService> &ptr);
@@ -312,6 +312,11 @@ protected:
 
 	ePtr<eTimer> m_nownext_timer;
 	void updateEpgCacheNowNext();
+
+#ifdef PASSTHROUGH_FIX
+	ePtr<eTimer> m_passthrough_fix_timer;
+	void forcePassthrough();
+#endif
 
 		/* radiotext */
 	ePtr<eDVBRdsDecoder> m_rds_decoder;

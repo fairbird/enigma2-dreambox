@@ -238,6 +238,7 @@ def InitUsageConfig():
 	config.usage.show_infobar_on_skip = ConfigYesNo(default=True)
 	config.usage.show_infobar_on_event_change = ConfigYesNo(default=False)
 	config.usage.show_second_infobar = ConfigSelection(default="0", choices=[("no", _("None"))] + choicelist + [("EPG", _("EPG"))])
+	config.usage.showInfoBarSubservices = ConfigSelection(default=1, choices=[(0, _("Off")),(1, _("If EPG available")),(2, _("Always"))])
 	config.usage.show_simple_second_infobar = ConfigYesNo(default=False)
 	config.usage.show_infobar_adds = ConfigYesNo(default=False)
 	config.usage.infobar_frontend_source = ConfigSelection(default="settings", choices=[("settings", _("Settings")), ("tuner", _("Tuner"))])
@@ -251,8 +252,6 @@ def InitUsageConfig():
 	config.usage.show_spinner = ConfigYesNo(default=True)
 	config.usage.enable_blinking = ConfigYesNo(default=False)
 	config.usage.menu_sort_weight = ConfigDictionarySet(default={"mainmenu": {"submenu": {}}})
-	config.usage.menu_sort_mode = ConfigSelection(default="default", choices=[("a_z", _("alphabetical")), ("default", _("Default")), ("user", _("user defined")), ("user_hidden", _("user defined hidden"))])
-	config.usage.menu_show_numbers = ConfigSelection(default="no", choices=[("no", _("no")), ("menu&plugins", _("in menu and plugins")), ("menu", _("in menu only")), ("plugins", _("in plugins only"))])
 	config.usage.showScreenPath = ConfigSelection(default="small", choices=[("off", _("Disabled")), ("small", _("Small")), ("large", _("Large"))])
 	config.usage.enable_tt_caching = ConfigYesNo(default=True)
 	config.usage.sort_settings = ConfigYesNo(default=False)
@@ -280,11 +279,11 @@ def InitUsageConfig():
 		("swapstop", _("Move PiP to main picture")), ("stop", _("Stop PiP"))])
 	config.usage.pip_hideOnExit = ConfigSelection(default="without popup", choices=[
 		("no", _("no")), ("popup", _("With popup")), ("without popup", _("Without popup"))])
-	choicelist = [("-1", _("Disabled")), ("0", _("No timeout"))]
-	for i in [60, 300, 600, 900, 1800, 2700, 3600]:
-		m = i / 60
-		choicelist.append((str(i), ngettext("%d minute", "%d minutes", m) % m))
-	config.usage.pip_last_service_timeout = ConfigSelection(default="0", choices=choicelist)
+	choiceList = [
+		("-1", _("Disabled")),
+		("0", _("No timeout"))
+	] + [(str(x * 60), ngettext("%d Minute", "%d Minutes", x) % x) for x in (1, 5, 10, 15, 30, 45, 60)]
+	config.usage.pip_last_service_timeout = ConfigSelection(default="-1", choices=choiceList)
 
 	if not exists(resolveFilename(SCOPE_HDD)):
 		try:
@@ -378,7 +377,8 @@ def InitUsageConfig():
 	config.timeshift.skipReturnToLive = ConfigYesNo(default=False)
 
 	config.usage.movielist_trashcan = ConfigYesNo(default=True)
-	config.usage.movielist_trashcan_days = ConfigNumber(default=8)
+	config.usage.movielist_trashcan_network_clean = ConfigYesNo(default=False)
+	config.usage.movielist_trashcan_days = ConfigSelection(default=8, choices=[(x, ngettext("%d Day", "%d Days", x) % x) for x in range(1, 32)])
 	config.usage.movielist_trashcan_reserve = ConfigNumber(default=40)
 	config.usage.on_movie_start = ConfigSelection(default="resume", choices=[
 		("ask yes", _("Ask user") + " " + _("default") + " " + _("yes")),
@@ -492,8 +492,10 @@ def InitUsageConfig():
 
 	config.usage.screenSaverStartTimer = ConfigSelection(default=0, choices=[(0, _("Disabled"))] + [(x, _("%d Seconds") % x) for x in (5, 10, 20, 30, 40, 50)] + [(x * 60, ngettext("%d Minute", "%d Minutes", x) % x) for x in (1, 5, 10, 15, 20, 30, 45, 60)])
 	config.usage.screenSaverMoveTimer = ConfigSelection(default=10, choices=[(x, ngettext("%d Second", "%d Seconds", x) % x) for x in range(1, 61)])
-
+	config.usage.movieSelectionInMenu = ConfigYesNo(False)
 	config.usage.check_timeshift = ConfigYesNo(default=True)
+	config.usage.informationShowAllMenuScreens = ConfigYesNo(default=False)
+	config.usage.informationExtraSpacing = ConfigYesNo(False)
 
 	choicelist = [("0", _("Disabled"))]
 	for i in (2, 3, 4, 5, 10, 20, 30):
@@ -1169,6 +1171,7 @@ def InitUsageConfig():
 	config.epg.cacheloadtimer = ConfigSelectionNumber(default = 24, stepwidth = 1, min = 1, max = 24, wraparound = True)
 	config.epg.cachesavetimer = ConfigSelectionNumber(default = 24, stepwidth = 1, min = 1, max = 24, wraparound = True)
 
+	config.osd = ConfigSubsection()
 	if BoxInfo.getItem("AmlogicFamily"):
 		from Plugins.SystemPlugins.Videomode.VideoHardware import video_hw
 		limits = [int(x) for x in video_hw.getWindowsAxis().split()]
@@ -1197,6 +1200,8 @@ def InitUsageConfig():
 		("mode1", _("Mode 1")),
 		("mode2", _("Mode 2"))
 	])
+
+	config.osd.language = ConfigText(default=config.misc.locale.value)
 
 	hddchoises = [('/etc/enigma2/', 'Internal Flash')]
 	for p in harddiskmanager.getMountedPartitions():
@@ -1315,7 +1320,7 @@ def InitUsageConfig():
 	config.crash.coredump = ConfigYesNo(default=False)
 
 	def updateDebugPath(configElement):
-		debugPath = config.crash.debugPath.value
+		debugPath = config.crash.debug_path.value
 		try:
 			makedirs(debugPath, 0o755, exist_ok=True)
 		except OSError as err:
@@ -1325,14 +1330,14 @@ def InitUsageConfig():
 	for partition in harddiskmanager.getMountedPartitions():
 		if exists(partition.mountpoint) and partition.mountpoint != "/":
 			choiceList.append((pathjoin(partition.mountpoint, "logs", ""), normpath(partition.mountpoint)))
-	config.crash.debugPath = ConfigSelection(default="/home/root/logs/", choices=choiceList)
-	config.crash.debugPath.addNotifier(updateDebugPath, immediate_feedback=False)
+	config.crash.debug_path = ConfigSelection(default="/home/root/logs/", choices=choiceList)
+	config.crash.debug_path.addNotifier(updateDebugPath, immediate_feedback=False)
 
 	crashlogheader = _("We are really sorry. Your receiver encountered "
 		"a software problem, and needs to be restarted.\n"
 		"Please send the logfile %senigma2_crash_xxxxxx.log to https://github.com/fairbird/enigma2-dreambox.\n"
 		"Your receiver restarts in 10 seconds!\n"
-		"Component: enigma2") % config.crash.debugPath.value
+		"Component: enigma2") % config.crash.debug_path.value
 	config.crash.debug_text = ConfigText(default=crashlogheader, fixed_size=False)
 	config.crash.skin_error_crash = ConfigYesNo(default=True)
 
@@ -2081,10 +2086,30 @@ def preferredTunerChoicesUpdate(update=False):
 			atsc_nims.append((str(slot.slot), slot.getSlotName()))
 		nims.append((str(slot.slot), slot.getSlotName()))
 
-	config.usage.menutype = ConfigSelection(default="standard", choices=[
+	config.workaround = ConfigSubsection()
+	config.workaround.deeprecord = ConfigYesNo(default=False)
+	config.workaround.wakeuptime = ConfigSelectionNumber(default=5, stepwidth=1, min=0, max=30, wraparound=True)
+	config.workaround.wakeupwindow = ConfigSelectionNumber(default=5, stepwidth=5, min=5, max=60, wraparound=True)
+
+	config.usage.showicons = ConfigYesNo(default=True)
+
+	config.usage.menuType = ConfigSelection(default="standard", choices=[
 		("horzanim", _("Horizontal menu")),
 		("horzicon", _("Horizontal icons")),
 		("standard", _("Standard menu"))
+	])
+
+	config.usage.menuEntryStyle = ConfigSelection(default="text", choices=[
+		("text", _("Entry text only")),
+		("number", _("Entry number and text")),
+		("image", _("Entry image and text")),
+		("both", _("Entry image, number and text")),
+	])
+
+	config.usage.menuSortOrder = ConfigSelection(default="user", choices=[
+		("alpha", _("Alphabetical")),
+		("default", _("Default")),
+		("user", _("User defined"))
 	])
 
 	if not update:

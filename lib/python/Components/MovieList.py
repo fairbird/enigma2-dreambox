@@ -17,6 +17,7 @@ from ServiceReference import ServiceReference
 from Components.MultiContent import MultiContentEntryText, MultiContentEntryPixmapAlphaBlend, MultiContentEntryProgress
 from Components.config import config
 from Components.FileList import AUDIO_EXTENSIONS, DVD_EXTENSIONS, IMAGE_EXTENSIONS, MOVIE_EXTENSIONS, KNOWN_EXTENSIONS
+from Tools.Trashcan import TRASHCAN
 
 cutsParser = Struct(">QI")  # Big-endian, 64-bit PTS and 32-bit type.
 
@@ -398,10 +399,9 @@ class MovieList(GUIComponent):
 			else:
 				p = split(pathName)
 				if not p[1]:
-					# if path ends in "/", p is blank.
-					p = split(p[0])
+					p = split(p[0])  # If path ends in "/", p is blank.
 				txt = p[1]
-				if txt == ".Trash":
+				if txt == TRASHCAN:
 					res.append(MultiContentEntryPixmapAlphaBlend(pos=(self.spaceLeft, self.trashShift), size=(iconSize, self.iconTrash.size().height()), png=self.iconTrash))
 					res.append(MultiContentEntryText(pos=(x + self.spaceLeft, 0), size=(width - x - tn - r - self.spaceLeft, self.itemHeight), font=0, flags=RT_HALIGN_LEFT | valign_center, text=_("Deleted items")))
 					res.append(MultiContentEntryText(pos=(width - tn - r, 0), size=(tn, self.itemHeight), font=1, flags=RT_HALIGN_RIGHT | valign_center, text=_("Trash can")))

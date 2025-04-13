@@ -114,8 +114,8 @@ DEBUG_TIME="${DEBUGTIME}"
 # Create and set log folder
 LOGFOLDER="/home/root/logs/"
 if [ ! -d $LOGFOLDER ] ; then mkdir -p $LOGFOLDER; fi
-if [ "$(grep config.crash.debugPath= /etc/enigma2/settings | sed 's/config.crash.debugPath=//g')" != "" -a -d "$(grep config.crash.debugPath= /etc/enigma2/settings | sed 's/config.crash.debugPath=//g')" ]; then
-	LOGFOLDER=$(grep config.crash.debugPath= /etc/enigma2/settings | sed 's/config.crash.debugPath=//g')
+if [ "$(grep config.crash.debug_path= /etc/enigma2/settings | sed 's/config.crash.debug_path=//g')" != "" -a -d "$(grep config.crash.debug_path= /etc/enigma2/settings | sed 's/config.crash.debug_path=//g')" ]; then
+	LOGFOLDER=$(grep config.crash.debug_path= /etc/enigma2/settings | sed 's/config.crash.debug_path=//g')
 fi
 
 # Enable and configure gstreamer debug log of category and level without color
@@ -128,7 +128,7 @@ if [ "$(grep -i config.crash.gstdebug=true /etc/enigma2/settings)" != "" ]; then
 	if [ "$(grep config.crash.gstdebuglevel= /etc/enigma2/settings | sed 's/config.crash.gstdebuglevel=//g')" != "" ]; then
 		GSTDEBUGLEVEL=$(grep config.crash.gstdebuglevel= /etc/enigma2/settings | sed 's/config.crash.gstdebuglevel=//g')
 	fi
-	export GST_DEBUG_FILE="${LOGFOLDER}$(date +%Y%m%d-%H%M%S)-gstreamer-debug.log"
+	export GST_DEBUG_FILE="${LOGFOLDER}Gstreamer_debug_$(date +%Y-%m-%d_%H-%M-%S).log"
 	export GST_DEBUG="${GSTDEBUGCATEGORY}:${GSTDEBUGLEVEL}"
 	export GST_DEBUG_NO_COLOR="1"
 fi
@@ -145,7 +145,7 @@ fi
 # The size limit could be set via /etc/security/limits.conf.
 if [ "$(grep -i config.crash.coredump=true /etc/enigma2/settings)" != "" ]; then
 	COREDUMPSIZE=$((10 * 512 * 4 - 1 * 512 * 4)) # size is in blocks (512 byte) so this sets 10 MB - 1 MB for log files
-	COREDUMPFILE=${LOGFOLDER}%t-enigma2-core.dump
+	COREDUMPFILE=${LOGFOLDER}Enigma2_core_%t.dump
 	if [ "$(grep -i config.crash.sizeloglimit= /etc/enigma2/settings | sed 's/config.crash.sizeloglimit=//g')" != "" ]; then
 		COREDUMPSIZE=$(grep -i config.crash.sizeloglimit= /etc/enigma2/settings | sed 's/config.crash.sizeloglimit=//g')
 		COREDUMPSIZE=$((${COREDUMPSIZE} * 512 * 4 - 1 * 512 * 4))
@@ -156,7 +156,7 @@ fi
 
 # Start enigma2 with or without debug
 if [ -n "$ENIGMA_DEBUG" ]; then
-	(LD_PRELOAD=$LIBS ENIGMA_DEBUG_TIME="${DEBUG_TIME}" /usr/bin/enigma2 &> ${LOGFOLDER}$(date +%Y%m%d-%H%M%S)-enigma2-debug.log) &
+	(LD_PRELOAD=$LIBS ENIGMA_DEBUG_TIME="${DEBUG_TIME}" /usr/bin/enigma2 &> ${LOGFOLDER}Enigma2_debug_$(date +%Y-%m-%d_%H-%M-%S).log) &
 else
 	(LD_PRELOAD=$LIBS ENIGMA_DEBUG_TIME="${DEBUG_TIME}" /usr/bin/enigma2) &
 fi
@@ -231,6 +231,7 @@ case $ret in
 	15)
 		rm -fR /home/root/.cache/gstreamer-1.0
 		rm -f /tmp/.listen.camd.socket.ignore
+                dd if=/dev/zero of=/dev/fb0
 		# /usr/bin/kodi
 		;;
 	16)

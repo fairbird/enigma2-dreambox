@@ -220,6 +220,9 @@ class NimSetup(Setup, ServiceStopScreen):
 					if fileExists("/proc/stb/frontend/%d/t2mirawmode" % self.nim.slot):
 						self.t2mirawmode = (self.indent % _("T2MI RAW Mode"), self.nimConfig.t2miRawMode, _("With T2MI RAW mode disabled (default) we can use single T2MI PLP de-encapsulation. With T2MI RAW mode enabled we can use astra-sm to analyze T2MI"))
 						self.list.append(self.t2mirawmode)
+					if len(self.nimConfig.input.choices) > 1:
+						self.Connector = (self.indent % _("Connector"), self.nimConfig.input, _("Select the input connector you want to use."))
+						self.list.append(self.Connector)
 		if self.nim.isCompatible("DVB-C") or (self.nim.isCombined() and self.nim.canBeCompatible("DVB-C")):
 			if self.nim.isCombined():
 				self.configModeDVBC = (_("Configure DVB-C"), self.nimConfig.configModeDVBC, _("Select 'Yes' when you want to configure this tuner for DVB-C"))
@@ -809,7 +812,7 @@ class NimSelection(Screen):
 		self.updateList(index)
 
 	def showNim(self, nim):
-		return True
+		return not (nim.isEmpty() or (nim.isCompatible("DVB-C") and nim.isFBCTuner() and not nim.isFBCRoot()))
 
 	def updateList(self, index=None):
 		self.list = []
@@ -915,7 +918,7 @@ class NimSelection(Screen):
 					text = _("Tuner is not supported")
 				if x.isCompatible("DVB-T") and ("DVB-T" in (text + x.friendly_full_description) or "/T" in (text + x.friendly_full_description)) and _("Disabled") not in text and hasattr(nimConfig, "terrestrial_5V") and nimConfig.terrestrial_5V.value:
 					text += _(" (+5 volt terrestrial)")
-				self.list.append((slotid, x.friendly_full_description, text or nimConfig.configMode.value, x))
+				self.list.append((slotid, x.friendly_full_description_compressed if x.isCompatible("DVB-C") and x.isFBCTuner() else x.friendly_full_description, text or nimConfig.configMode.value, x))
 		self["nimlist"].setList(self.list)
 		self["nimlist"].updateList(self.list)
 		if index is not None:

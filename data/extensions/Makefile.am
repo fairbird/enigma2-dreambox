@@ -11,6 +11,8 @@ dist_install_DATA = \
 	iso.png \
 	link.png \
 	link-arrow.png \
+	link_arrow.png \
+	link_error.png \
 	lock_off.png \
 	lock_on.png \
 	log.png \

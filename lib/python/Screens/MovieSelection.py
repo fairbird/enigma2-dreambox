@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+from os import W_OK, access, listdir, mkdir, rename, rmdir, stat, link, unlink, walk
+from os.path import exists, isdir, isfile, join, normpath, realpath, split, splitext, basename
 from Screens.Screen import Screen
 from Components.Button import Button
 from Components.ActionMap import HelpableActionMap, ActionMap, NumberActionMap
@@ -30,12 +33,11 @@ import Screens.InfoBar
 from Tools.NumericalTextInput import NumericalTextInput, MAP_SEARCH_UPCASE
 from Tools.Directories import resolveFilename, SCOPE_HDD
 from Tools.BoundFunction import boundFunction
-import Tools.Trashcan
+from Tools.Trashcan import TRASHCAN, TrashInfo, cleanAll, createTrashcan, getTrashcan, createTrashFolder
 import NavigationInstance
 import RecordTimer
 
 from enigma import eServiceReference, eServiceCenter, eTimer, eSize, iPlayableService, iServiceInformation, getPrevAsciiCode, eRCInput
-import os
 import time
 from time import localtime, strftime
 from skin import findSkinScreen
@@ -107,15 +109,14 @@ def getPreferredTagEditor():
 def isTrashFolder(ref):
 	if not config.usage.movielist_trashcan.value or not ref.flags & eServiceReference.mustDescent:
 		return False
-	path = os.path.realpath(ref.getPath())
-	return path.endswith('.Trash') and path.startswith(Tools.Trashcan.getTrashFolder(path))
+	return realpath(ref.getPath()).endswith(TRASHCAN) or realpath(ref.getPath()).endswith(f"{TRASHCAN}/")
 
 
 def isInTrashFolder(ref):
 	if not config.usage.movielist_trashcan.value or not ref.flags & eServiceReference.mustDescent:
 		return False
-	path = os.path.realpath(ref.getPath())
-	return path.startswith(Tools.Trashcan.getTrashFolder(path))
+	path = realpath(ref.getPath())
+	return path.startswith(getTrashcan(path))
 
 
 def isSimpleFile(item):
@@ -160,25 +161,25 @@ def canCopy(item):
 def createMoveList(serviceref, dest):
 	#normpath is to remove the trailing '/' from directories
 	ext_ts = "%s.ts" % serviceref
-	src = isinstance(serviceref, str) and "%s.ts" % serviceref or os.path.normpath(serviceref.getPath()) if os.path.exists(ext_ts) else isinstance(serviceref, str) and "%s.stream" % serviceref or os.path.normpath(serviceref.getPath())
-	srcPath, srcName = os.path.split(src)
-	if os.path.normpath(srcPath) == dest:
+	src = isinstance(serviceref, str) and "%s.ts" % serviceref or normpath(serviceref.getPath()) if exists(ext_ts) else isinstance(serviceref, str) and "%s.stream" % serviceref or normpath(serviceref.getPath())
+	srcPath, srcName = split(src)
+	if normpath(srcPath) == dest:
 		# move file to itself is allowed, so we have to check it
 		raise Exception(_("Refusing to move to the same directory"))
 	# Make a list of items to move
-	moveList = [(src, os.path.join(dest, srcName))]
+	moveList = [(src, join(dest, srcName))]
 	if isinstance(serviceref, str) or not serviceref.flags & eServiceReference.mustDescent:
 		# Real movie, add extra files...
-		srcBase = os.path.splitext(src)[0]
-		baseName = os.path.split(srcBase)[1]
+		srcBase = splitext(src)[0]
+		baseName = split(srcBase)[1]
 		eitName = srcBase + '.eit'
-		if os.path.exists(eitName):
-			moveList.append((eitName, os.path.join(dest, baseName + '.eit')))
-		baseName = os.path.split(src)[1]
+		if exists(eitName):
+			moveList.append((eitName, join(dest, baseName + '.eit')))
+		baseName = split(src)[1]
 		for ext in ('.ap', '.cuts', '.meta', '.sc'):
 			candidate = src + ext
-			if os.path.exists(candidate):
-				moveList.append((candidate, os.path.join(dest, baseName + ext)))
+			if exists(candidate):
+				moveList.append((candidate, join(dest, baseName + ext)))
 	return moveList
 
 
@@ -189,7 +190,7 @@ def moveServiceFiles(serviceref, dest, name=None, allowCopy=True):
 	try:
 		try:
 			for item in moveList:
-				os.rename(item[0], item[1])
+				rename(item[0], item[1])
 				movedList.append(item)
 		except OSError as e:
 			if e.errno == 18 and allowCopy:
@@ -198,7 +199,7 @@ def moveServiceFiles(serviceref, dest, name=None, allowCopy=True):
 				# start with the smaller files, do the big one later.
 				moveList.reverse()
 				if name is None:
-					name = os.path.split(moveList[-1][0])[1]
+					name = split(moveList[-1][0])[1]
 				moveFiles(moveList, name)
 				print("[MovieSelection] Moving in background...")
 			else:
@@ -207,7 +208,7 @@ def moveServiceFiles(serviceref, dest, name=None, allowCopy=True):
 		print("[MovieSelection] Failed move:", e)
 		for item in movedList:
 			try:
-				os.rename(item[1], item[0])
+				rename(item[1], item[0])
 			except:
 				print("[MovieSelection] Failed to undo move:", item)
 		# rethrow exception
@@ -221,7 +222,7 @@ def copyServiceFiles(serviceref, dest, name=None):
 	movedList = []
 	try:
 		for item in moveList:
-			os.link(item[0], item[1])
+			link(item[0], item[1])
 			movedList.append(item)
 		# this worked, we're done
 		return
@@ -229,7 +230,7 @@ def copyServiceFiles(serviceref, dest, name=None):
 		print("[MovieSelection] Failed copy using link:", e)
 		for item in movedList:
 			try:
-				os.unlink(item[1])
+				unlink(item[1])
 			except:
 				print("[MovieSelection] Failed to undo copy:", item)
 	#Link failed, really copy.
@@ -237,7 +238,7 @@ def copyServiceFiles(serviceref, dest, name=None):
 	# start with the smaller files, do the big one later.
 	moveList.reverse()
 	if name is None:
-		name = os.path.split(moveList[-1][0])[1]
+		name = split(moveList[-1][0])[1]
 	copyFiles(moveList, name)
 	print("[MovieSelection] Copying in background...")
 
@@ -248,11 +249,11 @@ def copyServiceFiles(serviceref, dest, name=None):
 def buildMovieLocationList(bookmarks):
 	inlist = []
 	for d in config.movielist.videodirs.value:
-		d = os.path.normpath(d)
+		d = normpath(d)
 		bookmarks.append((d, d))
 		inlist.append(d)
 	for p in Components.Harddisk.harddiskmanager.getMountedPartitions():
-		d = os.path.normpath(p.mountpoint)
+		d = normpath(p.mountpoint)
 		if d in inlist:
 			# improve shortcuts to mountpoints
 			try:
@@ -279,6 +280,10 @@ class MovieBrowserConfiguration(Setup):
 
 	def createSetup(self):
 		configList = [
+			(_("Use 'Trash' in movie list"), config.usage.movielist_trashcan, _("When enabled, deleted recordings are moved to the trashcan, instead of being deleted immediately.")),
+			(_("Purge 'Trash' after (days)"), config.usage.movielist_trashcan_days, _("Configure the number of days after which items are automatically removed from the trashcan.")),
+			(_("Clean network 'Trash"), config.usage.movielist_trashcan_network_clean, _("When enabled, network trashcans are probed for cleaning.")),
+			(_("Space to reserve for recordings (GB)"), config.usage.movielist_trashcan_reserve, _("Configure the minimum amount of disk space to be available for recordings. When the amount of space drops below this value, deleted items will be removed from the trashcan.")),
 			(_("Sort"), self.cfg.moviesort, _("You can set sorting type for items in movielist.")),
 			(_("Show extended description"), self.cfg.description, _("You can enable if will be displayed extended EPG description for item.")),
 			(_("Type"), self.cfg.listtype, _("Set movielist type.")),
@@ -479,7 +484,7 @@ class MovieSelectionSummary(Screen):
 				name = item[1].getName(item[0])
 			if item[0].flags & eServiceReference.mustDescent:
 				if len(name) > 12:
-					name = os.path.split(os.path.normpath(name))[1]
+					name = split(normpath(name))[1]
 				name = "> " + name
 			self["name"].text = name
 		else:
@@ -536,7 +541,7 @@ class MovieSelection(Screen, HelpableScreen, SelectionEventInfo, InfoBarBase, Pr
 			from Components.ParentalControl import parentalControl
 			if not parentalControl.sessionPinCached and config.movielist.last_videodir.value and [x for x in config.movielist.last_videodir.value[1:].split("/") if x.startswith(".") and not x.startswith(".Trash")]:
 				config.movielist.last_videodir.value = ""
-		if not os.path.isdir(config.movielist.last_videodir.value):
+		if not isdir(config.movielist.last_videodir.value):
 			config.movielist.last_videodir.value = defaultMoviePath()
 			config.movielist.last_videodir.save()
 		self.setCurrentRef(config.movielist.last_videodir.value)
@@ -570,6 +575,7 @@ class MovieSelection(Screen, HelpableScreen, SelectionEventInfo, InfoBarBase, Pr
 		self["movie_sort"].hide()
 
 		self["freeDiskSpace"] = self.diskinfo = DiskInfo(config.movielist.last_videodir.value, DiskInfo.FREE, update=False)
+		self["TrashcanSize"] = self.trashinfo = TrashInfo(config.movielist.last_videodir.value)
 
 		self["NumberActions"] = NumberActionMap(["NumberActions", "InputAsciiActions"],
 			{
@@ -846,7 +852,7 @@ class MovieSelection(Screen, HelpableScreen, SelectionEventInfo, InfoBarBase, Pr
 		if item:
 			path = item.getPath()
 			if not item.flags & eServiceReference.mustDescent:
-				ext = os.path.splitext(path)[1].lower()
+				ext = splitext(path)[1].lower()
 				if ext in IMAGE_EXTENSIONS:
 					return False
 				else:
@@ -858,7 +864,7 @@ class MovieSelection(Screen, HelpableScreen, SelectionEventInfo, InfoBarBase, Pr
 		if service:
 			path = service.getPath()
 			if path:
-				path = os.path.split(os.path.normpath(path))[0]
+				path = split(normpath(path))[0]
 				if not path.endswith('/'):
 					path += '/'
 				self.gotFilename(path, selItem=service)
@@ -1008,9 +1014,9 @@ class MovieSelection(Screen, HelpableScreen, SelectionEventInfo, InfoBarBase, Pr
 			print("[ML] DVD Player not installed:", e)
 
 	def playSuburi(self, path):
-		suburi = os.path.splitext(path)[0][:-7]
+		suburi = splitext(path)[0][:-7]
 		for ext in AUDIO_EXTENSIONS:
-			if os.path.exists("%s%s" % (suburi, ext)):
+			if exists("%s%s" % (suburi, ext)):
 				current = eServiceReference(4097, 0, "file://%s&suburi=file://%s%s" % (path, suburi, ext))
 				self.close(current)
 				return True
@@ -1070,7 +1076,7 @@ class MovieSelection(Screen, HelpableScreen, SelectionEventInfo, InfoBarBase, Pr
 			if not next:
 				return
 			path = next.getPath()
-			ext = os.path.splitext(path)[1].lower()
+			ext = splitext(path)[1].lower()
 			print("Next up:", path)
 			if ext in AUDIO_EXTENSIONS:
 				self.nextInBackground = next
@@ -1124,17 +1130,17 @@ class MovieSelection(Screen, HelpableScreen, SelectionEventInfo, InfoBarBase, Pr
 		if current is not None:
 			path = current.getPath()
 			if current.flags & eServiceReference.mustDescent:
-				if BlurayPlayer is not None and os.path.isdir(os.path.join(path, 'BDMV/STREAM/')):
+				if BlurayPlayer is not None and isdir(join(path, 'BDMV/STREAM/')):
 					#force a BLU-RAY extention
 					Screens.InfoBar.InfoBar.instance.checkTimeshiftRunning(boundFunction(self.itemSelectedCheckTimeshiftCallback, 'bluray', path))
 					return
-				if os.path.isdir(os.path.join(path, 'VIDEO_TS/')) or os.path.exists(os.path.join(path, 'VIDEO_TS.IFO')):
+				if isdir(join(path, 'VIDEO_TS/')) or exists(join(path, 'VIDEO_TS.IFO')):
 					#force a DVD extention
 					Screens.InfoBar.InfoBar.instance.checkTimeshiftRunning(boundFunction(self.itemSelectedCheckTimeshiftCallback, '.img', path))
 					return
 				self.gotFilename(path)
 			else:
-				ext = os.path.splitext(path)[1].lower()
+				ext = splitext(path)[1].lower()
 				if config.movielist.play_audio_internal.value and (ext in AUDIO_EXTENSIONS):
 					self.preview()
 					return
@@ -1154,7 +1160,7 @@ class MovieSelection(Screen, HelpableScreen, SelectionEventInfo, InfoBarBase, Pr
 							p = item[0].getPath()
 							if p == path:
 								index = len(filelist)
-							if os.path.splitext(p)[1].lower() in IMAGE_EXTENSIONS:
+							if splitext(p)[1].lower() in IMAGE_EXTENSIONS:
 								filelist.append(((p, False), None))
 						self.session.open(ui.Pic_Full_View, filelist, index, path)
 					except Exception as ex:
@@ -1201,7 +1207,7 @@ class MovieSelection(Screen, HelpableScreen, SelectionEventInfo, InfoBarBase, Pr
 	def saveLocalSettings(self):
 		if config.movielist.settings_per_directory.value:
 			try:
-				path = os.path.join(config.movielist.last_videodir.value, ".e2settings.pkl")
+				path = join(config.movielist.last_videodir.value, ".e2settings.pkl")
 				pickle.dump(self.settings, open(path, "wb"))
 			except Exception as e:
 				print("Failed to save settings to %s: %s" % (path, e))
@@ -1218,7 +1224,7 @@ class MovieSelection(Screen, HelpableScreen, SelectionEventInfo, InfoBarBase, Pr
 		'Load settings, called when entering a directory'
 		if config.movielist.settings_per_directory.value:
 			try:
-				path = os.path.join(config.movielist.last_videodir.value, ".e2settings.pkl")
+				path = join(config.movielist.last_videodir.value, ".e2settings.pkl")
 				updates = pickle.load(open(path, "rb"))
 				self.applyConfigSettings(updates)
 			except IOError as e:
@@ -1362,14 +1368,19 @@ class MovieSelection(Screen, HelpableScreen, SelectionEventInfo, InfoBarBase, Pr
 	def reloadWithDelay(self):
 		if self.initialRun:
 			self.loadLocalSettings()
-		if not os.path.isdir(config.movielist.last_videodir.value):
+		if not isdir(config.movielist.last_videodir.value):
 			path = defaultMoviePath()
 			config.movielist.last_videodir.value = path
 			config.movielist.last_videodir.save()
 			self.setCurrentRef(path)
 			self["freeDiskSpace"].path = path
+			self["TrashcanSize"].update(path)
+		else:
+			self["TrashcanSize"].update(config.movielist.last_videodir.value)
 		if self.reload_sel is None:
 			self.reload_sel = self.getCurrent()
+		if config.usage.movielist_trashcan.value and access(config.movielist.last_videodir.value, W_OK):
+			trash = createTrashcan(config.movielist.last_videodir.value)
 		self["list"].reload(self.current_ref, self.selected_tags)
 		self.updateTags()
 		title = _("Recorded files...")
@@ -1428,8 +1439,8 @@ class MovieSelection(Screen, HelpableScreen, SelectionEventInfo, InfoBarBase, Pr
 			res += '/'
 		currentDir = config.movielist.last_videodir.value
 		if res != currentDir:
-			if os.path.isdir(res):
-				baseName = os.path.basename(res[:-1])
+			if isdir(res):
+				baseName = basename(res[:-1])
 				if checkParentControl and config.ParentalControl.servicepinactive.value and baseName.startswith(".") and not baseName.startswith(".Trash"):
 					from Components.ParentalControl import parentalControl
 					if not parentalControl.sessionPinCached:
@@ -1440,6 +1451,7 @@ class MovieSelection(Screen, HelpableScreen, SelectionEventInfo, InfoBarBase, Pr
 				self.loadLocalSettings()
 				self.setCurrentRef(res)
 				self["freeDiskSpace"].path = res
+				self["TrashcanSize"].update(res)
 				if selItem:
 					self.reloadList(home=True, sel=selItem)
 				else:
@@ -1518,7 +1530,7 @@ class MovieSelection(Screen, HelpableScreen, SelectionEventInfo, InfoBarBase, Pr
 				)
 				return
 			choice = choice[1]
-		choice = os.path.normpath(choice)
+		choice = normpath(choice)
 		self.rememberMovieLocation(choice)
 		self.onMovieSelected(choice)
 		del self.onMovieSelected
@@ -1542,15 +1554,15 @@ class MovieSelection(Screen, HelpableScreen, SelectionEventInfo, InfoBarBase, Pr
 
 	def isBlurayFolderAndFile(self, service):
 		self.playfile = ""
-		folder = os.path.join(service.getPath(), "STREAM/")
+		folder = join(service.getPath(), "STREAM/")
 		if "BDMV/STREAM/" not in folder:
 			folder = folder[:-7] + "BDMV/STREAM/"
-		if os.path.isdir(folder):
+		if isdir(folder):
 			fileSize = 0
-			for name in os.listdir(folder):
+			for name in listdir(folder):
 				try:
 					if name.endswith(".m2ts"):
-						size = os.stat(folder + name).st_size
+						size = stat(folder + name).st_size
 						if size > fileSize:
 							fileSize = size
 							self.playfile = folder + name
@@ -1607,8 +1619,8 @@ class MovieSelection(Screen, HelpableScreen, SelectionEventInfo, InfoBarBase, Pr
 			return
 		msg = None
 		try:
-			path = os.path.join(config.movielist.last_videodir.value, name)
-			os.mkdir(path)
+			path = join(config.movielist.last_videodir.value, name)
+			mkdir(path)
 			if not path.endswith('/'):
 				path += '/'
 			self.reloadList(sel=eServiceReference("2:0:1:0:0:0:0:0:0:0:" + path))
@@ -1633,17 +1645,17 @@ class MovieSelection(Screen, HelpableScreen, SelectionEventInfo, InfoBarBase, Pr
 			return
 		self.extension = ""
 		if isFolder(item):
-			p = os.path.split(item[0].getPath())
+			p = split(item[0].getPath())
 			if not p[1]:
 				# if path ends in '/', p is blank.
-				p = os.path.split(p[0])
+				p = split(p[0])
 			name = p[1]
 		else:
 			info = item[1]
 			name = info.getName(item[0])
-			full_name = os.path.split(item[0].getPath())[1]
+			full_name = split(item[0].getPath())[1]
 			if full_name == name: # split extensions for files without metafile
-				name, self.extension = os.path.splitext(name)
+				name, self.extension = splitext(name)
 
 		self.session.openWithCallback(self.renameCallback, VirtualKeyBoard,
 			title=_("Rename"),
@@ -1669,7 +1681,7 @@ class MovieSelection(Screen, HelpableScreen, SelectionEventInfo, InfoBarBase, Pr
 		self.copy_eit_file(filepath[:-3] + ".eit", new_eit_name + ".eit")
 
 	def copy_eit_file(self, original_eit, new_eit):
-		if os.path.isfile(original_eit):
+		if isfile(original_eit):
 			from shutil import copy2
 			copy2(original_eit, new_eit)
 
@@ -1682,7 +1694,7 @@ class MovieSelection(Screen, HelpableScreen, SelectionEventInfo, InfoBarBase, Pr
 			try:
 				oldfilename = item[0].getPath().rstrip('/')
 				meta = oldfilename + '.meta'
-				if os.path.isfile(meta):
+				if isfile(meta):
 					# if .meta file is present don't rename files. Only set new name in .meta
 					name = "".join((newbasename, self.extension))
 					metafile = open(meta, "r+")
@@ -1702,22 +1714,22 @@ class MovieSelection(Screen, HelpableScreen, SelectionEventInfo, InfoBarBase, Pr
 					return
 				# rename all files
 				msg = None
-				path, filename = os.path.split(oldfilename)
+				path, filename = split(oldfilename)
 				if item[0].flags & eServiceReference.mustDescent: # directory
-					newfilename = os.path.join(path, newbasename)
+					newfilename = join(path, newbasename)
 					print("[ML] rename dir", oldfilename, "to", newfilename)
-					os.rename(oldfilename, newfilename)
+					rename(oldfilename, newfilename)
 				else:
 					if oldfilename.endswith(self.extension):
 						oldbasename = oldfilename[:-len(self.extension)]
 					renamelist = []
 					dont_rename = False
 					for ext in ('.eit', self.extension + '.cuts', self.extension):
-						newfilename = os.path.join(path, newbasename) + ext
-						oldfilename = os.path.join(path, oldbasename) + ext
-						if not os.path.isfile(oldfilename): # .eit and .cuts maybe not present
+						newfilename = join(path, newbasename) + ext
+						oldfilename = join(path, oldbasename) + ext
+						if not isfile(oldfilename): # .eit and .cuts maybe not present
 							continue
-						if not os.path.isfile(newfilename):
+						if not isfile(newfilename):
 							renamelist.append((oldfilename, newfilename))
 						else:
 							msg = _("The path %s already exists.") % newname
@@ -1726,7 +1738,7 @@ class MovieSelection(Screen, HelpableScreen, SelectionEventInfo, InfoBarBase, Pr
 					if not dont_rename:
 						for r in renamelist:
 							print("[ML] rename", r[0], "to", r[1])
-							os.rename(r[0], r[1])
+							rename(r[0], r[1])
 				self.reloadList(sel=eServiceReference("2:0:1:0:0:0:0:0:0:0:" + newfilename))
 			except OSError as e:
 				print("Error %s:" % e.errno, e)
@@ -1757,7 +1769,7 @@ class MovieSelection(Screen, HelpableScreen, SelectionEventInfo, InfoBarBase, Pr
 				# Special case
 				return
 			name = info and info.getName(current) or _("this recording")
-			path = os.path.normpath(current.getPath())
+			path = normpath(current.getPath())
 			# show a more limited list of destinations, no point
 			# in showing mountpoints.
 			title = _("Select destination for:") + " " + name
@@ -1765,11 +1777,11 @@ class MovieSelection(Screen, HelpableScreen, SelectionEventInfo, InfoBarBase, Pr
 			inlist = []
 			# Subdirs
 			try:
-				base = os.path.split(path)[0]
-				for fn in os.listdir(base):
+				base = split(path)[0]
+				for fn in listdir(base):
 					if not fn.startswith('.'): # Skip hidden things
-						d = os.path.join(base, fn)
-						if os.path.isdir(d) and (d not in inlist):
+						d = join(base, fn)
+						if isdir(d) and (d not in inlist):
 							bookmarks.append((fn, d))
 							inlist.append(d)
 			except Exception as e:
@@ -1780,11 +1792,11 @@ class MovieSelection(Screen, HelpableScreen, SelectionEventInfo, InfoBarBase, Pr
 					bookmarks.append((d, d))
 			# Other favourites
 			for d in config.movielist.videodirs.value:
-				d = os.path.normpath(d)
+				d = normpath(d)
 				bookmarks.append((d, d))
 				inlist.append(d)
 			for p in Components.Harddisk.harddiskmanager.getMountedPartitions():
-				d = os.path.normpath(p.mountpoint)
+				d = normpath(p.mountpoint)
 				if d not in inlist:
 					bookmarks.append((p.description, d))
 					inlist.append(d)
@@ -1795,7 +1807,7 @@ class MovieSelection(Screen, HelpableScreen, SelectionEventInfo, InfoBarBase, Pr
 	def gotMoveMovieDest(self, choice):
 		if not choice:
 			return
-		dest = os.path.normpath(choice)
+		dest = normpath(choice)
 		try:
 			item = self.getCurrentSelection()
 			current = item[0]
@@ -1825,7 +1837,7 @@ class MovieSelection(Screen, HelpableScreen, SelectionEventInfo, InfoBarBase, Pr
 	def gotCopyMovieDest(self, choice):
 		if not choice:
 			return
-		dest = os.path.normpath(choice)
+		dest = normpath(choice)
 		try:
 			item = self.getCurrentSelection()
 			current = item[0]
@@ -1874,9 +1886,9 @@ class MovieSelection(Screen, HelpableScreen, SelectionEventInfo, InfoBarBase, Pr
 			return
 		current = item[0]
 		info = item[1]
-		cur_path = os.path.realpath(current.getPath())
+		cur_path = realpath(current.getPath())
 		try:
-			st = os.stat(cur_path)
+			st = stat(cur_path)
 		except OSError as e:
 			msg = _("Cannot move to trash can") + "\n" + str(e) + "\n"
 			self.session.open(MessageBox, msg, MessageBox.TYPE_ERROR)
@@ -1895,23 +1907,23 @@ class MovieSelection(Screen, HelpableScreen, SelectionEventInfo, InfoBarBase, Pr
 						# Move the files to the trash can in a way that their CTIME is
 						# set to "now". A simple move would not correctly update the
 						# ctime, and hence trigger a very early purge.
-						trash = Tools.Trashcan.createTrashFolder(cur_path)
-						trash = os.path.join(trash, os.path.split(cur_path)[1])
-						os.mkdir(trash)
-						for root, dirnames, filenames in os.walk(cur_path):
-							trashroot = os.path.join(trash, root[len(cur_path) + 1:])
+						trash = createTrashFolder(cur_path)
+						trash = join(trash, split(cur_path)[1])
+						mkdir(trash)
+						for root, dirnames, filenames in walk(cur_path):
+							trashroot = join(trash, root[len(cur_path) + 1:])
 							for fn in filenames:
-								print("Move %s -> %s" % (os.path.join(root, fn), os.path.join(trashroot, fn)))
-								os.rename(os.path.join(root, fn), os.path.join(trashroot, fn))
+								print("Move %s -> %s" % (join(root, fn), join(trashroot, fn)))
+								rename(join(root, fn), join(trashroot, fn))
 							for dn in dirnames:
-								print("MkDir", os.path.join(trashroot, dn))
-								os.mkdir(os.path.join(trashroot, dn))
+								print("MkDir", join(trashroot, dn))
+								mkdir(join(trashroot, dn))
 						# second pass to remove the empty directories
-						for root, dirnames, filenames in os.walk(cur_path, topdown=False):
+						for root, dirnames, filenames in walk(cur_path, topdown=False):
 							for dn in dirnames:
-								print("rmdir", os.path.join(trashroot, dn))
-								os.rmdir(os.path.join(root, dn))
-						os.rmdir(cur_path)
+								print("rmdir", join(trashroot, dn))
+								rmdir(join(root, dn))
+						rmdir(cur_path)
 						self["list"].removeService(current)
 						self.showActionFeedback(_("Deleted") + " " + name)
 						# Files were moved to .Trash, ok.
@@ -1930,10 +1942,10 @@ class MovieSelection(Screen, HelpableScreen, SelectionEventInfo, InfoBarBase, Pr
 				msg += _("Sorry, deleting directories can (for now) only be done through the trash can.")
 				self.session.open(MessageBox, msg, MessageBox.TYPE_ERROR)
 				return
-			for fn in os.listdir(cur_path):
+			for fn in listdir(cur_path):
 				if (fn != '.') and (fn != '..'):
-					ffn = os.path.join(cur_path, fn)
-					if os.path.isdir(ffn):
+					ffn = join(cur_path, fn)
+					if isdir(ffn):
 						subdirs += 1
 					else:
 						files += 1
@@ -1949,7 +1961,7 @@ class MovieSelection(Screen, HelpableScreen, SelectionEventInfo, InfoBarBase, Pr
 				return
 			else:
 				try:
-					os.rmdir(cur_path)
+					rmdir(cur_path)
 				except Exception as e:
 					print("[MovieSelection] Failed delete", e)
 					self.session.open(MessageBox, _("Delete failed!") + "\n" + str(e), MessageBox.TYPE_ERROR)
@@ -1958,13 +1970,13 @@ class MovieSelection(Screen, HelpableScreen, SelectionEventInfo, InfoBarBase, Pr
 					self.showActionFeedback(_("Deleted") + " " + name)
 		else:
 			if not args:
-				rec_filename = os.path.split(current.getPath())[1]
+				rec_filename = split(current.getPath())[1]
 				if rec_filename.endswith(".ts"):
 					rec_filename = rec_filename[:-3]
 				if rec_filename.endswith(".stream"):
 					rec_filename = rec_filename[:-7]
 				for timer in NavigationInstance.instance.RecordTimer.timer_list:
-					if timer.isRunning() and not timer.justplay and os.path.split(timer.Filename)[1] in rec_filename:
+					if timer.isRunning() and not timer.justplay and split(timer.Filename)[1] in rec_filename:
 						choices = [
 							(_("Cancel"), None),
 							(_("Stop recording"), ("s", timer)),
@@ -1977,7 +1989,7 @@ class MovieSelection(Screen, HelpableScreen, SelectionEventInfo, InfoBarBase, Pr
 						return
 			if config.usage.movielist_trashcan.value:
 				try:
-					trash = Tools.Trashcan.createTrashFolder(cur_path)
+					trash = createTrashFolder(cur_path)
 					# Also check whether we're INSIDE the trash, then it's a purge.
 					if cur_path.startswith(trash):
 						msg = _("Deleted items") + "\n"
@@ -2018,7 +2030,7 @@ class MovieSelection(Screen, HelpableScreen, SelectionEventInfo, InfoBarBase, Pr
 		try:
 			if offline is None:
 				from enigma import eBackgroundFileEraser
-				eBackgroundFileEraser.getInstance().erase(os.path.realpath(current.getPath()))
+				eBackgroundFileEraser.getInstance().erase(realpath(current.getPath()))
 			else:
 				if offline.deleteFromDisk(0):
 					raise Exception("Offline delete failed")
@@ -2044,8 +2056,7 @@ class MovieSelection(Screen, HelpableScreen, SelectionEventInfo, InfoBarBase, Pr
 			return
 		item = self.getCurrentSelection()
 		current = item[0]
-		cur_path = os.path.realpath(current.getPath())
-		Tools.Trashcan.cleanAll(cur_path)
+		cleanAll(split(current.getPath())[0])
 
 	def showNetworkSetup(self):
 		from Screens import NetworkSetup
@@ -2063,6 +2074,9 @@ class MovieSelection(Screen, HelpableScreen, SelectionEventInfo, InfoBarBase, Pr
 	def hideActionFeedback(self):
 		print("[ML] hide feedback")
 		self.diskinfo.update()
+		current = self.getCurrent()
+		if current is not None:
+			self.trashinfo.update(current.getPath())
 
 	def can_gohome(self, item):
 		return True
@@ -2157,7 +2171,7 @@ class MovieSelection(Screen, HelpableScreen, SelectionEventInfo, InfoBarBase, Pr
 			if item:
 				item = item[0]
 				if not item.flags & eServiceReference.mustDescent:
-					ext = os.path.splitext(item.getPath())[1].lower()
+					ext = splitext(item.getPath())[1].lower()
 					if ext not in IMAGE_EXTENSIONS:
 						items.append(item)
 

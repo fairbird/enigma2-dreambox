@@ -2,7 +2,7 @@ from Components.Addons.GUIAddon import GUIAddon
 
 from enigma import eListbox, eListboxPythonMultiContent, BT_ALIGN_CENTER, RT_VALIGN_CENTER, RT_HALIGN_LEFT, RT_HALIGN_CENTER, BT_SCALE, eSize, getDesktop, gFont
 
-from skin import parseScale, parseColor, parseFont, applySkinFactor
+from skin import parseScale, parseColor, parseFont
 
 from Components.MultiContent import MultiContentEntryPixmapAlphaBlend, MultiContentEntryText
 from Components.Label import Label
@@ -20,8 +20,8 @@ class ColorButtonsSequence(GUIAddon):
 		self.l.setBuildFunc(self.buildEntry)
 		self.l.setItemHeight(35)
 		self.l.setItemWidth(35)
-		self.spacingButtons = applySkinFactor(40)
-		self.spacingPixmapText = applySkinFactor(10)
+		self.spacingButtons = 40
+		self.spacingPixmapText = 10
 		self.layoutStyle = "fixed"
 		self.colorIndicatorStyle = "pixmap"
 		self.orientations = {"orHorizontal": eListbox.orHorizontal, "orVertical": eListbox.orVertical}
@@ -116,7 +116,7 @@ class ColorButtonsSequence(GUIAddon):
 								pos=(xPos, yPos),
 								size=(textWidth + textPaddings * 2, height),
 								png=pic,
-								backcolor=0x000000, backcolor_sel=None, flags=BT_SCALE, corner_radius=self.cornerRadius))
+								backcolor=0x000000, backcolor_sel=None, flags=BT_SCALE, cornerRadius=self.cornerRadius))
 						res.append(MultiContentEntryText(
 							pos=(xPos + textPaddings, yPos), size=(textWidth, height - 2),
 							font=0, flags=textFlags,
@@ -125,7 +125,7 @@ class ColorButtonsSequence(GUIAddon):
 					res.append(MultiContentEntryText(
 						pos=(xPos, yPos), size=(textWidth + textPaddings * 2, height - 2),
 						font=0, flags=textFlags,
-						text=buttonText, color=textColor, color_sel=textColor, backcolor=backColor, corner_radius=self.cornerRadius))
+						text=buttonText, color=textColor, color_sel=textColor, backcolor=backColor, cornerRadius=self.cornerRadius))
 
 				xPos += textWidth + textPaddings * 2 + self.spacingButtons
 			if xPos > width and self.layoutStyle != "fluid":

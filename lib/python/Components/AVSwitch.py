@@ -103,6 +103,10 @@ def InitAVSwitch():
 	config.av = ConfigSubsection()
 	config.av.yuvenabled = ConfigBoolean(default=True)
 	colorformat_choices = {"cvbs": "CVBS"}
+
+	delayChoices = [(i, _("%d ms") % i) for i in list(range(0, 3000, 100))]  # noqa: F821
+	config.av.passthrough_fix_long = ConfigSelection(choices=delayChoices, default=1200)
+	config.av.passthrough_fix_short = ConfigSelection(choices=delayChoices, default=100)
 	
 	config.av.osd_alpha = ConfigSlider(default=255, increment=5, limits=(20, 255))  # Make Openpli compatible with some plugins who still use config.av.osd_alpha.
 
@@ -208,9 +212,8 @@ def InitAVSwitch():
 		iAVSwitch.setColorFormat(map[configElement.value])
 	config.av.colorformat.addNotifier(setColorFormat)
 
-	def setAspectRatio(configElement):
-		map = {"4_3_letterbox": 0, "4_3_panscan": 1, "16_9": 2, "16_9_always": 3, "16_10_letterbox": 4, "16_10_panscan": 5, "16_9_letterbox": 6}
-		iAVSwitch.setAspectRatio(map[configElement.value])
+	def setAspectRatio(self, value):
+		iAVSwitch.setAspectRatio(value)
 
 	def setSystem(configElement):
 		map = {"pal": 0, "ntsc": 1, "multinorm": 2}
@@ -220,7 +223,6 @@ def InitAVSwitch():
 		iAVSwitch.setAspectWSS()
 
 	# this will call the "setup-val" initial
-	config.av.aspectratio.addNotifier(setAspectRatio)
 	config.av.tvsystem.addNotifier(setSystem)
 	config.av.wss.addNotifier(setWSS)
 
@@ -851,6 +853,5 @@ def InitAVSwitch():
 		("50", _("Force 50Hz")),
 		("60", _("Force 60Hz"))
 	])
-
 
 iAVSwitch = AVSwitch()

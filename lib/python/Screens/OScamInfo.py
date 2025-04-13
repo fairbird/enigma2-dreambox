@@ -504,9 +504,9 @@ class OSCamEntitlements(Screen, OSCamGlobals):
 				<parameter name="OSCamInfoBGcolors" value="0x10fef2e6, 0x10f0f4e5" />
 			</parameters>
 			<widget source="entitleslist" render="Listbox" position="15,165" size="1890,828" backgroundColor="#10b3b3b3" enableWrapAround="1" scrollbarMode="showOnDemand" >
-	  			<convert type="TemplatedMultiContent">
+				<convert type="TemplatedMultiContent">
 					{"templates":  # index 0 is backgroundcolor
-		  				{	"default": (36, [
+						{	"default": (36, [
 							MultiContentEntryText(pos=(0,0), size=(88,36), font=0, flags=RT_HALIGN_CENTER|RT_VALIGN_CENTER, color=0x000000, backcolor=MultiContentTemplateColor(0), text=1),  # Type
 							MultiContentEntryText(pos=(90,0), size=(103,36), font=0, flags=RT_HALIGN_CENTER|RT_VALIGN_CENTER, color=0x000000, backcolor=MultiContentTemplateColor(0), text=2),  # CAID
 							MultiContentEntryText(pos=(195,0), size=(118,36), font=0, flags=RT_HALIGN_CENTER|RT_VALIGN_CENTER, color=0x000000, backcolor=MultiContentTemplateColor(0), text=3),  # Provid
@@ -534,7 +534,7 @@ class OSCamEntitlements(Screen, OSCamGlobals):
 							MultiContentEntryText(pos=(1710,0), size=(73,36), font=0, flags=RT_HALIGN_CENTER|RT_VALIGN_CENTER, color=0x000000, backcolor=MultiContentTemplateColor(0), text=19),  # Resx
 							MultiContentEntryText(pos=(1785,0), size=(105,36), font=0, flags=RT_HALIGN_CENTER|RT_VALIGN_CENTER, color=0x000000, backcolor=MultiContentTemplateColor(0), text=20)  # Reshare
 							])
-	  					},
+						},
 						"fonts": [gFont("Regular",27)], "itemHeight":36
 					}
 				</convert>
@@ -898,7 +898,7 @@ class OSCamInfoSetup(Setup):
 	def __init__(self, session):
 		self.status = None
 		self.oldIP = config.oscaminfo.ip.value
-		self.hostValidator = compile("(\d*[a-zA-Z]+[\.]*\d*)+$")
+		self.hostValidator = compile(r"(\d*[a-zA-Z]+[\.]*\d*)+$")
 		Setup.__init__(self, session, setup="OSCamInfoSetup")
 
 	def selectionChanged(self):

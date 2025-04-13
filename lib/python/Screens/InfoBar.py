@@ -24,7 +24,7 @@ from Screens.InfoBarGenerics import InfoBarShowHide, \
 	InfoBarServiceNotifications, InfoBarPVRState, InfoBarCueSheetSupport, InfoBarBuffer, \
 	InfoBarSummarySupport, InfoBarMoviePlayerSummarySupport, InfoBarTimeshiftState, InfoBarTeletextPlugin, InfoBarExtensions, \
 	InfoBarSubtitleSupport, InfoBarPiP, InfoBarPlugins, InfoBarServiceErrorPopupSupport, InfoBarJobman, InfoBarPowersaver, \
-	InfoBarHDMI, InfoBarHdmi2, resumePointsInstance
+	InfoBarHDMI, resumePointsInstance
 from Screens.Hotkey import InfoBarHotkey
 
 eProfileWrite("LOAD:InitBar_Components")
@@ -42,7 +42,7 @@ class InfoBar(InfoBarBase, InfoBarShowHide,
 	InfoBarSubserviceSelection, InfoBarTimeshift, InfoBarSeek, InfoBarCueSheetSupport, InfoBarBuffer,
 	InfoBarSummarySupport, InfoBarTimeshiftState, InfoBarTeletextPlugin, InfoBarExtensions,
 	InfoBarPiP, InfoBarPlugins, InfoBarSubtitleSupport, InfoBarServiceErrorPopupSupport, InfoBarPowersaver,
-	InfoBarHDMI, InfoBarHdmi2, InfoBarHotkey, InfoBarJobman, InfoBarHandleBsod, Screen):
+	InfoBarHDMI, InfoBarHotkey, InfoBarJobman, InfoBarHandleBsod, Screen):
 
 	instance = None
 
@@ -70,7 +70,7 @@ class InfoBar(InfoBarBase, InfoBarShowHide,
 				InfoBarAdditionalInfo, InfoBarNotifications, InfoBarDish, InfoBarSubserviceSelection, InfoBarBuffer, \
 				InfoBarTimeshift, InfoBarSeek, InfoBarCueSheetSupport, InfoBarSummarySupport, InfoBarTimeshiftState, \
 				InfoBarTeletextPlugin, InfoBarExtensions, InfoBarPiP, InfoBarSubtitleSupport, InfoBarHandleBsod, InfoBarPowersaver, \
-				InfoBarHdmi2, InfoBarPlugins, InfoBarServiceErrorPopupSupport, InfoBarHotkey, InfoBarJobman:
+				InfoBarHDMI, InfoBarPlugins, InfoBarServiceErrorPopupSupport, InfoBarHotkey, InfoBarJobman:
 			x.__init__(self)
 
 		self.helpList.append((self["actions"], "InfobarActions", [("showMovies", _("Watch recordings..."))]))
@@ -242,7 +242,7 @@ def tryAudioTrack(tracks, audiolang, caudiolang, trackList, seltrack, useAc3):
 class MoviePlayer(InfoBarBase, InfoBarShowHide, InfoBarMenu, InfoBarSeek, InfoBarShowMovies, InfoBarInstantRecord, InfoBarVmodeButton, InfoBarResolutionSelection, InfoBarAspectSelection,
 		InfoBarAudioSelection, InfoBarNotifications, InfoBarServiceNotifications, InfoBarPVRState,
 		InfoBarCueSheetSupport, InfoBarMoviePlayerSummarySupport, InfoBarSubtitleSupport, Screen, InfoBarTeletextPlugin,
-		InfoBarServiceErrorPopupSupport, InfoBarExtensions, InfoBarPlugins, InfoBarPiP, InfoBarHDMI, InfoBarHdmi2, InfoBarHotkey, InfoBarJobman):
+		InfoBarServiceErrorPopupSupport, InfoBarExtensions, InfoBarPlugins, InfoBarPiP, InfoBarHDMI, InfoBarHotkey, InfoBarJobman):
 
 	ENABLE_RESUME_SUPPORT = True
 	movie_instance = None
@@ -564,32 +564,6 @@ class MoviePlayer(InfoBarBase, InfoBarShowHide, InfoBarMenu, InfoBarSeek, InfoBa
 			else:
 				slist.moveDown()
 			slist.zap(enable_pipzap=True)
-
-	def showPiP(self):
-		slist = self.servicelist
-		if self.session.pipshown:
-			if slist and slist.dopipzap:
-				slist.togglePipzap()
-			if self.session.pipshown:
-				del self.session.pip
-				self.session.pipshown = False
-		elif slist:
-			from Screens.PictureInPicture import PictureInPicture
-			self.session.pip = self.session.instantiateDialog(PictureInPicture)
-			self.session.pip.show()
-			if self.session.pip.playService(slist.getCurrentSelection()):
-				self.session.pipshown = True
-				self.session.pip.servicePath = slist.getCurrentServicePath()
-			else:
-				self.session.pipshown = False
-				del self.session.pip
-
-	def movePiP(self):
-		if self.session.pipshown:
-			InfoBarPiP.movePiP(self)
-
-	def swapPiP(self):
-		pass
 
 	def showDefaultEPG(self):
 		self.infobar and self.infobar.showMultiEPG()

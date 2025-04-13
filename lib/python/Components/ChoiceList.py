@@ -44,7 +44,7 @@ def ChoiceEntryComponent(key=None, text=None):
 			elif key == "bullet":
 				png = LoadPixmap(resolveFilename(SCOPE_GUISKIN, "icons/bullet.png"))
 			else:
-				iconKeyConfigName = "ChoicelistButtonIcon"
+				# iconKeyConfigName = "ChoicelistButtonIcon"
 				png = LoadPixmap(resolveFilename(SCOPE_GUISKIN, "buttons/key_%s.png" % key))
 			if png:
 				x, y, w, h = parameters.get(iconKeyConfigName, (5, 0, 35, 25))

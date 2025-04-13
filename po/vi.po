@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: enigma 2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-12-20 11:32+0100\n"
+"POT-Creation-Date: 2025-03-16 15:41+0100\n"
 "PO-Revision-Date: 2021-08-02 09:19+0700\n"
 "Last-Translator: krong\n"
 "Language-Team: none\n"
@@ -387,6 +387,10 @@ msgstr "(trống)"
 
 msgid "(not activated)"
 msgstr "(chưa kích hoạt)"
+
+#, fuzzy
+msgid "(old model)"
+msgstr "Chế độ 3d"
 
 msgid "(show optional DVD audio menu)"
 msgstr "(hiển thị menu âm thanh DVD tùy chọn)"
@@ -1257,9 +1261,6 @@ msgstr "Biến định dạng có sẵn"
 msgid "Available locales are:"
 msgstr "Các giả lập có sẵn là:"
 
-msgid "Axas E4HD Ultra"
-msgstr ""
-
 msgid "Azerbaijan"
 msgstr "Ailen"
 
@@ -1460,6 +1461,13 @@ msgstr "Botswana"
 #, fuzzy
 msgid "Bottom"
 msgstr "dưới cùng"
+
+#, fuzzy
+msgid "Bouquet down"
+msgstr "Giảm âm lượng"
+
+msgid "Bouquet up"
+msgstr ""
 
 msgid "Bouvet Island"
 msgstr "Đảo Bouvet"
@@ -1734,6 +1742,10 @@ msgstr "Thay đổi kích thước bước"
 msgid "Change timer"
 msgstr "Thay đổi bộ đếm thời gian"
 
+#, fuzzy
+msgid "Change view mode"
+msgstr "Thay đổi bộ đếm thời gian"
+
 msgid "Channel"
 msgstr "Kênh"
 
@@ -1745,11 +1757,11 @@ msgid "Channel Select Base Actions"
 msgstr "Chọn kênh"
 
 #, fuzzy
-msgid "Channel Select Edit Actions"
+msgid "Channel Select EPG Actions"
 msgstr "Chọn kênh"
 
 #, fuzzy
-msgid "Channel SelectEPG Actions"
+msgid "Channel Select Edit Actions"
 msgstr "Chọn kênh"
 
 #, fuzzy
@@ -2413,6 +2425,10 @@ msgstr "Tham khảo bảng thông số kỹ thuật của động cơ của bạ
 msgid "Content does not fit on DVD!"
 msgstr "Nội dung không phù hợp với DVD!"
 
+#, fuzzy
+msgid "Context Menu"
+msgstr "Menu ngữ cảnh kênh"
+
 msgid "Continue"
 msgstr "Tiếp tục"
 
@@ -2656,18 +2672,6 @@ msgstr "Ghi DVD"
 msgid "DVD Menu"
 msgstr "Menu DVD"
 
-#, fuzzy
-msgid "DVD Player Actions"
-msgstr "Đâu đia DVD"
-
-#, fuzzy
-msgid "DVD Title List"
-msgstr "DVD chuẩn độ"
-
-#, fuzzy
-msgid "DVD Toolbox"
-msgstr "Hộp công cụ DVD"
-
 msgid "DVD data format"
 msgstr "Định dạng dữ liệu DVD"
 
@@ -2685,6 +2689,18 @@ msgstr "DVD chuẩn độ"
 
 msgid "DVDPlayer"
 msgstr "Đâu đia DVD"
+
+#, fuzzy
+msgid "DVDPlayer Actions"
+msgstr "Đâu đia DVD"
+
+#, fuzzy
+msgid "DVDTitle List"
+msgstr "DVD chuẩn độ"
+
+#, fuzzy
+msgid "DVDToolbox"
+msgstr "Hộp công cụ DVD"
 
 msgid "Danish"
 msgstr "Người Đan Mạch"
@@ -3706,7 +3722,7 @@ msgid "Event View Actions"
 msgstr "Menu xem sự kiện"
 
 #, fuzzy
-msgid "Event ViewEPG Actions"
+msgid "Event View EPG Actions"
 msgstr "Menu xem sự kiện"
 
 msgid "Event font size (relative to skin size)"
@@ -3857,9 +3873,6 @@ msgstr "Thêm thời gian bắt đầu để bỏ qua sleeptimer không hoạt �
 
 msgid "F"
 msgstr "F"
-
-msgid "F1/F3/F4/F4-TURBO"
-msgstr "F1/F3/F4/F4-TURBO"
 
 msgid "FAILED"
 msgstr "THẤT BẠI"
@@ -4431,13 +4444,6 @@ msgstr "HD"
 msgid "HD list"
 msgstr "Danh sách HD"
 
-msgid "HD2400"
-msgstr "HD2400"
-
-#, fuzzy
-msgid "HD60/HD66SE/Multibox/Multibox SE"
-msgstr "HD60/Multibox/Multibox SE"
-
 msgid "HDMI"
 msgstr ""
 
@@ -4471,9 +4477,6 @@ msgstr ""
 
 msgid "HDR10 support"
 msgstr "Hỗ trợ HDR10"
-
-msgid "HDx1/HD1xxx/HD5x0C/VS1x00/et7x00/et8500/et7000mini"
-msgstr "HDx1/HD1xxx/HD5x0C/VS1x00/et7x00/et8500/et7000mini"
 
 msgid "HELP"
 msgstr "CỨU GIÚP"
@@ -4653,10 +4656,6 @@ msgstr "I"
 
 msgid "I do not want to perform any service scans"
 msgstr "Tôi không muốn thực hiện bất kỳ quét dịch vụ nào"
-
-#, fuzzy
-msgid "I55SE/H7(new model)/H9(new model)/H9COMBO/H9TWIN/H9SE/H9COMBOSE/H10/H11/H17"
-msgstr "I55SE / H7 (mẫu mới) / H9 (mẫu mới) / H9COMBO / H9TWIN / H9SE / H9COMBOSE / H10 / H11"
 
 msgid "IDLE"
 msgstr "IDLE"
@@ -4870,6 +4869,10 @@ msgid "Infobar Cue Sheet Actions"
 msgstr ""
 
 #, fuzzy
+msgid "Infobar EPG Actions"
+msgstr "Hết thời gian chờ thanh thông tin"
+
+#, fuzzy
 msgid "Infobar Extensions"
 msgstr "Cài đặt tiện ích mở rộng"
 
@@ -4934,10 +4937,6 @@ msgstr ""
 
 msgid "Infobar frontend data source"
 msgstr "Nguồn dữ liệu lối vào Infobar"
-
-#, fuzzy
-msgid "InfobarEPG Actions"
-msgstr "Hết thời gian chờ thanh thông tin"
 
 msgid "Information"
 msgstr "Thông tin"
@@ -5173,7 +5172,15 @@ msgstr ""
 msgid "Jump to next marked position"
 msgstr "Chuyển đến vị trí được đánh dấu tiếp theo"
 
+#, fuzzy
+msgid "Jump to next marker"
+msgstr "Chuyển đến vị trí được đánh dấu tiếp theo"
+
 msgid "Jump to previous marked position"
+msgstr "Chuyển đến vị trí được đánh dấu trước đó"
+
+#, fuzzy
+msgid "Jump to previous marker"
 msgstr "Chuyển đến vị trí được đánh dấu trước đó"
 
 #. TRANSLATORS: (aspect ratio policy: scale as close to fullscreen as possible)
@@ -5779,6 +5786,10 @@ msgstr "Đi xuống danh sách"
 msgid "Move down a screen"
 msgstr "di chuyển xuống mục cuối cùng"
 
+#, fuzzy
+msgid "Move down in bouquet list"
+msgstr "Đi xuống danh sách"
+
 msgid "Move east"
 msgstr "Di chuyển về phía đông"
 
@@ -5835,6 +5846,10 @@ msgstr "Đã chuyển đến vị trí tại chỉ mục"
 
 msgid "Move up a screen"
 msgstr ""
+
+#, fuzzy
+msgid "Move up in bouquet list"
+msgstr "Kết thúc chỉnh sửa gói kênh"
 
 msgid "Move west"
 msgstr "Di chuyển về phía tây"
@@ -6473,10 +6488,6 @@ msgstr "Phụ đề & ngôn ngữ khác"
 msgid "Other buttons will jump to the help for that button, if there is help."
 msgstr ""
 
-#, fuzzy
-msgid "Other functions"
-msgstr "giáo dục nâng cao"
-
 msgid "Output"
 msgstr "Đầu ra"
 
@@ -6562,10 +6573,6 @@ msgid "PREVIOUSSONG"
 msgstr ""
 
 #, fuzzy
-msgid "PULSe 4K(mini)"
-msgstr "PULSe 4K"
-
-#, fuzzy
 msgid "PVR"
 msgstr "OVR"
 
@@ -6580,6 +6587,14 @@ msgstr "Quản lý gói"
 
 msgid "Packet manager"
 msgstr "Quản lý gói"
+
+#, fuzzy
+msgid "Page down"
+msgstr "Hạ xuống"
+
+#, fuzzy
+msgid "Page up"
+msgstr "Cài đặt sử dụng"
 
 msgid "Pakistan"
 msgstr "Pakistan"
@@ -6667,12 +6682,12 @@ msgstr "Peru"
 msgid "Philippines"
 msgstr "Philippines"
 
-#, fuzzy
-msgid "PiP Setup Actions"
-msgstr "Hành động lựa chọn giao diện"
-
 msgid "PiP setup"
 msgstr "Thiết lập PiP"
+
+#, fuzzy
+msgid "PiPSetup Actions"
+msgstr "Hành động lựa chọn giao diện"
 
 msgid "Picon"
 msgstr "Picon"
@@ -7377,6 +7392,10 @@ msgstr ""
 
 msgid "Radio"
 msgstr "Radio"
+
+#, fuzzy
+msgid "Radio mode"
+msgstr "Chế độ 3d"
 
 msgid "Ram disk"
 msgstr "Đĩa Ram"
@@ -8132,6 +8151,10 @@ msgstr "Tìm kiếm"
 msgid "Search east"
 msgstr "Tìm kiếm phía đông"
 
+#, fuzzy
+msgid "Search in SMS mode"
+msgstr "Chế độ tiêu đề dịch vụ"
+
 msgid "Search west"
 msgstr "Tìm kiếm về phía tây"
 
@@ -8227,6 +8250,10 @@ msgstr "Chọn 'có' để bao gồm nhóm%s trong tìm kiếm của bạn."
 
 msgid "Select 'yes' to only send the DiSEqC command when changing from one satellite to another, or select 'no' for the DiSEqC command to be resent on every zap."
 msgstr "Chọn 'có' để chỉ gửi lệnh DiSEqC khi thay đổi từ vệ tinh này sang vệ tinh khác hoặc chọn 'không' để lệnh DiSEqC được gửi lại trên mỗi zap."
+
+#, fuzzy
+msgid "Select Audio"
+msgstr "Chọn CAId"
 
 msgid "Select CAId"
 msgstr "Chọn CAId"
@@ -8363,6 +8390,10 @@ msgstr "Chọn tốc độ làm mới"
 
 msgid "Select satellites"
 msgstr "Chọn vệ tinh"
+
+#, fuzzy
+msgid "Select service"
+msgstr "Chọn phim"
 
 #, fuzzy
 msgid "Select service name"
@@ -8811,6 +8842,10 @@ msgstr "Chọn hành động"
 msgid "Show"
 msgstr "Đưa ra cho xem"
 
+#, fuzzy
+msgid "Show All Services"
+msgstr "Hiển thị danh sách dịch vụ"
+
 msgid "Show Audioselection"
 msgstr "Hiển thị âm thanh"
 
@@ -8826,11 +8861,23 @@ msgstr "Hiển thị EPG cho kênh hiện tại ..."
 msgid "Show EPG..."
 msgstr "Hiển thị EPG ..."
 
+#, fuzzy
+msgid "Show Favorites"
+msgstr "Hiển thị danh sách yêu thích"
+
 msgid "Show InfoBar"
 msgstr "Hiển thị thông tin"
 
 msgid "Show PiP"
 msgstr "Hiển thị PiP"
+
+#, fuzzy
+msgid "Show Providers"
+msgstr "Xem phim"
+
+#, fuzzy
+msgid "Show Satellites"
+msgstr "Hiển thị danh sách vệ tinh"
 
 msgid "Show True/False as graphical switch"
 msgstr "Hiển thị Đúng / Sai dưới dạng chuyển đổi đồ họa"
@@ -9903,6 +9950,10 @@ msgstr "CHẠY"
 msgid "TV"
 msgstr ""
 
+#, fuzzy
+msgid "TV mode"
+msgstr "Chế độ kiểm tra"
+
 msgid "TV physical address report"
 msgstr "Báo cáo địa chỉ vật lý TV"
 
@@ -10054,7 +10105,7 @@ msgstr ""
 msgid "The number of steps to change the volume on the device the keys are forwarded to."
 msgstr ""
 
-msgid "The order and grouping of the help information list can be controlled using MENU>Setup>User Interface>Settings>Sort order for help screen."
+msgid "The order and grouping of the help information list can be controlled using MENU>Setup>User Interface>Settings>Sort order for help screen or pressing long help"
 msgstr ""
 
 msgid ""
@@ -10566,6 +10617,10 @@ msgstr "Chuyển đổi LCD LiveTV"
 msgid "Toggle PiPzap"
 msgstr "Chuyển đổi PIPzap"
 
+#, fuzzy
+msgid "Toggle TV Radio mode"
+msgstr "Chuyển đổi chế độ TV / RADIO"
+
 msgid "Toggle TV/RADIO mode"
 msgstr "Chuyển đổi chế độ TV / RADIO"
 
@@ -10577,6 +10632,10 @@ msgstr "Chuyển đổi dòng nhấp nháy cho dịch vụ này"
 
 msgid "Toggle infoBar"
 msgstr "Chuyển đổi thông tinBar"
+
+#, fuzzy
+msgid "Toggle movemode"
+msgstr "Chuyển đổi chế độ video"
 
 msgid "Toggle new text inserts before or overwrites existing text"
 msgstr "Chuyển đổi chèn văn bản mới trước hoặc ghi đè văn bản hiện có"
@@ -11135,9 +11194,6 @@ msgstr ""
 
 msgid "VOL-"
 msgstr ""
-
-msgid "VU+"
-msgstr "VU+"
 
 msgid "Valid ONID/TSID look at www.lyngsat.com..."
 msgstr "ONID / TSID hợp lệ xem tại www.lyngsat.com ..."
@@ -11883,6 +11939,10 @@ msgstr "Bạn có thể đặt thư mục đã chọn làm thư mục 'root' cho
 msgid "You can set sorting type for items in movielist."
 msgstr "Bạn có thể đặt loại sắp xếp cho các mục trong Movielist."
 
+#, fuzzy, python-format
+msgid "You can't update the software because %s can not be reached."
+msgstr "Không thể kiểm tra trạng thái của hình ảnh hiện tại vì không thể đạt được%s."
+
 msgid "You cannot delete this!"
 msgstr "Bạn không thể xóa cái này!"
 
@@ -12065,6 +12125,10 @@ msgstr "Chế độ zap"
 msgid "Zap to"
 msgstr "Chuyển sang"
 
+#, fuzzy
+msgid "Zap to channel number"
+msgstr "nhảy đến chương theo số"
+
 msgid "Zap to selected channel"
 msgstr "Chuyển sang kênh đã chọn"
 
@@ -12084,16 +12148,6 @@ msgstr "Được chuyển sang dịch vụ hẹn giờ%s dưới dạng PiP!"
 #, python-format
 msgid "Zapped to timer service %s!"
 msgstr "Chuyển sang dịch vụ hẹn giờ%s!"
-
-msgid "Zgemma H.S/H.2S/H.2H/H5/H7(old model)"
-msgstr "Zgemma H.S / H.2S / H.2H / H5 / H7 (mẫu cũ)"
-
-#, fuzzy
-msgid "Zgemma H9(old model)/I55Plus/H8"
-msgstr "Zgemma H9 (mẫu cũ) / I55Plus"
-
-msgid "Zgemma Star S/2S/H1/H2"
-msgstr "Zgemma Star S/2S/H1/H2"
 
 msgid "Zimbabwe"
 msgstr "Zimbabwe"
@@ -12382,21 +12436,6 @@ msgstr "lỗi bắt đầu quét"
 
 msgid "error while scanning"
 msgstr "lỗi trong khi quét"
-
-msgid "et4000"
-msgstr "et4000"
-
-msgid "et5000/et6000"
-msgstr "et5000/et6000"
-
-msgid "et8000/et10000"
-msgstr "et8000/et10000"
-
-msgid "et9000/et9100"
-msgstr "et9000/et9100"
-
-msgid "et9200/et9500/et6500"
-msgstr "et9200/et9500/et6500"
 
 msgid "execute cuts (requires MovieCut plugin)"
 msgstr "thực hiện cắt giảm (yêu cầu plugin MovieCut)"
@@ -13167,9 +13206,6 @@ msgstr "với tên bộ chỉnh"
 
 msgid "with_errors"
 msgstr "có -nỗi"
-
-msgid "xp1000"
-msgstr "xp1000"
 
 msgid "yellow"
 msgstr "màu vàng"

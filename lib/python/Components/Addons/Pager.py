@@ -2,7 +2,7 @@ from Components.Addons.GUIAddon import GUIAddon
 
 from enigma import eListbox, eListboxPythonMultiContent, BT_ALIGN_CENTER, BT_VALIGN_CENTER
 
-from skin import parseScale, applySkinFactor
+from skin import parseScale
 
 from Components.MultiContent import MultiContentEntryPixmapAlphaBlend
 from Components.Sources.List import List
@@ -18,7 +18,7 @@ class Pager(GUIAddon):
 		self.l.setBuildFunc(self.buildEntry)
 		self.l.setItemHeight(25)  # 25 is the height of the default images. For other images set the height in the skin.
 		self.l.setItemWidth(25)  # 25 is the width of the default images. For other images set the width in the skin.
-		self.spacing = applySkinFactor(5)
+		self.spacing = 5
 		self.picDotPage = LoadPixmap(resolveFilename(SCOPE_GUISKIN, "icons/dot.png"))
 		self.picDotCurPage = LoadPixmap(resolveFilename(SCOPE_GUISKIN, "icons/dotfull.png"))
 		self.picShevronLeft = LoadPixmap(resolveFilename(SCOPE_GUISKIN, "icons/shevronleft.png"))
@@ -162,7 +162,7 @@ class Pager(GUIAddon):
 	def getCurrentIndex(self):
 		if hasattr(self.source, "index"):
 			return self.source.index
-		return self.source.l.getCurrentSelectionIndex()
+		return self.l.getCurrentSelectionIndex()
 
 	def getSourceSize(self):
 		if isinstance(self.source, List):  # Components.Sources.List

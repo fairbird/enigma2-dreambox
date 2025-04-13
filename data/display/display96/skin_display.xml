@@ -1,6 +1,15 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!--  Skin: LCD from Magic by MiLo -->
 <skin>
+	<colors>
+		<color name="oled1" value="#00adff2f" /> <!--Schriftfarbe Menue gelbgruen-->
+		<color name="oled2" value="#00ffffff" /> <!--Schriftfarbe Textroller-->
+		<color name="oled3" value="#00adff2f" /> <!--Schriftfarbe Uhrzeit usw.-->
+		<color name="oled4" value="#00adff2f" /> <!--Schriftfarbe Sender-->
+		<color name="oled5" value="#00ffffff" /> <!--Schriftfarbe Sendung-->
+		<color name="oled6" value="#00adff2f" /> <!--Schriftfarbe Sender Kanalliste-->
+		<color name="oled7" value="#00ff2525" /> <!--Schriftfarbe Uhr Standby-->
+	</colors>
 	<windowstyle type="skinned" id="1">
 		<color name="Background" color="#000000"/>
 		<color name="LabelForeground" color="#ffffff"/>
@@ -89,11 +98,21 @@
 	</screen>
 
 <!-- menus-->
-	<screen name="MenuSummary" position="0,0" size="96,64">
-		<widget source="parent.title" render="Label" position="0,0" size="96,16" font="FdLcD;14" halign="center" valign="top" noWrap="1"  foregroundColor="lightyellow" />
-		<widget source="parent.menu" render="Label" position="0,16" size="96,48" font="FdLcD;16" halign="left" valign="top">
+	<screen name="MenuSummary" position="fill">
+		<widget source="parent.Title" render="Label" position="top" size="*,119" font="FdLcD;38" foregroundColor="#87CEFA" horizontalAlignment="center" verticalAlignment="center" />
+		<eLabel position="top" size="*,1" backgroundColor="white" />
+		<widget source="parent.menu" render="Label" position="top" size="*,119" font="FdLcD;38" horizontalAlignment="center" verticalAlignment="center">
 			<convert type="StringListSelection" />
 		</widget>
+	</screen>
+
+<!-- setup-->
+	<screen name="SetupSummary" position="fill">
+		<widget source="SetupTitle" render="Label" position="top" size="*,85" font="FdLcD;38" foregroundColor="#87CEFA" horizontalAlignment="left"  verticalAlignment="center" />
+		<eLabel position="top" size="*,1" backgroundColor="white" />
+		<widget source="SetupEntry" render="Label" position="top" size="*,95" font="FdLcD;25" horizontalAlignment="left" verticalAlignment="center" />
+		<eLabel position="top" size="*,1" backgroundColor="white" />
+		<widget source="SetupValue" render="Label" position="top" size="*,65" font="FdLcD;25" foregroundColor="#F4FA58" horizontalAlignment="left" verticalAlignment="center" />
 	</screen>
 
 <!-- movieplayer-->
@@ -146,13 +165,6 @@
 		<widget source="session.CurrentService" render="Progress" position="0,52" size="96,12" borderWidth="1" >
 			<convert type="ServicePosition">Position</convert>
 		</widget>
-	</screen>
-
-<!-- setup-->
-	<screen name="SetupSummary" position="0,0" size="96,64">
-		<widget source="SetupTitle" render="Label" position="0,0" size="96,12" font="FdLcD;12" halign="left" foregroundColor="lightyellow" />
-		<widget source="SetupEntry" render="Label" position="0,12" size="96,40" font="FdLcD;12" halign="left" />
-		<widget source="SetupValue" render="Label" position="0,52" size="96,12" font="FdLcD;12" halign="left"  foregroundColor="lightyellow" />
 	</screen>
 
 <!-- misc-->

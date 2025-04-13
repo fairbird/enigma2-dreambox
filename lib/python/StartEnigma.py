@@ -14,7 +14,7 @@ enigma.eSocketNotifier = eBaseImpl.eSocketNotifier
 enigma.eConsoleAppContainer = eConsoleImpl.eConsoleAppContainer
 from Components.config import config, configfile, ConfigText, ConfigYesNo, ConfigInteger, ConfigSelection, ConfigSubsection, NoSave
 from Components.SystemInfo import BoxInfo
-
+from Tools.Directories import InitFallbackFiles, resolveFilename, SCOPE_PLUGINS, SCOPE_CURRENT_SKIN
 from traceback import print_exc
 
 MODEL = BoxInfo.getItem("model")
@@ -32,6 +32,7 @@ config.crash.debugDVBScan = ConfigYesNo(default=False)
 config.crash.debugDVBTime = ConfigYesNo(default=False)
 config.crash.debugDVB = ConfigYesNo(default=False)
 config.crash.debugInternational = ConfigYesNo(default=False)
+config.crash.debugTimers = ConfigYesNo(default=False)
 config.crash.debugTeletext = ConfigYesNo(default=False)
 config.crash.debugStorage = ConfigYesNo(default=False)
 
@@ -50,8 +51,11 @@ config.misc.plugin_style = ConfigSelection(default="list", choices=[
 	("grid5", _("View as grid 5")),
 	("grid6", _("View as grid 6"))])
 
+# Enable numbers in Plugin Browser (Do not move it to other file)
+config.misc.menu_show_numbers = ConfigYesNo(default=False)
+
 # New VirtualkeyBoard Style
-config.misc.virtualkeyBoardstyle = ConfigSelection(default="e2", choices=[
+config.misc.virtualkeyBoardstyle = ConfigSelection(default="new", choices=[
 	("new", _("New style")),
 	("e2", _("Enigma2 default"))])
 
@@ -86,20 +90,6 @@ def setLoadUnlinkedUserbouquets(configElement):
 
 config.misc.load_unlinked_userbouquets.addNotifier(setLoadUnlinkedUserbouquets)
 enigma.eDVBDB.getInstance().reloadBouquets()
-
-enigma.eProfileWrite("ParentalControl")
-import Components.ParentalControl
-Components.ParentalControl.InitParentalControl()
-
-enigma.eProfileWrite("LOAD:Navigation")
-from Navigation import Navigation
-
-enigma.eProfileWrite("LOAD:skin")
-from skin import readSkin
-
-enigma.eProfileWrite("LOAD:Tools")
-from Tools.Directories import InitFallbackFiles, resolveFilename, SCOPE_PLUGINS, SCOPE_CURRENT_SKIN
-InitFallbackFiles()
 
 enigma.eProfileWrite("config.misc")
 config.misc.radiopic = ConfigText(default=resolveFilename(SCOPE_CURRENT_SKIN, "radio.mvi"))
@@ -329,17 +319,15 @@ class Session:
 			screen.addSummary(self.summary)
 
 	def doInstantiateDialog(self, screen, arguments, kwargs, desktop):
-		# create dialog
-		dlg = screen(self, *arguments, **kwargs)
-		if dlg is None:
+		dialog = screen(self, *arguments, **kwargs)  # Create dialog.
+		if dialog is None:
 			return
-		# read skin data
-		readSkin(dlg, None, dlg.skinName, desktop)
-		# create GUI view of this dialog
-		dlg.setDesktop(desktop)
-		dlg.applySkin()
-		self.allDialogs.append(dlg)
-		return dlg
+		readSkin(dialog, None, dialog.skinName, desktop)  # Read skin data.
+		dialog.setDesktop(desktop)  # Create GUI view of this dialog.
+		dialog.applySkin()
+		if not hasattr(dialog, "noSkinReload"):
+			self.allDialogs.append(dialog)
+		return dialog
 
 	def pushCurrent(self):
 		if self.current_dialog is not None:
@@ -418,9 +406,9 @@ class Session:
 			self.summary.show()
 
 	def doShutdown(self):
-		for function in self.onShutdown:
-			if callable(function):
-				function()
+		for callback in self.onShutdown:
+			if callable(callback):
+				callback()
 
 	def reloadDialogs(self):
 		for dlg in self.allDialogs:
@@ -444,7 +432,7 @@ class PowerKey:
 		globalActionMap.actions["power_down"] = lambda *args: None
 		globalActionMap.actions["power_up"] = self.powerup
 		globalActionMap.actions["power_long"] = self.powerlong
-		globalActionMap.actions["deepstandby"] = self.shutdown # frontpanel long power button press
+		globalActionMap.actions["deepstandby"] = self.shutdown # Front panel  long power button press
 		globalActionMap.actions["discrete_off"] = self.standby
 
 	def shutdown(self):
@@ -599,9 +587,9 @@ def runScreenTest():
 	# we need session.scart to access it from within menu.xml
 	session.scart = AutoScartControl(session)
 
-	enigma.eProfileWrite("Init:Trashcan")
-	import Tools.Trashcan
-	Tools.Trashcan.init(session)
+	enigma.eProfileWrite("InitTrashcan")
+	from Tools.Trashcan import initTrashcan
+	initTrashcan(session)
 
 	enigma.eProfileWrite("RunReactor")
 	enigma.eProfileDone()
@@ -647,13 +635,19 @@ def runScreenTest():
 	session.nav.shutdown()
 	session.doShutdown()
 
-	VolumeControl.instance.saveVolumeState()
-
 	enigma.eProfileWrite("configfile.save")
 	configfile.save()
 
 	return 0
 
+enigma.eProfileWrite("Navigation")
+from Navigation import Navigation
+
+enigma.eProfileWrite("LOAD:skin")
+from skin import readSkin
+
+enigma.eProfileWrite("LOAD:Tools")
+InitFallbackFiles()
 
 enigma.eProfileWrite("Skin")
 from skin import InitSkins
@@ -739,16 +733,16 @@ from Components.PowerOffTimer import powerOffTimer
 #t.callback.append(dump_malloc_stats)
 #t.start(1000)
 
-# first, setup a screen
+# Lets get going and load a screen.
 try:
-	runScreenTest()
-
-	plugins.shutdown()
-
-	Components.ParentalControl.parentalControl.save()
-except:
-	print('[StartEnigma] EXCEPTION IN PYTHON STARTUP CODE:')
-	print('-' * 60)
-	print_exc(file=stdout)
-	enigma.quitMainloop(5)
-	print('-' * 60)
+	runScreenTest()  # Start running the first screen.
+	plugins.shutdown()  # Shutdown all plugins.
+	from Components.ParentalControl import parentalControl
+	parentalControl.save()  # Save parental control settings.
+except Exception:
+	print("Error: Exception in Python StartEnigma startup code:")
+	print("=" * 52)
+	print_exc(file=sys.stdout)
+	print("[StartEnigma] Exiting via quitMainloop #4.")
+	enigma.quitMainloop(5)  # QUIT_ERROR_RESTART
+	print("-" * 52)

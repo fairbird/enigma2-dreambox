@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: enigma\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-12-20 11:32+0100\n"
+"POT-Creation-Date: 2025-03-16 15:41+0100\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Frenske <voorzitter@openpli.org>\n"
 "Language-Team: PLiteam <translators@openpli.org>\n"
@@ -399,6 +399,10 @@ msgstr "(leeg)"
 
 msgid "(not activated)"
 msgstr "(gedéactiveerd)"
+
+#, fuzzy
+msgid "(old model)"
+msgstr "3d modus"
 
 msgid "(show optional DVD audio menu)"
 msgstr "(optioneel DVD audio menu weergeven)"
@@ -1267,9 +1271,6 @@ msgstr "Beschikbare formaten"
 msgid "Available locales are:"
 msgstr "Beschikbare talen:"
 
-msgid "Axas E4HD Ultra"
-msgstr "Axas E4HD Ultra"
-
 msgid "Azerbaijan"
 msgstr "Azerbaijan"
 
@@ -1466,6 +1467,13 @@ msgstr "Botswana"
 
 msgid "Bottom"
 msgstr "Onder"
+
+#, fuzzy
+msgid "Bouquet down"
+msgstr "Volume -"
+
+msgid "Bouquet up"
+msgstr ""
 
 msgid "Bouvet Island"
 msgstr "Bouvet eilanden"
@@ -1736,6 +1744,10 @@ msgstr "Wijzig stapgrootte"
 msgid "Change timer"
 msgstr "Wijzig timer"
 
+#, fuzzy
+msgid "Change view mode"
+msgstr "Wijzig timer"
+
 msgid "Channel"
 msgstr "Kanaal"
 
@@ -1745,11 +1757,12 @@ msgstr "Zenderinfo"
 msgid "Channel Select Base Actions"
 msgstr "Zenderkeuze basis actie(s)"
 
+#, fuzzy
+msgid "Channel Select EPG Actions"
+msgstr "Zender kies de EPG actie(s)"
+
 msgid "Channel Select Edit Actions"
 msgstr "Wijzigen zenderkeuze actie(s)"
-
-msgid "Channel SelectEPG Actions"
-msgstr "Zender kies de EPG actie(s)"
 
 msgid "Channel Selection"
 msgstr "Zenderkeuze"
@@ -2568,6 +2581,10 @@ msgstr "Raadpleeg het specificatie overzicht van de motor, of laat deze instelli
 msgid "Content does not fit on DVD!"
 msgstr "De inhoud past niet op deze DVD!"
 
+#, fuzzy
+msgid "Context Menu"
+msgstr "Zenderlijstmenu"
+
 msgid "Continue"
 msgstr "Doorgaan"
 
@@ -2804,15 +2821,6 @@ msgstr "DVD branden"
 msgid "DVD Menu"
 msgstr "DVD menu"
 
-msgid "DVD Player Actions"
-msgstr "DVD-speler actie(s)"
-
-msgid "DVD Title List"
-msgstr "DVD titellijst"
-
-msgid "DVD Toolbox"
-msgstr "DVD gereedschap"
-
 msgid "DVD data format"
 msgstr "DVD dataformaat"
 
@@ -2830,6 +2838,18 @@ msgstr "DVD titellijst"
 
 msgid "DVDPlayer"
 msgstr "DVD-speler"
+
+#, fuzzy
+msgid "DVDPlayer Actions"
+msgstr "DVD-speler actie(s)"
+
+#, fuzzy
+msgid "DVDTitle List"
+msgstr "DVD titellijst"
+
+#, fuzzy
+msgid "DVDToolbox"
+msgstr "DVD gereedschap"
 
 msgid "Danish"
 msgstr "Deens"
@@ -3848,7 +3868,8 @@ msgstr "Ethiopië"
 msgid "Event View Actions"
 msgstr "Programmaoverzichtsmenu actie(s)"
 
-msgid "Event ViewEPG Actions"
+#, fuzzy
+msgid "Event View EPG Actions"
 msgstr "EPG programmaoverzichtsmenu actie(s)"
 
 msgid "Event font size (relative to skin size)"
@@ -3998,9 +4019,6 @@ msgstr "Extra begintijd om de inactiviteit sleeptimer te negeren"
 
 msgid "F"
 msgstr "F"
-
-msgid "F1/F3/F4/F4-TURBO"
-msgstr "F1/F3/F4/F4-TURBO"
 
 msgid "FAILED"
 msgstr "MISLUKT"
@@ -4560,12 +4578,6 @@ msgstr "HD"
 msgid "HD list"
 msgstr "HD lijst"
 
-msgid "HD2400"
-msgstr "HD2400"
-
-msgid "HD60/HD66SE/Multibox/Multibox SE"
-msgstr "HD60/HD66SE/Multibox/Multibox SE"
-
 msgid "HDMI"
 msgstr "HDMI"
 
@@ -4598,9 +4610,6 @@ msgstr "HDMI-In"
 
 msgid "HDR10 support"
 msgstr "HDR10 ondersteuning"
-
-msgid "HDx1/HD1xxx/HD5x0C/VS1x00/et7x00/et8500/et7000mini"
-msgstr "HDx1/HD1xxx/HD5x0C/VS1x00/et7x00/et8500/et7000mini"
 
 msgid "HELP"
 msgstr "HELP"
@@ -4775,9 +4784,6 @@ msgstr "I"
 
 msgid "I do not want to perform any service scans"
 msgstr "Ik wil verder geen (aanvullende) zenderscan uitvoeren."
-
-msgid "I55SE/H7(new model)/H9(new model)/H9COMBO/H9TWIN/H9SE/H9COMBOSE/H10/H11/H17"
-msgstr "I55SE/H7(new model)/H9(new model)/H9COMBO/H9TWIN/H9SE/H9COMBOSE/H10/H11/H17"
 
 msgid "IDLE"
 msgstr "INACTIEF"
@@ -4996,6 +5002,10 @@ msgstr "Informatiebalk zenderkeuze actie(s)"
 msgid "Infobar Cue Sheet Actions"
 msgstr "Informatiebalk filmfragmenten actie(s)"
 
+#, fuzzy
+msgid "Infobar EPG Actions"
+msgstr "Informatiebalk EPG actie(s)"
+
 msgid "Infobar Extensions"
 msgstr "Informatiebalk applicaties"
 
@@ -5049,9 +5059,6 @@ msgstr "Informatiebalk Vmodus toets actie(s)"
 
 msgid "Infobar frontend data source"
 msgstr "Databron van de informatiebalk"
-
-msgid "InfobarEPG Actions"
-msgstr "Informatiebalk EPG actie(s)"
 
 msgid "Information"
 msgstr "Informatie"
@@ -5280,7 +5287,15 @@ msgstr "Spring naar het laatste item in de lijst of het einde van de tekst"
 msgid "Jump to next marked position"
 msgstr "Spring naar de volgende markering"
 
+#, fuzzy
+msgid "Jump to next marker"
+msgstr "Spring naar de volgende markering"
+
 msgid "Jump to previous marked position"
+msgstr "Spring naar de vorige markering"
+
+#, fuzzy
+msgid "Jump to previous marker"
 msgstr "Spring naar de vorige markering"
 
 #. TRANSLATORS: (aspect ratio policy: scale as close to fullscreen as possible)
@@ -5877,6 +5892,10 @@ msgstr "Ga één regel naar beneden"
 msgid "Move down a screen"
 msgstr "Ga één scherm naar beneden"
 
+#, fuzzy
+msgid "Move down in bouquet list"
+msgstr "Ga één regel naar beneden"
+
 msgid "Move east"
 msgstr "Draai oost"
 
@@ -5930,6 +5949,10 @@ msgstr "Ga één regel naar boven"
 
 msgid "Move up a screen"
 msgstr "Ga één scherm naar boven."
+
+#, fuzzy
+msgid "Move up in bouquet list"
+msgstr "Bouquet bewerken stoppen"
 
 msgid "Move west"
 msgstr "Draai west"
@@ -6559,9 +6582,6 @@ msgstr "Andere Ondertitels & lang"
 msgid "Other buttons will jump to the help for that button, if there is help."
 msgstr "Andere knoppen springen naar de hulp voor die specifieke knop, indien er hulp voor is."
 
-msgid "Other functions"
-msgstr "Andere functies"
-
 msgid "Output"
 msgstr "Uitgang"
 
@@ -6646,9 +6666,6 @@ msgstr "Vorige"
 msgid "PREVIOUSSONG"
 msgstr "VORIG LIEDJE"
 
-msgid "PULSe 4K(mini)"
-msgstr "PULSe 4K (mini)"
-
 msgid "PVR"
 msgstr "PVR"
 
@@ -6663,6 +6680,14 @@ msgstr "Pakketbeheer"
 
 msgid "Packet manager"
 msgstr "Pakketbeheer"
+
+#, fuzzy
+msgid "Page down"
+msgstr "Zap naar beneden"
+
+#, fuzzy
+msgid "Page up"
+msgstr "Gebruikersinstellingen"
 
 msgid "Pakistan"
 msgstr "Pakistan"
@@ -6749,11 +6774,12 @@ msgstr "Peru"
 msgid "Philippines"
 msgstr "Philippijnen"
 
-msgid "PiP Setup Actions"
-msgstr "PIP setup actie(s)"
-
 msgid "PiP setup"
 msgstr "PIP instellingen"
+
+#, fuzzy
+msgid "PiPSetup Actions"
+msgstr "PIP setup actie(s)"
 
 msgid "Picon"
 msgstr "Picon"
@@ -7485,6 +7511,10 @@ msgstr "RECHTS"
 
 msgid "Radio"
 msgstr "Radio"
+
+#, fuzzy
+msgid "Radio mode"
+msgstr "3d modus"
 
 msgid "Ram disk"
 msgstr "Ramdisk"
@@ -8243,6 +8273,10 @@ msgstr "Zoeken"
 msgid "Search east"
 msgstr "Zoek oost"
 
+#, fuzzy
+msgid "Search in SMS mode"
+msgstr "Zenders titel mode"
+
 msgid "Search west"
 msgstr "Zoek west"
 
@@ -8338,6 +8372,10 @@ msgstr "Kies 'ja' om %s band te voegen aan uw scan."
 
 msgid "Select 'yes' to only send the DiSEqC command when changing from one satellite to another, or select 'no' for the DiSEqC command to be resent on every zap."
 msgstr "Selecteer ‘ja’ om enkel een DiSEqC signaal te versturen bij het wisselen van satelliet, of kies voor ‘nee’ om het DiSEqC commando te versturen bij iedere keer dat u zapt."
+
+#, fuzzy
+msgid "Select Audio"
+msgstr "Selecteer CAId"
 
 msgid "Select CAId"
 msgstr "Selecteer CAId"
@@ -8475,6 +8513,10 @@ msgstr "Selecteer herhalingsfrequentie"
 
 msgid "Select satellites"
 msgstr "Kies de satellieten"
+
+#, fuzzy
+msgid "Select service"
+msgstr "Kies een zender"
 
 msgid "Select service name"
 msgstr "Kies een zendernaam"
@@ -8912,6 +8954,10 @@ msgstr "Snelkoppeling actie(s)"
 msgid "Show"
 msgstr "Toon menu-item"
 
+#, fuzzy
+msgid "Show All Services"
+msgstr "Toon de zenderlijst"
+
 msgid "Show Audioselection"
 msgstr "Toon de audioselectie"
 
@@ -8927,11 +8973,23 @@ msgstr "Toon de EPG van de huidige zender"
 msgid "Show EPG..."
 msgstr "Toon de EPG..."
 
+#, fuzzy
+msgid "Show Favorites"
+msgstr "Toon de favorietenlijsten"
+
 msgid "Show InfoBar"
 msgstr "Toon de informatiebalk"
 
 msgid "Show PiP"
 msgstr "Toon de PIP"
+
+#, fuzzy
+msgid "Show Providers"
+msgstr "Toon de films"
+
+#, fuzzy
+msgid "Show Satellites"
+msgstr "Toon de lijst van satellieten"
 
 msgid "Show True/False as graphical switch"
 msgstr "Toon 'waar/niet waar' als grafische schakelaar"
@@ -9992,6 +10050,10 @@ msgstr "AFSTEMMEN"
 msgid "TV"
 msgstr "TV"
 
+#, fuzzy
+msgid "TV mode"
+msgstr "Test modus"
+
 msgid "TV physical address report"
 msgstr "TV fysiek adres overzicht"
 
@@ -10149,7 +10211,8 @@ msgstr ""
 msgid "The number of steps to change the volume on the device the keys are forwarded to."
 msgstr "Het aantal stappen waarmee het volume wijzigt op het apparaat waarnaar de toetsen worden doorgestuurd."
 
-msgid "The order and grouping of the help information list can be controlled using MENU>Setup>User Interface>Settings>Sort order for help screen."
+#, fuzzy
+msgid "The order and grouping of the help information list can be controlled using MENU>Setup>User Interface>Settings>Sort order for help screen or pressing long help"
 msgstr "De volgorde en indeling van de hulp-informatielijst kan gewijzigd worden via MENU - Instellen - Gebruikersinterface -Instellen - Sorteervolgorde voor het hulpscherm."
 
 msgid ""
@@ -10667,6 +10730,10 @@ msgstr "Activeer Live TV op het LCD display"
 msgid "Toggle PiPzap"
 msgstr "Activeer PIPzap"
 
+#, fuzzy
+msgid "Toggle TV Radio mode"
+msgstr "Schakel tussen TV/RADIO"
+
 msgid "Toggle TV/RADIO mode"
 msgstr "Schakel tussen TV/RADIO"
 
@@ -10678,6 +10745,10 @@ msgstr "Activeer de optie 'verberg de stippellijn' voor dit kanaal"
 
 msgid "Toggle infoBar"
 msgstr "Activeer de informatiebalk"
+
+#, fuzzy
+msgid "Toggle movemode"
+msgstr "Schakel tussen de videomode"
 
 msgid "Toggle new text inserts before or overwrites existing text"
 msgstr "Schakel nieuwe invoegingen in of overschrijf de bestaande tekst"
@@ -11232,9 +11303,6 @@ msgstr "VOL+"
 
 msgid "VOL-"
 msgstr "VOL-"
-
-msgid "VU+"
-msgstr "Vu+"
 
 msgid "Valid ONID/TSID look at www.lyngsat.com..."
 msgstr "Bekijk de correcte ONID/TSID op www.lyngsat.com"
@@ -12015,6 +12083,10 @@ msgstr "U kunt de gekozen directory instellen als 'root' directory voor de movie
 msgid "You can set sorting type for items in movielist."
 msgstr "U kunt aangeven hoe u een filmoverzicht wilt sorteren."
 
+#, fuzzy, python-format
+msgid "You can't update the software because %s can not be reached."
+msgstr "De status van de huidige image kan niet worden bepaald omdat %s niet te bereiken is."
+
 msgid "You cannot delete this!"
 msgstr "U kunt dit niet wissen!"
 
@@ -12199,6 +12271,10 @@ msgstr "Zapmodus"
 msgid "Zap to"
 msgstr "Zap naar"
 
+#, fuzzy
+msgid "Zap to channel number"
+msgstr "Spring via nummer naar hoofdstuk"
+
 msgid "Zap to selected channel"
 msgstr "Ga naar het geselecteerde kanaal"
 
@@ -12218,15 +12294,6 @@ msgstr "Schakelde naar het timer kanaal %s als PIP!"
 #, python-format
 msgid "Zapped to timer service %s!"
 msgstr "Naar timer kanaal %s geschakeld!"
-
-msgid "Zgemma H.S/H.2S/H.2H/H5/H7(old model)"
-msgstr "Zgemma H.S/H.2S/H.2H/H5/H7 (oud model)"
-
-msgid "Zgemma H9(old model)/I55Plus/H8"
-msgstr "Zgemma H9(oud model)/I55Plus/H8"
-
-msgid "Zgemma Star S/2S/H1/H2"
-msgstr "Zgemma Star S/2S/H1/H2"
 
 msgid "Zimbabwe"
 msgstr "Zimbabwe"
@@ -12510,21 +12577,6 @@ msgstr "fout tijdens het opstarten van de scan"
 
 msgid "error while scanning"
 msgstr "fout tijdens het scannen"
-
-msgid "et4000"
-msgstr "ET4000"
-
-msgid "et5000/et6000"
-msgstr "et5000/et6000"
-
-msgid "et8000/et10000"
-msgstr "ET8000/ET10000"
-
-msgid "et9000/et9100"
-msgstr "ET9000/9100"
-
-msgid "et9200/et9500/et6500"
-msgstr "et9200/et9500/et6500"
 
 msgid "execute cuts (requires MovieCut plugin)"
 msgstr "Voor de knipbewerking uit (MovieCut plugin is hiervoor nodig)"
@@ -13278,9 +13330,6 @@ msgstr "Met de tunernaam"
 
 msgid "with_errors"
 msgstr "met_fouten"
-
-msgid "xp1000"
-msgstr "XP1000"
 
 msgid "yellow"
 msgstr "Geel"

@@ -20,6 +20,8 @@
 #include <lib/gdi/gpixmap.h>
 #include <lib/dvb/subtitle.h>
 
+#include <lib/base/cfile.h>
+
 #include <string>
 
 #include <gst/gst.h>
@@ -506,6 +508,9 @@ eServiceMP3::eServiceMP3(eServiceReference ref):
 	m_dvb_subtitle_sync_timer = eTimer::create(eApp);
 	m_dvb_subtitle_parser = new eDVBSubtitleParser();
 	m_dvb_subtitle_parser->connectNewPage(sigc::mem_fun(*this, &eServiceMP3::newDVBSubtitlePage), m_new_dvb_subtitle_page_connection);
+#ifdef PASSTHROUGH_FIX
+ 	m_passthrough_fix_timer = eTimer::create(eApp);
+ #endif
 	m_stream_tags = 0;
 	m_currentAudioStream = -1;
 	m_currentSubtitleStream = -1;
@@ -553,6 +558,9 @@ eServiceMP3::eServiceMP3(eServiceReference ref):
 	CONNECT(m_dvb_subtitle_sync_timer->timeout, eServiceMP3::pushDVBSubtitles);
 	CONNECT(m_pump.recv_msg, eServiceMP3::gstPoll);
 	CONNECT(m_nownext_timer->timeout, eServiceMP3::updateEpgCacheNowNext);
+#ifdef PASSTHROUGH_FIX
+	CONNECT(m_passthrough_fix_timer->timeout, eServiceMP3::forcePassthrough);
+#endif
 	m_aspect = m_width = m_height = m_framerate = m_progressive = m_gamma = -1;
 
 	m_state = stIdle;
@@ -946,6 +954,15 @@ eServiceMP3::~eServiceMP3()
 	m_new_dvb_subtitle_page_connection = 0;
 }
 
+#ifdef PASSTHROUGH_FIX
+void eServiceMP3::forcePassthrough()
+{
+	eTrace("[eServiceMP3] Setting 'passthrough' to force correct operation");
+	CFile::writeStr("/proc/stb/audio/ac3", "passthrough");
+	clearBuffers();
+}
+#endif
+
 void eServiceMP3::updateEpgCacheNowNext()
 {
 	bool update = false;
@@ -1268,7 +1285,7 @@ RESULT eServiceMP3::trickSeek(gdouble ratio)
 		m_to_paused = true;
 		gst_element_set_state(m_gst_playbin, GST_STATE_PAUSED);
 		//m_paused = true;
-		if ( pos_ret >= 0)
+		if ( pos_ret >= 0 )
 			seekTo(pts);
 		/* pipeline sometimes block due to audio track issue off gstreamer.
 		If the pipeline is blocked up on pending state change to paused ,
@@ -1276,6 +1293,12 @@ RESULT eServiceMP3::trickSeek(gdouble ratio)
 		ret = gst_element_get_state(m_gst_playbin, &state, &pending, 3LL * GST_SECOND);
 		if (state == GST_STATE_PLAYING && pending == GST_STATE_PAUSED)
 		{
+
+			if (m_currentAudioStream >= 0)
+				selectAudioStream(m_currentAudioStream, true);
+			else
+				selectAudioStream(0, true);
+
 			if (pos_ret >= 0)
 			{
 				eDebug("[eServiceMP3] blocked pipeline we need to flush playposition in pts at last pos before paused is %" G_GINT64_FORMAT, (gint64)pts);
@@ -1961,6 +1984,11 @@ RESULT eServiceMP3::selectTrack(unsigned int i)
 		return m_currentAudioStream;
 	eDebug("[eServiceMP3 selectTrack %d", i);
 
+	return selectAudioStream(i);
+}
+
+void eServiceMP3::clearBuffers()
+{
 	bool validposition = false;
 	pts_t ppos = 0;
 	if (getPlayPosition(ppos) >= 0)
@@ -1975,19 +2003,58 @@ RESULT eServiceMP3::selectTrack(unsigned int i)
 		//flush
 		seekTo(ppos);
 	}
-	return selectAudioStream(i);
 }
 
-int eServiceMP3::selectAudioStream(int i)
+
+int eServiceMP3::selectAudioStream(int i, bool skipAudioFix)
 {
-	int current_audio;
+	int current_audio, current_audio_orig;
+
+	g_object_get (m_gst_playbin, "current-audio", &current_audio_orig, NULL);
 	g_object_set (m_gst_playbin, "current-audio", i, NULL);
 	g_object_get (m_gst_playbin, "current-audio", &current_audio, NULL);
 	if ( current_audio == i )
 	{
-		eDebug ("[eServiceMP3] switched to audio stream %d", current_audio);
-		m_currentAudioStream = i;
-		setCacheEntry(true, i);
+		if (!skipAudioFix)
+		{
+			eDebug ("[eServiceMP3] switched to audio stream %d", current_audio);
+			m_currentAudioStream = i;
+
+#ifdef PASSTHROUGH_FIX
+			GstPad* pad = 0;
+			g_signal_emit_by_name (m_gst_playbin, "get-audio-pad", i, &pad);
+			GstCaps* caps = gst_pad_get_current_caps(pad);
+			gst_object_unref(pad);
+			if (caps) {
+				GstStructure* str = gst_caps_get_structure(caps, 0);
+				const gchar *g_type = gst_structure_get_name(str);
+				audiotype_t apidtype = gstCheckAudioPad(str);
+				gst_caps_unref(caps);
+				if (apidtype == atAC3 || apidtype == atEAC3 || apidtype == atAAC || apidtype == atUnknown || apidtype == atPCM) {
+					std::string pass = CFile::read("/proc/stb/audio/ac3");
+					if(pass.find("passthrough") != std::string::npos)
+					{
+						int longAudioDelay = eSimpleConfig::getInt("config.av.passthrough_fix_long", 1200);
+						int shortAudioDelay = eSimpleConfig::getInt("config.av.passthrough_fix_short", 100);
+						m_passthrough_fix_timer->stop();
+						m_passthrough_fix_timer->start(apidtype == atEAC3 && i > 0 && current_audio_orig > -1 ? longAudioDelay : shortAudioDelay, true);
+					}
+					else
+					{
+						clearBuffers();
+					}
+				}
+				else
+				{
+					clearBuffers();
+				}
+
+			}
+#else
+			clearBuffers();
+#endif
+			setCacheEntry(true, i);
+		}
 		return 0;
 	}
 	return -1;
@@ -2077,14 +2144,14 @@ subtype_t getSubtitleType(GstPad* pad, gchar *g_codec=NULL)
 			{
 				if ( !strcmp(g_type, "subpicture/x-dvd") )
 					type = stVOB;
+				else if ( !strcmp(g_type, "subpicture/x-dvb") )
+					type = stDVB;
 				else if ( !strcmp(g_type, "text/x-pango-markup") )
 					type = stSRT;
 				else if ( !strcmp(g_type, "text/plain") || !strcmp(g_type, "text/x-plain") || !strcmp(g_type, "text/x-raw") )
 					type = stPlainText;
 				else if ( !strcmp(g_type, "subpicture/x-pgs") )
 					type = stPGS;
-				else if ( !strcmp(g_type, "subpicture/x-dvb") )
-					type = stDVB;
 				else
 					eDebug("[eServiceMP3] getSubtitleType::unsupported subtitle caps %s (%s)", g_type, g_codec ? g_codec : "(null)");
 			}
@@ -2429,8 +2496,7 @@ void eServiceMP3::gstBusCall(GstMessage *msg)
 				}
 			}
 			gst_tag_list_free(tags);
-			m_event((iPlayableService*)this, evUser+15); // Use user event for tags changed notification since if we use evUpdatedInfo it causes constant refreshes of AudioSelectionLists
-//			m_event((iPlayableService*)this, evUpdatedInfo);
+			m_event((iPlayableService*)this, evUpdatedEventInfo);
 			break;
 		}
 		/* TOC entry intercept used for chapter support CVR */
@@ -2954,14 +3020,12 @@ audiotype_t eServiceMP3::gstCheckAudioPad(GstStructure* structure)
 
 	else if ( gst_structure_has_name (structure, "audio/x-ac3") || gst_structure_has_name (structure, "audio/ac3") )
 		return atAC3;
-	else if ( gst_structure_has_name (structure, "truehd") || gst_structure_has_name (structure, "audio/ac3") )
-		return atAC3;
+	else if (gst_structure_has_name (structure, "audio/x-eac3") || gst_structure_has_name (structure, "audio/eac3") || gst_structure_has_name (structure, "audio/x-true-hd") || gst_structure_has_name (structure, "audio/xTrueHD"))
+		return atEAC3;
 	else if ( gst_structure_has_name (structure, "audio/x-dts") || gst_structure_has_name (structure, "audio/dts") )
 		return atDTS;
-	else if ( gst_structure_has_name (structure, "audio/x-raw") )
-		return atPCM;
 
-	return atUnknown;
+	return atPCM;
 }
 
 void eServiceMP3::gstPoll(ePtr<GstMessageContainer> const &msg)

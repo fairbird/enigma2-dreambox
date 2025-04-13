@@ -39,10 +39,17 @@ class HdmiCECSetupScreen(ConfigListScreen, Screen):
 		self.list = []
 		self.list.append((_("Enabled"), config.hdmicec.enabled, _("Enable or disable using HDMI-CEC.")))
 		if config.hdmicec.enabled.value:
+			self.list.append((_("Advanced Settings"), config.hdmicec.advanced_settings, _("Enable the advanced HDMI-CEC setting options.")))
+			if config.hdmicec.advanced_settings.value and config.hdmicec.handle_deepstandby_events.value and config.workaround.deeprecord.value:
+				self.list.append((_("Wait for timesync at startup"), config.hdmicec.deepstandby_waitfortimesync, _("If the deep standby workaround is enabled wait until the system time is synchronized. Depending on the requirement the device wake up will continuing after a maximum of 2 minutes.")))
 			self.list.append((_("Put TV in standby"), config.hdmicec.control_tv_standby, _("Automatically put the TV in standby whenever the receiver goes into standby or deep standby.")))
 			self.list.append((_("Wakeup TV from standby"), config.hdmicec.control_tv_wakeup, _("When the receiver wakes from standby or deep standby, it will send a command to the TV to bring it out of standby too.")))
 			if config.hdmicec.control_tv_wakeup.value:
 				self.list.append((_("Wakeup command for TV"), config.hdmicec.tv_wakeup_command, _("Some TVs do not wake from standby when they receive the 'Image View On' command. If this is the case try the 'Text View On' command instead.")))
+			if config.hdmicec.advanced_settings.value and config.hdmicec.control_tv_wakeup.value:
+				self.list.append((_("Even if a 'Zap' recording timer starting?"), config.hdmicec.tv_wakeup_zaptimer, _("Select 'Yes' if you want to wake the TV for a 'Zap' recording timer is starting.")))
+				self.list.append((_("Even if a 'Zap and Record' recording timer starting?"), config.hdmicec.tv_wakeup_zapandrecordtimer, _("Select 'Yes' if you want to wake the TV for a 'Zap and Record' recording timer is starting.")))
+				self.list.append((_("Even if a 'Wakeup' scheduled task starting?"), config.hdmicec.tv_wakeup_wakeuppowertimer, _("Select 'Yes' if you want to wake the TV when a 'Wakeup' scheduled task is starting.")))
 			self.list.append((_("Regard deep standby as standby"), config.hdmicec.handle_deepstandby_events, _("If set to 'yes' the same commands will be sent to the TV for deep standby events, as are sent during regular standby events.")))
 			self.list.append((_("Switch TV to correct input"), config.hdmicec.report_active_source, _("When receiver wakes from standby, it will command the TV to switch to the HDMI input the receiver is connected to.")))
 			self.list.append((_("Use TV remote control"), config.hdmicec.report_active_menu, _("Allows the TV remote to be used to control the receiver.")))
@@ -61,6 +68,7 @@ class HdmiCECSetupScreen(ConfigListScreen, Screen):
 			self.list.append((_("Minimum send interval"), config.hdmicec.minimum_send_interval, _("Delay between CEC commands when sending a series of commands. Some devices require this delay for correct functioning, usually between 50-150ms.")))
 			self.list.append((_("Repeat leave standby messages"), config.hdmicec.repeat_wakeup_timer, _("The command to wake from standby will be sent multiple times.")))
 			self.list.append((_("Send 'sourceactive' before zap timers"), config.hdmicec.sourceactive_zaptimers, _("Command the TV to switch to the correct HDMI input when zap timers activate.")))
+			self.list.append((_("Check power and input state from TV"), config.hdmicec.check_tv_state, _("An attempt is made to capture the current TV status. If this is not possible due to incorrect or missing status messages it may cause the receiver to respond unexpectedly. On the other hand, tries to respond better to different operating conditions.")))
 			self.list.append((_("Detect other boxes before standby"), config.hdmicec.next_boxes_detect, _("Before sending the command to switch the TV to standby, the receiver tests if all the other devices plugged to TV are in standby. If they are not, the 'sourceinactive' command will be sent to the TV instead of the 'standby' command.")))
 			if config.hdmicec.next_boxes_detect.value:
 				for i in range(len(config.hdmicec.ethbox)):

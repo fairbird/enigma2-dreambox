@@ -44,7 +44,7 @@ private:
 	static int ReadProcInt(int, const std::string &);
 	static void WriteProcInt(int, const std::string &, int);
 	static void WriteProcStr(int, const std::string &, int);
-#ifdef DREAMBOX
+#ifdef HAVE_DM_FBC
 	static void LoadConnectChoices(int, std::string &);
 #else
 	static void LoadConnectChoices(int, connect_choices_t &);

@@ -363,7 +363,7 @@ class PluginBrowser(Screen, ProtectedScreen):
 				self.list.append(PluginEntryComponent(plugin[0], self.listWidth))
 				pluginlist.remove(plugin[0])
 		self.list = self.list + [PluginEntryComponent(plugin, self.listWidth) for plugin in pluginlist]
-		if config.usage.menu_show_numbers.value in ("menu&plugins", "plugins") or showHelp:
+		if config.misc.menu_show_numbers.value or showHelp:
 			for x in enumerate(self.list):
 				tmp = list(x[1][1])
 				tmp[7] = "%s %s" % (x[0] + 1, tmp[7])
@@ -371,7 +371,7 @@ class PluginBrowser(Screen, ProtectedScreen):
 		self["list"].l.setList(self.list)
 
 	def showHelp(self):
-		if config.usage.menu_show_numbers.value not in ("menu&plugins", "plugins"):
+		if config.misc.menu_show_numbers.value:
 			self.help = not self.help
 			self.updateList(self.help)
 
@@ -878,7 +878,7 @@ class PluginBrowserNew(Screen):
 				self.list.append(PluginEntryComponent(plugin[0], self.listWidth))
 				pluginlist.remove(plugin[0])
 		self.list = self.list + [PluginEntryComponent(plugin, self.listWidth) for plugin in pluginlist]
-		if config.usage.menu_show_numbers.value in ("menu&plugins", "plugins") or showHelp:
+		if config.misc.menu_show_numbers.value or showHelp:
 			for x in enumerate(self.list):
 				tmp = list(x[1][1])
 				tmp[7] = "%s %s" % (x[0] + 1, tmp[7])
@@ -886,7 +886,7 @@ class PluginBrowserNew(Screen):
 		self["list"].l.setList(self.list)
 
 	def showHelp(self):
-		if config.usage.menu_show_numbers.value not in ("menu&plugins", "plugins"):
+		if config.misc.menu_show_numbers.value:
 			self.help = not self.help
 			self.updateList(self.help)
 
@@ -1062,14 +1062,14 @@ class PackageAction(Screen, NumericalTextInput):
 			"yellow": (self.keyShowLog, _("Show the last opkg command's output"))
 		}, prio=0, description=description)
 		self["logAction"].setEnabled(False)
-		self["navigationActions"] = HelpableActionMap(self, ["NavigationActions"], {
+		self["navigationActions"] = HelpableActionMap(self, ["NavigationActions", "PreviousNextActions"], {
 			"top": (self["plugins"].goTop, _("Move to the first item on the first screen")),
 			"pageUp": (self["plugins"].goPageUp, _("Move up a screen")),
 			"up": (self["plugins"].goLineUp, _("Move up a line")),
-			# "first": (self.keyTop, _("Move to the first item on the current line")),
-			"left": (self.keyPreviousCategory, _("Move to the previous category in the list")),
-			"right": (self.keyNextCategory, _("Move to the next category in the list")),
-			# "last": (self.keyBottom, _("Move to the last item on the current line")),
+			"first": (self.keyPreviousCategory, _("Move to the previous category in the list")),
+			"previous": (self.keyPreviousCategory, _("Move to the previous category in the list")),
+			"last": (self.keyNextCategory, _("Move to the next category in the list")),
+			"next": (self.keyNextCategory, _("Move to the next category in the list")),
 			"down": (self["plugins"].goLineDown, _("Move down a line")),
 			"pageDown": (self["plugins"].goPageDown, _("Move down a screen")),
 			"bottom": (self["plugins"].goBottom, _("Move to the last item on the last screen"))

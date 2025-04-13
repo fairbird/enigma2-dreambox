@@ -145,6 +145,7 @@ dist_install_DATA = \
 	kp.png \
 	kr.png \
 	ks.png \
+	ku.png \
 	kw.png \
 	kz.png \
 	la.png \

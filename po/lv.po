@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: enigma2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-01-04 14:33+0200\n"
+"POT-Creation-Date: 2025-03-16 15:41+0100\n"
 "PO-Revision-Date: 2014-11-12 00:49+0200\n"
 "Last-Translator: Taapat <taapat@gmail.com>\n"
 "Language-Team: Taapat <taapat@gmail.com>\n"
@@ -415,6 +415,10 @@ msgstr "(tukšs)"
 
 msgid "(not activated)"
 msgstr "(nav aktivizēts)"
+
+#, fuzzy
+msgid "(old model)"
+msgstr "3d režīms"
 
 msgid "(show optional DVD audio menu)"
 msgstr "(rādīt papildu DVD skaņas izvēlni)"
@@ -1282,9 +1286,6 @@ msgstr "Pieejamie mainīgo formāti"
 
 msgid "Available locales are:"
 msgstr "Pieejamās valodas:"
-
-msgid "Axas E4HD Ultra"
-msgstr "Axas E4HD Ultra"
 
 msgid "Azerbaijan"
 msgstr "Azerbaidžāna"
@@ -3837,9 +3838,6 @@ msgstr "Papildus sākuma laiks neaktivitātes miega taimera ignorēšanai"
 msgid "F"
 msgstr "F"
 
-msgid "F1/F3/F4/F4-TURBO"
-msgstr "F1/F3/F4/F4-TURBO"
-
 msgid "FAILED"
 msgstr "NEIZDEVĀS"
 
@@ -4398,12 +4396,6 @@ msgstr "HD"
 msgid "HD list"
 msgstr "HD saraksts"
 
-msgid "HD2400"
-msgstr "HD2400"
-
-msgid "HD60/HD66SE/Multibox/Multibox SE"
-msgstr "HD60/HD66SE/Multibox/Multibox SE"
-
 msgid "HDMI"
 msgstr "HDMI"
 
@@ -4436,9 +4428,6 @@ msgstr "HDMI-In"
 
 msgid "HDR10 support"
 msgstr "HDR10 atbalsts"
-
-msgid "HDx1/HD1xxx/HD5x0C/VS1x00/et7x00/et8500/et7000mini"
-msgstr "HDx1/HD1xxx/HD5x0C/VS1x00/et7x00/et8500/et7000mini"
 
 msgid "HELP"
 msgstr "PALĪDZĪBA"
@@ -4613,9 +4602,6 @@ msgstr "I"
 
 msgid "I do not want to perform any service scans"
 msgstr "Es nevēlos veikt kanālu meklēšanu"
-
-msgid "I55SE/H7(new model)/H9(new model)/H9COMBO/H9TWIN/H9SE/H9COMBOSE/H10/H11/H17"
-msgstr "I55SE/H7(new model)/H9(new model)/H9COMBO/H9TWIN/H9SE/H9COMBOSE/H10/H11/H17"
 
 msgid "IDLE"
 msgstr "NEIZMANTOTS"
@@ -6475,9 +6461,6 @@ msgstr "IEPRIEKŠĒJAIS"
 
 msgid "PREVIOUSSONG"
 msgstr "IEPRIEKŠEJĀ DZIESMA"
-
-msgid "PULSe 4K(mini)"
-msgstr "PULSe 4K(mini)"
 
 msgid "PVR"
 msgstr "PVR"
@@ -9954,7 +9937,8 @@ msgstr ""
 msgid "The number of steps to change the volume on the device the keys are forwarded to."
 msgstr "Darbību skaits, kas tiks veiktas, lai mainītu ierīces skaļumu, uz kuru tiek pārsūtīti taustiņi."
 
-msgid "The order and grouping of the help information list can be controlled using MENU>Setup>User Interface>Settings>Sort order for help screen."
+#, fuzzy
+msgid "The order and grouping of the help information list can be controlled using MENU>Setup>User Interface>Settings>Sort order for help screen or pressing long help"
 msgstr "Palīdzības informācijas saraksta secību un grupēšanu var kontrolēt, izmantojot Iestatījumi>Iestatīšana>Lietotāja interfeiss>Iestatījumi>Kārtošanas secība."
 
 msgid ""
@@ -11026,9 +11010,6 @@ msgstr "VOL+"
 msgid "VOL-"
 msgstr "VOL-"
 
-msgid "VU+"
-msgstr "VU+"
-
 msgid "Valid ONID/TSID look at www.lyngsat.com..."
 msgstr "Derīgu ONID/TSID meklējiet www.lyngsat.com..."
 
@@ -11971,15 +11952,6 @@ msgstr "Pārslēdz kā PiP uz taimera kanālu %s!"
 msgid "Zapped to timer service %s!"
 msgstr "Pārslēdz uz taimera kanālu %s!"
 
-msgid "Zgemma H.S/H.2S/H.2H/H5/H7(old model)"
-msgstr "Zgemma H.S/H.2S/H.2H/H5/H7(vecais modelis)"
-
-msgid "Zgemma H9(old model)/I55Plus/H8"
-msgstr "Zgemma H9(vecais modelis)/I55Plus/H8"
-
-msgid "Zgemma Star S/2S/H1/H2"
-msgstr "Zgemma Star S/2S/H1/H2"
-
 msgid "Zimbabwe"
 msgstr "Zimbabve"
 
@@ -12262,21 +12234,6 @@ msgstr "kļūda uzsākot skenēšanu"
 
 msgid "error while scanning"
 msgstr "kļūda skenējot"
-
-msgid "et4000"
-msgstr "et4000"
-
-msgid "et5000/et6000"
-msgstr "et5000/et6000"
-
-msgid "et8000/et10000"
-msgstr "et8000/et10000"
-
-msgid "et9000/et9100"
-msgstr "et9000/et9100"
-
-msgid "et9200/et9500/et6500"
-msgstr "et9200/et9500/et6500"
 
 msgid "execute cuts (requires MovieCut plugin)"
 msgstr "izpildīt griešanu (izmanto spraudni MovieCut)"
@@ -13030,9 +12987,6 @@ msgstr "ar uztvērēja nosaukumu"
 
 msgid "with_errors"
 msgstr "ar_kļūdām"
-
-msgid "xp1000"
-msgstr "xp1000"
 
 msgid "yellow"
 msgstr "dzeltenā"
