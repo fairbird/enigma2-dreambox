@@ -389,7 +389,7 @@ class Navigation:
 				for f in Navigation.playServiceExtensions:
 					playref, isHandled = f(self, playref, event, InfoBarInstance)
 
- 				print(f"[Navigation] Playref is '{playref.toString()}'.")
+				print(f"[Navigation] Playref is '{playref.toString()}'.")
 				self.currentlyPlayingServiceOrGroup = ref
 				if InfoBarInstance and InfoBarInstance.servicelist.servicelist.setCurrent(ref, adjust):
 					self.currentlyPlayingServiceOrGroup = InfoBarInstance.servicelist.servicelist.getCurrent()
