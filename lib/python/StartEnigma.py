@@ -143,7 +143,7 @@ except ImportError:
 	def runReactor():
 		enigma.runMainloop()
 
-enigma.eProfileWrite("LOAD:Plugin")
+enigma.eProfileWrite("Plugin")
 
 from twisted.python import log
 config.misc.enabletwistedlog = ConfigYesNo(default=False)
@@ -155,7 +155,7 @@ else:
 # initialize autorun plugins and plugin menu entries
 from Components.PluginComponent import plugins
 
-enigma.eProfileWrite("LOAD:Wizard")
+enigma.eProfileWrite("Wizard")
 config.misc.rcused = ConfigInteger(default=1)
 from Screens.Wizard import wizardManager
 from Screens.StartWizard import *
@@ -186,7 +186,7 @@ def dump(dir, p=""):
 # display
 
 
-enigma.eProfileWrite("LOAD:ScreenGlobals")
+enigma.eProfileWrite("ScreenGlobals")
 from Screens.Globals import Globals
 from Screens.SessionGlobals import SessionGlobals
 from Screens.Screen import Screen
@@ -511,19 +511,19 @@ class AutoScartControl:
 					self.scartDialog.switchToTV()
 
 
-enigma.eProfileWrite("Load:CI")
+enigma.eProfileWrite("CI")
 from Screens.Ci import CiHandler
 
-enigma.eProfileWrite("Load:VolumeControl")
-from Components.VolumeControl import VolumeControl
+enigma.eProfileWrite("VolumeControl")
+from Screens.VolumeControl import VolumeAdjust, VolumeControl
 
-enigma.eProfileWrite("Load:Processing")
+enigma.eProfileWrite("Processing")
 from Screens.Processing import Processing
 
 enigma.eProfileWrite("ModalMessageBox")
 from Screens.MessageBox import ModalMessageBox
 
-enigma.eProfileWrite("Load:StackTracePrinter")
+enigma.eProfileWrite("StackTracePrinter")
 from Components.StackTrace import StackTracePrinter
 StackTracePrinterInst = StackTracePrinter()
 
@@ -574,6 +574,8 @@ def runScreenTest():
 
 	enigma.eProfileWrite("Init:VolumeControl")
 	vol = VolumeControl(session)
+	enigma.eProfileWrite("VolumeAdjust")
+	vol = VolumeAdjust(session)
 	enigma.eProfileWrite("InitProcessing")
 	processing = Processing(session)
 	enigma.eProfileWrite("Global MessageBox Screen")
@@ -643,10 +645,10 @@ def runScreenTest():
 enigma.eProfileWrite("Navigation")
 from Navigation import Navigation
 
-enigma.eProfileWrite("LOAD:skin")
+enigma.eProfileWrite("skin")
 from skin import readSkin
 
-enigma.eProfileWrite("LOAD:Tools")
+enigma.eProfileWrite("Tools")
 InitFallbackFiles()
 
 enigma.eProfileWrite("Skin")

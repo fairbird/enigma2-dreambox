@@ -1511,6 +1511,9 @@ singlebouquet_radio_ref = serviceRefAppendPath(service_types_radio_ref, " FROM B
 
 
 class ChannelSelectionBase(Screen):
+	MODE_TV = 0
+	MODE_RADIO = 1
+
 	def __init__(self, session):
 		def leftHelp():
 			return _("Move to previous marker") if self.servicelist.isVertical() else _("Move to the previous item")
@@ -1722,6 +1725,19 @@ class ChannelSelectionBase(Screen):
 
 	def moveEnd(self):  # This is used by InfoBarGenerics.
 		self.servicelist.goBottom()
+
+	def getCurrentMode(self):
+		return self.mode
+
+	def setCurrentMode(self, mode):
+		if mode != MODE_RADIO:
+			mode = MODE_TV
+		self.servicePath = self.servicePathRadio if mode == MODE_RADIO else self.servicePathTV
+		self.mode = mode
+		self.recallBouquetMode()
+		self.buildTitleString()
+		# modeString = {MODE_RADIO: "Radio", MODE_TV: "TV"}.get(mode)
+		# print(f"[ChannelSelection] DEBUG {modeString} Mode selected.")
 
 	def clearPath(self):
 		del self.servicePath[:]

@@ -64,7 +64,8 @@
 					</menu>
 					<menu key="audio" level="1" text="Audio Settings">
 						<item key="au_setup" text="Audio Setup" level="0"><setup setupKey="Audio_setup"/></item>
-						<item key="subtitle_setup" level="2" text="Subtitle Setup"><setup setupKey="Subtitlesetup" /></item>
+						<item key="volume_adjust" text="Volume Adjust Settings" level="1" ><screen module="VolumeControl" screen="VolumeAdjustSettings"/></item>
+						<item key="subtitle_setup" level="2" text="Subtitle Setup"><setup setupKey="Subtitlesetup"/></item>
 						<item key="autolanguage_setup" level="1" text="Auto Language Setup"><setup setupKey="Autolanguagesetup"/></item>
 					</menu>
 				</menu>

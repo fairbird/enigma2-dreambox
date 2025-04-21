@@ -128,29 +128,49 @@ class ConfigList(GUIComponent):
 
 	list = property(getList, setList)
 
+	def goTop(self):
+		if self.instance:
+			self.instance.goTop()
+
+	def goPageUp(self):
+		if self.instance:
+			self.instance.goPageUp()
+
+	def goLineUp(self):
+		if self.instance:
+			self.instance.goLineUp()
+
+	def goLineDown(self):
+		if self.instance:
+			self.instance.goLineDown()
+
+	def goPageDown(self):
+		if self.instance:
+			self.instance.goPageDown()
+
+	def goBottom(self):
+		if self.instance:
+			self.instance.goBottom()
+
+	# Old navigation method names.
+	#
 	def moveTop(self):
-		if self.instance is not None:
-			self.instance.moveSelection(self.instance.moveTop)
+		self.goTop()
 
 	def pageUp(self):
-		if self.instance is not None:
-			self.instance.moveSelection(self.instance.pageUp)
+		self.goPageUp()
 
 	def moveUp(self):
-		if self.instance is not None:
-			self.instance.moveSelection(self.instance.moveUp)
+		self.goLineUp()
 
 	def moveDown(self):
-		if self.instance is not None:
-			self.instance.moveSelection(self.instance.moveDown)
+		self.goLineDown()
 
 	def pageDown(self):
-		if self.instance is not None:
-			self.instance.moveSelection(self.instance.pageDown)
+		self.goPageDown()
 
 	def moveBottom(self):
-		if self.instance is not None:
-			self.instance.moveSelection(self.instance.moveEnd)
+		self.goBottom()
 
 
 class ConfigListScreen:
