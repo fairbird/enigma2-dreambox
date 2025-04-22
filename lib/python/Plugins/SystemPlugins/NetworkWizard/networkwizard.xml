@@ -61,6 +61,7 @@ self.condition = (self.InterfaceState == True )
                 <text value="Your receiver is now ready to use.\n\nYour internet connection is working now.\n\nPlease press OK to continue." />
                 <displaytext value="Please follow the instructions on the TV" />
                 <code>
+self.showIP()
 self.clearSelectedKeys()
 self.selectKey("OK")
                 </code>
