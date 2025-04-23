@@ -222,6 +222,11 @@
 		<item level="2" text="Country for EPG event genre information" description="Choose a country scheme for decoding genre information in EPG events.">config.misc.epggenrecountry</item>
 		<item level="2" text="Full description separator" description="Configure separator type used in full description for separate short and extended descriptions.">config.epg.fulldescription_separator</item>
 		<item level="2" text="Replace newlines in EPG" description="Select char for replacing newlines in EPG.">config.epg.replace_newlines</item>
+		<item level="1" text="Enable filtering in SingleEPG" description="Enable setting a time interval for filtering events in SingleEPG using the 'Stop' button.">config.epg.filter</item>
+		<item level="1" text="Start time" indents="4" conditional="config.epg.filter.value" description="Start of the time interval within which an events must start in order to be displayed.">config.epg.filter_start</item>
+		<item level="1" text="End time" indents="4" conditional="config.epg.filter.value" description="End of the time interval within which an events must start in order to be displayed.">config.epg.filter_end</item>
+		<item level="1" text="Toggle Filter Order" indents="4" conditional="config.epg.filter.value" description="Using the 'Stop' button will cyclically switch displaying events starting: 'outside the interval', 'within the interval', and 'without filtering', instead of 'within the interval', 'outside the interval', and 'without filtering'.">config.epg.filter_reversal</item>
+		<item level="1" text="Keep sorting" indents="4" conditional="config.epg.filter.value" description="When switching the filter, the selected EPG sorting is preserved.">config.epg.filter_keepsorting</item>
 		<item level="2" text="Enable EPG event name abbreviation removal" description="Broadcasters sometimes split long event names into the event description using ... Choose whether to prevent this behaviour.">config.epg.joinAbbreviatedEventNames</item>
 		<item level="2" text="EPG event name prefixes to remove" conditional="config.epg.eventNamePrefixMode.value > 0" description="| separated list of prefixes you'd like to be removed from event names, separated with |, e.g. New:|Live:">config.epg.eventNamePrefixes</item>
 	</setup>
