@@ -206,7 +206,11 @@ def getActiveSubservicesForCurrentChannel(service):
 					if title and ("Sendepause" not in title and "Sky Sport Kompakt" not in title):
 						starttime = datetime.datetime.fromtimestamp(event[0]).strftime('%H:%M')
 						endtime = datetime.datetime.fromtimestamp(event[0] + event[1]).strftime('%H:%M')
-						current_show_name = "%s [%s-%s]" % (title, str(starttime), str(endtime))
+						try:
+							service_name = ServiceReference(subservice).getServiceName()
+						except:
+							service_name = ""
+						current_show_name = "%s [%s-%s] %s" % (title, str(starttime), str(endtime), service_name)
 						activeSubservices.append((current_show_name, subservice))
 	if not activeSubservices:
 		subservices = service and service.subServices()
