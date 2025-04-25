@@ -794,10 +794,10 @@ class NumberZap(Screen):
 		self.searchNumber = searchNumberFunction
 		self.startBouquet = None
 
-		self["channel"] = Label(_("Channel:"))
+		self["channel"] = Label(_("Channel") + ":")
 		self["number"] = Label(self.numberString)
 		self["servicename"] = Label()
-		self["channel_summary"] = StaticText(_("Channel:"))
+		self["channel_summary"] = StaticText(_("Channel") + ":")
 		self["number_summary"] = StaticText(self.numberString)
 		self["servicename_summary"] = StaticText()
 		self["Service"] = ServiceEvent()
@@ -3481,7 +3481,7 @@ class InfoBarResolutionSelection:
 		resList = []
 		resList.append((_("Exit"), "exit"))
 		resList.append((_("Auto(not available)"), "auto"))
-		resList.append((_("Video: ") + "%dx%d@%gHz" % (xRes, yRes, fps), ""))
+		resList.append((_("Video") + ": %dx%d@%gHz" % (xRes, yRes, fps), ""))
 		resList.append(("--", ""))
 		# Do we need a new sorting with this way here or should we disable some choices?
 		from Plugins.SystemPlugins.Videomode.VideoHardware import video_hw
@@ -3520,7 +3520,7 @@ class InfoBarTimerButton:
 	def __init__(self):
 		self["TimerButtonActions"] = HelpableActionMap(self, ["InfobarTimerButtonActions"],
 			{
-				"timerSelection": (self.timerSelection, _("Timer selection...")),
+				"timerSelection": (self.timerSelection, _("Timer selection")),
 			})
 
 	def timerSelection(self):
