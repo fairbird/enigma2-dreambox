@@ -75,13 +75,12 @@ class FallbackTimerList():
 							description=timer["description"])
 					for timer in timers['timers']
 				]
-				self.fallback()
-
 		except Exception as e:
 			self.fallback(e)
 
 		print("[FallbackTimer] read %s timers from fallback tuner" % len(self.list))
 		self.parent.session.nav.RecordTimer.setFallbackTimerList(self.list)
+		self.fallback()
 
 	def removeTimer(self, timer, fallbackFunction, fallbackFunctionNOK=None):
 		self.fallbackFunction = fallbackFunction
