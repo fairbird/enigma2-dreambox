@@ -465,7 +465,7 @@ CPPFLAGS="$CPPFLAGS $PYTHON_CPPFLAGS"
 CFLAGS="$CFLAGS -Wall"
 CXXFLAGS="$CXXFLAGS -Wall \
 	-Wformat=2 -Wformat-overflow=2 -Wformat-nonliteral -Wformat-security \
-	-Wimplicit-fallthrough=5 -Wdangling-else -Wno-error=stringop-truncation \
+	-Wimplicit-fallthrough=5 -Wdangling-else -Wno-error=stringop-truncation -Wno-error=maybe-uninitialized \
 	$BASE_CFLAGS $ENIGMA2_CFLAGS $PTHREAD_CFLAGS $OPENMP_CFLAGS $GLES_CFLAGS $ALSA_CFLAGS $AMCODEC_CFLAGS $FFMPEG_CFLAGS $AMADEC_CFLAGS $DVBCSA_CFLAGS"
 
 AX_SWIG_PYTHON_OPT="$AX_SWIG_PYTHON_OPT -DSWIG_PYTHON_LEGACY_BOOL"

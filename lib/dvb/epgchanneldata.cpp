@@ -55,7 +55,11 @@ void eEPGChannelData::startChannel()
 
 void eEPGChannelData::startEPG()
 {
-	eTrace("[eEPGChannelData] start reading events(%lld)", ::time(0));
+#ifdef GLIBC_64BIT_TIME_FLAGS
+ 	eTrace("[eEPGChannelData] start reading events(%lld)", ::time(0));
+#else
+ 	eTrace("[eEPGChannelData] start reading events(%ld)", ::time(0));
+#endif
 	state=0;
 	haveData=0;
 	for (unsigned int i=0; i < sizeof(seenSections)/sizeof(tidMap); ++i)
@@ -278,7 +282,11 @@ void eEPGChannelData::finishEPG()
 {
 	if (!isRunning)  // epg ready
 	{
+#ifdef GLIBC_64BIT_TIME_FLAGS
 		eTrace("[eEPGChannelData] stop caching events(%lld)", ::time(0));
+#else
+		eTrace("[eEPGChannelData] stop caching events(%ld)", ::time(0));
+#endif
 		zapTimer->start(UPDATE_INTERVAL, 1);
 		eTrace("[eEPGChannelData] next update in %i min", UPDATE_INTERVAL / 60000);
 		for (unsigned int i=0; i < sizeof(seenSections)/sizeof(tidMap); ++i)
@@ -505,7 +513,11 @@ void eEPGChannelData::readData( const uint8_t *data, int source)
 #endif
 			default: eTraceNoNewLine("unknown");break;
 		}
+#ifdef GLIBC_64BIT_TIME_FLAGS
 		eTraceNoNewLine(" finished(%lld)\n", ::time(0));
+#else
+		eTraceNoNewLine(" finished(%ld)\n", ::time(0));
+#endif
 		if ( reader )
 			reader->stop();
 		isRunning &= ~source;
@@ -1149,7 +1161,11 @@ void eEPGChannelData::readMHWData(const uint8_t *data)
 				return;	// Continue reading of the current table.
 		}
 	}
+#ifdef GLIBC_64BIT_TIME_FLAGS
 	eTrace("[eEPGChannelData] mhw finished(%lld) %zu summaries not found",
+#else
+	eTrace("[eEPGChannelData] mhw finished(%ld) %zu summaries not found",
+#endif
 		::time(0),
 		m_program_ids.size());
 	// Summaries have been read, titles that have summaries have been stored.
@@ -1463,7 +1479,11 @@ void eEPGChannelData::readMHWData2(const uint8_t *data)
 			// Now store titles that do not have summaries.
 			for (std::map<uint32_t, mhw_title_t>::iterator itTitle(m_titles.begin()); itTitle != m_titles.end(); itTitle++)
 				storeMHWTitle( itTitle, "", data );
+#ifdef GLIBC_64BIT_TIME_FLAGS
 			eTrace("[eEPGChannelData] mhw2 finished(%lld) %zu summaries not found",
+#else
+			eTrace("[eEPGChannelData] mhw2 finished(%ld) %zu summaries not found",
+#endif
 				::time(0),
 				m_program_ids.size());
 		}
