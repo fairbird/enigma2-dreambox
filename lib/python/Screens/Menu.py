@@ -1,10 +1,11 @@
+# -*- coding: utf-8 -*-
 from gettext import dgettext
 from os.path import isdir, isfile
 from xml.etree.ElementTree import parse
 
 from enigma import eTimer
 
-from skin import findSkinScreen, menus
+from skin import findSkinScreen, menus, parameters, menuicons
 from Components.ActionMap import HelpableNumberActionMap, HelpableActionMap
 from Components.config import ConfigDictionarySet, NoSave, config, configfile
 from Components.Pixmap import Pixmap
@@ -53,6 +54,23 @@ lastKey = None
 file = open(resolveFilename(SCOPE_SKINS, "menu.xml"))
 mdom = parse(file)
 file.close()
+
+
+def E2DarkOS():
+	if config.skin.primary_skin.value == "E2-DarkOS/skin.xml":
+		return True
+
+
+def MenuEntryPixmap(key, png_cache):
+	if not menuicons:
+		return None
+	w, h = parameters.get("MenuIconSize", (50, 50))
+	png = png_cache.get(key)
+	if png is None:  # no cached entry
+		pngPath = menuicons.get(key, menuicons.get("default", ""))
+		if pngPath:
+			png = LoadPixmap(resolveFilename(SCOPE_GUISKIN, pngPath), cached=True, width=w, height=0 if pngPath.endswith(".svg") else h)
+	return png
 
 
 def findMenu(key):
@@ -108,6 +126,30 @@ def menuEntryName(name):
 			else:
 				break
 	return name if len(nameSplit) < 2 else "\n".join(nameSplit)
+
+
+class title_History():
+	def __init__(self):
+		self.thistory = ""
+
+	def reset(self):
+		self.thistory = ""
+
+	def reducehistory(self):
+		history_len = len(self.thistory.split(">"))
+		if history_len < 3:
+			self.reset()
+			return
+		if self.thistory == "":
+			return
+		result = self.thistory.rsplit(">", 2)
+		if result[0] == "":
+			self.reset()
+			return
+		self.thistory = result[0] + "> "
+
+
+t_history = title_History()
 
 
 class Menu(Screen, ProtectedScreen):
@@ -172,6 +214,8 @@ class Menu(Screen, ProtectedScreen):
 		</widget>
 	</screen>"""
 
+	png_cache = {}
+
 	def __init__(self, session, parentMenu, PluginLanguageDomain=None):
 		self.session = session
 		self.parentMenu = parentMenu
@@ -227,26 +271,34 @@ class Menu(Screen, ProtectedScreen):
 			"9": (self.keyNumberGlobal, _("Direct menu item selection")),
 			"0": (self.keyNumberGlobal, _("Direct menu item selection"))
 		}, prio=0, description=_("Menu Common Actions"))
-		self["navigationActions"] = HelpableActionMap(self, ["NavigationActions"], {
-			"top": (self.keyTop, _("Move to first line / screen")),
-			"pageUp": (self.keyPageUp, _("Move up a screen")),
-			"up": (self.keyUp, _("Move up a line")),
-			# "first": (self.keyFirst, _("Jump to first item in list or the start of text")),
-			# "last": (self.keyLast, _("Jump to last item in list or the end of text")),
-			"down": (self.keyDown, _("Move down a line")),
-			"pageDown": (self.keyPageDown, _("Move down a screen")),
-			"bottom": (self.keyBottom, _("Move to last line / screen"))
-		}, prio=-1, description=_("Menu Navigation Actions"))
-		if config.usage.menuSortOrder.value == "user":
+		if not E2DarkOS():
+			self["navigationActions"] = HelpableActionMap(self, ["NavigationActions"], {
+				"top": (self.keyTop, _("Move to first line / screen")),
+				"pageUp": (self.keyPageUp, _("Move up a screen")),
+				"up": (self.keyUp, _("Move up a line")),
+				# "first": (self.keyFirst, _("Jump to first item in list or the start of text")),
+				# "last": (self.keyLast, _("Jump to last item in list or the end of text")),
+				"down": (self.keyDown, _("Move down a line")),
+				"pageDown": (self.keyPageDown, _("Move down a screen")),
+				"bottom": (self.keyBottom, _("Move to last line / screen"))
+			}, prio=-1, description=_("Menu Navigation Actions"))
+		if config.usage.menuSortOrder.value == "user" and not E2DarkOS():
 			self["editActions"] = HelpableActionMap(self, ["ColorActions"], {
 				"green": (self.keyGreen, _("Toggle item move mode on/off")),
 				"yellow": (self.keyYellow, _("Toggle hide/show of the current item")),
 				"blue": (self.toggleSortMode, _("Toggle item edit mode on/off"))
 			}, prio=0, description=_("Menu Edit Actions"))
 		title = parentMenu.get("title", "") or None
-		title = title and (dgettext(self.pluginLanguageDomain, title) if self.pluginLanguageDomain else _(title))
-		if title is None:
-			title = _(parentMenu.get("text", ""))
+		if E2DarkOS():
+			if title is None:
+				title = _(parentMenu.get("text", ""))
+			else:
+				t_history.reset()
+			self["title"] = StaticText(title)
+		else:
+			if title is None:
+				title = _(parentMenu.get("text", ""))
+			title = title and (dgettext(self.pluginLanguageDomain, title) if self.pluginLanguageDomain else _(title))
 		self.setTitle(title)
 		self.number = 0
 		self.nextNumberTimer = eTimer()
@@ -284,7 +336,10 @@ class Menu(Screen, ProtectedScreen):
 				description = plugins.getDescriptionForMenuEntryID(self.menuID, pluginKey)  # It is assumed that description is already translated by the plugin!
 				if "%s %s" in description:
 					description = description % getBoxDisplayName()
-				image = self.getMenuEntryImage(plugin[PLUGIN_KEY], lastKey)
+				if not E2DarkOS():
+					image = self.getMenuEntryImage(plugin[PLUGIN_KEY], lastKey)
+				else:
+					image = MenuEntryPixmap(plugin[2], self.png_cache)
 				if len(plugin) > PLUGIN_CLOSEALL and plugin[PLUGIN_CLOSEALL]:  # Was "len(plugin) > 4".
 					self.menuList.append((plugin[PLUGIN_TEXT], boundFunction(plugin[PLUGIN_MODULE], self.session, self.close), plugin[PLUGIN_KEY], plugin[PLUGIN_WEIGHT] or 50, description, image))
 				else:
@@ -313,7 +368,11 @@ class Menu(Screen, ProtectedScreen):
 			self.hideShowEntries()
 		else:  # Sort by menu item weight.
 			self.menuList.sort(key=lambda x: int(x[MENU_WEIGHT]))
-		self.setMenuList(self.menuList)
+		if not E2DarkOS():
+			self.setMenuList(self.menuList)
+		else:
+			self["menu"].setList(self.menuList)
+			self.screenContentChanged()
 
 	def addItem(self, menu):
 		requires = menu.get("requires")
@@ -330,7 +389,10 @@ class Menu(Screen, ProtectedScreen):
 		key = menu.get("key", "undefined")
 		weight = menu.get("weight", 50)
 		description = self.processDisplayedText(menu.get("description"))
-		image = self.getMenuEntryImage(key, lastKey)
+		if not E2DarkOS():
+			image = self.getMenuEntryImage(key, lastKey)
+		else:
+			image = MenuEntryPixmap(key, self.png_cache)
 		for menuItem in menu:
 			if menuItem.tag == "screen":
 				module = menuItem.get("module")
@@ -377,7 +439,10 @@ class Menu(Screen, ProtectedScreen):
 		key = menu.get("key", "undefined")
 		weight = menu.get("weight", 50)
 		description = self.processDisplayedText(menu.get("description"))
-		image = self.getMenuEntryImage(key, lastKey)
+		if not E2DarkOS():
+			image = self.getMenuEntryImage(key, lastKey)
+		else:
+			image = MenuEntryPixmap(key, self.png_cache)
 		if menu.get("flushConfigOnClose"):
 			module = boundFunction(self.session.openWithCallback, self.menuClosedWithConfigFlush, Menu, menu)
 		else:
@@ -434,14 +499,18 @@ class Menu(Screen, ProtectedScreen):
 
 	def layoutFinished(self):
 		self["menu"].enableAutoNavigation(False)
-		self["menu"].setStyle(config.usage.menuEntryStyle.value)
+		if E2DarkOS():
+			self.screenContentChanged()
+		else:
+			self["menu"].setStyle(config.usage.menuEntryStyle.value)
 		self.selectionChanged()
 
 	def selectionChanged(self):
 		current = self["menu"].getCurrent()
 		if current:
-			if config.usage.showicons.value:
-				self["menuimage"].instance.setPixmap(current[WIDGET_IMAGE])
+			if not E2DarkOS():
+				if config.usage.showicons.value:
+					self["menuimage"].instance.setPixmap(current[WIDGET_IMAGE])
 			self["description"].setText(current[WIDGET_DESCRIPTION])
 			if self.sortMode:
 				self["key_yellow"].setText(_("Show") if self.subMenuSort.getConfigValue(current[WIDGET_KEY], "hidden") else _("Hide"))
@@ -452,9 +521,13 @@ class Menu(Screen, ProtectedScreen):
 		global lastKey
 		self.resetNumberKey()
 		current = self["menu"].getCurrent()
-		if current and current[WIDGET_MODULE]:
-			lastKey = current[WIDGET_KEY]
-			current[WIDGET_MODULE]()
+		if not E2DarkOS():
+			if current and current[WIDGET_MODULE]:
+				lastKey = current[WIDGET_KEY]
+				current[WIDGET_MODULE]()
+		else:
+			if current and current[1]:
+				current[1]()
 
 	def menuClosedWithConfigFlush(self, *result):
 		configfile.save()
