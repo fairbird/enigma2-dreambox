@@ -128,30 +128,6 @@ def menuEntryName(name):
 	return name if len(nameSplit) < 2 else "\n".join(nameSplit)
 
 
-class title_History():
-	def __init__(self):
-		self.thistory = ""
-
-	def reset(self):
-		self.thistory = ""
-
-	def reducehistory(self):
-		history_len = len(self.thistory.split(">"))
-		if history_len < 3:
-			self.reset()
-			return
-		if self.thistory == "":
-			return
-		result = self.thistory.rsplit(">", 2)
-		if result[0] == "":
-			self.reset()
-			return
-		self.thistory = result[0] + "> "
-
-
-t_history = title_History()
-
-
 class Menu(Screen, ProtectedScreen):
 	skin = """
 	<screen name="Menu" title="Menu"  position="center,center" size="980,600" resolution="1280,720">
@@ -271,33 +247,28 @@ class Menu(Screen, ProtectedScreen):
 			"9": (self.keyNumberGlobal, _("Direct menu item selection")),
 			"0": (self.keyNumberGlobal, _("Direct menu item selection"))
 		}, prio=0, description=_("Menu Common Actions"))
-		if not E2DarkOS():
-			self["navigationActions"] = HelpableActionMap(self, ["NavigationActions"], {
-				"top": (self.keyTop, _("Move to first line / screen")),
-				"pageUp": (self.keyPageUp, _("Move up a screen")),
-				"up": (self.keyUp, _("Move up a line")),
-				# "first": (self.keyFirst, _("Jump to first item in list or the start of text")),
-				# "last": (self.keyLast, _("Jump to last item in list or the end of text")),
-				"down": (self.keyDown, _("Move down a line")),
-				"pageDown": (self.keyPageDown, _("Move down a screen")),
-				"bottom": (self.keyBottom, _("Move to last line / screen"))
-			}, prio=-1, description=_("Menu Navigation Actions"))
-		if config.usage.menuSortOrder.value == "user" and not E2DarkOS():
+		self["navigationActions"] = HelpableActionMap(self, ["NavigationActions"], {
+			"top": (self.keyTop, _("Move to first line / screen")),
+			"pageUp": (self.keyPageUp, _("Move up a screen")),
+			"up": (self.keyUp, _("Move up a line")),
+			# "first": (self.keyFirst, _("Jump to first item in list or the start of text")),
+			# "last": (self.keyLast, _("Jump to last item in list or the end of text")),
+			"down": (self.keyDown, _("Move down a line")),
+			"pageDown": (self.keyPageDown, _("Move down a screen")),
+			"bottom": (self.keyBottom, _("Move to last line / screen"))
+		}, prio=0 if E2DarkOS() else -1, description=_("Menu Navigation Actions"))
+		if config.usage.menuSortOrder.value == "user":
 			self["editActions"] = HelpableActionMap(self, ["ColorActions"], {
 				"green": (self.keyGreen, _("Toggle item move mode on/off")),
 				"yellow": (self.keyYellow, _("Toggle hide/show of the current item")),
 				"blue": (self.toggleSortMode, _("Toggle item edit mode on/off"))
 			}, prio=0, description=_("Menu Edit Actions"))
 		title = parentMenu.get("title", "") or None
+		if title is None:
+			title = _(parentMenu.get("text", ""))
 		if E2DarkOS():
-			if title is None:
-				title = _(parentMenu.get("text", ""))
-			else:
-				t_history.reset()
 			self["title"] = StaticText(title)
 		else:
-			if title is None:
-				title = _(parentMenu.get("text", ""))
 			title = title and (dgettext(self.pluginLanguageDomain, title) if self.pluginLanguageDomain else _(title))
 		self.setTitle(title)
 		self.number = 0
@@ -521,13 +492,10 @@ class Menu(Screen, ProtectedScreen):
 		global lastKey
 		self.resetNumberKey()
 		current = self["menu"].getCurrent()
-		if not E2DarkOS():
-			if current and current[WIDGET_MODULE]:
-				lastKey = current[WIDGET_KEY]
-				current[WIDGET_MODULE]()
-		else:
-			if current and current[1]:
-				current[1]()
+		self.WIDGET_MODULE = 1 if E2DarkOS() and not self.sortMode else WIDGET_MODULE
+		if current and current[self.WIDGET_MODULE]:
+			lastKey = current[WIDGET_KEY]
+			current[self.WIDGET_MODULE]()
 
 	def menuClosedWithConfigFlush(self, *result):
 		configfile.save()
@@ -738,12 +706,15 @@ class Menu(Screen, ProtectedScreen):
 			config.usage.menu_sort_weight.save()
 			self.hideShowEntries()
 			self.setMenuList(self.menuList)
+			if E2DarkOS():
+				self["menu"].setList(self.menuList)
 		else:
 			self["key_green"].setText(_("Move Mode On"))
 			self["key_blue"].setText(_("Edit Mode Off"))
 			self.sortMode = True
 			self.hideShowEntries()
 			self.setMenuList(self.menuList)
+
 
 	def hideShowEntries(self):
 		menuList = list(self.fullMenuList)
