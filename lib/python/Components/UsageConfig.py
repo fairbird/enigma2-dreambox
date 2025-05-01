@@ -1248,6 +1248,7 @@ def InitUsageConfig():
 	config.epg.filter_end.addNotifier(validateEPGFilterTimes)
 	config.epg.filter_reversal = ConfigYesNo(default=False)
 	config.epg.filter_keepsorting = ConfigYesNo(default=False)
+	config.epg.filter_restore_timespan = ConfigYesNo(default=True)
 
 	config.misc.usegstplaybin3 = ConfigYesNo(default=False)
 

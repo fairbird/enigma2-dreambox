@@ -723,7 +723,14 @@
 		<key id="KEY_TV2" mapto="preview" flags="m" />
 		<key id="KEY_REWIND" mapto="prevDay" flags="m" />
 		<key id="KEY_FASTFORWARD" mapto="nextDay" flags="m" />
+	</map>
+
+	<map context="EPGFilterActions">
 		<key id="KEY_STOP" mapto="filter" flags="m" />
+		<key id="KEY_1" mapto="startUp" flags="m" />
+		<key id="KEY_4" mapto="startDown" flags="m" />
+		<key id="KEY_3" mapto="endUp" flags="m" />
+		<key id="KEY_6" mapto="endDown" flags="m" />
 	</map>
 
 	<map context="GMEPGSelectActions">
