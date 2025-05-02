@@ -225,7 +225,7 @@ class NimSetup(Setup, ServiceStopScreen):
 						self.list.append(self.Connector)
 		if self.nim.isCompatible("DVB-C") or (self.nim.isCombined() and self.nim.canBeCompatible("DVB-C")):
 			if self.nim.isCombined():
-				self.configModeDVBC = (_("Configure DVB-C"), self.nimConfig.dvbc.configModeDVBC, _("Select 'Yes' when you want to configure this tuner for DVB-C"))
+				self.configModeDVBC = (_("Configure DVB-C"), self.nimConfig.configModeDVBC, _("Select 'Yes' when you want to configure this tuner for DVB-C"))
 				self.list.append(self.configModeDVBC)
 			elif not self.nim.isMultiType():
 				warning_text = ""
@@ -233,7 +233,7 @@ class NimSetup(Setup, ServiceStopScreen):
 					warning_text = _("Warning: FBC-C V1 tuner should be connected to the first slot to work correctly. Otherwise, only 2 out of 8 demodulators will be available when connected in the second slot. ")
 				self.configMode = (self.indent % _("Configuration mode"), self.nimConfig.configMode, warning_text + _("Select 'enabled' if this tuner has a signal cable connected, otherwise select 'nothing connected'."))
 				self.list.append(self.configMode)
-			if self.nimConfig.dvbc.configModeDVBC.value if self.nim.isCombined() else self.nimConfig.configMode.value != "nothing":
+			if self.nimConfig.configModeDVBC.value if self.nim.isCombined() else self.nimConfig.configMode.value != "nothing":
 				self.list.append((self.indent % _("Network ID"), self.nimConfig.cable.scan_networkid, _("This setting depends on your cable provider and location. If you don't know the correct setting refer to the menu in the official cable receiver, or get it from your cable provider, or seek help via internet forum.")))
 				self.cableScanType = (self.indent % _("Used service scan type"), self.nimConfig.cable.scan_type, _("Select 'provider' to scan from the predefined list of cable multiplexes. Select 'bands' to only scan certain parts of the spectrum. Select 'steps' to scan in steps of a particular frequency bandwidth."))
 				self.list.append(self.cableScanType)
@@ -294,12 +294,12 @@ class NimSetup(Setup, ServiceStopScreen):
 						self.list.append((self.indent % (_("Scan additional SR")), self.nimConfig.cable.scan_sr_ext2, _("This field allows you to search an additional symbol rate up to %s.") % ("7320")))
 		if self.nim.isCompatible("DVB-T") or (self.nim.isCombined() and self.nim.canBeCompatible("DVB-T")):
 			if self.nim.isCombined():
-				self.configModeDVBT = (_("Configure DVB-T"), self.nimConfig.dvbt.configModeDVBT, _("Select 'Yes' when you want to configure this tuner for DVB-T"))
+				self.configModeDVBT = (_("Configure DVB-T"), self.nimConfig.configModeDVBT, _("Select 'Yes' when you want to configure this tuner for DVB-T"))
 				self.list.append(self.configModeDVBT)
 			elif not self.nim.isMultiType():
 				self.configMode = (self.indent % _("Configuration mode"), self.nimConfig.configMode, _("Select 'enabled' if this tuner has a signal cable connected, otherwise select 'nothing connected'."))
 				self.list.append(self.configMode)
-			if self.nimConfig.dvbt.configModeDVBT.value if self.nim.isCombined() else self.nimConfig.configMode.value != "nothing":
+			if self.nimConfig.configModeDVBT.value if self.nim.isCombined() else self.nimConfig.configMode.value != "nothing":
 				# country/region tier one
 				if self.terrestrialCountriesEntry is None:
 					terrestrialcountrycodelist = nimmanager.getTerrestrialsCountrycodeList()
@@ -308,23 +308,23 @@ class NimSetup(Setup, ServiceStopScreen):
 					choices = [("all", _("All"))] + sorted([(x, self.countrycodeToCountry(x)) for x in terrestrialcountrycodelist], key=lambda listItem: listItem[1])
 					self.terrestrialCountries = ConfigSelection(default=default, choices=choices)
 					self.terrestrialCountriesEntry = (self.indent % _("Country"), self.terrestrialCountries, _("Select your country. If not available select 'all'."))
-					self.originalTerrestrialRegion = self.nimConfig.dvbt.terrestrial.value
+					self.originalTerrestrialRegion = self.nimConfig.terrestrial.value
 				# country/region tier two
 				if self.terrestrialCountries.value == "all":
 					terrstrialNames = [x[0] for x in sorted(sorted(nimmanager.getTerrestrialsList(), key=lambda listItem: listItem[0]), key=lambda listItem: self.countrycodeToCountry(listItem[2]))]
 				else:
 					terrstrialNames = sorted([x[0] for x in nimmanager.getTerrestrialsByCountrycode(self.terrestrialCountries.value)])
-				default = self.nimConfig.dvbt.terrestrial.value in terrstrialNames and self.nimConfig.dvbt.terrestrial.value or None
+				default = self.nimConfig.terrestrial.value in terrstrialNames and self.nimConfig.terrestrial.value or None
 				self.terrestrialRegions = ConfigSelection(default=default, choices=terrstrialNames)
 
 				def updateTerrestrialProvider(configEntry):
-					self.nimConfig.dvbt.terrestrial.value = configEntry.value
-					self.nimConfig.dvbt.terrestrial.save()
+					self.nimConfig.terrestrial.value = configEntry.value
+					self.nimConfig.terrestrial.save()
 				self.terrestrialRegions.addNotifier(updateTerrestrialProvider)
 				self.terrestrialRegionsEntry = (self.indent % _("Region"), self.terrestrialRegions, _("Select your region. If not available change 'Country' to 'all' and select one of the default alternatives."))
 				self.list.append(self.terrestrialCountriesEntry)
 				self.list.append(self.terrestrialRegionsEntry)
-				self.list.append((self.indent % _("Enable 5V for active antenna"), self.nimConfig.dvbt.terrestrial_5V, _("Enable this setting if your aerial system needs power")))
+				self.list.append((self.indent % _("Enable 5V for active antenna"), self.nimConfig.terrestrial_5V, _("Enable this setting if your aerial system needs power")))
 		if self.nim.isCompatible("ATSC") or (self.nim.isCombined() and self.nim.canBeCompatible("ATSC")):
 			if self.nim.isCombined():
 				self.configModeATSC = (_("Configure ATSC"), self.nimConfig.configModeATSC, _("Select 'Yes' when you want to configure this tuner for ATSC"))
@@ -747,9 +747,9 @@ class NimSetup(Setup, ServiceStopScreen):
 		if reopen and self.oldref and self.slot_number == self.slotid:
 			type_service = self.oldAlternativeref.getUnsignedData(4) >> 16
 			force_reopen = False
-			if type_service == 0xEEEE and (self.nim.isCompatible("DVB-T") and self.nimConfig.configMode.value == "nothing") or (self.nim.isCombined() and self.nim.canBeCompatible("DVB-T") and not self.nimConfig.dvbt.configModeDVBT.value):
+			if type_service == 0xEEEE and (self.nim.isCompatible("DVB-T") and self.nimConfig.configMode.value == "nothing") or (self.nim.isCombined() and self.nim.canBeCompatible("DVB-T") and not self.nimConfig.configModeDVBT.value):
 				force_reopen = True
-			elif type_service == 0xFFFF and ((self.nim.isCompatible("DVB-C") and self.nimConfig.configMode.value == "nothing") or (self.nim.isCombined() and self.nim.canBeCompatible("DVB-C") and not self.nimConfig.dvbc.configModeDVBC.value)) or ((self.nim.isCompatible("ATSC") and self.nimConfig.configMode.value == "nothing") or (self.nim.isCombined() and self.nim.canBeCompatible("ATSC") and not self.nimConfig.configModeATSC.value)):
+			elif type_service == 0xFFFF and ((self.nim.isCompatible("DVB-C") and self.nimConfig.configMode.value == "nothing") or (self.nim.isCombined() and self.nim.canBeCompatible("DVB-C") and not self.nimConfig.configModeDVBC.value)) or ((self.nim.isCompatible("ATSC") and self.nimConfig.configMode.value == "nothing") or (self.nim.isCombined() and self.nim.canBeCompatible("ATSC") and not self.nimConfig.configModeATSC.value)):
 				force_reopen = True
 			if force_reopen:
 				raw_channel = eDVBResourceManager.getInstance().allocateRawChannel(self.slotid)
@@ -772,8 +772,8 @@ class NimSetup(Setup, ServiceStopScreen):
 		for x in self["config"].list:
 			x[1].cancel()
 		if hasattr(self, "originalTerrestrialRegion"):
-			self.nimConfig.dvbt.terrestrial.value = self.originalTerrestrialRegion
-			self.nimConfig.dvbt.terrestrial.save()
+			self.nimConfig.terrestrial.value = self.originalTerrestrialRegion
+			self.nimConfig.terrestrial.save()
 		if hasattr(self, "originalCableRegion"):
 			self.nimConfig.cable.scan_provider.value = self.originalCableRegion
 			self.nimConfig.cable.scan_provider.save()
@@ -916,9 +916,9 @@ class NimSelection(Screen):
 				if x.isMultiType():
 					if x.canBeCompatible("DVB-S") and nimmanager.getNimConfig(x.slot).configMode.value != "nothing":
 						text = " DVB-S,"
-					if x.canBeCompatible("DVB-C") and nimmanager.getNimConfig(x.slot).dvbc.configMode.value != "nothing":
+					if x.canBeCompatible("DVB-C") and nimmanager.getNimConfig(x.slot).configMode.value != "nothing":
 						text = " DVB-C," + text
-					if x.canBeCompatible("DVB-T") and nimmanager.getNimConfig(x.slot).dvbt.configMode.value != "nothing":
+					if x.canBeCompatible("DVB-T") and nimmanager.getNimConfig(x.slot).configMode.value != "nothing":
 						text = " DVB-T," + text
 					if text:
 						text = _("Enabled") + ":" + text[:-1]
