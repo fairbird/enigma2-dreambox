@@ -341,6 +341,9 @@ class StorageDeviceManager():
 				rw = parts[3]
 				deviceMounts.append((mountP, mountFsType, rw))
 			if not deviceMounts:
+				mountP = _("None")
+				mountFsType = _("unavailable")
+				rw = _("None")
 				swapDevicesNames = [x.split()[0] for x in swapDevices]
 				for parts in [parts for parts in mounts if devicePoint != parts[0]]:
 					if f"/dev/{device}" in swapDevicesNames:
@@ -349,10 +352,6 @@ class StorageDeviceManager():
 						rw = ""
 						swapState = True
 						break
-					else:
-						mountP = _("None")
-						mountFsType = _("unavailable")
-						rw = _("None")
 		else:
 			mountP = ""
 			rw = ""
