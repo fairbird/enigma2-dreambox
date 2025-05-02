@@ -24,6 +24,23 @@ iDVBFrontendDict = {
 }
 
 
+def LNB_CHOICES():
+	return {
+		"universal_lnb": _("Universal LNB"),
+		"unicable": _("Unicable / JESS"),
+		"c_band": _("C-Band"),
+		"circular_lnb": _("Circular LNB"),
+		"ka_sat": _("KA-SAT"),
+		"user_defined": _("User defined")}
+
+
+def UNICABLE_CHOICES():
+	return {
+		"unicable_lnb": _("Unicable LNB"),
+		"unicable_matrix": _("Unicable Matrix"),
+		"unicable_user": "Unicable " + _("User defined")}
+
+
 def getConfigSatlist(orbpos, satlist):
 	default_orbpos = None
 	for x in satlist:
@@ -130,8 +147,8 @@ class SecConfigure:
 
 	def getRoot(self, slotid, connto):
 		visited = []
-		while self.NimManager.getNimConfig(connto).configMode.value in ("satposdepends", "equal", "loopthrough"):
-			connto = int(self.NimManager.getNimConfig(connto).connectedTo.value)
+		while self.NimManager.getNimConfig(connto).dvbs.configMode.value in ("satposdepends", "equal", "loopthrough"):
+			connto = int(self.NimManager.getNimConfig(connto).dvbs.connectedTo.value)
 			if connto in visited:  # prevent endless loop
 				return slotid
 			visited.append(connto)
@@ -152,8 +169,27 @@ class SecConfigure:
 		self.equal = {}
 
 		nim_slots = self.NimManager.nim_slots
-
 		used_nim_slots = []
+
+		try:
+			for slot in nim_slots:
+				if slot.frontend_id is not None:
+					types = [tunertype for tunertype in ["DVB-C", "DVB-T", "DVB-T2", "DVB-S", "DVB-S2", "ATSC"] if eDVBResourceManager.getInstance().frontendIsCompatible(slot.frontend_id, tunertype)]
+					if "DVB-T2" in types:
+						# DVB-T2 implies DVB-T support
+						types.remove("DVB-T")
+					if "DVB-S2" in types:
+						# DVB-S2 implies DVB-S support
+						types.remove("DVB-S")
+					if "DVB-S2X" in types:
+						# DVB-S2X implies DVB-S2 support
+						types.remove("DVB-S2")
+					if len(types) > 1:
+						slot.multi_type = {}
+						for tunertype in types:
+							slot.multi_type[str(types.index(tunertype))] = tunertype
+		except:
+			pass
 
 		for slot in nim_slots:
 			if slot.type is not None:
@@ -1002,7 +1038,7 @@ class NimManager:
 
 	def getNimListOfType(self, type, exception=-1):
 		# returns a list of indexes for NIMs compatible to the given type, except for 'exception'
-		return [x.slot for x in self.nim_slots if x.isCompatible(type) and x.slot != exception]
+		return [x.slot for x in self.nim_slots if x.slot != exception and x.canBeCompatible(type)]
 
 	def getEnabledNimListOfType(self, type, exception=-1):
 		def enabled(n):
