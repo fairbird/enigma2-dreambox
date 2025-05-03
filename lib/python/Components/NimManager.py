@@ -147,8 +147,8 @@ class SecConfigure:
 
 	def getRoot(self, slotid, connto):
 		visited = []
-		while self.NimManager.getNimConfig(connto).dvbs.configMode.value in ("satposdepends", "equal", "loopthrough"):
-			connto = int(self.NimManager.getNimConfig(connto).dvbs.connectedTo.value)
+		while self.NimManager.getNimConfig(connto).configMode.value in ("satposdepends", "equal", "loopthrough"):
+			connto = int(self.NimManager.getNimConfig(connto).connectedTo.value)
 			if connto in visited:  # prevent endless loop
 				return slotid
 			visited.append(connto)
