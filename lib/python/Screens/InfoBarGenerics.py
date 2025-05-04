@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from Screens.ChannelSelection import ChannelSelection, BouquetSelector, SilentBouquetSelector
 
-from Components.ActionMap import ActionMap, HelpableActionMap, NumberActionMap
+from Components.ActionMap import ActionMap, HelpableActionMap, NumberActionMap, HelpableNumberActionMap
 from Components.Harddisk import harddiskmanager, findMountPoint
 from Components.Input import Input
 from Components.Label import Label
@@ -837,19 +837,19 @@ class InfoBarNumberZap:
 				iPlayableService.evStart: self.__serviceStarted,
 			})
 		self.toggleSeekStatus = False
-		self["NumberActions"] = NumberActionMap(["NumberActions", "InfobarSeekActions"],
+		self["NumberActions"] = HelpableNumberActionMap(self, ["NumberActions", "InfobarSeekActions"],
 			{
-				"1": self.keyNumberGlobal,
-				"2": self.keyNumberGlobal,
-				"3": self.keyNumberGlobal,
-				"4": self.keyNumberGlobal,
-				"5": self.keyNumberGlobal,
-				"6": self.keyNumberGlobal,
-				"7": self.keyNumberGlobal,
-				"8": self.keyNumberGlobal,
-				"9": self.keyNumberGlobal,
-				"0": self.keyNumberGlobal,
-				"toggleSeek": self.toggleSeek,
+				"1": (self.keyNumberGlobal, _('Numberzap or seek backward small step')),
+				"2": (self.keyNumberGlobal, _('Numberzap')),
+				"3": (self.keyNumberGlobal, _('Numberzap or seek forward small step')),
+				"4": (self.keyNumberGlobal, _('Numberzap or seek backward medium step')),
+				"5": (self.keyNumberGlobal, _('Numberzap')),
+				"6": (self.keyNumberGlobal, _('Numberzap or seek forward medium step')),
+				"7": (self.keyNumberGlobal, _('Numberzap or seek backward big step')),
+				"8": (self.keyNumberGlobal, _('Numberzap')),
+				"9": (self.keyNumberGlobal, _('Numberzap or seek backward big step')),
+				"0": (self.keyNumberGlobal, _('Numberzap or zap to previous service')),
+				"toggleSeek": (self.toggleSeek, _("Toggle between zap and seek mode")),
 			})
 
 	def __serviceStarted(self):
