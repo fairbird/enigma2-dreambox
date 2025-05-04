@@ -35,12 +35,7 @@ def InitUsageConfig():
 			print("[UsageConfig] No registry.arm.bin?")
 
 	showrotorpositionChoicesUpdate()
-	config.usage.maxchannelnumlen = ConfigSelection(default="4", choices=[
-		("3", _("3")),
-		("4", _("4")),
-		("5", _("5")),
-		("6", _("6"))
-	])
+	config.usage.numberZapDigits = ConfigSelection(default=4, choices=[(x, ngettext("%d Digit", "%d Digits", x) % x) for x in range(1, 6)])
 
 	def setNumberModeChange(configElement):
 		eDVBDB.getInstance().setNumberingMode(configElement.value)
