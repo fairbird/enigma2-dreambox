@@ -36,6 +36,12 @@ def InitUsageConfig():
 
 	showrotorpositionChoicesUpdate()
 	config.usage.numberZapDigits = ConfigSelection(default=4, choices=[(x, ngettext("%d Digit", "%d Digits", x) % x) for x in range(1, 6)])
+	config.usage.numberZapDisplay = ConfigSelection(default="number", choices=[
+		("number", _("Number only")),
+		("name", _("Number and name")),
+		("picon", _("Number and picon")),
+		("both", _("Number, name and picon"))
+	])
 
 	def setNumberModeChange(configElement):
 		eDVBDB.getInstance().setNumberingMode(configElement.value)

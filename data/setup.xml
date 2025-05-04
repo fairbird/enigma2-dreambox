@@ -141,6 +141,7 @@
 		<item level="1" text="Zap mode" requires="ZapMode" description="Configure the way in which the receiver changes channels.">config.misc.zapmode</item>
 		<item level="1" text="Zap mode" description="Configure the way in which your device changes channels.">config.misc.zapmodeDM</item>
 		<item level="2" text="Number of digits in service number" description="This allows you to set the maximum number of digits in a service number, up to 5.">config.usage.numberZapDigits</item>
+		<item level="2" text="Service zap screen contents" description="Select the preferred service information to display, in addition to the service number, for the service selection pop up screen.">config.usage.numberZapDisplay</item>
 		<item level="2" text="Change bouquets in quickzap" description="When enabled, continue to the next bouquet when the last channel of the current bouquet is reached while changing channels.">config.usage.quickzap_bouquet_change</item>
 		<item level="2" text="Enable OK as preview in channel selection" description="When enabled then when you select a new channel in the channel selection the channel selection will not close. It will only close when you select the current playing service. This is a kind of preview mode">config.usage.channelselection_preview</item>
 		<item level="2" text="Enable 'neutrino' style zap controlling" description="When enabled the arrow buttons around the OK button will follow the 'neutrino' style zap controls instead of the enigma2 style.">config.usage.oldstyle_zap_controls</item>
@@ -164,8 +165,10 @@
 		<item level="0" text="Show InfoBar picons" description="Option to disable picons on the Infobar.">config.usage.showpicon</item>
 		<item level="0" text="Show picon background color" description="This option allows you choose the background color of transparent picons.">config.usage.show_picon_bkgrn</item>
 		<item level="0" text="Show picon folder name" description="This option allows you choose the name of folder picons." restart="gui">config.picon.foldername</item>
-		<item level="0" text="Enable infobar fade-out" description="Fade the infobar when hiding">config.usage.show_infobar_do_dimming</item>
-		<item level="0" text="Infobar fade-out speed" description="Configure the infobar fading speed">config.usage.show_infobar_dimming_speed</item>
+		<if requires="CanChangeOsdAlpha">
+			<item level="0" text="Enable InfoBar fade-out" description="Fade the InfoBar on hide.">config.usage.show_infobar_do_dimming</item>
+			<item level="0" text="InfoBar fade-out speed" description="Control the InfoBar fading speed." conditional="config.usage.show_infobar_do_dimming.value">config.usage.show_infobar_dimming_speed</item>
+		</if>
 		<item level="2" text="Show infobar on channel change" description="When enabled, the infobar will be displayed when changing channels.">config.usage.show_infobar_on_zap</item>
 		<item level="2" text="Show infobar on skip forward/backward" description="When enabled, the infobar will be displayed when skipping forwards/backwards during media playback.">config.usage.show_infobar_on_skip</item>
 		<item level="2" text="Show infobar on event change" description="When enabled, the infobar will be displayed when a new event starts.">config.usage.show_infobar_on_event_change</item>
