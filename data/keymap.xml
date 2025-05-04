@@ -728,6 +728,7 @@
 
 	<map context="EPGFilterActions">
 		<key id="KEY_STOP" mapto="filter" flags="m" />
+		<key id="KEY_0" mapto="saveTimes" flags="m" />
 		<key id="KEY_1" mapto="startUp" flags="m" />
 		<key id="KEY_4" mapto="startDown" flags="m" />
 		<key id="KEY_3" mapto="endUp" flags="m" />
