@@ -7,6 +7,7 @@ from Components.Pixmap import Pixmap
 from Components.Label import Label
 from Components.EpgList import EPGList, EPG_TYPE_SINGLE, EPG_TYPE_SIMILAR, EPG_TYPE_MULTI, EPG_TYPE_PARTIAL
 from Components.ActionMap import ActionMap, HelpableActionMap
+from Screens.HelpMenu import HelpableScreen
 from Components.UsageConfig import preferredTimerPath
 from Components.Sources.ServiceEvent import ServiceEvent
 from Components.Sources.StaticText import StaticText
