@@ -16,12 +16,12 @@ from Components.SystemInfo import BoxInfo, getBoxDisplayName
 from Components.UsageConfig import preferredInstantRecordPath, defaultMoviePath
 from Components.VolumeControl import VolumeControl
 from Components.Sources.StaticText import StaticText
+from Components.Task import job_manager
 from Screens.EpgSelection import EPGSelection
 from Plugins.Plugin import PluginDescriptor
 
 from Screens.Screen import Screen
 from Screens.ScreenSaver import InfoBarScreenSaver
-import Screens.Standby
 from Screens import Standby
 from Screens.ChoiceBox import ChoiceBox
 from Screens.Dish import Dish
@@ -32,6 +32,7 @@ from Screens.MinuteInput import MinuteInput
 from Screens.TimerSelection import TimerSelection
 from Screens.PictureInPicture import PictureInPicture
 from Screens.PiPSetup import PiPSetup
+from Screens.PVRState import PVRState, TimeshiftState
 from Screens.SubtitleDisplay import SubtitleDisplay
 from Screens.RdsDisplay import RdsInfoDisplay, RassInteractive
 from Screens.TimeDateInput import TimeDateInput
@@ -43,13 +44,18 @@ from Tools.Directories import SCOPE_CONFIG, SCOPE_SKINS, fileExists, fileReadLin
 from Tools.ServiceReference import hdmiInServiceRef
 from keyids import KEYFLAGS, KEYIDS, KEYIDNAMES
 from Tools.Notifications import AddPopup, AddNotificationWithCallback, current_notifications, lock, notificationAdded, notifications, RemovePopup
+from Tools.BoundFunction import boundFunction
 
 from keyids import KEYFLAGS, KEYIDS, KEYIDNAMES
+
+from RecordTimer import parseEvent
 
 from enigma import eAVControl, eTimer, getBsodCounter, eServiceCenter, eDVBServicePMTHandler, iServiceInformation, iPlayableService, eServiceReference, eEPGCache, eActionMap, getDesktop, eDVBDB, resetBsodCounter
 
 from skin import findSkinScreen
 from time import time, localtime, strftime
+import Screens.Standby
+import inspect
 import os
 from os.path import isfile
 from bisect import insort
@@ -2128,9 +2134,6 @@ class InfoBarSeek:
 			self.jumpNextMark()
 
 
-from Screens.PVRState import PVRState, TimeshiftState
-
-
 class InfoBarPVRState:
 	def __init__(self, screen=PVRState, force_show=False):
 		self.onChangedEntry = []
@@ -2758,11 +2761,6 @@ class InfoBarExtensions:
 		from Screens.OScamInfo import OscamInfoMenu
 		self.session.open(OscamInfoMenu)
 
-from Tools.BoundFunction import boundFunction
-import inspect
-
-# depends on InfoBarExtensions
-
 
 class InfoBarPlugins:  # Depends on InfoBarExtensions.
 	def __init__(self):
@@ -2789,9 +2787,6 @@ class InfoBarPlugins:  # Depends on InfoBarExtensions.
 			except Exception as err:
 				print("[InfoBarGenerics] Error: ", err)
 				print(f"[InfoBarGenerics] InfoBarPlugins: Error: {str(err)}!")
-
-
-from Components.Task import job_manager
 
 
 class InfoBarJobman:
@@ -2967,10 +2962,6 @@ class InfoBarPiP:
 			self.showPiP()
 		elif "stop" == use:
 			self.showPiP()
-
-
-
-from RecordTimer import parseEvent
 
 
 class InfoBarInstantRecord:
