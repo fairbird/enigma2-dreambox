@@ -6,6 +6,7 @@ from Components.Harddisk import harddiskmanager, findMountPoint
 from Components.Input import Input
 from Components.Label import Label
 from Components.MovieList import AUDIO_EXTENSIONS, MOVIE_EXTENSIONS, DVD_EXTENSIONS
+from Components.Pixmap import MovingPixmap
 from Components.PluginComponent import plugins
 from Components.ServiceEventTracker import ServiceEventTracker
 from Components.Sources.ServiceEvent import ServiceEvent
@@ -1606,6 +1607,76 @@ class InfoBarRdsDecoder:
 		self.rds_display.show()
 
 
+class Seekbar(Screen):
+	def __init__(self, session, fwd):
+		Screen.__init__(self, session)
+		self.setTitle(_("Seek"))
+		self.fwd = fwd
+		self.percent = 0.0
+		self.length = None
+		service = session.nav.getCurrentService()
+		if service:
+			self.seek = service.seek()
+			if self.seek:
+				self.length = self.seek.getLength()
+				position = self.seek.getPlayPosition()
+				if self.length and position and int(self.length[1]) > 0:
+					if int(position[1]) > 0:
+						self.percent = float(position[1]) * 100.0 / float(self.length[1])
+				else:
+					self.close()
+		self["cursor"] = MovingPixmap()
+		self["time"] = Label()
+		self["actions"] = HelpableActionMap(self, ["WizardActions", "DirectionActions"], {
+			"back": (self.exit, _("Cancel selection")),
+			"ok": (self.keyOK, _("Seek forward long")),
+			"left": (self.keyLeft, _("Seek back short")),
+			"right": (self.keyRight, _("Seek forward  short"))
+		}, prio=-1, description=_("Seek Actions"))
+		self.cursorTimer = eTimer()
+		self.cursorTimer.callback.append(self.updateCursor)
+		self.cursorTimer.start(200, False)
+
+	def updateCursor(self):
+		if self.length:
+			screenwidth = getDesktop(0).size().width()
+			if screenwidth and screenwidth == 1920:
+				x = 218 + int(4.05 * self.percent)
+				self["cursor"].moveTo(x, 23, 1)
+			else:
+				x = 145 + int(2.7 * self.percent)
+				self["cursor"].moveTo(x, 15, 1)
+			self["cursor"].startMoving()
+			pts = int(float(self.length[1]) / 100.0 * self.percent)
+			self["time"].setText("%d:%02d" % ((pts / 60 / 90000), ((pts / 90000) % 60)))
+
+	def exit(self):
+		self.cursorTimer.stop()
+		self.close()
+
+	def keyOK(self):
+		if self.length:
+			self.seek.seekTo(int(float(self.length[1]) / 100.0 * self.percent))
+			self.exit()
+
+	def keyLeft(self):
+		self.percent -= float(config.seek.sensibility.value) / 10.0
+		if self.percent < 0.0:
+			self.percent = 0.0
+
+	def keyRight(self):
+		self.percent += float(config.seek.sensibility.value) / 10.0
+		if self.percent > 100.0:
+			self.percent = 100.0
+
+	def keyNumberGlobal(self, number):
+		sel = self["config"].getCurrent()[1]
+		if sel == self.positionEntry:
+			self.percent = float(number) * 10.0
+		else:
+			ConfigListScreen.keyNumberGlobal(self, number)
+
+
 class InfoBarSeek:
 	"""handles actions like seeking, pause"""
 
@@ -1643,22 +1714,31 @@ class InfoBarSeek:
 				else:
 					return HelpableActionMap.action(self, contexts, action)
 
-		self["SeekActions"] = InfoBarSeekActionMap(self, actionmap,
-			{
-				"playpauseService": (self.playpauseService, _("Pause/Continue playback")),
-				"pauseService": (self.pauseService, _("Pause playback")),
-				"unPauseService": (self.unPauseService, _("Continue playback")),
-				"okButton": (self.okButton, _("Continue playback")),
-				"seekFwd": (self.seekFwd, _("Seek forward")),
-				"seekFwdManual": (self.seekFwdManual, _("Seek forward (enter time)")),
-				"seekBack": (self.seekBack, _("Seek backward")),
-				"seekBackManual": (self.seekBackManual, _("Seek backward (enter time)")),
-				"jumpPreviousMark": (self.seekPreviousMark, _("Jump to previous marked position")),
-				"jumpNextMark": (self.seekNextMark, _("Jump to next marked position")),
-			}, prio=-1)
-			# give them a little more priority to win over color buttons
-
+		self["SeekActions"] = InfoBarSeekActionMap(self, actionmap, {
+			"playpauseService": (self.playpauseService, _("Pause/Continue playback")),
+			"pauseService": (self.pauseService, _("Pause playback")),
+			"pauseServiceYellow": (self.pauseServiceYellow, _("Pause playback")),
+			"unPauseService": (self.unPauseService, _("Continue playback")),
+			"okButton": (self.okButton, _("Continue playback")),
+			"seekFwd": (self.seekFwd, _("Seek forward")),
+			"seekFwdManual": (self.seekFwdManual, _("Seek forward (enter time)")),
+			"seekBack": (self.seekBack, _("Seek backward")),
+			"seekBackManual": (self.seekBackManual, _("Seek backward (enter time)")),
+			"SeekbarFwd": self.seekFwdSeekbar,
+			"SeekbarBack": self.seekBackSeekbar
+		}, prio=-1, description=_("Seek Actions"))  # Give them a little more priority to win over the color buttons.
 		self["SeekActions"].setEnabled(False)
+		self["SeekActionsPTS"] = InfoBarSeekActionMap(self, "InfobarSeekActionsPTS", {
+			"playpauseService": (self.playpauseService, _("Pause/Continue playback")),
+			"pauseService": (self.pauseService, _("Pause playback")),
+			"pauseServiceYellow": (self.pauseServiceYellow, _("Pause playback")),
+			"unPauseService": (self.unPauseService, _("Continue playback")),
+			"seekFwd": (self.seekFwd, _("Skip forward")),
+			"seekFwdManual": (self.seekFwdManual, _("Skip forward (enter time)")),
+			"seekBack": (self.seekBack, _("Skip backward")),
+			"seekBackManual": (self.seekBackManual, _("Skip backward (enter time)"))
+		}, prio=-1, description=_("Seek Actions"))  # Give them a little more priority to win over the color buttons.
+		self["SeekActionsPTS"].setEnabled(False)
 
 		self.seekstate = self.SEEK_STATE_PLAY
 		self.lastseekstate = self.SEEK_STATE_PLAY
@@ -1810,6 +1890,9 @@ class InfoBarSeek:
 		else:
 			self.unPauseService()
 
+	def pauseServiceYellow(self):
+		self.audioSelection()
+
 	def pauseService(self):
 		if self.seekstate == self.SEEK_STATE_PAUSE:
 			if config.seek.on_pause.value == "play":
@@ -1828,6 +1911,8 @@ class InfoBarSeek:
 		print("unpause")
 		if self.seekstate == self.SEEK_STATE_PLAY:
 			return 0
+		if config.usage.show_infobar_on_skip.value and not config.usage.show_infobar_locked_on_pause.value:
+			self.showAfterSeek()
 		self.setSeekState(self.SEEK_STATE_PLAY)
 
 	def doSeek(self, pts):
@@ -1848,7 +1933,7 @@ class InfoBarSeek:
 			else:
 				self.setSeekState(self.SEEK_STATE_PLAY)
 		seekable.seekRelative(pts < 0 and -1 or 1, abs(pts))
-		if abs(pts) > 100 and config.usage.show_infobar_on_skip.value:
+		if (abs(pts) > 100 or not config.usage.show_infobar_locked_on_pause.value) and config.usage.show_infobar_on_skip.value:
 			self.showAfterSeek()
 
 	def seekFwd(self):
@@ -1925,31 +2010,67 @@ class InfoBarSeek:
 			else:
 				self.setSeekState(self.SEEK_STATE_PAUSE)
 
-	def seekFwdManual(self):
-		self.session.openWithCallback(self.fwdSeekTo, MinuteInput, maxValue=1440)
+	def seekFwdManual(self, fwd=True):
+		if config.seek.baractivation.value == "leftright":
+			self.session.open(Seekbar, fwd)
+		else:
+			self.session.openWithCallback(self.fwdSeekTo, MinuteInput, maxValue=1440)
 
-	def fwdSeekTo(self, minutes):
-		print("Seek", minutes, "minutes forward")
-		self.doSeekRelative(minutes * 60 * 90000)
+	def seekBackManual(self, fwd=True):
+		if config.seek.baractivation.value == "leftright":
+			self.session.open(Seekbar, fwd)
+		else:
+			self.session.openWithCallback(self.rwdSeekTo, MinuteInput, maxValue=1440)
 
-	def seekBackManual(self):
-		self.session.openWithCallback(self.rwdSeekTo, MinuteInput, maxValue=1440)
+	def seekFwdVod(self, fwd=True):
+		seekable = self.getSeek()
+		if seekable is None:
+			return
+		else:
+			if config.seek.baractivation.value == "leftright":
+				self.session.open(Seekbar, fwd)
+			else:
+				self.session.openWithCallback(self.fwdSeekTo, MinuteInput)
+
+	def seekFwdSeekbar(self, fwd=True):
+		if not config.seek.baractivation.value == "leftright":
+			self.session.open(Seekbar, fwd)
+		else:
+			self.session.openWithCallback(self.fwdSeekTo, MinuteInput)
 
 	def rwdSeekTo(self, minutes):
 		print("rwdSeekTo")
 		self.doSeekRelative(-minutes * 60 * 90000)
 
+	def fwdSeekTo(self, minutes):
+		print("Seek", minutes, "minutes forward")
+		self.doSeekRelative(minutes * 60 * 90000)
+
+	def seekBackSeekbar(self, fwd=False):
+		if not config.seek.baractivation.value == "leftright":
+			self.session.open(Seekbar, fwd)
+		else:
+			self.session.openWithCallback(self.rwdSeekTo, MinuteInput)
+
 	def checkSkipShowHideLock(self):
-		wantlock = self.seekstate != self.SEEK_STATE_PLAY
-
-		if config.usage.show_infobar_on_skip.value:
-			if self.lockedBecauseOfSkipping and not wantlock:
-				self.unlockShow()
+		if self.seekstate == self.SEEK_STATE_PLAY or self.seekstate == self.SEEK_STATE_EOF:
+			self.lockedBecauseOfSkipping = False
+			self.unlockShow()
+		elif self.seekstate == self.SEEK_STATE_PAUSE and not config.usage.show_infobar_locked_on_pause.value:
+			if config.usage.show_infobar_on_skip.value:
 				self.lockedBecauseOfSkipping = False
+				self.unlockShow()
+				self.showAfterSeek()
+		else:
+			wantlock = self.seekstate != self.SEEK_STATE_PLAY
+			if config.usage.show_infobar_on_skip.value:
+				if self.lockedBecauseOfSkipping and not wantlock:
+					self.unlockShow()
+					self.lockedBecauseOfSkipping = False
 
-			if wantlock and not self.lockedBecauseOfSkipping:
-				self.lockShow()
-				self.lockedBecauseOfSkipping = True
+				if wantlock and not self.lockedBecauseOfSkipping:
+					self.lockShow()
+					self.lockedBecauseOfSkipping = True
 
 	def calcRemainingTime(self):
 		seekable = self.getSeek()
@@ -2011,35 +2132,92 @@ from Screens.PVRState import PVRState, TimeshiftState
 
 class InfoBarPVRState:
 	def __init__(self, screen=PVRState, force_show=False):
+		self.onChangedEntry = []
 		self.onPlayStateChanged.append(self.__playStateChanged)
 		self.pvrStateDialog = self.session.instantiateDialog(screen)
+		self.pvrStateDialog.setAnimationMode(0)
 		self.onShow.append(self._mayShow)
 		self.onHide.append(self.pvrStateDialog.hide)
 		self.force_show = force_show
 
+	def createSummary(self):
+		return InfoBarMoviePlayerSummary
+
 	def _mayShow(self):
-		if self.shown:
+		if "state" in self and not config.usage.movieplayer_pvrstate.value:
+			self["state"].setText("")
+			self["statusicon"].setPixmapNum(6)
+			self["speed"].setText("")
+		if self.shown and self.seekstate != self.SEEK_STATE_EOF and not config.usage.movieplayer_pvrstate.value:
+			self.DimmingTimer.stop()
+			self.doWriteAlpha(config.av.osd_alpha.value)
 			self.pvrStateDialog.show()
-		if config.usage.show_infobar_do_dimming.value is True:
-			if self.shown and self.seekstate != self.SEEK_STATE_EOF:
-				self.DimmingTimer.stop()
-				self.doWriteAlpha(config.av.osd_alpha.value)
-				self.pvrStateDialog.show()
-				self.startHideTimer()
+			self.startHideTimer()
 
 	def __playStateChanged(self, state):
 		playstateString = state[3]
-		playstate = playstateString.split()
-		pixmapnum = [">", '||', 'END', '>>', '<<', '/'].index(playstate[0])
-		self.pvrStateDialog["state"].setText(playstateString)
-		self.pvrStateDialog["statusicon"].setPixmapNum(pixmapnum)
-		self.pvrStateDialog["speed"].setText(playstate[1] if len(playstate) > 1 else "")
-		if "state" in self:
-			self["state"].setText(playstateString)
-			self["statusicon"].setPixmapNum(pixmapnum)
-			self["speed"].setText(playstate[1] if len(playstate) > 1 else "")
-
-		# if we return into "PLAY" state, ensure that the dialog gets hidden if there will be no infobar displayed
+		state_summary = playstateString
+		if "statusicon" in self.pvrStateDialog:
+			self.pvrStateDialog["state"].setText(playstateString)
+			if playstateString == ">":
+				self.pvrStateDialog["statusicon"].setPixmapNum(0)
+				self.pvrStateDialog["speed"].setText("")
+				speed_summary = self.pvrStateDialog["speed"].text
+				statusicon_summary = 0
+				if "state" in self and config.usage.movieplayer_pvrstate.value:
+					self["state"].setText(playstateString)
+					self["statusicon"].setPixmapNum(0)
+					self["speed"].setText("")
+			elif playstateString == "||":
+				self.pvrStateDialog["statusicon"].setPixmapNum(1)
+				self.pvrStateDialog["speed"].setText("")
+				speed_summary = self.pvrStateDialog["speed"].text
+				statusicon_summary = 1
+				if "state" in self and config.usage.movieplayer_pvrstate.value:
+					self["state"].setText(playstateString)
+					self["statusicon"].setPixmapNum(1)
+					self["speed"].setText("")
+			elif playstateString == "END":
+				self.pvrStateDialog["statusicon"].setPixmapNum(2)
+				self.pvrStateDialog["speed"].setText("")
+				speed_summary = self.pvrStateDialog["speed"].text
+				statusicon_summary = 2
+				if "state" in self and config.usage.movieplayer_pvrstate.value:
+					self["state"].setText(playstateString)
+					self["statusicon"].setPixmapNum(2)
+					self["speed"].setText("")
+			elif playstateString.startswith(">>"):
+				speed = state[3].split()
+				self.pvrStateDialog["statusicon"].setPixmapNum(3)
+				self.pvrStateDialog["speed"].setText(speed[1])
+				speed_summary = self.pvrStateDialog["speed"].text
+				statusicon_summary = 3
+				if "state" in self and config.usage.movieplayer_pvrstate.value:
+					self["state"].setText(playstateString)
+					self["statusicon"].setPixmapNum(3)
+					self["speed"].setText(speed[1])
+			elif playstateString.startswith("<<"):
+				speed = state[3].split()
+				self.pvrStateDialog["statusicon"].setPixmapNum(4)
+				self.pvrStateDialog["speed"].setText(speed[1])
+				speed_summary = self.pvrStateDialog["speed"].text
+				statusicon_summary = 4
+				if "state" in self and config.usage.movieplayer_pvrstate.value:
+					self["state"].setText(playstateString)
+					self["statusicon"].setPixmapNum(4)
+					self["speed"].setText(speed[1])
+			elif playstateString.startswith("/"):
+				self.pvrStateDialog["statusicon"].setPixmapNum(5)
+				self.pvrStateDialog["speed"].setText(playstateString)
+				speed_summary = self.pvrStateDialog["speed"].text
+				statusicon_summary = 5
+				if "state" in self and config.usage.movieplayer_pvrstate.value:
+					self["state"].setText(playstateString)
+					self["statusicon"].setPixmapNum(5)
+					self["speed"].setText(playstateString)
+			for cb in self.onChangedEntry:
+				cb(state_summary, speed_summary, statusicon_summary)
+		# If we return into "PLAY" state, ensure that the dialog gets hidden if there will be no InfoBar displayed.
 		if not config.usage.show_infobar_on_skip.value and self.seekstate == self.SEEK_STATE_PLAY and not self.force_show:
 			self.pvrStateDialog.hide()
 		else:
