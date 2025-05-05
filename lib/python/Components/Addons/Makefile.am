@@ -7,4 +7,5 @@ install_PYTHON = \
 	ButtonSequence.py \
 	ColorButtonsSequence.py \
 	ScreenHeader.py \
-	ServiceInfoBar.py
+	ServiceInfoBar.py \
+	ScreenButtonsBar.py
