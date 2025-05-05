@@ -26,18 +26,15 @@ def isHD():
 class Time(Setup):
 	def __init__(self, session):
 		Setup.__init__(self, session=session, setup="Time")
+		self.addSaveNotifier(self.updateNetworkTime)
 		self["key_yellow"] = StaticText("")
-		self["geolocationActions"] = HelpableActionMap(self, ["ColorActions"], {
-			"yellow": (self.useGeolocation, _("Use geolocation to set the current time zone location")),
-			"green": (self.keySave, _("Save and update Network Time")),
+		self["geolocationActions"] = HelpableActionMap(self, "ColorActions", {
+			"yellow": (self.useGeolocation, _("Use geolocation to set the current time zone location"))
 		}, prio=0, description=_("Time Setup Actions"))
-		self.NTPserver = config.misc.NTPserver.value
-		self.SyncTimeUsing = config.misc.SyncTimeUsing.value
-		self.useNTPminutes = config.misc.useNTPminutes.value
 		self.selectionChanged()
 
 	def updateNetworkTime(self):
-		if not self.NTPserver == config.misc.NTPserver.value or not self.SyncTimeUsing == config.misc.SyncTimeUsing.value or not self.useNTPminutes == config.misc.useNTPminutes.value:
+		if config.misc.SyncTimeUsing.isChanged() or config.misc.NTPserver.isChanged() or config.misc.useNTPminutes.isChanged():
 			ntpSyncPoller.timeCheck()
 
 	def selectionChanged(self):
@@ -52,11 +49,11 @@ class Time(Setup):
 	def useGeolocation(self):
 		geolocationData = geolocation.getGeolocationData(fields="status,message,timezone,proxy")
 		if geolocationData.get("proxy", True):
-			self.session.open(MessageBox, 'Geolocation is not available.', MessageBox.TYPE_INFO, timeout=3)
+			self.setFootnote(_("Geolocation data is not available."))
 			return
 		tz = geolocationData.get("timezone", None)
 		if tz is None:
-			self.session.open(MessageBox, 'Geolocation does not contain time zone information.', MessageBox.TYPE_INFO, timeout=3)
+			self.setFootnote(_("Geolocation data does not contain time zone information."))
 		else:
 			areaItem = None
 			valItem = None
@@ -74,14 +71,10 @@ class Time(Setup):
 			if valItem is not None:
 				valItem[1].changed()
 			self["config"].invalidate(valItem)
-			self.session.open(MessageBox, 'Geolocation has been used to set the time zone.', MessageBox.TYPE_INFO, timeout=3)
+			self.setFootnote(_("Geolocation data has been used to set the time zone."))
 
 	def yellow(self):  # Invoked from the Wizard.
 		self.useGeolocation()
-
-	def keySave(self):
-		Setup.keySave(self)
-		self.updateNetworkTime()
 
 
 class TimeWizard(ConfigListScreen, Screen, Rc):
@@ -208,6 +201,14 @@ class TimeWizard(ConfigListScreen, Screen, Rc):
 		self.onLayoutFinish.append(self.selectKeys)
 		self.updateTimeList()
 
+	def keyLeft(self):
+		ConfigListScreen.keyLeft(self)
+		self.updateTimeList()
+
+	def keyRight(self):
+		ConfigListScreen.keyRight(self)
+		self.updateTimeList()
+
 	def selectKeys(self):
 		self.clearSelectedKeys()
 		self.selectKey("UP")
@@ -222,8 +223,9 @@ class TimeWizard(ConfigListScreen, Screen, Rc):
 		self.list.append((_("Time zone area"), config.timezone.area))
 		self.list.append((_("Time zone"), config.timezone.val))
 		self.list.append((_("Time synchronization method"), config.misc.SyncTimeUsing))
-		self.list.append((_("pool.ntp.org"), config.misc.NTPserver))
-		self.list.append((_("Sync NTP every (minutes)"), config.misc.useNTPminutes))
+		if config.misc.SyncTimeUsing.value == "1":
+			self.list.append((_("pool.ntp.org"), config.misc.NTPserver))
+			self.list.append((_("Sync NTP every (minutes)"), config.misc.useNTPminutes))
 		if config.usage.date.enabled.value:
 			self.list.append((_("Date style"), config.usage.date.dayfull))
 			config.usage.date.dayfull.save()
