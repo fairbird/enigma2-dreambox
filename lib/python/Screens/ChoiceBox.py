@@ -221,7 +221,7 @@ class ChoiceBox(Screen):
 					self["summary_selection"].text = entry[1]
 				elif entry[0] != "dummy":
 					summarytext += entry[0]
-				summarytext += " " + entry[1] + "\n"
+				summarytext += " " + str(entry[1]) + "\n"
 		self["summary_list"].text = summarytext
 
 	def displayDescription(self, curpos=0):
