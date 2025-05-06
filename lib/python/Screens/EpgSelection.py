@@ -414,6 +414,8 @@ class EPGSelection(Screen, HelpableScreen):
 	def saveFilterValues(self):
 		def save(answer):
 			if answer:
+				config.epg.filter_start.save()
+				config.epg.filter_end.save()
 				self.original_cfg_filter_start = config.epg.filter_start.value
 				self.original_cfg_filter_end = config.epg.filter_end.value
 		if self.filtering:
