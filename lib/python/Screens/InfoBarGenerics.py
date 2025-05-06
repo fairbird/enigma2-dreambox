@@ -1479,7 +1479,7 @@ class InfoBarEPG:
 	def showEventInfoPlugins(self):
 		pluginlist = self.getEPGPluginList()
 		if pluginlist:
-			self.session.openWithCallback(self.EventInfoPluginChosen, ChoiceBox, title=_("Please choose an extension..."), list=pluginlist, skin_name="EPGExtensionsList", reorderConfig="eventinfoOrder", windowTitle=_("Events info menu"))
+			self.session.openWithCallback(self.EventInfoPluginChosen, ChoiceBox, title=_("Please choose an extension..."), list=pluginlist, skinName="EPGExtensionsList", reorderConfig="eventinfoOrder", windowTitle=_("Events info menu"))
 		else:
 			self.openSingleServiceEPG()
 
@@ -2672,7 +2672,7 @@ class ExtensionsList(ChoiceBox):
 			extensionList.append((extension[0], extension[1]))
 
 		reorderConfig = "extensionOrder" if config.usage.sortExtensionslist.value == "user" else ""
-		ChoiceBox.__init__(self, session, title=_("Extensions"), list=extensionList, keys=extensionKeys, reorderConfig=reorderConfig, skin_name="ExtensionsList")
+		ChoiceBox.__init__(self, session, title=_("Extensions"), list=extensionList, keys=extensionKeys, reorderConfig=reorderConfig, skinName="ExtensionsList")
 
 
 class InfoBarExtensions:
@@ -3489,7 +3489,7 @@ class InfoBarSubserviceSelection:
 					keys = ["red", "", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
 					selection += 2
 				if tlist:
-					self.session.openWithCallback(self.subserviceSelected, ChoiceBox, title=_("Please select a sub service..."), list=tlist, selection=selection, keys=keys, skin_name="SubserviceSelection")
+					self.session.openWithCallback(self.subserviceSelected, ChoiceBox, title=_("Please select a sub service..."), list=tlist, selection=selection, keys=keys, skinName="SubserviceSelection")
 				else:
 					self.session.open(MessageBox, _("No active subservices available."), MessageBox.TYPE_INFO, timeout=5, simple=True)
 
