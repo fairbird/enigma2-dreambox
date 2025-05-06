@@ -1479,7 +1479,7 @@ class InfoBarEPG:
 	def showEventInfoPlugins(self):
 		pluginlist = self.getEPGPluginList()
 		if pluginlist:
-			self.session.openWithCallback(self.EventInfoPluginChosen, ChoiceBox, title=_("Please choose an extension..."), list=pluginlist, skinName="EPGExtensionsList", reorderConfig="eventinfoOrder", windowTitle=_("Events info menu"))
+			self.session.openWithCallback(self.EventInfoPluginChosen, ChoiceBox, title=_("Please choose an extension..."), list=pluginlist, skin_name="EPGExtensionsList", reorderConfig="eventinfoOrder", windowTitle=_("Events info menu"))
 		else:
 			self.openSingleServiceEPG()
 
@@ -2672,7 +2672,7 @@ class ExtensionsList(ChoiceBox):
 			extensionList.append((extension[0], extension[1]))
 
 		reorderConfig = "extensionOrder" if config.usage.sortExtensionslist.value == "user" else ""
-		ChoiceBox.__init__(self, session, title=_("Extensions"), list=extensionList, keys=extensionKeys, reorderConfig=reorderConfig, skinName="ExtensionsList")
+		ChoiceBox.__init__(self, session, title=_("Extensions"), list=extensionList, keys=extensionKeys, reorderConfig=reorderConfig, skin_name="ExtensionsList")
 
 
 class InfoBarExtensions:
@@ -2825,13 +2825,13 @@ class InfoBarPiP:
 				"activatePiP": (self.activePiP, self.activePiPName),
 			}, prio=0, description=_("PiP Actions"))
 			if self.allowPiP:
-				self.addExtension((self.getShowHideName, self.showPiP, lambda: True), "blue")
-				self.addExtension((self.getMoveName, self.movePiP, self.pipShown), "green")
-				self.addExtension((self.getSwapName, self.swapPiP, lambda: self.pipShown() and isStandardInfoBar(self)), "yellow")
-				self.addExtension((self.getTogglePipzapName, self.togglePipzap, self.pipShown), "red")
+				self.addExtension((self.extShowHideName, self.showPiP, lambda: True), "blue")
+				self.addExtension((self.extMoveName, self.movePiP, self.pipShown), "green")
+				self.addExtension((self.extSwapName, self.swapPiP, lambda: self.pipShown() and isStandardInfoBar(self)), "yellow")
+				self.addExtension((self.extTogglePipZapName, self.togglePipZap, self.pipShown), "red")
 			else:
-				self.addExtension((self.getShowHideName, self.showPiP, self.pipShown), "blue")
-				self.addExtension((self.getMoveName, self.movePiP, self.pipShown), "green")
+				self.addExtension((self.extShowHideName, self.showPiP, self.pipShown), "blue")
+				self.addExtension((self.extMoveName, self.movePiP, self.pipShown), "green")
 		self.lastPiPServiceTimeoutTimer = eTimer()
 		self.lastPiPServiceTimeoutTimer.callback.append(self.clearLastPiPService)
 
@@ -2841,13 +2841,13 @@ class InfoBarPiP:
 	def pipHandles0Action(self):
 		return self.pipShown() and config.usage.pip_zero_button.value != "standard"
 
-	def getShowHideName(self):
+	def extShowHideName(self):
 		return _("Disable Picture in Picture") if self.session.pipshown else _("Activate Picture in Picture")
 
-	def getSwapName(self):
+	def extSwapName(self):
 		return _("Swap services")
 
-	def getMoveName(self):
+	def extMoveName(self):
 		return _("Picture in Picture Setup")
 
 	def getTogglePipzapName(self):
@@ -2856,14 +2856,17 @@ class InfoBarPiP:
 			return _("Zap focus to main screen")
 		return _("Zap focus to Picture in Picture")
 
-	def togglePipzap(self):
+	def togglePipzap(self):  # called from ButtonSetup
+		return self.togglePipZap()
+
+	def togglePipZap(self):
 		if not self.session.pipshown:
 			self.showPiP()
-		slist = self.servicelist
-		if slist and self.session.pipshown:
-			slist.togglePipzap()
-			if slist.dopipzap:
-				currentServicePath = slist.getCurrentServicePath()
+		serviceList = self.servicelist
+		if serviceList and self.session.pipshown:
+			serviceList.togglePipzap()
+			if serviceList.dopipzap:
+				currentServicePath = serviceList.getCurrentServicePath()
 				self.servicelist.setCurrentServicePath(self.session.pip.servicePath, doZap=False)
 				self.session.pip.servicePath = currentServicePath
 
@@ -2932,26 +2935,25 @@ class InfoBarPiP:
 
 	def swapPiP(self):
 		if self.pipShown():
-			swapservice = self.session.nav.getCurrentlyPlayingServiceOrGroup()
-			pipref = self.session.pip.getCurrentService()
-			if swapservice and pipref and pipref.toString() != swapservice.toString():
+			swapService = self.session.nav.getCurrentlyPlayingServiceOrGroup()
+			pipServiceReference = self.session.pip.getCurrentService()
+			if swapService and pipServiceReference and pipServiceReference.toString() != swapService.toString():
 				currentServicePath = self.servicelist.getCurrentServicePath()
 				currentBouquet = self.servicelist and self.servicelist.getRoot()
 				self.servicelist.setCurrentServicePath(self.session.pip.servicePath, doZap=False)
-				self.session.pip.playService(swapservice)
+				self.session.pip.playService(swapService)
 				self.session.nav.stopService()  # Stop portal.
-				self.session.nav.playService(pipref, checkParentalControl=False, adjust=False)
+				self.session.nav.playService(pipServiceReference, checkParentalControl=False, adjust=False)
 				self.session.pip.servicePath = currentServicePath
 				self.session.pip.servicePath[1] = currentBouquet
-				if self.servicelist.dopipzap:
-					# This unfortunately won't work with subservices.
+				if self.servicelist.dopipzap:  # This unfortunately won't work with subservices.
 					self.servicelist.setCurrentSelection(self.session.pip.getCurrentService())
 
 	def movePiP(self):
 		if self.pipShown():
 			self.session.open(PiPSetup, pip=self.session.pip)
 
-	def pipDoHandle0Action(self):
+	def extTogglePipZapName(self):
 		use = config.usage.pip_zero_button.value
 		if "swap" == use:
 			self.swapPiP()
@@ -3489,7 +3491,7 @@ class InfoBarSubserviceSelection:
 					keys = ["red", "", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
 					selection += 2
 				if tlist:
-					self.session.openWithCallback(self.subserviceSelected, ChoiceBox, title=_("Please select a sub service..."), list=tlist, selection=selection, keys=keys, skinName="SubserviceSelection")
+					self.session.openWithCallback(self.subserviceSelected, ChoiceBox, title=_("Please select a sub service..."), list=tlist, selection=selection, keys=keys, skin_name="SubserviceSelection")
 				else:
 					self.session.open(MessageBox, _("No active subservices available."), MessageBox.TYPE_INFO, timeout=5, simple=True)
 
