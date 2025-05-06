@@ -96,7 +96,7 @@ class FlashManager(Screen):
 		self["description"] = StaticText()
 		self["list"] = ChoiceList(list=[ChoiceEntryComponent("", ((_("Retrieving image list, please wait...")), "Loading"))])
 		self.feedUrls = [
-			("Unknown", "https://Unknown.com")
+			("OpenATV", "https://images.mynonpublic.com/openatv/json/%s" % BoxInfo.getItem("BoxName"))
 		]
 		self.callLater(self.getImagesList)
 
@@ -125,8 +125,8 @@ class FlashManager(Screen):
 					print("[FlashManager] getImagesList Error: Unable to extract file list from Zip file '%s'!" % file)
 
 		def getImagesListCallback(retVal=None):  # The retVal argument absorbs the unwanted return value from MessageBox.
-			if self.imageFeed != "Unknown":
-				self.keyDistributionCallback("Unknown")  # No images can be found for the selected distribution so go back to the Unknown default.
+			if self.imageFeed != "OpenATV":
+				self.keyDistributionCallback("OpenATV")  # No images can be found for the selected distribution so go back to the Unknown default.
 
 		machinebuild = BoxInfo.getItem("machinebuild")
 		model = BoxInfo.getItem("model")
@@ -135,7 +135,7 @@ class FlashManager(Screen):
 		if not self.imagesList:
 			index = findInList(self.imageFeed)
 			box = machinebuild if index else boxname
-			feedURL = self.feedUrls[index][FEED_JSON_URL] if index else "https://Unknown/json/%s" % box
+			feedURL = self.feedUrls[index][FEED_JSON_URL] if index else "https://images.mynonpublic.com/openatv/json/%s" % box
 			try:
 				req = Request(feedURL, None, USER_AGENT)
 				self.imagesList = dict(load(urlopen(req)))
@@ -146,7 +146,7 @@ class FlashManager(Screen):
 				print("[FlashManager] getImagesList Error: Unable to load json data from URL '%s'!" % feedURL)
 				self.imagesList = {}
 			searchFolders = []
-			# Get all folders of /media/ and /media/net/ and only if Unknown
+			# Get all folders of /media/ and /media/net/ and only if OpenATV
 			if not index:
 				for media in ["/media/%s" % x for x in listdir("/media")] + (["/media/net/%s" % x for x in listdir("/media/net")] if isdir("/media/net") else []):
 					# print("[FlashManager] getImagesList DEBUG: media='%s'." % media)
@@ -234,12 +234,12 @@ class FlashManager(Screen):
 		self.selectionChanged()
 
 	def keyDistribution(self):
-		self.feedUrls = [["Unknown", "https://Unknown/json/%s" % BoxInfo.getItem("BoxName")]]
+		self.feedUrls = [["OpenATV", "https://images.mynonpublic.com/openatv/json/%s" % BoxInfo.getItem("BoxName")]]
 		distributionList = []
 		default = 0
 		machine = BoxInfo.getItem("machinebuild")
 		try:
-			req = Request("https://Unknown/%s.json" % machine, None, USER_AGENT)
+			req = Request("https://raw.githubusercontent.com/OpenATV/FlashImage/gh-pages/%s.json" % machine, None, USER_AGENT)
 			responseList = load(urlopen(req, timeout=5))
 			self.feedUrls = self.feedUrls + responseList
 		except Exception as err:
