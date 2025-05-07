@@ -595,7 +595,8 @@ class MultiBootClass():
 			info["distro"] = " ".join(data[:-1])
 			info["displaydistro"] = {
 				"beyonwiz": "Beyonwiz",
-				"blackhole": "Black Hole",
+				"BlackHole": "Black Hole",
+				"OpenTSimage": "OpenTSimage",
 				"egami": "EGAMI",
 				"openatv": "OpenATV",
 				"openbh": "OpenBH",
