@@ -66,7 +66,7 @@ void eFBCTunerManager::WriteProcStr(int fe_index, const std::string & entry, int
 		return;
 
 	char configStr[255];
-	snprintf(configStr, 255, "config.Nims.%d.dvbs.input", fe_index);
+	snprintf(configStr, 255, "config.Nims.%d.input", fe_index);
 	std::string str = eSimpleConfig::getString(configStr, "A");
 	file << str.c_str();
 }
