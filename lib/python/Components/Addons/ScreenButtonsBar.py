@@ -68,6 +68,8 @@ class ScreenButtonsBar(GUIAddon):
 		last_pixd_width = 0
 		if self.actionButtonsPosition != "right":
 			xPosAction = width if self.actionButtonsPosition == "farRight" else 0
+			if self.actionButtonsPosition == "farRight":
+				sequenceAction.reverse()
 			for x in sequenceAction:
 				if x in self.pixmaps:
 					pic = LoadPixmap(resolveFilename(SCOPE_GUISKIN, self.pixmaps[x]))
@@ -178,14 +180,14 @@ class ScreenButtonsBar(GUIAddon):
 
 	def constructButtonSequence(self):
 		sequenceColor = {}
-		sequenceAction = {}
+		sequenceAction = []
 		for x, val in self.colorButtonSources.items():
 			if hasattr(val, "text") and val.text:
 				sequenceColor[x] = val
 
 		for x, val in self.actionButtonSources.items():
-			if hasattr(val, "text") and val.text:
-				sequenceAction[x] = val
+			if hasattr(val, "boolean") and val.boolean and x not in sequenceAction:
+				sequenceAction.append(x)
 
 		self.updateAddon(sequenceColor, sequenceAction)
 
