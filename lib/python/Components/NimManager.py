@@ -571,7 +571,7 @@ class SecConfigure:
 
 
 class NIM:
-	def __init__(self, slot, sattype, description, has_outputs=True, internally_connectable=None, multi_type={}, frontend_id=None, i2c=None, is_empty=False, supports_blind_scan=False, is_fbc=[0, 0, 0], number_of_slots=0):
+	def __init__(self, slot, sattype, description, has_outputs=True, internally_connectable=None, multi_type={}, frontend_id=None, i2c=None, is_empty=False, input_name=None, supports_blind_scan=False, is_fbc=[0, 0, 0], number_of_slots=0):
 		nim_types = ["DVB-S", "DVB-S2", "DVB-S2X", "DVB-C", "DVB-T", "DVB-T2", "ATSC"]
 
 		if sattype and sattype not in nim_types:
@@ -589,7 +589,8 @@ class NIM:
 		self.i2c = i2c
 		self.frontend_id = frontend_id
 		self.__is_empty = is_empty
-		self.is_fbc = is_fbc
+		self.is_fbc = is_fbc or (0, 0, 0)
+		self.input_name = input_name
 
 		self.compatible = {
 			None: (None,),
@@ -665,11 +666,19 @@ class NIM:
 	def getSlotID(self, slot=None):
 		return chr(ord('A') + (slot if slot is not None else self.slot))
 
+	def getSlotInputName(self):
+		name = self.input_name
+		if name is None:
+			name = chr(ord('A') + self.slot)
+		return name
+
+	slot_input_name = property(getSlotInputName)
+
 	def getSlotName(self, slot=None):
 		# get a friendly description for a slot name.
 		# we name them "Tuner A/B/C/...", because that's what's usually written on the back
 		# of the device.
-		return "%s %s" % (_("Tuner"), self.getSlotID(slot))
+		return "%s %s" % (_("Tuner "), self.getSlotID(slot) if slot else self.getSlotInputName())
 
 	def getI2C(self):
 		return self.i2c
@@ -943,6 +952,8 @@ class NimManager:
 			elif line.startswith("Type:"):
 				entries[current_slot]["type"] = str(line[6:])
 				entries[current_slot]["isempty"] = False
+			elif line.strip().startswith("Input_Name:"):
+				entries[current_slot]["input_name"] = str(line.strip()[12:])
 			elif line.startswith("Name:"):
 				entries[current_slot]["name"] = str(line[6:])
 				entries[current_slot]["isempty"] = False
@@ -1001,6 +1012,8 @@ class NimManager:
 				entry["frontend_device"] = None
 			if "multi_type" not in entry:
 				entry["multi_type"] = {}
+			if "input_name" not in entry:
+				entry["input_name"] = chr(ord('A') + id)
 			if "supports_blind_scan" not in entry:
 				entry["supports_blind_scan"] = False
 
@@ -1016,7 +1029,7 @@ class NimManager:
 					fbc_number = 0
 					fbc_tuner += 1
 
-			self.nim_slots.append(NIM(slot=id, description=entry["name"], sattype=entry["type"], has_outputs=entry["has_outputs"], internally_connectable=entry["internally_connectable"], multi_type=entry["multi_type"], frontend_id=entry["frontend_device"], i2c=entry["i2c"], is_empty=entry["isempty"], supports_blind_scan=entry["supports_blind_scan"], is_fbc=entry["fbc"], number_of_slots=self.number_of_slots))
+			self.nim_slots.append(NIM(slot=id, description=entry["name"], sattype=entry["type"], has_outputs=entry["has_outputs"], internally_connectable=entry["internally_connectable"], multi_type=entry["multi_type"], frontend_id=entry["frontend_device"], i2c=entry["i2c"], is_empty=entry["isempty"], input_name=entry.get("input_name", None), supports_blind_scan=entry["supports_blind_scan"], is_fbc=entry["fbc"], number_of_slots=self.number_of_slots))
 
 	def hasNimType(self, chktype):
 		return any(slot.canBeCompatible(chktype) for slot in self.nim_slots)
@@ -1029,6 +1042,10 @@ class NimManager:
 
 	def getNimName(self, slotid):
 		return self.nim_slots[slotid].description
+
+	def getNimSlotInputName(self, slotid):
+		# returns just "A", "B", ...
+		return self.nim_slots[slotid].slot_input_name
 
 	def getNim(self, slotid):
 		return self.nim_slots[slotid]
