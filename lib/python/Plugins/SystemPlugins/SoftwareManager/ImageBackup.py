@@ -144,7 +144,7 @@ class ImageBackup(Screen):
 				self.session.openWithCallback(self.runImageBackup, ChoiceBox, title=_("Please select the target location to save the backup:"), list=choiceList, windowTitle=self.getTitle())
 		else:
 			self.session.open(MessageBox, "You are using different MultiBoot. Not Chkroot MultiBoot.\n\nSorry You can not create backup.", MessageBox.TYPE_ERROR, timeout=10)
-			self.close(True)
+			return
 
 	def keyCloseRecursive(self):
 		self.close(True)
