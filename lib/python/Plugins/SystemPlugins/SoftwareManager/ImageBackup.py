@@ -131,16 +131,20 @@ class ImageBackup(Screen):
 
 	def keyStart(self):
 		current = self["config"].getCurrent()  # (label, slotCode, recovery)
-		targets = []
-		choiceList = []  # (label, slotCode, target, recovery)
-		if current[0][1]:  # The MultiBoot enumeration is complete as we now have slotCodes.
-			for target in [join("/media", x) for x in listdir("/media")] + ([join("/media/net", x) for x in listdir("/media/net")] if isdir("/media/net") else []):
-				if Freespace(target) > 300000:
-					targets.append(target)
-					choiceList.append((target, current[0][1], target, current[0][2]))
-			choiceList.append((_("Do not backup the image"), False, None, False))
-			print(f"[ImageBackup] Potential target{"" if len(targets) == 1 else "s"}: '{"', '".join(targets)}'.")
-			self.session.openWithCallback(self.runImageBackup, ChoiceBox, title=_("Please select the target location to save the backup:"), list=choiceList, windowTitle=self.getTitle())
+		if current != None:
+			targets = []
+			choiceList = []  # (label, slotCode, target, recovery)
+			if current[0][1]:  # The MultiBoot enumeration is complete as we now have slotCodes.
+				for target in [join("/media", x) for x in listdir("/media")] + ([join("/media/net", x) for x in listdir("/media/net")] if isdir("/media/net") else []):
+					if Freespace(target) > 300000:
+						targets.append(target)
+						choiceList.append((target, current[0][1], target, current[0][2]))
+				choiceList.append((_("Do not backup the image"), False, None, False))
+				print(f"[ImageBackup] Potential target{"" if len(targets) == 1 else "s"}: '{"', '".join(targets)}'.")
+				self.session.openWithCallback(self.runImageBackup, ChoiceBox, title=_("Please select the target location to save the backup:"), list=choiceList, windowTitle=self.getTitle())
+		else:
+			self.session.open(MessageBox, "You are using different MultiBoot. Not Chkroot MultiBoot.\n\nSorry You can not create backup.", MessageBox.TYPE_ERROR, timeout=10)
+			self.close(True)
 
 	def keyCloseRecursive(self):
 		self.close(True)
