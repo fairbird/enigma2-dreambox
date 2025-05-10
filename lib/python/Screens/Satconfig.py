@@ -614,7 +614,7 @@ class NimSetup(Setup, ServiceStopScreen):
 		if self.isChanged():
 			self.stopService()
 		if self["config"].getCurrent() == self.advancedSelectSatsEntry:
-			conf = self.nimConfig.advanced.sat[int(self.nimConfig.advanced.sats.value)].userSatellitesList
+			conf = self.nimConfig.advanced.sat[self.nimConfig.advanced.sats.value].userSatellitesList
 			self.session.openWithCallback(boundFunction(self.updateConfUserSatellitesList, conf), SelectSatsEntryScreen, userSatlist=conf.value)
 		elif self["config"].getCurrent() == self.selectSatsEntry:
 			conf = self.nimConfig.userSatellitesList
