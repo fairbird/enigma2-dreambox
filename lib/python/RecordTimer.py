@@ -773,9 +773,9 @@ class RecordTimerEntry(timer.TimerEntry):
 
 	def gotRecordEvent(self, record, event):
 		# TODO: this is not working (never true), please fix. (comparing two swig wrapped ePtrs)
-		if self.__record_service.__deref__() != record.__deref__():
-			return
-		self.log(16, "record event %d" % event)
+		#if self.__record_service.__deref__() != record.__deref__():
+		#	return
+		#self.log(16, "record event %d" % event)
 		if event == iRecordableService.evRecordWriteError:
 			print("WRITE ERROR on recording, disk full?")
 			# show notification. the 'id' will make sure that it will be
