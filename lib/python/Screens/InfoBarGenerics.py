@@ -2152,12 +2152,11 @@ class InfoBarPVRState:
 			self["state"].setText("")
 			self["statusicon"].setPixmapNum(6)
 			self["speed"].setText("")
-		if config.usage.show_infobar_do_dimming.value is True:
-			if self.shown and self.seekstate != self.SEEK_STATE_EOF and not config.usage.movieplayer_pvrstate.value:
-				self.DimmingTimer.stop()
-				self.doWriteAlpha(config.av.osd_alpha.value)
-				self.pvrStateDialog.show()
-				self.startHideTimer()
+		if self.shown and self.seekstate != self.SEEK_STATE_EOF and not config.usage.movieplayer_pvrstate.value:
+			self.DimmingTimer.stop()
+			self.doWriteAlpha(config.av.osd_alpha.value)
+			self.pvrStateDialog.show()
+			self.startHideTimer()
 
 	def __playStateChanged(self, state):
 		playstateString = state[3]
