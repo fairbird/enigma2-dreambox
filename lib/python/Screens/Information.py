@@ -681,14 +681,10 @@ class DistributionInformation(InformationBase):
 		info.append(formatLine("S", _("Enigma2 information")))
 		if self.extraSpacing:
 			info.append("")
-		enigmaVersion = str(BoxInfo.getItem("imageversion"))
-		enigmaVersion = enigmaVersion.rsplit("-", enigmaVersion.count("-") - 2)
-		if len(enigmaVersion) == 3:
-			enigmaVersion = f"{enigmaVersion[0]} ({enigmaVersion[2]}-{enigmaVersion[1].capitalize()})"
-		elif len(enigmaVersion) == 1:
-			enigmaVersion = f"{enigmaVersion[0]}"
-		else:
-			enigmaVersion = f"{enigmaVersion[0]} ({enigmaVersion[1].capitalize()})"
+		enigmaVersion = about.getEnigmaVersionString()
+		enigmaBranch = f"{enigmaVersion[11:]}"
+		enigmaVersion = f"{enigmaVersion[:10]}"
+		info.append(formatLine("P1", _("Enigma2 branch"), enigmaBranch))
 		info.append(formatLine("P1", _("Enigma2 version"), enigmaVersion))
 		compileDate = str(BoxInfo.getItem("compiledate"))
 		info.append(formatLine("P1", _("Last update"), formatDate(f"{compileDate[:4]}{compileDate[4:6]}{compileDate[6:]}")))
