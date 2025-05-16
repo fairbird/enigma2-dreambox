@@ -49,4 +49,5 @@ doxy/
 *.wsuo
 *.bin
 /.vs
-.vscode/
+.vscode
+path/
