@@ -58,7 +58,7 @@ class CronTimers(Screen):
 				<widget name="labrun" position="440,100" size="100,24" font="Regular;20" verticalAlignment="center" horizontalAlignment="center" backgroundColor="green" zPosition="2"/>
 				<widget source="list" render="Listbox" position="10,140" size="540,280" scrollbarBorderWidth="1" scrollbarWidth="10" transparent="1" >
 					<convert type="TemplatedMultiContent">
-						{"template": 
+						{"template":
 							[
 							MultiContentEntryText(pos = (5, 2), size = (695, 28), font=0, flags = RT_HALIGN_LEFT | RT_VALIGN_CENTER, text = 0), # index 0 is the name
 							],
@@ -94,7 +94,7 @@ class CronTimers(Screen):
 				<widget name="labrun" position="780,150" size="150,40" font="Regular;28" verticalAlignment="center" horizontalAlignment="center" backgroundColor="green" zPosition="2"/>
 				<widget source="list" render="Listbox" position="10,205" size="967,558" scrollbarBorderWidth="1" scrollbarWidth="10" transparent="1" >
 					<convert type="TemplatedMultiContent">
-						{"template": 
+						{"template":
 							[
 							MultiContentEntryText(pos = (5, 2), size = (800, 35), font=0, flags = RT_HALIGN_LEFT | RT_VALIGN_CENTER, text = 0), # index 0 is the name
 							],

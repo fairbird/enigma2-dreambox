@@ -167,7 +167,7 @@ class PluginComponent:
 		return self.pluginWarnings
 
 	warnings = property(getWarnings)
-	
+
 	def resetWarnings(self):
 		self.pluginWarnings = []
 

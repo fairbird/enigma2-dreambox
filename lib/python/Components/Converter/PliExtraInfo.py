@@ -98,13 +98,13 @@ def createCurrentCaidLabel(info, currentCaid=None):
 				stateSlot = dvbCIUI.getState(slot)
 				if stateDecoding == 2 and stateSlot not in (-1, 0, 3):
 					decodingCiSlot = slot
-		
+
 	if not pathExists("/tmp/ecm.info") and decodingCiSlot == -1:
 		return "FTA"
-		
+
 	if decodingCiSlot > -1 and not pathExists("/tmp/ecm.info"):
 		return "CI%d" % (decodingCiSlot)
-		
+
 	for caid_entry in caid_data:
 		if int(caid_entry[0], 16) <= int(current_caid, 16) <= int(caid_entry[1], 16):
 			res = caid_entry[4]
@@ -368,7 +368,7 @@ class PliExtraInfo(Poll, Converter):
 					return addspace(self.createCryptoBar(info)) + self.createCryptoSpecial(info)
 				else:
 					return addspace(self.createCryptoBar(info)) + addspace(self.current_source) + self.createCryptoSpecial(info)
-				
+
 			if self.type == "CurrentCrypto":
 				self.getCryptoInfo(info)
 				return self.createCurrentCaidLabel(info)

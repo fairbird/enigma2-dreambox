@@ -317,7 +317,7 @@ class CaidInfo2(Poll, Converter, object):
 					else:
 						if source != "cache" and source == "net" and source.find("emu") == -1:
 							return True
-						#return  (source != None and source == "net") or (source != None and source != "sci") or (source != None and source != "emu") or (reader != None and reader != "emu") or (source != None and source != "card") 
+						#return  (source != None and source == "net") or (source != None and source != "sci") or (source != None and source != "emu") or (reader != None and reader != "emu") or (source != None and source != "card")
 
 				else:
 					return False

@@ -1175,7 +1175,7 @@ class ChannelSelectionEdit:
 	def addBouquet(self, bName, services):
 		serviceHandler = eServiceCenter.getInstance()
 		mutableBouquetList = serviceHandler.list(self.bouquet_root).startEdit()
-		if mutableBouquetList:			
+		if mutableBouquetList:
 			if self.mode == MODE_TV:
 				bName = f"{bName} {_('(TV)')}"
 				new_bouquet_ref = eServiceReference(service_types_tv_ref)
@@ -2357,7 +2357,7 @@ class ChannelSelection(ChannelSelectionBase, ChannelSelectionEdit, ChannelSelect
 				self.setModeRadio()
 		else:
 			self.setModeTv()
-		
+
 		standbyScreen = None
 		doPlay = False
 		if self == ChannelSelection.instance and Screens.Standby.inStandby:  # Find Standby screen if already inStandby.

@@ -447,7 +447,7 @@ class SelectionEventInfo:
 		info = serviceref and eServiceCenter.getInstance().info(serviceref)
 		if info:
 			timeCreate = strftime("%A %d %b %Y", localtime(info.getInfo(serviceref, iServiceInformation.sTimeCreate)))
-			duration = "%d min" % (info.getLength(serviceref) / 60) 
+			duration = "%d min" % (info.getLength(serviceref) / 60)
 			filesize = "%d MB" % (info.getInfoObject(serviceref, iServiceInformation.sFileSize) / (1024 * 1024))
 			moviedetails = "%s  •  %s  •  %s" % (timeCreate, duration, filesize)
 			self["moviedetails"].setText(moviedetails)
@@ -1389,7 +1389,7 @@ class MovieSelection(Screen, HelpableScreen, SelectionEventInfo, InfoBarBase, Pr
 		if self.selected_tags:
 			title += " - " + ','.join(self.selected_tags)
 		self.setTitle(title)
-		
+
 		self.displayMovieOffStatus()
 		self.displaySortStatus()
 		if not (self.reload_sel and self["list"].moveTo(self.reload_sel)):

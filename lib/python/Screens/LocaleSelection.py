@@ -426,7 +426,7 @@ class LocaleSettings(Setup):
 
 class LocaleSelectionSummary(ScreenSummary):
 	skin = '''
-	<screen name="SkinSelectorSummary" position="0,0" size="400,240"> 
+	<screen name="SkinSelectorSummary" position="0,0" size="400,240">
 		<widget source="native" render="Label" position="0,30" size="400,50" font="FdLcD;35" halign="center" valign="center" zPosition="2"/>
 		<widget source="name" render="Label" position="0,85" size="400,50" font="FdLcD;35" halign="center" zPosition="2"/>
 		<widget source="locale" render="Label" position="0,135" size="400,50" font="FdLcD;35" halign="center" zPosition="2"/>
