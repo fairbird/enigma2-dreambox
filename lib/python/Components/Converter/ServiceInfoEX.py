@@ -25,7 +25,9 @@ from enigma import iServiceInformation, iPlayableService
 from Components.config import config
 from Components.Element import cached
 from Tools.Directories import fileExists
-import os, re, socket
+import os
+import re
+import socket
 
 if fileExists('/etc/issue'):
     image = ''
@@ -40,6 +42,7 @@ if fileExists('/etc/issue'):
 
 #WIDESCREEN = [3, 4, 7, 8, 11, 12, 15, 16]
 WIDESCREEN = [1, 3, 4, 7, 8, 0xB, 0xC, 0xF, 0x10]
+
 
 class ServiceInfoEX(Poll, Converter, object):
         apid = 0

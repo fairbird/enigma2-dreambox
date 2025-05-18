@@ -775,4 +775,5 @@ class MultiBootClass():
 		else:
 			return path
 
+
 MultiBoot = MultiBootClass()

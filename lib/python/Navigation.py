@@ -31,7 +31,7 @@ MODULE_NAME = __name__.split(".")[-1]
 class Navigation:
 	playServiceExtensions = []
 	recordServiceExtensions = []
- 
+
 	TIMER_TYPES = {
 		0: "Record-timer",
 		1: "Zap-timer",

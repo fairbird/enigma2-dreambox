@@ -376,6 +376,8 @@ def getConfigMenuItem(configElement):
 
 # Temporary legacy interfaces.  Only used in Menu screen.
 #
+
+
 def getSetupTitle(id):
 	xmlData = setupDom()
 	for x in xmlData.findall("setup"):

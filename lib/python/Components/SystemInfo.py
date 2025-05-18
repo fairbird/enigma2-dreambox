@@ -116,6 +116,7 @@ class BoxInformation:  # To maintain data integrity class variables should not b
 
 BoxInfo = BoxInformation()
 
+
 class SystemInformation(dict):
 	def __getitem__(self, item):
 		return BoxInfo.boxInfo[item]

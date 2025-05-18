@@ -162,7 +162,7 @@ class WeatherData:
 			self.timer.start(timeout, True)
 			print("[VWeather] lookup for ID %s" % config.plugins.AtileHD.woeid.value)
 			url = f"http://query.yahooapis.com/v1/public/yql?q=select%20item%20from%20weather.forecast%20where%20woeid%3D%22" + str(config.plugins.AtileHD.woeid.value) + f"%22&format=xml"
-			getPage(url.encode('utf-8'),timeout=10).addCallback(self.GotWeatherData).addErrback(self.downloadError)
+			getPage(url.encode('utf-8'), timeout=10).addCallback(self.GotWeatherData).addErrback(self.downloadError)
 
 	def GotWeatherData(self, data=None):
 		if data is not None:

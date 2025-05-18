@@ -352,7 +352,7 @@ def fileWriteLines(filename, lines, source=DEFAULT_MODULE_NAME, debug=False):
 def fileDate(f):
 	if fileExists(f):
 		return datetime.fromtimestamp(os.stat(f).st_mtime).strftime("%Y-%m-%d")
-	return("1970-01-01")
+	return ("1970-01-01")
 
 
 def fileReadXML(filename, default=None, source=DEFAULT_MODULE_NAME, debug=False):
@@ -765,6 +765,7 @@ def InitFallbackFiles():
 # Returns a list of tuples containing pathname and filename matching the given pattern
 # Example-pattern: match all txt-files: ".*\.txt$"
 #
+
 
 def sanitizeFilename(filename, maxlen=255):  # 255 is max length in bytes in ext4 (and most other file systems)
 	"""Return a fairly safe version of the filename.

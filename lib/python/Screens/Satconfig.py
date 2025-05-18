@@ -207,7 +207,7 @@ class NimSetup(Setup, ServiceStopScreen):
 						cur_orb_pos = self.nimConfig.advanced.sats.orbital_position
 						if cur_orb_pos is not None:
 							if cur_orb_pos not in self.nimConfig.advanced.sat.keys():
-								cur_orb_pos = next(iter(self.nimConfig.advanced.sat)) # get first key
+								cur_orb_pos = next(iter(self.nimConfig.advanced.sat))  # get first key
 							self.fillListWithAdvancedSatEntrys(self.nimConfig.advanced.sat[cur_orb_pos])
 					self.have_advanced = True
 				if self.nimConfig.configMode.value != "nothing" and config.usage.setup_level.index >= 2:
@@ -460,7 +460,7 @@ class NimSetup(Setup, ServiceStopScreen):
 						self.nimConfig.advanced.unicableconnectedTo.setChoices(choices)
 						self.list.append((self.indent % _("Connected to"), self.nimConfig.advanced.unicableconnectedTo, _("Select the tuner to which the signal cable of the SCR device is connected.")))
 
-			else:	#kein Unicable
+			else:  # kein Unicable
 				self.list.append((self.indent % _("Voltage mode"), Sat.voltage, _("Select 'polarisation' if using a 'universal' LNB, otherwise consult your LNB spec sheet.")))
 				self.list.append((self.indent % _("Increased voltage"), currLnb.increased_voltage))
 				self.list.append((self.indent % _("Tone mode"), Sat.tonemode, _("Select 'band' if using a 'universal' LNB, otherwise consult your LNB spec sheet.")))
@@ -609,7 +609,6 @@ class NimSetup(Setup, ServiceStopScreen):
 		self.slot_dest_list = []
 		return checkRecursiveConnect(self.slotid)
 
-
 	def keySelect(self):
 		if self.isChanged():
 			self.stopService()
@@ -663,7 +662,7 @@ class NimSetup(Setup, ServiceStopScreen):
 				# why we need this cast?
 				sat_name = str(nimmanager.getSatDescription(orbpos))
 			except:
-				if orbpos > 1800: # west
+				if orbpos > 1800:  # west
 					orbpos = 3600 - orbpos
 					h = _("W")
 				else:

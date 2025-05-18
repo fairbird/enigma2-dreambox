@@ -45,9 +45,9 @@ def getBouquetServices(bouquet):
 	if not Servicelist is None:
 		while True:
 			service = Servicelist.getNext()
-			if not service.valid(): #check if end of list
+			if not service.valid():  # check if end of list
 				break
-			if service.flags & (eServiceReference.isDirectory | eServiceReference.isMarker): #ignore non playable services
+			if service.flags & (eServiceReference.isDirectory | eServiceReference.isMarker):  # ignore non playable services
 				continue
 			services.append(ServiceReference(service))
 	return services

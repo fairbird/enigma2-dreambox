@@ -16,8 +16,10 @@ from Components.Slider import Slider
 from Screens.TextBox import TextBox
 from Tools.BoundFunction import boundFunction
 from urllib.request import urlopen
-import datetime, os
-import gettext, json
+import datetime
+import os
+import gettext
+import json
 
 opkg_ugradable_filename = '/tmp/.opkg_ugradable'
 
@@ -33,14 +35,19 @@ REDC = '\x1b[31m'
 YELLOWC = '\x1b[33m'
 GRENC = '\x1b[32m'
 ENDC = '\x1b[m'
+
+
 def cprint(text):
         print(YELLOWC + text + ENDC)
+
 
 def cprintoff(text):
         print(REDC + text + ENDC)
 
+
 def cprinton(text):
         print(GRENC + text + ENDC)
+
 
 def connected_to_internet():
         import requests
@@ -52,7 +59,8 @@ def connected_to_internet():
             return False
         print(connected_to_internet())
 
-def logdata(label_name = '', data = None):
+
+def logdata(label_name='', data=None):
         try:
             data = str(data)
             fp = open('/tmp/updatecheck_log', 'a')
@@ -61,11 +69,13 @@ def logdata(label_name = '', data = None):
         except:
             pass
 
-def AutoCheck(session = None, **kwargs):
+
+def AutoCheck(session=None, **kwargs):
         global installerupdatecheck
         #logdata('kwargs', kwargs)
         installerupdatecheck = InstallerUpdateCheck(session)
         installerupdatecheck.configChange()
+
 
 class InstallerUpdateCheck:
 
@@ -85,7 +95,7 @@ class InstallerUpdateCheck:
                 else:
                        cprintoff('[CheckInetrnet] we are Offline')
 
-        def configChange(self, configElement = None):
+        def configChange(self, configElement=None):
             if self.timer.isActive():
                 self.timer.stop()
             cprint('[UpdateCheck] timer changed')

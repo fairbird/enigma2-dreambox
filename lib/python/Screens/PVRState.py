@@ -12,5 +12,6 @@ class PVRState(Screen):
 		self["speed"] = Label()
 		self["statusicon"] = MultiPixmap()
 
+
 class TimeshiftState(PVRState):
 	pass

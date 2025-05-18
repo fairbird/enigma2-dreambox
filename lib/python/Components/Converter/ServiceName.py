@@ -43,7 +43,7 @@ class ServiceName(Converter):
 		if isinstance(service, iPlayableServicePtr):
 			info = service and service.info()
 			ref = None
-		else: # reference
+		else:  # reference
 			info = service and self.source.info
 			ref = service
 		if not info:
@@ -94,8 +94,6 @@ class ServiceName(Converter):
 					res_str = self.appendToStringWithSeparator(res_str, tuner_system)
 			return res_str
 
-
-
 	text = property(getText)
 
 	def changed(self, what):
@@ -133,10 +131,10 @@ class ServiceName(Converter):
 		if tp_data is not None:
 			try:
 				position = tp_data["orbital_position"]
-				if position > 1800: # west
-					orbitalpos = "%.1f " %(float(3600 - position)/10) + _("°W")
+				if position > 1800:  # west
+					orbitalpos = "%.1f " % (float(3600 - position) / 10) + _("°W")
 				else:
-					orbitalpos = "%.1f " %(float(position)/10) + _("°E")
+					orbitalpos = "%.1f " % (float(position) / 10) + _("°E")
 			except:
 				pass
 		return orbitalpos, tp_data

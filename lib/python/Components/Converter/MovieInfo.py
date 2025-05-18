@@ -10,13 +10,13 @@ from time import localtime, strftime
 
 
 class MovieInfo(Converter):
-	MOVIE_SHORT_DESCRIPTION = 0 # meta description when available.. when not .eit short description
-	MOVIE_META_DESCRIPTION = 1 # just meta description when available
-	MOVIE_REC_SERVICE_NAME = 2 # name of recording service
-	MOVIE_REC_FILESIZE = 3 # filesize of recording
-	MOVIE_FULL_DESCRIPTION = 4 # short and exended description
-	MOVIE_NAME = 5 # recording name
-	FORMAT_STRING = 6 # it is formatted string based on parameter and with defined separator
+	MOVIE_SHORT_DESCRIPTION = 0  # meta description when available.. when not .eit short description
+	MOVIE_META_DESCRIPTION = 1  # just meta description when available
+	MOVIE_REC_SERVICE_NAME = 2  # name of recording service
+	MOVIE_REC_FILESIZE = 3  # filesize of recording
+	MOVIE_FULL_DESCRIPTION = 4  # short and exended description
+	MOVIE_NAME = 5  # recording name
+	FORMAT_STRING = 6  # it is formatted string based on parameter and with defined separator
 
 	def __init__(self, type):
 		Converter.__init__(self, type)
@@ -81,9 +81,9 @@ class MovieInfo(Converter):
 					return _("Directory")
 				filesize = info.getInfoObject(service, iServiceInformation.sFileSize)
 				if filesize is not None:
-					if filesize >= 104857600000: #100000*1024*1024
+					if filesize >= 104857600000:  # 100000*1024*1024
 						return "%.0f %s" % (filesize / 1073741824.0, _("GB"))
-					elif filesize >= 1073741824: #1024*1024*1024
+					elif filesize >= 1073741824:  # 1024*1024*1024
 						return "%.2f %s" % (filesize / 1073741824.0, _("GB"))
 					elif filesize >= 1048576:
 						return "%.0f %s" % (filesize / 1048576.0, _("MB"))
@@ -104,7 +104,7 @@ class MovieInfo(Converter):
 					if x == "DURATION" and duration and duration > 0:
 						res_str = self.appendToStringWithSeparator(res_str, "%d min" % (duration / 60))
 					if x == "FILESIZE" and filesize:
-						res_str = self.appendToStringWithSeparator(res_str, "%d MB" % (filesize / (1024*1024)))
+						res_str = self.appendToStringWithSeparator(res_str, "%d MB" % (filesize / (1024 * 1024)))
 					if x == "RECSERVICE" and rec_service_name:
 						res_str = self.appendToStringWithSeparator(res_str, rec_service_name)
 				return res_str

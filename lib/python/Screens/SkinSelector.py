@@ -268,11 +268,12 @@ class LcdSkinSelector(SkinSelector):
 
 class SkinSelectorSummary(ScreenSummary):
 	skin = '''
-	<screen name="SkinSelectorSummary" position="0,0" size="400,240"> 
+	<screen name="SkinSelectorSummary" position="0,0" size="400,240">
 		<widget source="Name" render="Label" position="0,30" size="400,100" font="FdLcD;35" halign="center" valign="center" zPosition="2"/>
 		<widget source="value" render="Label" position="0,140" size="400,100" font="FdLcD;35" halign="center" zPosition="2"/>
 	</screen>
 	'''
+
 	def __init__(self, session, parent):
 		ScreenSummary.__init__(self, session, parent=parent)
 		self["entry"] = StaticText("")

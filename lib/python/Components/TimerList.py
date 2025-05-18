@@ -45,7 +45,7 @@ class TimerList(GUIComponent):
 			if self.iconRepeat:
 				res.append((eListboxPythonMultiContent.TYPE_PIXMAP_ALPHABLEND, (self.iconMargin // 2) + self.sidesMargin, self.rowSplit + (self.itemHeight - self.rowSplit - self.iconHeight) // 2, self.iconWidth, self.iconHeight, self.iconRepeat))
 		else:
-			repeatedtext = begin[0] # date
+			repeatedtext = begin[0]  # date
 			if "autotimer" in timer.flags:
 				self.iconAutoTimer and res.append((eListboxPythonMultiContent.TYPE_PIXMAP_ALPHABLEND, (self.iconMargin // 2) + self.sidesMargin, self.rowSplit + (self.itemHeight - self.rowSplit - self.iconHeight) // 2, self.iconWidth, self.iconHeight, self.iconAutoTimer))
 		if timer.justplay:

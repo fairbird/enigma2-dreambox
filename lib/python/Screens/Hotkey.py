@@ -17,9 +17,11 @@ from Components.Pixmap import Pixmap
 from Components.Label import Label
 import os
 
+
 def getDesktopSize():
 	s = getDesktop(0).size()
 	return (s.width(), s.height())
+
 
 def isHD():
 	desktopSize = getDesktopSize()
@@ -297,7 +299,7 @@ class HotkeySetup(Screen):
 	else:
 		skin = '''
 			<screen name="HotkeySetup" position="center,center" size="800,870" title="Input">
-				<ePixmap pixmap="buttons/red.png" position="0,0" size="200,40" alphaTest="on" zPosition="1" />				
+				<ePixmap pixmap="buttons/red.png" position="0,0" size="200,40" alphaTest="on" zPosition="1" />
 				<widget objectTypes="key_red,StaticText" source="key_red" render="Pixmap" pixmap="buttons/red.png" position="0,0" size="200,40" zPosition="1" alphaTest="blend">
 					<convert type="ConditionalShowHide"/>
 				</widget>
@@ -421,7 +423,7 @@ class HotkeySetupSelect(Screen):
 	else:
 		skin = '''
 			<screen name="HotkeySetupSelect" position="center,center" size="800,870" title="Input">
-				<ePixmap pixmap="buttons/red.png" position="0,0" size="200,40" alphaTest="on" zPosition="1" />				
+				<ePixmap pixmap="buttons/red.png" position="0,0" size="200,40" alphaTest="on" zPosition="1" />
 				<widget objectTypes="key_red,StaticText" source="key_red" render="Pixmap" pixmap="buttons/red.png" position="0,0" size="200,40" zPosition="1" alphaTest="blend">
 					<convert type="ConditionalShowHide"/>
 				</widget>

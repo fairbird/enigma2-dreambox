@@ -55,7 +55,6 @@ class CaidInfo2(Poll, Converter, object):
 	CRYPT3 = 38
 	my_interval = 1000
 
-
 	def __init__(self, type):
 		Poll.__init__(self)
 		Converter.__init__(self, type)
@@ -127,9 +126,9 @@ class CaidInfo2(Poll, Converter, object):
 			self.type = self.CRD
 		elif type == "CrdTxt":
 			self.type = self.CRDTXT
-		elif  type == "IsFta":
+		elif type == "IsFta":
 			self.type = self.IS_FTA
-		elif  type == "IsCrypted":
+		elif type == "IsCrypted":
 			self.type = self.IS_CRYPTED
 		elif type == "Short":
 			self.type = self.SHORT
@@ -318,7 +317,7 @@ class CaidInfo2(Poll, Converter, object):
 					else:
 						if source != "cache" and source == "net" and source.find("emu") == -1:
 							return True
-						#return  (source != None and source == "net") or (source != None and source != "sci") or (source != None and source != "emu") or (reader != None and reader != "emu") or (source != None and source != "card") 
+						#return  (source != None and source == "net") or (source != None and source != "sci") or (source != None and source != "emu") or (reader != None and reader != "emu") or (source != None and source != "card")
 
 				else:
 					return False
@@ -351,7 +350,7 @@ class CaidInfo2(Poll, Converter, object):
 				ecm_info = self.ecmfile()
 				if fileExists("/tmp/ecm.info"):
 					try:
-						caid = "%0.4X" % int(ecm_info.get("caid", ""),16)
+						caid = "%0.4X" % int(ecm_info.get("caid", ""), 16)
 						return "%s" % self.systemCaids.get(caid[:2])
 					except:
 						return '----'
@@ -526,7 +525,7 @@ class CaidInfo2(Poll, Converter, object):
 					return info
 				old_ecm_mtime = ecm_mtime
 				#ecmf = open("/tmp/ecm.info", "rb")
-				ecmf = open("/tmp/ecm.info", "r") # Fix Python3 (TypeError: a bytes-like object is required, not 'str' )
+				ecmf = open("/tmp/ecm.info", "r")  # Fix Python3 (TypeError: a bytes-like object is required, not 'str' )
 				ecm = ecmf.readlines()
 			except:
 				old_ecm_mtime = None

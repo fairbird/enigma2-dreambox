@@ -259,7 +259,7 @@ def buildMovieLocationList(bookmarks):
 			try:
 				bookmarks[bookmarks.index((d, d))] = (p.tabbedDescription(), d)
 			except:
-				pass # When already listed as some "friendly" name
+				pass  # When already listed as some "friendly" name
 		else:
 			bookmarks.append((p.tabbedDescription(), d))
 		inlist.append(d)
@@ -446,9 +446,9 @@ class SelectionEventInfo:
 		self["Service"].newService(serviceref)
 		info = serviceref and eServiceCenter.getInstance().info(serviceref)
 		if info:
-			timeCreate =  strftime("%A %d %b %Y", localtime(info.getInfo(serviceref, iServiceInformation.sTimeCreate)))
-			duration = "%d min" % (info.getLength(serviceref) / 60) 
-			filesize = "%d MB" % (info.getInfoObject(serviceref, iServiceInformation.sFileSize) / (1024*1024))
+			timeCreate = strftime("%A %d %b %Y", localtime(info.getInfo(serviceref, iServiceInformation.sTimeCreate)))
+			duration = "%d min" % (info.getLength(serviceref) / 60)
+			filesize = "%d MB" % (info.getInfoObject(serviceref, iServiceInformation.sFileSize) / (1024 * 1024))
 			moviedetails = "%s  •  %s  •  %s" % (timeCreate, duration, filesize)
 			self["moviedetails"].setText(moviedetails)
 
@@ -505,7 +505,7 @@ class MovieSelection(Screen, HelpableScreen, SelectionEventInfo, InfoBarBase, Pr
 
 		HelpableScreen.__init__(self)
 		if not timeshiftEnabled:
-			InfoBarBase.__init__(self) # For ServiceEventTracker
+			InfoBarBase.__init__(self)  # For ServiceEventTracker
 		ProtectedScreen.__init__(self)
 
 		self.setTitle(_("Movie selection"))
@@ -558,7 +558,7 @@ class MovieSelection(Screen, HelpableScreen, SelectionEventInfo, InfoBarBase, Pr
 		self.list = self["list"]
 		self.selectedmovie = selectedmovie
 
-		self.playGoTo = None #1 - preview next item / -1 - preview previous
+		self.playGoTo = None  # 1 - preview next item / -1 - preview previous
 
 		# Need list for init
 		SelectionEventInfo.__init__(self)
@@ -820,7 +820,7 @@ class MovieSelection(Screen, HelpableScreen, SelectionEventInfo, InfoBarBase, Pr
 			self["list"].moveDown()
 
 	def moveToFirstOrFirstFile(self):
-		if self.list.getCurrentIndex() <= self.list.firstFileEntry: #selection above or on first movie
+		if self.list.getCurrentIndex() <= self.list.firstFileEntry:  # selection above or on first movie
 			if self.list.getCurrentIndex() < 1:
 				self.list.moveToLast()
 			else:
@@ -829,7 +829,7 @@ class MovieSelection(Screen, HelpableScreen, SelectionEventInfo, InfoBarBase, Pr
 			self.list.moveToFirstMovie()
 
 	def moveToLastOrFirstFile(self):
-		if self.list.getCurrentIndex() >= self.list.firstFileEntry or self.list.firstFileEntry == len(self.list): #selection below or on first movie or no files
+		if self.list.getCurrentIndex() >= self.list.firstFileEntry or self.list.firstFileEntry == len(self.list):  # selection below or on first movie or no files
 			if self.list.getCurrentIndex() == len(self.list) - 1:
 				self.list.moveToFirst()
 			else:
@@ -984,7 +984,7 @@ class MovieSelection(Screen, HelpableScreen, SelectionEventInfo, InfoBarBase, Pr
 			self.updateDescription()
 
 	def onFirstTimeShown(self):
-		self.onShown.remove(self.onFirstTimeShown) # Just once, not after returning etc.
+		self.onShown.remove(self.onFirstTimeShown)  # Just once, not after returning etc.
 		self.show()
 		self.reloadList(self.selectedmovie, home=True)
 		del self.selectedmovie
@@ -1071,7 +1071,7 @@ class MovieSelection(Screen, HelpableScreen, SelectionEventInfo, InfoBarBase, Pr
 		if config.movielist.play_audio_internal.value:
 			index = self.list.findService(playInBackground)
 			if index is None:
-				return # Not found?
+				return  # Not found?
 			next = self.list.getItem(index + 1)
 			if not next:
 				return
@@ -1235,7 +1235,7 @@ class MovieSelection(Screen, HelpableScreen, SelectionEventInfo, InfoBarBase, Pr
 					"movieoff": config.usage.on_movie_eof.default
 				}
 				self.applyConfigSettings(updates)
-				pass # ignore fail to open errors
+				pass  # ignore fail to open errors
 			except Exception as e:
 				print("Failed to load settings from %s: %s" % (path, e))
 		else:
@@ -1384,12 +1384,12 @@ class MovieSelection(Screen, HelpableScreen, SelectionEventInfo, InfoBarBase, Pr
 		self["list"].reload(self.current_ref, self.selected_tags)
 		self.updateTags()
 		title = _("Recorded files...")
-		if config.usage.setup_level.index >= 2: # expert+
+		if config.usage.setup_level.index >= 2:  # expert+
 			title += "  " + config.movielist.last_videodir.value
 		if self.selected_tags:
 			title += " - " + ','.join(self.selected_tags)
 		self.setTitle(title)
-		
+
 		self.displayMovieOffStatus()
 		self.displaySortStatus()
 		if not (self.reload_sel and self["list"].moveTo(self.reload_sel)):
@@ -1488,7 +1488,7 @@ class MovieSelection(Screen, HelpableScreen, SelectionEventInfo, InfoBarBase, Pr
 
 	def tagChosen(self, tag):
 		if tag is not None:
-			if tag[1] is None: # all
+			if tag[1] is None:  # all
 				self.showAll()
 				return
 			# TODO: Some error checking maybe, don't wanna crash on KeyError
@@ -1654,7 +1654,7 @@ class MovieSelection(Screen, HelpableScreen, SelectionEventInfo, InfoBarBase, Pr
 			info = item[1]
 			name = info.getName(item[0])
 			full_name = split(item[0].getPath())[1]
-			if full_name == name: # split extensions for files without metafile
+			if full_name == name:  # split extensions for files without metafile
 				name, self.extension = splitext(name)
 
 		self.session.openWithCallback(self.renameCallback, VirtualKeyBoard,
@@ -1715,7 +1715,7 @@ class MovieSelection(Screen, HelpableScreen, SelectionEventInfo, InfoBarBase, Pr
 				# rename all files
 				msg = None
 				path, filename = split(oldfilename)
-				if item[0].flags & eServiceReference.mustDescent: # directory
+				if item[0].flags & eServiceReference.mustDescent:  # directory
 					newfilename = join(path, newbasename)
 					print("[ML] rename dir", oldfilename, "to", newfilename)
 					rename(oldfilename, newfilename)
@@ -1727,7 +1727,7 @@ class MovieSelection(Screen, HelpableScreen, SelectionEventInfo, InfoBarBase, Pr
 					for ext in ('.eit', self.extension + '.cuts', self.extension):
 						newfilename = join(path, newbasename) + ext
 						oldfilename = join(path, oldbasename) + ext
-						if not isfile(oldfilename): # .eit and .cuts maybe not present
+						if not isfile(oldfilename):  # .eit and .cuts maybe not present
 							continue
 						if not isfile(newfilename):
 							renamelist.append((oldfilename, newfilename))
@@ -1779,7 +1779,7 @@ class MovieSelection(Screen, HelpableScreen, SelectionEventInfo, InfoBarBase, Pr
 			try:
 				base = split(path)[0]
 				for fn in listdir(base):
-					if not fn.startswith('.'): # Skip hidden things
+					if not fn.startswith('.'):  # Skip hidden things
 						d = join(base, fn)
 						if isdir(d) and (d not in inlist):
 							bookmarks.append((fn, d))
@@ -2021,7 +2021,7 @@ class MovieSelection(Screen, HelpableScreen, SelectionEventInfo, InfoBarBase, Pr
 			return
 		item = self.getCurrentSelection()
 		if item is None:
-			return # huh?
+			return  # huh?
 		current = item[0]
 		info = item[1]
 		name = info and info.getName(current) or _("this recording")
@@ -2105,7 +2105,7 @@ class MovieSelection(Screen, HelpableScreen, SelectionEventInfo, InfoBarBase, Pr
 			self['key_blue'].setText(sorttext)
 		self.sorttimer = eTimer()
 		self.sorttimer.callback.append(self._updateButtonTexts)
-		self.sorttimer.start(1500, True) #time for displaying sorting type just applied
+		self.sorttimer.start(1500, True)  # time for displaying sorting type just applied
 		self.sortBy(int(l_moviesort[index][0]))
 		self["movie_sort"].setPixmapNum(int(l_moviesort[index][0]) - 1)
 

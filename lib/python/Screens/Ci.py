@@ -79,7 +79,7 @@ class MMIDialog(Screen):
 		print("MMIDialog with action" + str(action))
 
 		self["key_menu"] = StaticText(_("MENU"))
-		
+
 		self.mmiclosed = False
 		self.tag = None
 		self.slotid = slotid
@@ -464,9 +464,9 @@ class CiSelection(Screen):
 		self.list.append((_("Reset"), ConfigNothing(), 0, slot))
 		self.list.append((_("Init"), ConfigNothing(), 1, slot))
 
-		if self.state[slot] == 1: #module in init
+		if self.state[slot] == 1:  # module in init
 			self.list.append((_("init module"), ConfigNothing(), 2, slot))
-		elif self.state[slot] == 2: #module ready
+		elif self.state[slot] == 2:  # module ready
 			appname = eDVBCI_UI.getInstance().getAppName(slot)
 			self.list.append((appname, ConfigNothing(), 2, slot))
 
@@ -519,12 +519,12 @@ class CiSelection(Screen):
 					self.keyRight()
 				elif isinstance(cur[1], ConfigSelection):
 					self.keySelection()
-			elif action == 0: #reset
+			elif action == 0:  # reset
 				eDVBCI_UI.getInstance().setReset(slot)
 				authFile = "/etc/ciplus/ci_auth_slot_%d.bin" % slot
 				if exists(authFile):
 					remove(authFile)
-			elif action == 1: #init
+			elif action == 1:  # init
 				eDVBCI_UI.getInstance().setInit(slot)
 			elif action == 5:
 				self.session.openWithCallback(self.cancelCB, PermanentPinEntry, config.ci[slot].static_pin, _("Smartcard PIN"))
