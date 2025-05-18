@@ -16,8 +16,10 @@ from Components.Slider import Slider
 from Screens.TextBox import TextBox
 from Tools.BoundFunction import boundFunction
 from urllib.request import urlopen
-import datetime, os
-import gettext, json
+import datetime
+import os
+import gettext
+import json
 
 opkg_ugradable_filename = '/tmp/.opkg_ugradable'
 
