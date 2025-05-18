@@ -109,6 +109,7 @@ config.misc.SyncTimeUsing = ConfigSelection(default="0", choices=[
 ])
 config.misc.NTPserver = ConfigText(default="pool.ntp.org", fixed_size=False)
 
+
 def setEPGCachePath(configElement):
 	if os.path.isdir(configElement.value) or os.path.islink(configElement.value):
 		configElement.value = os.path.join(configElement.value, "epg.dat")
@@ -125,6 +126,7 @@ def setEPGCachePath(configElement):
 
 #config.misc.standbyCounter.addNotifier(standbyCountChanged, initial_call = False)
 ####################################################
+
 
 enigma.eProfileWrite("Twisted")
 try:
@@ -641,6 +643,7 @@ def runScreenTest():
 	configfile.save()
 
 	return 0
+
 
 enigma.eProfileWrite("Navigation")
 from Navigation import Navigation

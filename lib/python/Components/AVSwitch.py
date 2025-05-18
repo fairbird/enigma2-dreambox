@@ -854,4 +854,5 @@ def InitAVSwitch():
 		("60", _("Force 60Hz"))
 	])
 
+
 iAVSwitch = AVSwitch()

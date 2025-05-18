@@ -433,6 +433,7 @@ class LocaleSelectionSummary(ScreenSummary):
 		<widget source="package" render="Label" position="0,190" size="400,50" font="FdLcD;35" halign="center" zPosition="2"/>
 	</screen>
 	'''
+
 	def __init__(self, session, parent):
 		ScreenSummary.__init__(self, session, parent=parent)
 		self["native"] = StaticText("")

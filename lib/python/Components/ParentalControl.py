@@ -278,4 +278,5 @@ class ParentalControl:
 			else:
 				eDVBDB.getInstance().removeFlag(eServiceReference(ref), FLAG_IS_PARENTAL_PROTECTED_HIDDEN)
 
+
 parentalControl = ParentalControl()

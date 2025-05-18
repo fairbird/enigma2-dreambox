@@ -39,6 +39,7 @@ if fileExists('/usr/lib/bitratecalc.so'):
 else:
 	binaryfound = False
 
+
 class Bitrate2(Converter, object):
 	VBIT = 0
 	ABIT = 1

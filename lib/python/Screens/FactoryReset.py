@@ -26,6 +26,7 @@ config.FactoryReset.resetSkins = ConfigYesNo(default=True)
 config.FactoryReset.resetTimers = ConfigYesNo(default=True)
 config.FactoryReset.resetOthers = ConfigYesNo(default=True)
 
+
 class FactoryReset(ConfigListScreen, Screen, ProtectedScreen):
         def __init__(self, session):
                 Screen.__init__(self, session)

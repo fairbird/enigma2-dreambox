@@ -29,6 +29,7 @@ from os import path, popen
 import re
 import os
 
+
 class BoxInfo(Poll, Converter, object):
 	Boxtype = 0
 	CpuInfo = 1	

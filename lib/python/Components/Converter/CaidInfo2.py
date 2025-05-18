@@ -55,7 +55,6 @@ class CaidInfo2(Poll, Converter, object):
 	CRYPT3 = 38
 	my_interval = 1000
 
-
 	def __init__(self, type):
 		Poll.__init__(self)
 		Converter.__init__(self, type)

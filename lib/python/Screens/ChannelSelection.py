@@ -2188,6 +2188,7 @@ class ChannelSelectionBase(Screen):
 			return None
 		return ChannelSelectionEdit.getMutableList(self, root)
 
+
 HISTORYSIZE = 20
 
 #config for lastservice

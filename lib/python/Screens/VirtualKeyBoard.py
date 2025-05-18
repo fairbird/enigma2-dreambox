@@ -18,9 +18,11 @@ from Tools.LoadPixmap import LoadPixmap
 from Tools.NumericalTextInput import NumericalTextInput
 from Components.config import config
 
+
 def getDesktopSize():
     s = getDesktop(0).size()
     return (s.width(), s.height())
+
 
 def isHD():
     desktopSize = getDesktopSize()
@@ -94,6 +96,7 @@ vkeyboard_fhdskin = '''<screen name="vkeyboard_fhdskin" title="Virtual keyboard"
 		<ePixmap position="26,63" size="103,35" zPosition="2" pixmap="/usr/share/enigma2/VirtualKeyBoard_Icons/buttonsFHD/key_board.png" transparent="1" alphatest="blend"/>
 		<widget name="locale" conditional="locale" position="980,262" size="330,200" verticalAlignment="center" halign="center" font="Regular;27" foregroundColor="#00ffff00" transparent="1"/>
 </screen>'''
+
 
 class VirtualKeyBoardList(MenuList):
 	def __init__(self, list, enableWrapAround=False):
@@ -1255,6 +1258,7 @@ class VirtualKeyBoard(Screen):
 						return True
 					selkey += 1
 		return False
+
 
 class VirtualKeyBoardstyle(Screen):
 	def __init__(self, session, title=_("Virtual KeyBoard Text:"), text="", maxSize=False, visible_width=False, type=Input.TEXT, currPos=None, allMarked=False, style=VKB_ENTER_ICON):
@@ -2421,6 +2425,7 @@ class VirtualKeyBoardstyle(Screen):
 						return True
 					selkey += 1
 		return False
+
 
 if config.misc.virtualkeyBoardstyle.value == "new":
 	VirtualKeyBoard = VirtualKeyBoardstyle

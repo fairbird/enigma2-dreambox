@@ -115,14 +115,20 @@ config.hdmicec.ethernet_pc_used = ConfigYesNo(default=False)
 config.hdmicec.pc_ip = ConfigIP(default=[192, 168, 3, 7])
 
 config.hdmicec.ethbox = ConfigSubList()
+
+
 def create_box(ip=[192, 168, 1, 1], port=80, used=False):
     box = ConfigSubsection()
     box.used = ConfigYesNo(default=used)
     box.ip = ConfigIP(default=ip)
     box.port = ConfigInteger(default=port, limits=(1, 65535))
     return box
+
+
 def add_box(ip, port, used=False):
 	config.hdmicec.ethbox.append(create_box(ip=ip, port=port, used=used))
+
+
 add_box([192, 168, 3, 41], 80)
 add_box([192, 168, 3, 43], 80)
 

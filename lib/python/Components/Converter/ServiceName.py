@@ -94,8 +94,6 @@ class ServiceName(Converter):
 					res_str = self.appendToStringWithSeparator(res_str, tuner_system)
 			return res_str
 
-
-
 	text = property(getText)
 
 	def changed(self, what):

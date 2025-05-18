@@ -766,6 +766,7 @@ def InitFallbackFiles():
 # Example-pattern: match all txt-files: ".*\.txt$"
 #
 
+
 def sanitizeFilename(filename, maxlen=255):  # 255 is max length in bytes in ext4 (and most other file systems)
 	"""Return a fairly safe version of the filename.
 	We don't limit ourselves to ascii, because we want to keep municipality
