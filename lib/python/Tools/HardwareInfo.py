@@ -28,8 +28,8 @@ class HardwareInfo:
 		self.device_name = fileReadLine("/proc/stb/info/model", "", source=MODULE_NAME).strip()
 
 		# standard values
-		self.machine_name = BoxInfo.getItem("machinebuild") # This contains the value where the image is buld from
-		self.device_model = BoxInfo.getItem("model") # This may contain more information about the specific model
+		self.machine_name = BoxInfo.getItem("machinebuild")  # This contains the value where the image is buld from
+		self.device_model = BoxInfo.getItem("model")  # This may contain more information about the specific model
 		self.device_brandname = BoxInfo.getItem("brand")
 		self.device_hw = BoxInfo.getItem("displaymodel")
 

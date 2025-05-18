@@ -71,7 +71,7 @@ class ImportChannels:
 				self.settings['url'] = loads(result.decode('utf-8'))
 		if 'url' in self.settings and 'result' in self.settings['url'] and self.settings['url']['result'] == True:
 				for key, value in self.settings['url']['settings']:
-					if key.endswith(e2settingname): #use the config key when the endpart but also the whole part matches
+					if key.endswith(e2settingname):  # use the config key when the endpart but also the whole part matches
 						return value
 		return ""
 
@@ -136,7 +136,7 @@ class ImportChannels:
 
 		if "channels" in self.remote_fallback_import:
 			print("[Import Channels] Enumerate and Fetch remote files")
-			if self.ImportGetFilelist(True, 'bouquets.tv', 'bouquets.radio'): # we should ensure we have at some files available
+			if self.ImportGetFilelist(True, 'bouquets.tv', 'bouquets.radio'):  # we should ensure we have at some files available
 				try:
 					print("[Import Channels] Enumerate and Fetch remote support files")
 					for file in [file.replace(e2path, '') for file in loads(self.getUrl("%s/file?dir=%s" % (self.url, e2path)))["files"] if os.path.basename(file).startswith(supportfiles)]:

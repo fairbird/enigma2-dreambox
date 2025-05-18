@@ -55,7 +55,7 @@ class CopyFileTask(Components.Task.PythonTask):
 		try:
 			for src, dst in self.handles:
 				try:
-					bs = 1048576 # 1MB chunks
+					bs = 1048576  # 1MB chunks
 					offset = 0
 					fdd = dst.fileno()
 					fds = src.fileno()

@@ -326,7 +326,7 @@ class DVDPlayer(Screen, InfoBarBase, InfoBarNotifications, InfoBarSeek, InfoBarP
 		if subs:
 			subs.disableSubtitles(self.session.current_dialog.instance)
 
-	def serviceStarted(self): #override InfoBarShowHide function
+	def serviceStarted(self):  # override InfoBarShowHide function
 		self.dvdScreen and self.dvdScreen.show()
 
 	def doEofInternal(self, playing):
@@ -573,7 +573,7 @@ class DVDPlayer(Screen, InfoBarBase, InfoBarNotifications, InfoBarSeek, InfoBarP
 				ifofilename = val
 				if not ifofilename.upper().endswith("/VIDEO_TS"):
 					ifofilename += "/VIDEO_TS"
-				files = [("/VIDEO_TS.IFO", 0x100), ("/VTS_01_0.IFO", 0x100), ("/VTS_01_0.IFO", 0x200)] # ( filename, offset )
+				files = [("/VIDEO_TS.IFO", 0x100), ("/VTS_01_0.IFO", 0x100), ("/VTS_01_0.IFO", 0x200)]  # ( filename, offset )
 				for name in files:
 					(status, isNTSC, isLowResolution) = self.readVideoAtributes(ifofilename, name)
 					if status:
@@ -648,7 +648,7 @@ class DVDPlayer(Screen, InfoBarBase, InfoBarNotifications, InfoBarSeek, InfoBarP
 		except:
 			pass
 
-	def playLastCB(self, answer): # overwrite infobar cuesheet function
+	def playLastCB(self, answer):  # overwrite infobar cuesheet function
 		print("[DVD] playLastCB", answer, self.resume_point)
 		if self.service:
 			if answer:

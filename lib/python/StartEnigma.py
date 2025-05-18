@@ -94,10 +94,10 @@ enigma.eDVBDB.getInstance().reloadBouquets()
 enigma.eProfileWrite("config.misc")
 config.misc.radiopic = ConfigText(default=resolveFilename(SCOPE_CURRENT_SKIN, "radio.mvi"))
 config.misc.blackradiopic = ConfigText(default=resolveFilename(SCOPE_CURRENT_SKIN, "black.mvi"))
-config.misc.startCounter = ConfigInteger(default=0) # number of e2 starts...
-config.misc.standbyCounter = NoSave(ConfigInteger(default=0)) # number of standby
-config.misc.DeepStandby = NoSave(ConfigYesNo(default=False)) # detect deepstandby
-config.misc.RestartUI = ConfigYesNo(default=False) # detect user interface restart
+config.misc.startCounter = ConfigInteger(default=0)  # number of e2 starts...
+config.misc.standbyCounter = NoSave(ConfigInteger(default=0))  # number of standby
+config.misc.DeepStandby = NoSave(ConfigYesNo(default=False))  # detect deepstandby
+config.misc.RestartUI = ConfigYesNo(default=False)  # detect user interface restart
 config.misc.prev_wakeup_time = ConfigInteger(default=0)
 #config.misc.prev_wakeup_time_type is only valid when wakeup_time is not 0
 config.misc.prev_wakeup_time_type = ConfigInteger(default=0)
@@ -345,7 +345,7 @@ class Session:
 		self.pushCurrent()
 		self.current_dialog = dialog
 		self.current_dialog.isTmp = False
-		self.current_dialog.callback = None # would cause re-entrancy problems.
+		self.current_dialog.callback = None  # would cause re-entrancy problems.
 		self.execBegin()
 
 	def openWithCallback(self, callback, screen, *arguments, **kwargs):
@@ -432,7 +432,7 @@ class PowerKey:
 		globalActionMap.actions["power_down"] = lambda *args: None
 		globalActionMap.actions["power_up"] = self.powerup
 		globalActionMap.actions["power_long"] = self.powerlong
-		globalActionMap.actions["deepstandby"] = self.shutdown # Front panel  long power button press
+		globalActionMap.actions["deepstandby"] = self.shutdown  # Front panel  long power button press
 		globalActionMap.actions["discrete_off"] = self.standby
 
 	def shutdown(self):
@@ -617,7 +617,7 @@ def runScreenTest():
 	if wakeupList:
 		from time import strftime
 		startTime = wakeupList[0]
-		if (startTime[0] - nowTime) < 270: # no time to switch box back on
+		if (startTime[0] - nowTime) < 270:  # no time to switch box back on
 			wptime = nowTime + 30  # so switch back on in 30 seconds
 		else:
 			wptime = startTime[0] - 240

@@ -93,12 +93,12 @@ def ResolveCiAlternative(ref, ignore_ref=None, record_mode=False):
 			if num == 1:
 				return prio_list[0][0]
 			elif num > 1:
-				prio_map = [(3, 2, 1),# -S -C -T
-							(3, 1, 2),# -S -T -C
-							(2, 3, 1),# -C -S -T
-							(1, 3, 2),# -C -T -S
-							(1, 2, 3),# -T -C -S
-							(2, 1, 3) # -T -S -C
+				prio_map = [(3, 2, 1),  # -S -C -T
+							(3, 1, 2),  # -S -T -C
+							(2, 3, 1),  # -C -S -T
+							(1, 3, 2),  # -C -T -S
+							(1, 2, 3),  # -T -C -S
+							(2, 1, 3)  # -T -S -C
 							]
 				cur = tmp = 0
 				stream_service = service = None

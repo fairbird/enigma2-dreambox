@@ -29,7 +29,7 @@ class International:
 	# The list of available locales rarely changes so this has been done to optimize the speed of starting Enigma2.
 	DEFINED_LOCALES = ["ar", "bg", "ca", "cs", "da", "de", "el", "en", "es", "et", "fa", "fi", "fr", "fy", "he", "hr", "hu", "id", "is", "it", "ku", "lt", "lv", "nb", "nl", "nn", "pl", "pt", "pt_BR", "ro", "ru", "sk", "sl", "sr", "sv", "ta", "th", "tr", "uk", "vi", "zh_CN", "zh_HK"]
 	LOCALE_TEMPLATE = "enigma2-locale-%s"
-	PERMANENT_LOCALES = ["en_US", "de_DE","fr_FR"]
+	PERMANENT_LOCALES = ["en_US", "de_DE", "fr_FR"]
 
 	LANG_NAME = 0
 	LANG_TRANSLATED = 1
