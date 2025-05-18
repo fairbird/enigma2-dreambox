@@ -203,6 +203,8 @@ void eDVBServicePMTHandler::PMTready(int error)
 			else
 				eDebug("[eDVBServicePMTHandler] cannot call buildCAPMT");
 		}
+		if (m_service_type == pvrDescramble)
+			serviceEvent(eventStartPvrDescramble);
 	}
 }
 
@@ -959,7 +961,7 @@ int eDVBServicePMTHandler::tuneExt(eServiceReferenceDVB &ref, ePtr<iTsSource> &s
 		if (!m_resourceManager->getChannelList(db))
 			db->getService((eServiceReferenceDVB&)m_reference, m_service);
 
-		if (!res && !simulate && !m_ca_disabled)
+		if (!res && !simulate && !m_ca_disabled && descramble)
 			eDVBCIInterfaces::getInstance()->addPMTHandler(this);
 	} else if (!simulate) // no simulation of playback services
 	{
@@ -1115,4 +1117,9 @@ void eDVBServicePMTHandler::removeCaHandler()
 	m_ca_disabled = true;
 	if (m_channel)
 		eDVBCIInterfaces::getInstance()->removePMTHandler(this);
+}
+
+bool eDVBServicePMTHandler::isCiConnected()
+{
+	return eDVBCIInterfaces::getInstance()->isCiConnected(this);
 }

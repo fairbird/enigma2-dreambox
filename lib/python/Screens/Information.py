@@ -658,8 +658,12 @@ class DistributionInformation(InformationBase):
 			else:
 				if BoxInfo.getItem("HasKexecMultiboot"):
 					device = MultiBoot.bootSlots[slotCode]["device"]
+				elif BoxInfo.getItem("HasChkrootMultiboot"):
+					device = MultiBoot.bootSlots[slotCode]["device"]
 				if "mmcblk" in device:
 					device = _("eMMC slot %s%s") % (slotCode, f"  -  {device}" if device else "")
+				elif "mtd" in device:
+					device = _("MTD slot %s%s") % (slotCode, f"  -  {device}" if device else "")
 				else:
 					device = _("USB slot %s%s") % (slotCode, f"  -  {device}" if device else "")
 			info.append(formatLine("P1", _("Hardware MultiBoot device"), device))
@@ -677,14 +681,10 @@ class DistributionInformation(InformationBase):
 		info.append(formatLine("S", _("Enigma2 information")))
 		if self.extraSpacing:
 			info.append("")
-		enigmaVersion = str(BoxInfo.getItem("imageversion"))
-		enigmaVersion = enigmaVersion.rsplit("-", enigmaVersion.count("-") - 2)
-		if len(enigmaVersion) == 3:
-			enigmaVersion = f"{enigmaVersion[0]} ({enigmaVersion[2]}-{enigmaVersion[1].capitalize()})"
-		elif len(enigmaVersion) == 1:
-			enigmaVersion = f"{enigmaVersion[0]}"
-		else:
-			enigmaVersion = f"{enigmaVersion[0]} ({enigmaVersion[1].capitalize()})"
+		enigmaVersion = about.getEnigmaVersionString()
+		enigmaBranch = f"{enigmaVersion[11:]}"
+		enigmaVersion = f"{enigmaVersion[:10]}"
+		info.append(formatLine("P1", _("Enigma2 branch"), enigmaBranch))
 		info.append(formatLine("P1", _("Enigma2 version"), enigmaVersion))
 		compileDate = str(BoxInfo.getItem("compiledate"))
 		info.append(formatLine("P1", _("Last update"), formatDate(f"{compileDate[:4]}{compileDate[4:6]}{compileDate[6:]}")))
@@ -706,6 +706,7 @@ class DistributionInformation(InformationBase):
 			info.append(formatLine("P1", _("Distribution folder"), BoxInfo.getItem("imagedir")))
 		if BoxInfo.getItem("imagefs"):
 			info.append(formatLine("P1", _("Distribution file system"), BoxInfo.getItem("imagefs").strip()))
+		info.append(formatLine("P1", _("File compression"), about.getFileCompressionInfo()))
 		info.append(formatLine("P1", _("Feed URL"), BoxInfo.getItem("feedsurl")))
 		info.append(formatLine("P1", _("Compiled by"), BoxInfo.getItem("developername")))
 		info.append("")
@@ -714,10 +715,10 @@ class DistributionInformation(InformationBase):
 			info.append("")
 		info.append(formatLine("P1", _("GCC version"), about.getGccVersion()))
 		info.append(formatLine("P1", _("Glibc version"), about.getGlibcVersion()))
-		info.append(formatLine("P1", _("OpenSSL version"), about.getopensslVersionString()))
+		info.append(formatLine("P1", _("OpenSSL version"), about.getVersionFromOpkg("openssl")))
 		info.append(formatLine("P1", _("Python version"), about.getPythonVersionString()))
 		info.append(formatLine("P1", _("GStreamer version"), about.getGStreamerVersionString().replace("GStreamer ", "")))
-		info.append(formatLine("P1", _("FFmpeg version"), about.getffmpegVersionString()))
+		info.append(formatLine("P1", _("FFmpeg version"), about.getVersionFromOpkg("ffmpeg")))
 		bootId = fileReadLine("/proc/sys/kernel/random/boot_id", source=MODULE_NAME)
 		if bootId:
 			info.append(formatLine("P1", _("Boot ID"), bootId))
@@ -935,7 +936,8 @@ class MultiBootInformation(InformationBase):
 					indent = "P0V" if boot == "" else "P1V"
 					if current:
 						indent = indent.replace("P", "F").replace("V", "F")
-					slotType = "eMMC" if "mmcblk" in self.slotImages[slot]["device"] else "USB"
+					device = self.slotImages[slot]["device"]
+					slotType = "eMMC" if "mmcblk" in device else "MTD" if "mtd" in device else "USB"
 					imageLists[boot].append(formatLine(indent, _("Slot '%s' %s") % (slot, slotType), f"{self.slotImages[slot]['imagename']}{current}"))
 			count = 0
 			for bootCode in sorted(imageLists.keys()):

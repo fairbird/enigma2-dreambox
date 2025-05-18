@@ -33,7 +33,6 @@ class Element:
 	def connectUpstream(self, upstream):
 		assert not self.SINGLE_SOURCE or self.source is None
 		self.sources.append(upstream)
-		self.source = upstream
 		self.source = upstream  # The self.source always refers to the last recent source added.
 		self.changed((self.CHANGED_DEFAULT,))
 
@@ -44,7 +43,6 @@ class Element:
 	def disconnectAll(self):  # We disconnect from down (Renderer) to up (Source).
 		# We should not disconnect from upstream if there are still elements depending on us.
 		assert len(self.downstream_elements) == 0, "there are still downstream elements left"
-
 		for source in self.sources:  # Sources don't have a source themselves. don't do anything here.
 			source.disconnectDownstream(self)
 		if self.source:  # Sources are owned by the Screen, so don't destroy them here.
@@ -56,7 +54,6 @@ class Element:
 		self.downstream_elements.remove(downstream)
 		if self.master == downstream:
 			self.master = None
-
 		if len(self.downstream_elements) == 0:
 			self.disconnectAll()
 
@@ -65,7 +62,7 @@ class Element:
 		self.downstream_elements.changed(*args, **kwargs)
 		self.cache = None
 		for x in self.onChanged:
-			x()
+ 			x()
 
 	def setSuspend(self, suspended):
 		changed = self.__suspended != suspended
@@ -73,7 +70,6 @@ class Element:
 			self.doSuspend(1)
 		elif self.__suspended and not suspended:
 			self.doSuspend(0)
-
 		self.__suspended = suspended
 		if changed:
 			for source in self.sources:
@@ -89,6 +85,7 @@ class Element:
 
 	def destroy(self):
 		pass
+
 
 class ElementError(Exception):
 	def __init__(self, message):

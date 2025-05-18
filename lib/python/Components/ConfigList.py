@@ -45,7 +45,7 @@ class ConfigList(GUIComponent):
 		self.handleKey(ACTIONKEY_TIMEOUT)
 
 	def handleKey(self, key, callback=None):
-		selection = self.getCurrent()
+		selection = self.getCurrent(full=False)
 		if selection and len(selection) > 1 and selection[1].enabled:
 			selection[1].handleKey(key, callback)
 			self.invalidateCurrent()
@@ -53,11 +53,14 @@ class ConfigList(GUIComponent):
 				self.timer.start(1000, 1)
 
 	def toggle(self):
-		self.getCurrent()[1].toggle()
+		self.getCurrent(full=False)[1].toggle()
 		self.invalidateCurrent()
 
-	def getCurrent(self):
-		return self.l.getCurrentSelection()
+	def getCurrent(self, full=True):
+		item = self.l.getCurrentSelection()
+		if full and item and len(item) > 1 and isinstance(item[0], tuple):
+			item = (item[0][0],) + item[1:]
+		return item
 
 	def getCurrentIndex(self):
 		return self.l.getCurrentSelectionIndex()
@@ -94,7 +97,7 @@ class ConfigList(GUIComponent):
 	def selectionChanged(self):
 		if isinstance(self.current, tuple) and len(self.current) >= 2:
 			self.current[1].onDeselect(self.session)
-		self.current = self.getCurrent()
+		self.current = self.getCurrent(full=False)
 		if isinstance(self.current, tuple) and len(self.current) >= 2:
 			self.current[1].onSelect(self.session)
 		else:
@@ -125,29 +128,49 @@ class ConfigList(GUIComponent):
 
 	list = property(getList, setList)
 
+	def goTop(self):
+		if self.instance:
+			self.instance.goTop()
+
+	def goPageUp(self):
+		if self.instance:
+			self.instance.goPageUp()
+
+	def goLineUp(self):
+		if self.instance:
+			self.instance.goLineUp()
+
+	def goLineDown(self):
+		if self.instance:
+			self.instance.goLineDown()
+
+	def goPageDown(self):
+		if self.instance:
+			self.instance.goPageDown()
+
+	def goBottom(self):
+		if self.instance:
+			self.instance.goBottom()
+
+	# Old navigation method names.
+	#
 	def moveTop(self):
-		if self.instance is not None:
-			self.instance.moveSelection(self.instance.moveTop)
+		self.goTop()
 
 	def pageUp(self):
-		if self.instance is not None:
-			self.instance.moveSelection(self.instance.pageUp)
+		self.goPageUp()
 
 	def moveUp(self):
-		if self.instance is not None:
-			self.instance.moveSelection(self.instance.moveUp)
+		self.goLineUp()
 
 	def moveDown(self):
-		if self.instance is not None:
-			self.instance.moveSelection(self.instance.moveDown)
+		self.goLineDown()
 
 	def pageDown(self):
-		if self.instance is not None:
-			self.instance.moveSelection(self.instance.pageDown)
+		self.goPageDown()
 
 	def moveBottom(self):
-		if self.instance is not None:
-			self.instance.moveSelection(self.instance.moveEnd)
+		self.goBottom()
 
 
 class ConfigListScreen:
@@ -267,16 +290,16 @@ class ConfigListScreen:
 		self.restartMsg = _("Restart GUI now?") if msg is None else msg
 
 	def getCurrentItem(self):
-		return self["config"].getCurrent() and len(self["config"].getCurrent()) > 1 and self["config"].getCurrent()[1] or None
+		return self["config"].getCurrent(full=False) and len(self["config"].getCurrent()) > 1 and self["config"].getCurrent()[1] or None
 
 	def getCurrentEntry(self):
 		return self["config"].getCurrent() and self["config"].getCurrent()[0] or ""
 
 	def getCurrentValue(self):
-		return self["config"].getCurrent() and len(self["config"].getCurrent()) > 1 and str(self["config"].getCurrent()[1].getText()) or ""
+		return self["config"].getCurrent(full=False) and len(self["config"].getCurrent()) > 1 and str(self["config"].getCurrent()[1].getText()) or ""
 
 	def getCurrentDescription(self):
-		return self["config"].getCurrent() and len(self["config"].getCurrent()) > 2 and self["config"].getCurrent()[2] or ""
+		return self["config"].getCurrent(full=False) and len(self["config"].getCurrent()) > 2 and self["config"].getCurrent()[2] or ""
 
 	def changedEntry(self):
 		for x in self.onChangedEntry:
@@ -286,7 +309,7 @@ class ConfigListScreen:
 		self["config"].instance.allowNativeKeys(False)
 
 	def handleInputHelpers(self):
-		currConfig = self["config"].getCurrent()
+		currConfig = self["config"].getCurrent(full=False)
 		if currConfig is not None:
 			if isinstance(currConfig[1], (ConfigInteger, ConfigMacText, ConfigSequence, ConfigText)):
 				self["editConfigActions"].setEnabled(True)
@@ -315,7 +338,7 @@ class ConfigListScreen:
 
 	def displayHelp(self, state):
 		if "config" in self and "HelpWindow" in self and self["config"].getCurrent() is not None and len(self["config"].getCurrent()) > 1:
-			currConf = self["config"].getCurrent()[1]
+			currConf = self["config"].getCurrent(full=False)[1]
 			if isinstance(currConf, (ConfigText, ConfigMacText)) and currConf.help_window is not None and currConf.help_window.instance is not None:
 				if state:
 					currConf.help_window.show()
@@ -341,7 +364,7 @@ class ConfigListScreen:
 	def keyTextCallback(self, callback=None):
 		if callback is not None:
 			prev = str(self.getCurrentValue())
-			self["config"].getCurrent()[1].setValue(callback)
+			self["config"].getCurrent(full=False)[1].setValue(callback)
 			self["config"].invalidateCurrent()
 			if callback != prev:
 				self.entryChanged()
@@ -429,9 +452,10 @@ class ConfigListScreen:
 		for item in set(self["config"].list + self.manipulatedItems):
 			if len(item) > 1:
 				if item[1].isChanged():
-					if item[0].endswith("*"):
+					itemText = item[0][0] if isinstance(item[0], tuple) else item[0]
+					if itemText.endswith("*"):
 						quitData = (QUIT_RESTART, _("Restart GUI now?"))
-					elif item[0].endswith("#"):
+					elif itemText.endswith("#"):
 						quitData = (QUIT_REBOOT, _("Reboot %s %s now?") % getBoxDisplayName())
 				item[1].save()
 		configfile.save()

@@ -64,7 +64,7 @@ config.skin.FallbackFont = ConfigSelection(default="fallback.font", choices=[("f
 config.skin.autorefresh = ConfigEnableDisable(default=False)
 currentPrimarySkin = None
 currentDisplaySkin = None
-onLoadCallbacks = []
+callbacks = []
 runCallbacks = False
 
 
@@ -81,7 +81,7 @@ runCallbacks = False
 # E.g. "MySkin/skin_display.xml"
 #
 def InitSkins():
-	global currentPrimarySkin, currentDisplaySkin, resolutions, runCallbacks
+	global currentPrimarySkin, currentDisplaySkin, resolutions
 	# #################################################################################################
 	if isfile("/etc/.restore_skins"):
 		unlink("/etc/.restore_skins")
@@ -101,6 +101,7 @@ def InitSkins():
 			except Exception as err:
 				print(f"[Skin] RESTORE_SKIN: Error occurred!  ({err})")
 	# #################################################################################################
+	runCallbacks = False
 	# Add the emergency skin.  This skin should provide enough functionality
 	# to enable basic GUI functions to work.
 	loadSkin(EMERGENCY_SKIN, scope=SCOPE_GUISKIN, desktop=getDesktop(GUI_SKIN_ID), screenID=GUI_SKIN_ID)
@@ -150,11 +151,7 @@ def InitSkins():
 	if resolution[0] and resolution[1]:
 		gMainDC.getInstance().setResolution(resolution[0], resolution[1])
 		getDesktop(GUI_SKIN_ID).resize(eSize(resolution[0], resolution[1]))
-	if not runCallbacks:
-		runCallbacks = True
-		for method in onLoadCallbacks:
-			if callable(method):
-				method()
+	runCallbacks = True
 	# Load all XML templates.
 	reloadSkinTemplates()
 
@@ -196,6 +193,10 @@ def loadSkin(filename, scope=SCOPE_SKINS, desktop=getDesktop(GUI_SKIN_ID), scree
 						print(f"[Skin] This skin has a windowstyle for screen ID='{scrnID}'.")
 			# Element is not a screen or windowstyle element so no need for it any longer.
 		print(f"[Skin] Loading skin file '{filename}' complete.")
+		if runCallbacks:
+			for method in callbacks:
+				if method:
+					method()
 		return True
 	return False
 
@@ -263,13 +264,15 @@ def reloadSkinTemplates(clear=False):
 
 
 def addCallback(callback):
-	if callback not in onLoadCallbacks:
-		onLoadCallbacks.append(callback)
+	global callbacks
+	if callback not in callbacks:
+		callbacks.append(callback)
 
 
 def removeCallback(callback):
-	if callback in onLoadCallbacks:
-		onLoadCallbacks.remove(callback)
+	global callbacks
+	if callback in callbacks:
+		callbacks.remove(callback)
 
 
 def getParentSize(object, desktop):
@@ -1546,6 +1549,7 @@ def loadSingleSkinData(desktop, screenID, domSkin, pathSkin, scope=SCOPE_GUISKIN
 				style.setHeaderFont(parseFont(configList.attrib.get("headerFont", "Regular;20"), ((1, 1), (1, 1))))
 			style.setValue(eWindowStyleSkinned.valueEntryLeftOffset, parseInteger(configList.attrib.get("entryLeftOffset", "15")))
 			style.setValue(eWindowStyleSkinned.valueHeaderLeftOffset, parseInteger(configList.attrib.get("headerLeftOffset", "15")))
+			style.setValue(eWindowStyleSkinned.valueIndentSize, parseInteger(configList.attrib.get("indentSize", "20")))
 		for label in tag.findall("label"):
 			style.setLabelFont(parseFont(label.attrib.get("font", "Regular;20"), ((1, 1), (1, 1))))
 		for listBox in tag.findall("listbox"):

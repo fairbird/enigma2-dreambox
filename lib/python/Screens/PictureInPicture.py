@@ -62,7 +62,7 @@ class PictureInPicture(Screen):
 		self.currentService = None
 		self.currentServiceReference = None
 		self.noSkinReload = True
-		self.isCurrentStreamRelay = False
+		self.isCurrentStreamRelay = None
 		self.pipservice = None
 		session.nav.pnav.clearPiPService()
 
@@ -188,24 +188,26 @@ class PictureInPicture(Screen):
 			self.session.nav.pnav.clearPiPService()
 			return 0
 		from Screens.InfoBarGenerics import streamrelay
+		orig_ref = self.resolveAlternatePipService(service)
 		ref = streamrelay.streamrelayChecker(self.resolveAlternatePipService(service))[0]
 		if ref:
 			if BoxInfo.getItem("CanNotDoSimultaneousTranscodeAndPIP") and StreamServiceList:
 				self.pipservice = None
 				self.currentService = None
 				self.currentServiceReference = None
+				self.CurrentIsStreamRelay = None
 				if not config.usage.hide_zap_errors.value:
 					Notifications.AddPopup(text="PiP...\n" + _("Connected transcoding, limit - no PiP!"), type=MessageBox.TYPE_ERROR, timeout=5, id="ZapPipError")
 				return 0
 			if ref.toString().startswith("4097"):  # Change to service type 1 and try to play a stream as type 1
 				ref = eServiceReference("1" + ref.toString()[4:])
 			self.session.nav.pnav.setPiPService(ref)
-			if not self.isPlayableForPipService(ref):
+			if not self.isPlayableForPipService(orig_ref):
 				is_sr = self.isCurrentStreamRelay
 				if is_sr:
 					if self.pipservice:
 						self.pipservice.stop()
-					self.isCurrentStreamRelay = False
+					self.isCurrentStreamRelay = None
 				if not config.usage.hide_zap_errors.value and not is_sr:
 					Notifications.AddPopup(text=_("No free tuner!"), type=MessageBox.TYPE_ERROR, timeout=5, id="ZapPipError")
 				return 0 if not is_sr else 2
@@ -213,17 +215,18 @@ class PictureInPicture(Screen):
 			self.pipservice = eServiceCenter.getInstance().play(ref)
 			if self.pipservice and not self.pipservice.setTarget(1, True):
 				if hasattr(self, "dishpipActive") and self.dishpipActive is not None:
-					self.dishpipActive.startPiPService(ref)
+					self.dishpipActive.startPiPService(orig_ref)
 				self.pipservice.start()
 				self.currentService = service
-				self.currentServiceReference = ref
+				self.currentServiceReference = orig_ref
 				if ref and ref.getIsStreamRelay():
-					self.isCurrentStreamRelay = True
+					self.isCurrentStreamRelay = ref
 				return 1
 			else:
 				self.pipservice = None
 				self.currentService = None
 				self.currentServiceReference = None
+				self.isCurrentStreamRelay = ref
 				if not config.usage.hide_zap_errors.value:
 					Notifications.AddPopup(text=_("Incorrect type service for PiP!"), type=MessageBox.TYPE_ERROR, timeout=5, id="ZapPipError")
 		return 0
@@ -236,7 +239,7 @@ class PictureInPicture(Screen):
 
 	def isPlayableForPipService(self, service):
 		playingref = self.session.nav.getCurrentlyPlayingServiceReference()
-		if playingref is None or service == playingref:
+		if playingref and service == playingref:
 			return True
 		info = eServiceCenter.getInstance().info(service)
 		oldref = self.currentService or eServiceReference()

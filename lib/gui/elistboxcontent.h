@@ -24,7 +24,8 @@ public:
 	eSize getItemSize() { return m_itemsize; }
 	int getMaxItemTextWidth();
 	uint8_t getOrientation() { return m_orientation; }
-	
+	int getListSize() { return size(); }
+
 #ifndef SWIG
 protected:
 	void cursorHome();
@@ -75,6 +76,7 @@ public:
 	void setSeperation(int sep) { m_seperation = sep; }
 	int getEntryLeftOffset();
 	int getHeaderLeftOffset();
+	int getIndentSize();
 	int currentCursorSelectable();
 	void setSlider(int height, int space)
 	{
@@ -123,6 +125,7 @@ public:
 	void entryRemoved(int idx);
 	void setTemplate(SWIG_PYOBJECT(ePyObject) tmplate);
 	int getMaxItemTextWidth();
+	int getListSize() { return size(); }
 protected:
 	virtual void setBuildArgs(int selected) {}
 	virtual bool getIsMarked(int selected) { return false; }

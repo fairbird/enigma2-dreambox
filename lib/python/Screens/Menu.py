@@ -1,10 +1,11 @@
+# -*- coding: utf-8 -*-
 from gettext import dgettext
 from os.path import isdir, isfile
 from xml.etree.ElementTree import parse
 
 from enigma import eTimer
 
-from skin import findSkinScreen, menus
+from skin import findSkinScreen, menus, parameters, menuicons
 from Components.ActionMap import HelpableNumberActionMap, HelpableActionMap
 from Components.config import ConfigDictionarySet, NoSave, config, configfile
 from Components.Pixmap import Pixmap
@@ -53,6 +54,23 @@ lastKey = None
 file = open(resolveFilename(SCOPE_SKINS, "menu.xml"))
 mdom = parse(file)
 file.close()
+
+
+def E2DarkOS():
+	if config.skin.primary_skin.value == "E2-DarkOS/skin.xml":
+		return True
+
+
+def MenuEntryPixmap(key, png_cache):
+	if not menuicons:
+		return None
+	w, h = parameters.get("MenuIconSize", (50, 50))
+	png = png_cache.get(key)
+	if png is None:  # no cached entry
+		pngPath = menuicons.get(key, menuicons.get("default", ""))
+		if pngPath:
+			png = LoadPixmap(resolveFilename(SCOPE_GUISKIN, pngPath), cached=True, width=w, height=0 if pngPath.endswith(".svg") else h)
+	return png
 
 
 def findMenu(key):
@@ -172,6 +190,8 @@ class Menu(Screen, ProtectedScreen):
 		</widget>
 	</screen>"""
 
+	png_cache = {}
+
 	def __init__(self, session, parentMenu, PluginLanguageDomain=None):
 		self.session = session
 		self.parentMenu = parentMenu
@@ -236,7 +256,7 @@ class Menu(Screen, ProtectedScreen):
 			"down": (self.keyDown, _("Move down a line")),
 			"pageDown": (self.keyPageDown, _("Move down a screen")),
 			"bottom": (self.keyBottom, _("Move to last line / screen"))
-		}, prio=-1, description=_("Menu Navigation Actions"))
+		}, prio=0 if E2DarkOS() else -1, description=_("Menu Navigation Actions"))
 		if config.usage.menuSortOrder.value == "user":
 			self["editActions"] = HelpableActionMap(self, ["ColorActions"], {
 				"green": (self.keyGreen, _("Toggle item move mode on/off")),
@@ -244,9 +264,12 @@ class Menu(Screen, ProtectedScreen):
 				"blue": (self.toggleSortMode, _("Toggle item edit mode on/off"))
 			}, prio=0, description=_("Menu Edit Actions"))
 		title = parentMenu.get("title", "") or None
-		title = title and (dgettext(self.pluginLanguageDomain, title) if self.pluginLanguageDomain else _(title))
 		if title is None:
 			title = _(parentMenu.get("text", ""))
+		if E2DarkOS():
+			self["title"] = StaticText(title)
+		else:
+			title = title and (dgettext(self.pluginLanguageDomain, title) if self.pluginLanguageDomain else _(title))
 		self.setTitle(title)
 		self.number = 0
 		self.nextNumberTimer = eTimer()
@@ -284,7 +307,10 @@ class Menu(Screen, ProtectedScreen):
 				description = plugins.getDescriptionForMenuEntryID(self.menuID, pluginKey)  # It is assumed that description is already translated by the plugin!
 				if "%s %s" in description:
 					description = description % getBoxDisplayName()
-				image = self.getMenuEntryImage(plugin[PLUGIN_KEY], lastKey)
+				if not E2DarkOS():
+					image = self.getMenuEntryImage(plugin[PLUGIN_KEY], lastKey)
+				else:
+					image = MenuEntryPixmap(plugin[2], self.png_cache)
 				if len(plugin) > PLUGIN_CLOSEALL and plugin[PLUGIN_CLOSEALL]:  # Was "len(plugin) > 4".
 					self.menuList.append((plugin[PLUGIN_TEXT], boundFunction(plugin[PLUGIN_MODULE], self.session, self.close), plugin[PLUGIN_KEY], plugin[PLUGIN_WEIGHT] or 50, description, image))
 				else:
@@ -313,7 +339,11 @@ class Menu(Screen, ProtectedScreen):
 			self.hideShowEntries()
 		else:  # Sort by menu item weight.
 			self.menuList.sort(key=lambda x: int(x[MENU_WEIGHT]))
-		self.setMenuList(self.menuList)
+		if not E2DarkOS():
+			self.setMenuList(self.menuList)
+		else:
+			self["menu"].setList(self.menuList)
+			self.screenContentChanged()
 
 	def addItem(self, menu):
 		requires = menu.get("requires")
@@ -330,7 +360,10 @@ class Menu(Screen, ProtectedScreen):
 		key = menu.get("key", "undefined")
 		weight = menu.get("weight", 50)
 		description = self.processDisplayedText(menu.get("description"))
-		image = self.getMenuEntryImage(key, lastKey)
+		if not E2DarkOS():
+			image = self.getMenuEntryImage(key, lastKey)
+		else:
+			image = MenuEntryPixmap(key, self.png_cache)
 		for menuItem in menu:
 			if menuItem.tag == "screen":
 				module = menuItem.get("module")
@@ -377,7 +410,10 @@ class Menu(Screen, ProtectedScreen):
 		key = menu.get("key", "undefined")
 		weight = menu.get("weight", 50)
 		description = self.processDisplayedText(menu.get("description"))
-		image = self.getMenuEntryImage(key, lastKey)
+		if not E2DarkOS():
+			image = self.getMenuEntryImage(key, lastKey)
+		else:
+			image = MenuEntryPixmap(key, self.png_cache)
 		if menu.get("flushConfigOnClose"):
 			module = boundFunction(self.session.openWithCallback, self.menuClosedWithConfigFlush, Menu, menu)
 		else:
@@ -434,14 +470,18 @@ class Menu(Screen, ProtectedScreen):
 
 	def layoutFinished(self):
 		self["menu"].enableAutoNavigation(False)
-		self["menu"].setStyle(config.usage.menuEntryStyle.value)
+		if E2DarkOS():
+			self.screenContentChanged()
+		else:
+			self["menu"].setStyle(config.usage.menuEntryStyle.value)
 		self.selectionChanged()
 
 	def selectionChanged(self):
 		current = self["menu"].getCurrent()
 		if current:
-			if config.usage.showicons.value:
-				self["menuimage"].instance.setPixmap(current[WIDGET_IMAGE])
+			if not E2DarkOS():
+				if config.usage.showicons.value:
+					self["menuimage"].instance.setPixmap(current[WIDGET_IMAGE])
 			self["description"].setText(current[WIDGET_DESCRIPTION])
 			if self.sortMode:
 				self["key_yellow"].setText(_("Show") if self.subMenuSort.getConfigValue(current[WIDGET_KEY], "hidden") else _("Hide"))
@@ -452,9 +492,10 @@ class Menu(Screen, ProtectedScreen):
 		global lastKey
 		self.resetNumberKey()
 		current = self["menu"].getCurrent()
-		if current and current[WIDGET_MODULE]:
+		self.WIDGET_MODULE = 1 if E2DarkOS() and not self.sortMode else WIDGET_MODULE
+		if current and current[self.WIDGET_MODULE]:
 			lastKey = current[WIDGET_KEY]
-			current[WIDGET_MODULE]()
+			current[self.WIDGET_MODULE]()
 
 	def menuClosedWithConfigFlush(self, *result):
 		configfile.save()
@@ -665,12 +706,15 @@ class Menu(Screen, ProtectedScreen):
 			config.usage.menu_sort_weight.save()
 			self.hideShowEntries()
 			self.setMenuList(self.menuList)
+			if E2DarkOS():
+				self["menu"].setList(self.menuList)
 		else:
 			self["key_green"].setText(_("Move Mode On"))
 			self["key_blue"].setText(_("Edit Mode Off"))
 			self.sortMode = True
 			self.hideShowEntries()
 			self.setMenuList(self.menuList)
+
 
 	def hideShowEntries(self):
 		menuList = list(self.fullMenuList)

@@ -14,6 +14,7 @@ from Components.Input import Input
 from Components.Opkg import OpkgComponent
 from Components.Sources.StaticText import StaticText
 from Components.ScrollLabel import ScrollLabel
+from Components.SystemInfo import BoxInfo
 from Components.Pixmap import Pixmap
 from Components.MenuList import MenuList
 from Components.Sources.List import List
@@ -34,6 +35,7 @@ from Plugins.SystemPlugins.SoftwareManager.BackupRestore import BackupSelection,
 from Plugins.SystemPlugins.SoftwareManager.SoftwareTools import iSoftwareTools
 from .ImageBackup import ImageBackup
 from Screens.FlashManager import FlashManager
+from Screens.MultiBootManager import MultiBootManager
 
 config.plugins.configurationbackup = ConfigSubsection()
 config.plugins.configurationbackup.backuplocation = ConfigText(default='/media/hdd/', visible_width=50, fixed_size=False)
@@ -139,6 +141,8 @@ class UpdatePluginMenu(Screen):
 			self.list.append(("software-update", _("Software update"), _("Online update of your receiver software.") + self.oktext, None))
 			self.list.append(("backup-image", _("Backup Image"), _("Backup your running image to HDD or USB.") + self.oktext + "\n\n" + self.infotext, None))
 			self.list.append(("flash-online", _("Flash Online"), _("Download and flash images on your Box.") + self.oktext + "\n\n" + self.infotext, None))
+			if BoxInfo.getItem("canMultiBoot"):
+				self.list.append(("multi-boot", _("MultiBoot Manager"), _("Maintain your multi boot device.") + self.oktext + "\n\n" + self.infotext, None))
 			self.list.append(("system-backup", _("Backup system settings"), _("Backup your receiver settings.") + self.oktext + "\n\n" + self.infotext, None))
 			self.list.append(("system-restore", _("Restore system settings"), _("Restore your receiver settings.") + self.oktext, None))
 			self.list.append(("opkg-install", _("Install local extension"), _("Scan for local extensions and install them.") + self.oktext, None))
@@ -268,6 +272,8 @@ class UpdatePluginMenu(Screen):
 					self.session.open(ImageBackup)
 				elif (currentEntry == "flash-online"):
 					self.session.open(FlashManager)
+				elif (currentEntry == "multi-boot"):
+					self.session.open(MultiBootManager)
 				elif (currentEntry == "system-backup"):
 					self.session.openWithCallback(self.backupDone, BackupScreen, runBackup=True)
 				elif (currentEntry == "system-restore"):

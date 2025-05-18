@@ -159,7 +159,11 @@ void eDebugImpl(int flags, const char* fmt, ...)
 
 	if (debugTime && !(flags & _DBGFLG_NOTIME)) {
 		clock_gettime(CLOCK_MONOTONIC, &tp);
+#ifdef GLIBC_64BIT_TIME_FLAGS
+		pos = snprintf(buf, eDEBUG_BUFLEN, "<%6llu.%03lu> ", tp.tv_sec, tp.tv_nsec/1000000);
+#else
 		pos = snprintf(buf, eDEBUG_BUFLEN, "<%6lu.%03lu> ", tp.tv_sec, tp.tv_nsec/1000000);
+#endif
 	}
 
 	va_list ap;
@@ -178,7 +182,11 @@ void eDebugImpl(int flags, const char* fmt, ...)
 		// +2 for \0 and optional newline
 		buf = new char[pos + vsize + 2];
 		if (debugTime && !(flags & _DBGFLG_NOTIME))
+#ifdef GLIBC_64BIT_TIME_FLAGS
+			pos = snprintf(buf, pos + vsize, "<%6llu.%03lu> ", tp.tv_sec, tp.tv_nsec/1000000);
+#else
 			pos = snprintf(buf, pos + vsize, "<%6lu.%03lu> ", tp.tv_sec, tp.tv_nsec/1000000);
+#endif
 		va_start(ap, fmt);
 		vsize = vsnprintf(buf + pos, vsize + 1, fmt, ap);
 		va_end(ap);

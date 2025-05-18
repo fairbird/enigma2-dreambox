@@ -6,6 +6,7 @@ from glob import glob
 from locale import format_string
 from os import stat
 from os.path import isfile
+from subprocess import Popen, PIPE
 from platform import libc_ver
 from re import search
 from Tools.HardwareInfo import HardwareInfo
@@ -121,15 +122,6 @@ def getEnigmaBranchString():
 def getGStreamerVersionString():
 	from enigma import getGStreamerVersionString
 	return getGStreamerVersionString()
-
-
-def getffmpegVersionString():
-	lines = fileReadLines("/var/lib/opkg/info/ffmpeg.control", source=MODULE_NAME)
-	if lines:
-		for line in lines:
-			if line[0:8] == "Version:":
-				return line[9:].split("+")[0]
-	return _("Not Installed")
 
 
 def getKernelVersionString():
@@ -340,20 +332,12 @@ def getDriverInstalledDate():
 	return _("Unknown")
 
 
-def getPythonVersionString():
-	try:
-		return pyversion.split(' ')[0]
-	except:
-		return _("Unknown")
-
-
-def getopensslVersionString():
-	lines = fileReadLines("/var/lib/opkg/info/openssl.control", source=MODULE_NAME)
-	if lines:
-		for line in lines:
-			if line[0:8] == "Version:":
-				return line[9:].split("+")[0]
-	return _("Not Installed")
+def getFileCompressionInfo():
+	result = Popen("strings /bin/bash | grep '$Id: UPX.*Copyright'", stdout=PIPE, shell=True, text=True)
+	# $Id: UPX 4.24 Copyright (C) 1996-2024 the UPX Team. All Rights Reserved. $
+	output = result.communicate()[0]
+	parts = output.strip().split() if result.returncode == 0 and output else []
+	return f"{_("Enabled")} ({parts[1].lower()} {parts[2]})" if len(parts) >= 3 else _("Disabled")
 
 
 def getOpenSSLVersion():
@@ -420,6 +404,17 @@ def getGccVersion():
 	except:
 		print("[About] Get gcc version failed.")
 	return _("Unknown")
+
+
+def getPythonVersionString():
+	try:
+		return pyversion.split(' ')[0]
+	except:
+		return _("Unknown")
+
+
+def getVersionFromOpkg(fileName):
+	return next((line[9:].split("+")[0] for line in (fileReadLines(f"/var/lib/opkg/info/{fileName}.control", source=MODULE_NAME) or []) if line.startswith("Version:")), _("Not Installed"))
 
 
 # For modules that do "from About import about"

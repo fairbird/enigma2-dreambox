@@ -35,11 +35,12 @@ def InitUsageConfig():
 			print("[UsageConfig] No registry.arm.bin?")
 
 	showrotorpositionChoicesUpdate()
-	config.usage.maxchannelnumlen = ConfigSelection(default="4", choices=[
-		("3", _("3")),
-		("4", _("4")),
-		("5", _("5")),
-		("6", _("6"))
+	config.usage.numberZapDigits = ConfigSelection(default=4, choices=[(x, ngettext("%d Digit", "%d Digits", x) % x) for x in range(1, 6)])
+	config.usage.numberZapDisplay = ConfigSelection(default="number", choices=[
+		("number", _("Number only")),
+		("name", _("Number and name")),
+		("picon", _("Number and picon")),
+		("both", _("Number, name and picon"))
 	])
 
 	def setNumberModeChange(configElement):
@@ -236,6 +237,7 @@ def InitUsageConfig():
 	config.usage.show_infobar_dimming_speed = ConfigSelectionNumber(min = 1, max = 40, stepwidth = 1, default = 40, wraparound = True)
 	config.usage.show_infobar_on_zap = ConfigYesNo(default=True)
 	config.usage.show_infobar_on_skip = ConfigYesNo(default=True)
+	config.usage.show_infobar_locked_on_pause = ConfigYesNo(default=True)
 	config.usage.show_infobar_on_event_change = ConfigYesNo(default=False)
 	config.usage.show_second_infobar = ConfigSelection(default="0", choices=[("no", _("None"))] + choicelist + [("EPG", _("EPG"))])
 	config.usage.showInfoBarSubservices = ConfigSelection(default=1, choices=[(0, _("Off")),(1, _("If EPG available")),(2, _("Always"))])
@@ -252,6 +254,7 @@ def InitUsageConfig():
 	config.usage.show_spinner = ConfigYesNo(default=True)
 	config.usage.enable_blinking = ConfigYesNo(default=False)
 	config.usage.menu_sort_weight = ConfigDictionarySet(default={"mainmenu": {"submenu": {}}})
+	config.usage.movieplayer_pvrstate = ConfigYesNo(default=False)
 	config.usage.showScreenPath = ConfigSelection(default="small", choices=[("off", _("Disabled")), ("small", _("Small")), ("large", _("Large"))])
 	config.usage.enable_tt_caching = ConfigYesNo(default=True)
 	config.usage.sort_settings = ConfigYesNo(default=False)
@@ -1234,6 +1237,21 @@ def InitUsageConfig():
 	choicelist = [("no", _("no")), ("nothing", _("omit")), ("space", _("space")), ("dot", ". "), ("dash", " - "), ("asterisk", " * "), ("hashtag", " # ")]
 	config.epg.replace_newlines = ConfigSelection(default="no", choices=choicelist)
 
+	config.epg.filter = ConfigYesNo(default=False)
+	config.epg.filter_start = ConfigClock(default=time.mktime((1970, 1, 1, 6, 0, 0, 0, 0, 0)))
+	config.epg.filter_end = ConfigClock(default=time.mktime((1970, 1, 1, 20, 0, 0, 0, 0, 0)))
+	def validateEPGFilterTimes(configElement):
+		def minutes(t):
+			return t[0] * 60 + t[1]
+		start, end = minutes(config.epg.filter_start.value), minutes(config.epg.filter_end.value)
+		if start == end:
+			config.epg.filter_end.value = [(config.epg.filter_end.value[0] + 1) % 24, config.epg.filter_end.value[1]]
+			print("[UsageConfig] EPG filter - start and end times must be different.")
+	config.epg.filter_start.addNotifier(validateEPGFilterTimes)
+	config.epg.filter_end.addNotifier(validateEPGFilterTimes)
+	config.epg.filter_reversal = ConfigYesNo(default=False)
+	config.epg.filter_keepsorting = ConfigYesNo(default=False)
+
 	config.misc.usegstplaybin3 = ConfigYesNo(default=False)
 
 	config.misc.spinnerPosition = ConfigSequence(default=[50, 50], limits=[(0, 1260), (0, 700)], seperator=",")
@@ -1365,6 +1383,48 @@ def InitUsageConfig():
 	config.crash.debugStorage.addNotifier(debugStorageChanged)
 
 	config.seek = ConfigSubsection()
+	config.seek.baractivation = ConfigSelection(default="leftright", choices=[
+		("leftright", _("Long Left/Right")),
+		("ffrw", _("Long << / >>"))
+	])
+	config.seek.sensibilityHorizontal = ConfigSelection(default=1.0, choices=[(x, f"{x:.1f}%") for x in [0.1, 0.2, 0.5, 1.0, 2.0, 5.0, 10.0]])
+	config.seek.sensibilityVertical = ConfigSelection(default=2.0, choices=[(x, f"{x:.1f}%") for x in [0.1, 0.2, 0.5, 1.0, 2.0, 5.0, 10.0]])
+	config.seek.arrowSkipMode = ConfigSelection(default="t", choices=[
+		("t", _("Traditional")),
+		("s", _("Symmetrical skips")),
+		("d", _("Defined skips"))
+	])
+	config.seek.numberSkipMode = ConfigSelection(default="s", choices=[
+		("s", _("Symmetrical skips")),
+		("d", _("Defined skips")),
+		("p", _("Percentage skips"))
+	])
+	config.seek.defined = ConfigSubDict()
+	config.seek.defined[13] = ConfigSelectionNumber(default=15, min=1, max=300, stepwidth=1, wraparound=True)
+	config.seek.defined[46] = ConfigSelectionNumber(default=60, min=1, max=600, stepwidth=1, wraparound=True)
+	config.seek.defined[79] = ConfigSelectionNumber(default=300, min=1, max=1200, stepwidth=1, wraparound=True)
+	config.seek.defined[1] = ConfigSelectionNumber(default=-15, min=-1800, max=1800, stepwidth=1, wraparound=True)
+	config.seek.defined[2] = ConfigSelectionNumber(default=10, min=-1800, max=1800, stepwidth=1, wraparound=True)
+	config.seek.defined[3] = ConfigSelectionNumber(default=15, min=-1800, max=1800, stepwidth=1, wraparound=True)
+	config.seek.defined[4] = ConfigSelectionNumber(default=-60, min=-1800, max=1800, stepwidth=1, wraparound=True)
+	config.seek.defined[5] = ConfigSelectionNumber(default=30, min=-1800, max=1800, stepwidth=1, wraparound=True)
+	config.seek.defined[6] = ConfigSelectionNumber(default=60, min=-1800, max=1800, stepwidth=1, wraparound=True)
+	config.seek.defined[7] = ConfigSelectionNumber(default=-300, min=-1800, max=1800, stepwidth=1, wraparound=True)
+	config.seek.defined[8] = ConfigSelectionNumber(default=180, min=-1800, max=1800, stepwidth=1, wraparound=True)
+	config.seek.defined[9] = ConfigSelectionNumber(default=300, min=-1800, max=1800, stepwidth=1, wraparound=True)
+	config.seek.defined[0] = ConfigSelectionNumber(default=300, min=-1800, max=1800, stepwidth=1, wraparound=True)
+	config.seek.defined["UP"] = ConfigSelectionNumber(default=180, min=-1800, max=1800, stepwidth=1, wraparound=True)
+	config.seek.defined["LEFT"] = ConfigSelectionNumber(default=-10, min=-1800, max=1800, stepwidth=1, wraparound=True)
+	config.seek.defined["RIGHT"] = ConfigSelectionNumber(default=15, min=-1800, max=1800, stepwidth=1, wraparound=True)
+	config.seek.defined["DOWN"] = ConfigSelectionNumber(default=-120, min=-1800, max=1800, stepwidth=1, wraparound=True)
+	config.seek.defined["CUT_13"] = ConfigSelectionNumber(default=10, min=-1800, max=1800, stepwidth=1, wraparound=True)
+	config.seek.defined["CUT_46"] = ConfigSelectionNumber(default=30, min=-1800, max=1800, stepwidth=1, wraparound=True)
+	config.seek.defined["CUT_79"] = ConfigSelectionNumber(default=90, min=-1800, max=1800, stepwidth=1, wraparound=True)
+	config.seek.defined["CUT_UP"] = ConfigSelectionNumber(default=300, min=-600, max=600, stepwidth=1, wraparound=True)
+	config.seek.defined["CUT_LEFT"] = ConfigSelectionNumber(default=-1, min=-600, max=600, stepwidth=1, wraparound=True)
+	config.seek.defined["CUT_RIGHT"] = ConfigSelectionNumber(default=1, min=-600, max=600, stepwidth=1, wraparound=True)
+	config.seek.defined["CUT_DOWN"] = ConfigSelectionNumber(default=-300, min=-600, max=600, stepwidth=1, wraparound=True)
+	config.seek.sensibility = ConfigSelectionNumber(min=1, max=10, stepwidth=1, default=10, wraparound=True)
 	config.seek.selfdefined_13 = ConfigNumber(default=15)
 	config.seek.selfdefined_46 = ConfigNumber(default=60)
 	config.seek.selfdefined_79 = ConfigNumber(default=300)

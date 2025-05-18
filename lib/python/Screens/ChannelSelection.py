@@ -1511,6 +1511,9 @@ singlebouquet_radio_ref = serviceRefAppendPath(service_types_radio_ref, " FROM B
 
 
 class ChannelSelectionBase(Screen):
+	MODE_TV = 0
+	MODE_RADIO = 1
+
 	def __init__(self, session):
 		def leftHelp():
 			return _("Move to previous marker") if self.servicelist.isVertical() else _("Move to the previous item")
@@ -1722,6 +1725,19 @@ class ChannelSelectionBase(Screen):
 
 	def moveEnd(self):  # This is used by InfoBarGenerics.
 		self.servicelist.goBottom()
+
+	def getCurrentMode(self):
+		return self.mode
+
+	def setCurrentMode(self, mode):
+		if mode != MODE_RADIO:
+			mode = MODE_TV
+		self.servicePath = self.servicePathRadio if mode == MODE_RADIO else self.servicePathTV
+		self.mode = mode
+		self.recallBouquetMode()
+		self.buildTitleString()
+		# modeString = {MODE_RADIO: "Radio", MODE_TV: "TV"}.get(mode)
+		# print(f"[ChannelSelection] DEBUG {modeString} Mode selected.")
 
 	def clearPath(self):
 		del self.servicePath[:]
@@ -2467,7 +2483,7 @@ class ChannelSelection(ChannelSelectionBase, ChannelSelectionEdit, ChannelSelect
 						self.showPipzapMessage()
 					elif zap_res == 2:
 						self.retryServicePlayTimer = eTimer()
-						self.retryServicePlayTimer.callback.append(boundFunction(self.zap, enable_pipzap=True, checkParentalControl=False))
+						self.retryServicePlayTimer.callback.append(boundFunction(self.zap, enable_pipzap=True, checkParentalControl=False, ref=nref))
 						self.retryServicePlayTimer.start(config.misc.softcam_streamrelay_delay.value, True)
 				else:
 					self.setStartRoot(self.curRoot)
@@ -2522,7 +2538,7 @@ class ChannelSelection(ChannelSelectionBase, ChannelSelectionEdit, ChannelSelect
 			if self.delhistpoint is not None:
 				x = self.delhistpoint
 				while x <= len(self.history)-1:
-					del self.history[x]
+					del self.history[x]  # TODO This deletion is wrong
 			self.delhistpoint = None
 
 			if self.servicePath is not None:
@@ -2552,7 +2568,7 @@ class ChannelSelection(ChannelSelectionBase, ChannelSelectionEdit, ChannelSelect
 		if hlen > 1 and self.history_pos > 0:
 			self.history_pos -= 1
 			self.setHistoryPath()
-		self.delhistpoint = self.history_pos+1
+		# self.delhistpoint = self.history_pos + 1 # TODO Do we need this?
 
 	def historyNext(self):
 		self.delhistpoint = None
@@ -2606,7 +2622,7 @@ class ChannelSelection(ChannelSelectionBase, ChannelSelectionEdit, ChannelSelect
 			if x[-1] == retval:
 				break
 			pos += 1
-		self.delhistpoint = pos + 1
+		# self.delhistpoint = pos + 1  # TODO Do we need this?
 		if pos < hlen and pos != self.history_pos:
 			tmp = self.history[pos]
 			# self.history.append(tmp)

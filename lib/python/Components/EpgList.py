@@ -321,11 +321,38 @@ class EPGList(GUIComponent):
 		#print(time() - t)
 		self.selectionChanged()
 
-	def fillSingleEPG(self, service):
+	def filtering_epg(self, epg_list, filtering):
+		def dailySpan(start, end):
+			return list(filter(lambda event: (start <= event_time(event) < end), epg_list))
+		def overnightSpan(start, end):
+			return list(filter(lambda event: (start <= event_time(event) < 1440 or 0 <= event_time(event) < end), epg_list))
+		def event_time(event):
+			return localtime(event[2]).tm_hour * 60 + localtime(event[2]).tm_min
+
+		def minutes(t):
+			return t[0] * 60 + t[1]
+
+		start, end = minutes(config.epg.filter_start.value), minutes(config.epg.filter_end.value)
+		if filtering == 1:
+			if start < end:
+				return dailySpan(start, end)
+			else:
+				return overnightSpan(start, end)
+		elif filtering == 2:
+			if start < end:
+				return overnightSpan(end, start)
+			else:
+				return dailySpan(end, start)
+
+	def fillSingleEPG(self, service, sorting=0, filtering=0):
 		t = int(time())
 		epg_time = t - (int(config.epg.histminutes.value) * 60)
 		test = ['RIBDT', (service.ref.toString(), 0, epg_time, -1)]
 		self.list = self.queryEPG(test)
+		if filtering:
+			self.list = self.filtering_epg(self.list, filtering)
+		if config.epg.filter_keepsorting.value and sorting:
+			self.sortSingleEPG(sorting)
 		self.l.setList(self.list)
 		if t != epg_time:
 			idx = 0

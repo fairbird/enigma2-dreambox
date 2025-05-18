@@ -4,7 +4,7 @@ from Screens.Screen import Screen
 from Screens.Setup import Setup
 from Components.SystemInfo import BoxInfo
 from Components.ActionMap import ActionMap
-from Components.NimManager import nimmanager
+from Components.NimManager import InitNimManager, LNB_CHOICES, UNICABLE_CHOICES, nimmanager
 from Components.Button import Button
 from Components.Label import Label
 from Components.UsageConfig import showrotorpositionChoicesUpdate, preferredTunerChoicesUpdate
@@ -546,11 +546,75 @@ class NimSetup(Setup, ServiceStopScreen):
 			self.fillListWithAdvancedSatEntrys(Sat)
 		self["config"].list = self.list
 
+	def unicableconnection(self):
+		def checkRecursiveConnect(slot_id):
+			if slot_id in self.slot_dest_list:
+				print(f"[SatConfig] Slot ID {slot_id}.")
+				return False
+			self.slot_dest_list.append(slot_id)
+			slot_config = nimmanager.nim_slots[slot_id].config
+			if slot_config.configMode.value == "advanced":
+				try:
+					connected = slot_config.advanced.unicableconnected.value
+				except Exception:
+					connected = False
+				if connected is True:
+					return checkRecursiveConnect(int(slot_config.advanced.unicableconnectedTo.value))
+			return True
+
+		if self.nimConfig.configMode.value == "advanced":
+			connect_count = 0
+			dvbs_slots = nimmanager.getNimListOfType("DVB-S")
+			dvbs_slots_len = len(dvbs_slots)
+			for slot in dvbs_slots:
+				try:
+					nim_slot = nimmanager.nim_slots[slot]
+					if nim_slot == self.nimConfig:
+						self_idx = slot
+					if nim_slot.config.configMode.value == "advanced":
+						if nim_slot.config.advanced.unicableconnected.value is True:
+							connect_count += 1
+				except Exception:
+					pass
+			if connect_count >= dvbs_slots_len:
+				return False
+		self.slot_dest_list = []
+		return checkRecursiveConnect(self.slotid)
+
+	def checkLoopthrough(self):
+		def checkRecursiveConnect(slot_id):
+			if slot_id in self.slot_dest_list:
+				return False
+			self.slot_dest_list.append(slot_id)
+			slot_config = nimmanager.nim_slots[slot_id].config
+			if slot_config.configMode.value == "loopthrough":
+				return checkRecursiveConnect(int(slot_config.connectedTo.value))
+			return True
+
+		if self.nimConfig.configMode.value == "loopthrough":
+			loopthrough_count = 0
+			dvbs_slots = nimmanager.getNimListOfType("DVB-S")
+			dvbs_slots_len = len(dvbs_slots)
+			for slot in dvbs_slots:
+				try:
+					nim_slot = nimmanager.nim_slots[slot]
+					if nim_slot == self.nimConfig:
+						self_idx = slot
+					if nim_slot.config.configMode.value == "loopthrough":
+						loopthrough_count += 1
+				except Exception:
+					pass
+			if loopthrough_count >= dvbs_slots_len:
+				return False
+		self.slot_dest_list = []
+		return checkRecursiveConnect(self.slotid)
+
+
 	def keySelect(self):
 		if self.isChanged():
 			self.stopService()
 		if self["config"].getCurrent() == self.advancedSelectSatsEntry:
-			conf = self.nimConfig.advanced.sat[int(self.nimConfig.advanced.sats.value)].userSatellitesList
+			conf = self.nimConfig.advanced.sat[self.nimConfig.advanced.sats.value].userSatellitesList
 			self.session.openWithCallback(boundFunction(self.updateConfUserSatellitesList, conf), SelectSatsEntryScreen, userSatlist=conf.value)
 		elif self["config"].getCurrent() == self.selectSatsEntry:
 			conf = self.nimConfig.userSatellitesList
@@ -566,6 +630,13 @@ class NimSetup(Setup, ServiceStopScreen):
 	def keySave(self):
 		if self.isChanged():
 			self.stopService()
+		if self.nim.canBeCompatible("DVB-S"):
+			if not self.unicableconnection():
+				self.session.open(MessageBox, _("The unicable connection setting is wrong.\nMaybe recursive connection of tuners."), MessageBox.TYPE_ERROR, timeout=10)
+				return
+			if not self.checkLoopthrough():
+				self.session.open(MessageBox, _("The loopthrough setting is wrong."), MessageBox.TYPE_ERROR, timeout=10)
+				return
 		old_configured_sats = nimmanager.getConfiguredSats()
 		if not self.run():
 			return
@@ -743,6 +814,7 @@ class NimSelection(Screen):
 
 		self.list = [None] * nimmanager.getSlotCount()
 		self["nimlist"] = List(self.list)
+		self.loadFBCLinks()
 		self.updateList()
 
 		self.setResultClass()
@@ -757,6 +829,21 @@ class NimSelection(Screen):
 		}, -2)
 		self.setTitle(_("Choose Tuner"))
 
+	def loadFBCLinks(self):
+		for x in nimmanager.nim_slots:
+			slotid = x.slot
+			if self.showNim(x):
+				if x.isCompatible("DVB-S"):
+					nimConfig = nimmanager.getNimConfig(x.slot)
+					configMode = nimConfig.configMode.value
+					if isFBCLink(x.slot) and configMode != "advanced":
+						link = getLinkedSlotID(x.slot)
+						if link == -1:
+							nimConfig.configMode.value = "nothing"
+						else:
+							nimConfig.configMode.value = "loopthrough"
+							nimConfig.connectedTo.value = str(link)
+
 	def checkFBCLinks(self):
 		for x in nimmanager.nim_slots:
 			if self.showNim(x):
@@ -765,9 +852,9 @@ class NimSelection(Screen):
 					if isFBCLink(slotid):
 						link = getLinkedSlotID(slotid)
 						if link != -1:
-							linkNimConfig = nimmanager.getNimConfig(link).dvbs
+							linkNimConfig = nimmanager.getNimConfig(link)
 							if linkNimConfig.configMode.value == "nothing":
-								nimConfig = nimmanager.getNimConfig(slotid).dvbs
+								nimConfig = nimmanager.getNimConfig(slotid)
 								nimConfig.configMode.value = "nothing"  # Reset child if parent is "nothing"
 								nimConfig.configMode.save()
 
@@ -809,6 +896,7 @@ class NimSelection(Screen):
 
 	def NimSetupCB(self, index=None):
 		self.checkFBCLinks()
+		self.loadFBCLinks()
 		self.updateList(index)
 
 	def showNim(self, nim):
@@ -820,37 +908,45 @@ class NimSelection(Screen):
 			if x.isFBCLink() and not x.isFBCLinkEnabled():
 				continue
 			slotid = x.slot
-			nimConfig = nimmanager.getNimConfig(x.slot)
 			text = ""
 			if self.showNim(x):
 				fbc_text = ""
 				if x.isFBCTuner():
 					fbc_text = (x.isFBCRoot() and _("Slot %s / FBC in %s") % (x.is_fbc[2], x.is_fbc[1])) or _("Slot %s / FBC virtual %s") % (x.is_fbc[2], x.is_fbc[1] - (x.isCompatible("DVB-S") and 2 or 1))
-				if x.isCompatible("DVB-S"):
+				if x.isMultiType():
+					if x.canBeCompatible("DVB-S") and nimmanager.getNimConfig(x.slot).configMode.value != "nothing":
+						text = " DVB-S,"
+					if x.canBeCompatible("DVB-C") and nimmanager.getNimConfig(x.slot).configMode.value != "nothing":
+						text = " DVB-C," + text
+					if x.canBeCompatible("DVB-T") and nimmanager.getNimConfig(x.slot).configMode.value != "nothing":
+						text = " DVB-T," + text
+					if text:
+						text = _("Enabled") + ":" + text[:-1]
+					else:
+						text = _("nothing connected")
+					text = _("Switchable tuner types:") + "(" + ",".join(list(x.getMultiTypeList().values())) + ")" + "\n" + text
+				elif x.isCompatible("DVB-S"):
+					nimConfig = nimmanager.getNimConfig(x.slot)
+					text = nimConfig.configMode.value
 					if nimConfig.configMode.value in ("loopthrough", "equal", "satposdepends"):
-						if x.isFBCLink():
-							text = "%s %s" % (_("FBC automatic\nconnected to"), nimmanager.getNim(int(nimConfig.connectedTo.value)).slot_name)
+						text = {
+								"loopthrough": _("Loop through to"),
+								"equal": _("Equal to"),
+								"satposdepends": _("Second cable of motorized LNB")
+							}[nimConfig.configMode.value]
+						if len(x.input_name) > 1:
+							text += " " + _("Tuner") + " " + ["A1", "A2", "A3", "A4", "A5", "A6", "A7", "A8", "B1", "B2", "B3", "B4", "B5", "B6", "B7", "B8", "B", "C"][int(nimConfig.connectedTo.value)]
 						else:
-							text = "%s %s" % ({"loopthrough": _("Loop through from"), "equal": _("Equal to"), "satposdepends": _("Second cable of motorized LNB")}[nimConfig.configMode.value],
-								nimmanager.getNim(int(nimConfig.connectedTo.value)).slot_name)
+							text += " " + _("Tuner") + " " + chr(ord("A") + int(nimConfig.connectedTo.value))
 						if fbc_text:
 							text += "\n" + fbc_text
 					elif nimConfig.configMode.value == "nothing":
-						if x.isFBCLink():
-							link = getLinkedSlotID(x.slot)
-							if link == -1:
-								text = _("FBC automatic\ninactive")
-							else:
-								link = nimmanager.getNim(link).slot_name
-								text = _("FBC automatic\nconnected to %s") % link
-						else:
-							text = _("Disabled")
+						text = _("Not configured")
 						if fbc_text:
 							text += "\n" + fbc_text
 					elif nimConfig.configMode.value == "simple":
 						if nimConfig.diseqcMode.value in ("single", "toneburst_a_b", "diseqc_a_b", "diseqc_a_b_c_d"):
-							text = "%s\n%s: " % ({"single": _("Single"), "toneburst_a_b": _("Toneburst A/B"), "diseqc_a_b": _("DiSEqC A/B"), "diseqc_a_b_c_d": _("DiSEqC A/B/C/D")}[nimConfig.diseqcMode.value],
-								_("Sats"))
+							text = "%s\n%s:" % ({"single": _("Single"), "toneburst_a_b": _("Tone burst A/B"), "diseqc_a_b": _("DiSEqC A/B"), "diseqc_a_b_c_d": _("DiSEqC A/B/C/D")}[nimConfig.diseqcMode.value], _("Sats"))
 							satnames = []
 							if nimConfig.diseqcA.orbital_position < 3600:
 								satnames.append(nimmanager.getSatName(int(nimConfig.diseqcA.value)))
@@ -865,8 +961,9 @@ class NimSelection(Screen):
 							if len(satnames) <= 2:
 								text += ", ".join(satnames)
 							elif len(satnames) > 2:
-								# basic info - orbital positions only
-								text += ', '.join(sat.split()[0] for sat in satnames)
+								# We need a newline here, since multi content lists don't support automatic line wrapping.
+								text += ", ".join(satnames[:2]) + ",\n"
+								text += "         " + ", ".join(satnames[2:])
 						elif nimConfig.diseqcMode.value in ("positioner", "positioner_select"):
 							text = "%s: " % {"positioner": _("Positioner"), "positioner_select": _("Positioner (selecting satellites)")}[nimConfig.diseqcMode.value]
 							if nimConfig.positionerMode.value == "usals":
@@ -878,47 +975,46 @@ class NimSelection(Screen):
 						if fbc_text:
 							text = fbc_text + " / " + text
 					elif nimConfig.configMode.value == "advanced":
-						satnames = []
-						sat_list = nimmanager.getSatListForNim(slotid)
-						for sat in sat_list:
-							satnames.append(self.OrbToStr(int(sat[0])))
-						description = ""
-						unicableconnecto = ""
-						if hasattr(nimConfig.advanced, "unicableconnected") and nimConfig.advanced.unicableconnected.value:
-							nim2 = nimConfig.advanced.unicableconnectedTo.value
-							if nim2.isdigit():
-								unicableconnecto = " / " + _("Connected to") + " " + nimmanager.getNim(int(nim2)).slot_name
-						if int(nimConfig.advanced.sat[3607].lnb.value) != 0:
-							ident = satnames and " + " or " "
-							description = "%s(%s %s)" % (ident, (x.isFBCLink() and unicableconnecto and _(" unicable LNB input of rotor")) or _("additional cable of rotor"), (unicableconnecto and " " or nimmanager.getNim(int(nimConfig.connectedTo.value)).slot_name))
-						else:
-							rotor_sat_list = nimmanager.getRotorSatListForNim(slotid)
-							if rotor_sat_list:
-								ident = len(sat_list) > len(rotor_sat_list) and " + " or " "
-								description = "%s(%s)" % (ident, _("rotor"))
+						text = _("Advanced")
+						sat = nimConfig.advanced.sats.value
+						lnb = nimConfig.advanced.sat.get(sat)
+						if lnb:
+							lnb = nimConfig.advanced.sat.get(sat).content.items.get("lnb")
+							if lnb:
+								lnb = int(lnb.value)
+								try:
+									lof = nimConfig.advanced.lnb[lnb].lof.value
+									text += " / " + LNB_CHOICES().get(lof, lof)
+									if lof == "unicable":
+										uni = nimConfig.advanced.lnb[lnb].unicable.value
+										text += " / " + UNICABLE_CHOICES().get(uni, uni)
+								except AttributeError:
+									pass
 						if fbc_text:
-							fbc_text = fbc_text + " / "
-						if satnames or not description:
-							text = "%s\n%s: " % (fbc_text + _("Advanced") + unicableconnecto + description, _("Sats"))
-							text += ", ".join(satnames)
-						elif description:
-							text = "%s\n%s: " % (fbc_text + _("Advanced") + unicableconnecto, _("Sats"))
-							text += description
-				elif x.isCompatible("DVB-T") or x.isCompatible("DVB-C") or x.isCompatible("ATSC"):
+							text += "\n" + fbc_text
+					if isFBCLink(x.slot) and nimConfig.configMode.value != "advanced":
+						text += _("\n<This tuner is configured automatically>")
+				elif x.isCompatible("DVB-T"):
+					nimConfig = nimmanager.getNimConfig(x.slot).dvbt
 					if nimConfig.configMode.value == "nothing":
-						text = _("Disabled")
-					elif nimConfig.configMode.value == "enabled" and not x.isCombined():
+						text = _("nothing connected")
+					elif nimConfig.configMode.value == "enabled":
 						text = _("Enabled")
-					if x.isCompatible("DVB-C") and fbc_text:
-						text += "\n" + fbc_text
-				if x.multi_type:
-					enabledTuners = "/".join([y[1].replace("DVB-", "") for y in sorted([({"DVB-S": 1, "DVB-C": 2, "DVB-T": 3, "ATSC": 4}[y[:5]], y) for y in x.getTunerTypesEnabled()])] if nimConfig.configMode.value != "nothing" else [])
-					text = ("%s: %s\n%s" % (_("Modes") if "/" in enabledTuners else _("Mode"), enabledTuners if enabledTuners == 'ATSC' else "DVB-%s" % enabledTuners, text)) if enabledTuners else _("Disabled")
+				elif x.isCompatible("DVB-C"):
+					nimConfig = nimmanager.getNimConfig(x.slot).dvbc
+					if nimConfig.configMode.value == "nothing":
+						text = _("nothing connected")
+					elif nimConfig.configMode.value == "enabled":
+						text = _("Enabled")
+				elif x.isCompatible("ATSC"):
+					nimConfig = nimmanager.getNimConfig(x.slot).atsc
+					if nimConfig.configMode.value == "nothing":
+						text = _("nothing connected")
+					elif nimConfig.configMode.value == "enabled":
+						text = _("Enabled")
 				if not x.isSupported():
 					text = _("Tuner is not supported")
-				if x.isCompatible("DVB-T") and ("DVB-T" in (text + x.friendly_full_description) or "/T" in (text + x.friendly_full_description)) and _("Disabled") not in text and hasattr(nimConfig, "terrestrial_5V") and nimConfig.terrestrial_5V.value:
-					text += _(" (+5 volt terrestrial)")
-				self.list.append((slotid, x.friendly_full_description_compressed if x.isCompatible("DVB-C") and x.isFBCTuner() else x.friendly_full_description, text or nimConfig.configMode.value, x))
+				self.list.append((slotid, x.friendly_full_description_compressed if x.isCompatible("DVB-C") and x.isFBCTuner() else x.friendly_full_description, text, x))
 		self["nimlist"].setList(self.list)
 		self["nimlist"].updateList(self.list)
 		if index is not None:
