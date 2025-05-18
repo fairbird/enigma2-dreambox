@@ -447,13 +447,17 @@ class EPGSelection(Screen, HelpableScreen):
 		return  "(%02d:%02d - %02d:%02d)" % ((*begin, *end) if self.filtering == 1 else (*end, *begin))
 
 	def filterStartDown(self):
-		if self.filtering: self.filterShiftTimespan('start', -1)
+		if self.filtering:
+			self.filterShiftTimespan('start', -1)
 	def filterStartUp(self):
-		if self.filtering: self.filterShiftTimespan('start', 1)
+		if self.filtering:
+			self.filterShiftTimespan('start', 1)
 	def filterEndDown(self):
-		if self.filtering: self.filterShiftTimespan('end', -1)
+		if self.filtering:
+			self.filterShiftTimespan('end', -1)
 	def filterEndUp(self):
-		if self.filtering: self.filterShiftTimespan('end', 1)
+		if self.filtering:
+			self.filterShiftTimespan('end', 1)
 
 	def yellowButtonPressed(self):
 		if self.type == EPG_TYPE_MULTI:
