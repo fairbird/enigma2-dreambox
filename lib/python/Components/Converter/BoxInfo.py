@@ -114,7 +114,7 @@ class BoxInfo(Poll, Converter, object):
 					if 'system type' in line:
 						info = line.split(':')[-1].split()[0].strip().strip('\n')
 					elif 'cpu MHz' in line:
-						cpu_speed =  line.split(':')[-1].strip().strip('\n')
+						cpu_speed = line.split(':')[-1].strip().strip('\n')
 					elif 'cpu type' in line:
 						info = line.split(':')[-1].strip().strip('\n')
 					elif 'model name' in line or 'Processor' in line:
@@ -135,7 +135,7 @@ class BoxInfo(Poll, Converter, object):
 							f = open('/sys/firmware/devicetree/base/cpus/cpu@0/clock-frequency', 'rb')
 							clockfrequency = f.read()
 							f.close()
-							cpu_speed = "%s" % str(int(binascii.hexlify(clockfrequency), 16)/1000000)
+							cpu_speed = "%s" % str(int(binascii.hexlify(clockfrequency), 16) / 1000000)
 						except:
 							cpu_speed = '-'
 				if cpu_info == '': 

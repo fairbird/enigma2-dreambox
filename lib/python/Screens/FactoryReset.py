@@ -225,6 +225,6 @@ class FactoryReset(ConfigListScreen, Screen, ProtectedScreen):
 
         def cancel(self):
                 for i in self["config"].list:
-                        if len(i)>1:
+                        if len(i) > 1:
                                 i[1].cancel()
                 self.close(False)

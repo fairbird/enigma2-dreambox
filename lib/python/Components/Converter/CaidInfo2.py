@@ -127,9 +127,9 @@ class CaidInfo2(Poll, Converter, object):
 			self.type = self.CRD
 		elif type == "CrdTxt":
 			self.type = self.CRDTXT
-		elif  type == "IsFta":
+		elif type == "IsFta":
 			self.type = self.IS_FTA
-		elif  type == "IsCrypted":
+		elif type == "IsCrypted":
 			self.type = self.IS_CRYPTED
 		elif type == "Short":
 			self.type = self.SHORT

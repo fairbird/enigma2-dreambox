@@ -104,7 +104,7 @@ class MovieInfo(Converter):
 					if x == "DURATION" and duration and duration > 0:
 						res_str = self.appendToStringWithSeparator(res_str, "%d min" % (duration / 60))
 					if x == "FILESIZE" and filesize:
-						res_str = self.appendToStringWithSeparator(res_str, "%d MB" % (filesize / (1024*1024)))
+						res_str = self.appendToStringWithSeparator(res_str, "%d MB" % (filesize / (1024 * 1024)))
 					if x == "RECSERVICE" and rec_service_name:
 						res_str = self.appendToStringWithSeparator(res_str, rec_service_name)
 				return res_str
