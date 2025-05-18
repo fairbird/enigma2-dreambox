@@ -35,14 +35,19 @@ REDC = '\x1b[31m'
 YELLOWC = '\x1b[33m'
 GRENC = '\x1b[32m'
 ENDC = '\x1b[m'
+
+
 def cprint(text):
         print(YELLOWC + text + ENDC)
+
 
 def cprintoff(text):
         print(REDC + text + ENDC)
 
+
 def cprinton(text):
         print(GRENC + text + ENDC)
+
 
 def connected_to_internet():
         import requests
@@ -54,6 +59,7 @@ def connected_to_internet():
             return False
         print(connected_to_internet())
 
+
 def logdata(label_name='', data=None):
         try:
             data = str(data)
@@ -63,11 +69,13 @@ def logdata(label_name='', data=None):
         except:
             pass
 
+
 def AutoCheck(session=None, **kwargs):
         global installerupdatecheck
         #logdata('kwargs', kwargs)
         installerupdatecheck = InstallerUpdateCheck(session)
         installerupdatecheck.configChange()
+
 
 class InstallerUpdateCheck:
 

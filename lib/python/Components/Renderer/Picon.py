@@ -18,6 +18,7 @@ config.picon.foldername = ConfigSelection(default="1", choices=[
 		("3", _("XPicon"))
 	])
 
+
 class PiconLocator:
 	def __init__(self, piconDirectories=["picon"]):
 		harddiskmanager.on_partition_list_change.append(self.onPartitionChange)
@@ -37,7 +38,6 @@ class PiconLocator:
 			mp = join(part.mountpoint, "usr/share/enigma2")
 			self.onMountpointAdded(part.mountpoint)
 			self.onMountpointAdded(mp)
-
 
 	def onMountpointAdded(self, mountpoint):
 		for piconDirectory in self.piconDirectories:

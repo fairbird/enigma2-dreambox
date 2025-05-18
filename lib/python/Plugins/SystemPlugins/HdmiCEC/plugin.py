@@ -12,7 +12,6 @@ from Screens.LocationBox import LocationBox
 from Screens.Screen import Screen
 
 
-
 class HdmiCECSetupScreen(ConfigListScreen, Screen):
 	def __init__(self, session):
 		Screen.__init__(self, session)

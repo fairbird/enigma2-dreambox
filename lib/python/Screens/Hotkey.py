@@ -17,9 +17,11 @@ from Components.Pixmap import Pixmap
 from Components.Label import Label
 import os
 
+
 def getDesktopSize():
 	s = getDesktop(0).size()
 	return (s.width(), s.height())
+
 
 def isHD():
 	desktopSize = getDesktopSize()

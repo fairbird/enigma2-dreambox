@@ -292,6 +292,7 @@ class HelpMenuListOld(GUIComponent):
 		for x in self.onSelChanged:
 			x()
 
+
 class HelpMenu(Screen, Rc):
 	def __init__(self, session, helpList):
 		Screen.__init__(self, session)

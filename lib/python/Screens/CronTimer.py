@@ -21,9 +21,11 @@ from boxbranding import getMachineBrand, getMachineName
 OPKGCMD = "/usr/bin/opkg"
 UPDATERC = "/usr/sbin/update-rc.d"
 
+
 def getDesktopSize():
 	s = getDesktop(0).size()
 	return (s.width(), s.height())
+
 
 def isHD():
 	desktopSize = getDesktopSize()

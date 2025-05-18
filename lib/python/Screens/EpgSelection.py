@@ -449,12 +449,15 @@ class EPGSelection(Screen, HelpableScreen):
 	def filterStartDown(self):
 		if self.filtering:
 			self.filterShiftTimespan('start', -1)
+
 	def filterStartUp(self):
 		if self.filtering:
 			self.filterShiftTimespan('start', 1)
+
 	def filterEndDown(self):
 		if self.filtering:
 			self.filterShiftTimespan('end', -1)
+
 	def filterEndUp(self):
 		if self.filtering:
 			self.filterShiftTimespan('end', 1)

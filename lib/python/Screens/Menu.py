@@ -715,7 +715,6 @@ class Menu(Screen, ProtectedScreen):
 			self.hideShowEntries()
 			self.setMenuList(self.menuList)
 
-
 	def hideShowEntries(self):
 		menuList = list(self.fullMenuList)
 		if not self.sortMode:

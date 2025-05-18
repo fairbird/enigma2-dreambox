@@ -19,9 +19,11 @@ config.usage.swapautostart = ConfigYesNo(default=False)
 
 startswap = None
 
+
 def getDesktopSize():
 	s = getDesktop(0).size()
 	return (s.width(), s.height())
+
 
 def isHD():
 	desktopSize = getDesktopSize()

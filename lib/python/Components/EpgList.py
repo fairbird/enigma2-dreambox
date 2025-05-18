@@ -324,8 +324,10 @@ class EPGList(GUIComponent):
 	def filtering_epg(self, epg_list, filtering):
 		def dailySpan(start, end):
 			return list(filter(lambda event: (start <= event_time(event) < end), epg_list))
+
 		def overnightSpan(start, end):
 			return list(filter(lambda event: (start <= event_time(event) < 1440 or 0 <= event_time(event) < end), epg_list))
+
 		def event_time(event):
 			return localtime(event[2]).tm_hour * 60 + localtime(event[2]).tm_min
 

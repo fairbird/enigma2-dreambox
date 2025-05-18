@@ -82,6 +82,7 @@ listscreen = config.misc.graph_mepg.default_mode.value
 
 class EPGList(GUIComponent):
 	buildEntryExtensionFunctions = []
+
 	def __init__(self, selChangedCB=None, timer=None, time_epoch=120, overjump_empty=True, epg_bouquet=None):
 		GUIComponent.__init__(self)
 		self.cur_event = None

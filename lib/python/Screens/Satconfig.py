@@ -609,7 +609,6 @@ class NimSetup(Setup, ServiceStopScreen):
 		self.slot_dest_list = []
 		return checkRecursiveConnect(self.slotid)
 
-
 	def keySelect(self):
 		if self.isChanged():
 			self.stopService()

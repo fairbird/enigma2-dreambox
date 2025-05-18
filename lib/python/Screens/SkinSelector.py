@@ -273,6 +273,7 @@ class SkinSelectorSummary(ScreenSummary):
 		<widget source="value" render="Label" position="0,140" size="400,100" font="FdLcD;35" halign="center" zPosition="2"/>
 	</screen>
 	'''
+
 	def __init__(self, session, parent):
 		ScreenSummary.__init__(self, session, parent=parent)
 		self["entry"] = StaticText("")

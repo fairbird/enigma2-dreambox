@@ -656,7 +656,6 @@ class InfoBarShowHide(InfoBarScreenSaver):
 		if self.execing:
 			self.startHideTimer()
 
-
 	def checkHideVBI(self, service=None):
 		service = service or self.session.nav.getCurrentlyPlayingServiceReference()
 		servicepath = service and service.getPath()
@@ -3554,6 +3553,7 @@ class InfoBarRedButton:
 			for x in self.onRedButtonActivation:
 				x()
 
+
 class InfoBarAspectSelection:
 	STATE_HIDDEN = 0
 	STATE_ASPECT = 1
@@ -3700,6 +3700,7 @@ class InfoBarResolutionSelection:
 					self.ExGreen_doHide()
 		else:
 			self.ExGreen_doHide()
+
 
 class InfoBarTimerButton:
 	def __init__(self):

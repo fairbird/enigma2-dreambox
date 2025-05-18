@@ -66,6 +66,7 @@ def addspace(text):
 		text += " "
 	return text
 
+
 def getCryptoInfo(info):
 	ecmdata = GetEcmInfo()
 	if info and info.getInfo(iServiceInformation.sIsCrypted) == 1:
