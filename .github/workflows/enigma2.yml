@@ -1,10 +1,10 @@
-name: Enigma2 Python3
+name: Enigma2 Python 3
 
 on:
   push:
-    branches: [ develop ]
+    branches: [ test ]
   pull_request:
-    branches: [ develop ]
+    branches: [ test ]
 
 jobs:
   build:
@@ -14,25 +14,12 @@ jobs:
         gcc: [14]
         python: ['3.13']
     steps:
-    - uses: actions/checkout@v4
-    - name: Setup Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: ${{ matrix.python }}
-    - name: install dep packages
-      run: |
-        python -m pip install --upgrade pip
-        pip install six
-    - uses: actions/checkout@v4
-    - name: install gcc ${{ matrix.gcc }}
-      run: |
-        sudo apt-get -q update
-        sudo add-apt-repository -y ppa:deadsnakes/ppa
-        sudo apt-get install g++-${{ matrix.gcc }}
     - name: install dev packages
       run: |
+        sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
         sudo apt-get -q update
         sudo apt remove -y libunwind-14-dev
+        sudo apt-get install g++-${{ matrix.gcc }}
         sudo apt-get install linux-libc-dev
         sudo apt-get install git
         sudo apt-get install build-essential
@@ -47,14 +34,42 @@ jobs:
         sudo apt-get install libgstreamer-plugins-base1.0-dev
         sudo apt-get install libfreetype6-dev
         sudo apt-get install libfribidi-dev
+        sudo apt-get install libssl-dev
         sudo apt-get install libavahi-client-dev
         sudo apt-get install libjpeg-turbo8-dev
         sudo apt-get install libgif-dev
         sudo apt-get install libcurl4-openssl-dev
         sudo apt-get install mm-common
-    - name: build enigma2 dependencies
-      id: depends
-      continue-on-error: true
+
+    - uses: actions/checkout@v4
+    - uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python }}
+
+    - name: Install python ${{ matrix.python }} packages
+      run: |
+        pip3 install flake8
+
+
+
+    - name: Check format PEP8
+      run: |
+        echo "checking locale format..."
+        find . -type f -name "*.po" -exec msgfmt {} -o {}.mo \;
+        echo "checking PEP8 validation..."
+        flake8 --builtins="_,ngettext,pgettext" --ignore=W191,W503,W504,E123,E126,E128,E501,E722,F824 . --exit-zero
+
+# PEP8 :- IGNORE CODES
+# W191 : indentation contains tabs
+# W503 : line break before binary operator
+# W504 : line break after binary operator
+# E128 : continuation line under-indented for visual indent
+# E501 : line too long (> 79 characters)
+# E722 : do not use bare 'except'
+# F824 : is unused: name is never assigned in scope
+
+
+    - name: Build enigma2 dependencies, gcc-${{ matrix.gcc }}
       env:
         CC: "gcc-${{ matrix.gcc }}"
         CXX: "g++-${{ matrix.gcc }}"
@@ -103,13 +118,13 @@ jobs:
       run: |
         sed -i 's/mallinfo2/mallinfo/g' main/enigma.cpp
     - name: build enigma2
-      env: 
+      env:
         CC: "gcc-${{ matrix.gcc }}"
         CXX: "g++-${{ matrix.gcc }}"
       run: |
-        echo compiling enigma2
+        echo "compiling enigma2"
         autoreconf -i
         ./configure --with-libsdl=no --with-boxtype=nobox --enable-dependency-tracking ac_cv_prog_c_openmp=-fopenmp --with-gstversion=1.0 --with-textlcd
         make
         python -m compileall .
-        echo done!
+        echo "checking enigma2 compiles completed"
