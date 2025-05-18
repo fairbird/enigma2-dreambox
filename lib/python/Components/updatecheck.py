@@ -54,7 +54,7 @@ def connected_to_internet():
             return False
         print(connected_to_internet())
 
-def logdata(label_name = '', data = None):
+def logdata(label_name='', data=None):
         try:
             data = str(data)
             fp = open('/tmp/updatecheck_log', 'a')
@@ -63,7 +63,7 @@ def logdata(label_name = '', data = None):
         except:
             pass
 
-def AutoCheck(session = None, **kwargs):
+def AutoCheck(session=None, **kwargs):
         global installerupdatecheck
         #logdata('kwargs', kwargs)
         installerupdatecheck = InstallerUpdateCheck(session)
@@ -87,7 +87,7 @@ class InstallerUpdateCheck:
                 else:
                        cprintoff('[CheckInetrnet] we are Offline')
 
-        def configChange(self, configElement = None):
+        def configChange(self, configElement=None):
             if self.timer.isActive():
                 self.timer.stop()
             cprint('[UpdateCheck] timer changed')

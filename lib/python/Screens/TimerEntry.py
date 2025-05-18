@@ -140,7 +140,7 @@ class TimerEntry(ConfigListScreen, Screen):
 		self.timerentry_pipzap = ConfigYesNo(default=pipzap)
 		self.timerentry_conflictdetection = ConfigYesNo(default=conflict_detection)
 
-		self.timerentry_date = ConfigDateTime(default = self.timer.begin, formatstring = config.usage.date.full.value, increment = 86400)
+		self.timerentry_date = ConfigDateTime(default=self.timer.begin, formatstring=config.usage.date.full.value, increment=86400)
 		self.timerentry_starttime = ConfigClock(default=self.timer.begin)
 		self.timerentry_endtime = ConfigClock(default=self.timer.end)
 		self.timerentry_showendtime = ConfigSelection(default=((self.timer.end - self.timer.begin) > 4), choices=[(True, _("yes")), (False, _("no"))])
@@ -156,7 +156,7 @@ class TimerEntry(ConfigListScreen, Screen):
 			locations.append(default)
 		self.timerentry_fallbackdirname = ConfigSelection(default=default, choices=locations)
 
-		self.timerentry_repeatedbegindate = ConfigDateTime(default = self.timer.repeatedbegindate, formatstring = config.usage.date.full.value, increment = 86400)
+		self.timerentry_repeatedbegindate = ConfigDateTime(default=self.timer.repeatedbegindate, formatstring=config.usage.date.full.value, increment=86400)
 
 		self.timerentry_weekday = ConfigSelection(default=weekday_table[weekday], choices=[("mon", _("Monday")), ("tue", _("Tuesday")), ("wed", _("Wednesday")), ("thu", _("Thursday")), ("fri", _("Friday")), ("sat", _("Saturday")), ("sun", _("Sunday"))])
 

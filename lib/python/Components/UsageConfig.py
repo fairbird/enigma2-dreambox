@@ -235,8 +235,8 @@ def InitUsageConfig():
 	for i in range(1, 12):
 		choicelist.append((str(i), ngettext("%d second", "%d seconds", i) % i))
 	config.usage.infobar_timeout = ConfigSelection(default="5", choices=choicelist)
-	config.usage.show_infobar_do_dimming = ConfigYesNo(default = True)
-	config.usage.show_infobar_dimming_speed = ConfigSelectionNumber(min = 1, max = 40, stepwidth = 1, default = 40, wraparound = True)
+	config.usage.show_infobar_do_dimming = ConfigYesNo(default=True)
+	config.usage.show_infobar_dimming_speed = ConfigSelectionNumber(min=1, max=40, stepwidth=1, default=40, wraparound=True)
 	config.usage.show_infobar_on_zap = ConfigYesNo(default=True)
 	config.usage.show_infobar_on_skip = ConfigYesNo(default=True)
 	config.usage.show_infobar_locked_on_pause = ConfigYesNo(default=True)
@@ -639,14 +639,14 @@ def InitUsageConfig():
 	config.usage.movielist_unseen = ConfigYesNo(default=False)
 
 	config.usage.swap_snr_on_osd = ConfigYesNo(default=False)
-	config.usage.swap_time_display_on_osd = ConfigSelection(default = "0", choices = [("0", _("Skin Setting")), ("1", _("Mins")), ("2", _("Mins Secs")), ("3", _("Hours Mins")), ("4", _("Hours Mins Secs")), ("5", _("Percentage"))])
-	config.usage.swap_media_time_display_on_osd = ConfigSelection(default = "0", choices = [("0", _("Skin Setting")), ("1", _("Mins")), ("2", _("Mins Secs")), ("3", _("Hours Mins")), ("4", _("Hours Mins Secs")), ("5", _("Percentage"))])
-	config.usage.swap_time_remaining_on_osd = ConfigSelection(default = "0", choices = [("0", _("Remaining")), ("1", _("Elapsed")), ("2", _("Elapsed & Remaining")), ("3", _("Remaining & Elapsed"))])
-	config.usage.elapsed_time_positive_osd = ConfigYesNo(default = False)
-	config.usage.swap_time_display_on_vfd = ConfigSelection(default = "0", choices = [("0", _("Skin Setting")), ("1", _("Mins")), ("2", _("Mins Secs")), ("3", _("Hours Mins")), ("4", _("Hours Mins Secs")), ("5", _("Percentage"))])
-	config.usage.swap_media_time_display_on_vfd = ConfigSelection(default = "0", choices = [("0", _("Skin Setting")), ("1", _("Mins")), ("2", _("Mins Secs")), ("3", _("Hours Mins")), ("4", _("Hours Mins Secs")), ("5", _("Percentage"))])
-	config.usage.swap_time_remaining_on_vfd = ConfigSelection(default = "0", choices = [("0", _("Remaining")), ("1", _("Elapsed")), ("2", _("Elapsed & Remaining")), ("3", _("Remaining & Elapsed"))])
-	config.usage.elapsed_time_positive_vfd = ConfigYesNo(default = False)
+	config.usage.swap_time_display_on_osd = ConfigSelection(default="0", choices=[("0", _("Skin Setting")), ("1", _("Mins")), ("2", _("Mins Secs")), ("3", _("Hours Mins")), ("4", _("Hours Mins Secs")), ("5", _("Percentage"))])
+	config.usage.swap_media_time_display_on_osd = ConfigSelection(default="0", choices=[("0", _("Skin Setting")), ("1", _("Mins")), ("2", _("Mins Secs")), ("3", _("Hours Mins")), ("4", _("Hours Mins Secs")), ("5", _("Percentage"))])
+	config.usage.swap_time_remaining_on_osd = ConfigSelection(default="0", choices=[("0", _("Remaining")), ("1", _("Elapsed")), ("2", _("Elapsed & Remaining")), ("3", _("Remaining & Elapsed"))])
+	config.usage.elapsed_time_positive_osd = ConfigYesNo(default=False)
+	config.usage.swap_time_display_on_vfd = ConfigSelection(default="0", choices=[("0", _("Skin Setting")), ("1", _("Mins")), ("2", _("Mins Secs")), ("3", _("Hours Mins")), ("4", _("Hours Mins Secs")), ("5", _("Percentage"))])
+	config.usage.swap_media_time_display_on_vfd = ConfigSelection(default="0", choices=[("0", _("Skin Setting")), ("1", _("Mins")), ("2", _("Mins Secs")), ("3", _("Hours Mins")), ("4", _("Hours Mins Secs")), ("5", _("Percentage"))])
+	config.usage.swap_time_remaining_on_vfd = ConfigSelection(default="0", choices=[("0", _("Remaining")), ("1", _("Elapsed")), ("2", _("Elapsed & Remaining")), ("3", _("Remaining & Elapsed"))])
+	config.usage.elapsed_time_positive_vfd = ConfigYesNo(default=False)
 
 	def SpinnerOnOffChanged(configElement):
 		setSpinnerOnOff(int(configElement.value))
@@ -1161,8 +1161,8 @@ def InitUsageConfig():
 		eEPGCache.getInstance().setEpgHistorySeconds(int(configElement.value) * 60)
 	config.epg.histminutes.addNotifier(EpgHistorySecondsChanged)
 
-	config.epg.cacheloadsched = ConfigYesNo(default = False)
-	config.epg.cachesavesched = ConfigYesNo(default = False)
+	config.epg.cacheloadsched = ConfigYesNo(default=False)
+	config.epg.cachesavesched = ConfigYesNo(default=False)
 
 	def EpgCacheLoadSchedChanged(configElement):
 		import Components.EpgLoadSave
@@ -1171,10 +1171,10 @@ def InitUsageConfig():
 	def EpgCacheSaveSchedChanged(configElement):
 		import Components.EpgLoadSave
 		Components.EpgLoadSave.EpgCacheSaveCheck()
-	config.epg.cacheloadsched.addNotifier(EpgCacheLoadSchedChanged, immediate_feedback = False)
-	config.epg.cachesavesched.addNotifier(EpgCacheSaveSchedChanged, immediate_feedback = False)
-	config.epg.cacheloadtimer = ConfigSelectionNumber(default = 24, stepwidth = 1, min = 1, max = 24, wraparound = True)
-	config.epg.cachesavetimer = ConfigSelectionNumber(default = 24, stepwidth = 1, min = 1, max = 24, wraparound = True)
+	config.epg.cacheloadsched.addNotifier(EpgCacheLoadSchedChanged, immediate_feedback=False)
+	config.epg.cachesavesched.addNotifier(EpgCacheSaveSchedChanged, immediate_feedback=False)
+	config.epg.cacheloadtimer = ConfigSelectionNumber(default=24, stepwidth=1, min=1, max=24, wraparound=True)
+	config.epg.cachesavetimer = ConfigSelectionNumber(default=24, stepwidth=1, min=1, max=24, wraparound=True)
 
 	config.osd = ConfigSubsection()
 	if BoxInfo.getItem("AmlogicFamily"):
@@ -1214,9 +1214,9 @@ def InitUsageConfig():
 			d = normpath(p.mountpoint)
 			if p.mountpoint != '/':
 				hddchoises.append((p.mountpoint, d))
-	config.misc.epgcachepath = ConfigSelection(default = '/etc/enigma2/', choices = hddchoises)
+	config.misc.epgcachepath = ConfigSelection(default='/etc/enigma2/', choices=hddchoises)
 	config.misc.epgcachefilename = ConfigText(default='epg', fixed_size=False)
-	config.misc.epgcache_filename = ConfigText(default = (config.misc.epgcachepath.value + config.misc.epgcachefilename.value.replace('.dat','') + '.dat'))
+	config.misc.epgcache_filename = ConfigText(default=(config.misc.epgcachepath.value + config.misc.epgcachefilename.value.replace('.dat','') + '.dat'))
 	def EpgCacheChanged(configElement):
 		config.misc.epgcache_filename.setValue(pathjoin(config.misc.epgcachepath.value, config.misc.epgcachefilename.value.replace('.dat','') + '.dat'))
 		config.misc.epgcache_filename.save()
@@ -1226,13 +1226,13 @@ def InitUsageConfig():
 		if not config.misc.epgcache_filename.value.startswith("/etc/enigma2/"):
 			if exists('/etc/enigma2/' + config.misc.epgcachefilename.value.replace('.dat','') + '.dat'):
 				os.remove('/etc/enigma2/' + config.misc.epgcachefilename.value.replace('.dat','') + '.dat')
-	config.misc.epgcachepath.addNotifier(EpgCacheChanged, immediate_feedback = False)
-	config.misc.epgcachefilename.addNotifier(EpgCacheChanged, immediate_feedback = False)
+	config.misc.epgcachepath.addNotifier(EpgCacheChanged, immediate_feedback=False)
+	config.misc.epgcachefilename.addNotifier(EpgCacheChanged, immediate_feedback=False)
 
 	config.misc.epgratingcountry = ConfigSelection(default="", choices=[("", _("Auto Detect")), ("ETSI", _("Generic")), ("AUS", _("Australia"))])
 	config.misc.epggenrecountry = ConfigSelection(default="", choices=[("", _("Auto Detect")), ("ETSI", _("Generic")), ("AUS", _("Australia"))])
 
-	config.misc.showradiopic = ConfigYesNo(default = True)
+	config.misc.showradiopic = ConfigYesNo(default=True)
 
 	choicelist = [("newline", _("new line")), ("2newlines", _("2 new lines")), ("space", _("space")), ("dot", " . "), ("dash", " - "), ("asterisk", " * "), ("nothing", _("nothing"))]
 	config.epg.fulldescription_separator = ConfigSelection(default="2newlines", choices=choicelist)
@@ -1494,7 +1494,7 @@ def InitUsageConfig():
 		def setZapmodeDM(el):
 			print('[UsageConfig] >>> zapmodeDM')
 		config.misc.zapmodeDM = ConfigSelection(default="black", choices=[("black", _("Black screen")), ("hold", _("Hold screen"))])
-		config.misc.zapmodeDM.addNotifier(setZapmodeDM, immediate_feedback = False)
+		config.misc.zapmodeDM.addNotifier(setZapmodeDM, immediate_feedback=False)
 
 	if BoxInfo.getItem("VFD_scroll_repeats"):
 		def scroll_repeats(el):
