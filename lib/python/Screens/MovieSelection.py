@@ -446,9 +446,9 @@ class SelectionEventInfo:
 		self["Service"].newService(serviceref)
 		info = serviceref and eServiceCenter.getInstance().info(serviceref)
 		if info:
-			timeCreate =  strftime("%A %d %b %Y", localtime(info.getInfo(serviceref, iServiceInformation.sTimeCreate)))
+			timeCreate = strftime("%A %d %b %Y", localtime(info.getInfo(serviceref, iServiceInformation.sTimeCreate)))
 			duration = "%d min" % (info.getLength(serviceref) / 60) 
-			filesize = "%d MB" % (info.getInfoObject(serviceref, iServiceInformation.sFileSize) / (1024*1024))
+			filesize = "%d MB" % (info.getInfoObject(serviceref, iServiceInformation.sFileSize) / (1024 * 1024))
 			moviedetails = "%s  •  %s  •  %s" % (timeCreate, duration, filesize)
 			self["moviedetails"].setText(moviedetails)
 

@@ -2537,7 +2537,7 @@ class ChannelSelection(ChannelSelectionBase, ChannelSelectionEdit, ChannelSelect
 		if not self.isSubservices() or not self.history:
 			if self.delhistpoint is not None:
 				x = self.delhistpoint
-				while x <= len(self.history)-1:
+				while x <= len(self.history) - 1:
 					del self.history[x]  # TODO This deletion is wrong
 			self.delhistpoint = None
 
@@ -2597,9 +2597,9 @@ class ChannelSelection(ChannelSelectionBase, ChannelSelectionEdit, ChannelSelect
 
 	def historyClear(self):
 		if self and self.servicelist:
-			for i in range(0, len(self.history)-1):
+			for i in range(0, len(self.history) - 1):
 				del self.history[0]
-			self.history_pos = len(self.history)-1
+			self.history_pos = len(self.history) - 1
 			return True
 		return False
 

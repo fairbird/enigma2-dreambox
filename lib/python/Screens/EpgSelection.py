@@ -444,7 +444,7 @@ class EPGSelection(Screen, HelpableScreen):
 
 	def getTimespanText(self):
 		begin, end = config.epg.filter_start.value, config.epg.filter_end.value
-		return  "(%02d:%02d - %02d:%02d)" % ((*begin, *end) if self.filtering == 1 else (*end, *begin))
+		return "(%02d:%02d - %02d:%02d)" % ((*begin, *end) if self.filtering == 1 else (*end, *begin))
 
 	def filterStartDown(self):
 		if self.filtering:

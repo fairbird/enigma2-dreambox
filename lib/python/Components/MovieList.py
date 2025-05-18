@@ -174,7 +174,7 @@ class MovieList(GUIComponent):
 		self.partIconeShiftCompact = 4
 		self.partIconeShiftOriginal = 5
 		self.spaceRight = 2
-		self.spaceLeft= 2
+		self.spaceLeft = 2
 		self.spaceIconeText = 2
 		self.iconsWidth = 22
 		self.trashShift = 1
