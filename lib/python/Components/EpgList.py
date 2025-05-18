@@ -184,7 +184,7 @@ class EPGList(GUIComponent):
 				xpos += w
 				w = width / 10 * 5
 				self.descr_rect = Rect(xpos, 0, width, height)
-		else: # EPG_TYPE_SIMILAR
+		else:  # EPG_TYPE_SIMILAR
 			if self.skinColumns:
 				x = 0
 				self.weekday_rect = Rect(0, 0, self.gap(self.col[0] + 120), height)
@@ -218,7 +218,7 @@ class EPGList(GUIComponent):
 		t = localtime(beginTime)
 		et = localtime(beginTime + duration)
 		res = [
-			None, # no private data needed
+			None,  # no private data needed
 			(eListboxPythonMultiContent.TYPE_TEXT, r1.x, r1.y, r1.w, r1.h, 0, RT_HALIGN_LEFT | RT_VALIGN_CENTER, strftime(config.usage.date.dayshort.value, t)),
 			(eListboxPythonMultiContent.TYPE_TEXT, r2.x, r2.y, split, r2.h, 0, RT_HALIGN_RIGHT | RT_VALIGN_CENTER, strftime(config.usage.time.short.value + " -", t)),
 			(eListboxPythonMultiContent.TYPE_TEXT, r2.x + split, r2.y, r2.w - split, r2.h, 0, RT_HALIGN_RIGHT | RT_VALIGN_CENTER, strftime(config.usage.time.short.value, et))
@@ -324,8 +324,10 @@ class EPGList(GUIComponent):
 	def filtering_epg(self, epg_list, filtering):
 		def dailySpan(start, end):
 			return list(filter(lambda event: (start <= event_time(event) < end), epg_list))
+
 		def overnightSpan(start, end):
 			return list(filter(lambda event: (start <= event_time(event) < 1440 or 0 <= event_time(event) < end), epg_list))
+
 		def event_time(event):
 			return localtime(event[2]).tm_hour * 60 + localtime(event[2]).tm_min
 

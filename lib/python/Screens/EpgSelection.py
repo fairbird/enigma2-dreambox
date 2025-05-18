@@ -45,7 +45,7 @@ class EPGSelection(Screen, HelpableScreen):
 		HelpableScreen.__init__(self)
 		self.bouquetChangeCB = bouquetChangeCB
 		self.serviceChangeCB = serviceChangeCB
-		self.ask_time = -1 #now
+		self.ask_time = -1  # now
 		self["key_red"] = StaticText("")
 		self["key_menu"] = StaticText(_("MENU"))
 		self["key_info"] = StaticText(_("INFO"))
@@ -122,10 +122,10 @@ class EPGSelection(Screen, HelpableScreen):
 				"blue": self.blueButtonPressed,
 				"info": self.infoKeyPressed,
 				"menu": self.furtherOptions,
-				"nextBouquet": self.nextBouquet, # just used in multi epg yet
-				"prevBouquet": self.prevBouquet, # just used in multi epg yet
-				"nextService": self.nextService, # just used in single epg yet
-				"prevService": self.prevService, # just used in single epg yet
+				"nextBouquet": self.nextBouquet,  # just used in multi epg yet
+				"prevBouquet": self.prevBouquet,  # just used in multi epg yet
+				"nextService": self.nextService,  # just used in single epg yet
+				"prevService": self.prevService,  # just used in single epg yet
 				"preview": self.eventPreview,
 			})
 		self["EPGFilterActions"] = HelpableActionMap(self, ["EPGFilterActions"],
@@ -444,16 +444,23 @@ class EPGSelection(Screen, HelpableScreen):
 
 	def getTimespanText(self):
 		begin, end = config.epg.filter_start.value, config.epg.filter_end.value
-		return  "(%02d:%02d - %02d:%02d)" % ((*begin, *end) if self.filtering == 1 else (*end, *begin))
+		return "(%02d:%02d - %02d:%02d)" % ((*begin, *end) if self.filtering == 1 else (*end, *begin))
 
 	def filterStartDown(self):
-		if self.filtering: self.filterShiftTimespan('start', -1)
+		if self.filtering:
+			self.filterShiftTimespan('start', -1)
+
 	def filterStartUp(self):
-		if self.filtering: self.filterShiftTimespan('start', 1)
+		if self.filtering:
+			self.filterShiftTimespan('start', 1)
+
 	def filterEndDown(self):
-		if self.filtering: self.filterShiftTimespan('end', -1)
+		if self.filtering:
+			self.filterShiftTimespan('end', -1)
+
 	def filterEndUp(self):
-		if self.filtering: self.filterShiftTimespan('end', 1)
+		if self.filtering:
+			self.filterShiftTimespan('end', 1)
 
 	def yellowButtonPressed(self):
 		if self.type == EPG_TYPE_MULTI:

@@ -10,9 +10,11 @@ from enigma import eTimer, getDesktop
 
 import enigma
 
+
 def getDesktopSize():
     s = getDesktop(0).size()
     return (s.width(), s.height())
+
 
 def isFHD():
     desktopSize = getDesktopSize()
@@ -119,7 +121,6 @@ class NetworkWizard(Wizard, Rc):
 				</widget>
 				<widget name="HelpWindow" pixmap="buttons/key_text.png" position="125,170" zPosition="1" size="1,1" transparent="1" alphaTest="on" />
 			</screen>"""
-
 
 	def __init__(self, session, interface=None):
 		self.xmlfile = resolveFilename(SCOPE_PLUGINS, "SystemPlugins/NetworkWizard/networkwizard.xml")

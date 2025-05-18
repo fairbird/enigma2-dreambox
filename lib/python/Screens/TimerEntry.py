@@ -100,18 +100,18 @@ class TimerEntry(ConfigListScreen, Screen):
 
 		day = list([int(x) for x in reversed('{0:07b}'.format(self.timer.repeated))])
 		weekday = 0
-		if self.timer.repeated: # repeated
+		if self.timer.repeated:  # repeated
 			type = "repeated"
-			if (self.timer.repeated == 31): # Mon-Fri
+			if (self.timer.repeated == 31):  # Mon-Fri
 				repeated = "weekdays"
-			elif (self.timer.repeated == 127): # daily
+			elif (self.timer.repeated == 127):  # daily
 				repeated = "daily"
 			else:
 				repeated = "user"
 				if day.count(1) == 1:
 					repeated = "weekly"
 					weekday = day.index(1)
-		else: # once
+		else:  # once
 			type = "once"
 			repeated = None
 			weekday = int(strftime("%u", localtime(self.timer.begin))) - 1
@@ -140,7 +140,7 @@ class TimerEntry(ConfigListScreen, Screen):
 		self.timerentry_pipzap = ConfigYesNo(default=pipzap)
 		self.timerentry_conflictdetection = ConfigYesNo(default=conflict_detection)
 
-		self.timerentry_date = ConfigDateTime(default = self.timer.begin, formatstring = config.usage.date.full.value, increment = 86400)
+		self.timerentry_date = ConfigDateTime(default=self.timer.begin, formatstring=config.usage.date.full.value, increment=86400)
 		self.timerentry_starttime = ConfigClock(default=self.timer.begin)
 		self.timerentry_endtime = ConfigClock(default=self.timer.end)
 		self.timerentry_showendtime = ConfigSelection(default=((self.timer.end - self.timer.begin) > 4), choices=[(True, _("yes")), (False, _("no"))])
@@ -156,7 +156,7 @@ class TimerEntry(ConfigListScreen, Screen):
 			locations.append(default)
 		self.timerentry_fallbackdirname = ConfigSelection(default=default, choices=locations)
 
-		self.timerentry_repeatedbegindate = ConfigDateTime(default = self.timer.repeatedbegindate, formatstring = config.usage.date.full.value, increment = 86400)
+		self.timerentry_repeatedbegindate = ConfigDateTime(default=self.timer.repeatedbegindate, formatstring=config.usage.date.full.value, increment=86400)
 
 		self.timerentry_weekday = ConfigSelection(default=weekday_table[weekday], choices=[("mon", _("Monday")), ("tue", _("Tuesday")), ("wed", _("Wednesday")), ("thu", _("Thursday")), ("fri", _("Friday")), ("sat", _("Saturday")), ("sun", _("Sunday"))])
 
@@ -166,7 +166,7 @@ class TimerEntry(ConfigListScreen, Screen):
 
 		# FIXME some service-chooser needed here
 		servicename = "N/A"
-		try: # no current service available?
+		try:  # no current service available?
 			servicename = str(self.timer.service_ref.getServiceName())
 		except:
 			pass
@@ -191,7 +191,7 @@ class TimerEntry(ConfigListScreen, Screen):
 
 		if self.timerentry_type.value == "once":
 			self.frequencyEntry = None
-		else: # repeated
+		else:  # repeated
 			self.frequencyEntry = (_("Repeats"), self.timerentry_repeated)
 			self.list.append(self.frequencyEntry)
 			self.repeatedbegindateEntry = (_("Starting on"), self.timerentry_repeatedbegindate)
@@ -239,7 +239,7 @@ class TimerEntry(ConfigListScreen, Screen):
 		self.list.append(self.channelEntry)
 
 		self.dirname = (_("Location"), self.timerentry_fallbackdirname) if self.timerentry_fallback.value and self.timerentry_fallbackdirname.value else (_("Location"), self.timerentry_dirname)
-		if config.usage.setup_level.index >= 2 and ((self.timerentry_fallback.value and self.timerentry_fallbackdirname.value) or (self.timerentry_justplay.value != "zap" and self.timerentry_dirname.value)): # expert+
+		if config.usage.setup_level.index >= 2 and ((self.timerentry_fallback.value and self.timerentry_fallbackdirname.value) or (self.timerentry_justplay.value != "zap" and self.timerentry_dirname.value)):  # expert+
 			self.list.append(self.dirname)
 
 		self.conflictDetectionEntry = (_("Enable timer conflict detection"), self.timerentry_conflictdetection)
@@ -314,7 +314,7 @@ class TimerEntry(ConfigListScreen, Screen):
 			_("Select target folder"),
 			self.timerentry_dirname.value,
 			filename=answer,
-			minFree=100 # We require at least 100MB free space
+			minFree=100  # We require at least 100MB free space
 			)
 
 	def keySelect(self):

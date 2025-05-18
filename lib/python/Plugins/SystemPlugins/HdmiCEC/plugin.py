@@ -12,7 +12,6 @@ from Screens.LocationBox import LocationBox
 from Screens.Screen import Screen
 
 
-
 class HdmiCECSetupScreen(ConfigListScreen, Screen):
 	def __init__(self, session):
 		Screen.__init__(self, session)
@@ -72,10 +71,10 @@ class HdmiCECSetupScreen(ConfigListScreen, Screen):
 			self.list.append((_("Detect other boxes before standby"), config.hdmicec.next_boxes_detect, _("Before sending the command to switch the TV to standby, the receiver tests if all the other devices plugged to TV are in standby. If they are not, the 'sourceinactive' command will be sent to the TV instead of the 'standby' command.")))
 			if config.hdmicec.next_boxes_detect.value:
 				for i in range(len(config.hdmicec.ethbox)):
-					self.list.append((8*" " + _("Detect box%s via network") % (i + 1), config.hdmicec.ethbox[i].used, _("For this box, the network connection can also be used for detection.")))
+					self.list.append((8 * " " + _("Detect box%s via network") % (i + 1), config.hdmicec.ethbox[i].used, _("For this box, the network connection can also be used for detection.")))
 					if config.hdmicec.ethbox[i].used.value:
-						self.list.append((16*" " + _("IP"), config.hdmicec.ethbox[i].ip, _("OpenWebif is used for detection on box with this IP address.")))
-						self.list.append((16*" " + _("port"), config.hdmicec.ethbox[i].port, _("Port used by OpenWebif on tested box.")))
+						self.list.append((16 * " " + _("IP"), config.hdmicec.ethbox[i].ip, _("OpenWebif is used for detection on box with this IP address.")))
+						self.list.append((16 * " " + _("port"), config.hdmicec.ethbox[i].port, _("Port used by OpenWebif on tested box.")))
 			self.list.append((_("Ping device before standby"), config.hdmicec.ethernet_pc_used, _("Before sending the command to switch the TV to standby, the receiver can test if a device connected to the TV responds to a network 'ping'. If it does, instead of the 'standby' command the 'sourceinactive' command will be sent to the TV.")))
 			if config.hdmicec.ethernet_pc_used.value:
 				self.list.append((8 * " " + _("IP"), config.hdmicec.pc_ip, _("'Ping' is used for detection device on this address.")))

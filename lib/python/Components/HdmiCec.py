@@ -112,17 +112,23 @@ config.hdmicec.log_path = ConfigDirectory(LOGPATH)
 config.hdmicec.next_boxes_detect = ConfigYesNo(default=False)
 config.hdmicec.sourceactive_zaptimers = ConfigYesNo(default=False)
 config.hdmicec.ethernet_pc_used = ConfigYesNo(default=False)
-config.hdmicec.pc_ip = ConfigIP(default = [192,168,3,7])
+config.hdmicec.pc_ip = ConfigIP(default=[192, 168, 3, 7])
 
 config.hdmicec.ethbox = ConfigSubList()
+
+
 def create_box(ip=[192, 168, 1, 1], port=80, used=False):
     box = ConfigSubsection()
     box.used = ConfigYesNo(default=used)
     box.ip = ConfigIP(default=ip)
     box.port = ConfigInteger(default=port, limits=(1, 65535))
     return box
+
+
 def add_box(ip, port, used=False):
 	config.hdmicec.ethbox.append(create_box(ip=ip, port=port, used=used))
+
+
 add_box([192, 168, 3, 41], 80)
 add_box([192, 168, 3, 43], 80)
 
@@ -196,7 +202,7 @@ class HdmiCec:
 			else:
 				cmd = 0x04
 		elif message == "sourceactive":
-			address = 0x0f # use broadcast for active source command
+			address = 0x0f  # use broadcast for active source command
 			cmd = 0x82
 			data = self.setData()
 		elif message == "standby":
@@ -228,7 +234,7 @@ class HdmiCec:
 			cmd = 0x90
 			data = struct.pack('B', 0x01)
 		elif message == "reportaddress":
-			address = 0x0f # use broadcast address
+			address = 0x0f  # use broadcast address
 			cmd = 0x84
 			data = self.setData(True)
 		elif message == "vendorid":
@@ -242,13 +248,13 @@ class HdmiCec:
 			data = struct.pack('B', 0x6c)
 		elif message == "sendcecversion":
 			cmd = 0x9E
-			data = struct.pack('B', 0x04) # v1.3a
+			data = struct.pack('B', 0x04)  # v1.3a
 		elif message == "requestactivesource":
-			address = 0x0f # use broadcast address
+			address = 0x0f  # use broadcast address
 			cmd = 0x85
 		elif message == "getpowerstatus":
 			self.useStandby = True
-			address = 0x0f # use broadcast address => boxes will send info
+			address = 0x0f  # use broadcast address => boxes will send info
 			cmd = 0x8f
 
 		if cmd:
@@ -357,7 +363,7 @@ class HdmiCec:
 				print("[HDMI-CEC] error", e)
 
 		for box in config.hdmicec.ethbox:
-			if not self.useStandby: # no further testing is needed
+			if not self.useStandby:  # no further testing is needed
 				break
 			if box.used.value:
 				ip = "%d.%d.%d.%d" % tuple(box.ip.value)
@@ -407,55 +413,55 @@ class HdmiCec:
 			if config.hdmicec.debug.value != "0":
 				self.debugRx(length, cmd, data)
 			if cmd == 0x00:
-				if length == 0: # only polling message ( it's some as ping )
+				if length == 0:  # only polling message ( it's some as ping )
 					print("eHdmiCec: received polling message")
 				else:
 					# feature abort
 					if ctrl0 == 0x44:
 						print('eHdmiCec: volume forwarding not supported by device %02x' % (message.getAddress()))
 						self.volumeForwardingEnabled = False
-			elif cmd == 0x46: # request name
+			elif cmd == 0x46:  # request name
 				self.sendMessage(message.getAddress(), 'osdname')
-			elif cmd == 0x7e or cmd == 0x72: # system audio mode status
+			elif cmd == 0x7e or cmd == 0x72:  # system audio mode status
 				if ctrl0 == 0x01:
-					self.volumeForwardingDestination = 5 # on: send volume keys to receiver
+					self.volumeForwardingDestination = 5  # on: send volume keys to receiver
 				else:
-					self.volumeForwardingDestination = 0 # off: send volume keys to tv
+					self.volumeForwardingDestination = 0  # off: send volume keys to tv
 				if config.hdmicec.volume_forwarding.value:
 					print('eHdmiCec: volume forwarding to device %02x enabled' % (self.volumeForwardingDestination))
 					self.volumeForwardingEnabled = True
-			elif cmd == 0x8f: # request power status
+			elif cmd == 0x8f:  # request power status
 				if inStandby:
 					self.sendMessage(message.getAddress(), 'powerinactive')
 				else:
 					self.sendMessage(message.getAddress(), 'poweractive')
-			elif cmd == 0x83: # request address
+			elif cmd == 0x83:  # request address
 				self.sendMessage(message.getAddress(), 'reportaddress')
-			elif cmd == 0x86: # request streaming path
+			elif cmd == 0x86:  # request streaming path
 				physicaladdress = ctrl0 * 256 + ctrl1
 				ouraddress = eHdmiCEC.getInstance().getPhysicalAddress()
 				if physicaladdress == ouraddress:
 					if not inStandby:
 						if config.hdmicec.report_active_source.value:
 							self.sendMessage(message.getAddress(), 'sourceactive')
-			elif cmd == 0x85: # request active source
+			elif cmd == 0x85:  # request active source
 				if not inStandby:
 					if config.hdmicec.report_active_source.value:
 						self.sendMessage(message.getAddress(), 'sourceactive')
-			elif cmd == 0x8c: # request vendor id
+			elif cmd == 0x8c:  # request vendor id
 				self.sendMessage(message.getAddress(), 'vendorid')
-			elif cmd == 0x8d: # menu request
-				if ctrl0 == 1: # query
+			elif cmd == 0x8d:  # menu request
+				if ctrl0 == 1:  # query
 					if inStandby:
 						self.sendMessage(message.getAddress(), 'menuinactive')
 					else:
 						self.sendMessage(message.getAddress(), 'menuactive')
-			elif cmd == 0x90: # receive powerstatus report
-				if ctrl0 == 0: # some box is powered
+			elif cmd == 0x90:  # receive powerstatus report
+				if ctrl0 == 0:  # some box is powered
 					if config.hdmicec.next_boxes_detect.value:
 						self.useStandby = False
 					print("[HDMI-CEC] powered box found")
-			elif cmd == 0x9F: # request get CEC version
+			elif cmd == 0x9F:  # request get CEC version
 				self.sendMessage(message.getAddress(), 'sendcecversion')
 
 			# handle standby request from the tv

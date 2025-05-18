@@ -168,5 +168,6 @@ class JobView(InfoBarNotifications, ConfigListScreen, Screen):
 		if answer:
 			AddNotification(Screens.Standby.TryQuitMainloop, 1)
 
+
 class TaskView(JobView):
 	pass

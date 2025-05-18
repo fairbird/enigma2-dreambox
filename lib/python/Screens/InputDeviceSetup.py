@@ -354,8 +354,8 @@ class RemoteControlType(ConfigListScreen, Screen):
 			("h9combo", 28),
 			("h9combose", 28),
 			("i55se", 28),
-			("h7", 28), # new model /old 21
-			("h9", 28), # new model /old 25
+			("h7", 28),  # new model /old 21
+			("h9", 28),  # new model /old 25
 			("h9twin", 28),
 			("h9twinse", 28),
 			("h10", 28),

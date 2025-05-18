@@ -68,7 +68,7 @@ class CutListContextMenu(FixedMenu):
 	SHOW_DELETECUT = 2
 
 	def __init__(self, session, state, nearmark, cut_state):
-		menu = [(_("back"), self.close)] #, (None, )]
+		menu = [(_("back"), self.close)]  # , (None, )]
 
 		if state == self.SHOW_STARTCUT:
 			menu.append((_("start cut here (reset)"), self.startCut))
@@ -365,7 +365,7 @@ class CutListEditor(Screen, InfoBarBase, InfoBarSeek, InfoBarCueSheetSupport):
 		self.putCuesheet()
 
 	def __addMark(self):
-		self.toggleMark(onlyadd=True, tolerance=90000) # do not allow two marks in <1s
+		self.toggleMark(onlyadd=True, tolerance=90000)  # do not allow two marks in <1s
 
 	def __removeMark(self):
 		m = self["cutlist"].getCurrent()
@@ -398,7 +398,7 @@ class CutListEditor(Screen, InfoBarBase, InfoBarSeek, InfoBarCueSheetSupport):
 		self["OutLen"].setText(SecToMSS(out_len / 90000))
 
 		cl = self.cut_list
-		if cl and cl[0][1] == self.CUT_TYPE_LAST and cl[0][0] <= 1: # remove state indicator marks
+		if cl and cl[0][1] == self.CUT_TYPE_LAST and cl[0][0] <= 1:  # remove state indicator marks
 			cl = cl[1:]
 		r = [CutListEntry(0, self.CUT_TYPE_START, cl[0][0] if cl else length)]
 		for i, e in enumerate(cl):
@@ -487,7 +487,7 @@ class CutListEditor(Screen, InfoBarBase, InfoBarSeek, InfoBarCueSheetSupport):
 				if self.cut_start >= self.cut_end:
 					self.cut_end = None
 					return
-			else: # CutListContextMenu.RET_ENDCUT
+			else:  # CutListContextMenu.RET_ENDCUT
 				self.cut_end = self.context_position
 				self.state = CutListContextMenu.SHOW_ENDCUT
 				if self.cut_start is None:
@@ -510,9 +510,9 @@ class CutListEditor(Screen, InfoBarBase, InfoBarSeek, InfoBarCueSheetSupport):
 			in_after = None
 
 			for (where, what) in self.cut_list:
-				if what == 1 and where <= self.context_position: # out
+				if what == 1 and where <= self.context_position:  # out
 					out_before = (where, what)
-				elif what == 0 and where < self.context_position: # in, before out
+				elif what == 0 and where < self.context_position:  # in, before out
 					out_before = None
 				elif what == 0 and where >= self.context_position and in_after is None:
 					in_after = (where, what)
@@ -579,7 +579,7 @@ class CutListEditor(Screen, InfoBarBase, InfoBarSeek, InfoBarCueSheetSupport):
 		elif result == CutListContextMenu.RET_EXECUTECUTS:
 			try:
 				from Plugins.Extensions.MovieCut.ui import MovieCut
-				self.session.nav.stopService()	# need to stop to save the cuts file
+				self.session.nav.stopService()  # need to stop to save the cuts file
 				self.session.openWithCallback(self.executeCallback, MovieCut, self.service)
 			except ImportError as e:
 				self.session.open(MessageBox, _("The MovieCut plugin is not installed."), type=MessageBox.TYPE_INFO, timeout=10)

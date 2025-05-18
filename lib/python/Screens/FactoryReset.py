@@ -26,6 +26,7 @@ config.FactoryReset.resetSkins = ConfigYesNo(default=True)
 config.FactoryReset.resetTimers = ConfigYesNo(default=True)
 config.FactoryReset.resetOthers = ConfigYesNo(default=True)
 
+
 class FactoryReset(ConfigListScreen, Screen, ProtectedScreen):
         def __init__(self, session):
                 Screen.__init__(self, session)
@@ -225,6 +226,6 @@ class FactoryReset(ConfigListScreen, Screen, ProtectedScreen):
 
         def cancel(self):
                 for i in self["config"].list:
-                        if len(i)>1:
+                        if len(i) > 1:
                                 i[1].cancel()
                 self.close(False)

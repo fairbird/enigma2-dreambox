@@ -26,7 +26,7 @@ class ScreenButtonsBar(GUIAddon):
 		self.colorIndicatorStyle = "pixmap"
 		self.orientations = {"orHorizontal": eListbox.orHorizontal, "orVertical": eListbox.orVertical}
 		self.orientation = eListbox.orHorizontal
-		self.actionButtonsPosition = "farRight" # can be left, right, farRight
+		self.actionButtonsPosition = "farRight"  # can be left, right, farRight
 		self.renderType = "ImageTextRight"  # Currently supported are ImageTextRight, ImageTextOver and ColorTextOver
 		self.alignment = "left"
 		self.cornerRadius = 0
@@ -40,7 +40,7 @@ class ScreenButtonsBar(GUIAddon):
 
 	def onContainerShown(self):
 		for x, val in self.sources.items():
-			if x in ("key_red","key_green","key_yellow","key_blue"):
+			if x in ("key_red", "key_green", "key_yellow", "key_blue"):
 				self.colorButtonSources[x] = val
 			else:
 				self.actionButtonSources[x] = val

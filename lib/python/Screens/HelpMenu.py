@@ -232,7 +232,7 @@ class HelpMenuListOld(GUIComponent):
 				if name is None:
 					continue
 
-				if flags & 8: # for long keypresses, prepend l_ into the key name.
+				if flags & 8:  # for long keypresses, prepend l_ into the key name.
 					name = (name[0], "long")
 
 				entry = [(actionmap, context, action, name)]
@@ -291,6 +291,7 @@ class HelpMenuListOld(GUIComponent):
 	def selectionChanged(self):
 		for x in self.onSelChanged:
 			x()
+
 
 class HelpMenu(Screen, Rc):
 	def __init__(self, session, helpList):

@@ -29,9 +29,10 @@ from os import path, popen
 import re
 import os
 
+
 class BoxInfo(Poll, Converter, object):
 	Boxtype = 0
-	CpuInfo = 1	
+	CpuInfo = 1
 	HddTemp = 2
 	TempInfo = 3
 	FanInfo = 4
@@ -61,7 +62,7 @@ class BoxInfo(Poll, Converter, object):
 		'TimeInfo': self.TimeInfo,
 		'TimeInfo2': self.TimeInfo2,
 		'TimeInfo3': self.TimeInfo3,
-		'TimeInfo4': self.TimeInfo4}[type]		
+		'TimeInfo4': self.TimeInfo4}[type]
 
 	def imageinfo(self):
 		imageinfo = ''
@@ -75,7 +76,7 @@ class BoxInfo(Poll, Converter, object):
 			imageinfo = '/var/opkg/status'
 		return imageinfo
 
-	@cached	
+	@cached
 	def getText(self):
 		if self.type == self.Boxtype:
 			box = software = ''
@@ -114,7 +115,7 @@ class BoxInfo(Poll, Converter, object):
 					if 'system type' in line:
 						info = line.split(':')[-1].split()[0].strip().strip('\n')
 					elif 'cpu MHz' in line:
-						cpu_speed =  line.split(':')[-1].strip().strip('\n')
+						cpu_speed = line.split(':')[-1].strip().strip('\n')
 					elif 'cpu type' in line:
 						info = line.split(':')[-1].strip().strip('\n')
 					elif 'model name' in line or 'Processor' in line:
@@ -135,10 +136,10 @@ class BoxInfo(Poll, Converter, object):
 							f = open('/sys/firmware/devicetree/base/cpus/cpu@0/clock-frequency', 'rb')
 							clockfrequency = f.read()
 							f.close()
-							cpu_speed = "%s" % str(int(binascii.hexlify(clockfrequency), 16)/1000000)
+							cpu_speed = "%s" % str(int(binascii.hexlify(clockfrequency), 16) / 1000000)
 						except:
 							cpu_speed = '-'
-				if cpu_info == '': 
+				if cpu_info == '':
 					return _('%s, %s MHz (%d %s)') % (info, cpu_speed, cpu_count, cpu_count > 1 and cores or core)
 			else:
 				return _('No info')
@@ -201,19 +202,19 @@ class BoxInfo(Poll, Converter, object):
 				MINUTE = 60
 				HOUR = MINUTE * 60
 				DAY = HOUR * 24
-				days = int( total_seconds / DAY )
-				hours = int( ( total_seconds % DAY ) / HOUR )
-				minutes = int( ( total_seconds % HOUR ) / MINUTE )
-				seconds = int( total_seconds % MINUTE )
+				days = int(total_seconds / DAY)
+				hours = int((total_seconds % DAY) / HOUR)
+				minutes = int((total_seconds % HOUR) / MINUTE)
+				seconds = int(total_seconds % MINUTE)
 				uptime = ''
 				if days > 0:
-					uptime += str(days) + ' ' + (days == 1 and _('day') or _('days') ) + ' '
+					uptime += str(days) + ' ' + (days == 1 and _('day') or _('days')) + ' '
 				if len(uptime) > 0 or hours > 0:
-					uptime += str(hours) + ' ' + (hours == 1 and _('hour') or _('hours') ) + ' '
+					uptime += str(hours) + ' ' + (hours == 1 and _('hour') or _('hours')) + ' '
 				if len(uptime) > 0 or minutes > 0:
-					uptime += str(minutes) + ' ' + (minutes == 1 and _('minute') or _('minutes') )
+					uptime += str(minutes) + ' ' + (minutes == 1 and _('minute') or _('minutes'))
 				return _('Time working: %s') % uptime
-	
+
 		elif self.type == self.CpuLoad:
 			info = ''
 			try:
@@ -230,7 +231,7 @@ class BoxInfo(Poll, Converter, object):
 			info = 0
 			try:
 				for line in open('/proc/cpuinfo').readlines():
-					line = [ x.strip() for x in line.strip().split(':') ]
+					line = [x.strip() for x in line.strip().split(':')]
 					if line[0] == 'cpu MHz':
 						info = '%1.0f' % float(line[1])
 				if not info:
@@ -246,14 +247,14 @@ class BoxInfo(Poll, Converter, object):
 			except:
 				return ''
 
-		elif self.type == self.SkinInfo:			
+		elif self.type == self.SkinInfo:
 			if fileExists('/etc/enigma2/settings'):
 				try:
 					for line in open('/etc/enigma2/settings'):
 						if 'config.skin.primary_skin' in line:
 							return (_('Skin: ')) + line.replace('/skin.xml', ' ').split('=')[1]
 				except:
-					return				
+					return
 
 		elif self.type == self.TimeInfo:
 			if not config.timezone.val.value.startswith('(GMT)'):
@@ -278,5 +279,5 @@ class BoxInfo(Poll, Converter, object):
 				return (_('Part~of~the~light: ')) + config.timezone.area.value[0:12]
 			else:
 				return '+0'
-				
+
 	text = property(getText)

@@ -249,7 +249,7 @@ class StandbyScreen(Screen):
 	def standbyTimeout(self):
 		if config.usage.standby_to_shutdown_timer_blocktime.value:
 			curtime = localtime(time())
-			if curtime.tm_year > 1970: #check if the current time is valid
+			if curtime.tm_year > 1970:  # check if the current time is valid
 				curtime = (curtime.tm_hour, curtime.tm_min, curtime.tm_sec)
 				begintime = tuple(config.usage.standby_to_shutdown_timer_blocktime_begin.value)
 				endtime = tuple(config.usage.standby_to_shutdown_timer_blocktime_end.value)
@@ -391,13 +391,13 @@ class TryQuitMainloop(MessageBox):
 	def getRecordEvent(self, recservice, event):
 		if event == iRecordableService.evEnd:
 			recordings = self.session.nav.getRecordings()
-			if not recordings: # no more recordings exist
+			if not recordings:  # no more recordings exist
 				rec_time = self.session.nav.RecordTimer.getNextRecordingTime()
 				if rec_time > 0 and (rec_time - time()) < 360:
-					self.initTimeout(360) # wait for next starting timer
+					self.initTimeout(360)  # wait for next starting timer
 					self.startTimer()
 				else:
-					self.close(True) # immediate shutdown
+					self.close(True)  # immediate shutdown
 		elif event == iRecordableService.evStart:
 			self.stopTimer()
 

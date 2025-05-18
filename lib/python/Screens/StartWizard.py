@@ -55,7 +55,6 @@ class StartWizard(Wizard, Rc):
 		config.misc.firstrun.save()
 		configfile.save()
 
-
 	def hasPartitions(self):
 		partitions = fileReadLines("/proc/partitions", source=MODULE_NAME)
 		count = 0

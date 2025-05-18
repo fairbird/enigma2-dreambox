@@ -40,7 +40,7 @@ class Scart(Screen):
 	def switchToTV(self, *val):
 		if self.msgVisible:
 			if self.msgBox:
-				self.msgBox.close() # ... MsgBoxClosed -> switchToTV again..
+				self.msgBox.close()  # ... MsgBoxClosed -> switchToTV again..
 				return
 			self.avswitch.setInput("encoder")
 			self.msgVisible = False

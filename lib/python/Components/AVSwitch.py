@@ -7,7 +7,7 @@ from Tools.AVHelper import pChoice, readChoices
 from os.path import isfile
 import os
 
-iAVSwitch = None # will be initialized later, allows to import name 'iAVSwitch' from 'Components.AVSwitch'
+iAVSwitch = None  # will be initialized later, allows to import name 'iAVSwitch' from 'Components.AVSwitch'
 
 MODULE_NAME = __name__.split(".")[-1]
 
@@ -47,24 +47,24 @@ class AVSwitch:
 
 	def getOutputAspect(self):
 		valstr = config.av.aspectratio.value
-		if valstr in ("4_3_letterbox", "4_3_panscan"): # 4:3
+		if valstr in ("4_3_letterbox", "4_3_panscan"):  # 4:3
 			return (4, 3)
-		elif valstr == "16_9": # auto ... 4:3 or 16:9
+		elif valstr == "16_9":  # auto ... 4:3 or 16:9
 			if isfile("/proc/stb/vmpeg/0/aspect"):
 				try:
-					if "1" in open("/proc/stb/vmpeg/0/aspect", "r").read().split('\n', 1)[0]: # 4:3
+					if "1" in open("/proc/stb/vmpeg/0/aspect", "r").read().split('\n', 1)[0]:  # 4:3
 						return (4, 3)
 				except IOError:
 					print("[AVSwitch] Read /proc/stb/vmpeg/0/aspect failed!")
 			elif isfile("/sys/class/video/screen_mode"):
 				try:
-					if "1" in open("/sys/class/video/screen_mode", "r").read().split('\n', 1)[0]: # 4:3
+					if "1" in open("/sys/class/video/screen_mode", "r").read().split('\n', 1)[0]:  # 4:3
 						return (4, 3)
 				except IOError:
 					print("[AVSwitch] Read /sys/class/video/screen_mode failed!")
-		elif valstr in ("16_9_always", "16_9_letterbox"): # 16:9
+		elif valstr in ("16_9_always", "16_9_letterbox"):  # 16:9
 			pass
-		elif valstr in ("16_10_letterbox", "16_10_panscan"): # 16:10
+		elif valstr in ("16_10_letterbox", "16_10_panscan"):  # 16:10
 			return (16, 10)
 		return (16, 9)
 
@@ -93,9 +93,9 @@ class AVSwitch:
 
 	def setAspectWSS(self, aspect=None):
 		if not config.av.wss.value:
-			value = 2 # auto(4:3_off)
+			value = 2  # auto(4:3_off)
 		else:
-			value = 1 # auto
+			value = 1  # auto
 		eAVSwitch.getInstance().setWSS(value)
 
 
@@ -107,7 +107,7 @@ def InitAVSwitch():
 	delayChoices = [(i, _("%d ms") % i) for i in list(range(0, 3000, 100))]  # noqa: F821
 	config.av.passthrough_fix_long = ConfigSelection(choices=delayChoices, default=1200)
 	config.av.passthrough_fix_short = ConfigSelection(choices=delayChoices, default=100)
-	
+
 	config.av.osd_alpha = ConfigSlider(default=255, increment=5, limits=(20, 255))  # Make Openpli compatible with some plugins who still use config.av.osd_alpha.
 
 	# when YUV, Scart or S-Video is not support by HW, don't let the user select it
@@ -226,7 +226,7 @@ def InitAVSwitch():
 	config.av.tvsystem.addNotifier(setSystem)
 	config.av.wss.addNotifier(setWSS)
 
-	iAVSwitch.setInput("encoder") # init on startup
+	iAVSwitch.setInput("encoder")  # init on startup
 
 	BoxInfo.setItem("ScartSwitch", eAVControl.getInstance().hasScartSwitch())
 
@@ -853,5 +853,6 @@ def InitAVSwitch():
 		("50", _("Force 50Hz")),
 		("60", _("Force 60Hz"))
 	])
+
 
 iAVSwitch = AVSwitch()

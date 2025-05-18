@@ -14,9 +14,11 @@ from Screens.HelpMenu import Rc
 from Tools.Directories import fileContains
 from enigma import getDesktop
 
+
 def getDesktopSize():
 	s = getDesktop(0).size()
 	return (s.width(), s.height())
+
 
 def isHD():
 	desktopSize = getDesktopSize()
