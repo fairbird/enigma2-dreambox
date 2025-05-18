@@ -109,14 +109,8 @@ jobs:
         make
         sudo make install
         popd
-    - name: Check on failures
-      if: steps.depends.outcome != 'success'
-      run: |
-        cat /tmp/libdvbsi/config.log
-        exit 1
-    - name: patch enigma cpp files
-      run: |
-        sed -i 's/mallinfo2/mallinfo/g' main/enigma.cpp
+
+
     - name: build enigma2
       env:
         CC: "gcc-${{ matrix.gcc }}"
