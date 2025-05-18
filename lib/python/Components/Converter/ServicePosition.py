@@ -126,9 +126,12 @@ class ServicePosition(Poll, Converter):
 		if l == 0 and p > 0:  # Set position to 0 if length = 0 and pos > 0
 			p = 0
 
-		if self.negate: l = -l
-		if self.negate: p = -p
-		if self.negate: r = -r
+		if self.negate:
+			l = -l
+		if self.negate:
+			p = -p
+		if self.negate:
+			r = -r
 
 		if l >= 0:
 			sign_l = ""
