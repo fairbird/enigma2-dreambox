@@ -201,17 +201,17 @@ class BoxInfo(Poll, Converter, object):
 				MINUTE = 60
 				HOUR = MINUTE * 60
 				DAY = HOUR * 24
-				days = int( total_seconds / DAY )
-				hours = int( ( total_seconds % DAY ) / HOUR )
-				minutes = int( ( total_seconds % HOUR ) / MINUTE )
-				seconds = int( total_seconds % MINUTE )
+				days = int(total_seconds / DAY)
+				hours = int((total_seconds % DAY) / HOUR)
+				minutes = int((total_seconds % HOUR) / MINUTE)
+				seconds = int(total_seconds % MINUTE)
 				uptime = ''
 				if days > 0:
-					uptime += str(days) + ' ' + (days == 1 and _('day') or _('days') ) + ' '
+					uptime += str(days) + ' ' + (days == 1 and _('day') or _('days')) + ' '
 				if len(uptime) > 0 or hours > 0:
-					uptime += str(hours) + ' ' + (hours == 1 and _('hour') or _('hours') ) + ' '
+					uptime += str(hours) + ' ' + (hours == 1 and _('hour') or _('hours')) + ' '
 				if len(uptime) > 0 or minutes > 0:
-					uptime += str(minutes) + ' ' + (minutes == 1 and _('minute') or _('minutes') )
+					uptime += str(minutes) + ' ' + (minutes == 1 and _('minute') or _('minutes'))
 				return _('Time working: %s') % uptime
 	
 		elif self.type == self.CpuLoad:
@@ -230,7 +230,7 @@ class BoxInfo(Poll, Converter, object):
 			info = 0
 			try:
 				for line in open('/proc/cpuinfo').readlines():
-					line = [ x.strip() for x in line.strip().split(':') ]
+					line = [x.strip() for x in line.strip().split(':')]
 					if line[0] == 'cpu MHz':
 						info = '%1.0f' % float(line[1])
 				if not info:
