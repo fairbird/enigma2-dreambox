@@ -112,7 +112,7 @@ config.hdmicec.log_path = ConfigDirectory(LOGPATH)
 config.hdmicec.next_boxes_detect = ConfigYesNo(default=False)
 config.hdmicec.sourceactive_zaptimers = ConfigYesNo(default=False)
 config.hdmicec.ethernet_pc_used = ConfigYesNo(default=False)
-config.hdmicec.pc_ip = ConfigIP(default = [192,168,3,7])
+config.hdmicec.pc_ip = ConfigIP(default=[192,168,3,7])
 
 config.hdmicec.ethbox = ConfigSubList()
 def create_box(ip=[192, 168, 1, 1], port=80, used=False):
