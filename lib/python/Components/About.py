@@ -294,7 +294,7 @@ def getCPUArch():
 
 def getDVBAPI():
 	if BoxInfo.getItem("OLDE2API"):
-		return _("Old") 
+		return _("Old")
 	else:
 		return _("New")
 

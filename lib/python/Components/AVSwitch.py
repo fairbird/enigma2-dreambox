@@ -107,7 +107,7 @@ def InitAVSwitch():
 	delayChoices = [(i, _("%d ms") % i) for i in list(range(0, 3000, 100))]  # noqa: F821
 	config.av.passthrough_fix_long = ConfigSelection(choices=delayChoices, default=1200)
 	config.av.passthrough_fix_short = ConfigSelection(choices=delayChoices, default=100)
-	
+
 	config.av.osd_alpha = ConfigSlider(default=255, increment=5, limits=(20, 255))  # Make Openpli compatible with some plugins who still use config.av.osd_alpha.
 
 	# when YUV, Scart or S-Video is not support by HW, don't let the user select it

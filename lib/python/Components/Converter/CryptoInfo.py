@@ -51,7 +51,7 @@ class CryptoInfo(Poll, Converter):
 										ecm_time = ecm_info.get("ecm time", "")
 									else:
 										ecm_time = ecm_info.get("ecm time", "").replace(".", "").lstrip("0") + " msec"
-										
+
 									#from (oscam)
 									from_item = ecm_info.get("from", "")
 									from_splitted = from_item.split(":")

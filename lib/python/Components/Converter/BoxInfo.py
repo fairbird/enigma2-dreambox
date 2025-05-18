@@ -32,7 +32,7 @@ import os
 
 class BoxInfo(Poll, Converter, object):
 	Boxtype = 0
-	CpuInfo = 1	
+	CpuInfo = 1
 	HddTemp = 2
 	TempInfo = 3
 	FanInfo = 4
@@ -62,7 +62,7 @@ class BoxInfo(Poll, Converter, object):
 		'TimeInfo': self.TimeInfo,
 		'TimeInfo2': self.TimeInfo2,
 		'TimeInfo3': self.TimeInfo3,
-		'TimeInfo4': self.TimeInfo4}[type]		
+		'TimeInfo4': self.TimeInfo4}[type]
 
 	def imageinfo(self):
 		imageinfo = ''
@@ -76,7 +76,7 @@ class BoxInfo(Poll, Converter, object):
 			imageinfo = '/var/opkg/status'
 		return imageinfo
 
-	@cached	
+	@cached
 	def getText(self):
 		if self.type == self.Boxtype:
 			box = software = ''
@@ -139,7 +139,7 @@ class BoxInfo(Poll, Converter, object):
 							cpu_speed = "%s" % str(int(binascii.hexlify(clockfrequency), 16) / 1000000)
 						except:
 							cpu_speed = '-'
-				if cpu_info == '': 
+				if cpu_info == '':
 					return _('%s, %s MHz (%d %s)') % (info, cpu_speed, cpu_count, cpu_count > 1 and cores or core)
 			else:
 				return _('No info')
@@ -214,7 +214,7 @@ class BoxInfo(Poll, Converter, object):
 				if len(uptime) > 0 or minutes > 0:
 					uptime += str(minutes) + ' ' + (minutes == 1 and _('minute') or _('minutes'))
 				return _('Time working: %s') % uptime
-	
+
 		elif self.type == self.CpuLoad:
 			info = ''
 			try:
@@ -247,14 +247,14 @@ class BoxInfo(Poll, Converter, object):
 			except:
 				return ''
 
-		elif self.type == self.SkinInfo:			
+		elif self.type == self.SkinInfo:
 			if fileExists('/etc/enigma2/settings'):
 				try:
 					for line in open('/etc/enigma2/settings'):
 						if 'config.skin.primary_skin' in line:
 							return (_('Skin: ')) + line.replace('/skin.xml', ' ').split('=')[1]
 				except:
-					return				
+					return
 
 		elif self.type == self.TimeInfo:
 			if not config.timezone.val.value.startswith('(GMT)'):
@@ -279,5 +279,5 @@ class BoxInfo(Poll, Converter, object):
 				return (_('Part~of~the~light: ')) + config.timezone.area.value[0:12]
 			else:
 				return '+0'
-				
+
 	text = property(getText)
