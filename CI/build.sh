@@ -4,8 +4,8 @@
 # You're not allowed to remove my copyright or reuse this script without putting this header.
 
 setup_git() {
-  git config --global user.email "atef_anim_1974@yahoo.com"
-  git config --global user.name "atefganm"
+  git config --global user.email "rrrr53@hotmail.com"
+  git config --global user.name "fairbird"
 }
 
 commit_files() {
