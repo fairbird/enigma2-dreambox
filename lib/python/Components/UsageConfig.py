@@ -13,7 +13,9 @@ from Components.SystemInfo import BoxInfo
 from skin import getcomponentTemplateNames, parameters, domScreens
 from os import makedirs, unlink
 from os.path import exists, isfile, join as pathjoin, normpath
-import os, time, locale
+import os
+import time
+import locale
 from boxbranding import getDisplayType
 
 displaytype = getDisplayType()
