@@ -782,7 +782,7 @@ class PluginBrowserNew(Screen):
 			self.session.open(MessageBox, text=text, type=MessageBox.TYPE_WARNING)
 
 	def setIcons(self):
-		for x,elem in enumerate(self.plugins):
+		for x, elem in enumerate(self.plugins):
 			x += 1
 			icon = elem[3] or LoadPixmap(resolveFilename(SCOPE_CURRENT_SKIN, "icons/plugin.png"))
 			self['icon_' + str(x)].instance.setScale(1)

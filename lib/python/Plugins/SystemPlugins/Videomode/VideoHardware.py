@@ -161,7 +161,7 @@ class VideoHardware:
 						aspect_str = open("/sys/class/video/screen_mode", "r").read()
 					except IOError:
 						print("[VideoHardware] Read /sys/class/video/screen_mode failed!")
-				if aspect_str == "1": # 4:3
+				if aspect_str == "1":  # 4:3
 					ret = (4, 3)
 			else:  # 4:3
 				ret = (4, 3)

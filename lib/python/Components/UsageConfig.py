@@ -242,7 +242,7 @@ def InitUsageConfig():
 	config.usage.show_infobar_locked_on_pause = ConfigYesNo(default=True)
 	config.usage.show_infobar_on_event_change = ConfigYesNo(default=False)
 	config.usage.show_second_infobar = ConfigSelection(default="0", choices=[("no", _("None"))] + choicelist + [("EPG", _("EPG"))])
-	config.usage.showInfoBarSubservices = ConfigSelection(default=1, choices=[(0, _("Off")),(1, _("If EPG available")),(2, _("Always"))])
+	config.usage.showInfoBarSubservices = ConfigSelection(default=1, choices=[(0, _("Off")), (1, _("If EPG available")), (2, _("Always"))])
 	config.usage.show_simple_second_infobar = ConfigYesNo(default=False)
 	config.usage.show_infobar_adds = ConfigYesNo(default=False)
 	config.usage.infobar_frontend_source = ConfigSelection(default="settings", choices=[("settings", _("Settings")), ("tuner", _("Tuner"))])
@@ -1216,16 +1216,16 @@ def InitUsageConfig():
 				hddchoises.append((p.mountpoint, d))
 	config.misc.epgcachepath = ConfigSelection(default='/etc/enigma2/', choices=hddchoises)
 	config.misc.epgcachefilename = ConfigText(default='epg', fixed_size=False)
-	config.misc.epgcache_filename = ConfigText(default=(config.misc.epgcachepath.value + config.misc.epgcachefilename.value.replace('.dat','') + '.dat'))
+	config.misc.epgcache_filename = ConfigText(default=(config.misc.epgcachepath.value + config.misc.epgcachefilename.value.replace('.dat', '') + '.dat'))
 	def EpgCacheChanged(configElement):
-		config.misc.epgcache_filename.setValue(pathjoin(config.misc.epgcachepath.value, config.misc.epgcachefilename.value.replace('.dat','') + '.dat'))
+		config.misc.epgcache_filename.setValue(pathjoin(config.misc.epgcachepath.value, config.misc.epgcachefilename.value.replace('.dat', '') + '.dat'))
 		config.misc.epgcache_filename.save()
 		eEPGCache.getInstance().setCacheFile(config.misc.epgcache_filename.value)
 		epgcache = eEPGCache.getInstance()
 		epgcache.save()
 		if not config.misc.epgcache_filename.value.startswith("/etc/enigma2/"):
-			if exists('/etc/enigma2/' + config.misc.epgcachefilename.value.replace('.dat','') + '.dat'):
-				os.remove('/etc/enigma2/' + config.misc.epgcachefilename.value.replace('.dat','') + '.dat')
+			if exists('/etc/enigma2/' + config.misc.epgcachefilename.value.replace('.dat', '') + '.dat'):
+				os.remove('/etc/enigma2/' + config.misc.epgcachefilename.value.replace('.dat', '') + '.dat')
 	config.misc.epgcachepath.addNotifier(EpgCacheChanged, immediate_feedback=False)
 	config.misc.epgcachefilename.addNotifier(EpgCacheChanged, immediate_feedback=False)
 
@@ -1488,7 +1488,7 @@ def InitUsageConfig():
 		config.misc.zapmode.addNotifier(setZapmode, immediate_feedback=False)
 
 	config.usage.historymode = ConfigSelection(default='1', choices=[('0', _('Just zap')), ('1', _('Show menu'))])
-	config.usage.zapHistorySort = ConfigSelection(default=0, choices=[(0, _("Most recent first")),(1, _("Most recent last"))])
+	config.usage.zapHistorySort = ConfigSelection(default=0, choices=[(0, _("Most recent first")), (1, _("Most recent last"))])
 
 	if not BoxInfo.getItem("ZapMode") and exists("/proc/stb/info/model"):
 		def setZapmodeDM(el):

@@ -106,16 +106,16 @@ class PiconLocator:
 			#fallback to 1 for TV services with non-standard service types
 			fields[2] = "1"
 			pngname = self.findPicon("_".join(fields))
-		if not pngname: # picon by channel name
+		if not pngname:  # picon by channel name
 			if (sname := ServiceReference(serviceName).getServiceName()) and "SID 0x" not in sname and (utf8_name := sanitizeFilename(sname).lower()) and utf8_name != "__":  # avoid lookups on zero length service names
 				legacy_name = sub("[^a-z0-9]", "", utf8_name.replace("&", "and").replace("+", "plus").replace("*", "star"))  # legacy ascii service name picons
 				pngname = self.findPicon(utf8_name) or legacy_name and self.findPicon(legacy_name) or self.findPicon(sub(r"(fhd|uhd|hd|sd|4k)$", "", utf8_name).strip()) or legacy_name and self.findPicon(sub(r"(fhd|uhd|hd|sd|4k)$", "", legacy_name).strip())
 				if not pngname and len(legacy_name) > 6:
 					series = sub(r"s[0-9]*e[0-9]*$", "", legacy_name)
 					pngname = self.findPicon(series)
-		if not pngname: # picon default
-			tmp = resolveFilename(SCOPE_CURRENT_SKIN, "picon_default.png") # picon_default in current active skin
-			tmp2 = self.findPicon("picon_default") # picon_default in picon folder
+		if not pngname:  # picon default
+			tmp = resolveFilename(SCOPE_CURRENT_SKIN, "picon_default.png")  # picon_default in current active skin
+			tmp2 = self.findPicon("picon_default")  # picon_default in picon folder
 			if exists(tmp2):
 				pngname = tmp2
 			else:
@@ -164,9 +164,9 @@ class Picon(Renderer):
 		if self.instance:
 			if what[0] in (self.CHANGED_DEFAULT, self.CHANGED_ALL, self.CHANGED_SPECIFIC):
 				pngname = piconLocator.getPiconName(self.source.text)
-				if not exists(pngname): # no picon for service found
+				if not exists(pngname):  # no picon for service found
 					pngname = self.defaultpngname
-				if not config.usage.showpicon.value: # disabe picon on infobar
+				if not config.usage.showpicon.value:  # disabe picon on infobar
 					pngname = self.defaultpngname
 				if self.pngname != pngname:
 					if pngname:

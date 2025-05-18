@@ -351,7 +351,7 @@ class CaidInfo2(Poll, Converter, object):
 				ecm_info = self.ecmfile()
 				if fileExists("/tmp/ecm.info"):
 					try:
-						caid = "%0.4X" % int(ecm_info.get("caid", ""),16)
+						caid = "%0.4X" % int(ecm_info.get("caid", ""), 16)
 						return "%s" % self.systemCaids.get(caid[:2])
 					except:
 						return '----'
@@ -526,7 +526,7 @@ class CaidInfo2(Poll, Converter, object):
 					return info
 				old_ecm_mtime = ecm_mtime
 				#ecmf = open("/tmp/ecm.info", "rb")
-				ecmf = open("/tmp/ecm.info", "r") # Fix Python3 (TypeError: a bytes-like object is required, not 'str' )
+				ecmf = open("/tmp/ecm.info", "r")  # Fix Python3 (TypeError: a bytes-like object is required, not 'str' )
 				ecm = ecmf.readlines()
 			except:
 				old_ecm_mtime = None

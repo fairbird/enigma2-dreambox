@@ -262,7 +262,7 @@ class TimerEditList(Screen):
 		self.list.extend([(timer, False) for timer in self.session.nav.RecordTimer.timer_list])
 		self.list.extend([(timer, True) for timer in self.session.nav.RecordTimer.processed_timers])
 
-		if config.usage.timerlist_finished_timer_position.index: #end of list
+		if config.usage.timerlist_finished_timer_position.index:  # end of list
 			self.list.sort(key=functools.cmp_to_key(eol_compare))
 		else:
 			self.list.sort(key=lambda x: x[0].begin)
@@ -425,7 +425,7 @@ class TimerSanityConflict(Screen):
 		for x in timer:
 			self.list.append((timer[count], False))
 			count += 1
-		warning_color = "\c00ffff00" # yellow
+		warning_color = "\c00ffff00"  # yellow
 		title_text = count == 1 and warning_color + _("Channel not in services list") or warning_color + _("Timer sanity error")
 		self.setTitle(title_text)
 

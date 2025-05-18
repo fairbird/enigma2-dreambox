@@ -45,7 +45,7 @@ class EPGSelection(Screen, HelpableScreen):
 		HelpableScreen.__init__(self)
 		self.bouquetChangeCB = bouquetChangeCB
 		self.serviceChangeCB = serviceChangeCB
-		self.ask_time = -1 #now
+		self.ask_time = -1  # now
 		self["key_red"] = StaticText("")
 		self["key_menu"] = StaticText(_("MENU"))
 		self["key_info"] = StaticText(_("INFO"))
@@ -122,10 +122,10 @@ class EPGSelection(Screen, HelpableScreen):
 				"blue": self.blueButtonPressed,
 				"info": self.infoKeyPressed,
 				"menu": self.furtherOptions,
-				"nextBouquet": self.nextBouquet, # just used in multi epg yet
-				"prevBouquet": self.prevBouquet, # just used in multi epg yet
-				"nextService": self.nextService, # just used in single epg yet
-				"prevService": self.prevService, # just used in single epg yet
+				"nextBouquet": self.nextBouquet,  # just used in multi epg yet
+				"prevBouquet": self.prevBouquet,  # just used in multi epg yet
+				"nextService": self.nextService,  # just used in single epg yet
+				"prevService": self.prevService,  # just used in single epg yet
 				"preview": self.eventPreview,
 			})
 		self["EPGFilterActions"] = HelpableActionMap(self, ["EPGFilterActions"],

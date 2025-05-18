@@ -40,7 +40,7 @@ class HelpMenuList(GUIComponent):
 					if name is None:
 						continue
 
-					if flags & 8: # for long keypresses, prepend l_ into the key name.
+					if flags & 8:  # for long keypresses, prepend l_ into the key name.
 						name = (name[0], "long")
 
 					entry = [(actionmap, context, action, name)]

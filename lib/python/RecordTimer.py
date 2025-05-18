@@ -133,7 +133,7 @@ class RecordTimerEntry(timer.TimerEntry):
 			print("RecordTimer.staticGotRecordEvent(iRecordableService.evEnd)")
 			if not checkForRecordings():
 				print("No recordings busy of sceduled within 6 minutes so shutdown")
-				RecordTimerEntry.shutdown() # immediate shutdown
+				RecordTimerEntry.shutdown()  # immediate shutdown
 		elif event == iRecordableService.evStart:
 			print("RecordTimer.staticGotRecordEvent(iRecordableService.evStart)")
 
@@ -187,7 +187,7 @@ class RecordTimerEntry(timer.TimerEntry):
 		self.dirname = dirname
 		self.dirnameHadToFallback = False
 		self.autoincrease = False
-		self.autoincreasetime = 3600 * 24 # 1 day
+		self.autoincreasetime = 3600 * 24  # 1 day
 		self.tags = tags or []
 		self.descramble = descramble
 		self.record_ecm = record_ecm
@@ -247,7 +247,7 @@ class RecordTimerEntry(timer.TimerEntry):
 			elif config.recording.filename_composition.value == "long":
 				filename += " - " + name + " - " + self.description
 			else:
-				filename += " - " + name # standard
+				filename += " - " + name  # standard
 
 		if config.recording.ascii_filenames.value:
 			filename = legacyEncode(filename)
@@ -464,7 +464,7 @@ class RecordTimerEntry(timer.TimerEntry):
 					elif not config.recording.asktozap.value:
 						self.log(8, "asking user to zap away")
 						AddNotificationWithCallback(self.failureCB, MessageBox, _("A timer failed to record!\nDisable TV and try again?\n"), timeout=20, default=True)
-					else: # zap without asking
+					else:  # zap without asking
 						self.log(9, "zap without asking")
 						AddNotification(MessageBox, _("In order to record a timer, the TV was switched to the recording service!\n"), type=MessageBox.TYPE_INFO, timeout=20)
 						self.setRecordingPreferredTuner()
@@ -555,7 +555,7 @@ class RecordTimerEntry(timer.TimerEntry):
 			else:
 				if RecordTimerEntry.wasInDeepStandby:
 					RecordTimerEntry.keypress()
-					if Screens.Standby.inStandby: #In case some plugin did put the receiver already in standby
+					if Screens.Standby.inStandby:  # In case some plugin did put the receiver already in standby
 						config.misc.standbyCounter.value = 0
 					else:
 						AddNotification(Screens.Standby.Standby, StandbyCounterIncrease=False)
@@ -1254,7 +1254,7 @@ class RecordTimer(timer.Timer):
 		return self.timer_list + self.fallback_timer_list
 
 	def getDisabledTimers(self):
-		return self.processed_timers # TODO add  fallback processed timers too
+		return self.processed_timers  # TODO add  fallback processed timers too
 
 	def isInTimer(self, eventid, begin, duration, service, disabledTimers=False):
 		returnValue = None

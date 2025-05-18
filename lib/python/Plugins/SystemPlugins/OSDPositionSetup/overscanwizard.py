@@ -129,7 +129,7 @@ class OverscanWizard(ConfigListScreen, Screen):
 			config.skin.primary_skin.value = "PLi-HD/skin.xml"
 			config.save()
 			self["introduction"].setText(_("The user interface of the receiver will now restart to select the selected skin"))
-			quitMainloop(3) # Restart
+			quitMainloop(3)  # Restart
 		self["config"].list = self.list
 		if self["config"].instance:
 			self.__layoutFinished()
