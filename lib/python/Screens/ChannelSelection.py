@@ -3056,7 +3056,7 @@ class SimpleChannelSelection(ChannelSelectionBase, SelectionEventInfo):
 		self.showFavourites()
 
 	def toggleTVRadio(self):
-		if self.mode == MODE_TV :
+		if self.mode == MODE_TV:
 			self.setModeRadio()
 		else:
 			self.setModeTv()
