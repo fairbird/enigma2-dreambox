@@ -1,8 +1,9 @@
+# -*- coding: utf-8 -*-
 from os import remove
 from os.path import exists
 from time import ctime, time
 
-from enigma import eServiceCenter, eServiceReference, eTimer, getBestPlayableServiceReference, iPlayableService, iServiceInformation, iRecordableServicePtr, pNavigation, eStreamServer
+from enigma import eServiceCenter, eServiceReference, eTimer, getBestPlayableServiceReference, iPlayableService, iServiceInformation, iRecordableService, iRecordableServicePtr, pNavigation, eStreamServer
 
 import NavigationInstance
 import RecordTimer
@@ -44,9 +45,14 @@ class Navigation:
 			raise NavigationInstance.instance
 		NavigationInstance.instance = self  # This is needed to prevent circular imports
 		self.ServiceHandler = eServiceCenter.getInstance()
+		self.activeStreamings = []
+		self.indicatorRecordingsCount = None
+		self.anyRecordingsCount = None
+		self.realRecordingsCount = None
 		self.pnav = pNavigation()
 		self.pnav.m_event.get().append(self.dispatchEvent)
 		self.pnav.m_record_event.get().append(self.dispatchRecordEvent)
+		eStreamServer.getInstance().streamStatusChanged.get().append(self.streamStatusChangedCB)
 		self.event = []
 		self.record_event = []
 		self.currentBouquetName = ""
@@ -283,6 +289,9 @@ class Navigation:
 
 	def dispatchRecordEvent(self, rec_service, event):
 		# print(f"[Navigation] Record_event {rec_service}, {event}.")
+		self.anyRecordingsCount = None
+		self.indicatorRecordingsCount = None
+		self.realRecordingsCount = None
 		for x in self.record_event:
 			x(rec_service, event)
 
@@ -495,6 +504,20 @@ class Navigation:
 		if service and isinstance(service, iRecordableServicePtr):
 			ret = self.pnav and self.pnav.stopRecordService(service)
 		return ret
+
+	def streamStatusChangedCB(self, status, sref):
+		recService = iRecordableServicePtr()  # This is only a dummy variable
+		if status == 0:
+			self.activeStreamings = [recService]  # TODO: Check if this is correct. Add support for multiple streams.
+		else:
+			self.activeStreamings = []
+
+		self.anyRecordingsCount = None
+		self.indicatorRecordingsCount = None
+		self.realRecordingsCount = None
+
+		for x in self.record_event:
+			x(recService, iRecordableService.evStart if status == 0 else iRecordableService.evEnd)
 
 	def getRecordings(self, simulate=False, type=pNavigation.isAnyRecording):
 		return self.pnav and self.pnav.getRecordings(simulate, type)
