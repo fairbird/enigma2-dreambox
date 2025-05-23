@@ -145,6 +145,7 @@ def isFullHD():
     desktopSize = getDesktopSize()
     return desktopSize[0] == 1920
 
+
 class PluginBrowserSummary(Screen):
 	def __init__(self, session, parent):
 		Screen.__init__(self, session, parent=parent)
