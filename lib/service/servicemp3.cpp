@@ -3372,7 +3372,6 @@ void eServiceMP3::pullSubtitle(GstBuffer *buffer)
 			{
 				uint8_t *data = map.data;
 				m_dvb_subtitle_parser->processBuffer(data, len, buf_pos / 1000000ULL);
-			} 
 			}
 			else if (subType < stVOB)
 			{
