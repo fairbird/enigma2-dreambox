@@ -4513,4 +4513,4 @@ class InfoBarHandleBsod:
 					self.bsodTimer.start(5000, True)
 					bsodTimeoutCallback(False)
 					raise
-			self.bsodCount = bsodOccurencesconfig.av
+			self.bsodCount = bsodOccurences
