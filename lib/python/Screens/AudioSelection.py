@@ -482,8 +482,11 @@ class AudioSelection(ConfigListScreen, Screen):
 		if isinstance(track, int):
 			ref = self.session.nav.getCurrentlyPlayingServiceReference()
 			#ref = ref and eServiceReference(ref.toString())
-			if self.session.nav.getCurrentService().audioTracks().getNumberOfTracks() > track:
+			service = self.session.nav.getCurrentService()
+			if service.audioTracks().getNumberOfTracks() > track:
 				self.audioTracks.selectTrack(track)
+				if self.session.nav.isCurrentServiceIPTV():
+					eDVBDB.getInstance().saveIptvServicelist()
 				if isIPTV(ref):
 					self.saveAVDict()
 
@@ -590,6 +593,8 @@ class AudioSelection(ConfigListScreen, Screen):
 				else:
 					self.enableSubtitle(cur[0][:5])
 					self.__updatedInfo()
+				if self.session.nav.isCurrentServiceIPTV():
+					eDVBDB.getInstance().saveIptvServicelist()
 				if isIPTV(ref):
 					self.saveAVDict()
 			self.close(0)
