@@ -543,60 +543,60 @@ class PluginBrowserNew(Screen):
 			# plugins icon size
 			iconsize = "250,250"
 			# screen
-			positionx=0
-			positiony=0
-			sizex=1920
-			sizey=1080
+			positionx = 0
+			positiony = 0
+			sizex = 1920
+			sizey = 1080
 			# Title
-			positionx1=50
-			positiony1=12
-			sizex1=900
-			sizey1=100
-			font1=75
+			positionx1 = 50
+			positiony1 = 12
+			sizex1 = 900
+			sizey1 = 100
+			font1 = 75
 			# plugin_description
-			positionx2=50
-			positiony2=105
-			sizex2=900
-			sizey2=100
-			font2=40
+			positionx2 = 50
+			positiony2 = 105
+			sizex2 = 900
+			sizey2 = 100
+			font2 = 40
 			# Time
-			positionx3=1617
-			positiony3=12
-			sizex3=273
-			sizey3=100
-			font3=80
+			positionx3 = 1617
+			positiony3 = 12
+			sizex3 = 273
+			sizey3 = 100
+			font3 = 80
 			# Date
-			positionx4=1128
-			positiony4=105
-			sizex4=762
-			sizey4=50
-			font4=40
+			positionx4 = 1128
+			positiony4 = 105
+			sizex4 = 762
+			sizey4 = 50
+			font4 = 40
 			# pages
-			positionx5=1683
-			positiony5=975
-			sizex5=220
-			sizey5=85
-			font5=40
+			positionx5 = 1683
+			positiony5 = 975
+			sizex5 = 220
+			sizey5 = 85
+			font5 = 40
 			# keys eLabel
-			eLabelx1=67
-			eLabely1=1065
-			eLabelx2=393
-			eLabely2=1065
-			eLabelx3=719
-			eLabely3=1065
-			eLabelx4=1045
-			eLabely4=1065
-			eLabel1ysizex=300
-			eLabel1ysizey=8
+			eLabelx1 = 67
+			eLabely1 = 1065
+			eLabelx2 = 393
+			eLabely2 = 1065
+			eLabelx3 = 719
+			eLabely3 = 1065
+			eLabelx4 = 1045
+			eLabely4 = 1065
+			eLabel1ysizex = 300
+			eLabel1ysizey = 8
 			# keys function
-			positionxkey1=67
-			positionxkey2=393
-			positionxkey3=719
-			positionxkey4=1045
-			positionykey=1013
-			sizekeysx=300
-			sizekeysy=50
-			fontkey=32
+			positionxkey1 = 67
+			positionxkey2 = 393
+			positionxkey3 = 719
+			positionxkey4 = 1045
+			positionykey = 1013
+			sizekeysx = 300
+			sizekeysy = 50
+			fontkey = 32
 		else:
 			# panel backgroundColor
 			backgroundColor = self.backgroundColor
@@ -613,60 +613,60 @@ class PluginBrowserNew(Screen):
 			# plugins icon size
 			iconsize = "150,150"
 			# screen
-			positionx=0
-			positiony=0
-			sizex=1280
-			sizey=720
+			positionx = 0
+			positiony = 0
+			sizex = 1280
+			sizey = 720
 			# Title
-			positionx1=20
-			positiony1=12
-			sizex1=563
-			sizey1=45
-			font1=40
+			positionx1 = 20
+			positiony1 = 12
+			sizex1 = 563
+			sizey1 = 45
+			font1 = 40
 			# plugin_description
-			positionx2=20
-			positiony2=60
-			sizex2=567
-			sizey2=32
-			font2=28
+			positionx2 = 20
+			positiony2 = 60
+			sizex2 = 567
+			sizey2 = 32
+			font2 = 28
 			# Time
-			positionx3=1000
-			positiony3=12
-			sizex3=273
-			sizey3=100
-			font3=50
+			positionx3 = 1000
+			positiony3 = 12
+			sizex3 = 273
+			sizey3 = 100
+			font3 = 50
 			# Date
-			positionx4=813
-			positiony4=60
-			sizex4=462
-			sizey4=32
-			font4=28
+			positionx4 = 813
+			positiony4 = 60
+			sizex4 = 462
+			sizey4 = 32
+			font4 = 28
 			# pages
-			positionx5=1130
-			positiony5=655
-			sizex5=160
-			sizey5=50
-			font5=27
+			positionx5 = 1130
+			positiony5 = 655
+			sizex5 = 160
+			sizey5 = 50
+			font5 = 27
 			# keys eLabel
-			eLabelx1=67
-			eLabely1=712
-			eLabelx2=293
-			eLabely2=712
-			eLabelx3=519
-			eLabely3=712
-			eLabelx4=750
-			eLabely4=712
-			eLabel1ysizex=200
-			eLabel1ysizey=5
+			eLabelx1 = 67
+			eLabely1 = 712
+			eLabelx2 = 293
+			eLabely2 = 712
+			eLabelx3 = 519
+			eLabely3 = 712
+			eLabelx4 = 750
+			eLabely4 = 712
+			eLabel1ysizex = 200
+			eLabel1ysizey = 5
 			# keys function
-			positionxkey1=67
-			positionxkey2=293
-			positionxkey3=519
-			positionxkey4=750
-			positionykey=677
-			sizekeysx=200
-			sizekeysy=35
-			fontkey=28
+			positionxkey1 = 67
+			positionxkey2 = 293
+			positionxkey3 = 519
+			positionxkey4 = 750
+			positionykey = 677
+			sizekeysx = 200
+			sizekeysy = 35
+			fontkey = 28
 		posx = posxstart
 		posy = posystart
 		list_dummy = []
@@ -696,22 +696,22 @@ class PluginBrowserNew(Screen):
 			x += 1
 			count += 1
 			if isFullHD():
-				skincontent += '<widget backgroundColor="'+self.primaryColor+'" name="plugin_' + str(x) + '" position="' + str(posx) + ',' + str(posy) + '" size="' + iconsize + '" />'
-				skincontent += '<widget foregroundColor="'+self.primaryColorLabel+'" name="label_'+str(x)+'" position="'+str(posx+10)+','+str(posy+139)+'" size="220,84" zPosition="3" font="Regular;32" horizontalAlignment="center" verticalAlignment="center" transparent="1" />'
-				skincontent += '<widget  name="icon_'+str(x)+'" position="'+str(posx+30)+','+str(posy+40)+'" size="180,80" zPosition="3" alphaTest="on" transparent="1" />'
+				skincontent += '<widget backgroundColor="' + self.primaryColor + '" name="plugin_' + str(x) + '" position="' + str(posx) + ',' + str(posy) + '" size="' + iconsize + '" />'
+				skincontent += '<widget foregroundColor="' + self.primaryColorLabel + '" name="label_' + str(x) + '" position="' + str(posx + 10) + ',' + str(posy + 139) + '" size="220,84" zPosition="3" font="Regular;32" horizontalAlignment="center" verticalAlignment="center" transparent="1" />'
+				skincontent += '<widget  name="icon_' + str(x) + '" position="' + str(posx + 30) + ',' + str(posy + 40) + '" size="180,80" zPosition="3" alphaTest="on" transparent="1" />'
 			else:
-				skincontent += '<widget backgroundColor="'+self.primaryColor+'" name="plugin_' + str(x) + '" position="' + str(posx) + ',' + str(posy) + '" size="' + iconsize + '" />'
-				skincontent += '<widget foregroundColor="'+self.primaryColorLabel+'" name="label_'+str(x)+'" position="'+str(posx)+','+str(posy+20)+'" size="150,65" zPosition="3" font="Regular;22" horizontalAlignment="center" verticalAlignment="center" transparent="1" />'
-				skincontent += '<widget  name="icon_'+str(x)+'" position="'+str(posx+10)+','+str(posy+20)+'" size="150,50" zPosition="3" alphaTest="on" transparent="1" />'
+				skincontent += '<widget backgroundColor="' + self.primaryColor + '" name="plugin_' + str(x) + '" position="' + str(posx) + ',' + str(posy) + '" size="' + iconsize + '" />'
+				skincontent += '<widget foregroundColor="' + self.primaryColorLabel + '" name="label_' + str(x) + '" position="' + str(posx) + ',' + str(posy + 20) + '" size="150,65" zPosition="3" font="Regular;22" horizontalAlignment="center" verticalAlignment="center" transparent="1" />'
+				skincontent += '<widget  name="icon_' + str(x) + '" position="' + str(posx + 10) + ',' + str(posy + 20) + '" size="150,50" zPosition="3" alphaTest="on" transparent="1" />'
 			self.plugins_pos.append((posx, posy))
 			self.plugins.append((p.name, p.description, p, p.icon))
-			self["plugin_"+str(x)] = Label()
-			self["label_"+str(x)] = Label()
-			self["icon_"+str(x)] = Pixmap()
-			self["label_"+str(x)].setText(p.name)
+			self["plugin_" + str(x)] = Label()
+			self["label_" + str(x)] = Label()
+			self["icon_" + str(x)] = Pixmap()
+			self["label_" + str(x)].setText(p.name)
 			posx += posxplus
 			list_dummy.append(x)
-			if len(list_dummy)==7:
+			if len(list_dummy) == 7:
 				list_dummy[:] = []
 				posx = posxstart
 				posy += posyplus
@@ -722,11 +722,11 @@ class PluginBrowserNew(Screen):
 
 		skin += skincontent
 		skin += '</screen>'
-		self.total_pages = int(math.ceil(float(len(self.plugins))/21))
+		self.total_pages = int(math.ceil(float(len(self.plugins)) / 21))
 		count = 1
 		counting = 1
 		list_dummy = []
-		for x in range(1, len(self.plugins)+1):
+		for x in range(1, len(self.plugins) + 1):
 			if count == 21:
 				count += 1
 				counting += 1
@@ -738,7 +738,7 @@ class PluginBrowserNew(Screen):
 				count += 1
 				counting += 1
 				list_dummy.append(x)
-				if int(counting) == len(self.plugins)+1:
+				if int(counting) == len(self.plugins) + 1:
 					self.mainlist.append(list_dummy)
 		return skin
 
@@ -786,39 +786,39 @@ class PluginBrowserNew(Screen):
 		for x,elem in enumerate(self.plugins):
 			x += 1
 			icon = elem[3] or LoadPixmap(resolveFilename(SCOPE_CURRENT_SKIN, "icons/plugin.png"))
-			self['icon_'+str(x)].instance.setScale(1)
-			self['icon_'+str(x)].instance.setPixmap(icon)
+			self['icon_' + str(x)].instance.setScale(1)
+			self['icon_' + str(x)].instance.setPixmap(icon)
 
 	def activeBox(self):
 		for index, plugin in enumerate(self.plugins):
 			index += 1
-			if index == self.current+1:
+			if index == self.current + 1:
 				self["plugin_description"].setText(plugin[1])
 				pos = self.plugins_pos[self.current]
 				if isFullHD():
-					self["plugin_"+str(index)].instance.resize(eSize(270, 270))
-					self["plugin_" +str(index)].instance.move(ePoint(pos[0]-10, pos[1]-10))
-					self["label_" +str(index)].instance.move(ePoint(pos[0]+10, pos[1]+155))
+					self["plugin_" + str(index)].instance.resize(eSize(270, 270))
+					self["plugin_" + str(index)].instance.move(ePoint(pos[0] - 10, pos[1] - 10))
+					self["label_" + str(index)].instance.move(ePoint(pos[0] + 10, pos[1] + 155))
 				else:
-					self["plugin_"+str(index)].instance.resize(eSize(190, 190))
-					self["plugin_" +str(index)].instance.move(ePoint(pos[0]-10, pos[1]-10))
-					self["label_" +str(index)].instance.move(ePoint(pos[0]+5, pos[1]+110))
+					self["plugin_" + str(index)].instance.resize(eSize(190, 190))
+					self["plugin_" + str(index)].instance.move(ePoint(pos[0] - 10, pos[1] - 10))
+					self["label_" + str(index)].instance.move(ePoint(pos[0] + 5, pos[1] + 110))
 				self["plugin_" + str(index)].instance.setBackgroundColor(parseColor(self.secondaryColor))
-				self["plugin_"+str(index)].instance.invalidate()
+				self["plugin_" + str(index)].instance.invalidate()
 				self["label_" + str(index)].instance.setBackgroundColor(parseColor(self.secondaryColor))
-				self["label_"+str(index)].instance.setForegroundColor(parseColor(self.secondaryColorLabel))
+				self["label_" + str(index)].instance.setForegroundColor(parseColor(self.secondaryColorLabel))
 			else:
-				pos = self.plugins_pos[index-1]
+				pos = self.plugins_pos[index - 1]
 				if isFullHD():
-					self["plugin_"+str(index)].instance.resize(eSize(250, 250))
-					self["plugin_"+str(index)].instance.move(ePoint(pos[0], pos[1]))
-					self["label_" +str(index)].instance.move(ePoint(pos[0]+10, pos[1]+139))
+					self["plugin_" + str(index)].instance.resize(eSize(250, 250))
+					self["plugin_" + str(index)].instance.move(ePoint(pos[0], pos[1]))
+					self["label_" + str(index)].instance.move(ePoint(pos[0] + 10, pos[1] + 139))
 				else:
-					self["plugin_"+str(index)].instance.resize(eSize(170, 170))
-					self["plugin_"+str(index)].instance.move(ePoint(pos[0], pos[1]))
-					self["label_" +str(index)].instance.move(ePoint(pos[0]+10, pos[1]+90))
+					self["plugin_" + str(index)].instance.resize(eSize(170, 170))
+					self["plugin_" + str(index)].instance.move(ePoint(pos[0], pos[1]))
+					self["label_" + str(index)].instance.move(ePoint(pos[0] + 10, pos[1] + 90))
 				self["plugin_" + str(index)].instance.setBackgroundColor(parseColor(self.primaryColor))
-				self["plugin_"+str(index)].instance.invalidate()
+				self["plugin_" + str(index)].instance.invalidate()
 				self["label_" + str(index)].instance.setBackgroundColor(parseColor(self.primaryColor))
 				self["label_" + str(index)].instance.setForegroundColor(parseColor(self.primaryColorLabel))
 		self.selectionChanged()
@@ -841,7 +841,7 @@ class PluginBrowserNew(Screen):
 		plugin(session=self.session)
 
 	def currentPage(self):
-		self['pages'].setText("Page {}/{}".format(self.current_page+1, self.total_pages))
+		self['pages'].setText("Page {}/{}".format(self.current_page + 1, self.total_pages))
 
 	def keyRight(self):
 		self.move(1, 'forward')
@@ -856,15 +856,15 @@ class PluginBrowserNew(Screen):
 		self.move(7, 'backwards')
 
 	def move(self, step, direction):
-		ls = [elem for elem in range(1, len(self.plugins_pos)+1)]
+		ls = [elem for elem in range(1, len(self.plugins_pos) + 1)]
 		if direction == 'backwards':
 			self.current -= step
 		else:
 			self.current += step
-		if self.current > (len(ls)-1):
+		if self.current > (len(ls) - 1):
 			self.current = 0
 		if self.current < 0:
-			self.current = len(ls)-1
+			self.current = len(ls) - 1
 		for i in range(self.total_pages):
 			if ls[self.current] in self.mainlist[i]:
 				self.current_page = i
@@ -874,14 +874,14 @@ class PluginBrowserNew(Screen):
 		for i in range(self.total_pages):
 			if i != self.current_page:
 				for x in self.mainlist[i]:
-					self["plugin_"+str(x)].hide()
-					self["label_"+str(x)].hide()
-					self['icon_'+str(x)].hide()
+					self["plugin_" + str(x)].hide()
+					self["label_" + str(x)].hide()
+					self['icon_' + str(x)].hide()
 			else:
 				for x in self.mainlist[i]:
-					self["plugin_"+str(x)].show()
-					self["label_"+str(x)].show()
-					self["icon_"+str(x)].show()
+					self["plugin_" + str(x)].show()
+					self["label_" + str(x)].show()
+					self["icon_" + str(x)].show()
 
 	def updateList(self, showHelp=False):
 		self.list = []
