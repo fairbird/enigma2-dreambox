@@ -983,6 +983,8 @@ public:
 
 		evFccFailed,
 
+		evGstreamerStart,
+
 		evUser = 0x100
 	};
 };
