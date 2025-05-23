@@ -2501,6 +2501,7 @@ void eServiceMP3::gstBusCall(GstMessage *msg)
 						configvalue = eSettings::audio_autoselect4;
 						if (configvalue != "")
 							autoaudio_languages.push_back(configvalue);
+
 						for (unsigned int i = 0; i < m_audioStreams.size(); i++)
 						{
 							if (!m_audioStreams[i].language_code.empty())
@@ -2517,6 +2518,7 @@ void eServiceMP3::gstBusCall(GstMessage *msg)
 								}
 							}
 						}
+
 						if (autoaudio)
 							selectAudioStream(autoaudio);
 					}
@@ -2528,7 +2530,7 @@ void eServiceMP3::gstBusCall(GstMessage *msg)
 					if (!m_initial_start)
 					{
 						if (!m_sourceinfo.is_streaming)
-							seekTo(0);seekTo(0);
+							seekTo(0);
 						m_initial_start = true;
 					}
 					if (!m_first_paused)
@@ -2689,7 +2691,7 @@ void eServiceMP3::gstBusCall(GstMessage *msg)
 
 				// eDebug("[eServiceMP3] async-done - %d video, %d audio, %d subtitle", n_video, n_audio, n_text);
 
-				if ( n_video + n_audio <= 0 )
+				if (n_video + n_audio <= 0)
 					stop();
 
 				std::vector<audioStream> audioStreams_temp;
@@ -2769,7 +2771,6 @@ void eServiceMP3::gstBusCall(GstMessage *msg)
 						gst_tag_list_get_string(tags, GST_TAG_SUBTITLE_CODEC, &g_codec);
 						gst_tag_list_free(tags);
 					}
-				}
 
 					// eDebug("[eServiceMP3] subtitle stream=%i language=%s codec=%s", i, subs.language_code.c_str(), g_codec ? g_codec : "(null)");
 
