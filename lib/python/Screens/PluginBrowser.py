@@ -35,7 +35,8 @@ from Tools.NumericalTextInput import NumericalTextInput
 
 from skin import parseColor
 from time import time
-import os, math
+import os
+import math
 
 language.addCallback(plugins.reloadPlugins)
 
