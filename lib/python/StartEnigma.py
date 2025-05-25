@@ -42,7 +42,7 @@ config.plugins.remotecontroltype = ConfigSubsection()
 config.plugins.remotecontroltype.rctype = ConfigInteger(default=0)
 
 # New Plugin Style (Do not move it to other file)
-config.misc.plugin_style = ConfigSelection(default="list", choices=[
+config.misc.plugin_style = ConfigSelection(default="grid3", choices=[
 	("list", _("View as list")),
 	("grid1", _("View as grid 1")),
 	("grid2", _("View as grid 2")),
