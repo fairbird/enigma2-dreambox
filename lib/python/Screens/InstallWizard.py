@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from Screens.Screen import Screen
 from Components.ConfigList import ConfigListScreen, ConfigList
-from Components.ActionMap import ActionMap
+from Components.ActionMap import HelpableActionMap
 from Components.Sources.StaticText import StaticText
 from Components.config import config, ConfigSubsection, ConfigBoolean, ConfigSelection, ConfigYesNo, ConfigIP, ConfigNothing
 from Components.Network import iNetwork
@@ -159,8 +159,11 @@ class InstallWizardOpkgUpdater(Screen):
 
 	def __init__(self, session, index, info, cmd, pkg=None):
 		self.skin = InstallWizardOpkgUpdater.skin
-		Screen.__init__(self, session)
-
+		Screen.__init__(self, session, enableHelp=True)
+		self["actions"] = HelpableActionMap(self, ["SelectCancelActions"], {
+			"cancel": (self.close, _("Close the screen")),
+			"select": (self.close, _("Close the screen"))
+		}, prio=0, description=_("Install Wizard Opkg Updater"))
 		self["statusbar"] = StaticText(info)
 
 		self.pkg = pkg
