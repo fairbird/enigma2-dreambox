@@ -144,6 +144,7 @@ self.session.openWithCallback(msgClosed, EpgDeleteMsg)
 						<item key="flash_expander" level="2" text="Flash Expander" weight="40"><screen module="FlashExpander" screen="FlashExpander" /></item>
 					</menu>
 					<item key="network_setup" level="0" text="Network"><screen module="NetworkSetup" screen="NetworkAdapterSelection"/></item>
+					<item key="password_setup" level="1" text="Password Settings" weight="8"><screen module="NetworkSetup" screen="NetworkPassword" /></item>
 					<item key="input_device_setup" level="1" text="Input devices"><screen module="InputDeviceSetup" screen="InputDeviceSelection"/></item>
 					<item key="keyboard_setup" text="Keyboard"><setup setupKey="keyboard"/></item>
 					<item key="hotkey_setup" level="1" text="Hotkey"><screen module="Hotkey" screen="HotkeySetup"/></item>
