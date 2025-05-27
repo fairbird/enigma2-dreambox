@@ -46,6 +46,7 @@ class AudioSelection(ConfigListScreen, Screen):
 		self["key_green"] = Boolean(False)
 		self["key_yellow"] = Boolean(True)
 		self["key_blue"] = Boolean(False)
+		self["key_menu"] = StaticText(_("MENU"))
 		self["key_left"] = Pixmap()
 		self["key_right"] = Pixmap()
 		self["switchdescription"] = Label(_("Switch between Audio-, Subtitlepage"))
