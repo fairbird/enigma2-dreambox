@@ -27,7 +27,7 @@ textdomain("enigma2")
 class International:
 	# This is the list of all locales built for OpenATV. If any locales are added or removed then this list should be updated!
 	# The list of available locales rarely changes so this has been done to optimize the speed of starting Enigma2.
-	DEFINED_LOCALES = ["ar", "bg", "ca", "cs", "da", "de", "el", "en", "es", "et", "fa", "fi", "fr", "fy", "he", "hr", "hu", "id", "is", "it", "ku", "lt", "lv", "nb", "nl", "nn", "pl", "pt", "pt-br", "ro", "ru", "sk", "sl", "sr", "sv", "ta", "th", "tr", "uk", "vi", "zh-cn", "zh-hk"]
+	DEFINED_LOCALES = ["ar", "bg", "ca", "cs", "da", "de", "el", "en", "es", "et", "fa", "fi", "fr", "fy", "he", "hr", "hu", "id", "is", "it", "ku", "lt", "lv", "nb", "nl", "nn", "pl", "pt", "pt-br", "ro", "ru", "sk", "sl", "sr", "sv", "th", "tr", "uk", "vi", "zh-cn", "zh-hk"]
 	LOCALE_TEMPLATE = "enigma2-locale-%s"
 	PERMANENT_LOCALES = ["en_US", "de_DE", "fr_FR"]
 
@@ -221,7 +221,6 @@ class International:
 		"su": ("Sundanese", _("Sundanese"), "Basa Sunda", "", "", ("SD",)),
 		"sv": ("Swedish", _("Swedish"), "Svenska", "ISO-8859-15", "", ("SE", "FI")),
 		"sw": ("Swahili", _("Swahili"), "Kiswahili", "", "", ("KE", "TZ")),
-		"ta": ("Tamil", _("Tamil"), "தமிழ்", "", "", ("IN", "LK")),
 		"te": ("Telugu", _("Telugu"), "తెలుగు", "", "", ("IN",)),
 		"tg": ("Tajik", _("Tajik"), "тоҷикӣ, toçikī, تاجیکی", "", "", ("TJ",)),
 		"th": ("Thai", _("Thai"), "ไทย", "ISO-8859-15", "", ("TH",)),
