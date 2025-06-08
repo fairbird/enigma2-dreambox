@@ -28,7 +28,7 @@ class StreamService(Source):
 		self.ref = eServiceReference(cmd)
 
 	def recordEvent(self, service, event):
-		if service is self.__service:
+		if service is None or service is self.__service:
 			return
 		print("[StreamService] RECORD event for us:", service)
 		self.changed((self.CHANGED_ALL, ))
