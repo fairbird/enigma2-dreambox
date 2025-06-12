@@ -9,7 +9,6 @@ from Components.Pixmap import Pixmap
 from Components.Sources.Boolean import Boolean
 from Components.Sources.StaticText import StaticText
 from Components.Sources.List import List
-from Components.Sources.Boolean import Boolean
 from Components.SystemInfo import BoxInfo
 from Components.UsageConfig import originalAudioTracks, visuallyImpairedCommentary
 from Components.VolumeControl import VolumeControl
