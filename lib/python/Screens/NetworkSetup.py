@@ -2100,6 +2100,10 @@ class NetworkMiniDLNASetup(Setup):
 		self.session.openWithCallback(selectSharesCallBack, uShareSelection, self.selectedFiles)
 
 
+class NetworkSambaSetup(Setup):
+	def __init__(self, session):
+		Setup.__init__(self, session=session, setup="NetworkSamba")
+
 class NetworkPassword(Setup):
 	def __init__(self, session):
 		config.network.password = NoSave(ConfigPassword(default=""))
