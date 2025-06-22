@@ -10,6 +10,7 @@ dist_pkgdata_DATA = \
 	iso-639-3.pck \
 	keymap.xml \
 	menu.xml \
+	networkdaemons.xml \
 	otv_00820000_fbff_16a8.dict \
 	otv_011a0000_0002_07d4.dict \
 	otv_06180000_1000_0011.dict \

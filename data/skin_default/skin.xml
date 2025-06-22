@@ -1429,6 +1429,9 @@ self.autoResize()
 	<screen name="Console" position="center,center" size="880,480">
 		<widget name="text" position="0,0" size="880,480" font="Console;14" transparent="0"/>
 	</screen>
+	<screen name="NetworkLogScreen" position="center,center" size="1280,720">
+		<widget name="infotext" position="10,10" size="1270,710" font="Regular;25" transparent="0"/>
+	</screen>
 	<screen name="clockDisplay" position="center,center" size="300,300">
 		<widget name="okbutton" position="10,10" size="280,40" transparent="0"/>
 		<widget name="title" position="10,120" size="280,50" transparent="0"/>
