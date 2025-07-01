@@ -855,7 +855,7 @@ class InfoBarNumberZap:
 				"6": (self.keyNumberGlobal, _('Numberzap or seek forward medium step')),
 				"7": (self.keyNumberGlobal, _('Numberzap or seek backward big step')),
 				"8": (self.keyNumberGlobal, _('Numberzap')),
-				"9": (self.keyNumberGlobal, _('Numberzap or seek backward big step')),
+				"9": (self.keyNumberGlobal, _('Numberzap or seek forward big step')),
 				"0": (self.keyNumberGlobal, _('Numberzap or zap to previous service')),
 				"toggleSeek": (self.toggleSeek, _("Toggle between zap and seek mode")),
 			})
