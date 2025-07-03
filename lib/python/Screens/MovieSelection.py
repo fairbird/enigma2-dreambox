@@ -616,6 +616,7 @@ class MovieSelection(Screen, HelpableScreen, SelectionEventInfo, InfoBarBase, Pr
 				"down": (self.keyDown, _("Go down the list"))
 			}, prio=-2)
 
+		self.initUserDefinedActions()
 		def getinitUserDefinedActionsDescription(key):
 			return _(userDefinedActions.get(eval("config.movielist.%s.value" % key), _("Not defined")))
 
@@ -760,22 +761,23 @@ class MovieSelection(Screen, HelpableScreen, SelectionEventInfo, InfoBarBase, Pr
 		self._updateButtonTexts()
 
 	def _callButton(self, name):
-		if name.startswith('@'):
-			item = self.getCurrentSelection()
-			if isSimpleFile(item):
-				name = name[1:]
-				for p in plugins.getPlugins(PluginDescriptor.WHERE_MOVIELIST):
-					if name == p.name:
-						p(self.session, item[0])
-		elif name.startswith('/'):
-			self.gotFilename(name)
-		else:
-			try:
-				a = getattr(self, 'do_' + name)
-			except Exception:
-				# Undefined action
-				return
-			a()
+		if not self["waitingtext"].getVisible():
+			if name.startswith('@'):
+				item = self.getCurrentSelection()
+				if isSimpleFile(item):
+					name = name[1:]
+					for p in plugins.getPlugins(PluginDescriptor.WHERE_MOVIELIST):
+						if name == p.name:
+							p(self.session, item[0])
+			elif name.startswith('/'):
+				self.gotFilename(name)
+			else:
+				try:
+					a = getattr(self, 'do_' + name)
+				except Exception:
+					# Undefined action
+					return
+				a()
 
 	def btn_red(self):
 		self._callButton(config.movielist.btn_red.value)
@@ -1411,7 +1413,6 @@ class MovieSelection(Screen, HelpableScreen, SelectionEventInfo, InfoBarBase, Pr
 	def enablePathSelect(self):
 		self.pathselectEnabled = True
 		if self.initialRun:
-			self.callLater(self.initUserDefinedActions)
 			self.initialRun = False
 
 	def doPathSelect(self):
