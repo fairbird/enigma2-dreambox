@@ -617,6 +617,7 @@ class MovieSelection(Screen, HelpableScreen, SelectionEventInfo, InfoBarBase, Pr
 			}, prio=-2)
 
 		self.initUserDefinedActions()
+
 		def getinitUserDefinedActionsDescription(key):
 			return _(userDefinedActions.get(eval("config.movielist.%s.value" % key), _("Not defined")))
 
