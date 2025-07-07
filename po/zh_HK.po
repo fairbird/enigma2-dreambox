@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-16 15:41+0100\n"
+"POT-Creation-Date: 2025-07-01 17:09+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: 王彪 <satfan@163.com>\n"
 "Language-Team: 中國\n"
@@ -3314,6 +3314,10 @@ msgstr ""
 msgid "EPG Select Actions"
 msgstr "選擇位置"
 
+#, fuzzy
+msgid "EPG filter switching"
+msgstr "自動切換錄影機"
+
 msgid "EPG language selection 1"
 msgstr ""
 
@@ -3331,6 +3335,10 @@ msgstr ""
 
 msgid "EPG:"
 msgstr ""
+
+#, fuzzy
+msgid "EPGFilter Actions"
+msgstr "選擇位置"
 
 msgid "EPGSETUP"
 msgstr ""
@@ -3472,6 +3480,9 @@ msgstr ""
 msgid "Enable favourites edit"
 msgstr "允許編輯喜愛頻道"
 
+msgid "Enable filtering in SingleEPG"
+msgstr ""
+
 msgid "Enable freesat EPG"
 msgstr ""
 
@@ -3495,6 +3506,9 @@ msgid "Enable power off timer"
 msgstr "允許移動模式"
 
 msgid "Enable remote enigma2 receiver to be tried to tune into services that cannot be tuned into locally (e.g. tuner is occupied or service type is unavailable on the local tuner. Specify complete URL including http:// and port number (normally ...:8001), e.g. http://second_box:8001."
+msgstr ""
+
+msgid "Enable setting a time interval for filtering events in SingleEPG using the 'Stop' button."
 msgstr ""
 
 msgid "Enable teletext caching"
@@ -3544,6 +3558,9 @@ msgstr "結束自定義組編輯"
 
 msgid "End favourites edit"
 msgstr "結束喜愛頻道編輯"
+
+msgid "End of the time interval during which events must begin to be displayed. If the filter is active, use keys 3 and 6 to adjust the end time, and key 0 to save."
+msgstr ""
 
 msgid "End time"
 msgstr "結束時間"
@@ -5008,9 +5025,6 @@ msgstr ""
 msgid "Install local extension"
 msgstr "安裝本地附件"
 
-msgid "Install picons on"
-msgstr ""
-
 #, fuzzy
 msgid "Install plugin"
 msgstr "正在安裝"
@@ -5047,6 +5061,9 @@ msgid "Internal flash"
 msgstr ""
 
 msgid "Internal hdd only"
+msgstr ""
+
+msgid "Internet"
 msgstr ""
 
 msgid "Internet (ntp)"
@@ -5176,6 +5193,9 @@ msgid "Kazakhstan"
 msgstr ""
 
 msgid "Keep service"
+msgstr ""
+
+msgid "Keep sorting"
 msgstr ""
 
 msgid "Kenya"
@@ -6345,6 +6365,36 @@ msgstr ""
 
 msgid "Number or SMS style data entry"
 msgstr ""
+
+#, fuzzy
+msgid "Numberbuttons Seek"
+msgstr "選擇位置"
+
+#, fuzzy
+msgid "Numberbuttons Zap"
+msgstr "選擇位置"
+
+msgid "Numberzap"
+msgstr ""
+
+msgid "Numberzap or seek backward big step"
+msgstr ""
+
+msgid "Numberzap or seek backward medium step"
+msgstr ""
+
+msgid "Numberzap or seek backward small step"
+msgstr ""
+
+msgid "Numberzap or seek forward medium step"
+msgstr ""
+
+msgid "Numberzap or seek forward small step"
+msgstr ""
+
+#, fuzzy
+msgid "Numberzap or zap to previous service"
+msgstr "返回之前的頻道"
 
 #, fuzzy
 msgid "OE Version: "
@@ -8730,6 +8780,10 @@ msgstr ""
 msgid "Services"
 msgstr "頻道"
 
+#, fuzzy, python-format
+msgid "Set %s as default?"
+msgstr "預設列表樣式"
+
 msgid "Set CI assignment for detection of available services."
 msgstr ""
 
@@ -9568,6 +9622,9 @@ msgstr "重頭開始"
 msgid "Start instant recording"
 msgstr ""
 
+msgid "Start of the time interval during which events must begin to be displayed. If the filter is active, use keys 1 and 4 to adjust the start time, and key 0 to save."
+msgstr ""
+
 msgid "Start offline decode"
 msgstr ""
 
@@ -9741,6 +9798,14 @@ msgstr ""
 
 msgid "Stream request"
 msgstr ""
+
+#, fuzzy
+msgid "Stream-tv"
+msgstr "轉發器類型"
+
+#, fuzzy
+msgid "Streaming"
+msgstr "轉發器類型"
 
 msgid "Streaming clients info"
 msgstr ""
@@ -10609,6 +10674,10 @@ msgstr "今天"
 msgid "Toggle Configuration Mode or AutoDisqc"
 msgstr ""
 
+#, fuzzy
+msgid "Toggle Filter Order"
+msgstr "設定視頻模式"
+
 msgid "Toggle HDMI In"
 msgstr ""
 
@@ -10626,6 +10695,9 @@ msgid "Toggle TV/RADIO mode"
 msgstr ""
 
 msgid "Toggle a cut mark at the current position"
+msgstr ""
+
+msgid "Toggle between zap and seek mode"
 msgstr ""
 
 msgid "Toggle dashed flickering line for this service"
@@ -11072,6 +11144,9 @@ msgstr ""
 msgid "Use circular LNB"
 msgstr ""
 
+msgid "Use current filter values as default"
+msgstr ""
+
 msgid "Use fastscan channel names"
 msgstr ""
 
@@ -11168,6 +11243,9 @@ msgid "Using LNB %d"
 msgstr ""
 
 msgid "Using fixed address"
+msgstr ""
+
+msgid "Using the 'Stop' button will cyclically switch displaying events starting: 'outside the interval', 'within the interval', and 'without filtering', instead of 'within the interval', 'outside the interval', and 'without filtering'."
 msgstr ""
 
 #, python-format
@@ -11740,6 +11818,9 @@ msgid "When selected this allows video modes to be selected even if they are not
 msgstr ""
 
 msgid "When set to 'Yes', all locations where SNR is displayed in dB's will show an SNR percentage, and vice versa."
+msgstr ""
+
+msgid "When switching the filter, the selected EPG sorting is preserved."
 msgstr ""
 
 msgid "When the content has an aspect ratio of 16:9, choose whether to scale/stretch the picture."

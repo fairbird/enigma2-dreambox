@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: enigma\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-16 15:41+0100\n"
+"POT-Creation-Date: 2025-07-01 17:09+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Frenske <voorzitter@openpli.org>\n"
 "Language-Team: PLiteam <translators@openpli.org>\n"
@@ -3464,6 +3464,10 @@ msgstr "EPG"
 msgid "EPG Select Actions"
 msgstr "EPG keuze actie(s)"
 
+#, fuzzy
+msgid "EPG filter switching"
+msgstr "PID filter"
+
 msgid "EPG language selection 1"
 msgstr "Eerste taalkeuze t.b.v. de EPG weergave"
 
@@ -3481,6 +3485,10 @@ msgstr "EPG instellingen"
 
 msgid "EPG:"
 msgstr "EPG:"
+
+#, fuzzy
+msgid "EPGFilter Actions"
+msgstr "EPG keuze actie(s)"
 
 msgid "EPGSETUP"
 msgstr "EPGSETUP"
@@ -3623,6 +3631,10 @@ msgstr "Activeer de 'Fallback tuner'"
 msgid "Enable favourites edit"
 msgstr "Favorieten bewerken activeren"
 
+#, fuzzy
+msgid "Enable filtering in SingleEPG"
+msgstr "Virgin EPG inschakelen"
+
 msgid "Enable freesat EPG"
 msgstr "Freesat EPG inschakelen"
 
@@ -3646,6 +3658,9 @@ msgstr "Activeer de uitschakel timer"
 
 msgid "Enable remote enigma2 receiver to be tried to tune into services that cannot be tuned into locally (e.g. tuner is occupied or service type is unavailable on the local tuner. Specify complete URL including http:// and port number (normally ...:8001), e.g. http://second_box:8001."
 msgstr "Indien geactiveerd, dan wordt er een link naar een externe enigma2 receiver actief waarmee er, naast de huidige locale tuners, een extra tuner beschikbaar komt. Hiermee wordt de flexibiliteit om meer kanalen simultaan vanaf één ontvanger te kunnen opnemen aanzienlijk vergroot. De opties worden hierna uitgelegd."
+
+msgid "Enable setting a time interval for filtering events in SingleEPG using the 'Stop' button."
+msgstr ""
 
 msgid "Enable teletext caching"
 msgstr "Teletext caching inschakelen"
@@ -3697,6 +3712,9 @@ msgstr "Bouquet bewerken stoppen"
 
 msgid "End favourites edit"
 msgstr "Favorieten bewerken stoppen"
+
+msgid "End of the time interval during which events must begin to be displayed. If the filter is active, use keys 3 and 6 to adjust the end time, and key 0 to save."
+msgstr ""
 
 msgid "End time"
 msgstr "Eindtijd"
@@ -5141,9 +5159,6 @@ msgstr "Installeer applicaties"
 msgid "Install local extension"
 msgstr "Installeer plugins lokaal"
 
-msgid "Install picons on"
-msgstr "Installeer picons op"
-
 msgid "Install plugin"
 msgstr "Installeer een plugin"
 
@@ -5179,6 +5194,10 @@ msgstr "Intern geheugen"
 
 msgid "Internal hdd only"
 msgstr "Alleen interne harddisk"
+
+#, fuzzy
+msgid "Internet"
+msgstr "Intern"
 
 msgid "Internet (ntp)"
 msgstr "Internet (ntp)"
@@ -5309,6 +5328,10 @@ msgid "Kazakhstan"
 msgstr "Kazachstan"
 
 msgid "Keep service"
+msgstr "Blijf op de huidige zender"
+
+#, fuzzy
+msgid "Keep sorting"
 msgstr "Blijf op de huidige zender"
 
 msgid "Kenya"
@@ -6437,6 +6460,36 @@ msgstr "Het aantal herhaalde teksten op het display"
 
 msgid "Number or SMS style data entry"
 msgstr "Cijfer of SMS-stijl invoer"
+
+#, fuzzy
+msgid "Numberbuttons Seek"
+msgstr "Numerieke actie(s)"
+
+#, fuzzy
+msgid "Numberbuttons Zap"
+msgstr "Numerieke actie(s)"
+
+msgid "Numberzap"
+msgstr ""
+
+msgid "Numberzap or seek backward big step"
+msgstr ""
+
+msgid "Numberzap or seek backward medium step"
+msgstr ""
+
+msgid "Numberzap or seek backward small step"
+msgstr ""
+
+msgid "Numberzap or seek forward medium step"
+msgstr ""
+
+msgid "Numberzap or seek forward small step"
+msgstr ""
+
+#, fuzzy
+msgid "Numberzap or zap to previous service"
+msgstr "Herinner aan het eerdere programma"
 
 msgid "OE Version: "
 msgstr "OE Versie: "
@@ -8804,6 +8857,10 @@ msgstr "Zendernaam"
 msgid "Services"
 msgstr "Zenders"
 
+#, fuzzy, python-format
+msgid "Set %s as default?"
+msgstr "Zet als standaard"
+
 msgid "Set CI assignment for detection of available services."
 msgstr "Kies CI toekenning om de beschikbare zenders te detecteren."
 
@@ -9631,6 +9688,9 @@ msgstr "Start vanaf het begin"
 msgid "Start instant recording"
 msgstr "Start een directe opname"
 
+msgid "Start of the time interval during which events must begin to be displayed. If the filter is active, use keys 1 and 4 to adjust the start time, and key 0 to save."
+msgstr ""
+
 msgid "Start offline decode"
 msgstr "Start achteraf decoderen"
 
@@ -9801,6 +9861,14 @@ msgstr "URL van de Stream"
 
 msgid "Stream request"
 msgstr "Stream verzoek"
+
+#, fuzzy
+msgid "Stream-tv"
+msgstr "Stream"
+
+#, fuzzy
+msgid "Streaming"
+msgstr "Stream"
 
 msgid "Streaming clients info"
 msgstr "Streamende clients informatie"
@@ -10721,6 +10789,10 @@ msgstr "Vandaag"
 msgid "Toggle Configuration Mode or AutoDisqc"
 msgstr "Kies tussen Configuratiemodus of AutoDISEqC"
 
+#, fuzzy
+msgid "Toggle Filter Order"
+msgstr "Schakel tussen de videomode"
+
 msgid "Toggle HDMI In"
 msgstr "Activeer HDMI in"
 
@@ -10739,6 +10811,9 @@ msgstr "Schakel tussen TV/RADIO"
 
 msgid "Toggle a cut mark at the current position"
 msgstr "Op de huidige positie een snijmarkering aanbrengen"
+
+msgid "Toggle between zap and seek mode"
+msgstr ""
 
 msgid "Toggle dashed flickering line for this service"
 msgstr "Activeer de optie 'verberg de stippellijn' voor dit kanaal"
@@ -11169,6 +11244,9 @@ msgstr "Gebruik indien mogelijk als PIP"
 msgid "Use circular LNB"
 msgstr "Gebruik de circulaire LNB"
 
+msgid "Use current filter values as default"
+msgstr ""
+
 msgid "Use fastscan channel names"
 msgstr "Wilt u de Fastscan zendernamen gebruiken"
 
@@ -11266,6 +11344,9 @@ msgstr "Gebruik LNB %d"
 
 msgid "Using fixed address"
 msgstr "Gebruik vast ingesteld adres"
+
+msgid "Using the 'Stop' button will cyclically switch displaying events starting: 'outside the interval', 'within the interval', and 'without filtering', instead of 'within the interval', 'outside the interval', and 'without filtering'."
+msgstr ""
 
 #, python-format
 msgid "Using tuner %s"
@@ -11894,6 +11975,9 @@ msgstr ""
 "Indien ingesteld op 'Ja' worden op alle locaties waar de SNR werd weergegeven in dB's signaal in percentage getoond en omgekeerd,\n"
 "Weergave in dB werkt enkel indien dit door de tuner wordt ondersteund.\n"
 "N.B. Dit is een relatieve waarde gegenereerd door de betreffende tuner. Vergelijken tussen verschillende type tuners is vaak niet zinvol."
+
+msgid "When switching the filter, the selected EPG sorting is preserved."
+msgstr ""
 
 msgid "When the content has an aspect ratio of 16:9, choose whether to scale/stretch the picture."
 msgstr ""

@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: enigma2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-16 15:41+0100\n"
+"POT-Creation-Date: 2025-07-01 17:09+0200\n"
 "PO-Revision-Date: 2017-01-18 16:38+0100\n"
 "Last-Translator: lupine <a_ecklon@hotmail.com>\n"
 "Language-Team: \n"
@@ -3765,6 +3765,11 @@ msgstr "EPG"
 msgid "EPG Select Actions"
 msgstr "Vælg handling"
 
+#
+#, fuzzy
+msgid "EPG filter switching"
+msgstr "Autoskift Scart"
+
 msgid "EPG language selection 1"
 msgstr "EPG sprog valg 1"
 
@@ -3783,6 +3788,10 @@ msgstr "EPG indstillinger"
 
 msgid "EPG:"
 msgstr ""
+
+#, fuzzy
+msgid "EPGFilter Actions"
+msgstr "Vælg handling"
 
 msgid "EPGSETUP"
 msgstr ""
@@ -3944,6 +3953,10 @@ msgstr "Aktiver fallback remote receiver"
 msgid "Enable favourites edit"
 msgstr "Åbne favoritredigering"
 
+#, fuzzy
+msgid "Enable filtering in SingleEPG"
+msgstr "Aktiver Virgin EPG"
+
 msgid "Enable freesat EPG"
 msgstr "Aktiver Freesat EPG"
 
@@ -3971,6 +3984,9 @@ msgstr "Aktiver wakeup timer"
 
 msgid "Enable remote enigma2 receiver to be tried to tune into services that cannot be tuned into locally (e.g. tuner is occupied or service type is unavailable on the local tuner. Specify complete URL including http:// and port number (normally ...:8001), e.g. http://second_box:8001."
 msgstr "Aktiver trådløs enigma2 receiver for at prøve at tune ind til services der ikke kan tunes ind på lokalt (f.eks. tuner er optaget eller service typen er ikke tilgængelig på den lokale tuner. Specificer komplet URL inkluderet http:// og port nummer (normalt ...:8001), f.eks. http://second_box:8001."
+
+msgid "Enable setting a time interval for filtering events in SingleEPG using the 'Stop' button."
+msgstr ""
 
 msgid "Enable teletext caching"
 msgstr "Aktiver TekstTV lagring"
@@ -4028,6 +4044,9 @@ msgstr "Afslut favoritlisteredigering"
 #
 msgid "End favourites edit"
 msgstr "Afslut favoritredigering"
+
+msgid "End of the time interval during which events must begin to be displayed. If the filter is active, use keys 3 and 6 to adjust the end time, and key 0 to save."
+msgstr ""
 
 #
 msgid "End time"
@@ -5667,9 +5686,6 @@ msgstr "Installer udvidelser"
 msgid "Install local extension"
 msgstr "Installer lokal udvidelse"
 
-msgid "Install picons on"
-msgstr "Installer picons på"
-
 #
 #, fuzzy
 msgid "Install plugin"
@@ -5716,6 +5732,10 @@ msgstr "Intern flash"
 
 msgid "Internal hdd only"
 msgstr "Kun intern harddisk"
+
+#, fuzzy
+msgid "Internet"
+msgstr "Intern"
 
 msgid "Internet (ntp)"
 msgstr ""
@@ -5866,6 +5886,10 @@ msgid "Kazakhstan"
 msgstr ""
 
 msgid "Keep service"
+msgstr "Behold kanalen"
+
+#, fuzzy
+msgid "Keep sorting"
 msgstr "Behold kanalen"
 
 msgid "Kenya"
@@ -7204,6 +7228,37 @@ msgstr "Antal af gentaget tekst på display"
 
 msgid "Number or SMS style data entry"
 msgstr ""
+
+#, fuzzy
+msgid "Numberbuttons Seek"
+msgstr "yderligere uddannelse"
+
+#, fuzzy
+msgid "Numberbuttons Zap"
+msgstr "yderligere uddannelse"
+
+msgid "Numberzap"
+msgstr ""
+
+msgid "Numberzap or seek backward big step"
+msgstr ""
+
+msgid "Numberzap or seek backward medium step"
+msgstr ""
+
+msgid "Numberzap or seek backward small step"
+msgstr ""
+
+msgid "Numberzap or seek forward medium step"
+msgstr ""
+
+msgid "Numberzap or seek forward small step"
+msgstr ""
+
+#
+#, fuzzy
+msgid "Numberzap or zap to previous service"
+msgstr "Tilbage til forrige kanal"
 
 #
 #, fuzzy
@@ -9930,6 +9985,10 @@ msgstr "Servicenavn"
 msgid "Services"
 msgstr "Kanaler"
 
+#, fuzzy, python-format
+msgid "Set %s as default?"
+msgstr "Sæt standard"
+
 msgid "Set CI assignment for detection of available services."
 msgstr ""
 
@@ -10872,6 +10931,9 @@ msgstr "Start fra begyndelse"
 msgid "Start instant recording"
 msgstr "Start øjeblikkelig optagelse"
 
+msgid "Start of the time interval during which events must begin to be displayed. If the filter is active, use keys 1 and 4 to adjust the start time, and key 0 to save."
+msgstr ""
+
 msgid "Start offline decode"
 msgstr "Start offline dekodning"
 
@@ -11070,6 +11132,14 @@ msgstr "Stream"
 
 msgid "Stream request"
 msgstr "Stream forspørgsel"
+
+#, fuzzy
+msgid "Stream-tv"
+msgstr "Stream"
+
+#, fuzzy
+msgid "Streaming"
+msgstr "Stream"
 
 msgid "Streaming clients info"
 msgstr "Streamklient info"
@@ -12100,6 +12170,11 @@ msgstr "I dag"
 msgid "Toggle Configuration Mode or AutoDisqc"
 msgstr "Konfigurations type %s"
 
+#
+#, fuzzy
+msgid "Toggle Filter Order"
+msgstr "Vælg video type"
+
 msgid "Toggle HDMI In"
 msgstr "Skift HDMI In"
 
@@ -12119,6 +12194,9 @@ msgstr "Skift mellem TV/RADIO mode"
 #
 msgid "Toggle a cut mark at the current position"
 msgstr "Ændre en skæringsmarkør på den nuværende position"
+
+msgid "Toggle between zap and seek mode"
+msgstr ""
 
 msgid "Toggle dashed flickering line for this service"
 msgstr "Skift stiplet flimrende linje for denne serive"
@@ -12625,6 +12703,9 @@ msgstr ""
 msgid "Use circular LNB"
 msgstr "Brug cirkuler LNB"
 
+msgid "Use current filter values as default"
+msgstr ""
+
 msgid "Use fastscan channel names"
 msgstr "Brug hurtigsøgning kanalnavne"
 
@@ -12735,6 +12816,9 @@ msgstr "Bruger LNB %d"
 
 msgid "Using fixed address"
 msgstr "Brug fast adresse"
+
+msgid "Using the 'Stop' button will cyclically switch displaying events starting: 'outside the interval', 'within the interval', and 'without filtering', instead of 'within the interval', 'outside the interval', and 'without filtering'."
+msgstr ""
 
 #, python-format
 msgid "Using tuner %s"
@@ -13398,6 +13482,9 @@ msgstr ""
 #, fuzzy
 msgid "When set to 'Yes', all locations where SNR is displayed in dB's will show an SNR percentage, and vice versa."
 msgstr "Hvis indstillet til Ja, vil alle steder, hvor SNR i dB vises, vise SNR-procenten og omvendt."
+
+msgid "When switching the filter, the selected EPG sorting is preserved."
+msgstr ""
 
 msgid "When the content has an aspect ratio of 16:9, choose whether to scale/stretch the picture."
 msgstr "Når indholdet har et billedformat på 16:9 vælg om billedet skal skaleres eller strækkes."

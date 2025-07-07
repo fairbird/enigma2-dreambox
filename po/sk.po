@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: enigma2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-16 15:41+0100\n"
+"POT-Creation-Date: 2025-07-01 17:09+0200\n"
 "PO-Revision-Date: 2025-02-04 14:29+0100\n"
 "Last-Translator: Andrej Tobola <andrej.tobola@gmail.com>\n"
 "Language-Team: \n"
@@ -3298,6 +3298,10 @@ msgstr "EPG - programový sprievodca"
 msgid "EPG Select Actions"
 msgstr "Akcie výberu EPG"
 
+#, fuzzy
+msgid "EPG filter switching"
+msgstr "PID filtrovanie"
+
 msgid "EPG language selection 1"
 msgstr "Voľba primárneho jazyka EPG"
 
@@ -3315,6 +3319,10 @@ msgstr "Nastavenie EPG"
 
 msgid "EPG:"
 msgstr "EPG:"
+
+#, fuzzy
+msgid "EPGFilter Actions"
+msgstr "Akcie výberu EPG"
 
 msgid "EPGSETUP"
 msgstr "EPGSETUP"
@@ -3453,6 +3461,10 @@ msgstr "Povoliť záložný vzdialený prijímač"
 msgid "Enable favourites edit"
 msgstr "Povoliť úpravu obľúbených"
 
+#, fuzzy
+msgid "Enable filtering in SingleEPG"
+msgstr "Povoliť Virgin EPG"
+
 msgid "Enable freesat EPG"
 msgstr "Povoliť FreeSat EPG"
 
@@ -3476,6 +3488,9 @@ msgstr "Povoliť časovač vypnutia"
 
 msgid "Enable remote enigma2 receiver to be tried to tune into services that cannot be tuned into locally (e.g. tuner is occupied or service type is unavailable on the local tuner. Specify complete URL including http:// and port number (normally ...:8001), e.g. http://second_box:8001."
 msgstr "Povolenie vzdialenému Enigma2 prijímaču pokúsiť sa naladiť stanice, ktoré nie je možné naladiť lokálne (napr. tuner je zaneprázdnený alebo typ stanice nie je k dispozícii). Zadajte úplnú adresu URL, vrátane http:// a číslo portu (obvykle ...: 8001 ), napríklad http://druhy_box: 8001."
+
+msgid "Enable setting a time interval for filtering events in SingleEPG using the 'Stop' button."
+msgstr ""
 
 msgid "Enable teletext caching"
 msgstr "Povoliť ukladanie teletextu do medzipamäte"
@@ -3524,6 +3539,9 @@ msgstr "Skončiť úpravu prehľadu"
 
 msgid "End favourites edit"
 msgstr "Skončiť úpravu obľúbených"
+
+msgid "End of the time interval during which events must begin to be displayed. If the filter is active, use keys 3 and 6 to adjust the end time, and key 0 to save."
+msgstr ""
 
 msgid "End time"
 msgstr "Čas ukončenia"
@@ -4958,9 +4976,6 @@ msgstr "Inštalovať rozšírenia"
 msgid "Install local extension"
 msgstr "Inštalovať miestne rozšírenie"
 
-msgid "Install picons on"
-msgstr "Inštalovať picony do"
-
 msgid "Install plugin"
 msgstr "Inštalovať doplnok"
 
@@ -4996,6 +5011,10 @@ msgstr "Vnútorná flash pamäť"
 
 msgid "Internal hdd only"
 msgstr "Iba vnútorný HDD"
+
+#, fuzzy
+msgid "Internet"
+msgstr "Vnútorný"
 
 msgid "Internet (ntp)"
 msgstr "Internet (ntp)"
@@ -5127,6 +5146,10 @@ msgid "Kazakhstan"
 msgstr "Kazachstan"
 
 msgid "Keep service"
+msgstr "Ponechať stanicu"
+
+#, fuzzy
+msgid "Keep sorting"
 msgstr "Ponechať stanicu"
 
 msgid "Kenya"
@@ -6249,6 +6272,36 @@ msgstr "Počet opakovania textu na displeji."
 
 msgid "Number or SMS style data entry"
 msgstr "Vstupné údaje číslo alebo štýl SMS"
+
+#, fuzzy
+msgid "Numberbuttons Seek"
+msgstr "Číselné akcie"
+
+#, fuzzy
+msgid "Numberbuttons Zap"
+msgstr "Číselné akcie"
+
+msgid "Numberzap"
+msgstr ""
+
+msgid "Numberzap or seek backward big step"
+msgstr ""
+
+msgid "Numberzap or seek backward medium step"
+msgstr ""
+
+msgid "Numberzap or seek backward small step"
+msgstr ""
+
+msgid "Numberzap or seek forward medium step"
+msgstr ""
+
+msgid "Numberzap or seek forward small step"
+msgstr ""
+
+#, fuzzy
+msgid "Numberzap or zap to previous service"
+msgstr "Návrat na predchádzajúcu stanicu"
 
 msgid "OE Version: "
 msgstr "Verzia OE: "
@@ -7632,7 +7685,7 @@ msgid "Resolution"
 msgstr "Rozlíšenie"
 
 msgid "Restart"
-msgstr "Reštartovať"
+msgstr "Reštartovať prijímač"
 
 msgid "Restart GUI now?"
 msgstr "Teraz reštartovať GUI?"
@@ -8583,6 +8636,10 @@ msgstr "Názov stanice"
 msgid "Services"
 msgstr "Stanice"
 
+#, fuzzy, python-format
+msgid "Set %s as default?"
+msgstr "Nastaviť predvolené"
+
 msgid "Set CI assignment for detection of available services."
 msgstr "Nastaviť priradenie CI kvôli detekcii dostupných kanálov."
 
@@ -9398,6 +9455,9 @@ msgstr "Spustiť od začiatku"
 msgid "Start instant recording"
 msgstr "Spustiť okamžité nahrávanie"
 
+msgid "Start of the time interval during which events must begin to be displayed. If the filter is active, use keys 1 and 4 to adjust the start time, and key 0 to save."
+msgstr ""
+
 msgid "Start offline decode"
 msgstr "Spustiť offline dekódovanie"
 
@@ -9565,6 +9625,14 @@ msgstr "URL adresa streamu"
 
 msgid "Stream request"
 msgstr "Žiadosť o stream"
+
+#, fuzzy
+msgid "Stream-tv"
+msgstr "Stream"
+
+#, fuzzy
+msgid "Streaming"
+msgstr "Stream"
 
 msgid "Streaming clients info"
 msgstr "Info o streamujúcich klientoch"
@@ -10467,6 +10535,10 @@ msgstr "Dnes"
 msgid "Toggle Configuration Mode or AutoDisqc"
 msgstr "Prepnutie režimu konfigurácie alebo AutoDisqc"
 
+#, fuzzy
+msgid "Toggle Filter Order"
+msgstr "Prepnúť videorežim"
+
 msgid "Toggle HDMI In"
 msgstr "Prepnúť HDMI vstup"
 
@@ -10485,6 +10557,9 @@ msgstr "Prepnúť TV/RÁDIO mód"
 
 msgid "Toggle a cut mark at the current position"
 msgstr "Prepnúť strihovú značku na tejto pozícii"
+
+msgid "Toggle between zap and seek mode"
+msgstr ""
 
 msgid "Toggle dashed flickering line for this service"
 msgstr "Prepnúť čiarkovaný blikajúci riadok pre túto stanicu"
@@ -10915,6 +10990,9 @@ msgstr "Použiť ako PiP ak je to možné"
 msgid "Use circular LNB"
 msgstr "Použiť kruhový LNB"
 
+msgid "Use current filter values as default"
+msgstr ""
+
 msgid "Use fastscan channel names"
 msgstr "Použiť FastScan názvy kanálov"
 
@@ -11007,6 +11085,9 @@ msgstr "Používa sa LNB %d"
 
 msgid "Using fixed address"
 msgstr "Používam pevnú adresu"
+
+msgid "Using the 'Stop' button will cyclically switch displaying events starting: 'outside the interval', 'within the interval', and 'without filtering', instead of 'within the interval', 'outside the interval', and 'without filtering'."
+msgstr ""
 
 #, python-format
 msgid "Using tuner %s"
@@ -11595,6 +11676,9 @@ msgstr "Ak je vybraté, umožní sa zvoliť video režim i napriek tomu, že nie
 
 msgid "When set to 'Yes', all locations where SNR is displayed in dB's will show an SNR percentage, and vice versa."
 msgstr "Ak je nastavená hodnota „Áno“, na všetkých miestach, kde sa SNR zobrazuje v dB, sa zobrazí SNR v percentách a naopak."
+
+msgid "When switching the filter, the selected EPG sorting is preserved."
+msgstr ""
 
 msgid "When the content has an aspect ratio of 16:9, choose whether to scale/stretch the picture."
 msgstr "Ak má obsah pomer strán 16: 9, vyberte, či chcete veľkosť obrazu prispôsobiť alebo obraz roztiahnuť. Doporučená hodnota: Letterbox."

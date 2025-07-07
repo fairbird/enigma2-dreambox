@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: enigma2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-16 15:41+0100\n"
+"POT-Creation-Date: 2025-07-01 17:09+0200\n"
 "PO-Revision-Date: 2021-03-06\n"
 "Last-Translator: LinuxSTV\n"
 "Language-Team: \n"
@@ -3421,6 +3421,10 @@ msgstr "EPG"
 msgid "EPG Select Actions"
 msgstr "Pilih tindakan"
 
+#, fuzzy
+msgid "EPG filter switching"
+msgstr "Penyaringan PID"
+
 msgid "EPG language selection 1"
 msgstr "Pemilihan bahasa EPG 1"
 
@@ -3438,6 +3442,10 @@ msgstr "Pengaturan EPG"
 
 msgid "EPG:"
 msgstr "EPG:"
+
+#, fuzzy
+msgid "EPGFilter Actions"
+msgstr "Pilih tindakan"
 
 msgid "EPGSETUP"
 msgstr ""
@@ -3583,6 +3591,10 @@ msgstr "Aktifkan penggunaan rx dari jauh"
 msgid "Enable favourites edit"
 msgstr "Aktifkan ubah favorit"
 
+#, fuzzy
+msgid "Enable filtering in SingleEPG"
+msgstr "Aktifkan EPG Virgin"
+
 msgid "Enable freesat EPG"
 msgstr "Aktifkan EPG freesat"
 
@@ -3608,6 +3620,9 @@ msgstr "Aktifkan pewaktu bangun tidur"
 
 msgid "Enable remote enigma2 receiver to be tried to tune into services that cannot be tuned into locally (e.g. tuner is occupied or service type is unavailable on the local tuner. Specify complete URL including http:// and port number (normally ...:8001), e.g. http://second_box:8001."
 msgstr "Aktifkan rx enigma2 dari jauh untuk mencoba menala layanan yang tidak bisa ditala secara lokal (misalnya penala sedang digunakan atau tipe layanan tidak tersedia pada penala lokal. Tentukan URL lengkap termasuk http:// dan nomor port (biasanya ...:8001), misalnya http://box_kedua:8001."
+
+msgid "Enable setting a time interval for filtering events in SingleEPG using the 'Stop' button."
+msgstr ""
 
 msgid "Enable teletext caching"
 msgstr "Aktifkan penyembunyian teleteks"
@@ -3656,6 +3671,9 @@ msgstr "Akhiri ubah buket"
 
 msgid "End favourites edit"
 msgstr "Akhiri ubah favorit"
+
+msgid "End of the time interval during which events must begin to be displayed. If the filter is active, use keys 3 and 6 to adjust the end time, and key 0 to save."
+msgstr ""
 
 msgid "End time"
 msgstr "Batas akhir"
@@ -5189,9 +5207,6 @@ msgstr "Pasang ekstensi"
 msgid "Install local extension"
 msgstr "Pasang ekstensi lokal"
 
-msgid "Install picons on"
-msgstr "Pasang picon pada"
-
 #, fuzzy
 msgid "Install plugin"
 msgstr "Pemasangan"
@@ -5229,6 +5244,10 @@ msgstr "Flash memori internal"
 
 msgid "Internal hdd only"
 msgstr "Hdd internal saja"
+
+#, fuzzy
+msgid "Internet"
+msgstr "Internal"
 
 msgid "Internet (ntp)"
 msgstr "Internet (ntp"
@@ -5363,6 +5382,10 @@ msgid "Kazakhstan"
 msgstr "Kazakhstan"
 
 msgid "Keep service"
+msgstr "Tetap pada layanan"
+
+#, fuzzy
+msgid "Keep sorting"
 msgstr "Tetap pada layanan"
 
 msgid "Kenya"
@@ -6545,6 +6568,36 @@ msgstr "Jumlah teks berulang pada tampilan"
 
 msgid "Number or SMS style data entry"
 msgstr "Nomor atau entri data gaya SMS"
+
+#, fuzzy
+msgid "Numberbuttons Seek"
+msgstr "edukasi lanjut"
+
+#, fuzzy
+msgid "Numberbuttons Zap"
+msgstr "edukasi lanjut"
+
+msgid "Numberzap"
+msgstr ""
+
+msgid "Numberzap or seek backward big step"
+msgstr ""
+
+msgid "Numberzap or seek backward medium step"
+msgstr ""
+
+msgid "Numberzap or seek backward small step"
+msgstr ""
+
+msgid "Numberzap or seek forward medium step"
+msgstr ""
+
+msgid "Numberzap or seek forward small step"
+msgstr ""
+
+#, fuzzy
+msgid "Numberzap or zap to previous service"
+msgstr "Kembali ke layanan sebelumnya"
 
 #, fuzzy
 msgid "OE Version: "
@@ -8962,6 +9015,10 @@ msgstr "Nama layanan"
 msgid "Services"
 msgstr "Layanan"
 
+#, fuzzy, python-format
+msgid "Set %s as default?"
+msgstr "Atur bawaan"
+
 msgid "Set CI assignment for detection of available services."
 msgstr "Set penetapan CI untuk deteksi ketersediaan layanan."
 
@@ -9817,6 +9874,9 @@ msgstr "Mulai dari awal"
 msgid "Start instant recording"
 msgstr "Mulai merekam segera"
 
+msgid "Start of the time interval during which events must begin to be displayed. If the filter is active, use keys 1 and 4 to adjust the start time, and key 0 to save."
+msgstr ""
+
 msgid "Start offline decode"
 msgstr "Mulai dekode luring"
 
@@ -9993,6 +10053,14 @@ msgstr "Stream"
 
 msgid "Stream request"
 msgstr "Permintaan stream"
+
+#, fuzzy
+msgid "Stream-tv"
+msgstr "Stream"
+
+#, fuzzy
+msgid "Streaming"
+msgstr "Stream"
 
 msgid "Streaming clients info"
 msgstr "Info klien streaming"
@@ -10921,6 +10989,10 @@ msgstr "Hari ini"
 msgid "Toggle Configuration Mode or AutoDisqc"
 msgstr "Mode penyetelan: %s"
 
+#, fuzzy
+msgid "Toggle Filter Order"
+msgstr "Pilih mode video"
+
 msgid "Toggle HDMI In"
 msgstr "Alihkan In HDMI"
 
@@ -10939,6 +11011,9 @@ msgstr "Alihkan mode TV/RADIO"
 
 msgid "Toggle a cut mark at the current position"
 msgstr "Alihkan tanda potong pada posisi saat ini"
+
+msgid "Toggle between zap and seek mode"
+msgstr ""
 
 msgid "Toggle dashed flickering line for this service"
 msgstr "Alihkan garis berkedip putus-putus untuk layanan ini"
@@ -11395,6 +11470,9 @@ msgstr "Gunakan sbg PiP jika memungkinkan"
 msgid "Use circular LNB"
 msgstr "Gunakan LNB sirkular"
 
+msgid "Use current filter values as default"
+msgstr ""
+
 msgid "Use fastscan channel names"
 msgstr "Gunakan nama kanal lacakcepat"
 
@@ -11492,6 +11570,9 @@ msgstr "Menggunakan LNB %d"
 
 msgid "Using fixed address"
 msgstr "Menggunakan alamat tetap"
+
+msgid "Using the 'Stop' button will cyclically switch displaying events starting: 'outside the interval', 'within the interval', and 'without filtering', instead of 'within the interval', 'outside the interval', and 'without filtering'."
+msgstr ""
 
 #, python-format
 msgid "Using tuner %s"
@@ -12103,6 +12184,9 @@ msgstr "Ketika dipilih, ini memungkinkan mode video dipilih walaupun ia dilapork
 #, fuzzy
 msgid "When set to 'Yes', all locations where SNR is displayed in dB's will show an SNR percentage, and vice versa."
 msgstr "Jika diatur ke Ya, semua tempat di mana SNR dalam dB ditampilkan akan menampilkan persentase SNR dan sebaliknya."
+
+msgid "When switching the filter, the selected EPG sorting is preserved."
+msgstr ""
 
 msgid "When the content has an aspect ratio of 16:9, choose whether to scale/stretch the picture."
 msgstr "Ketika konten punya rasio aspek 16:9, pilih apakah akan menskala/merentangkan gambar."

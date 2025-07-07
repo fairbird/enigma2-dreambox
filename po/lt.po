@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PLi enigma2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-16 15:41+0100\n"
+"POT-Creation-Date: 2025-07-01 17:09+0200\n"
 "PO-Revision-Date: 2022-10-23 15:37+0300\n"
 "Last-Translator: Audronis <adga45@gmail.com>\n"
 "Language-Team: Adga (C) <adga45@gmail.com>\n"
@@ -3334,6 +3334,10 @@ msgstr "Elektroninis programų vadovas"
 msgid "EPG Select Actions"
 msgstr "Pasirinkite veiksmą"
 
+#, fuzzy
+msgid "EPG filter switching"
+msgstr "PID filtravimas"
+
 msgid "EPG language selection 1"
 msgstr "1-a pasirinkta EPG kalba"
 
@@ -3351,6 +3355,10 @@ msgstr "EPG nustatymai"
 
 msgid "EPG:"
 msgstr "Elektroninis programų vadovas:"
+
+#, fuzzy
+msgid "EPGFilter Actions"
+msgstr "Pasirinkite veiksmą"
 
 msgid "EPGSETUP"
 msgstr ""
@@ -3489,6 +3497,10 @@ msgstr "Įjungti atsarginį nuotolinį imtuvą"
 msgid "Enable favourites edit"
 msgstr "Įjungti mėgstamų redagavimą"
 
+#, fuzzy
+msgid "Enable filtering in SingleEPG"
+msgstr "Įjungti Virgin EPG"
+
 msgid "Enable freesat EPG"
 msgstr "Įjungti nekoduojamų kanalų EPG"
 
@@ -3512,6 +3524,9 @@ msgstr "Įjunkite maitinimo išjungimo laikmatį"
 
 msgid "Enable remote enigma2 receiver to be tried to tune into services that cannot be tuned into locally (e.g. tuner is occupied or service type is unavailable on the local tuner. Specify complete URL including http:// and port number (normally ...:8001), e.g. http://second_box:8001."
 msgstr "Įjungti nuotolinį enigma2 imtuvą, kad būtų galima žiūrėti kanalus, kurie negali būti priimti lokaliai (pvz., imtuvas užimtas, arba kanalas nepasiekiamas vietiniam imtuvui. Nurodykite pilną internetinį adresą, įskaitant http://ir prievado numerį (paprastai ...:8001), pvz., http://antrasis_aparatas:8001."
+
+msgid "Enable setting a time interval for filtering events in SingleEPG using the 'Stop' button."
+msgstr ""
 
 msgid "Enable teletext caching"
 msgstr "Įjungti teleteksto kaupimą talpykloje"
@@ -3560,6 +3575,9 @@ msgstr "Baigti paketų redagavimą"
 
 msgid "End favourites edit"
 msgstr "Baigti mėgstamų redagavimą"
+
+msgid "End of the time interval during which events must begin to be displayed. If the filter is active, use keys 3 and 6 to adjust the end time, and key 0 to save."
+msgstr ""
 
 msgid "End time"
 msgstr "Pabaigos laikas"
@@ -5025,9 +5043,6 @@ msgstr "Įdiekite išplėtimus"
 msgid "Install local extension"
 msgstr "Įdiekite vietinį išplėtimą"
 
-msgid "Install picons on"
-msgstr "Įdiegti logotipus į"
-
 #, fuzzy
 msgid "Install plugin"
 msgstr "Diegiama"
@@ -5065,6 +5080,10 @@ msgstr "Vidinė atmintis"
 
 msgid "Internal hdd only"
 msgstr "Tik vidinis hdd"
+
+#, fuzzy
+msgid "Internet"
+msgstr "Vidinis"
 
 msgid "Internet (ntp)"
 msgstr "Internetas (ntp)"
@@ -5196,6 +5215,10 @@ msgid "Kazakhstan"
 msgstr "Kazachstanas"
 
 msgid "Keep service"
+msgstr "Išlaikyti kanalą"
+
+#, fuzzy
+msgid "Keep sorting"
 msgstr "Išlaikyti kanalą"
 
 msgid "Kenya"
@@ -6336,6 +6359,36 @@ msgstr "Teksto pasikartojimų ekrane skaičius."
 
 msgid "Number or SMS style data entry"
 msgstr "Skaičių ar SMS stiliaus duomenų įvedimas"
+
+#, fuzzy
+msgid "Numberbuttons Seek"
+msgstr "aukštasis mokslas"
+
+#, fuzzy
+msgid "Numberbuttons Zap"
+msgstr "aukštasis mokslas"
+
+msgid "Numberzap"
+msgstr ""
+
+msgid "Numberzap or seek backward big step"
+msgstr ""
+
+msgid "Numberzap or seek backward medium step"
+msgstr ""
+
+msgid "Numberzap or seek backward small step"
+msgstr ""
+
+msgid "Numberzap or seek forward medium step"
+msgstr ""
+
+msgid "Numberzap or seek forward small step"
+msgstr ""
+
+#, fuzzy
+msgid "Numberzap or zap to previous service"
+msgstr "Grįžti į ankstesnį kanalą"
 
 #, fuzzy
 msgid "OE Version: "
@@ -8693,6 +8746,10 @@ msgstr "Kanalo pavadinimas"
 msgid "Services"
 msgstr "Kanalai"
 
+#, fuzzy, python-format
+msgid "Set %s as default?"
+msgstr "Nustatykite numatytuoju"
+
 msgid "Set CI assignment for detection of available services."
 msgstr "Galimų kanalų aptikimui, įtraukti ir CI priskyrimą."
 
@@ -9527,6 +9584,9 @@ msgstr "Pradėti nuo pradžių"
 msgid "Start instant recording"
 msgstr "Pradėti neplaninį įrašymą"
 
+msgid "Start of the time interval during which events must begin to be displayed. If the filter is active, use keys 1 and 4 to adjust the start time, and key 0 to save."
+msgstr ""
+
 msgid "Start offline decode"
 msgstr "Pradėti iššifravimą neprisijungus"
 
@@ -9699,6 +9759,14 @@ msgstr "Srautas"
 
 msgid "Stream request"
 msgstr "Srauto užklausa"
+
+#, fuzzy
+msgid "Stream-tv"
+msgstr "Srautas"
+
+#, fuzzy
+msgid "Streaming"
+msgstr "Srautas"
 
 msgid "Streaming clients info"
 msgstr "Srauto transliacijų klientai"
@@ -10603,6 +10671,10 @@ msgstr "Šiandien"
 msgid "Toggle Configuration Mode or AutoDisqc"
 msgstr "Konfigūravimo būdas: %s"
 
+#, fuzzy
+msgid "Toggle Filter Order"
+msgstr "Perjungti vaizdo režimą"
+
 msgid "Toggle HDMI In"
 msgstr "Perjungti HDMI įėjimą"
 
@@ -10621,6 +10693,9 @@ msgstr "Perjungti TV / Radijas režimus"
 
 msgid "Toggle a cut mark at the current position"
 msgstr "Nustatyti iškirpimo žymeklį šioje pozicijoje"
+
+msgid "Toggle between zap and seek mode"
+msgstr ""
 
 msgid "Toggle dashed flickering line for this service"
 msgstr "Perjungti punktyrinę, mirgančią liniją šiam kanalui"
@@ -11058,6 +11133,9 @@ msgstr "Jei įmanoma, naudokite kaip PiP"
 msgid "Use circular LNB"
 msgstr "Naudoti apskritiminę LNB"
 
+msgid "Use current filter values as default"
+msgstr ""
+
 msgid "Use fastscan channel names"
 msgstr "Naudokite greitos paieškos kanalo pavadinimus"
 
@@ -11153,6 +11231,9 @@ msgstr "Naudojama LNB %d"
 
 msgid "Using fixed address"
 msgstr "Naudojami fiksuoti adresai"
+
+msgid "Using the 'Stop' button will cyclically switch displaying events starting: 'outside the interval', 'within the interval', and 'without filtering', instead of 'within the interval', 'outside the interval', and 'without filtering'."
+msgstr ""
 
 #, python-format
 msgid "Using tuner %s"
@@ -11749,6 +11830,9 @@ msgstr "Pasirinkus šį variantą, galima pasirinkti vaizdo režimus, net jei ji
 #, fuzzy
 msgid "When set to 'Yes', all locations where SNR is displayed in dB's will show an SNR percentage, and vice versa."
 msgstr "Jei nustatyta į Taip, visose vietose, kur rodomas SNR dB, bus rodomas SNR procentas ir atvirkščiai."
+
+msgid "When switching the filter, the selected EPG sorting is preserved."
+msgstr ""
 
 msgid "When the content has an aspect ratio of 16:9, choose whether to scale/stretch the picture."
 msgstr "Kai turinys yra kraštinių santykis 16:9, pasirinkti, ar didinti mastelį/ištempti vaizdą."

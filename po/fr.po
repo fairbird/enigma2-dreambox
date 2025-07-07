@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: enigma2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-16 15:41+0100\n"
-"PO-Revision-Date: 2025-03-16 15:50+0100\n"
+"POT-Creation-Date: 2025-07-01 17:09+0200\n"
+"PO-Revision-Date: 2025-07-01 17:19+0200\n"
 "Last-Translator: Pr2\n"
 "Language-Team: french\n"
 "Language: fr\n"
@@ -3272,6 +3272,9 @@ msgstr "EPG"
 msgid "EPG Select Actions"
 msgstr "EPG sélectionner actions"
 
+msgid "EPG filter switching"
+msgstr "Changement de filtre EPG"
+
 msgid "EPG language selection 1"
 msgstr "Sélection de la langue EPG 1"
 
@@ -3289,6 +3292,9 @@ msgstr "Paramètres EPG"
 
 msgid "EPG:"
 msgstr "EPG:"
+
+msgid "EPGFilter Actions"
+msgstr "Actions de filtre EPG"
 
 msgid "EPGSETUP"
 msgstr "CONFIGEPG"
@@ -3427,6 +3433,9 @@ msgstr "Activer le récepteur distant de repli"
 msgid "Enable favourites edit"
 msgstr "Activer l'édition des favoris"
 
+msgid "Enable filtering in SingleEPG"
+msgstr "Activer le filtrage dans SingleEPG"
+
 msgid "Enable freesat EPG"
 msgstr "Activer EPG freesat"
 
@@ -3450,6 +3459,9 @@ msgstr "Activation de la minuterie de mise hors tension"
 
 msgid "Enable remote enigma2 receiver to be tried to tune into services that cannot be tuned into locally (e.g. tuner is occupied or service type is unavailable on the local tuner. Specify complete URL including http:// and port number (normally ...:8001), e.g. http://second_box:8001."
 msgstr "Activer un récepteur enigma2 distant pour essayer de syntoniser les services qui ne peuvent pas l'être localement (p.e. tuners occupés ou le type de service n'est pas disponible sur les tuners locaux. Spécifier l'URL complète http:// et le numéro de port (normalement ...: 8001), p.e. http://second_demo:8001."
+
+msgid "Enable setting a time interval for filtering events in SingleEPG using the 'Stop' button."
+msgstr "Permet de définir un intervalle de temps pour le filtrage des événements dans SingleEPG à l'aide du bouton « Stop »."
 
 msgid "Enable teletext caching"
 msgstr "Activer la mise en cache du télétexte"
@@ -3498,6 +3510,9 @@ msgstr "Terminer l'édition des bouquets"
 
 msgid "End favourites edit"
 msgstr "Terminer l'édition des favoris"
+
+msgid "End of the time interval during which events must begin to be displayed. If the filter is active, use keys 3 and 6 to adjust the end time, and key 0 to save."
+msgstr "Fin de l'intervalle de temps pendant lequel les événements doivent commencer à être affichés. Si le filtre est actif, utilisez les touches 3 et 6 pour régler l'heure de fin et la touche 0 pour sauvegarder."
 
 msgid "End time"
 msgstr "Heure de fin"
@@ -4928,9 +4943,6 @@ msgstr "Installer des extensions"
 msgid "Install local extension"
 msgstr "Installer extension locale"
 
-msgid "Install picons on"
-msgstr "Installer les picons sur"
-
 msgid "Install plugin"
 msgstr "Installation des plugins"
 
@@ -4966,6 +4978,9 @@ msgstr "Flash interne"
 
 msgid "Internal hdd only"
 msgstr "Disque dur interne seulement"
+
+msgid "Internet"
+msgstr "Internet"
 
 msgid "Internet (ntp)"
 msgstr "Internet (ntp)"
@@ -5096,6 +5111,9 @@ msgstr "Kazakhstan"
 
 msgid "Keep service"
 msgstr "Garder le service"
+
+msgid "Keep sorting"
+msgstr "Continuer le tri"
 
 msgid "Kenya"
 msgstr "Kenya"
@@ -6214,6 +6232,33 @@ msgstr "Nombre de texte se répétant sur l'écran."
 
 msgid "Number or SMS style data entry"
 msgstr "Saisie de données de type numéro ou SMS"
+
+msgid "Numberbuttons Seek"
+msgstr "Chercher avec les boutons numériques"
+
+msgid "Numberbuttons Zap"
+msgstr "Zapper avec les boutons numériques"
+
+msgid "Numberzap"
+msgstr "ZapperParNuméro"
+
+msgid "Numberzap or seek backward big step"
+msgstr "Numberzap ou chercher en arrière grand pas"
+
+msgid "Numberzap or seek backward medium step"
+msgstr "Numberzap ou chercher en arrière pas moyen"
+
+msgid "Numberzap or seek backward small step"
+msgstr "Numberzap ou chercher en arrière petit pas"
+
+msgid "Numberzap or seek forward medium step"
+msgstr "Numberzap ou chercher à avancer à pas moyen"
+
+msgid "Numberzap or seek forward small step"
+msgstr "Numberzap ou chercher à avancer à petits pas"
+
+msgid "Numberzap or zap to previous service"
+msgstr "Zapper par numéro ou revenir au service précédent"
 
 msgid "OE Version: "
 msgstr "Version OE: "
@@ -8538,6 +8583,10 @@ msgstr "Nom du service"
 msgid "Services"
 msgstr "Services"
 
+#, python-format
+msgid "Set %s as default?"
+msgstr "Définir %s par défaut?"
+
 msgid "Set CI assignment for detection of available services."
 msgstr "Définir l’assignation du CI pour la détection des services disponibles."
 
@@ -9349,6 +9398,9 @@ msgstr "Démarrer depuis le début"
 msgid "Start instant recording"
 msgstr "Démarrer l'enregistrement directe"
 
+msgid "Start of the time interval during which events must begin to be displayed. If the filter is active, use keys 1 and 4 to adjust the start time, and key 0 to save."
+msgstr "Début de l'intervalle de temps pendant lequel les événements doivent commencer à être affichés. Si le filtre est actif, utilisez les touches 1 et 4 pour régler l'heure de début et la touche 0 pour sauvegarder."
+
 msgid "Start offline decode"
 msgstr "Démarrer le décodage hors ligne"
 
@@ -9516,6 +9568,12 @@ msgstr "URL du flux"
 
 msgid "Stream request"
 msgstr "Demande de flux"
+
+msgid "Stream-tv"
+msgstr "Diffusion en flux TV"
+
+msgid "Streaming"
+msgstr "Diffusion en flux"
 
 msgid "Streaming clients info"
 msgstr "Information des clients de flux (stream)"
@@ -10418,6 +10476,9 @@ msgstr "Aujourd'hui"
 msgid "Toggle Configuration Mode or AutoDisqc"
 msgstr "Basculer le mode de configuration ou AutoDisqc"
 
+msgid "Toggle Filter Order"
+msgstr "Changer l'ordre des filtres"
+
 msgid "Toggle HDMI In"
 msgstr "Activer HDMI In"
 
@@ -10435,6 +10496,9 @@ msgstr "Basculer du mode TV/RADIO"
 
 msgid "Toggle a cut mark at the current position"
 msgstr "Commuter un marqueur coupé à cette position"
+
+msgid "Toggle between zap and seek mode"
+msgstr "Basculer entre le mode zap et le mode recherche"
 
 msgid "Toggle dashed flickering line for this service"
 msgstr "Basculer les scintillements en pointillés pour ce service"
@@ -10867,6 +10931,9 @@ msgstr "Utiliser comme PiP si possible"
 msgid "Use circular LNB"
 msgstr "Utiliser un LNB circulaire"
 
+msgid "Use current filter values as default"
+msgstr "Utiliser les valeurs actuelles du filtre comme valeurs par défaut"
+
 msgid "Use fastscan channel names"
 msgstr "Utiliser le nom des chaînes prévu par la recherche rapide"
 
@@ -10959,6 +11026,9 @@ msgstr "Utilisation LNB %d"
 
 msgid "Using fixed address"
 msgstr "Utilisation d'adresse fixe"
+
+msgid "Using the 'Stop' button will cyclically switch displaying events starting: 'outside the interval', 'within the interval', and 'without filtering', instead of 'within the interval', 'outside the interval', and 'without filtering'."
+msgstr "L'utilisation du bouton « Stop » permet d'afficher cycliquement les événements commençant par « en dehors de l'intervalle », « dans l'intervalle » et « sans filtrage », au lieu de « dans l'intervalle », « en dehors de l'intervalle » et « sans filtrage »."
 
 #, python-format
 msgid "Using tuner %s"
@@ -11549,6 +11619,9 @@ msgstr "Lorsque c’est activé cela permet de sélectionner des modes vidéos m
 
 msgid "When set to 'Yes', all locations where SNR is displayed in dB's will show an SNR percentage, and vice versa."
 msgstr "Lorsqu'il est réglé sur \"Oui\", tous les emplacements où le SNR est affiché en dB afficheront un pourcentage de SNR, et vice versa."
+
+msgid "When switching the filter, the selected EPG sorting is preserved."
+msgstr "Lorsque vous changez de filtre, le tri EPG sélectionné est conservé."
 
 msgid "When the content has an aspect ratio of 16:9, choose whether to scale/stretch the picture."
 msgstr "Lorsque le contenu a un format d'image 16:9, choisir de redimensionner/étirer l'image."

@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Project Slovenia\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-16 15:41+0100\n"
+"POT-Creation-Date: 2025-07-01 17:09+0200\n"
 "PO-Revision-Date: 2020-05-16 18:48+0200\n"
 "Last-Translator: Taykun345 <support@satnigmo.com>\n"
 "Language-Team: Satnigmo <support@satnigmo.com>\n"
@@ -3850,6 +3850,11 @@ msgid "EPG Select Actions"
 msgstr "Izberi dogodek"
 
 #
+#, fuzzy
+msgid "EPG filter switching"
+msgstr "Samodejno preklapljanje SCART"
+
+#
 msgid "EPG language selection 1"
 msgstr "Primarni jezik za EPG sistem"
 
@@ -3869,6 +3874,11 @@ msgstr "Elektronski programski vodič"
 
 msgid "EPG:"
 msgstr ""
+
+#
+#, fuzzy
+msgid "EPGFilter Actions"
+msgstr "Izberi dogodek"
 
 msgid "EPGSETUP"
 msgstr ""
@@ -4043,6 +4053,11 @@ msgid "Enable favourites edit"
 msgstr "Urejanje priljubljenih paketov"
 
 #
+#, fuzzy
+msgid "Enable filtering in SingleEPG"
+msgstr "Virgin EPG sistem"
+
+#
 msgid "Enable freesat EPG"
 msgstr "Freesat EPG sistem"
 
@@ -4072,6 +4087,9 @@ msgstr "Premik kanalov znotraj paketa"
 
 msgid "Enable remote enigma2 receiver to be tried to tune into services that cannot be tuned into locally (e.g. tuner is occupied or service type is unavailable on the local tuner. Specify complete URL including http:// and port number (normally ...:8001), e.g. http://second_box:8001."
 msgstr "Omogoči možnost, da se oddaljeni/rezervni enigma2 sprejemnik uporabi za gledanje kanalov, ki niso na voljo na primarnem sprejemniku ali pa je kanalnik zaseden s sprejemom nekega drugega kanala. Določite celoten naslov - EUR, vključno s \"http: //\". in številko vrat (običajno ...:8001 ), na primer http: // rezervni_sprejemnik:8001."
+
+msgid "Enable setting a time interval for filtering events in SingleEPG using the 'Stop' button."
+msgstr ""
 
 #
 msgid "Enable teletext caching"
@@ -4130,6 +4148,9 @@ msgstr "Konec urejanja paketa"
 #
 msgid "End favourites edit"
 msgstr "Končaj urejanje priljubljenih"
+
+msgid "End of the time interval during which events must begin to be displayed. If the filter is active, use keys 3 and 6 to adjust the end time, and key 0 to save."
+msgstr ""
 
 #
 msgid "End time"
@@ -5802,9 +5823,6 @@ msgstr "Namesti razširitve"
 msgid "Install local extension"
 msgstr "Namestitev lokalne razširitve"
 
-msgid "Install picons on"
-msgstr "Namestitev piconsev na"
-
 #
 #, fuzzy
 msgid "Install plugin"
@@ -5851,6 +5869,10 @@ msgstr "Notranji pomnilnik"
 
 msgid "Internal hdd only"
 msgstr "Samo notranji HDD"
+
+#, fuzzy
+msgid "Internet"
+msgstr "Notranje"
 
 msgid "Internet (ntp)"
 msgstr ""
@@ -5997,6 +6019,11 @@ msgstr ""
 
 #
 msgid "Keep service"
+msgstr "Obdrži kanal"
+
+#
+#, fuzzy
+msgid "Keep sorting"
 msgstr "Obdrži kanal"
 
 msgid "Kenya"
@@ -7348,6 +7375,39 @@ msgstr ""
 
 msgid "Number or SMS style data entry"
 msgstr ""
+
+#
+#, fuzzy
+msgid "Numberbuttons Seek"
+msgstr "Izberi dogodek"
+
+#
+#, fuzzy
+msgid "Numberbuttons Zap"
+msgstr "Izberi dogodek"
+
+msgid "Numberzap"
+msgstr ""
+
+msgid "Numberzap or seek backward big step"
+msgstr ""
+
+msgid "Numberzap or seek backward medium step"
+msgstr ""
+
+msgid "Numberzap or seek backward small step"
+msgstr ""
+
+msgid "Numberzap or seek forward medium step"
+msgstr ""
+
+msgid "Numberzap or seek forward small step"
+msgstr ""
+
+#
+#, fuzzy
+msgid "Numberzap or zap to previous service"
+msgstr "Nazaj na prejšnji kanal"
 
 #, fuzzy
 msgid "OE Version: "
@@ -10133,6 +10193,11 @@ msgstr ""
 msgid "Services"
 msgstr "Kanali"
 
+#
+#, fuzzy, python-format
+msgid "Set %s as default?"
+msgstr "Nastavi kot privzeto"
+
 msgid "Set CI assignment for detection of available services."
 msgstr ""
 
@@ -11112,6 +11177,9 @@ msgstr "Začnite od začetka"
 msgid "Start instant recording"
 msgstr "Začni takojšnje snemanje"
 
+msgid "Start of the time interval during which events must begin to be displayed. If the filter is active, use keys 1 and 4 to adjust the start time, and key 0 to save."
+msgstr ""
+
 msgid "Start offline decode"
 msgstr "Prični z offline dekodiranjem"
 
@@ -11316,6 +11384,14 @@ msgstr "Pretok"
 
 msgid "Stream request"
 msgstr "Zahtevek za pričetek pretakanja"
+
+#, fuzzy
+msgid "Stream-tv"
+msgstr "Pretok"
+
+#, fuzzy
+msgid "Streaming"
+msgstr "Pretok"
 
 msgid "Streaming clients info"
 msgstr ""
@@ -12324,6 +12400,11 @@ msgstr "Danes"
 msgid "Toggle Configuration Mode or AutoDisqc"
 msgstr "Nastavitveni način: %s"
 
+#
+#, fuzzy
+msgid "Toggle Filter Order"
+msgstr "Izberite video način"
+
 msgid "Toggle HDMI In"
 msgstr ""
 
@@ -12344,6 +12425,9 @@ msgstr ""
 #
 msgid "Toggle a cut mark at the current position"
 msgstr "Aktiviranje rezanja na trenutno označenem položaju"
+
+msgid "Toggle between zap and seek mode"
+msgstr ""
 
 msgid "Toggle dashed flickering line for this service"
 msgstr ""
@@ -12851,6 +12935,9 @@ msgstr ""
 msgid "Use circular LNB"
 msgstr ""
 
+msgid "Use current filter values as default"
+msgstr ""
+
 msgid "Use fastscan channel names"
 msgstr "Uporaba \"fastscan\" poimenovanja kanalov"
 
@@ -12964,6 +13051,9 @@ msgid "Using LNB %d"
 msgstr "V uporabi je LNB %d"
 
 msgid "Using fixed address"
+msgstr ""
+
+msgid "Using the 'Stop' button will cyclically switch displaying events starting: 'outside the interval', 'within the interval', and 'without filtering', instead of 'within the interval', 'outside the interval', and 'without filtering'."
 msgstr ""
 
 #, python-format
@@ -13629,6 +13719,9 @@ msgstr ""
 #, fuzzy
 msgid "When set to 'Yes', all locations where SNR is displayed in dB's will show an SNR percentage, and vice versa."
 msgstr "Če je nastavljeno na Da, bodo vsa mesta, kjer je prikazan SNR v dB, prikazala odstotek SNR in obratno."
+
+msgid "When switching the filter, the selected EPG sorting is preserved."
+msgstr ""
 
 msgid "When the content has an aspect ratio of 16:9, choose whether to scale/stretch the picture."
 msgstr "Če ima vsebina razmerje slike 16:9, potem lahko določite, kako naj se slika prilagaja zaslonu. Priporočena nastavitev je \"Samodejno\"."

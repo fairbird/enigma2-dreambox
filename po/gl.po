@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: enigma2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-16 15:41+0100\n"
+"POT-Creation-Date: 2025-07-01 17:09+0200\n"
 "PO-Revision-Date: 2021-10-16 21:21+0200\n"
 "Last-Translator: Luis A. Martínez <luis.a.martinez@gmail.com>\n"
 "Language-Team: LAMS\n"
@@ -3702,6 +3702,10 @@ msgstr "EPG"
 msgid "EPG Select Actions"
 msgstr "Seleccionar acción"
 
+#, fuzzy
+msgid "EPG filter switching"
+msgstr "Filtrado PID"
+
 msgid "EPG language selection 1"
 msgstr "Selección do idioma 1 da EPG"
 
@@ -3720,6 +3724,10 @@ msgstr "Configuración da EPG"
 
 msgid "EPG:"
 msgstr "EPG:"
+
+#, fuzzy
+msgid "EPGFilter Actions"
+msgstr "Seleccionar acción"
 
 msgid "EPGSETUP"
 msgstr ""
@@ -3876,6 +3884,10 @@ msgstr "Activar o receptor de reserva remoto"
 msgid "Enable favourites edit"
 msgstr "Activar a edición de favoritos"
 
+#, fuzzy
+msgid "Enable filtering in SingleEPG"
+msgstr "Activar a EPG Virgin"
+
 msgid "Enable freesat EPG"
 msgstr "Activar a EPG freesat"
 
@@ -3902,6 +3914,9 @@ msgstr "Activar o temporizador de activación"
 
 msgid "Enable remote enigma2 receiver to be tried to tune into services that cannot be tuned into locally (e.g. tuner is occupied or service type is unavailable on the local tuner. Specify complete URL including http:// and port number (normally ...:8001), e.g. http://second_box:8001."
 msgstr "Activar o receptor enigma2 remoto para que intente sintonizar os servizos que non se poden sintonizar localmente (por exemplo, o sintonizador está ocupado ou o tipo de servizo no está dispoñible no sintonizador local) Especifica o URL completo incluíndo http:// e o porto (normalmente 8001 ), Por exemplo, http://outro_receptor.com:8001."
+
+msgid "Enable setting a time interval for filtering events in SingleEPG using the 'Stop' button."
+msgstr ""
 
 msgid "Enable teletext caching"
 msgstr "Activar o almacenamento en caché de teletexto"
@@ -3959,6 +3974,9 @@ msgstr "Rematar a edición de buqués"
 #
 msgid "End favourites edit"
 msgstr "Rematar a edición de favoritos"
+
+msgid "End of the time interval during which events must begin to be displayed. If the filter is active, use keys 3 and 6 to adjust the end time, and key 0 to save."
+msgstr ""
 
 #
 msgid "End time"
@@ -5565,9 +5583,6 @@ msgstr "Instalar extensións"
 msgid "Install local extension"
 msgstr "Instalar extensión local"
 
-msgid "Install picons on"
-msgstr "Instalar picones en"
-
 #
 #, fuzzy
 msgid "Install plugin"
@@ -5615,6 +5630,10 @@ msgstr "Flash interno"
 
 msgid "Internal hdd only"
 msgstr "Só hdd interno"
+
+#, fuzzy
+msgid "Internet"
+msgstr "Interno"
 
 msgid "Internet (ntp)"
 msgstr "Internet (ntp)"
@@ -5759,6 +5778,10 @@ msgid "Kazakhstan"
 msgstr "Casaquistán"
 
 msgid "Keep service"
+msgstr "Manter servizo"
+
+#, fuzzy
+msgid "Keep sorting"
 msgstr "Manter servizo"
 
 msgid "Kenya"
@@ -7057,6 +7080,36 @@ msgstr "Número de texto repetido na pantalla."
 
 msgid "Number or SMS style data entry"
 msgstr "Números ou tipo de entrada ao estilo SMS"
+
+#, fuzzy
+msgid "Numberbuttons Seek"
+msgstr "educación avanzada"
+
+#, fuzzy
+msgid "Numberbuttons Zap"
+msgstr "educación avanzada"
+
+msgid "Numberzap"
+msgstr ""
+
+msgid "Numberzap or seek backward big step"
+msgstr ""
+
+msgid "Numberzap or seek backward medium step"
+msgstr ""
+
+msgid "Numberzap or seek backward small step"
+msgstr ""
+
+msgid "Numberzap or seek forward medium step"
+msgstr ""
+
+msgid "Numberzap or seek forward small step"
+msgstr ""
+
+#, fuzzy
+msgid "Numberzap or zap to previous service"
+msgstr "Volver ao servizo anterior"
 
 #, fuzzy
 msgid "OE Version: "
@@ -9705,6 +9758,10 @@ msgstr "Nome do servizo"
 msgid "Services"
 msgstr "Servizos"
 
+#, fuzzy, python-format
+msgid "Set %s as default?"
+msgstr "Establecer valor predeterminado"
+
 msgid "Set CI assignment for detection of available services."
 msgstr "Establecer a asignación de CI para a detección de servizos dispoñibles."
 
@@ -10616,6 +10673,9 @@ msgstr "Comezar desde o inicio"
 msgid "Start instant recording"
 msgstr "Comezar a gravación instantánea"
 
+msgid "Start of the time interval during which events must begin to be displayed. If the filter is active, use keys 1 and 4 to adjust the start time, and key 0 to save."
+msgstr ""
+
 msgid "Start offline decode"
 msgstr "Comezar a descodificación sen conexión"
 
@@ -10811,6 +10871,14 @@ msgstr "Fluxo"
 
 msgid "Stream request"
 msgstr "Solicitude de fluxo"
+
+#, fuzzy
+msgid "Stream-tv"
+msgstr "Fluxo"
+
+#, fuzzy
+msgid "Streaming"
+msgstr "Fluxo"
 
 msgid "Streaming clients info"
 msgstr "Información sobre os clientes de fluxo"
@@ -11813,6 +11881,11 @@ msgstr "Hoxe"
 msgid "Toggle Configuration Mode or AutoDisqc"
 msgstr "Modo Configuración: %s"
 
+#
+#, fuzzy
+msgid "Toggle Filter Order"
+msgstr "Alternar o modo de video"
+
 msgid "Toggle HDMI In"
 msgstr "Alternar entrada HDMI"
 
@@ -11832,6 +11905,9 @@ msgstr "Alternar os modos TV/RADIO"
 #
 msgid "Toggle a cut mark at the current position"
 msgstr "Crear/eliminar unha marca de corte na posición actual"
+
+msgid "Toggle between zap and seek mode"
+msgstr ""
 
 msgid "Toggle dashed flickering line for this service"
 msgstr "Conmutar a liña de pestañexante discontinua para este servizo"
@@ -12313,6 +12389,9 @@ msgstr "Usar como PiP se é posible"
 msgid "Use circular LNB"
 msgstr "Usar LNB circular"
 
+msgid "Use current filter values as default"
+msgstr ""
+
 msgid "Use fastscan channel names"
 msgstr "Usar os nomes das canles de fastscan"
 
@@ -12421,6 +12500,9 @@ msgstr "Utilizando LNB %d"
 
 msgid "Using fixed address"
 msgstr "Usando enderezo fixo"
+
+msgid "Using the 'Stop' button will cyclically switch displaying events starting: 'outside the interval', 'within the interval', and 'without filtering', instead of 'within the interval', 'outside the interval', and 'without filtering'."
+msgstr ""
 
 #, python-format
 msgid "Using tuner %s"
@@ -13070,6 +13152,9 @@ msgstr "Cando se selecciona, permítense seleccionar modos de vídeo que non se 
 #, fuzzy
 msgid "When set to 'Yes', all locations where SNR is displayed in dB's will show an SNR percentage, and vice versa."
 msgstr "Se se define como Si, todos os lugares onde se mostra a SNR en dB mostrarán a porcentaxe de SNR e viceversa."
+
+msgid "When switching the filter, the selected EPG sorting is preserved."
+msgstr ""
 
 msgid "When the content has an aspect ratio of 16:9, choose whether to scale/stretch the picture."
 msgstr "Cando o contido ten unha relación de aspecto de 16:9, elixe se desexas escalar/estirar a imaxe."

@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openpli\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-16 15:41+0100\n"
+"POT-Creation-Date: 2025-07-01 17:09+0200\n"
 "PO-Revision-Date: 2019-04-03 06:49+0300\n"
 "Last-Translator: \n"
 "Language-Team: Raivo, Henkka, eesatfan, rimas, zeros\\n faas, sateks, valgekotkas, tigekala, rootsikunn\\n kain, i70, mustkass, pelmeen, Scott\\n <digi-tv.ee>\n"
@@ -3351,6 +3351,10 @@ msgstr "Saatekava"
 msgid "EPG Select Actions"
 msgstr "Vali tegevus"
 
+#, fuzzy
+msgid "EPG filter switching"
+msgstr "Autom. SCART ümberlülitus"
+
 msgid "EPG language selection 1"
 msgstr "EPG keele valik 1"
 
@@ -3368,6 +3372,10 @@ msgstr "Saatekava seaded"
 
 msgid "EPG:"
 msgstr ""
+
+#, fuzzy
+msgid "EPGFilter Actions"
+msgstr "Vali tegevus"
 
 msgid "EPGSETUP"
 msgstr ""
@@ -3510,6 +3518,10 @@ msgstr "Luba kaugvastuvõtja"
 msgid "Enable favourites edit"
 msgstr "Luba lemmikute muutmine"
 
+#, fuzzy
+msgid "Enable filtering in SingleEPG"
+msgstr "Luba Virgin EPG"
+
 msgid "Enable freesat EPG"
 msgstr "Luba freesat EPG"
 
@@ -3535,6 +3547,9 @@ msgstr "Luba äratustaimer"
 
 msgid "Enable remote enigma2 receiver to be tried to tune into services that cannot be tuned into locally (e.g. tuner is occupied or service type is unavailable on the local tuner. Specify complete URL including http:// and port number (normally ...:8001), e.g. http://second_box:8001."
 msgstr "Luba E2 kaugvastuvõtjal proovida häälestuda teenustele, mida ei saa kohapeal kasutada (näiteks kohaliku vastuvõtja tuuner on hõivatud või teenuse tüüp on kohalikule tuunerile sobimatu. Määra terviklik URL mis sisaldab http:// ja pordi numbrit (tavaliselt ...:8001), näiteks http://second_box:8001"
+
+msgid "Enable setting a time interval for filtering events in SingleEPG using the 'Stop' button."
+msgstr ""
 
 msgid "Enable teletext caching"
 msgstr "Luba teleteksti puhverdamine"
@@ -3583,6 +3598,9 @@ msgstr "Salvesta muudatused ja välju"
 
 msgid "End favourites edit"
 msgstr "Salvesta muudatused ja välju"
+
+msgid "End of the time interval during which events must begin to be displayed. If the filter is active, use keys 3 and 6 to adjust the end time, and key 0 to save."
+msgstr ""
 
 msgid "End time"
 msgstr "Lõpetamise aeg"
@@ -5071,9 +5089,6 @@ msgstr "Paigalda laiendused"
 msgid "Install local extension"
 msgstr "Paigalda kohalik laiendus"
 
-msgid "Install picons on"
-msgstr "Paigalda kanalilogod"
-
 #, fuzzy
 msgid "Install plugin"
 msgstr "Paigaldamine"
@@ -5111,6 +5126,10 @@ msgstr "Sisemine flash-mälu"
 
 msgid "Internal hdd only"
 msgstr "Ainult sisemine kõvaketas"
+
+#, fuzzy
+msgid "Internet"
+msgstr "Sisemine"
 
 msgid "Internet (ntp)"
 msgstr ""
@@ -5242,6 +5261,10 @@ msgid "Kazakhstan"
 msgstr "Kasahstan"
 
 msgid "Keep service"
+msgstr "Jää teenusele"
+
+#, fuzzy
+msgid "Keep sorting"
 msgstr "Jää teenusele"
 
 msgid "Kenya"
@@ -6396,6 +6419,36 @@ msgstr "Näidikul korduva teksti arv."
 
 msgid "Number or SMS style data entry"
 msgstr ""
+
+#, fuzzy
+msgid "Numberbuttons Seek"
+msgstr "edasine haridus"
+
+#, fuzzy
+msgid "Numberbuttons Zap"
+msgstr "edasine haridus"
+
+msgid "Numberzap"
+msgstr ""
+
+msgid "Numberzap or seek backward big step"
+msgstr ""
+
+msgid "Numberzap or seek backward medium step"
+msgstr ""
+
+msgid "Numberzap or seek backward small step"
+msgstr ""
+
+msgid "Numberzap or seek forward medium step"
+msgstr ""
+
+msgid "Numberzap or seek forward small step"
+msgstr ""
+
+#, fuzzy
+msgid "Numberzap or zap to previous service"
+msgstr "Tagasi eelmise teenuse juurde"
 
 #, fuzzy
 msgid "OE Version: "
@@ -8788,6 +8841,10 @@ msgstr "Teenuse nimi"
 msgid "Services"
 msgstr "Kanalid"
 
+#, fuzzy, python-format
+msgid "Set %s as default?"
+msgstr "Sea vaikeseadesse"
+
 msgid "Set CI assignment for detection of available services."
 msgstr ""
 
@@ -9632,6 +9689,9 @@ msgstr "Alusta algusest"
 msgid "Start instant recording"
 msgstr "Alusta kohest salvestust"
 
+msgid "Start of the time interval during which events must begin to be displayed. If the filter is active, use keys 1 and 4 to adjust the start time, and key 0 to save."
+msgstr ""
+
 msgid "Start offline decode"
 msgstr "Alusta võrguta dekodeerimist"
 
@@ -9806,6 +9866,14 @@ msgstr "Voog"
 
 msgid "Stream request"
 msgstr "Striimi päring"
+
+#, fuzzy
+msgid "Stream-tv"
+msgstr "Voog"
+
+#, fuzzy
+msgid "Streaming"
+msgstr "Voog"
 
 msgid "Streaming clients info"
 msgstr "Voogedastuse klientide info"
@@ -10742,6 +10810,10 @@ msgstr "Täna"
 msgid "Toggle Configuration Mode or AutoDisqc"
 msgstr "Häälestamine: %s"
 
+#, fuzzy
+msgid "Toggle Filter Order"
+msgstr "Vali video töörežiim"
+
 msgid "Toggle HDMI In"
 msgstr "Lülita HDMI sisendeid"
 
@@ -10760,6 +10832,9 @@ msgstr "Vaheta TV/RADIO vahel"
 
 msgid "Toggle a cut mark at the current position"
 msgstr "Pane lõikemärk praegusele kohale"
+
+msgid "Toggle between zap and seek mode"
+msgstr ""
 
 msgid "Toggle dashed flickering line for this service"
 msgstr "Vaheta võbeleva katkendjoonega joon selle teenuse puhul"
@@ -11208,6 +11283,9 @@ msgstr "Kasuta nagu PiP kui võimalik"
 msgid "Use circular LNB"
 msgstr "Kasuta ringpolarisatsiooni LNB"
 
+msgid "Use current filter values as default"
+msgstr ""
+
 msgid "Use fastscan channel names"
 msgstr "Kasuta kiirotsingu kanalinimesid"
 
@@ -11304,6 +11382,9 @@ msgstr "Kasutuses LNB %d"
 
 msgid "Using fixed address"
 msgstr "Püsiaadress kasutuses"
+
+msgid "Using the 'Stop' button will cyclically switch displaying events starting: 'outside the interval', 'within the interval', and 'without filtering', instead of 'within the interval', 'outside the interval', and 'without filtering'."
+msgstr ""
 
 #, python-format
 msgid "Using tuner %s"
@@ -11913,6 +11994,9 @@ msgstr ""
 #, fuzzy
 msgid "When set to 'Yes', all locations where SNR is displayed in dB's will show an SNR percentage, and vice versa."
 msgstr "Kui see on seatud väärtusele Jah, kuvatakse kõigis kohtades, kus kuvatakse SNR-i dB-des, SNR protsenti ja vastupidi."
+
+msgid "When switching the filter, the selected EPG sorting is preserved."
+msgstr ""
 
 msgid "When the content has an aspect ratio of 16:9, choose whether to scale/stretch the picture."
 msgstr "Määra, kas 16:9 pildisuhtega sisu tuleb skaleerida/venitada."

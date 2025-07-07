@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: enigma2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-16 15:41+0100\n"
+"POT-Creation-Date: 2025-07-01 17:09+0200\n"
 "PO-Revision-Date: 2021-11-03 15:10+0100\n"
 "Last-Translator: mcfly82\n"
 "Language-Team: mcfly82 & wysless\n"
@@ -3331,6 +3331,10 @@ msgstr "EPG"
 msgid "EPG Select Actions"
 msgstr "Művelet kiválasztása"
 
+#, fuzzy
+msgid "EPG filter switching"
+msgstr "PID szűrés"
+
 msgid "EPG language selection 1"
 msgstr "EPG nyelvválasztás 1"
 
@@ -3348,6 +3352,10 @@ msgstr "EPG beállítások"
 
 msgid "EPG:"
 msgstr "EPG:"
+
+#, fuzzy
+msgid "EPGFilter Actions"
+msgstr "Művelet kiválasztása"
 
 msgid "EPGSETUP"
 msgstr ""
@@ -3487,6 +3495,10 @@ msgstr "Tartalék távoli vevő engedélyezése"
 msgid "Enable favourites edit"
 msgstr "Kedvencek módosításának engedélyezése"
 
+#, fuzzy
+msgid "Enable filtering in SingleEPG"
+msgstr "Virgin EPG engedélyezése"
+
 msgid "Enable freesat EPG"
 msgstr "Freesat EPG engedélyezése"
 
@@ -3511,6 +3523,9 @@ msgstr "Felébresztés időzítő engedélyezése"
 
 msgid "Enable remote enigma2 receiver to be tried to tune into services that cannot be tuned into locally (e.g. tuner is occupied or service type is unavailable on the local tuner. Specify complete URL including http:// and port number (normally ...:8001), e.g. http://second_box:8001."
 msgstr "Lehetővé teszi, hogy egy távoli enigma2 készülékről próbálja meg a csatorna megjelenítését, ha a helyi tuner erre nem képes (pl. a tuner foglalt, mert egy másik csatornán felvétel van folyamatban). Adja meg a tljes URL-t, beleértve a 'http://' részt és a port számát is. Pl: http://second_box:8001."
+
+msgid "Enable setting a time interval for filtering events in SingleEPG using the 'Stop' button."
+msgstr ""
 
 msgid "Enable teletext caching"
 msgstr "Teletext gyorsítótárazása"
@@ -3559,6 +3574,9 @@ msgstr "Lista szerkesztés befejezése"
 
 msgid "End favourites edit"
 msgstr "Kedvencek módosításának vége"
+
+msgid "End of the time interval during which events must begin to be displayed. If the filter is active, use keys 3 and 6 to adjust the end time, and key 0 to save."
+msgstr ""
 
 msgid "End time"
 msgstr "Vége időpont"
@@ -5035,9 +5053,6 @@ msgstr "Bővítmények telepítése"
 msgid "Install local extension"
 msgstr "Helyi bővítmények telepítése"
 
-msgid "Install picons on"
-msgstr "Pikonok telepítése ide"
-
 #, fuzzy
 msgid "Install plugin"
 msgstr "Telepítés"
@@ -5075,6 +5090,10 @@ msgstr "Belső Flash"
 
 msgid "Internal hdd only"
 msgstr "Csak a belső háttértárról"
+
+#, fuzzy
+msgid "Internet"
+msgstr "Belső"
 
 msgid "Internet (ntp)"
 msgstr "Internet (ntp)"
@@ -5207,6 +5226,10 @@ msgid "Kazakhstan"
 msgstr "Kazahsztán"
 
 msgid "Keep service"
+msgstr "Csatorna megtartása"
+
+#, fuzzy
+msgid "Keep sorting"
 msgstr "Csatorna megtartása"
 
 msgid "Kenya"
@@ -6351,6 +6374,36 @@ msgstr "A kijelzőn ismétlődő szövegek száma."
 
 msgid "Number or SMS style data entry"
 msgstr "SMS vagy szám stílusú adatbevitel"
+
+#, fuzzy
+msgid "Numberbuttons Seek"
+msgstr "továbboktatás"
+
+#, fuzzy
+msgid "Numberbuttons Zap"
+msgstr "továbboktatás"
+
+msgid "Numberzap"
+msgstr ""
+
+msgid "Numberzap or seek backward big step"
+msgstr ""
+
+msgid "Numberzap or seek backward medium step"
+msgstr ""
+
+msgid "Numberzap or seek backward small step"
+msgstr ""
+
+msgid "Numberzap or seek forward medium step"
+msgstr ""
+
+msgid "Numberzap or seek forward small step"
+msgstr ""
+
+#, fuzzy
+msgid "Numberzap or zap to previous service"
+msgstr "Előző csatornára váltás"
 
 #, fuzzy
 msgid "OE Version: "
@@ -8711,6 +8764,10 @@ msgstr "Csatornanév"
 msgid "Services"
 msgstr "Csatornák"
 
+#, fuzzy, python-format
+msgid "Set %s as default?"
+msgstr "Alapértelmezett"
+
 msgid "Set CI assignment for detection of available services."
 msgstr "A CI hozzárendelés beállítása az elérhető szolgáltatások érzékeléséhez."
 
@@ -9547,6 +9604,9 @@ msgstr "Indítsa az elejétől"
 msgid "Start instant recording"
 msgstr "Azonalli felvétel indítása"
 
+msgid "Start of the time interval during which events must begin to be displayed. If the filter is active, use keys 1 and 4 to adjust the start time, and key 0 to save."
+msgstr ""
+
 msgid "Start offline decode"
 msgstr "Offline dekódolás indítása"
 
@@ -9720,6 +9780,14 @@ msgstr "Adatfolyam"
 
 msgid "Stream request"
 msgstr "Adatfolyam kérés"
+
+#, fuzzy
+msgid "Stream-tv"
+msgstr "Adatfolyam"
+
+#, fuzzy
+msgid "Streaming"
+msgstr "Adatfolyam"
 
 msgid "Streaming clients info"
 msgstr "Streamelő kliensek"
@@ -10632,6 +10700,10 @@ msgstr "Ma"
 msgid "Toggle Configuration Mode or AutoDisqc"
 msgstr "Konfigurációs mód: %s"
 
+#, fuzzy
+msgid "Toggle Filter Order"
+msgstr "Video mód kapcsoló"
+
 msgid "Toggle HDMI In"
 msgstr "HDMI bemenet be/ki"
 
@@ -10650,6 +10722,9 @@ msgstr "TV/Rádió mód be/ki"
 
 msgid "Toggle a cut mark at the current position"
 msgstr "Jelenlegi pozícióra vágási jelet tenni"
+
+msgid "Toggle between zap and seek mode"
+msgstr ""
 
 msgid "Toggle dashed flickering line for this service"
 msgstr "A kép tetején lévő villogó csík eltakarása ezen csatornánál be/ki"
@@ -11087,6 +11162,9 @@ msgstr "Kép a képben használata, ha lehetséges"
 msgid "Use circular LNB"
 msgstr "Körpoláros fej használata"
 
+msgid "Use current filter values as default"
+msgstr ""
+
 msgid "Use fastscan channel names"
 msgstr "Szolgáltató által megadott csatorna elnevezés"
 
@@ -11182,6 +11260,9 @@ msgstr "%d fej használatával"
 
 msgid "Using fixed address"
 msgstr "Fix cím használatával"
+
+msgid "Using the 'Stop' button will cyclically switch displaying events starting: 'outside the interval', 'within the interval', and 'without filtering', instead of 'within the interval', 'outside the interval', and 'without filtering'."
+msgstr ""
 
 #, python-format
 msgid "Using tuner %s"
@@ -11777,6 +11858,9 @@ msgstr "Ezzel engedélyezheti a nem támogatott videómódok kiválasztását."
 #, fuzzy
 msgid "When set to 'Yes', all locations where SNR is displayed in dB's will show an SNR percentage, and vice versa."
 msgstr "Ha az Igen értékre van állítva, minden olyan helyen, ahol az SNR dB-ben jelenik meg, megjelenik az SNR százaléka, és fordítva."
+
+msgid "When switching the filter, the selected EPG sorting is preserved."
+msgstr ""
 
 msgid "When the content has an aspect ratio of 16:9, choose whether to scale/stretch the picture."
 msgstr "Egy 16:9-es kép méretarányú tartalom nagyítva vagy széthúzva legyen."

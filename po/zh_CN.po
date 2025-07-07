@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: enigma2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-16 15:41+0100\n"
+"POT-Creation-Date: 2025-07-01 17:09+0200\n"
 "PO-Revision-Date: 2025-01-20 11:41+0800\n"
 "Last-Translator: Mark Stone <Mark@kram.com>\n"
 "Language-Team: \n"
@@ -3282,6 +3282,10 @@ msgstr "EPG"
 msgid "EPG Select Actions"
 msgstr "选择 EPG 操作"
 
+#, fuzzy
+msgid "EPG filter switching"
+msgstr "PID 过滤"
+
 msgid "EPG language selection 1"
 msgstr "选择 EPG 语言 1"
 
@@ -3299,6 +3303,10 @@ msgstr "设置 EPG"
 
 msgid "EPG:"
 msgstr "EPG："
+
+#, fuzzy
+msgid "EPGFilter Actions"
+msgstr "选择 EPG 操作"
 
 msgid "EPGSETUP"
 msgstr "设置 EPG"
@@ -3437,6 +3445,10 @@ msgstr "启用备用远程接收机"
 msgid "Enable favourites edit"
 msgstr "启用收藏夹编辑"
 
+#, fuzzy
+msgid "Enable filtering in SingleEPG"
+msgstr "启用 Virgin EPG"
+
 msgid "Enable freesat EPG"
 msgstr "启用 freesat EPG"
 
@@ -3460,6 +3472,9 @@ msgstr "启用关机定时器"
 
 msgid "Enable remote enigma2 receiver to be tried to tune into services that cannot be tuned into locally (e.g. tuner is occupied or service type is unavailable on the local tuner. Specify complete URL including http:// and port number (normally ...:8001), e.g. http://second_box:8001."
 msgstr "启用远程 enigma2 接收机以尝试调谐到无法在本地调谐的频道（例如，调谐器被占用或本地调谐器上不可用的频道类型）。指定完整的URL，包括http://和端口号（通常为...:8001），例如http://second_box:8001。"
+
+msgid "Enable setting a time interval for filtering events in SingleEPG using the 'Stop' button."
+msgstr ""
 
 msgid "Enable teletext caching"
 msgstr "启用图文电视缓存"
@@ -3508,6 +3523,9 @@ msgstr "结束频道群编辑"
 
 msgid "End favourites edit"
 msgstr "结束收藏夹编辑"
+
+msgid "End of the time interval during which events must begin to be displayed. If the filter is active, use keys 3 and 6 to adjust the end time, and key 0 to save."
+msgstr ""
 
 msgid "End time"
 msgstr "结束时间"
@@ -4942,9 +4960,6 @@ msgstr "安装扩展"
 msgid "Install local extension"
 msgstr "安装本地扩展"
 
-msgid "Install picons on"
-msgstr "安装频道图标在"
-
 msgid "Install plugin"
 msgstr "安装插件"
 
@@ -4980,6 +4995,10 @@ msgstr "内部闪存"
 
 msgid "Internal hdd only"
 msgstr "仅内置硬盘"
+
+#, fuzzy
+msgid "Internet"
+msgstr "内部"
 
 msgid "Internet (ntp)"
 msgstr "互联网（NTP）"
@@ -5111,6 +5130,10 @@ msgid "Kazakhstan"
 msgstr "哈萨克斯坦"
 
 msgid "Keep service"
+msgstr "保留频道"
+
+#, fuzzy
+msgid "Keep sorting"
 msgstr "保留频道"
 
 msgid "Kenya"
@@ -6232,6 +6255,36 @@ msgstr "显示的重复文本的数量。"
 
 msgid "Number or SMS style data entry"
 msgstr "数字或短信样式的数据输入"
+
+#, fuzzy
+msgid "Numberbuttons Seek"
+msgstr "数字操作"
+
+#, fuzzy
+msgid "Numberbuttons Zap"
+msgstr "数字操作"
+
+msgid "Numberzap"
+msgstr ""
+
+msgid "Numberzap or seek backward big step"
+msgstr ""
+
+msgid "Numberzap or seek backward medium step"
+msgstr ""
+
+msgid "Numberzap or seek backward small step"
+msgstr ""
+
+msgid "Numberzap or seek forward medium step"
+msgstr ""
+
+msgid "Numberzap or seek forward small step"
+msgstr ""
+
+#, fuzzy
+msgid "Numberzap or zap to previous service"
+msgstr "回退到上一个频道"
 
 msgid "OE Version: "
 msgstr "OE 版本： "
@@ -8563,6 +8616,10 @@ msgstr "频道名称"
 msgid "Services"
 msgstr "频道"
 
+#, fuzzy, python-format
+msgid "Set %s as default?"
+msgstr "设为默认"
+
 msgid "Set CI assignment for detection of available services."
 msgstr "设置 CI 分配以检测可用频道。"
 
@@ -9378,6 +9435,9 @@ msgstr "从头开始"
 msgid "Start instant recording"
 msgstr "开始即时录制"
 
+msgid "Start of the time interval during which events must begin to be displayed. If the filter is active, use keys 1 and 4 to adjust the start time, and key 0 to save."
+msgstr ""
+
 msgid "Start offline decode"
 msgstr "开始离线解码"
 
@@ -9545,6 +9605,14 @@ msgstr "串流 URL 地址"
 
 msgid "Stream request"
 msgstr "串流请求"
+
+#, fuzzy
+msgid "Stream-tv"
+msgstr "流媒体"
+
+#, fuzzy
+msgid "Streaming"
+msgstr "流媒体"
 
 msgid "Streaming clients info"
 msgstr "流媒体客户端信息"
@@ -10444,6 +10512,10 @@ msgstr "今天"
 msgid "Toggle Configuration Mode or AutoDisqc"
 msgstr "切换配置模式或自动 DiSEqC"
 
+#, fuzzy
+msgid "Toggle Filter Order"
+msgstr "切换视频模式"
+
 msgid "Toggle HDMI In"
 msgstr "切换 HDMI IN"
 
@@ -10462,6 +10534,9 @@ msgstr "切换电视/广播模式"
 
 msgid "Toggle a cut mark at the current position"
 msgstr "在当前位置切换剪辑标记"
+
+msgid "Toggle between zap and seek mode"
+msgstr ""
 
 msgid "Toggle dashed flickering line for this service"
 msgstr "切换此频道的虚线闪烁行"
@@ -10891,6 +10966,9 @@ msgstr "如果可能，用作画中画"
 msgid "Use circular LNB"
 msgstr "使用圆极化高频头"
 
+msgid "Use current filter values as default"
+msgstr ""
+
 msgid "Use fastscan channel names"
 msgstr "使用快速扫描频道名称"
 
@@ -10983,6 +11061,9 @@ msgstr "正在使用高频头 %d"
 
 msgid "Using fixed address"
 msgstr "使用固定地址"
+
+msgid "Using the 'Stop' button will cyclically switch displaying events starting: 'outside the interval', 'within the interval', and 'without filtering', instead of 'within the interval', 'outside the interval', and 'without filtering'."
+msgstr ""
 
 #, python-format
 msgid "Using tuner %s"
@@ -11573,6 +11654,9 @@ msgstr "选择此项后，即使某些视频模式未被报告为受支持，也
 
 msgid "When set to 'Yes', all locations where SNR is displayed in dB's will show an SNR percentage, and vice versa."
 msgstr "当设置为“是”时，所有以 dB 为单位显示信噪比的位置将显示信噪比百分比，反之亦然。"
+
+msgid "When switching the filter, the selected EPG sorting is preserved."
+msgstr ""
 
 msgid "When the content has an aspect ratio of 16:9, choose whether to scale/stretch the picture."
 msgstr "当内容的宽高比为 16:9 时，选择是否对画面进行缩放/拉伸。"

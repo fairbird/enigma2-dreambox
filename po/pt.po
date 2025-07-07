@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: enigma2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-16 15:41+0100\n"
+"POT-Creation-Date: 2025-07-01 17:09+0200\n"
 "PO-Revision-Date: 2014-12-15 19:38-0000\n"
 "Last-Translator: Phenom <phenomxy@gmail.com>\n"
 "Language-Team: Muaitai <muaitai@gmail.com>\n"
@@ -3811,6 +3811,11 @@ msgstr "Guia de Programação"
 msgid "EPG Select Actions"
 msgstr "Seleccionar acção"
 
+#
+#, fuzzy
+msgid "EPG filter switching"
+msgstr "Selecção automática porta SCART"
+
 msgid "EPG language selection 1"
 msgstr "Idioma de Guia de Programação 1"
 
@@ -3830,6 +3835,10 @@ msgstr "Definições de Guia de Programação"
 
 msgid "EPG:"
 msgstr ""
+
+#, fuzzy
+msgid "EPGFilter Actions"
+msgstr "Seleccionar acção"
 
 msgid "EPGSETUP"
 msgstr ""
@@ -3994,6 +4003,10 @@ msgstr ""
 msgid "Enable favourites edit"
 msgstr "Activar a edição dos favoritos"
 
+#, fuzzy
+msgid "Enable filtering in SingleEPG"
+msgstr "Activar Guia de Programação Virgin"
+
 msgid "Enable freesat EPG"
 msgstr "Activar Guia de Programação freesat"
 
@@ -4021,6 +4034,9 @@ msgid "Enable power off timer"
 msgstr "Activar modo deslocar"
 
 msgid "Enable remote enigma2 receiver to be tried to tune into services that cannot be tuned into locally (e.g. tuner is occupied or service type is unavailable on the local tuner. Specify complete URL including http:// and port number (normally ...:8001), e.g. http://second_box:8001."
+msgstr ""
+
+msgid "Enable setting a time interval for filtering events in SingleEPG using the 'Stop' button."
 msgstr ""
 
 msgid "Enable teletext caching"
@@ -4081,6 +4097,9 @@ msgstr "Terminar edição de Bouquet"
 #
 msgid "End favourites edit"
 msgstr "Terminar edição de favoritos"
+
+msgid "End of the time interval during which events must begin to be displayed. If the filter is active, use keys 3 and 6 to adjust the end time, and key 0 to save."
+msgstr ""
 
 #
 msgid "End time"
@@ -5722,9 +5741,6 @@ msgstr "Instalar extensões"
 msgid "Install local extension"
 msgstr "Instalar extensão local"
 
-msgid "Install picons on"
-msgstr "Instalar picons em"
-
 #
 #, fuzzy
 msgid "Install plugin"
@@ -5776,6 +5792,10 @@ msgstr "Flash interna"
 
 msgid "Internal hdd only"
 msgstr "Apenas no disco rígido interno"
+
+#, fuzzy
+msgid "Internet"
+msgstr "Interface: "
 
 msgid "Internet (ntp)"
 msgstr ""
@@ -5929,6 +5949,10 @@ msgid "Kazakhstan"
 msgstr ""
 
 msgid "Keep service"
+msgstr "Manter canal"
+
+#, fuzzy
+msgid "Keep sorting"
 msgstr "Manter canal"
 
 msgid "Kenya"
@@ -7298,6 +7322,37 @@ msgstr ""
 
 msgid "Number or SMS style data entry"
 msgstr ""
+
+#, fuzzy
+msgid "Numberbuttons Seek"
+msgstr "educação"
+
+#, fuzzy
+msgid "Numberbuttons Zap"
+msgstr "educação"
+
+msgid "Numberzap"
+msgstr ""
+
+msgid "Numberzap or seek backward big step"
+msgstr ""
+
+msgid "Numberzap or seek backward medium step"
+msgstr ""
+
+msgid "Numberzap or seek backward small step"
+msgstr ""
+
+msgid "Numberzap or seek forward medium step"
+msgstr ""
+
+msgid "Numberzap or seek forward small step"
+msgstr ""
+
+#
+#, fuzzy
+msgid "Numberzap or zap to previous service"
+msgstr "Voltar ao canal anterior"
 
 #, fuzzy
 msgid "OE Version: "
@@ -10090,6 +10145,10 @@ msgstr ""
 msgid "Services"
 msgstr "Canais"
 
+#, fuzzy, python-format
+msgid "Set %s as default?"
+msgstr "Definir como padrão"
+
 msgid "Set CI assignment for detection of available services."
 msgstr ""
 
@@ -11069,6 +11128,9 @@ msgstr "Começar do início"
 msgid "Start instant recording"
 msgstr ""
 
+msgid "Start of the time interval during which events must begin to be displayed. If the filter is active, use keys 1 and 4 to adjust the start time, and key 0 to save."
+msgstr ""
+
 msgid "Start offline decode"
 msgstr "Iniciar desencriptação offline"
 
@@ -11274,6 +11336,14 @@ msgstr "Stream"
 
 msgid "Stream request"
 msgstr "Pedido de Stream"
+
+#, fuzzy
+msgid "Stream-tv"
+msgstr "Stream"
+
+#, fuzzy
+msgid "Streaming"
+msgstr "Stream"
 
 msgid "Streaming clients info"
 msgstr ""
@@ -12300,6 +12370,11 @@ msgstr "Hoje"
 msgid "Toggle Configuration Mode or AutoDisqc"
 msgstr "Modo de configuração: %s"
 
+#
+#, fuzzy
+msgid "Toggle Filter Order"
+msgstr "Seleccione modo de vídeo"
+
 msgid "Toggle HDMI In"
 msgstr ""
 
@@ -12321,6 +12396,9 @@ msgstr ""
 #, fuzzy
 msgid "Toggle a cut mark at the current position"
 msgstr "Marcar na posição actual"
+
+msgid "Toggle between zap and seek mode"
+msgstr ""
 
 msgid "Toggle dashed flickering line for this service"
 msgstr ""
@@ -12831,6 +12909,9 @@ msgstr ""
 msgid "Use circular LNB"
 msgstr ""
 
+msgid "Use current filter values as default"
+msgstr ""
+
 msgid "Use fastscan channel names"
 msgstr "Usar o nome dos canais da pesquisa rápida"
 
@@ -12952,6 +13033,9 @@ msgstr "LNB em uso: %d"
 
 msgid "Using fixed address"
 msgstr "Usar endereço fixo"
+
+msgid "Using the 'Stop' button will cyclically switch displaying events starting: 'outside the interval', 'within the interval', and 'without filtering', instead of 'within the interval', 'outside the interval', and 'without filtering'."
+msgstr ""
 
 #, python-format
 msgid "Using tuner %s"
@@ -13625,6 +13709,9 @@ msgstr ""
 #, fuzzy
 msgid "When set to 'Yes', all locations where SNR is displayed in dB's will show an SNR percentage, and vice versa."
 msgstr "Se definido para Sim, todos os locais onde o SNR em dB é apresentado apresentam a percentagem de SNR e vice-versa."
+
+msgid "When switching the filter, the selected EPG sorting is preserved."
+msgstr ""
 
 msgid "When the content has an aspect ratio of 16:9, choose whether to scale/stretch the picture."
 msgstr "Quando o conteúdo tem uma relação de aspecto de 16:9, escolher se deseja dimensionar/esticar a imagem."

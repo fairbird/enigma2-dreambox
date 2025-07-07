@@ -3,16 +3,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: OpenPLi enigma2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-16 15:41+0100\n"
+"POT-Creation-Date: 2025-07-01 17:09+0200\n"
 "PO-Revision-Date: \n"
-"Last-Translator: IMS <ims@openpli.org>\n"
+"Last-Translator: ims <ims@openpli.org>\n"
 "Language-Team: PLi <ims@openpli.org>\n"
 "Language: cs_CZ\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
-"X-Generator: Poedit 3.5\n"
+"X-Generator: Poedit 3.6\n"
 
 #
 msgid ""
@@ -1312,7 +1312,7 @@ msgstr "Audio PID%s, kodek & jazyk"
 
 #
 msgid "Audio Selection Actions"
-msgstr ""
+msgstr "Audio Selection Akce"
 
 msgid "Audio auto volume level"
 msgstr "Automatická úroveň hlasitosti"
@@ -1996,15 +1996,15 @@ msgstr "Informace o programu"
 
 #
 msgid "Channel Select Base Actions"
-msgstr ""
+msgstr "Channel Select Base Akce"
 
 #
 msgid "Channel Select EPG Actions"
-msgstr ""
+msgstr "Channel Select EPG Akce"
 
 #
 msgid "Channel Select Edit Actions"
-msgstr ""
+msgstr "Channel Select Edit Akce"
 
 #
 msgid "Channel Selection"
@@ -2150,7 +2150,7 @@ msgstr "Vánoční ostrov"
 
 #
 msgid "Ci Selection Actions"
-msgstr ""
+msgstr "Ci Selection Akce"
 
 msgid "Circular LNB"
 msgstr "Circular LNB"
@@ -2242,7 +2242,7 @@ msgstr "Barva"
 
 #
 msgid "Color Actions"
-msgstr ""
+msgstr "Color Akce"
 
 #
 msgid "Color format"
@@ -2301,7 +2301,7 @@ msgstr "Vytváření názvů nahrávaných souborů"
 
 #
 msgid "Config List Actions"
-msgstr ""
+msgstr "Config List Akce"
 
 msgid "Config Scan Details"
 msgstr "Konfigurovat detaily prohledávání"
@@ -2917,11 +2917,11 @@ msgstr "Střih"
 
 #
 msgid "Cut List Editor Actions"
-msgstr ""
+msgstr "Cut List Editor Akce"
 
 #
 msgid "Cutlist Seek Actions"
-msgstr ""
+msgstr "Cutlist Seek Akce"
 
 #
 msgid "Cutlist editor"
@@ -3030,7 +3030,7 @@ msgstr "DVD přehrávač"
 
 #
 msgid "DVDPlayer Actions"
-msgstr ""
+msgstr "DVDPlayer Akce"
 
 #
 msgid "DVDTitle List"
@@ -3038,7 +3038,7 @@ msgstr "Seznam DVD titulů"
 
 #
 msgid "DVDToolbox"
-msgstr ""
+msgstr "DVDToolbox"
 
 #
 msgid "Danish"
@@ -3358,7 +3358,7 @@ msgstr "Okamžité přehrávání připojených titulů bez menu"
 
 #
 msgid "Direction Actions"
-msgstr ""
+msgstr "Direction Akce"
 
 #
 msgid "Directory"
@@ -3755,7 +3755,10 @@ msgstr "EPG"
 
 #
 msgid "EPG Select Actions"
-msgstr ""
+msgstr "EPG Select Akce"
+
+msgid "EPG filter switching"
+msgstr "Přepínání EPG filtru"
 
 #
 msgid "EPG language selection 1"
@@ -3777,6 +3780,10 @@ msgstr "Nastavení EPG"
 
 msgid "EPG:"
 msgstr "EPG:"
+
+#
+msgid "EPGFilter Actions"
+msgstr "EPGFilter Akce"
 
 msgid "EPGSETUP"
 msgstr "EPGSETUP"
@@ -3938,6 +3945,10 @@ msgstr "Povolit záložní přijímač"
 msgid "Enable favourites edit"
 msgstr "Povolit úpravu oblíbených"
 
+#
+msgid "Enable filtering in SingleEPG"
+msgstr "Povolit filtrování v EPG jednoho kanálu"
+
 msgid "Enable freesat EPG"
 msgstr "Povolit freesat EPG"
 
@@ -3965,6 +3976,9 @@ msgstr "Povolit časovač vypnutí"
 
 msgid "Enable remote enigma2 receiver to be tried to tune into services that cannot be tuned into locally (e.g. tuner is occupied or service type is unavailable on the local tuner. Specify complete URL including http:// and port number (normally ...:8001), e.g. http://second_box:8001."
 msgstr "Na vzdáleném přijímači se budou zkoušet naladit služby, které nelze naladit lokálně (např. tuner je obsazený nebo typ služby není k dispozici na místním tuneru). Zadejte úplnou URL adresu včetně http:// a číslo portu (normálně ...:8001), například http://druhy_box:8001."
+
+msgid "Enable setting a time interval for filtering events in SingleEPG using the 'Stop' button."
+msgstr "Povolí nastavení časového intervalu pro filtrování událostí v EPG kanálu pomocí tlačítka 'Stop'."
 
 msgid "Enable teletext caching"
 msgstr "Povolit caching teletextu"
@@ -4023,6 +4037,9 @@ msgstr "Ukončit úpravu přehledu"
 #
 msgid "End favourites edit"
 msgstr "Ukončit úpravu oblíbených"
+
+msgid "End of the time interval during which events must begin to be displayed. If the filter is active, use keys 3 and 6 to adjust the end time, and key 0 to save."
+msgstr "Konec časového intervalu, ve kterém musí události začínat, aby byly zobrazeny. Pokud je filtr aktivní, použijte klávesy 3 a 6 pro změnu času konce a klávesu 0 pro uložení."
 
 #
 msgid "End time"
@@ -4210,10 +4227,10 @@ msgstr "Etiopie"
 
 #
 msgid "Event View Actions"
-msgstr ""
+msgstr "Event View Akce"
 
 msgid "Event View EPG Actions"
-msgstr ""
+msgstr "Event View EPG Akce"
 
 msgid "Event font size (relative to skin size)"
 msgstr "Velikost písma pro událost (relativně k velikosti skinu)"
@@ -4772,7 +4789,7 @@ msgid "Fullbackup Images"
 msgstr "Úplná záloha obrazů"
 
 msgid "Function Key Actions"
-msgstr ""
+msgstr "Function Key Akce"
 
 msgid "Function of OK button"
 msgstr "Funkce tlačítka OK"
@@ -4795,7 +4812,7 @@ msgstr "GB"
 
 #
 msgid "GMEPG Select Actions"
-msgstr ""
+msgstr "GMEPG Select Akce"
 
 msgid "GREEN"
 msgstr "GREEN"
@@ -4863,7 +4880,7 @@ msgid "Gibraltar"
 msgstr "Gibraltar"
 
 msgid "Global Actions"
-msgstr ""
+msgstr "Global Akce"
 
 #
 msgid "Go down the list"
@@ -5103,7 +5120,7 @@ msgstr "Nápověda"
 
 #
 msgid "Help Actions"
-msgstr ""
+msgstr "Help Akce"
 
 msgid "Help Screen"
 msgstr "Nápověda"
@@ -5190,7 +5207,7 @@ msgid "Hotkey"
 msgstr "Hotkey"
 
 msgid "Hotkey Actions"
-msgstr ""
+msgstr "Hotkey Akce"
 
 msgid "Hotkey Panic"
 msgstr "Hotkey Panic"
@@ -5450,84 +5467,84 @@ msgstr "Doba po které skrývat infobar"
 
 #
 msgid "Infobar Actions"
-msgstr ""
+msgstr "Infobar Akce"
 
 #
 msgid "Infobar Audio Selection Actions"
-msgstr ""
+msgstr "Infobar Audio Selection Akce"
 
 #
 msgid "Infobar Channel Selection"
-msgstr ""
+msgstr "Infobar Channel Selection"
 
 msgid "Infobar Cue Sheet Actions"
-msgstr ""
+msgstr "Infobar Cue Sheet Akce"
 
 #
 msgid "Infobar EPG Actions"
-msgstr ""
+msgstr "Infobar EPG Akce"
 
 #
 msgid "Infobar Extensions"
-msgstr ""
+msgstr "Infobar Extensions"
 
 #
 msgid "Infobar Instant Record"
-msgstr ""
+msgstr "Infobar Instant Record"
 
 #
 msgid "Infobar Menu Actions"
-msgstr ""
+msgstr "Infobar Menu Akce"
 
 msgid "Infobar Movie List Actions"
-msgstr ""
+msgstr "Infobar Movie List Akce"
 
 #
 msgid "Infobar PiP Actions"
-msgstr ""
+msgstr "Infobar PiP Akce"
 
 #
 msgid "Infobar Rds Actions"
-msgstr ""
+msgstr "Infobar Rds Akce"
 
 msgid "Infobar Red Button Actions"
-msgstr ""
+msgstr "Infobar Red Button Akce"
 
 #
 msgid "Infobar Seek Actions"
-msgstr ""
+msgstr "Infobar Seek Akce"
 
 msgid "Infobar Show Hide Actions"
-msgstr ""
+msgstr "Infobar Show Hide Akce"
 
 msgid "Infobar Subservice Quickzap Actions"
-msgstr ""
+msgstr "Infobar Subservice Quickzap Akce"
 
 #
 msgid "Infobar Subservice Selection Actions"
-msgstr ""
+msgstr "Infobar Subservice Selection Akce"
 
 #
 msgid "Infobar Subtitle Selection Actions"
-msgstr ""
+msgstr "Infobar Subtitle Selection Akce"
 
 #
 msgid "Infobar Teletext Actions"
-msgstr ""
+msgstr "Infobar Teletext Akce"
 
 msgid "Infobar Timer Button Actions"
-msgstr ""
+msgstr "Infobar Timer Button Akce"
 
 #
 msgid "Infobar Timeshift Actions"
-msgstr ""
+msgstr "Infobar Timeshift Akce"
 
 #
 msgid "Infobar Timeshift Activate Actions"
-msgstr ""
+msgstr "Infobar Timeshift Activate Akce"
 
 msgid "Infobar Vmode Button Actions"
-msgstr ""
+msgstr "Infobar Vmode Button Akce"
 
 msgid "Infobar frontend data source"
 msgstr "Zdroj Infobar frontend dat"
@@ -5590,13 +5607,13 @@ msgstr "Zadání "
 
 #
 msgid "Input Actions"
-msgstr ""
+msgstr "Input Akce"
 
 msgid "Input Ascii Actions"
-msgstr ""
+msgstr "Input Ascii Akce"
 
 msgid "Input Box Actions"
-msgstr ""
+msgstr "Input Box Akce"
 
 msgid "Input Stream ID"
 msgstr "Input Stream ID"
@@ -5630,10 +5647,6 @@ msgstr "Instalovat rozšíření"
 #
 msgid "Install local extension"
 msgstr "Instalovat místní rozšíření"
-
-#
-msgid "Install picons on"
-msgstr "Instalovat picons do"
 
 #
 msgid "Install plugin"
@@ -5680,6 +5693,9 @@ msgstr "Vnitřní flash"
 #
 msgid "Internal hdd only"
 msgstr "Pouze interní disk"
+
+msgid "Internet"
+msgstr "Internet"
 
 msgid "Internet (ntp)"
 msgstr "Internet (ntp)"
@@ -5829,6 +5845,10 @@ msgstr "Kazachstán"
 msgid "Keep service"
 msgstr "Zůstat na programu"
 
+#
+msgid "Keep sorting"
+msgstr "Zachovat třídění"
+
 msgid "Kenya"
 msgstr "Keňa"
 
@@ -5861,7 +5881,7 @@ msgstr "Klávesnice"
 
 #
 msgid "Keyboard Input Actions"
-msgstr ""
+msgstr "Keyboard Input Akce"
 
 #
 msgid "Keyboard data entry"
@@ -6062,10 +6082,10 @@ msgstr[2] "Seznam verze %(ver)d, nalezeno %(num)d kanálů"
 
 #
 msgid "Listbox Actions"
-msgstr ""
+msgstr "Listbox Akce"
 
 msgid "Listbox Help Menu Actions"
-msgstr ""
+msgstr "Listbox Help Menu Akce"
 
 #
 msgid "Listen to the radio..."
@@ -6327,13 +6347,13 @@ msgstr "Mayotte"
 
 #
 msgid "Media Player Actions"
-msgstr ""
+msgstr "Media Player Akce"
 
 msgid "Media Player Cue Sheet Actions"
-msgstr ""
+msgstr "Media Player Cue Sheet Akce"
 
 msgid "Media Player Seek Actions"
-msgstr ""
+msgstr "Media Player Seek Akce"
 
 #
 msgid "Media player"
@@ -6367,7 +6387,7 @@ msgstr "Menu"
 
 #
 msgid "Menu Actions"
-msgstr ""
+msgstr "Menu Akce"
 
 msgid "Menu button function"
 msgstr "Funkce tlačítka menu"
@@ -6401,7 +6421,7 @@ msgid "Minimum send interval"
 msgstr "Minimální interval posílání"
 
 msgid "Minute Input Actions"
-msgstr ""
+msgstr "Minute Input Akce"
 
 msgid "Missing "
 msgstr "Chybí "
@@ -6589,11 +6609,11 @@ msgid "Movement"
 msgstr "Natáčení"
 
 msgid "Movie Player Actions"
-msgstr ""
+msgstr "Movie Player Akce"
 
 #
 msgid "Movie Selection Actions"
-msgstr ""
+msgstr "Movie Selection Akce"
 
 msgid "Movie list configuration"
 msgstr "Nastavení seznamu filmů"
@@ -6625,7 +6645,7 @@ msgid "Mozambique"
 msgstr "Mosambik"
 
 msgid "Msg Box Actions"
-msgstr ""
+msgstr "Msg Box Akce"
 
 #
 msgid "Multi EPG"
@@ -6730,7 +6750,7 @@ msgstr "Pro pohyb nahoru/dolů použijte tlačítka UP/DOWN, pro změnu stránky
 
 #
 msgid "Navigation Actions"
-msgstr ""
+msgstr "Navigation Akce"
 
 msgid "Nepal"
 msgstr "Nepál"
@@ -7121,7 +7141,7 @@ msgid "Now, use the contrast setting to turn up the brightness of the background
 msgstr "Nyní použijte nastavení kontrastu pro nastavení světlosti pozadí na nejvyšší hodnotu, ale ujistěte se, že stále vidíte rozdíl mezi dvěma nejsvětlejšími odstíny. Pokud jste hotovi, stiskněte OK."
 
 msgid "Number Actions"
-msgstr ""
+msgstr "Number Akce"
 
 #
 msgid "Number of channels shown in channel selection list"
@@ -7132,6 +7152,36 @@ msgstr "Počet opakování textu na displeji."
 
 msgid "Number or SMS style data entry"
 msgstr "Číslo nebo SMS styl zadávání"
+
+msgid "Numberbuttons Seek"
+msgstr "Posun pomocí číselných tlačítek"
+
+msgid "Numberbuttons Zap"
+msgstr "Přepínání pomocí číselných tlačítek"
+
+msgid "Numberzap"
+msgstr "Přepnutí číslem"
+
+msgid "Numberzap or seek backward big step"
+msgstr "Přepnutí číslem nebo posun dozadu o velký krok"
+
+msgid "Numberzap or seek backward medium step"
+msgstr "Přepnutí číslem nebo posun dozadu o střední krok"
+
+msgid "Numberzap or seek backward small step"
+msgstr "Přepnutí číslem nebo posun dozadu o malý krok"
+
+msgid "Numberzap or seek forward big step"
+msgstr "Přepnutí číslem nebo posun dopředu o velký krok"
+
+msgid "Numberzap or seek forward medium step"
+msgstr "Přepnutí číslem nebo posun vpřed o střední krok"
+
+msgid "Numberzap or seek forward small step"
+msgstr "Přepnutí číslem nebo posun vpřed o malý krok"
+
+msgid "Numberzap or zap to previous service"
+msgstr "Přepnutí číslem nebo na předchozí stanici"
 
 msgid "OE Version: "
 msgstr "OE verze: "
@@ -7173,7 +7223,7 @@ msgstr "Zpoždění offline dekódování (ms)"
 
 #
 msgid "Ok Cancel Actions"
-msgstr ""
+msgstr "Ok Cancel Akce"
 
 msgid "Oman"
 msgstr "Omán"
@@ -7507,7 +7557,7 @@ msgstr "Nastavení PiP"
 
 #
 msgid "PiPSetup Actions"
-msgstr ""
+msgstr "PiPSetup Akce"
 
 msgid "Picon"
 msgstr "Pikona"
@@ -7966,7 +8016,7 @@ msgid "Positioner setup log"
 msgstr "Log nastavení pozicioneru"
 
 msgid "Power Key Actions"
-msgstr ""
+msgstr "Power Key Akce"
 
 msgid "Power LED"
 msgstr ""
@@ -8359,7 +8409,7 @@ msgstr "Náhodný"
 
 #
 msgid "Rass Interactive Actions"
-msgstr ""
+msgstr "Rass Interactive Akce"
 
 #, python-format
 msgid "Rating defined by broadcaster - %d"
@@ -9043,7 +9093,7 @@ msgid "Satellites"
 msgstr "Satelity"
 
 msgid "Satlist Shortcut Action"
-msgstr ""
+msgstr "Satlist Shortcut Akce"
 
 #
 msgid "Sats"
@@ -9825,6 +9875,11 @@ msgstr "Název programu"
 msgid "Services"
 msgstr "Programy"
 
+#
+#, python-format
+msgid "Set %s as default?"
+msgstr "Nastavit %s jako výchozí?"
+
 msgid "Set CI assignment for detection of available services."
 msgstr "Nastavte CI přiřazení pro zjištění dostupných programů."
 
@@ -9944,7 +9999,7 @@ msgstr "Nastavení"
 
 #
 msgid "Setup Actions"
-msgstr ""
+msgstr "Setup Akce"
 
 #
 msgid "Setup hard disk"
@@ -9982,7 +10037,7 @@ msgstr "Krátké názvy souborů"
 
 #
 msgid "Shortcut Actions"
-msgstr ""
+msgstr "Shortcut Akce"
 
 msgid "Show"
 msgstr "Zobrazit"
@@ -10401,7 +10456,7 @@ msgstr "Výběr skinu"
 
 #
 msgid "Skin Selection Actions"
-msgstr ""
+msgstr "Skin Selection Akce"
 
 msgid "SkinSelector: Restart GUI"
 msgstr "Výběr skinu - restartovat rozhraní"
@@ -10420,7 +10475,7 @@ msgid "Skip jumping to live TV while timeshifting with plugins"
 msgstr "Přeskočit návrat do živého vysílání při timeshiftu z pluginů"
 
 msgid "Sleep Timer Editor Actions"
-msgstr ""
+msgstr "Sleep Timer Editor Akce"
 
 #
 msgid "Sleep timer"
@@ -10704,7 +10759,7 @@ msgid "Standby / restart"
 msgstr "Standby / restart"
 
 msgid "Standby Actions"
-msgstr ""
+msgstr "Standby Akce"
 
 #
 msgid "Standby LED"
@@ -10751,6 +10806,9 @@ msgstr "Spustit od začátku"
 
 msgid "Start instant recording"
 msgstr "Spustit okamžité nahrávání"
+
+msgid "Start of the time interval during which events must begin to be displayed. If the filter is active, use keys 1 and 4 to adjust the start time, and key 0 to save."
+msgstr "Začátek časového intervalu, ve kterém musí události začínat, aby byly zobrazeny. Pokud je filtr aktivní, použijte klávesy 1 a 4 pro změnu času začátku a klávesu 0 pro uložení."
 
 #
 msgid "Start offline decode"
@@ -10947,6 +11005,12 @@ msgstr "Stream URL"
 
 msgid "Stream request"
 msgstr "Požadavek streamu"
+
+msgid "Stream-tv"
+msgstr "Stream-tv"
+
+msgid "Streaming"
+msgstr ""
 
 msgid "Streaming clients info"
 msgstr "Klienti používající stream"
@@ -11258,7 +11322,7 @@ msgstr "Tanzánie"
 
 #
 msgid "Teletext Actions"
-msgstr ""
+msgstr "Teletext Akce"
 
 msgid "Teletext subtitle color"
 msgstr "Barva teletextových titulků"
@@ -11293,10 +11357,10 @@ msgid "Testscreens that are helpfull to fine-tune your display"
 msgstr "Testovací obrazce pomáhají doladit obrazovku"
 
 msgid "Text Edit Actions"
-msgstr ""
+msgstr "Text Edit Akce"
 
 msgid "Text Entry Actions"
-msgstr ""
+msgstr "Text Entry Akce"
 
 msgid "Text View On"
 msgstr ""
@@ -11827,7 +11891,7 @@ msgstr "Časovač"
 
 #
 msgid "Timer Edit Actions"
-msgstr ""
+msgstr "Timer Edit Akce"
 
 #
 msgid "Timer Overview"
@@ -11943,6 +12007,10 @@ msgstr "Dnes"
 msgid "Toggle Configuration Mode or AutoDisqc"
 msgstr "Přepnout na konfigurační mód nebo AutoDisqc"
 
+#
+msgid "Toggle Filter Order"
+msgstr "Otočit pořadí filtru"
+
 msgid "Toggle HDMI In"
 msgstr "Přepnout HDMI vstup"
 
@@ -11961,6 +12029,9 @@ msgstr "Přepínat TV/RADIO mód"
 #
 msgid "Toggle a cut mark at the current position"
 msgstr "Přepnout střihovou značku na této pozici"
+
+msgid "Toggle between zap and seek mode"
+msgstr "Přepínání mezi přepínáním kanálů a posunem"
 
 msgid "Toggle dashed flickering line for this service"
 msgstr "Přepínat blikající linku pro tento program"
@@ -12170,7 +12241,7 @@ msgstr "Tuvalu"
 
 #
 msgid "Tv Radio Actions"
-msgstr ""
+msgstr "Tv Radio Akce"
 
 #
 msgid "Two"
@@ -12449,6 +12520,9 @@ msgstr "Použít jako PiP"
 msgid "Use circular LNB"
 msgstr "Použít circular LNB"
 
+msgid "Use current filter values as default"
+msgstr "Uložit aktuální hodnoty filtru"
+
 msgid "Use fastscan channel names"
 msgstr "Použít fastscan jména kanálů"
 
@@ -12558,6 +12632,9 @@ msgstr "Používá se LNB %d"
 
 msgid "Using fixed address"
 msgstr "Používaná pevná adresa"
+
+msgid "Using the 'Stop' button will cyclically switch displaying events starting: 'outside the interval', 'within the interval', and 'without filtering', instead of 'within the interval', 'outside the interval', and 'without filtering'."
+msgstr "Použití tlačítka 'Stop' bude cyklicky přepínat zobrazování událostí začínajících: 'mimo interval', 'v intervalu' a 'bez filtrace', namísto 'v intervalu', 'mimo interval' a 'bez filtrace'."
 
 #, python-format
 msgid "Using tuner %s"
@@ -12770,7 +12847,7 @@ msgstr "Panenské ostrovy (U.S.)"
 
 #
 msgid "Virtual Key Board Actions"
-msgstr ""
+msgstr "Virtual Key Board Akce"
 
 #
 msgid "Virtual KeyBoard Functions"
@@ -12782,7 +12859,7 @@ msgstr "Text virtuální klávesnice:"
 
 #
 msgid "Virtual Keyboard Actions"
-msgstr ""
+msgstr "Virtual Keyboard Akce"
 
 #
 msgid "Virtual keyboard"
@@ -13205,6 +13282,9 @@ msgstr "Umožňuje zvolit módy videa i přesto, že nejsou označeny jako podpo
 msgid "When set to 'Yes', all locations where SNR is displayed in dB's will show an SNR percentage, and vice versa."
 msgstr "Pokud je nastaveno na 'Ano', na všech místech, kde je zobrazen SNR v dB, se zobrazí SNR v procentech a naopak."
 
+msgid "When switching the filter, the selected EPG sorting is preserved."
+msgstr "Při přepínání filtru se zachovává zvolené setřídění EPG."
+
 msgid "When the content has an aspect ratio of 16:9, choose whether to scale/stretch the picture."
 msgstr "Pro obsah s poměrem stran 16:9 zvolte, zda chcete změnit velikost/roztáhnout obraz."
 
@@ -13220,7 +13300,7 @@ msgstr "Kam ukládat dočasný záznam timeshiftu?"
 
 #
 msgid "Window Actions"
-msgstr ""
+msgstr "Window Akce"
 
 #
 msgid "Wireless LAN"
@@ -13268,7 +13348,7 @@ msgstr "Bez dialogu"
 
 #
 msgid "Wizard Actions"
-msgstr ""
+msgstr "Wizard Akce"
 
 #
 msgid "Wizard setup"

@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: enigma2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-16 15:41+0100\n"
+"POT-Creation-Date: 2025-07-01 17:09+0200\n"
 "PO-Revision-Date: 2008-12-29 16:22+0100\n"
 "Last-Translator: gerrit <gerrit@nedlinux.nl>\n"
 "Language-Team: gerrit <fy@li.org>\n"
@@ -3785,6 +3785,11 @@ msgstr ""
 msgid "EPG Select Actions"
 msgstr "EPG Seleksje"
 
+#
+#, fuzzy
+msgid "EPG filter switching"
+msgstr "Auto scart skeakelje"
+
 msgid "EPG language selection 1"
 msgstr ""
 
@@ -3804,6 +3809,11 @@ msgstr ""
 
 msgid "EPG:"
 msgstr ""
+
+#
+#, fuzzy
+msgid "EPGFilter Actions"
+msgstr "EPG Seleksje"
 
 msgid "EPGSETUP"
 msgstr ""
@@ -3966,6 +3976,9 @@ msgstr ""
 msgid "Enable favourites edit"
 msgstr "Bewurkjen favorieten oan"
 
+msgid "Enable filtering in SingleEPG"
+msgstr ""
+
 msgid "Enable freesat EPG"
 msgstr ""
 
@@ -3992,6 +4005,9 @@ msgid "Enable power off timer"
 msgstr "Ferpleatsen mode oan"
 
 msgid "Enable remote enigma2 receiver to be tried to tune into services that cannot be tuned into locally (e.g. tuner is occupied or service type is unavailable on the local tuner. Specify complete URL including http:// and port number (normally ...:8001), e.g. http://second_box:8001."
+msgstr ""
+
+msgid "Enable setting a time interval for filtering events in SingleEPG using the 'Stop' button."
 msgstr ""
 
 msgid "Enable teletext caching"
@@ -4052,6 +4068,9 @@ msgstr "Bewurkjen boeket út"
 #
 msgid "End favourites edit"
 msgstr "Bewurkjen favoriet út"
+
+msgid "End of the time interval during which events must begin to be displayed. If the filter is active, use keys 3 and 6 to adjust the end time, and key 0 to save."
+msgstr ""
 
 #
 msgid "End time"
@@ -5700,9 +5719,6 @@ msgstr ""
 msgid "Install local extension"
 msgstr ""
 
-msgid "Install picons on"
-msgstr ""
-
 #
 #, fuzzy
 msgid "Install plugin"
@@ -5751,6 +5767,9 @@ msgid "Internal flash"
 msgstr "Ynterne Flash"
 
 msgid "Internal hdd only"
+msgstr ""
+
+msgid "Internet"
 msgstr ""
 
 msgid "Internet (ntp)"
@@ -5903,6 +5922,11 @@ msgstr ""
 
 msgid "Keep service"
 msgstr ""
+
+#
+#, fuzzy
+msgid "Keep sorting"
+msgstr "Untfangst Ynstellingen"
 
 msgid "Kenya"
 msgstr ""
@@ -7268,6 +7292,39 @@ msgstr ""
 
 msgid "Number or SMS style data entry"
 msgstr ""
+
+#
+#, fuzzy
+msgid "Numberbuttons Seek"
+msgstr "Kies Lokaasje"
+
+#
+#, fuzzy
+msgid "Numberbuttons Zap"
+msgstr "Kies Lokaasje"
+
+msgid "Numberzap"
+msgstr ""
+
+msgid "Numberzap or seek backward big step"
+msgstr ""
+
+msgid "Numberzap or seek backward medium step"
+msgstr ""
+
+msgid "Numberzap or seek backward small step"
+msgstr ""
+
+msgid "Numberzap or seek forward medium step"
+msgstr ""
+
+msgid "Numberzap or seek forward small step"
+msgstr ""
+
+#
+#, fuzzy
+msgid "Numberzap or zap to previous service"
+msgstr "Werom nei foariche service"
 
 #
 #, fuzzy
@@ -10039,6 +10096,11 @@ msgstr ""
 msgid "Services"
 msgstr "Kanalen"
 
+#
+#, fuzzy, python-format
+msgid "Set %s as default?"
+msgstr "lyst styl standert"
+
 msgid "Set CI assignment for detection of available services."
 msgstr ""
 
@@ -11000,6 +11062,9 @@ msgstr "Start fanôf it begjin"
 msgid "Start instant recording"
 msgstr ""
 
+msgid "Start of the time interval during which events must begin to be displayed. If the filter is active, use keys 1 and 4 to adjust the start time, and key 0 to save."
+msgstr ""
+
 msgid "Start offline decode"
 msgstr ""
 
@@ -11207,6 +11272,16 @@ msgstr ""
 
 msgid "Stream request"
 msgstr ""
+
+#
+#, fuzzy
+msgid "Stream-tv"
+msgstr "Transponder type"
+
+#
+#, fuzzy
+msgid "Streaming"
+msgstr "Transponder type"
 
 msgid "Streaming clients info"
 msgstr ""
@@ -12218,6 +12293,11 @@ msgstr "Hjoed"
 msgid "Toggle Configuration Mode or AutoDisqc"
 msgstr "Ynstellingen modus"
 
+#
+#, fuzzy
+msgid "Toggle Filter Order"
+msgstr "Kies fideo moadus"
+
 msgid "Toggle HDMI In"
 msgstr ""
 
@@ -12239,6 +12319,9 @@ msgstr ""
 #, fuzzy
 msgid "Toggle a cut mark at the current position"
 msgstr "merker oan/út op dizze posysje"
+
+msgid "Toggle between zap and seek mode"
+msgstr ""
 
 msgid "Toggle dashed flickering line for this service"
 msgstr ""
@@ -12741,6 +12824,9 @@ msgstr ""
 msgid "Use circular LNB"
 msgstr ""
 
+msgid "Use current filter values as default"
+msgstr ""
+
 msgid "Use fastscan channel names"
 msgstr ""
 
@@ -12862,6 +12948,9 @@ msgid "Using LNB %d"
 msgstr ""
 
 msgid "Using fixed address"
+msgstr ""
+
+msgid "Using the 'Stop' button will cyclically switch displaying events starting: 'outside the interval', 'within the interval', and 'without filtering', instead of 'within the interval', 'outside the interval', and 'without filtering'."
 msgstr ""
 
 #, python-format
@@ -13510,6 +13599,9 @@ msgstr ""
 #, fuzzy
 msgid "When set to 'Yes', all locations where SNR is displayed in dB's will show an SNR percentage, and vice versa."
 msgstr "As ynsteld op Ja, sille alle plakken wêr't de SNR yn dB wurdt werjûn it SNR-persintaazje werjaan en oarsom."
+
+msgid "When switching the filter, the selected EPG sorting is preserved."
+msgstr ""
 
 msgid "When the content has an aspect ratio of 16:9, choose whether to scale/stretch the picture."
 msgstr ""

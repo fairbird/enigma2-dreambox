@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tuxbox-enigma 0.0.1-En-Th\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-16 15:41+0100\n"
+"POT-Creation-Date: 2025-07-01 17:09+0200\n"
 "PO-Revision-Date: 2010-04-08 18:13+0700\n"
 "Last-Translator: Tony - Thaidreambox\n"
 "Language-Team: Tony @ Thai Dreambox <tonyboyth@gmail.com>\n"
@@ -3411,6 +3411,10 @@ msgstr ""
 msgid "EPG Select Actions"
 msgstr "เลือกผังรายการ"
 
+#, fuzzy
+msgid "EPG filter switching"
+msgstr "เปลี่ยน scart อัตโนมัติ"
+
 msgid "EPG language selection 1"
 msgstr ""
 
@@ -3429,6 +3433,10 @@ msgstr ""
 
 msgid "EPG:"
 msgstr ""
+
+#, fuzzy
+msgid "EPGFilter Actions"
+msgstr "เลือกผังรายการ"
 
 msgid "EPGSETUP"
 msgstr ""
@@ -3572,6 +3580,9 @@ msgstr ""
 msgid "Enable favourites edit"
 msgstr "แก้ไขรายการโปรด"
 
+msgid "Enable filtering in SingleEPG"
+msgstr ""
+
 msgid "Enable freesat EPG"
 msgstr ""
 
@@ -3595,6 +3606,9 @@ msgid "Enable power off timer"
 msgstr "ทำการเคลื่อนย้าย"
 
 msgid "Enable remote enigma2 receiver to be tried to tune into services that cannot be tuned into locally (e.g. tuner is occupied or service type is unavailable on the local tuner. Specify complete URL including http:// and port number (normally ...:8001), e.g. http://second_box:8001."
+msgstr ""
+
+msgid "Enable setting a time interval for filtering events in SingleEPG using the 'Stop' button."
 msgstr ""
 
 msgid "Enable teletext caching"
@@ -3646,6 +3660,9 @@ msgstr "จบการแก้ไขกลุ่มรายการ"
 
 msgid "End favourites edit"
 msgstr "จบรายการโปรด"
+
+msgid "End of the time interval during which events must begin to be displayed. If the filter is active, use keys 3 and 6 to adjust the end time, and key 0 to save."
+msgstr ""
 
 msgid "End time"
 msgstr "เวลาสิ้นสุด"
@@ -5141,9 +5158,6 @@ msgstr ""
 msgid "Install local extension"
 msgstr "ติดตั้งส่วนเพิ่มเติมจากในเครื่อง"
 
-msgid "Install picons on"
-msgstr ""
-
 #, fuzzy
 msgid "Install plugin"
 msgstr "กำลังติดตั้ง"
@@ -5186,6 +5200,9 @@ msgid "Internal flash"
 msgstr "หน่วยความจำภายใน"
 
 msgid "Internal hdd only"
+msgstr ""
+
+msgid "Internet"
 msgstr ""
 
 msgid "Internet (ntp)"
@@ -5325,6 +5342,10 @@ msgstr ""
 
 msgid "Keep service"
 msgstr ""
+
+#, fuzzy
+msgid "Keep sorting"
+msgstr "กำลังทำงาน"
 
 msgid "Kenya"
 msgstr ""
@@ -6524,6 +6545,36 @@ msgstr ""
 
 msgid "Number or SMS style data entry"
 msgstr ""
+
+#, fuzzy
+msgid "Numberbuttons Seek"
+msgstr "เลือกที่ที่จะสำรอง"
+
+#, fuzzy
+msgid "Numberbuttons Zap"
+msgstr "เลือกที่ที่จะสำรอง"
+
+msgid "Numberzap"
+msgstr ""
+
+msgid "Numberzap or seek backward big step"
+msgstr ""
+
+msgid "Numberzap or seek backward medium step"
+msgstr ""
+
+msgid "Numberzap or seek backward small step"
+msgstr ""
+
+msgid "Numberzap or seek forward medium step"
+msgstr ""
+
+msgid "Numberzap or seek forward small step"
+msgstr ""
+
+#, fuzzy
+msgid "Numberzap or zap to previous service"
+msgstr "กลับไปยังบริการก่อนหน้า"
 
 #, fuzzy
 msgid "OE Version: "
@@ -8974,6 +9025,10 @@ msgstr ""
 msgid "Services"
 msgstr "บริการต่างๆ"
 
+#, fuzzy, python-format
+msgid "Set %s as default?"
+msgstr "แสดงรูปแบบเริ่มต้น"
+
 msgid "Set CI assignment for detection of available services."
 msgstr ""
 
@@ -9849,6 +9904,9 @@ msgstr "เริ่มตั้งแต่ต้น"
 msgid "Start instant recording"
 msgstr ""
 
+msgid "Start of the time interval during which events must begin to be displayed. If the filter is active, use keys 1 and 4 to adjust the start time, and key 0 to save."
+msgstr ""
+
 msgid "Start offline decode"
 msgstr ""
 
@@ -10029,6 +10087,14 @@ msgstr ""
 
 msgid "Stream request"
 msgstr ""
+
+#, fuzzy
+msgid "Stream-tv"
+msgstr "ประเภทของทรานสปอนเดอร์"
+
+#, fuzzy
+msgid "Streaming"
+msgstr "ประเภทของทรานสปอนเดอร์"
 
 msgid "Streaming clients info"
 msgstr ""
@@ -10942,6 +11008,10 @@ msgstr "วันนี้"
 msgid "Toggle Configuration Mode or AutoDisqc"
 msgstr "โหมดการตั้งค่า"
 
+#, fuzzy
+msgid "Toggle Filter Order"
+msgstr "เลือกโหมดวีดีโอ"
+
 msgid "Toggle HDMI In"
 msgstr ""
 
@@ -10961,6 +11031,9 @@ msgstr ""
 #, fuzzy
 msgid "Toggle a cut mark at the current position"
 msgstr "สลับการเลือกจุดสำหรับตัดต่อตรงนี้"
+
+msgid "Toggle between zap and seek mode"
+msgstr ""
 
 msgid "Toggle dashed flickering line for this service"
 msgstr ""
@@ -11408,6 +11481,9 @@ msgstr ""
 msgid "Use circular LNB"
 msgstr ""
 
+msgid "Use current filter values as default"
+msgstr ""
+
 msgid "Use fastscan channel names"
 msgstr ""
 
@@ -11512,6 +11588,9 @@ msgid "Using LNB %d"
 msgstr ""
 
 msgid "Using fixed address"
+msgstr ""
+
+msgid "Using the 'Stop' button will cyclically switch displaying events starting: 'outside the interval', 'within the interval', and 'without filtering', instead of 'within the interval', 'outside the interval', and 'without filtering'."
 msgstr ""
 
 #, python-format
@@ -12112,6 +12191,9 @@ msgstr ""
 #, fuzzy
 msgid "When set to 'Yes', all locations where SNR is displayed in dB's will show an SNR percentage, and vice versa."
 msgstr "หากตั้งค่าเป็นใช่ ทุกตำแหน่งที่แสดง SNR ในหน่วย dB จะแสดงเปอร์เซ็นต์ SNR และในทางกลับกัน"
+
+msgid "When switching the filter, the selected EPG sorting is preserved."
+msgstr ""
 
 msgid "When the content has an aspect ratio of 16:9, choose whether to scale/stretch the picture."
 msgstr ""
