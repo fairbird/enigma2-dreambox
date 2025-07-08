@@ -724,6 +724,7 @@ class DistributionInformation(InformationBase):
 		info.append(formatLine("P1", _("Glibc version"), about.getGlibcVersion()))
 		info.append(formatLine("P1", _("OpenSSL version"), about.getVersionFromOpkg("openssl")))
 		info.append(formatLine("P1", _("Python version"), about.getPythonVersionString()))
+		info.append(formatLine("P1", _("Rust version"), about.getRustVersion()))
 		info.append(formatLine("P1", _("GStreamer version"), about.getGStreamerVersionString().replace("GStreamer ", "")))
 		info.append(formatLine("P1", _("FFmpeg version"), about.getVersionFromOpkg("ffmpeg")))
 		bootId = fileReadLine("/proc/sys/kernel/random/boot_id", source=MODULE_NAME)
