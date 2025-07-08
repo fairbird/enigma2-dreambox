@@ -288,9 +288,6 @@ class KexecInit(Screen):
 		self["key_red"] = StaticText()
 		self["key_green"] = StaticText()
 		self["description"] = Label()
-		greenAction = (self.rootInit, _("Start the Chkroot initialization"))
-		if BoxInfo.getItem("hasUBIMB"):
-			greenAction = (self.UBIMBInit, _("Start the Chkroot initialization"))
 		self["actions"] = HelpableActionMap(self, ["OkCancelActions"], {
 			"ok": (self.close, _("Close the Kexec MultiBoot Manager")),
 			"cancel": (self.close, _("Close the Kexec MultiBoot Manager"))
@@ -302,13 +299,13 @@ class KexecInit(Screen):
 			self["description"].setText("%s\n\n%s" % (_("Press GREEN to enable MultiBoot!"), self.descriptionSuffix))
 			self["kexecActions"] = HelpableActionMap(self, ["ColorActions"], {
 				"red": (self.removeFiles, _("Remove the MultiBoot files")),
-				"green": greenAction
+				"green": (self.ubimbInit if BoxInfo.getItem("hasUBIMB") else self.rootInit, _("Start the Chkroot initialization"))
 			}, prio=0, description=_("Kexec MultiBoot Actions"))
 		else:
 			self.descriptionSuffix = ""
 			self["description"].setText("%s: %s\n\n%s" % (_("NOTE"), _("Unable to initialize Kexec MultiBoot!"), _("Kexec MultiBoot files are missing.")))
 
-	def UBIMBInit(self):
+	def ubimbInit(self):
 		self.session.open(UBISlotManager)
 
 	def rootInit(self):
@@ -917,9 +914,8 @@ class UBISlotManager(Setup):
 	def partitionSizeGB(self, dev):
 		try:
 			base = dev.replace("/dev/", "")
-			pathClass = f"/sys/class/block/{base}/size"
-			pathBlock = f"/sys/block/{base}/size"
-			path = pathClass if exists(pathClass) else pathBlock
+			path = f"/sys/class/block/{base}/size"
+			path = path if exists(path) else f"/sys/block/{base}/size"
 			with open(path) as fd:
 				blocks = int(fd.read().strip())
 				return (blocks * 512) // (1024 * 1024 * 1024)
