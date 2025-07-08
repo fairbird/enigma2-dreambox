@@ -426,7 +426,6 @@ def getPythonVersionString():
 		return _("Unknown")
 
 
-
 def getRustVersion():
 	try:
 		major, minor = pyversion.split('.')[:2]
