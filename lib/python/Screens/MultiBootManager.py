@@ -91,7 +91,7 @@ class MultiBootManager(Screen):
 			"blue": (self.restoreImage, _("Restore the highlighted slot"))
 		}, prio=0, description=_("MultiBoot Manager Actions"))
 		self["restoreActions"].setEnabled(False)
-		if BoxInfo.getItem("HasKexecMultiboot") or BoxInfo.getItem("HasGPT") or BoxInfo.getItem("hasUBIMB"):
+		if BoxInfo.getItem("HasKexecMultiboot") or BoxInfo.getItem("HasGPT"):
 			self["moreSlotActions"] = HelpableActionMap(self, ["ColorActions"], {
 				"blue": (self.moreSlots, _("Add more slots"))
 			}, prio=0, description=_("MultiBoot Manager Actions"))
@@ -168,8 +168,6 @@ class MultiBootManager(Screen):
 	def moreSlots(self):
 		if BoxInfo.getItem("HasGPT"):
 			self.session.open(GPTSlotManager)
-		elif BoxInfo.getItem("hasUBIMB"):
-			self.session.open(UBISlotManager)
 		else:
 			self.session.open(KexecSlotManager)
 
@@ -239,7 +237,7 @@ class MultiBootManager(Screen):
 			self["restartActions"].setEnabled(True)
 			self["deleteActions"].setEnabled(True)
 			self["restoreActions"].setEnabled(False)
-		if (BoxInfo.getItem("HasKexecMultiboot") and slotCode == "R") or BoxInfo.getItem("HasGPT") or BoxInfo.getItem("hasUBIMB"):
+		if (BoxInfo.getItem("HasKexecMultiboot") and slotCode == "R") or BoxInfo.getItem("HasGPT"):
 			self["restoreActions"].setEnabled(False)
 			self["moreSlotActions"].setEnabled(True)
 			self["key_blue"].setText(_("Add more slots"))
@@ -290,6 +288,9 @@ class KexecInit(Screen):
 		self["key_red"] = StaticText()
 		self["key_green"] = StaticText()
 		self["description"] = Label()
+		greenAction = (self.rootInit, _("Start the Chkroot initialization"))
+		if BoxInfo.getItem("hasUBIMB"):
+			greenAction = (self.UBIMBInit, _("Start the Chkroot initialization"))
 		self["actions"] = HelpableActionMap(self, ["OkCancelActions"], {
 			"ok": (self.close, _("Close the Kexec MultiBoot Manager")),
 			"cancel": (self.close, _("Close the Kexec MultiBoot Manager"))
@@ -301,11 +302,14 @@ class KexecInit(Screen):
 			self["description"].setText("%s\n\n%s" % (_("Press GREEN to enable MultiBoot!"), self.descriptionSuffix))
 			self["kexecActions"] = HelpableActionMap(self, ["ColorActions"], {
 				"red": (self.removeFiles, _("Remove the MultiBoot files")),
-				"green": (self.rootInit, _("Start the Kexec initialization"))
+				"green": greenAction
 			}, prio=0, description=_("Kexec MultiBoot Actions"))
 		else:
 			self.descriptionSuffix = ""
 			self["description"].setText("%s: %s\n\n%s" % (_("NOTE"), _("Unable to initialize Kexec MultiBoot!"), _("Kexec MultiBoot files are missing.")))
+
+	def UBIMBInit(self):
+		self.session.open(UBISlotManager)
 
 	def rootInit(self):
 		def rootInitCallback(*args, **kwargs):
@@ -866,7 +870,7 @@ class UBISlotManager(Setup):
 	def formatDeviceCallback(self):
 		def closeStartUpCallback(answer):
 			if answer:
-				self.close()
+				self.session.open(TryQuitMainloop, QUIT_REBOOT)
 		MOUNTPOINT = "/tmp/boot"
 		mtdRootFs = BoxInfo.getItem("mtdrootfs")
 		mtdKernel = BoxInfo.getItem("mtdkernel")
@@ -874,7 +878,7 @@ class UBISlotManager(Setup):
 		uuidRootFS = fileReadLine(f"/dev/uuid/{device}2", default=None, source=MODULE_NAME)
 		diskSize = self.partitionSizeGB(f"/dev/{device}")
 
-		startupContent = f"kernel=/dev/{mtdKernel} root=/dev/{mtdRootFs} flash=1 rootfstype=ubifs\n"
+		startupContent = f"kernel=/dev/{mtdKernel} ubi.mtd=rootfs root=ubi0:rootfs flash=1 rootfstype=ubifs\n"
 		with open(f"{MOUNTPOINT}/STARTUP", "w") as fd:
 			fd.write(startupContent)
 		with open(f"{MOUNTPOINT}/STARTUP_FLASH", "w") as fd:
@@ -913,7 +917,9 @@ class UBISlotManager(Setup):
 	def partitionSizeGB(self, dev):
 		try:
 			base = dev.replace("/dev/", "")
-			path = f"/sys/class/block/{base}/size"
+			pathClass = f"/sys/class/block/{base}/size"
+			pathBlock = f"/sys/block/{base}/size"
+			path = pathClass if exists(pathClass) else pathBlock
 			with open(path) as fd:
 				blocks = int(fd.read().strip())
 				return (blocks * 512) // (1024 * 1024 * 1024)
