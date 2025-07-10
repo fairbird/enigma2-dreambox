@@ -63,7 +63,7 @@ from sys import maxsize
 import itertools
 import datetime
 from re import match
-from pickle import load as pickle_load, dump as pickle_dump, HIGHEST_PROTOCOL as pickle_HIGHEST_PROTOCOL
+from pickle import load as pickle_load, dump as pickle_dump
 
 from RecordTimer import RecordTimerEntry, RecordTimer, findSafeRecordPath
 
@@ -98,7 +98,7 @@ class ResumePoints():
 
 	def saveResumePoints(self):
 		with open(self.resumePointFile, "wb") as f:
-			pickle_dump(self.resumePointCache, f, pickle_HIGHEST_PROTOCOL)
+			pickle_dump(self.resumePointCache, f, protocol=5)
 
 	def delResumePoint(self, ref):
 		if (sref := ref.toString()) in self.resumePointCache:

@@ -69,7 +69,7 @@ def write_cache(cache_file, cache_data):
 		path = os.path.dirname(cache_file)
 		if not os.path.isdir(path):
 			os.mkdir(path)
-		pickle.dump(cache_data, open(cache_file, 'wb'), -1)
+		pickle.dump(cache_data, open(cache_file, 'wb'), protocol=5)
 	except Exception as ex:
 		print("Failed to write cache data to %s:" % cache_file, ex)
 
