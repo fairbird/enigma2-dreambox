@@ -406,10 +406,10 @@ static void png_load(Cfilepara* filepara, uint32_t background, bool forceRGB = f
 	filepara->ox = width;
 	filepara->oy = height;
 
-	if (color_type == PNG_COLOR_TYPE_RGBA || color_type == PNG_COLOR_TYPE_GA)
+	if (color_type == PNG_COLOR_TYPE_RGBA || color_type == PNG_COLOR_TYPE_GA) {
 		filepara->transparent = true;
-	else
-	{
+		filepara->bits = 32; // Here set bits to 32 explicitly to simulate alpha transparency if it is not explicitly set
+	} else {
 		png_bytep trans_alpha = NULL;
 		int num_trans = 0;
 		png_color_16p trans_color = NULL;
