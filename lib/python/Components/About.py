@@ -6,7 +6,6 @@ from glob import glob
 from locale import format_string
 from os import stat
 from os.path import isfile
-from subprocess import Popen, PIPE
 from platform import libc_ver
 from re import search
 from Tools.HardwareInfo import HardwareInfo
@@ -117,11 +116,6 @@ def getEnigmaVersionString():
 def getEnigmaBranchString():
 	import enigma
 	return enigma.getEnigmaVersionString()[11:]
-
-
-def getGStreamerVersionString():
-	from enigma import getGStreamerVersionString
-	return getGStreamerVersionString()
 
 
 def getKernelVersionString():
@@ -243,24 +237,6 @@ def getSystemTemperature():
 	if temperature:
 		return "%s%s C" % (temperature, "\u00B0")
 	return temperature
-
-
-def getChipSetString():
-	if MODEL in ('dm7080', 'dm820'):
-		return "7435"
-	elif MODEL in ('dm520', 'dm525'):
-		return "73625"
-	elif MODEL in ('dm900', 'dm920', 'et13000', 'sf5008'):
-		return "7252S"
-	elif MODEL in ('hd51', 'vs1500', 'h7'):
-		return "7251S"
-	elif MODEL in ('alien5',):
-		return "S905D"
-	else:
-		chipset = fileReadLine("/proc/stb/info/chipset", source=MODULE_NAME)
-		if chipset is None:
-			return _("Undefined")
-		return str(chipset.lower().replace('\n', '').replace('bcm', '').replace('brcm', '').replace('sti', ''))
 
 
 def getFlashType():

@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
 from enigma import eAVControl, getDesktop
 from Components.config import config, ConfigSlider, ConfigSelection, ConfigSubDict, ConfigInteger, ConfigYesNo, ConfigEnableDisable, ConfigOnOff, ConfigSubsection, ConfigSelectionNumber, ConfigBoolean, ConfigNothing, NoSave
-from Components.SystemInfo import BoxInfo
+from Components.SystemInfo import BoxInfo, getChipSetString
 from Components.Console import Console
 from Tools.CList import CList
-from Components.About import about
 from Tools.Directories import fileExists, fileReadLine, fileWriteLine
 from os import system
 from os.path import isfile
@@ -17,7 +16,7 @@ has_scart = BoxInfo.getItem("HasScart")
 has_yuv = BoxInfo.getItem("yuv")
 has_rca = BoxInfo.getItem("rca")
 has_avjack = BoxInfo.getItem("avjack")
-chipsetstring = about.getChipSetString()
+chipsetstring = getChipSetString()
 
 # The "VideoHardware" is the interface to /proc/stb/video.
 # It generates hotplug events, and gives you the list of

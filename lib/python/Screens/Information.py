@@ -10,7 +10,7 @@ from subprocess import PIPE, Popen
 from time import localtime, strftime, strptime
 from urllib.request import urlopen
 
-from enigma import eAVControl, eDVBFrontendParametersSatellite, eDVBResourceManager, eGetEnigmaDebugLvl, eServiceCenter, eStreamServer, eTimer, getDesktop, iPlayableService, iServiceInformation
+from enigma import eAVControl, eDVBFrontendParametersSatellite, eDVBResourceManager, eGetEnigmaDebugLvl, eServiceCenter, eStreamServer, eTimer, getDesktop, getGStreamerVersionString, iPlayableService, iServiceInformation
 
 from ServiceReference import ServiceReference
 from skin import parameters
@@ -727,7 +727,7 @@ class DistributionInformation(InformationBase):
 		info.append(formatLine("P1", _("OpenSSL version"), about.getVersionFromOpkg("openssl")))
 		info.append(formatLine("P1", _("Python version"), about.getPythonVersionString()))
 		info.append(formatLine("P1", _("Rust version"), about.getRustVersion()))
-		info.append(formatLine("P1", _("GStreamer version"), about.getGStreamerVersionString().replace("GStreamer ", "")))
+		info.append(formatLine("P1", _("GStreamer version"), getGStreamerVersionString().replace("GStreamer ", "")))
 		info.append(formatLine("P1", _("FFmpeg version"), about.getVersionFromOpkg("ffmpeg")))
 		bootId = fileReadLine("/proc/sys/kernel/random/boot_id", source=MODULE_NAME)
 		if bootId:
