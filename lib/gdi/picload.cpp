@@ -406,14 +406,10 @@ static void png_load(Cfilepara* filepara, uint32_t background, bool forceRGB = f
 	filepara->ox = width;
 	filepara->oy = height;
 
-	bool forceRGBA = false;
-
 	// When we have indexed (8bit) PNG convert it to standard 32bit png so to preserve transparency and to allow proper alphablending
 	if (color_type == PNG_COLOR_TYPE_PALETTE && bit_depth == 8) {
 		color_type = PNG_COLOR_TYPE_RGBA;
 		png_set_expand(png_ptr);
-		png_set_palette_to_rgb(png_ptr);
-		png_set_tRNS_to_alpha(png_ptr);
 		bit_depth = 32;
 		eTrace("[ePicLoad] Interlaced PNG 8bit -> 32bit");
 	}
@@ -431,7 +427,7 @@ static void png_load(Cfilepara* filepara, uint32_t background, bool forceRGB = f
 		filepara->transparent = (trans_alpha != NULL);
 	}
 
-	if ((bit_depth <= 8) && (color_type == PNG_COLOR_TYPE_GRAY || color_type & PNG_COLOR_MASK_PALETTE || forceRGBA)) {
+	if ((bit_depth <= 8) && (color_type == PNG_COLOR_TYPE_GRAY || color_type & PNG_COLOR_MASK_PALETTE)) {
 		if (bit_depth < 8)
 			png_set_packing(png_ptr);
 
@@ -1696,6 +1692,7 @@ int ePicLoad::getData(ePtr<gPixmap>& result) {
 					int r = 0;
 					int g = 0;
 					int b = 0;
+					int a = 0;
 					int sq = 0;
 					irow = irowy + ixfac * (int)xind;
 					// average over all pixels in x by y block
@@ -1704,6 +1701,7 @@ int ePicLoad::getData(ePtr<gPixmap>& result) {
 							r += irow[0];
 							g += irow[1];
 							b += irow[2];
+							a += irow[3];
 							sq++;
 							irow += ixfac;
 						}
@@ -1718,7 +1716,7 @@ int ePicLoad::getData(ePtr<gPixmap>& result) {
 					if (m_filepara->bits < 32) {
 						srow[3] = 0xFF; // alpha opaque
 					} else {
-						srow[3] = irow[3]; // alpha
+						srow[3] = a / sq; // alpha
 					}
 					srow += 4;
 					xind += xscale;
