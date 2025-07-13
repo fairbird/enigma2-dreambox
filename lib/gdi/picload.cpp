@@ -412,7 +412,7 @@ static void png_load(Cfilepara* filepara, uint32_t background, bool forceRGB = f
 		//png_set_expand(png_ptr);
 		//png_set_palette_to_rgb(png_ptr);
 		//png_set_tRNS_to_alpha(png_ptr);
-		bit_depth = 32;
+		//bit_depth = 32;
 		eTrace("[ePicLoad] Interlaced PNG 8bit -> 32bit");
 	}
 
