@@ -408,13 +408,17 @@ static void png_load(Cfilepara* filepara, uint32_t background, bool forceRGB = f
 
 	// When we have indexed (8bit) PNG convert it to standard 32bit png so to preserve transparency and to allow proper alphablending
 	if (color_type == PNG_COLOR_TYPE_PALETTE && bit_depth == 8) {
+		color_type = PNG_COLOR_TYPE_RGBA;
+		png_set_expand(png_ptr);
+		png_set_palette_to_rgb(png_ptr);
+		//png_set_tRNS_to_alpha(png_ptr);
+		bit_depth = 32;
 		eTrace("[ePicLoad] Interlaced PNG 8bit -> 32bit");
 	}
 
 	if (color_type == PNG_COLOR_TYPE_RGBA || color_type == PNG_COLOR_TYPE_GA) {
 		filepara->transparent = true;
-		filepara->bits =
-			32; // Here set bits to 32 explicitly to simulate alpha transparency if it is not explicitly set
+		filepara->bits = 32; // Here set bits to 32 explicitly to simulate alpha transparency if it is not explicitly set
 	} else {
 		png_bytep trans_alpha = NULL;
 		int num_trans = 0;
