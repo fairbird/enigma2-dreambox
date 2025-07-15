@@ -12,7 +12,7 @@
 			<item level="0" text="Auto show volume level" description="Select 'Yes' to show the volume level on any automated changes of volume level.">config.volumeAdjust.showVolumeBar</item>
 		</if>
 	</setup>
-	<setup key="Audio_setup" title="Audio Settings" level="1" showOpenWebif="1">
+	<setup key="Audio_setup" title="Audio Settings">
 		<item level="1" text="Volume steps" description="Select the size of the volume step when the VOLUME buttons are pressed.">config.volumeControl.pressStep</item>
 		<item level="1" text="Long press volume steps" description="Select the size of the volume steps when the VOLUME buttons are held down.">config.volumeControl.longStep</item>
 		<item level="1" text="Volume/Mute display timer" description="Select how long, in seconds, that the volume and mute displays are shown before they automatically hide.">config.volumeControl.hideTimer</item>
