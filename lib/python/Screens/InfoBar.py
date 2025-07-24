@@ -258,12 +258,6 @@ class MoviePlayer(InfoBarBase, InfoBarShowHide, InfoBarMenu, InfoBarSeek, InfoBa
 				"channelDown": (self.channelDown, _("when PiPzap enabled zap channel down...")),
 			})
 
-		self["DirectionActions"] = HelpableActionMap(self, ["DirectionActions"],
-			{
-				"left": self.left,
-				"right": self.right
-			}, prio=-2)
-
 		self["state"] = Label()
 		self["speed"] = Label()
 		self["statusicon"] = MultiPixmap()

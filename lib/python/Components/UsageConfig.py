@@ -1452,6 +1452,19 @@ def InitUsageConfig():
 		("play", _("Play")),
 		("step", _("Single step (GOP)")),
 		("last", _("Last speed"))])
+	config.seek.withjumps = ConfigYesNo(default=True)
+	config.seek.withjumps_after_ff_speed = ConfigSelection(default="4", choices=[
+		("1", _("Never")),
+		("2", _("2x")),
+		("4", _("2x, 4x")),
+		("6", _("2x, 4x, 6x")),
+		("8", _("2x, 4x, 6x, 8x"))
+	])
+	choiceList = [(str(x), _("%2.1f Seconds") % (x / 1000.0)) for x in range(200, 1100, 100)] + [(str(int(x * 1000)), _("%2.1f Seconds") % x) for x in (1.2, 1.5, 1.7, 2.0, 2.5, 3.0, 3.5, 4.0, 5.0)]
+	config.seek.withjumps_forwards_ms = ConfigSelection(default="700", choices=choiceList)
+	config.seek.withjumps_backwards_ms = ConfigSelection(default="700", choices=choiceList)
+	config.seek.withjumps_repeat_ms = ConfigSelection(default="200", choices=choiceList[:9])
+	config.seek.withjumps_avoid_zero = ConfigYesNo(default=True)
 
 	config.usage.timerlist_finished_timer_position = ConfigSelection(default="end", choices=[("beginning", _("At beginning")), ("end", _("At end"))])
 
