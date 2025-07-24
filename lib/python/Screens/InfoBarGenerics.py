@@ -852,7 +852,6 @@ class InfoBarNumberZap:
 		self.__event_tracker = ServiceEventTracker(screen=self, eventmap={
 				iPlayableService.evStart: self.__serviceStarted,
 			})
-
 		def digitHelp():
 			return _("Digit entry for service selection")
 		self.toggleSeekStatus = False
@@ -1792,7 +1791,7 @@ class SeekBar(Screen):
 		self["length"].setText(f"{length // 60}:{length % 60:02d}")
 
 	def screenShown(self):
-		for component in self.activeComponents:
+		for component in self.active_components:
 			if isinstance(component, (PositionGauge, Progress)):  # Progress is used for composite widgets like in Metrix.
 				for attribute, value in component.skinAttributes:
 					match attribute:
@@ -1933,17 +1932,6 @@ class InfoBarSeek:
 			"SeekbarBack": self.seekBackSeekbar
 		}, prio=-1, description=_("Seek Actions"))  # Give them a little more priority to win over the color buttons.
 		self["SeekActions"].setEnabled(False)
-		self["SeekActionsPTS"] = InfoBarSeekActionMap(self, "InfobarSeekActionsPTS", {
-			"playpauseService": (self.playpauseService, _("Pause/Continue playback")),
-			"pauseService": (self.pauseService, _("Pause playback")),
-			"pauseServiceYellow": (self.pauseServiceYellow, _("Pause playback")),
-			"unPauseService": (self.unPauseService, _("Continue playback")),
-			"seekFwd": (self.seekFwd, _("Skip forward")),
-			"seekFwdManual": (self.seekFwdManual, _("Skip forward (enter time)")),
-			"seekBack": (self.seekBack, _("Skip backward")),
-			"seekBackManual": (self.seekBackManual, _("Skip backward (enter time)"))
-		}, prio=-1, description=_("Seek Actions"))  # Give them a little more priority to win over the color buttons.
-		self["SeekActionsPTS"].setEnabled(False)
 		self.activity = 0
 		self.activityTimer = eTimer()
 		self.activityTimer.callback.append(self.doActivityTimer)
