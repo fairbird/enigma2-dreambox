@@ -852,6 +852,7 @@ class InfoBarNumberZap:
 		self.__event_tracker = ServiceEventTracker(screen=self, eventmap={
 				iPlayableService.evStart: self.__serviceStarted,
 			})
+
 		def digitHelp():
 			return _("Digit entry for service selection")
 		self.toggleSeekStatus = False
