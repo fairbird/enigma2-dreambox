@@ -326,14 +326,11 @@ class KexecInit(Screen):
 			self["description"].setText("%s\n\n%s" % (_("Press GREEN to enable MultiBoot!"), self.descriptionSuffix))
 			self["kexecActions"] = HelpableActionMap(self, ["ColorActions"], {
 				"red": (self.removeFiles, _("Remove the MultiBoot files")),
-				"green": (self.ubimbInit if BoxInfo.getItem("hasUBIMB") else self.rootInit, _("Start the Chkroot initialization"))
+				"green": (self.rootInit, _("Start the Kexec initialization"))
 			}, prio=0, description=_("Kexec MultiBoot Actions"))
 		else:
 			self.descriptionSuffix = ""
 			self["description"].setText("%s: %s\n\n%s" % (_("NOTE"), _("Unable to initialize Kexec MultiBoot!"), _("Kexec MultiBoot files are missing.")))
-
-	def ubimbInit(self):
-		self.session.open(UBISlotManager)
 
 	def rootInit(self):
 		def rootInitCallback(*args, **kwargs):
@@ -745,12 +742,15 @@ class ChkrootInit(Screen):
 			"ok": (self.close, _("Close the Chkroot MultiBoot Manager")),
 			"cancel": (self.close, _("Close the Chkroot MultiBoot Manager")),
 			"red": (self.disableChkroot, _("Disable the MultiBoot option")),
-			"green": (self.rootInit, _("Start the Chkroot initialization"))
+			"green": (self.ubimbInit if BoxInfo.getItem("hasUBIMB") else self.rootInit, _("Start the Chkroot initialization"))
 		}, prio=-1, description=_("Chkroot Manager Actions"))
 		self["key_red"].setText(_("Disable Chkroot"))
 		self["key_green"].setText(_("Initialize"))
 		self.descriptionSuffix = _("The %s %s will reboot within 1 seconds.") % getBoxDisplayName()
 		self["description"].setText("%s\n\n%s" % (_("Press GREEN to enable MultiBoot!"), self.descriptionSuffix))
+
+	def ubimbInit(self):
+		self.session.open(UBISlotManager)
 
 	def rootInit(self):
 		def rootInitCallback(*args, **kwargs):
