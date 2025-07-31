@@ -121,9 +121,9 @@ class Setup(ConfigListScreen, Screen, HelpableScreen):
 		indent = element.get("indent", "") or str(indent)
 		indent = int(indent) if indent and indent.isnumeric() and int(indent) > 0 else None
 		if restart == "gui" and not itemText.endswith("*"):  # Add "*" as restart indicator based on the restart attribute.
-			itemText = f"{itemText}*"
+			itemText = f"{itemText} *"
 		elif restart == "system" and not itemText.endswith("#"):  # Add "#" as reboot indicator based on the restart attribute.
-			itemText = f"{itemText}#"
+			itemText = f"{itemText} #"
 		item = eval(element.text or "")
 		if item == "":
 			self.list.append((self.formatItemText(itemText),))  # Add the comment line to the config list.
