@@ -567,6 +567,16 @@ class Navigation:
 			self.currentlyPlayingService = self.pnav and self.pnav.getCurrentService()
 		return self.currentlyPlayingService
 
+	def getAnyRecordingsCount(self):
+		if self.anyRecordingsCount is None:
+			self.anyRecordingsCount = len(self.getRecordings(False, pNavigation.isAnyRecording))
+		return self.anyRecordingsCount
+
+	def getRealRecordingsCount(self):
+		if self.realRecordingsCount is None:
+			self.realRecordingsCount = len(self.getRecordings(False, pNavigation.isRealRecording))
+		return self.realRecordingsCount
+
 	def stopService(self):
 		if self.pnav:
 			self.pnav.stopService()
