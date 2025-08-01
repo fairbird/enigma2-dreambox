@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from math import ceil
 from os import W_OK, access, listdir, remove, stat, statvfs
 from os.path import exists, isdir, join, realpath
 from re import compile
@@ -970,7 +971,7 @@ class ChkrootSlotManager(Setup):
 			path = path if exists(path) else f"/sys/block/{base}/size"
 			with open(path) as fd:
 				blocks = int(fd.read().strip())
-				return (blocks * 512) // (1024 * 1024 * 1024)
+				return ceil((blocks * 512) / (1024 * 1024 * 1024))
 		except Exception as e:
 			return 0
 
@@ -1146,7 +1147,7 @@ class UBISlotManager(Setup):
 			path = path if exists(path) else f"/sys/block/{base}/size"
 			with open(path) as fd:
 				blocks = int(fd.read().strip())
-				return (blocks * 512) // (1024 * 1024 * 1024)
+				return ceil((blocks * 512) / (1024 * 1024 * 1024))
 		except Exception as e:
 			return 0
 
