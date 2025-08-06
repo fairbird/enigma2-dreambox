@@ -45,15 +45,15 @@ class Screen(dict):
 		self.onHide = []
 		self.execing = False
 		self.shown = True
-		# DEBUG: Variable already_shown used in CutListEditor/ui.py and StartKodi/plugin.py...
+		# DEBUG: Variable alreadyShown used in CutListEditor/ui.py and StartKodi/plugin.py...
 		# DEBUG: self.alreadyShown = False  # Already shown is false until the screen is really shown (after creation).
-		self.already_shown = False  # Already shown is false until the screen is really shown (after creation).
+		self.alreadyShown = False  # Already shown is false until the screen is really shown (after creation).
 		self.renderer = []
 		self.helpList = []  # In order to support screens *without* a help, we need the list in every screen. how ironic.
 		self.close_on_next_exec = None
-		# DEBUG: Variable already_shown used in webinterface/src/WebScreens.py...
+		# DEBUG: Variable alreadyShown used in webinterface/src/WebScreens.py...
 		# DEBUG: self.standAlone = False  # Stand alone screens (for example web screens) don't care about having or not having focus.
-		self.stand_alone = False  # Stand alone screens (for example web screens) don't care about having or not having focus.
+		self.standAlone = False  # Stand alone screens (for example web screens) don't care about having or not having focus.
 		self.keyboardMode = None
 		self.desktop = None
 		self.instance = None
@@ -86,14 +86,14 @@ class Screen(dict):
 			for x in self.onExecBegin + single:
 				x()
 				# DEBUG: if not self.standAlone and self.session.current_dialog != self:
-				if not self.stand_alone and self.session.current_dialog != self:
+				if not self.standAlone and self.session.current_dialog != self:
 					return
 			# assert self.session is None, "a screen can only exec once per time"
 			# self.session = session
 			for val in list(self.values()) + self.renderer:
 				val.execBegin()
 				# DEBUG: if not self.standAlone and self.session.current_dialog != self:
-				if not self.stand_alone and self.session.current_dialog != self:
+				if not self.standAlone and self.session.current_dialog != self:
 					return
 				self.active_components.append(val)
 			self.execing = True
@@ -136,36 +136,34 @@ class Screen(dict):
 			self.session.close(self, *retval)
 
 	def show(self):
-		print("[Screen] Showing screen '%s'." % self.skinName)  # To ease identification of screens.
-		# DEBUG: if (self.shown and self.alreadyShown) or not self.instance:
-		if (self.shown and self.already_shown) or not self.instance:
-			return
-		self.shown = True
-		# DEBUG: self.alreadyShown = True
-		self.already_shown = True
-		self.instance.show()
-		for x in self.onShow:
-			x()
-		for val in list(self.values()) + self.renderer:
-			if isinstance(val, GUIComponent) or isinstance(val, Source):
-				val.onShow()
+		if not (self.shown and self.alreadyShown) and self.instance:
+			self.shown = True
+			self.alreadyShown = True
+			self.instance.show()
+			for method in self.onShow:
+				method()
+			for value in list(self.values()) + self.renderer:
+				if isinstance(value, GUIComponent) or isinstance(value, Source):
+					value.onShow()
 
 	def hide(self):
-		if not self.shown or not self.instance:
-			return
-		self.shown = False
-		self.instance.hide()
-		for x in self.onHide:
-			x()
-		for val in list(self.values()) + self.renderer:
-			if isinstance(val, GUIComponent) or isinstance(val, Source):
-				val.onHide()
+		if self.shown and self.instance:
+			self.shown = False
+			self.instance.hide()
+			for method in self.onHide:
+				method()
+			for value in list(self.values()) + self.renderer:
+				if isinstance(value, GUIComponent) or isinstance(value, Source):
+					value.onHide()
 
 	def isAlreadyShown(self):  # Already shown is false until the screen is really shown (after creation).
-		return self.already_shown
+		return self.alreadyShown
 
-	def isStandAlone(self):  # Stand alone screens (for example web screens) don't care about having or not having focus.
-		return self.stand_alone
+	def getStandAlone(self):  # Stand alone screens (for example web screens) don't care about having or not having focus.
+		return self.standAlone
+
+	def setStandAlone(self, value):  # Stand alone screens (for example web screens) don't care about having or not having focus.
+		self.standAlone = value
 
 	def getScreenPath(self):
 		return self.screenPath
@@ -334,32 +332,41 @@ class Screen(dict):
 		return None
 
 	def addSummary(self, summary):
-		if summary is not None and summary not in self.summaries:
+		if summary is not None:
 			self.summaries.append(summary)
 
 	def removeSummary(self, summary):
-		if summary is not None and summary in self.summaries:
+		if summary is not None:
 			self.summaries.remove(summary)
+
+	# These properties support legacy code that reaches into the internal variables of this class!
+	#
+	already_shown = property(isAlreadyShown)  # Used in CutListEditor/ui.py.
+	stand_alone = property(getStandAlone, setStandAlone)  # Used in webinterface/src/WebScreens.py.
 
 
 class ScreenSummary(Screen):
 	skin = """
-	<screen position="fill" flags="wfNoBorder">
-		<widget source="global.CurrentTime" render="Label" position="0,0" size="e,20" font="Regular;16" horizontalAlignment="center" verticalAlignment="center">
+	<screen name="ScreenSummary" position="fill" flags="wfNoBorder">
+		<widget source="global.CurrentTime" render="Label" position="0,0" size="e,20" font="Regular;16" halign="center" valign="center">
 			<convert type="ClockToText">WithSeconds</convert>
 		</widget>
-		<widget source="Title" render="Label" position="0,25" size="e,45" font="Regular;18" horizontalAlignment="center" verticalAlignment="center" />
+		<widget source="Title" render="Label" position="0,25" size="e,45" font="Regular;18" halign="center" valign="center" />
 	</screen>"""
 
 	def __init__(self, session, parent):
 		Screen.__init__(self, session, parent=parent)
 		self["Title"] = StaticText(parent.getTitle())
-		names = parent.skinName
-		if not isinstance(names, list):
-			names = [names]
-		self.skinName = ["%sSummary" % x for x in names]
+		skinName = parent.skinName
+		if not isinstance(skinName, list):
+			skinName = [skinName]
+		self.skinName = [f"{x}Summary" for x in skinName]
 		className = self.__class__.__name__
-		if className != "ScreenSummary" and className not in self.skinName:  # e.g. if a module uses Screens.Setup.SetupSummary the skin needs to be available directly
+		if className != "ScreenSummary" and className not in self.skinName:  # When a summary screen does not have the same name as the parent then add it to the list.
 			self.skinName.append(className)
+		self.skinName += [f"{x}_summary" for x in skinName]  # DEBUG: Old summary screens currently kept for compatibility.
 		self.skinName.append("ScreenSummary")
 		self.skin = parent.__dict__.get("skinSummary", self.skin)  # If parent has a "skinSummary" defined, use that as default.
+		# skins = "', '".join(self.skinName)
+		# print(f"[Screen] DEBUG: Skin names: '{skins}'.")
+		# print(f"[Screen] DEBUG: Skin:\n{self.skin}")
