@@ -732,4 +732,5 @@
 		<panel name="SummaryClockPanel" />
 		<panel name="MeinTunerInfoPanel" />
 	</screen>
+	<include filename="/usr/share/enigma2/display/skin_default/skin_display_templates.xml"/>
 </skin>

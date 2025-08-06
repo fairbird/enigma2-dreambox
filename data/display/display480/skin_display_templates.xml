@@ -1,0 +1,509 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<skin>
+	<screen name="SummaryClockPanel">
+		<widget source="global.CurrentTime" render="Label" position="260,197" size="120,38" font="FdLcD;38" valign="center" halign="right">
+			<convert type="ClockToText"/>
+		</widget>
+	</screen>
+
+	<!-- Tuner Panel - Tunerletter green - if recording red  -  optimized by Makumbo -->
+	<screen name="MeinTunerInfoPanel">
+		<eLabel text="Tuner" position="20,194" size="104,44" font="FdLcD;38"/>
+		<widget source="session.FrontendInfo" render="FixedLabel" position="126,194" size="28,44" text="A" foregroundColor="#04B404" font="FdLcD;38" zPosition="1">
+			<convert type="FrontendInfo">NUMBER</convert>
+			<convert type="ValueRange">0,0</convert>
+			<convert type="ConditionalShowHide"/>
+		</widget>
+		<widget source="session.FrontendInfo" render="FixedLabel" position="154,194" size="28,44" text="B" foregroundColor="#04B404" font="FdLcD;38" zPosition="1">
+			<convert type="FrontendInfo">NUMBER</convert>
+			<convert type="ValueRange">1,1</convert>
+			<convert type="ConditionalShowHide"/>
+		</widget>
+		<widget source="session.FrontendInfo" render="FixedLabel" position="181,194" size="28,44" text="C" foregroundColor="#04B404" font="FdLcD;38" zPosition="1">
+			<convert type="FrontendInfo">NUMBER</convert>
+			<convert type="ValueRange">2,2</convert>
+			<convert type="ConditionalShowHide"/>
+		</widget>
+		<widget source="session.FrontendInfo" render="FixedLabel" position="207,194" size="28,44" text="D" foregroundColor="#04B404" font="FdLcD;38" zPosition="1">
+			<convert type="FrontendInfo">NUMBER</convert>
+			<convert type="ValueRange">3,3</convert>
+			<convert type="ConditionalShowHide"/>
+		</widget>
+		<widget source="session.TunerInfo" render="FixedLabel" position="126,194" size="28,44" text="A" foregroundColor="#FF0000" font="FdLcD;38" zPosition="0">
+			<convert type="TunerInfo">TunerUseMask</convert>
+			<convert type="ValueBitTest">1</convert>
+			<convert type="ConditionalShowHide"/>
+		</widget>
+		<widget source="session.TunerInfo" render="FixedLabel" position="154,194" size="28,44" text="B" foregroundColor="#FF0000" font="FdLcD;38" zPosition="0">
+			<convert type="TunerInfo">TunerUseMask</convert>
+			<convert type="ValueBitTest">2</convert>
+			<convert type="ConditionalShowHide"/>
+		</widget>
+		<widget source="session.TunerInfo" render="FixedLabel" position="181,194" size="28,44" text="C" foregroundColor="#FF0000" font="FdLcD;38" zPosition="0">
+			<convert type="TunerInfo">TunerUseMask</convert>
+			<convert type="ValueBitTest">4</convert>
+			<convert type="ConditionalShowHide"/>
+		</widget>
+		<widget source="session.TunerInfo" render="FixedLabel" position="207,194" size="28,44" text="D" foregroundColor="#FF0000" font="FdLcD;38" zPosition="0">
+			<convert type="TunerInfo">TunerUseMask</convert>
+			<convert type="ValueBitTest">8</convert>
+			<convert type="ConditionalShowHide"/>
+		</widget>
+	</screen>
+
+	<!-- Rec Panel - If recording show the REC symbol blinking (or constantly) on the progress bar -->
+	<screen name="MeinRecordingPanel">
+		<widget source="session.RecordState" render="Pixmap" position="center,124" pixmap="/usr/share/enigma2/display/skin_default/rec.png" transparent="1" alphatest="on" size="50,26" zPosition="1">
+			<convert type="ConfigEntryTest">config.usage.blinking_rec_symbol_during_recording,True,CheckSourceBoolean</convert>
+			<convert type="ConditionalShowHide">Blink,1000</convert>
+		</widget>
+		<widget source="session.RecordState" render="Pixmap" position="center,124" pixmap="/usr/share/enigma2/display/skin_default/rec.png" transparent="1" alphatest="on" size="50,26" zPosition="1">
+			<convert type="ConfigEntryTest">config.usage.blinking_rec_symbol_during_recording,False,CheckSourceBoolean</convert>
+			<convert type="ConditionalShowHide"/>
+		</widget>
+	</screen>
+
+	<!-- standby - Clock and date - If recording show the REC symbol blinking (or constantly) between the two -->
+	<screen name="StandbySummary" position="0,0" size="400,240">
+		<widget source="global.CurrentTime" render="Label" position="0,34" size="400,100" font="FdLcD;85" halign="center">
+			<convert type="ClockToText">Format:%H:%M</convert>
+		</widget>
+		<widget source="global.CurrentTime" render="Label" position="0,154" size="400,44" font="FdLcD;38" halign="center">
+			<convert type="ClockToText">Format:%d.%m.%Y</convert>
+		</widget>
+		<panel name="MeinRecordingPanel"/>
+	</screen>
+
+	<!-- Movieplayer - If Enhanced Movie Player is not istalled -->
+	<screen name="InfoBarMoviePlayerSummary" position="0,0" size="400,240">
+		<widget source="session.CurrentService" render="Label" position="10,5" size="380,156" font="FdLcD;34" halign="center" valign="center">
+			<convert type="ServiceName">Name</convert>
+		</widget>
+		<eLabel position="10,161" size="380,2" backgroundColor="#FFFFFF" zPosition="3"/>
+		<widget source="session.CurrentService" render="Progress" position="10,166" size="380,20" foregroundColor="#888888">
+			<convert type="ServicePosition">Position</convert>
+		</widget>
+		<eLabel position="10,189" size="380,2" backgroundColor="#FFFFFF" zPosition="3"/>
+		<widget source="session.CurrentService" render="Label" position="20,197" size="210,38" font="FdLcD;38" foregroundColor="#87CEFA" valign="center" halign="left">
+			<convert type="ServicePosition">Remaining,ShowNoSeconds,Negate</convert>
+		</widget>
+		<panel name="SummaryClockPanel"/>
+		<widget source="session.RecordState" render="Pixmap" position="center,163" pixmap="/usr/share/enigma2/display/skin_default/rec.png" transparent="1" alphatest="on" size="50,26" zPosition="1">
+			<convert type="ConfigEntryTest">config.usage.blinking_rec_symbol_during_recording,True,CheckSourceBoolean</convert>
+			<convert type="ConditionalShowHide">Blink,1000</convert>
+		</widget>
+		<widget source="session.RecordState" render="Pixmap" position="center,163" pixmap="/usr/share/enigma2/display/skin_default/rec.png" transparent="1" alphatest="on" size="50,26" zPosition="1">
+			<convert type="ConfigEntryTest">config.usage.blinking_rec_symbol_during_recording,False,CheckSourceBoolean</convert>
+			<convert type="ConditionalShowHide"/>
+		</widget>
+	</screen>
+
+	<!-- EMCMoviePlayer -->
+	<screen name="EMCMoviePlayerSummary" position="0,0" size="400,240">
+		<widget source="session.CurrentService" render="Label" position="10,5" size="380,156" font="FdLcD;34" halign="center" valign="center">
+			<convert type="ServiceName">Name</convert>
+		</widget>
+		<eLabel position="10,161" size="380,2" backgroundColor="#FFFFFF" zPosition="3"/>
+		<widget source="Service" render="Progress" position="10,166" size="380,20" foregroundColor="#888888">
+			<convert type="EMCServicePosition">Position</convert>
+		</widget>
+		<eLabel position="10,189" size="380,2" backgroundColor="#FFFFFF" zPosition="3"/>
+		<widget source="session.CurrentService" render="Label" position="20,197" size="210,38" font="FdLcD;38" foregroundColor="#87CEFA" valign="center" halign="left">
+			<convert type="ServicePosition">Remaining,Negate</convert>
+		</widget>
+		<panel name="SummaryClockPanel"/>
+		<widget source="session.RecordState" render="Pixmap" position="center,163" pixmap="/usr/share/enigma2/display/skin_default/rec.png" transparent="1" alphatest="on" size="50,26" zPosition="1">
+			<convert type="ConfigEntryTest">config.usage.blinking_rec_symbol_during_recording,True,CheckSourceBoolean</convert>
+			<convert type="ConditionalShowHide">Blink,1000</convert>
+		</widget>
+		<widget source="session.RecordState" render="Pixmap" position="center,163" pixmap="/usr/share/enigma2/display/skin_default/rec.png" transparent="1" alphatest="on" size="50,26" zPosition="1">
+			<convert type="ConfigEntryTest">config.usage.blinking_rec_symbol_during_recording,False,CheckSourceBoolean</convert>
+			<convert type="ConditionalShowHide"/>
+		</widget>
+	</screen>
+
+	<!-- MovieContextMenuSummary - PVR/VIDEO then MENU pressed in list of recordings -->
+	<screen name="MovieContextMenuSummary" position="0,0" size="400,240">
+		<widget source="parent.Title" render="Label" position="0,5" size="400,92" font="FdLcD;40" halign="center" valign="center" foregroundColor="#87CEFA"/>
+		<eLabel position="5,97" size="390,2" backgroundColor="#FFFFFF" zPosition="3"/>
+		<widget source="selected" render="Label" position="0,99" size="400,138" font="FdLcD;40" halign="center" valign="center"/>
+	</screen>
+
+	<!-- MovieSelectionSummary - PVR/VIDEO key pressed -->
+	<screen name="MovieSelectionSummary" position="0,0" size="400,240">
+		<widget source="parent.Title" render="Label" position="5,5" size="390,37" font="FdLcD;32" foregroundColor="#87CEFA" halign="center" noWrap="1"/>
+		<eLabel position="5,42" size="390,2" backgroundColor="#FFFFFF" zPosition="3"/>
+		<widget source="name" render="Label" position="5,44" size="390,148" font="FdLcD;32" halign="center" valign="center"/>
+		<eLabel position="5,192" size="390,2" backgroundColor="#FFFFFF" zPosition="3"/>
+		<widget source="parent.Service" render="Label" position="20,201" size="120,32" font="FdLcD;32" foregroundColor="#87CEFA" valign="center" halign="left">
+			<convert type="ServiceTime">Duration</convert>
+			<convert type="ClockToText">AsLength</convert>
+		</widget>
+		<widget source="parent.Service" render="Label" position="210,201" size="170,32" font="FdLcD;32" foregroundColor="#87CEFA" valign="center" halign="right">
+			<convert type="MovieInfo">FileSize</convert>
+		</widget>
+	</screen>
+
+	<!-- EMCSelection - PVR/VIDEO key pressed -->
+	<screen name="EMCSelectionSummary" position="0,0" size="400,240">
+		<widget source="parent.Title" render="Label" position="5,5" size="390,37" font="FdLcD;32" foregroundColor="#87CEFA" halign="center" noWrap="1"/>
+		<eLabel position="5,42" size="390,2" backgroundColor="#FFFFFF" zPosition="3"/>
+		<widget source="parent.Service" render="Label" position="5,44" size="390,148" font="FdLcD;32" halign="center" valign="center">
+			<convert type="ServiceName">Name</convert>
+		</widget>
+		<eLabel position="5,192" size="390,2" backgroundColor="#FFFFFF" zPosition="3"/>
+		<widget source="parent.Service" render="Label" position="20,201" size="120,32" font="FdLcD;32" foregroundColor="#87CEFA" valign="center" halign="left">
+			<convert type="ServiceTime">Duration</convert>
+			<convert type="ClockToText">AsLength</convert>
+		</widget>
+		<widget source="parent.Service" render="Label" position="210,201" size="170,32" font="FdLcD;32" foregroundColor="#87CEFA" valign="center" halign="right">
+			<convert type="MovieInfo">FileSize</convert>
+		</widget>
+	</screen>
+
+	<!-- Mediaplayer - DOES NOT MAKE ANY SENCE - Who will call this ??? -->
+<!-- ####################
+	<screen name="MediaPlayerLCDScreen" position="0,0" size="400,240">
+		<widget name="text1" position="0,0" size="400,32" font="FdLcD;28" noWrap="1" halign="center" valign="center" transparent="1" zPosition="2"/>
+		<widget name="text3" position="0,35" size="400,32" font="FdLcD;28" noWrap="1" halign="center" valign="center" transparent="1" zPosition="2"/>
+		<widget name="text4" position="0,70" size="400,32" font="FdLcD;28" noWrap="1" halign="center" valign="center" transparent="1" zPosition="2"/>
+		<eLabel position="5,131" size="390,2" backgroundColor="#FFFFFF" zPosition="3"/>
+		<widget source="session.CurrentService" render="Progress" position="5,138" size="390,25" transparent="1">
+			<convert type="ServicePosition">Position</convert>
+		</widget>
+		<eLabel position="5,168" size="390,2" backgroundColor="#FFFFFF" zPosition="3"/>
+		<widget source="session.CurrentService" render="Label" position="299,181" size="100,40" font="FdLcD;40" foregroundColor="#87CEFA" zPosition="0" halign="right" transparent="1">
+			<convert type="ServicePosition">Remaining,ShowNoSeconds,OnlyMinute</convert>
+		</widget>
+		<panel name="MeinRecordingPanel"/>
+		<panel name="SummaryClockPanel"/>
+	</screen>
+#################### -->
+
+	<!-- Mediaplayer - Just 3 texts and the current time in lower right corner -->
+	<screen name="MediaPlayerLCDScreen" position="0,0" size="400,240">
+		<widget name="text1" position="0,5" size="400,46" font="FdLcD;40" foregroundColor="#87CEFA" halign="center" noWrap="1"/>
+		<eLabel position="5,71" size="390,2" backgroundColor="#FFFFFF" zPosition="3"/>
+		<widget name="text3" position="0,73" size="400,46" font="FdLcD;40" halign="center" noWrap="1"/>
+		<eLabel position="5,99" size="390,2" backgroundColor="#FFFFFF" zPosition="3"/>
+		<widget name="text4" position="0,141" size="400,46" font="FdLcD;40" halign="center" noWrap="1"/>
+		<panel name="SummaryClockPanel"/>
+	</screen>
+
+	<!-- RadioChannelselection - don't know who is calling this - untested -->
+	<screen name="ChannelSelectionRadioSummary" position="0,0" size="400,240">
+		<widget source="session.CurrentService" render="Label" position="0,5" size="400,46" foregroundColor="#87CEFA" font="FdLcD;40" halign="center" noWrap="1">
+			<convert type="ServiceName">Name</convert>
+		</widget>
+		<eLabel position="5,51" size="390,2" backgroundColor="#FFFFFF" zPosition="3"/>
+		<widget source="parent.RdsDecoder" render="Label" position="0,53" size="400,138" font="FdLcD;40" halign="center" valign="center">
+			<convert type="RdsInfo">RadioText</convert>
+		</widget>
+		<panel name="SummaryClockPanel"/>
+	</screen>
+
+	<!-- EPG Screens -->
+	<!-- EPGSelection - EPG key pressed -->
+	<screen name="EPGSelectionSummary" position="0,0" size="400,240">
+		<widget source="parent.Service" render="Label" position="0,5" size="400,55" font="FdLcD;48" halign="center" foregroundColor="#87CEFA">
+			<convert type="ServiceName">Name</convert>
+		</widget>
+		<eLabel position="5,61" size="390,2" backgroundColor="#FFFFFF" zPosition="3"/>
+		<widget source="parent.Event" render="Label" position="5,63" size="390,138" font="FdLcD;40" halign="center" valign="center">
+			<convert type="EventName">Name</convert>
+		</widget>
+		<eLabel position="5,201" size="390,2" backgroundColor="#FFFFFF" zPosition="3"/>
+		<widget source="parent.Event" render="Label" position="20,207" size="90,32" font="FdLcD;32" foregroundColor="#87CEFA" transparent="1" valign="center" halign="left">
+			<convert type="EventTime">StartTime</convert>
+			<convert type="ClockToText"/>
+		</widget>
+		<eLabel name="" text="-" position="102,207" size="20,32" font="FdLcD;32" foregroundColor="#87CEFA" valign="center" halign="center" transparent="1"/>
+		<widget source="parent.Event" render="Label" position="120,207" size="90,32" font="FdLcD;32" foregroundColor="#87CEFA" valign="center" halign="left">
+			<convert type="EventTime">EndTime</convert>
+			<convert type="ClockToText"/>
+		</widget>
+		<widget source="parent.Event" render="Label" position="230,207" size="150,32" font="FdLcD;32" foregroundColor="#87CEFA" valign="center" halign="right">
+			<convert type="EventTime">Remaining</convert>
+			<convert type="RemainingToText"></convert>
+		</widget>
+	</screen>
+
+	<!-- EventView - HELP/INFO key pressed - Infotext scrolling from bottom to top -->
+	<screen name="EventViewSummary" position="0,0" size="400,240">
+		<widget source="parent.Title" render="Label" position="5,5" size="390,37" font="FdLcD;32" halign="center" foregroundColor="#87CEFA" noWrap="1"/>
+		<eLabel position="5,42" size="390,2" backgroundColor="#FFFFFF" zPosition="3"/>
+		<widget source="parent.summary_description" position="5,49" size="390,148" font="FdLcD;32" render="RunningText" options="movetype=running,direction=top,startpoint=0,steptime=40,startdelay=2400,wrap=1,always=0,repeat=2,oneshot=1" valign="center"/>
+		<eLabel position="5,201" size="390,2" backgroundColor="#FFFFFF" zPosition="3"/>
+		<widget source="parent.Event" render="Label" position="20,207" size="90,32" font="FdLcD;32" foregroundColor="#87CEFA" transparent="1" valign="center" halign="left">
+			<convert type="EventTime">StartTime</convert>
+			<convert type="ClockToText"/>
+		</widget>
+		<eLabel name="" text="-" position="102,207" size="20,32" font="FdLcD;32" foregroundColor="#87CEFA" valign="center" halign="center" transparent="1"/>
+		<widget source="parent.Event" render="Label" position="120,207" size="90,32" font="FdLcD;32" foregroundColor="#87CEFA" valign="center" halign="left">
+			<convert type="EventTime">EndTime</convert>
+			<convert type="ClockToText"/>
+		</widget>
+		<widget source="parent.Event" render="Label" position="230,207" size="150,32" font="FdLcD;32" foregroundColor="#87CEFA" valign="center" halign="right">
+			<convert type="EventTime">Remaining</convert>
+			<convert type="RemainingToText"></convert>
+		</widget>
+	</screen>
+	<!-- EventViewSimple -->
+	<screen name="EventViewSimpleSummary" position="0,0" size="400,240">
+		<panel name="EventViewSummary"/>
+	</screen>
+
+	<!-- Numberzap - Servicenumber pressed on remote -->
+	<screen name="NumberZapSummary" position="0,0" size="400,240">
+		<widget source="parent.number_summary" render="Label" position="0,3" size="400,121" font="FdLcD;105" halign="center"/>
+		<widget source="parent.service_summary" render="Label" position="0,100" size="400,138" font="FdLcD;40" halign="center" valign="center"/>
+	</screen>
+	<screen name="NumberZapPiconSummary" position="0,0" size="400,240">
+		<panel name="NumberZapSummary"/>
+	</screen>
+	<screen name="NumberZapExtSummary" position="0,0" size="400,240">
+		<panel name="NumberZapSummary"/>
+	</screen>
+
+	<!-- menus - MENU key pressed -->
+	<screen name="MenuSummary" position="0,0" size="400,240">
+		<widget source="Title" render="Label" position="0,5" size="400,92" font="FdLcD;40" halign="center" valign="center" foregroundColor="#87CEFA"/>
+		<eLabel position="5,97" size="390,2" backgroundColor="#FFFFFF" zPosition="3"/>
+		<widget source="entry" render="Label" position="0,99" size="400,132" font="FdLcD;38" halign="center" valign="center"/>
+	</screen>
+
+	<!-- setup - OK pressed on a timer entry - or YELLOW or AUDIO key pressed - or PVR/VIDEO then MENU then OK - or MyMetrixLite (that without a headline) -->
+	<screen name="SetupSummary" position="0,0" size="400,240">
+		<widget source="Title" render="Label" position="5,5" size="380,35" font="FdLcD;30" foregroundColor="#87CEFA" halign="center" noWrap="1"/>
+		<eLabel position="5,40" size="390,2" backgroundColor="#FFFFFF" zPosition="3"/>
+		<widget source="entry" render="Label" position="10,42" size="380,111" font="FdLcD;32" halign="left" valign="center"/>
+		<eLabel position="5,153" size="390,2" backgroundColor="#FFFFFF" zPosition="3"/>
+		<widget source="value" render="Label" position="10,155" size="380,74" font="FdLcD;32" halign="left" valign="center"/>
+	</screen>
+
+	<!-- Schnellstartmenue - BLUE key pressed -->
+	<screen name="QuickMenuSummary" position="0,0" size="400,240">
+		<widget source="parent.Title" render="Label" position="0,5" size="400,41" font="FdLcD;36" foregroundColor="#87CEFA" halign="center"/>
+		<eLabel position="5,46" size="390,2" backgroundColor="#FFFFFF" zPosition="3"/>
+		<widget source="parent.summary_description" render="Label" position="10,50" size="380,156" font="FdLcD;34" halign="left" valign="center"/>
+	</screen>
+
+	<!-- Metrix-Menu - GREEN - MyMetrixLite OK -->
+	<screen name="MainSettingsViewSummary" position="0,0" size="400,240">
+		<widget source="parent.titleText" render="Label" position="0,0" size="400,234" font="FdLcD;34" foregroundColor="#87CEFA" halign="center" valign="center"/>
+		<panel name="SummaryClockPanel"/>
+	</screen>
+
+	<!-- misc - MENU - Setup - Usage and GUI - Choose Language -->
+	<screen name="ScreenSummary" position="0,0" size="400,240">
+		<widget source="Title" render="Label" position="0,0" size="400,234" font="FdLcD;34" foregroundColor="#87CEFA" halign="center" valign="center"/>
+		<panel name="SummaryClockPanel"/>
+	</screen>
+
+	<!-- misc - Like "ScreenSummary" but calls "parent.Title" instead of "Title" -->
+	<screen name="SimpleSummary" position="0,0" size="400,240">
+		<widget source="parent.Title" render="Label" position="0,0" size="400,234" font="FdLcD;34" foregroundColor="#87CEFA" halign="center" valign="center"/>
+		<panel name="SummaryClockPanel"/>
+	</screen>
+
+	<!-- LocationBox_summary - don't know who is calling this - untested - construction like "MainSettingsViewSummary" -->
+	<screen name="LocationBoxSummary" position="0,0" size="400,240">
+		<widget source="parent.text" render="Label" position="0,0" size="400,234" font="FdLcD;34" foregroundColor="#87CEFA" halign="center" valign="center"/>
+		<panel name="SummaryClockPanel"/>
+	</screen>
+
+	<!-- IMDbLCDScreen- don't know who is calling this - untested - construction like "MainSettingsViewSummary" -->
+	<screen name="IMDbLCDScreen" position="0,0" size="400,240">
+		<widget name="headline" position="0,0" size="400,234" font="FdLcD;34" foregroundColor="#87CEFA" halign="center" valign="center"/>
+		<panel name="SummaryClockPanel"/>
+	</screen>
+
+	<!-- Servicescan -->
+	<screen name="ServiceScanSummary" position="0,0" size="400,240">
+		<widget source="Title" render="Label" position="0,5" size="400,41" font="FdLcD;36" foregroundColor="#87CEFA" halign="center"/>
+		<widget name="scan_progress" position="10,57" size="380,46" foregroundColor="#888888" borderColor="#FFFFFF" borderWidth="2"/>
+		<widget name="Service" position="0,115" size="400,82" font="FdLcD;36" halign="center" valign="center"/>
+		<panel name="SummaryClockPanel"/>
+	</screen>
+
+	<!-- NetworkServices - "Network Settings"? - untested -->
+	<screen name="NetworkServicesSummary" position="0,0" size="400,240">
+		<widget source="title" render="Label" position="10,5" size="380,90" font="FdLcD;26" foregroundColor="#87CEFA" halign="center" valign="center"/>
+		<eLabel position="5,95" size="390,2" backgroundColor="#FFFFFF" zPosition="3"/>
+		<widget source="status_summary" render="Label" position="0,97" size="400,93" font="FdLcD;26" halign="center" valign="center"/>
+		<eLabel position="5,187" size="390,2" backgroundColor="#FFFFFF" zPosition="3"/>
+		<widget source="autostartstatus_summary" render="Label" position="10,189" size="380,46" font="FdLcD;20" halign="center" valign="center"/>
+	</screen>
+
+	<!-- SwapSummary - don't know who is calling this - untested -->
+	<screen name="SwapSummary" position="0,0" size="400,240">
+		<widget source="parent.Title" render="Label" position="0,5" size="400,41" font="FdLcD;36" foregroundColor="#87CEFA" halign="center"/>
+		<eLabel position="5,46" size="390,2" backgroundColor="#FFFFFF" zPosition="3"/>
+		<widget source="parent.swapname_summary" render="Label" position="10,48" size="380,41" font="FdLcD;36" halign="left"/>
+		<eLabel position="5,89" size="390,2" backgroundColor="#FFFFFF" zPosition="3"/>
+		<widget source="parent.swapactive_summary" render="Label" position="10,91" size="380,148" font="FdLcD;32" valign="center" halign="left"/>
+	</screen>
+
+	<!-- DevicesPanel - don't know who is calling this - untested -->
+	<screen name="DevicesPanelSummary" position="0,0" size="400,240">
+		<widget source="parent.Title" render="Label" position="0,5" size="400,41" font="FdLcD;36" foregroundColor="#87CEFA" halign="center"/>
+		<eLabel position="5,46" size="390,2" backgroundColor="#FFFFFF" zPosition="3"/>
+		<widget source="entry" render="Label" position="10,48" size="380,41" font="FdLcD;36" halign="left"/>
+		<eLabel position="5,89" size="390,2" backgroundColor="#FFFFFF" zPosition="3"/>
+		<widget source="desc" render="Label" position="10,91" size="380,148" font="FdLcD;32" valign="center" halign="left"/>
+	</screen>
+
+	<!-- Plugin browser - GREEN key pressed -->
+	<screen name="PluginBrowserSummary" position="0,0" size="400,240">
+		<widget source="Title" render="Label" position="0,5" size="400,41" font="FdLcD;36" foregroundColor="#87CEFA" halign="center"/>
+		<eLabel position="5,46" size="390,2" backgroundColor="#FFFFFF" zPosition="3"/>
+		<widget source="entry" render="Label" position="10,48" size="380,74" font="FdLcD;32" halign="left" valign="center"/>
+		<eLabel position="5,122" size="390,2" backgroundColor="#FFFFFF" zPosition="3"/>
+		<widget source="value" render="Label" position="10,124" size="380,111" font="FdLcD;32" halign="left" valign="center"/>
+	</screen>
+
+	<!-- JobView TaskView Summary - Initialize HDD / Check HDD / HDD ext3 to ext4 -->
+	<screen name="TaskViewSummary" position="0,0" size="400,240">
+		<widget source="parent.summary_job_progress" render="Label" position="0,5" size="400,41" font="FdLcD;36" foregroundColor="#87CEFA" halign="center">
+			<convert type="ProgressToText"/>
+		</widget>
+		<widget source="parent.summary_job_progress" render="Progress" position="10,46" size="380,30" foregroundColor="#888888" borderColor="#FFFFFF" borderWidth="2"/>
+		<widget source="parent.summary_job_name" render="Label" position="10,76" size="380,111" font="FdLcD;32" halign="left" valign="center"/>
+		<eLabel position="5,187" size="390,2" backgroundColor="#FFFFFF" zPosition="3"/>
+		<widget source="parent.summary_job_task" render="Label" position="10,189" size="380,37" font="FdLcD;32" halign="left"/>
+	</screen>
+
+	<!-- SoftwareUpdate - untested -->
+	<screen name="UpdatePluginSummary" position="0,0" size="400,240">
+		<widget source="parent.Title" render="Label" position="0,5" size="400,41" font="FdLcD;36" foregroundColor="#87CEFA" halign="center"/>
+		<eLabel position="5,46" size="390,2" backgroundColor="#FFFFFF" zPosition="3"/>
+		<widget source="parent.package" render="Label" position="10,48" size="380,78" font="FdLcD;34" halign="left" valign="center"/>
+		<eLabel position="5,126" size="390,2" backgroundColor="#FFFFFF" zPosition="3"/>
+		<widget source="parent.status" render="Label" position="10,128" size="380,111" font="FdLcD;32" valign="center" halign="left"/>
+	</screen>
+
+	<!-- SoftwareUpdateChanges - untested -->
+	<screen name="SoftwareUpdateChangesSummary" position="0,0" size="400,240">
+		<widget source="parent.title_summary" render="Label" position="0,5" size="400,46" font="FdLcD;40" foregroundColor="#87CEFA" halign="center"/>
+		<eLabel position="5,51" size="390,2" backgroundColor="#FFFFFF" zPosition="3"/>
+		<widget source="parent.text_summary" render="Label" position="10,53" size="380,184" font="FdLcD;40" halign="center" valign="center"/>
+	</screen>
+
+	<!-- Wizard - e.g Network Wizard - MENU - Settings - Network - Device Settings - LAN connection - Network Wizard -->
+	<screen name="WizardSummary" position="0,0" size="400,240">
+		<widget source="text" render="Label" position="10,5" size="380,78" font="FdLcD;34" foregroundColor="#87CEFA" halign="center" valign="center"/>
+		<eLabel position="5,83" size="390,2" backgroundColor="#FFFFFF" zPosition="3"/>
+		<widget source="parent.list" render="Label" position="10,85" size="380,148" font="FdLcD;32" halign="center" valign="center">
+			<convert type="StringListSelection"/>
+		</widget>
+	</screen>
+
+	<!-- ChoiceBox - "Delete Movie? - Yes / No - 1 2 3 4 5 6 7" - DOES NOT WORK LIKE IT SHOULD !!! The lines jump upwards !!! -->
+	<screen name="ChoiceBoxSummary" position="0,0" size="400,240">
+		<widget source="parent.summary_list" render="Label" position="10,5" size="380,224" font="FdLcD;24"/>
+	</screen>
+
+	<!-- MessageBox - Info like "A Recording has startet" or "Continue play at 1:00:00? - Yes / NO" -->
+	<screen name="MessageBoxSummary" position="0,0" size="400,240">
+		<widget source="text" render="Label" position="0,5" size="400,175" font="FdLcD;30" halign="center" valign="center"/>
+		<eLabel position="5,180" size="390,2" backgroundColor="#FFFFFF" zPosition="3"/>
+		<widget source="option" render="Label" position="0,187" size="400,48" font="FdLcD;42" foregroundColor="#87CEFA" halign="center"/>
+	</screen>
+	<screen name="MessageBoxSimpleSummary" position="0,0" size="400,240">
+		<panel name="MessageBoxSummary"/>
+	</screen>
+
+	<!-- console - don't know who is calling this - untested -->
+	<screen name="ConsoleSummary" position="0,0" size="400,240">
+		<widget source="parent.Title" render="Label" position="10,5" size="380,78" font="FdLcD;34" halign="center" valign="center" foregroundColor="#87CEFA"/>
+		<eLabel position="5,83" size="390,2" backgroundColor="#FFFFFF" zPosition="3"/>
+		<widget source="parent.summary_description" render="Label" position="10,85" size="380,156" font="FdLcD;34" halign="center" valign="center"/>
+	</screen>
+
+	<!-- TimerOverview - Show List of Timers -->
+	<screen name="TimerOverviewSummary" position="0,0" size="400,240">
+		<widget source="parent.Title" render="Label" position="0,10" size="400,35" font="FdLcD;30" foregroundColor="#87CEFA" halign="center" noWrap="1"/>
+		<eLabel position="5,48" size="390,2" backgroundColor="#FFFFFF" zPosition="3"/>
+		<widget source="name" render="Label" position="5,54" size="390,111" font="FdLcD;32" halign="center" valign="center"/>
+		<eLabel position="5,167" size="390,2" backgroundColor="#FFFFFF" zPosition="3"/>
+		<widget source="time" render="Label" position="5,173" size="390,35" font="FdLcD;30" halign="left" transparent="1"/>
+		<widget source="state" render="Label" position="5,173" size="390,35" font="FdLcD;30" foregroundColor="#04B404" halign="right" transparent="1"/>
+		<widget source="duration" render="Label" position="5,205" size="390,35" font="FdLcD;30" foregroundColor="#87CEFA" halign="left" transparent="1"/>
+		<widget source="service" render="Label" position="5,205" size="390,35" font="FdLcD;30" foregroundColor="#FFFF00" halign="right" transparent="1" noWrap="1"/>
+	</screen>
+
+	<!-- TimerLog_summary - untested -->
+	<screen name="TimerLogSummary" position="0,0" size="400,240">
+		<widget source="parent.Title" render="Label" position="0,5" size="400,41" font="FdLcD;36" foregroundColor="#87CEFA" halign="center" noWrap="1"/>
+		<eLabel position="5,46" size="390,2" backgroundColor="#FFFFFF" zPosition="3"/>
+		<widget source="parent.summary_description" render="Label" position="10,48" size="380,195" font="FdLcD;34" halign="center" valign="center"/>
+	</screen>
+
+	<!-- AutoTimer - untested -->
+	<screen name="AutoTimerOverviewSummary" position="0,0" size="400,240">
+		<widget source="parent.Title" render="Label" position="0,5" size="400,40" font="FdLcD;36" foregroundColor="#87CEFA" halign="center" noWrap="1"/>
+		<eLabel position="5,46" size="390,2" backgroundColor="#FFFFFF" zPosition="3"/>
+		<widget source="entry" render="Label" position="10,48" size="380,195" font="FdLcD;34" halign="center" valign="center"/>
+	</screen>
+
+	<!-- Neu -->
+	<!-- PackageAction - GREEN GREEN - Install Plugin -->
+	<screen name="PackageActionSummary" position="0,0" size="400,240">
+		<widget source="Title" render="Label" position="0,5" size="400,41" font="FdLcD;36" foregroundColor="#87CEFA" halign="center"/>
+		<eLabel position="5,46" size="390,2" backgroundColor="#FFFFFF" zPosition="3"/>
+		<widget source="category" render="Label" position="10,48" size="380,37" font="FdLcD;32"/>
+		<eLabel position="5,85" size="390,2" backgroundColor="#FFFFFF" zPosition="3"/>
+		<widget source="name" render="Label" position="10,87" size="380,37" font="FdLcD;32"/>
+		<eLabel position="5,124" size="390,2" backgroundColor="#FFFFFF" zPosition="3"/>
+		<widget source="description" render="Label" position="10,126" size="380,112" font="FdLcD;24" valign="center" halign="left"/>
+	</screen>
+
+	<!-- new_templateSummary1 - BLUE - Software Manager - OK - e.g. Show Default Backup Files -->
+	<screen name="_templateSummary1" position="0,0" size="400,240">
+		<widget source="parent.Title" render="Label" position="10,5" size="380,82" font="FdLcD;36" foregroundColor="#87CEFA" halign="center" valign="center"/>
+		<eLabel position="5,85" size="390,2" backgroundColor="#FFFFFF" zPosition="3"/>
+		<widget source="parent.summary_description" render="Label" position="10,87" size="380,123" font="FdLcD;36" halign="center" valign="center"/>
+	</screen>
+	<!-- new_template -->
+	<screen name="BackupSelectionSummary" position="0,0" size="400,240">
+		<panel name="_templateSummary1"/>
+	</screen>
+	<screen name="RestoreScreenSummary" position="0,0" size="400,240">
+		<panel name="_templateSummary1"/>
+	</screen>
+	<screen name="installedPluginsSummary" position="0,0" size="400,240">
+		<panel name="_templateSummary1"/>
+	</screen>
+	<screen name="RestartNetworkSummary" position="0,0" size="400,240">
+		<panel name="_templateSummary1"/>
+	</screen>
+	<screen name="RestorePluginsSummary" position="0,0" size="400,240">
+		<panel name="_templateSummary1"/>
+	</screen>
+	<screen name="RestoreMenuSummary" position="0,0" size="400,240">
+		<panel name="_templateSummary1"/>
+	</screen>
+
+	<!-- DVD nicht getestet - untested -->
+	<screen name="DVDSummary" position="0,0" size="400,240">
+		<widget source="session.CurrentService" render="Label" position="0,5" size="400,82" font="FdLcD;36" foregroundColor="#87CEFA" halign="center" valign="center">
+			<convert type="ServiceName">Name</convert>
+		</widget>
+		<widget source="session.CurrentService" render="Progress" position="10,89" size="380,35" foregroundColor="#888888" borderColor="#FFFFFF" borderWidth="2">
+			<convert type="ServicePosition">Position</convert>
+		</widget>
+		<panel position="fill">
+			<widget source="session.CurrentService" render="Label" position="10,126" size="380,41" font="FdLcD;36" halign="left">
+				<convert type="ServicePosition">Position</convert>
+			</widget>
+			<widget name="Chapter" position="10,169" size="380,41" font="FdLcD;36" halign="left"/>
+		</panel>
+	</screen>
+
+	<!-- Shoutcast - untested -->
+	<screen name="SHOUTcastLCDScreen" position="0,0" size="400,240">
+		<widget name="text1" position="10,5" size="380,84" font="FdLcD;24" halign="center" valign="center"/>
+		<widget name="text2" position="10,91" size="380,140" font="FdLcD;30" halign="center" valign="center"/>
+		<panel name="SummaryClockPanel"/>
+	</screen>
+</skin>

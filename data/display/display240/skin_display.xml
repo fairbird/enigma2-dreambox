@@ -422,4 +422,5 @@
 		<widget source="parent.summary_description" render="Label" position="0,35" size="240,30" font="FdLcD;24" horizontalAlignment="center" verticalAlignment="center" />
 		<panel name="SummaryClockPanel" />
 	</screen>
+	<include filename="/usr/share/enigma2/display/skin_default/skin_display_templates.xml"/>
 </skin>

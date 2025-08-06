@@ -404,4 +404,5 @@
 		<panel name="SummaryTunerStatusPanel" />
 		<panel name="SummaryClockPanel" />
 	</screen>
+	<include filename="/usr/share/enigma2/display/skin_default/skin_display_templates.xml"/>
 </skin>
