@@ -36,9 +36,9 @@ class Canvas(Renderer):
 			elif l[0] == 2:
 				self.instance.writeText(eRect(l[1], l[2], l[3], l[4]), gRGB(l[5]), gRGB(l[6]), l[7], l[8], l[9])
 			elif l[0] == 3:
-				self.instance.drawLine(l[1], l[2], l[3], l[4], gRGB(l[5]))
+				self.instance.drawLine(int(l[1]), int(l[2]), int(l[3]), int(l[4]), gRGB(l[5]))
 			elif l[0] == 4:
-				self.instance.drawRotatedLine(l[1], l[2], l[3], l[4], l[5], l[6], l[7], l[8], gRGB(l[9]))
+				self.instance.drawRotatedLine(int(l[1]), int(l[2]), int(l[3]), int(l[4]), int(l[5]), int(l[6]), l[7], l[8], gRGB(l[9]))
 			else:
 				print("drawlist entry:", l)
 				raise RuntimeError("invalid drawlist entry")
