@@ -221,11 +221,11 @@
 	</screen>
 
 	<screen name="ChoiceBox_summary" position="0,0" size="96,64">
-		<widget source="parent.summary_list" render="Label" position="fill" font="FdLcD;14" noWrap="1" verticalAlignment="top" />
+		<widget source="parent.summary_list" render="Label" position="fill" font="FdLcD;15" noWrap="1" verticalAlignment="top" />
 	</screen>
 
 	<screen name="MessageBox_summary" position="0,0" size="96,64">
-		<widget source="parent.Text" render="Label" position="0,0" size="96,52" font="FdLcD;11" halign="center" valign="center" />
+		<widget source="parent.Text" render="Label" position="0,0" size="96,52" font="FdLcD;12" halign="center" valign="center" />
 		<widget source="parent.selectedChoice" render="Label" position="0,50" size="96,14" font="FdLcD;14" halign="center" valign="center" />
 	</screen>
 
