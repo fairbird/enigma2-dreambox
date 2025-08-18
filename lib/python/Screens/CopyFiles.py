@@ -76,21 +76,30 @@ class CopyFileTask(Components.Task.PythonTask):
 					print("[CopyFileTask]", ex)
 					bs = 65536
 					d = bytearray(bs)
+					mv = memoryview(d)
 					while True:
 						if self.aborted:
 							print("[CopyFileTask] aborting")
 							raise Exception("Aborted")
-						l = src.readinto(d)
-						if l < bs:
-							if not l:
-								# EOF
-								src.close()
-								dst.close()
+						n = src.readinto(d)
+						if not n:
+							dst.flush()
+							try:
+								os.fsync(dst.fileno())
+							except:
+								pass
+							src.close()
+							dst.close()
+							break
+						view = memoryview(d)[:n]
+						written_total = 0
+						while written_total < n:
+							w = dst.write(view[written_total:])
+							if w is None:
+								print("[CopyFileTask] WARN: dst.write() returned None; assuming full write of", n - written_total, "bytes")
 								break
-							dst.write(buffer(d, 0, l))
-						else:
-							dst.write(d)
-						self.pos += l
+							written_total += w
+						self.pos += n
 		except:
 			# In any event, close all handles
 			for src, dst in self.handles:
