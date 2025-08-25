@@ -131,18 +131,6 @@
 		<widget source="parent.Title" render="Label" position="top" size="*,100" font="FdLcD;28" horizontalAlignment="center" verticalAlignment="center" />
 		<panel position="bottom" size="*,24" name="SummaryClockPanel" />
 	</screen>
-	<screen name="WizardSummary" position="fill">
-		<widget source="text" render="Label" position="top" size="*,71" font="FdLcD;35" horizontalAlignment="center" />
-		<widget source="parent.list" render="Label" position="fill" font="FdLcD;25" horizontalAlignment="center" >
-			<convert type="StringListSelection" />
-		</widget>
-	</screen>
-	<screen name="VideoWizardSummary" position="fill">
-		<widget name="text" position="top" size="*,40" font="FdLcD;12" transparent="1" />
-		<widget source="parent.list" render="Label" position="fill" font="FdLcD;45" horizontalAlignment="center" >
-			<convert type="StringListSelection" />
-		</widget>
-	</screen>
 
 <!-- standby -->
 	<screen name="StandbySummary" position="0,0" size="220,176">
@@ -160,13 +148,6 @@
 			<convert type="ConfigEntryTest">config.usage.blinking_rec_symbol_during_recording,False,CheckSourceBoolean</convert>
 			<convert type="ConditionalShowHide" />
 		</widget>
-	</screen>
-
-<!-- Plugin browser -->
-	<screen name="PluginBrowserSummary" position="fill">
-		<widget source="parent.Title" render="Label" foregroundColor="#FFFF00" position="0,0" size="220,26" font="FdLcD;25" horizontalAlignment="center" noWrap="1" />
-		<widget source="entry" render="Label" position="0,27" size="220,61" font="FdLcD;30" verticalAlignment="center" horizontalAlignment="center" />
-		<widget source="desc" render="Label" position="0,89" size="220,70" font="FdLcD;22" verticalAlignment="center" horizontalAlignment="center" />
 	</screen>
 
 <!-- JobView Summary -->
@@ -263,24 +244,6 @@
 		<widget source="state" render="Label" position="0,110" size="220,20" font="FdLcD;19" horizontalAlignment="right" transparent="1" />
 		<panel name="SummaryIconsPanel" />
 		<panel name="SummaryTunerStatusPanel" />
-	</screen>
-
-	<screen name="WizardSummary" position="0,0" size="220,176">
-		<widget source="text" render="Label" position="0,0" size="220,55" font="FdLcD;24" horizontalAlignment="center" />
-		<widget source="parent.list" render="Label" position="0,85" size="220,124" font="FdLcD;24" horizontalAlignment="center" >
-			<convert type="StringListSelection" />
-		</widget>
-	</screen>
-	<screen name="LanguageWizardSummary" position="0,0" size="220,176">
-		<widget source="parent.summarytext" render="Label" position="0,0" size="220,55" font="FdLcD;24" horizontalAlignment="center" />
-		<widget source="parent.summarylangname" render="Label" position="0,85" size="220,124" font="FdLcD;24" horizontalAlignment="center" />
-<!-- 		<widget source="parent.flag" render="Pixmap" position="0,0" size="110,40" backgroundColor="#ff000000" /> -->
-	</screen>
-	<screen name="VideoWizardSummary" position="fill">
-		<widget source="text" render="Label" position="0,0" size="220,50" font="FdLcD;24" horizontalAlignment="center" />
-		<widget source="parent.list" render="Label" position="0,85" size="220,124" font="FdLcD;24" horizontalAlignment="center" >
-			<convert type="StringListSelection" />
-		</widget>
 	</screen>
 
 <!-- DVD -->

@@ -445,18 +445,7 @@
 		<widget source="parent.Title" render="Label" position="0,0" size="471,237" font="FdLcD;38" foregroundColor="#87CEFA" horizontalAlignment="center" verticalAlignment="center" />
 		<panel name="SummaryClockPanel" />
 	</screen>
-	<screen name="WizardSummary" position="fill">
-		<widget source="text" render="Label" position="top" size="*,71" font="FdLcD;35" horizontalAlignment="center" />
-		<widget source="parent.list" render="Label" position="fill" font="FdLcD;25" horizontalAlignment="center" >
-			<convert type="StringListSelection" />
-		</widget>
-	</screen>
-	<screen name="VideoWizardSummary" position="fill">
-		<widget name="text" position="top" size="*,40" font="FdLcD;12" transparent="1" />
-		<widget source="parent.list" render="Label" position="fill" font="FdLcD;45" horizontalAlignment="center" >
-			<convert type="StringListSelection" />
-		</widget>
-	</screen>
+
 
 <!-- DevicesPanelSummary -->
 	<screen name="DevicesPanelSummary" position="5,0" size="471,320">
@@ -478,14 +467,6 @@
 		</widget>
 		<panel name="MeinRecordingPanel" />
 		<panel name="MeinTunerInfoPanel" />
-	</screen>
-
-<!-- Plugin browser -->
-	<screen name="PluginBrowserSummary" position="fill">
-		<widget source="parent.Title" render="Label" position="top" size="*,28" font="FdLcD;25" noWrap="1" />
-		<widget source="entry" render="Label" position="top" size="*,38" font="FdLcD;32" foregroundColor="#87CEFA" noWrap="1" horizontalAlignment="left" />
-		<eLabel position="top" size="*,1" backgroundColor="white" />
-		<widget source="desc" render="Label" position="fill" font="FdLcD;22" verticalAlignment="top" />
 	</screen>
 
 <!-- JobView Summary -->
@@ -547,17 +528,7 @@
 	</screen>
 
 <!-- System -->
-	<screen name="ChoiceBox_summary" position="fill" >
-		<widget source="parent.summary_list" render="Label" position="fill" font="FdLcD;21" noWrap="1" verticalAlignment="top" />
-	</screen>
-	<screen name="MessageBox_summary" position="5,0" size="471,320">
-		<widget source="parent.Text" render="Label" position="0,0" size="471,320" font="FdLcD;24" horizontalAlignment="center" />
-		<widget source="parent.selectedChoice" conditional="parent.selectedChoice" render="Label" position="0,180" size="471,37" font="FdLcD;26" foregroundColor="#F4FA58" horizontalAlignment="center" noWrap="1" />
-	</screen>
-	<screen name="MessageBoxSimple_summary" position="5,0" size="471,320">
-		<widget source="parent.Text" render="Label" position="0,0" size="471,320" font="FdLcD;24" horizontalAlignment="center" />
-		<widget source="parent.selectedChoice" conditional="parent.selectedChoice" render="Label" position="0,180" size="471,37" font="FdLcD;26" foregroundColor="#F4FA58" horizontalAlignment="center" noWrap="1" />
-	</screen>
+
 	<screen name="AboutSummary" position="5,0" size="471,320">
 		<widget source="parent.Title" render="Label" position="0,0" size="471,320" font="FdLcD;34" foregroundColor="#F4FA58" horizontalAlignment="center" verticalAlignment="center" />
 	</screen>
@@ -624,22 +595,6 @@
 	<screen name="SoftwareUpdateChanges_summary" position="5,0" size="471,320">
 		<widget source="parent.Title_summary" render="Label" position="0,0" size="471,35" font="FdLcD;24" foregroundColor="#87CEFA" horizontalAlignment="center" noWrap="1" />
 		<widget source="parent.text_summary" render="Label" position="0,37" size="471,283" font="FdLcD;24" horizontalAlignment="left" transparent="1" />
-	</screen>
-	<screen name="WizardSummary" position="5,0" size="471,320">
-		<widget source="text" render="Label" position="0,0" size="471,73" font="FdLcD;24" horizontalAlignment="center" />
-		<widget source="parent.list" render="Label" position="0,113" size="471,165" font="FdLcD;24" horizontalAlignment="center" >
-			<convert type="StringListSelection" />
-		</widget>
-	</screen>
-	<screen name="LanguageWizardSummary" position="5,0" size="471,320">
-		<widget source="parent.summarytext" render="Label" position="0,0" size="471,73" font="FdLcD;24" horizontalAlignment="center" />
-		<widget source="parent.summarylangname" render="Label" position="0,113" size="471,165" font="FdLcD;24" horizontalAlignment="center" />
-	</screen>
-	<screen name="VideoWizardSummary" position="fill">
-		<widget source="text" render="Label" position="0,0" size="471,67" font="FdLcD;24" horizontalAlignment="center" />
-		<widget source="parent.list" render="Label" position="0,113" size="471,165" font="FdLcD;24" horizontalAlignment="center" >
-			<convert type="StringListSelection" />
-		</widget>
 	</screen>
 
 <!-- Neu -->

@@ -29,6 +29,7 @@ class Console(Screen):
 		self["text"] = ScrollLabel("")
 		self["key_red"] = StaticText(_("Cancel"))
 		self["key_green"] = StaticText(_("Hide"))
+		self["summary_description"] = StaticText()
 		self["actions"] = ActionMap(["WizardActions", "DirectionActions", "ColorActions"],
 		{
 			"ok": self.closeConsole,
@@ -74,10 +75,12 @@ class Console(Screen):
 			self.show()
 			self.finished = True
 			lastpage = self["text"].isAtLastPage()
+			text = ngettext("Command finished.", "Commands finished.", len(self.cmdlist))
 			if self.cancel_msg:
 				self.cancel_msg.close()
 			if self.showStartStopText:
 				self["text"].appendText(_("Execution finished!!"))
+			self["summary_description"].setText(text)
 			if self.finishedCallback is not None:
 				self.finishedCallback()
 			if not self.errorOcurred and self.closeOnSuccess:

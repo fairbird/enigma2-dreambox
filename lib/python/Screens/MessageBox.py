@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from Screens.Screen import Screen
+from Screens.Screen import Screen, ScreenSummary
 from Components.ActionMap import ActionMap
 from Components.Label import Label
 from Components.Pixmap import Pixmap, MultiPixmap
@@ -227,6 +227,9 @@ class MessageBox(Screen):
 	def getListWidth(self):
 		return self["list"].instance.getMaxItemTextWidth()
 
+	def createSummary(self):
+		return MessageBoxSummary
+
 	def reloadLayout(self):
 		for method in self.onLayoutFinish:
 			if not isinstance(method, type(self.close)):
@@ -234,6 +237,30 @@ class MessageBox(Screen):
 			else:
 				method()
 		self.layoutFinished()
+
+
+class MessageBoxSummary(ScreenSummary):
+	def __init__(self, session, parent):
+		ScreenSummary.__init__(self, session, parent=parent)
+		self["text"] = StaticText(parent.text)
+		self["option"] = StaticText("")
+		if parent.list:
+			if self.addWatcher not in self.onShow:
+				self.onShow.append(self.addWatcher)
+			if self.removeWatcher not in self.onHide:
+				self.onHide.append(self.removeWatcher)
+
+	def addWatcher(self):
+		if self.selectionChanged not in self.parent["list"].onSelectionChanged:
+			self.parent["list"].onSelectionChanged.append(self.selectionChanged)
+		self.selectionChanged()
+
+	def removeWatcher(self):
+		if self.selectionChanged in self.parent["list"].onSelectionChanged:
+			self.parent["list"].onSelectionChanged.remove(self.selectionChanged)
+
+	def selectionChanged(self):
+		self["option"].setText(self.parent["list"].getCurrent()[0])
 
 
 class ModalMessageBox:

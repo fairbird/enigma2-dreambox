@@ -196,6 +196,7 @@ class RestoreMenu(Screen):
 		self["key_red"] = StaticText(_("Cancel"))
 		self["key_green"] = StaticText(_("Restore"))
 		self["key_yellow"] = StaticText(_("Delete"))
+		self["summary_description"] = StaticText("")
 
 		self.sel = []
 		self.val = []
@@ -219,6 +220,10 @@ class RestoreMenu(Screen):
 		self.flist = []
 		self["filelist"] = MenuList(self.flist)
 		self.fill_list()
+		self.onLayoutFinish.append(self.layoutFinished)
+
+	def layoutFinished(self):
+		self.checkSummary()
 
 	def fill_list(self):
 		self.flist = []
@@ -242,6 +247,14 @@ class RestoreMenu(Screen):
 	def keyCancel(self):
 		self.close()
 
+	def keyUp(self):
+		self["filelist"].up()
+		self.checkSummary()
+
+	def keyDown(self):
+		self["filelist"].down()
+		self.checkSummary()
+
 	def startRestore(self, ret=False):
 		if ret:
 			self.exe = True
@@ -262,6 +275,10 @@ class RestoreMenu(Screen):
 				remove(self.val)
 			self.exe = False
 			self.fill_list()
+
+	def checkSummary(self):
+		cur = self["filelist"].getCurrent()
+		self["summary_description"].text = cur
 
 
 class RestoreScreen(ConfigListScreen, Screen):

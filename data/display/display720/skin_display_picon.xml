@@ -365,22 +365,6 @@
 		<panel name="SummaryClockPanel" />
 	</screen>
 
-	<screen name="WizardSummary" position="0,0" size="720,576">
-		<widget source="text" render="Label" position="10,20" foregroundColor="#e5b243" size="670,150" font="FdLcD;70" horizontalAlignment="center" verticalAlignment="center" />
-		<widget source="parent.list" render="Label" position="20,190" size="670,200" font="FdLcD;60" horizontalAlignment="center" verticalAlignment="center" foregroundColor="#02c6ff">
-			<convert type="StringListSelection" />
-		</widget>
-		<panel name="SummaryClockPanel" />
-	</screen>
-
-	<screen name="VideoWizardSummary" position="0,0" size="720,576">
-		<widget source="text" render="Label" position="10,20" foregroundColor="#e5b243" size="670,120" font="FdLcD;70" horizontalAlignment="center" verticalAlignment="center" />
-		<widget source="parent.list" render="Label" position="20,190" size="670,200" font="FdLcD;60" horizontalAlignment="center" verticalAlignment="top" foregroundColor="#02c6ff">
-			<convert type="StringListSelection" />
-		</widget>
-		<panel name="SummaryClockPanel" />
-	</screen>
-
 <!-- standby -->
 <!--"Analog Clock" -->
 	<screen name="StandbySummary" position="0,0" size="720,576">
@@ -401,14 +385,6 @@
 		</widget>
 	</screen>
 
-<!-- Plugin browser -->
-	<screen name="PluginBrowserSummary" position="0,0" size="720,576">
-		<widget source="parent.Title" render="Label" position="15,20" foregroundColor="#e5b243" size="670,150" font="FdLcD;70" horizontalAlignment="center" verticalAlignment="top" />
-		<widget source="entry" render="Label" position="22,170" size="670,200" font="FdLcD;70" horizontalAlignment="center" verticalAlignment="center" foregroundColor="#02c6ff" />
-		<widget source="desc" render="Label" position="22,400" size="670,120" font="FdLcDLight;50" horizontalAlignment="center" verticalAlignment="center" />
-		<panel name="SummaryClockPanel" />
-	</screen>
-
 <!-- JobView Summary -->
 	<screen name="JobView_summary" position="0,0" size="720,576">
 		<widget source="parent.summary_job_name" render="Label" position="15,21" size="675,122" foregroundColor="#e5b243" font="FdLcD; 60" verticalAlignment="center" horizontalAlignment="center" zPosition="14" />
@@ -417,23 +393,6 @@
 		<widget source="parent.summary_job_progress" render="Label" position="20,350" size="658,104" font="FdLcDLight;80" horizontalAlignment="center" foregroundColor="#02c6ff" >
 			<convert type="ProgressToText" />
 		</widget>
-		<panel name="SummaryClockPanel" />
-	</screen>
-
-	<screen name="ChoiceBox_summary" position="0,0" size="720,576">
-		<widget source="parent.summary_list" render="Label" position="22,22" size="670,445" font="FdLcDLight;57" horizontalAlignment="center" verticalAlignment="center" foregroundColor="#e5b243" />
-		<panel name="SummaryClockPanel" />
-	</screen>
-
-	<screen name="MessageBox_summary" position="0,0" size="720,576">
-		<widget source="parent.Text" render="Label" position="10,20" size="670,376" font="FdLcD;70" horizontalAlignment="center" verticalAlignment="center" foregroundColor="#e5b243" />
-		<widget source="parent.selectedChoice" conditional="parent.selectedChoice" render="Label" position="22,390" size="670,63" foregroundColor="#02c6ff" font="FdLcDLight;60" horizontalAlignment="center" verticalAlignment="center" />
-		<panel name="SummaryClockPanel" />
-	</screen>
-
-	<screen name="MessageBoxSimple_summary" position="0,0" size="720,576">
-		<widget source="parent.Text" render="Label" position="10,20" size="670,376" font="FdLcD;70" horizontalAlignment="center" verticalAlignment="center" foregroundColor="#e5b243" />
-		<widget source="parent.selectedChoice" conditional="parent.selectedChoice" render="Label" position="22,390" size="670,63" foregroundColor="#02c6ff" font="FdLcDLight;60" horizontalAlignment="center" verticalAlignment="center" />
 		<panel name="SummaryClockPanel" />
 	</screen>
 

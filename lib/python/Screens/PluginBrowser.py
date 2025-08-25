@@ -146,11 +146,12 @@ def isFullHD():
     return desktopSize[0] == 1920
 
 
-class PluginBrowserSummary(Screen):
+class PluginBrowserSummary(ScreenSummary):
 	def __init__(self, session, parent):
-		Screen.__init__(self, session, parent=parent)
+		ScreenSummary.__init__(self, session, parent=parent)
+		self.skinName = ["PluginBrowserSummary"]
 		self["entry"] = StaticText("")
-		self["desc"] = StaticText("")
+		self["value"] = StaticText("")
 		self.onShow.append(self.addWatcher)
 		self.onHide.append(self.removeWatcher)
 
@@ -161,9 +162,9 @@ class PluginBrowserSummary(Screen):
 	def removeWatcher(self):
 		self.parent.onChangedEntry.remove(self.selectionChanged)
 
-	def selectionChanged(self, name, desc):
-		self["entry"].text = name
-		self["desc"].text = desc
+	def selectionChanged(self, name, description):
+		self["entry"].setText(name)
+		self["value"].setText(description)
 
 
 class PluginBrowser(Screen, ProtectedScreen):

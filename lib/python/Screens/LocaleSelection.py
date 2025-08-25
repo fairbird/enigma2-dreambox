@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from Components.ActionMap import HelpableActionMap
 from Components.config import ConfigSelection, ConfigSubsection, config
 from Components.Label import Label
@@ -272,7 +273,7 @@ class LocaleSelection(Screen):
 		config.osd.language.save()
 		international.activateLocale(self.currentLocale, runCallbacks=True)
 		if not self.inWizard and self.currentLocale != self.initialLocale:
-			self.session.openWithCallback(keySaveCallback, MessageBox, _("Restart GUI now to start using the new locale/language?"), default=True, type=MessageBox.TYPE_YESNO, title=self.getTitle())
+			self.session.openWithCallback(keySaveCallback, MessageBox, _("Restart GUI now to start using the new locale/language?"), default=True, type=MessageBox.TYPE_YESNO, windowTitle=self.getTitle())
 		else:
 			self.close()
 
@@ -341,7 +342,7 @@ class LocaleSelection(Screen):
 
 		current = self["locales"].getCurrent()
 		if current[self.LIST_LOCALE] == self.currentLocale:
-			self.session.openWithCallback(processPurge, MessageBox, _("Do you want to purge all locales/languages except %s?") % ", ".join(sorted(international.getPermanentLocales(self.currentLocale))), default=False, title=self.getTitle())
+			self.session.openWithCallback(processPurge, MessageBox, _("Do you want to purge all locales/languages except %s?") % ", ".join(sorted(international.getPermanentLocales(self.currentLocale))), default=False, windowTitle=self.getTitle())
 		else:
 			status = current[self.LIST_STATUS]
 			name = current[self.LIST_NAME]
@@ -425,15 +426,6 @@ class LocaleSettings(Setup):
 
 
 class LocaleSelectionSummary(ScreenSummary):
-	skin = '''
-	<screen name="SkinSelectorSummary" position="0,0" size="400,240">
-		<widget source="native" render="Label" position="0,30" size="400,50" font="FdLcD;35" halign="center" valign="center" zPosition="2"/>
-		<widget source="name" render="Label" position="0,85" size="400,50" font="FdLcD;35" halign="center" zPosition="2"/>
-		<widget source="locale" render="Label" position="0,135" size="400,50" font="FdLcD;35" halign="center" zPosition="2"/>
-		<widget source="package" render="Label" position="0,190" size="400,50" font="FdLcD;35" halign="center" zPosition="2"/>
-	</screen>
-	'''
-
 	def __init__(self, session, parent):
 		ScreenSummary.__init__(self, session, parent=parent)
 		self["native"] = StaticText("")
