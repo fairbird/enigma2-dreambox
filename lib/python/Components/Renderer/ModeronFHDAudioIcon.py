@@ -1,4 +1,4 @@
-﻿#  ModeronFHDAudioIcon renderer
+#  ModeronFHDAudioIcon renderer
 #  Modded and recoded by MCelliotG for use in Glamour skins or standalone
 #  If you use this Renderer for other skins and rename it, please keep the first and second line adding your credits below
 
