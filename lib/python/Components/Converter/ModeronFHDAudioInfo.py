@@ -16,7 +16,7 @@ import six
 try:
 	from enigma import iAudioType_ENUMS as iAt
 	AUDIO_FORMATS = {
-		iAt.atDTSHD: ("DTS-HD",_("DTS-HD"), 1),
+		iAt.atDTSHD: ("DTS-HD", _("DTS-HD"), 1),
 		iAt.atDTS: ("DTS", _("DTS"), 2),
 		iAt.atAACHE: ("AACHE", _("HE-AAC"), 3),
 		iAt.atAAC: ("AAC", _("AAC"), 4),
