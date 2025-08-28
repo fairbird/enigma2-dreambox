@@ -48,7 +48,7 @@ class ModeronFHDAudioInfo(Poll, Converter, object):
 		self.poll_enabled = True
 		self.lang_strings = ("ger", "german", "deu")
 		self.codecs = {
-			"01_dolbydigitalplus" : ("digital+", "digitalplus", "ac3+", "e-ac-3"),
+			"01_dolbydigitalplus": ("digital+", "digitalplus", "ac3+", "e-ac-3"),
 			"02_dolbydigital": ("ac3", "ac-3", "dolbydigital"),
 			"03_mp3": ("mp3",),
 			"04_wma": ("wma",),
@@ -63,9 +63,9 @@ class ModeronFHDAudioInfo(Poll, Converter, object):
 			"13_ogg": ("vorbis", "ogg"),
 			"14_opus": ("opus",),
 			}
-		self.codec_info = { "dolbydigitalplus" : ("51", "20", "71"),
-			"dolbydigital" : ("51", "20", "10", "71"),
-			"wma" : ("8", "9"),
+		self.codec_info = {"dolbydigitalplus": ("51", "20", "71"),
+			"dolbydigital": ("51", "20", "10", "71"),
+			"wma": ("8", "9"),
 			}
 		self.type, self.interesting_events = {
 			"AudioIcon": (self.GET_AUDIO_ICON, (iPlayableService.evUpdatedInfo,)),
