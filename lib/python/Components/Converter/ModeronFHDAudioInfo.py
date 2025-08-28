@@ -96,15 +96,15 @@ class ModeronFHDAudioInfo(Poll, Converter, object):
 		description_str = _("unknown")
 		if self.getAudio():
 			try:
-				type = AUDIO_FORMATS[self.audio_info.getType()][1];
+				type = AUDIO_FORMATS[self.audio_info.getType()][1]
 				description_str = type
-				channels = self.audio_info.getDescription();
+				channels = self.audio_info.getDescription()
 				channels_str = re.search("([0-9\.]+)", channels)
 				if channels_str:
 					description_str = description_str + " " + channels_str.group(1)
 			except:
 				languages = self.getLanguage()
-				description = self.audio_info.getDescription();
+				description = self.audio_info.getDescription()
 				description_str = description.split(" ")
 				if len(description_str) and description_str[0] in languages:
 					return languages
