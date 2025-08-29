@@ -95,7 +95,7 @@ class eDVBServicePlay: public eDVBServiceBase,
 public:
 	virtual ~eDVBServicePlay();
 
-		// iPlayableService
+	// iPlayableService
 	RESULT connectEvent(const sigc::slot<void(iPlayableService*,int)> &event, ePtr<eConnection> &connection);
 	RESULT start();
 	RESULT stop();
@@ -116,19 +116,19 @@ public:
 	RESULT rdsDecoder(ePtr<iRdsDecoder> &ptr);
 	RESULT keys(ePtr<iServiceKeys> &ptr) { ptr = nullptr; return -1; }
 
-		// iStreamedService
+	// iStreamedService
 	RESULT streamed(ePtr<iStreamedService> &ptr);
 	ePtr<iStreamBufferInfo> getBufferCharge();
 	int setBufferSize(int size);
 
 
-		// iPauseableService
+	// iPauseableService
 	RESULT pause();
 	RESULT unpause();
 	RESULT setSlowMotion(int ratio);
 	RESULT setFastForward(int ratio);
 
-		// iSeekableService
+	// iSeekableService
 	RESULT getLength(pts_t &len);
 	RESULT seekTo(pts_t to);
 	RESULT seekRelative(int direction, pts_t to);
@@ -136,7 +136,7 @@ public:
 	RESULT setTrickmode(int trick=0);
 	RESULT isCurrentlySeekable();
 
-		// iServiceInformation
+	// iServiceInformation
 	RESULT getName(std::string &name);
 	RESULT getEvent(ePtr<eServiceEvent> &evt, int nownext);
 	int getInfo(int w);
@@ -145,27 +145,27 @@ public:
 	void getAITApplications(std::map<int, std::string> &aitlist);
 	void getCaIds(std::vector<int> &caids, std::vector<int> &ecmpids, std::vector<std::string> &ecmdatabytes);
 
-		// iAudioTrackSelection
+	// iAudioTrackSelection
 	int getNumberOfTracks();
 	RESULT selectTrack(unsigned int i);
 	RESULT getTrackInfo(struct iAudioTrackInfo &, unsigned int n);
 	int getCurrentTrack();
 
-		// iAudioChannelSelection
+	// iAudioChannelSelection
 	int getCurrentChannel();
 	RESULT selectChannel(int i);
 
-		// iRdsDecoder
+	// iRdsDecoder
 	std::string getText(int i=0);
 	void showRassSlidePicture();
 	void showRassInteractivePic(int page, int subpage);
 	ePyObject getRassInteractiveMask();
 
-		// iSubserviceList
+	// iSubserviceList
 	int getNumberOfSubservices();
 	RESULT getSubservice(eServiceReference &subservice, unsigned int n);
 
-		// iTimeshiftService
+	// iTimeshiftService
 	RESULT startTimeshift();
 	RESULT stopTimeshift(bool swToLive=true);
 	int isTimeshiftActive();
@@ -176,28 +176,28 @@ public:
 	std::string getTimeshiftFilename();
 	virtual void switchToLive();
 
-		// iTapService
+	// iTapService
 	bool startTapToFD(int fd, const std::vector<int> &pids, int packetsize = 188);
 	void stopTapToFD();
 
-		// iCueSheet
+	// iCueSheet
 	PyObject *getCutList();
 	void setCutList(SWIG_PYOBJECT(ePyObject));
 	void setCutListEnable(int enable);
 
-		// iSubtitleOutput
+	// iSubtitleOutput
 	RESULT enableSubtitles(iSubtitleUser *user, SubtitleTrack &track);
 	RESULT disableSubtitles();
 	RESULT getSubtitleList(std::vector<SubtitleTrack> &sublist);
 	RESULT getCachedSubtitle(SubtitleTrack &track);
 
-		// iAudioDelay
+	// iAudioDelay
 	int getAC3Delay();
 	int getPCMDelay();
 	void setAC3Delay(int);
 	void setPCMDelay(int);
 
-		// iStreamableService
+	// iStreamableService
 	RESULT stream(ePtr<iStreamableService> &ptr);
 	ePtr<iStreamData> getStreamingData();
 	void setQpipMode(bool value, bool audio);
@@ -215,7 +215,7 @@ protected:
 	int m_tune_state;
 	bool m_noaudio;
 
-		/* in timeshift mode, we essentially have two channels, and thus pmt handlers. */
+	/* in timeshift mode, we essentially have two channels, and thus pmt handlers. */
 	eDVBServicePMTHandler m_service_handler_timeshift;
 	eDVBServiceEITHandler m_event_handler;
 	int m_current_audio_pid;
@@ -223,7 +223,7 @@ protected:
 
 	eDVBServicePlay(const eServiceReference &ref, eDVBService *service, bool connect_event=true);
 
-		/* events */
+	/* events */
 	void gotNewEvent(int error);
 
 	void serviceEvent(int event);
@@ -232,7 +232,7 @@ protected:
 
 	bool m_is_stream;
 
-		/* pvr */
+	/* pvr */
 	bool m_is_pvr;
 	int m_is_paused, m_timeshift_enabled, m_timeshift_active, m_timeshift_changed, m_save_timeshift;
 	int m_first_program_info;
@@ -245,7 +245,7 @@ protected:
 	int selectAudioStream(int n = -1);
 	RESULT setFastForward_internal(int ratio, bool final_seek=false);
 
-		/* timeshift */
+	/* timeshift */
 	ePtr<iDVBTSRecorder> m_record;
 	std::set<int> m_pids_active;
 
@@ -260,12 +260,10 @@ protected:
 	int m_fastforward;
 	int m_slowmotion;
 
-		/* tap */
-
+	/* tap */
 	ePtr<iDVBTSRecorder> m_tap_recorder;
 
-		/* cuesheet */
-
+	/* cuesheet */
 	ePtr<eCueSheet> m_cue;
 
 	struct cueEntry
@@ -293,7 +291,7 @@ protected:
 
 	iSubtitleUser *m_subtitle_widget;
 
-		/* teletext subtitles */
+	/* teletext subtitles */
 	ePtr<eDVBTeletextParser> m_teletext_parser;
 	void newSubtitleStream();
 	ePtr<eConnection> m_new_subtitle_stream_connection;
@@ -301,7 +299,7 @@ protected:
 	ePtr<eConnection> m_new_subtitle_page_connection;
 	std::list<eDVBTeletextSubtitlePage> m_subtitle_pages;
 
-		/* dvb subtitles */
+	/* dvb subtitles */
 	ePtr<eDVBSubtitleParser> m_subtitle_parser;
 	void newDVBSubtitlePage(const eDVBSubtitlePage &p);
 	ePtr<eConnection> m_new_dvb_subtitle_page_connection;
@@ -318,7 +316,7 @@ protected:
 	void forcePassthrough();
 #endif
 
-		/* radiotext */
+	/* radiotext */
 	ePtr<eDVBRdsDecoder> m_rds_decoder;
 	ePtr<eConnection> m_rds_decoder_event_connection;
 	void rdsDecoderEvent(int);
