@@ -242,9 +242,10 @@ class MessageBox(Screen):
 class MessageBoxSummary(ScreenSummary):
 	def __init__(self, session, parent):
 		ScreenSummary.__init__(self, session, parent=parent)
-		self["text"] = StaticText(parent.text)
+		text = getattr(parent, "text", _(""))  # Use empty string if .text is missing
+		self["text"] = StaticText(text)
 		self["option"] = StaticText("")
-		if parent.list:
+		if getattr(parent, "list", None):
 			if self.addWatcher not in self.onShow:
 				self.onShow.append(self.addWatcher)
 			if self.removeWatcher not in self.onHide:
