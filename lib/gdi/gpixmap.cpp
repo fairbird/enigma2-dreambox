@@ -749,9 +749,9 @@ void gPixmap::drawRectangle(const gRegion& region, const eRect& area, const gRGB
 
 	CornerData cornerData(radius, edges, area.width(), area.height(), borderWidth, borderCol);
 
-	for (unsigned int i = 0; i < region.rects.size(); ++i) {
+	for (unsigned int ri = 0; ri < region.rects.size(); ++ri) {
 		eRect reg = area;
-		reg &= region.rects[i];
+		reg &= region.rects[ri];
 
 		if (reg.empty())
 			continue;
@@ -761,7 +761,7 @@ void gPixmap::drawRectangle(const gRegion& region, const eRect& area, const gRGB
 
 		if (cornerData.topLeftCornerRadius) {
 			cornerRect = eRect(area.left(), area.top(), cornerData.topLeftCornerRadius, cornerData.topLeftCornerRadius);
-			cornerRect &= region.rects[i];
+			cornerRect &= region.rects[ri];
 			if (!cornerRect.empty()) {
 				corners += 1;
 				drawAngleTl(surface, gradientBuf, area, direction, cornerRect, cornerData);
@@ -769,7 +769,7 @@ void gPixmap::drawRectangle(const gRegion& region, const eRect& area, const gRGB
 		}
 		if (cornerData.topRightCornerRadius) {
 			cornerRect = eRect(area.right() - cornerData.topRightCornerRadius, area.top(), cornerData.topRightCornerRadius, cornerData.topRightCornerRadius);
-			cornerRect &= region.rects[i];
+			cornerRect &= region.rects[ri];
 			if (!cornerRect.empty()) {
 				corners += 2;
 				drawAngleTr(surface, gradientBuf, area, direction, cornerRect, cornerData);
@@ -777,7 +777,7 @@ void gPixmap::drawRectangle(const gRegion& region, const eRect& area, const gRGB
 		}
 		if (cornerData.bottomLeftCornerRadius) {
 			cornerRect = eRect(area.left(), area.bottom() - cornerData.bottomLeftCornerRadius, cornerData.bottomLeftCornerRadius, cornerData.bottomLeftCornerRadius);
-			cornerRect &= region.rects[i];
+			cornerRect &= region.rects[ri];
 			if (!cornerRect.empty()) {
 				corners += 4;
 				drawAngleBl(surface, gradientBuf, area, direction, cornerRect, cornerData);
@@ -787,7 +787,7 @@ void gPixmap::drawRectangle(const gRegion& region, const eRect& area, const gRGB
 		if (cornerData.bottomRightCornerRadius) {
 			cornerRect =
 				eRect(area.right() - cornerData.bottomRightCornerRadius, area.bottom() - cornerData.bottomRightCornerRadius, cornerData.bottomRightCornerRadius, cornerData.bottomRightCornerRadius);
-			cornerRect &= region.rects[i];
+			cornerRect &= region.rects[ri];
 			if (!cornerRect.empty()) {
 				corners += 8;
 				drawAngleBr(surface, gradientBuf, area, direction, cornerRect, cornerData);
@@ -820,13 +820,13 @@ void gPixmap::drawRectangle(const gRegion& region, const eRect& area, const gRGB
 			bottomw -= cornerData.bottomRightCornerRadius;
 
 		eRect topRect = eRect(topl, area.top(), topw, top);
-		topRect &= region.rects[i];
+		topRect &= region.rects[ri];
 
 		eRect bottomRect = eRect(bottoml, area.bottom() - bottom, bottomw, bottom);
-		bottomRect &= region.rects[i];
+		bottomRect &= region.rects[ri];
 
 		eRect mRect = eRect(area.left(), area.top() + top, area.width(), area.height() - top - bottom);
-		mRect &= region.rects[i];
+		mRect &= region.rects[ri];
 		const int blendRatio = 12;
 
 		if (direction == GRADIENT_VERTICAL) {
