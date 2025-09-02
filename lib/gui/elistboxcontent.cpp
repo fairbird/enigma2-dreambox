@@ -1667,9 +1667,6 @@ void eListboxPythonMultiContent::paint(gPainter &painter, eWindowStyle &style, c
 				if (size > 13)
 					pborderColor = lookupColor(PyTuple_GET_ITEM(item, 13), data);
 
-				if (PyLong_Check(pstring) && data) /* if the string is in fact a number, it refers to the 'data' list. */
-					pstring = PyTuple_GetItem(data, PyLong_AsLong(pstring));
-
 				int radius = 0;
 				int edges = 0;
 
@@ -1684,6 +1681,9 @@ void eListboxPythonMultiContent::paint(gPainter &painter, eWindowStyle &style, c
 
 				if (size > 17)
 					pTextBorderColor = lookupColor(PyTuple_GET_ITEM(item, 17), data);
+
+				if (PyLong_Check(pstring) && data) /* if the string is in fact a number, it refers to the 'data' list. */
+					pstring = PyTuple_GetItem(data, PyLong_AsLong(pstring));
 
 				/* don't do anything if we have 'None' as string */
 				if (!pstring || pstring == Py_None)
@@ -1701,7 +1701,7 @@ void eListboxPythonMultiContent::paint(gPainter &painter, eWindowStyle &style, c
 				int flags = PyLong_AsLong(pflags);
 				int fnt = PyLong_AsLong(pfnt);
 				int bwidth = pborderWidth ? PyLong_AsLong(pborderWidth) : 0;
-				int btwidth = pTextBorderWidth ? PyLong_AsLong(pTextBorderWidth) : 0;
+				int btwidth = pTextBorderWidth ? PyLong_AsLong(pTextBorderWidth) : border_size;
 
 				if (m_fonts.find(fnt) == m_fonts.end())
 				{
@@ -1796,8 +1796,15 @@ void eListboxPythonMultiContent::paint(gPainter &painter, eWindowStyle &style, c
 				}
 				else
 					painter.setFont(m_fonts[fnt]);
-				unsigned int textBColor = pTextBorderColor ? PyLong_AsUnsignedLongMask(pTextBorderColor) : 0x000000;
-				painter.renderText(rect, string, flags, gRGB(textBColor), btwidth);
+
+				if (pTextBorderColor && btwidth)
+				{
+					uint32_t textBColor = PyLong_AsUnsignedLongMask(pTextBorderColor);
+					painter.renderText(rect, string, flags, gRGB(textBColor), btwidth);
+				}
+				else
+					painter.renderText(rect, string, flags, border_color, border_size);
+
 				painter.clippop();
 
 				// draw border
