@@ -39,7 +39,7 @@ class DiskInfo(VariableText, GUIComponent):
 				else:
 					free = "%d %s" % (free >> 30, _("GB"))
 				self.setText(_("%(freespace)s %(percent)s free disk space") % {"freespace": free, "percent": percent})
-			except:
+			except Exception:
 				# occurs when f_blocks is 0 or a similar error
 				self.setText("-?-")
 

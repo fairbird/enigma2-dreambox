@@ -187,7 +187,7 @@ class SecConfigure:
 						slot.multi_type = {}
 						for tunertype in types:
 							slot.multi_type[str(types.index(tunertype))] = tunertype
-		except:
+		except Exception:
 			pass
 
 		for slot in nim_slots:
@@ -234,7 +234,7 @@ class SecConfigure:
 				if nim.configMode.value not in ("loopthrough", "satposdepends", "nothing"):
 					try:
 						advancedSlotLinked = nim.configMode.value == "advanced" and hasattr(nim.advanced, 'unicableconnected') and nim.advanced.unicableconnected.value and nim.advanced.unicableconnectedTo.value.isdigit()
-					except:
+					except Exception:
 						advancedSlotLinked = False
 					if not advancedSlotLinked:
 						sec.setSlotNotLinked(x)
@@ -362,7 +362,7 @@ class SecConfigure:
 							config.Nims[slotid].advanced.unicableconnected.save()
 							config.Nims[slotid].advanced.unicableconnectedTo.save_forced = False
 							return
-					except:
+					except Exception:
 						pass
 
 		try:
@@ -385,7 +385,7 @@ class SecConfigure:
 						self.linked[connto].append(slotid)
 				else:
 					config.Nims[slotid].advanced.unicableconnectedTo.save_forced = False
-		except:
+		except Exception:
 			pass
 
 		for x in range(1, 72):
@@ -629,7 +629,7 @@ class NIM:
 					self.config.configModeDVBC.value and x.startswith("DVB-C") or
 					self.config.configModeDVBT.value and x.startswith("DVB-T") or
 					self.config.configModeATSC.value and x.startswith("ATSC")]
-		except:
+		except Exception:
 			pass
 		return [self.getType()]
 
@@ -645,7 +645,7 @@ class NIM:
 				return [x for x in self.multi_type.values() if x.startswith("DVB-S")][0]
 			if self.isMultiType():
 				return self.multi_type[self.config.multiType.value]
-		except:
+		except Exception:
 			pass
 		return self.type
 
@@ -1784,7 +1784,7 @@ def InitNimManager(nimmgr, update_slots=[]):
 							try:
 								oldvalue = open("/sys/module/dvb_core/parameters/dvb_shutdown_timeout", "r").readline()
 								open("/sys/module/dvb_core/parameters/dvb_shutdown_timeout", "w").write("0")
-							except:
+							except Exception:
 								print("[InitNimManager] tunerTypeChanged read /sys/module/dvb_core/parameters/dvb_shutdown_timeout failed")
 						for fe_item in iDVBFrontendDict.items():
 							if fe_item[1] == system:
@@ -1797,7 +1797,7 @@ def InitNimManager(nimmgr, update_slots=[]):
 						if is_dvb_shutdown_timeout:
 							try:
 								open("/sys/module/dvb_core/parameters/dvb_shutdown_timeout", "w").write(oldvalue)
-							except:
+							except Exception:
 								print("[InitNimManager] tunerTypeChanged write to /sys/module/dvb_core/parameters/dvb_shutdown_timeout failed")
 
 						nimmgr.enumerateNIMs()
