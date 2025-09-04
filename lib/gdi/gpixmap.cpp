@@ -865,7 +865,6 @@ void gPixmap::drawRectangle(const gRegion& region, const eRect& area, const gRGB
 							--width;
 						}
 					}
-				}
 				} else {
 					for (int y = mRect.top(); y < mRect.bottom(); y++) {
 						uint32_t* dst = (uint32_t*)(((uint8_t*)surface->data) + y * surface->stride + mRect.left() * surface->bypp);
