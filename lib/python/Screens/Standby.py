@@ -3,8 +3,8 @@ import os
 import struct
 import RecordTimer
 import Components.ParentalControl
-from Screens.Screen import Screen
-from Screens.MessageBox import MessageBox
+from Screens.Screen import Screen, ScreenSummary
+from Screens.MessageBox import MessageBox, MessageBoxSummary
 from Components.ActionMap import ActionMap
 from Components.config import config
 from Components.AVSwitch import AVSwitch
@@ -310,7 +310,7 @@ class StandbySummary(Screen):
 
 class QuitMainloopScreen(Screen):
 	def __init__(self, session, retvalue=QUIT_SHUTDOWN):
-		self.skin = """<screen name="QuitMainloopScreen" position="fill" flags="wfNoBorder">
+		self.skin = """<screen name="QuitMainloopScreen" position="fill" flags="wfNoBorder"  resolution="1280,720">
 				<ePixmap pixmap="icons/input_info.png" position="c-27,c-60" size="53,53" alphaTest="on" />
 				<widget name="text" position="center,c+5" size="720,100" font="Regular;22" horizontalAlignment="center" />
 			</screen>"""
@@ -383,7 +383,9 @@ class TryQuitMainloop(MessageBox):
 				self.connected = True
 				self.onShow.append(self.__onShow)
 				self.onHide.append(self.__onHide)
+				self.isMessageBox = True
 				return
+		self.isMessageBox = False
 		self.skin = """<screen position="0,0" size="0,0"/>"""
 		Screen.__init__(self, session)
 		self.close(True)
@@ -447,6 +449,9 @@ class TryQuitMainloop(MessageBox):
 	def __onHide(self):
 		global inTryQuitMainloop
 		inTryQuitMainloop = False
+
+	def createSummary(self):
+		return MessageBoxSummary if self.isMessageBox else ScreenSummary
 
 
 class SwitchToAndroid(Screen):
