@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from enigma import eTimer, eSize
-from Components.ActionMap import HelpableActionMap
+from Components.ActionMap import ActionMap
 from Components.Label import Label
 from Components.MenuList import MenuList
 from Components.Pixmap import Pixmap, MultiPixmap
@@ -126,25 +126,20 @@ class MessageBox(Screen):
 			self.timer.start(25)
 
 	def createActionMap(self, prio):
-		if self.list:
-			self["actions"] = HelpableActionMap(self, ["MsgBoxActions", "NavigationActions"], {
-				"cancel": (self.cancel, _("Select the No / False response")),
-				"select": (self.select, _("Return the current selection response")),
-				"selectOk": (self.selectOk, _("Select the Yes / True response")),
-				"top": (self.top, _("Move to first line")),
-				"pageUp": (self.pageUp, _("Move up a page")),
-				"up": (self.up, _("Move up a line")),
-				# "first": (self.top, _("Move to first line")),
-				# "last": (self.bottom, _("Move to last line")),
-				"down": (self.down, _("Move down a line")),
-				"pageDown": (self.pageDown, _("Move down a page")),
-				"bottom": (self.bottom, _("Move to last line"))
-			}, prio=prio, description=_("Message Box Actions"))
-		else:
-			self["actions"] = HelpableActionMap(self, ["OkCancelActions"], {
-				"cancel": (self.cancel, _("Close the window")),
-				"ok": (self.select, _("Close the window"))
-			}, prio=prio, description=_("Message Box Actions"))
+		self["actions"] = ActionMap(["MsgBoxActions", "DirectionActions"],
+			{
+				"cancel": self.cancel,
+				"select": self.select,
+				"selectOk": self.selectOk,
+				"up": self.up,
+				"down": self.down,
+				"left": self.pageUp,
+				"right": self.pageDown,
+				"upRepeated": self.up,
+				"downRepeated": self.down,
+				"leftRepeated": self.pageUp,
+				"rightRepeated": self.pageDown
+			}, -1)
 
 	def initTimeout(self, timeout):
 		self.timeout = timeout
@@ -187,8 +182,8 @@ class MessageBox(Screen):
 				self.timeoutCallback()
 
 	def timeoutCallback(self):
-		if self.timeout_default is not None:
-			self.close(self.timeout_default)
+		if self.timeoutDefault is not None:
+			self.close(self.timeoutDefault)
 		else:
 			self.selectOk()
 
