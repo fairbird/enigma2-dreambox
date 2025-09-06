@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from Screens.InfoBar import InfoBar
 from Screens.Setup import Setup
 from Components.config import config

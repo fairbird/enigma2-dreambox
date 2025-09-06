@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from os.path import basename, dirname, exists, isdir, isfile, join, split, splitext
 from enigma import ePixmap, ePicLoad
 from Components.config import config

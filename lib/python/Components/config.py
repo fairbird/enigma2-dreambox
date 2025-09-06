@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from copy import copy as shallowcopy
 from os import fsync, rename, sep
 from os.path import realpath

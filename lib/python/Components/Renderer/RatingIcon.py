@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from Components.Renderer.Renderer import Renderer
 from Tools.Directories import SCOPE_GUISKIN, resolveFilename
 

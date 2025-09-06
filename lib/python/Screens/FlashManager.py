@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from json import load
 from os import W_OK, access, listdir, major, makedirs, minor, mkdir, remove, sep, stat, statvfs, unlink, walk
 from os.path import basename, exists, isdir, isfile, islink, ismount, splitext, join, getsize

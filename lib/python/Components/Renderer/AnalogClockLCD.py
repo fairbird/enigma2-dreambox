@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # original code is from openmips gb Team: [OMaClockLcd] Renderer #
 # Thx to arn354 #
 

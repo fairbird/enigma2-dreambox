@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from Components.Task import PythonTask, Task, Job, job_manager as JobManager
 from Tools.Directories import fileExists
 from enigma import eTimer

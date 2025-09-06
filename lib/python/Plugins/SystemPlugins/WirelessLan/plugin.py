@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from re import escape as re_escape
 
 from enigma import eTimer

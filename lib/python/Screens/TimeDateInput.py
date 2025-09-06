@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from Screens.Setup import Setup
 from Components.config import ConfigClock, ConfigDateTime
 import time

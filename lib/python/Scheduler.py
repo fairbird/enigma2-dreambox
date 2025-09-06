@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from bisect import insort
 from datetime import datetime
 from os import fsync, remove, rename

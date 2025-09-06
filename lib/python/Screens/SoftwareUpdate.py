@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from json import load
 from os.path import exists
 from urllib.request import urlopen

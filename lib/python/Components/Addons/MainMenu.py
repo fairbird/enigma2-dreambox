@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from Components.Addons.GUIAddon import GUIAddon
 
 from enigma import eListbox, eListboxPythonMultiContent, gFont, RT_HALIGN_LEFT, RT_VALIGN_CENTER, getDesktop, eSize

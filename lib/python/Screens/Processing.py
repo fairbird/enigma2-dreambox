@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from enigma import eLabel, ePoint, eSize, eTimer, getDesktop
 
 from Components.Label import Label

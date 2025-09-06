@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #
 #  Converter Bitrate2
 #

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from enigma import eListboxPythonMultiContent
 
 from skin import SkinContext, SkinContextStack, TemplateParser, parseFont

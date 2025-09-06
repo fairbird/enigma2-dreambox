@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License
 #
 # Copyright (c) 2024-2025 jbleyel

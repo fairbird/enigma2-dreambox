@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from Components.Addons.GUIAddon import GUIAddon
 
 from enigma import eListbox, eListboxPythonMultiContent, BT_ALIGN_CENTER, BT_VALIGN_CENTER

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #	ModeronFHDAudioInfo converter
 #	Modded and recoded by MCelliotG for use in Glamour skins or standalone, added Python3 support
 #	If you use this Converter for other skins and rename it, please keep the lines above adding your credits below

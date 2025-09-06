@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from Screens.Console import Console
 
 from Screens.MessageBox import MessageBox

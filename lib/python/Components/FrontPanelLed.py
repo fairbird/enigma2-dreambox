@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from enigma import iRecordableService
 from Components.config import config, ConfigSlider, ConfigSelection, ConfigSubsection
 from Tools.Directories import fileExists

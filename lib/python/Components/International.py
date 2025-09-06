@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # -*- coding: UTF-8 -*-
 
 from gettext import bindtextdomain, install, textdomain, translation

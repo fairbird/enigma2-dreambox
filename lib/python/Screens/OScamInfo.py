@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # PYTHON IMPORTS
 from datetime import datetime, timezone, timedelta
 from json import loads

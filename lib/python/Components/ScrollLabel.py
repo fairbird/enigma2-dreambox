@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from enigma import eLabel, eListbox, ePoint, eSize, eSlider, eWidget
 
 from skin import applyAllAttributes, parseBoolean, parseGradient, parseInteger, parseRadius, parseScrollbarMode, parseScrollbarScroll, scrollLabelStyle

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from re import compile
 from os.path import exists
 from wifi.scan import Cell

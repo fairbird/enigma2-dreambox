@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from errno import EEXIST
 from grp import getgrgid
 from json import loads

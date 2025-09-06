@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from time import localtime, strftime
 
 from enigma import eEPGCache, eTimer, eServiceReference

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from time import sleep
 from operator import mul
 from random import SystemRandom

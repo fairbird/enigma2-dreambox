@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from os import listdir, system
 from os.path import abspath, dirname, exists, ismount, join
 from subprocess import Popen, PIPE

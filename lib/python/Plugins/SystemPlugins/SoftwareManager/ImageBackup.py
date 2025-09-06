@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from os import chmod, listdir, makedirs
 from os.path import exists, isdir, isfile, join
 

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from os import sync
 from os.path import join
 from time import sleep

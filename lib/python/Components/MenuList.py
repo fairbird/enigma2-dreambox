@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from enigma import eListbox, eListboxPythonStringContent
 
 from Components.GUIComponent import GUIComponent
