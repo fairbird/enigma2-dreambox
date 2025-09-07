@@ -34,19 +34,7 @@ class MessageBox(Screen):
 		self.type = type
 		Screen.__init__(self, session, enableHelp=True)
 		self.text = text
-		if type == self.TYPE_YESNO:
-			self.list = [(_("Yes"), True), (_("No"), False)] if list is None else list
-			self["list"] = MenuList(self.list)
-			if isinstance(default, bool):
-				self.startIndex = 0 if default else 1
-			elif isinstance(default, int):
-				self.startIndex = default
-			else:
-				print(f"[MessageBox] Error: The context of the default ({default}) can't be determined!")
-		else:
-			self["list"] = MenuList([])
-			self["list"].hide()
-			self.list = None
+
 		self["text"] = Label(text)
 		self["Text"] = StaticText(text)
 		self["selectedChoice"] = StaticText()
@@ -101,6 +89,19 @@ class MessageBox(Screen):
 		self.windowTitle = windowTitle or self.TYPE_PREFIX.get(type, _("Message"))
 		self.baseTitle = self.windowTitle
 		self.activeTitle = self.windowTitle
+		if type == self.TYPE_YESNO or showYESNO:
+			self.list = [(_("Yes"), True), (_("No"), False)] if list is None else list
+			self["list"] = MenuList(self.list)
+			if isinstance(default, bool):
+				self.startIndex = 0 if default else 1
+			elif isinstance(default, int):
+				self.startIndex = default
+			else:
+				print(f"[MessageBox] Error: The context of the default ({default}) can't be determined!")
+		else:
+			self["list"] = MenuList([])
+			self["list"].hide()
+			self.list = None
 		self.onLayoutFinish.append(self.layoutFinished)
 
 	def __repr__(self):
