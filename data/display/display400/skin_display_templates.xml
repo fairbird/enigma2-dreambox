@@ -232,6 +232,7 @@
 	<screen name="EventViewSummary" position="0,0" size="400,240">
 		<widget source="parent.Title" render="Label" position="5,5" size="390,37" font="FdLcD;32" halign="center" foregroundColor="#87CEFA" noWrap="1"/>
 		<eLabel position="5,42" size="390,2" backgroundColor="#FFFFFF" zPosition="3"/>
+		<widget source="parent.summary_description" position="5,49" size="390,148" font="FdLcD;32" render="RunningText" options="movetype=running,direction=top,startpoint=0,steptime=40,startdelay=2400,wrap=1,always=0,repeat=2,oneshot=1" valign="center"/>
 		<eLabel position="5,201" size="390,2" backgroundColor="#FFFFFF" zPosition="3"/>
 		<widget source="parent.Event" render="Label" position="20,207" size="90,32" font="FdLcD;32" foregroundColor="#87CEFA" transparent="1" valign="center" halign="left">
 			<convert type="EventTime">StartTime</convert>
@@ -284,6 +285,7 @@
 	<screen name="QuickMenuSummary" position="0,0" size="400,240">
 		<widget source="parent.Title" render="Label" position="0,5" size="400,41" font="FdLcD;36" foregroundColor="#87CEFA" halign="center"/>
 		<eLabel position="5,46" size="390,2" backgroundColor="#FFFFFF" zPosition="3"/>
+		<widget source="parent.summary_description" render="Label" position="10,50" size="380,156" font="FdLcD;34" halign="left" valign="center"/>
 	</screen>
 
 	<!-- Metrix-Menu - GREEN - MyMetrixLite OK -->
@@ -415,6 +417,7 @@
 	<screen name="ConsoleSummary" position="0,0" size="400,240">
 		<widget source="parent.Title" render="Label" position="10,5" size="380,78" font="FdLcD;34" halign="center" valign="center" foregroundColor="#87CEFA"/>
 		<eLabel position="5,83" size="390,2" backgroundColor="#FFFFFF" zPosition="3"/>
+		<widget source="parent.summary_description" render="Label" position="10,85" size="380,156" font="FdLcD;34" halign="center" valign="center"/>
 	</screen>
 
 	<!-- TimerOverview - Show List of Timers -->
@@ -433,6 +436,7 @@
 	<screen name="TimerLogSummary" position="0,0" size="400,240">
 		<widget source="parent.Title" render="Label" position="0,5" size="400,41" font="FdLcD;36" foregroundColor="#87CEFA" halign="center" noWrap="1"/>
 		<eLabel position="5,46" size="390,2" backgroundColor="#FFFFFF" zPosition="3"/>
+		<widget source="parent.summary_description" render="Label" position="10,48" size="380,195" font="FdLcD;34" halign="center" valign="center"/>
 	</screen>
 
 	<!-- AutoTimer - untested -->
@@ -458,6 +462,7 @@
 	<screen name="_templateSummary1" position="0,0" size="400,240">
 		<widget source="parent.Title" render="Label" position="10,5" size="380,82" font="FdLcD;36" foregroundColor="#87CEFA" halign="center" valign="center"/>
 		<eLabel position="5,85" size="390,2" backgroundColor="#FFFFFF" zPosition="3"/>
+		<widget source="parent.summary_description" render="Label" position="10,87" size="380,123" font="FdLcD;36" halign="center" valign="center"/>
 	</screen>
 	<!-- new_template -->
 	<screen name="BackupSelectionSummary" position="0,0" size="400,240">
