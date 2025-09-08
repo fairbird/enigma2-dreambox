@@ -247,7 +247,8 @@ class EventViewBase:
 			for p in plugins.getPlugins(PluginDescriptor.WHERE_EVENTINFO):
 				# Only list service or event specific eventinfo plugins here, no servelist plugins.
 				if "servicelist" not in p.__call__.__code__.co_varnames:
-					menu.append((p.name, boundFunction(self.runPlugin, p)))
+					if 'selectedevent' not in p.fnc.__code__.co_varnames:
+						menu.append((p.name, boundFunction(self.runPlugin, p)))
 			if menu:
 				def boxAction(choice):
 					if choice:
