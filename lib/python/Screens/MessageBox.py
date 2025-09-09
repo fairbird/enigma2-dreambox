@@ -1,6 +1,6 @@
-# -*- coding: utf-8 -*-
 from enigma import eTimer, eSize
-from Components.ActionMap import ActionMap
+
+from Components.ActionMap import HelpableActionMap
 from Components.Label import Label
 from Components.MenuList import MenuList
 from Components.Pixmap import Pixmap, MultiPixmap
@@ -30,11 +30,9 @@ class MessageBox(Screen):
 		TYPE_MESSAGE: _("Message")
 	}
 
-	def __init__(self, session, text, type=TYPE_YESNO, timeout=-1, list=None, close_on_any_key=False, default=True, enable_input=True, enableInput=True, msgBoxID=None, picon=None, simple=False, timeout_default=None, windowTitle=None, skinName=None, skin_name=None, title=None, showYESNO=False, closeOnAnyKey=False, typeIcon=None, timeoutDefault=None):
-		self.type = type
+	def __init__(self, session, text, type=TYPE_YESNO, timeout=-1, list=None, default=True, closeOnAnyKey=False, enableInput=True, msgBoxID=None, typeIcon=None, timeoutDefault=None, windowTitle=None, skinName=None, close_on_any_key=False, enable_input=True, timeout_default=None, title=None, picon=None, skin_name=None, simple=None):
 		Screen.__init__(self, session, enableHelp=True)
 		self.text = text
-
 		self["text"] = Label(text)
 		self["Text"] = StaticText(text)
 		self["selectedChoice"] = StaticText()
@@ -43,9 +41,24 @@ class MessageBox(Screen):
 		self["QuestionPixmap"] = Pixmap()
 		self["InfoPixmap"] = Pixmap()
 		self["WarningPixmap"] = Pixmap()
-		self.timerRunning = False
-		self.initTimeout(timeout)
-
+		self.type = type
+		if type == self.TYPE_YESNO:
+			self.list = [(_("Yes"), True), (_("No"), False)] if list is None else list
+			self["list"] = MenuList(self.list)
+			if isinstance(default, bool):
+				self.startIndex = 0 if default else 1
+			elif isinstance(default, int):
+				self.startIndex = default
+			else:
+				print(f"[MessageBox] Error: The context of the default ({default}) can't be determined!")
+		else:
+			self["list"] = MenuList([])
+			self["list"].hide()
+			self.list = None
+		self.timeout = timeout
+		if close_on_any_key is True:  # Process legacy close_on_any_key argument.
+			closeOnAnyKey = True
+		self.closeOnAnyKey = closeOnAnyKey
 		if enable_input is False:  # Process legacy enable_input argument.
 			enableInput = False
 		if enableInput:
@@ -71,9 +84,11 @@ class MessageBox(Screen):
 		if timeout_default is not None:  # Process legacy timeout_default argument.
 			timeoutDefault = timeout_default
 		self.timeoutDefault = timeoutDefault
-		if close_on_any_key is True:  # Process legacy close_on_any_key argument.
-			closeOnAnyKey = True
-		self.closeOnAnyKey = closeOnAnyKey
+		if title is not None:  # Process legacy title argument.
+			windowTitle = title
+		self.windowTitle = windowTitle or self.TYPE_PREFIX.get(type, _("Message"))
+		self.baseTitle = self.windowTitle
+		self.activeTitle = self.windowTitle
 		if skin_name is not None:  # Process legacy skin_name argument.
 			skinName = skin_name
 		self.skinName = ["MessageBox"]
@@ -84,25 +99,30 @@ class MessageBox(Screen):
 				self.skinName.insert(0, skinName)
 			else:
 				self.skinName = skinName + self.skinName
-		if title is not None:  # Process legacy title argument.
-			windowTitle = title
-		self.windowTitle = windowTitle or self.TYPE_PREFIX.get(type, _("Message"))
-		self.baseTitle = self.windowTitle
-		self.activeTitle = self.windowTitle
-		if type == self.TYPE_YESNO or showYESNO:
-			self.list = [(_("Yes"), True), (_("No"), False)] if list is None else list
-			self["list"] = MenuList(self.list)
-			if isinstance(default, bool):
-				self.startIndex = 0 if default else 1
-			elif isinstance(default, int):
-				self.startIndex = default
-			else:
-				print(f"[MessageBox] Error: The context of the default ({default}) can't be determined!")
-		else:
-			self["list"] = MenuList([])
-			self["list"].hide()
-			self.list = None
+		self.timer = eTimer()
+		self.timer.callback.append(self.processTimer)
 		self.onLayoutFinish.append(self.layoutFinished)
+
+	def createActionMap(self, prio):
+		if self.list:
+			self["actions"] = HelpableActionMap(self, ["MsgBoxActions", "NavigationActions"], {
+				"cancel": (self.cancel, _("Select the No / False response")),
+				"select": (self.select, _("Return the current selection response")),
+				"selectOk": (self.selectOk, _("Select the Yes / True response")),
+				"top": (self.top, _("Move to first line")),
+				"pageUp": (self.pageUp, _("Move up a page")),
+				"up": (self.up, _("Move up a line")),
+				# "first": (self.top, _("Move to first line")),
+				# "last": (self.bottom, _("Move to last line")),
+				"down": (self.down, _("Move down a line")),
+				"pageDown": (self.pageDown, _("Move down a page")),
+				"bottom": (self.bottom, _("Move to last line"))
+			}, prio=prio, description=_("Message Box Actions"))
+		else:
+			self["actions"] = HelpableActionMap(self, ["OkCancelActions"], {
+				"cancel": (self.cancel, _("Close the window")),
+				"ok": (self.select, _("Close the window"))
+			}, prio=prio, description=_("Message Box Actions"))
 
 	def __repr__(self):
 		return f"{str(type(self))}({self.text})"
@@ -110,6 +130,7 @@ class MessageBox(Screen):
 	def layoutFinished(self):
 		if self.list:
 			self["list"].enableAutoNavigation(False)  # Override listbox navigation.
+			self["list"].moveToIndex(self.startIndex)
 		if self.typeIcon:
 			self["icon"].setPixmapNum(self.typeIcon - 1)
 		prefix = self.TYPE_PREFIX.get(self.type, _("Unknown"))
@@ -126,67 +147,31 @@ class MessageBox(Screen):
 			print(f"[MessageBox] Timeout set to {self.timeout} seconds.")
 			self.timer.start(25)
 
-	def createActionMap(self, prio):
-		self["actions"] = ActionMap(["MsgBoxActions", "DirectionActions"],
-			{
-				"cancel": self.cancel,
-				"select": self.select,
-				"selectOk": self.selectOk,
-				"up": self.up,
-				"down": self.down,
-				"left": self.pageUp,
-				"right": self.pageDown,
-				"upRepeated": self.up,
-				"downRepeated": self.down,
-				"leftRepeated": self.pageUp,
-				"rightRepeated": self.pageDown
-			}, -1)
-
-	def initTimeout(self, timeout):
-		self.timeout = timeout
-		if timeout > 0:
-			self.timer = eTimer()
-			self.timer.callback.append(self.timerTick)
-			self.onExecBegin.append(self.startTimer)
-			self.origTitle = None
-			if self.execing:
-				self.timerTick()
-			else:
-				self.onShown.append(self.__onShown)
-			self.timerRunning = True
-		else:
-			self.timerRunning = False
-
-	def __onShown(self):
-		self.onShown.remove(self.__onShown)
-		self.timerTick()
-
-	def startTimer(self):
-		self.timer.start(1000)
-
-	def stopTimer(self):
-		if self.timerRunning:
-			del self.timer
-			self.onExecBegin.remove(self.startTimer)
-			self.setTitle(self.origTitle, showPath=False)
-			self.timerRunning = False
-
-	def timerTick(self):
-		if self.execing:
+	def processTimer(self):
+		if self.activeTitle is None:  # Check if the title has been externally changed and if so make it the dominant title.
+			self.activeTitle = self.getTitle()
+			if "%s" in self.activeTitle:
+				self.activeTitle = self.activeTitle % self.TYPE_PREFIX.get(self.type, _("Unknown"))
+		if self.baseTitle != self.activeTitle:
+			self.baseTitle = self.activeTitle
+		if self.timeout > 0:
+			if self.baseTitle:
+				self.setTitle(f"{self.baseTitle} ({self.timeout})", showPath=False)
+			self.timer.start(1000)
 			self.timeout -= 1
-			if self.origTitle is None:
-				self.origTitle = self.instance.getTitle()
-			self.setTitle(self.origTitle + " (" + str(self.timeout) + ")", showPath=False)
-			if self.timeout == 0:
-				self.timer.stop()
-				self.timerRunning = False
-				self.timeoutCallback()
-
-	def timeoutCallback(self):
-		if self.timeoutDefault is not None:
-			self.close(self.timeoutDefault)
 		else:
-			self.selectOk()
+			self.stopTimer("Timeout!")
+			if self.timeoutDefault is not None:
+				self.close(self.timeoutDefault)
+			else:
+				self.select()
+
+	def stopTimer(self, reason):
+		print(f"[MessageBox] {reason}")
+		self.timer.stop()
+		self.timeout = 0
+		if self.baseTitle is not None:
+			self.setTitle(self.baseTitle, showPath=False)
 
 	def cancel(self):
 		self.close(False)
@@ -203,14 +188,14 @@ class MessageBox(Screen):
 	def top(self):
 		self.move(self["list"].instance.moveTop)
 
+	def pageUp(self):
+		self.move(self["list"].instance.pageUp)
+
 	def up(self):
 		self.move(self["list"].instance.moveUp)
 
 	def down(self):
 		self.move(self["list"].instance.moveDown)
-
-	def pageUp(self):
-		self.move(self["list"].instance.pageUp)
 
 	def pageDown(self):
 		self.move(self["list"].instance.pageDown)
@@ -218,19 +203,15 @@ class MessageBox(Screen):
 	def bottom(self):
 		self.move(self["list"].instance.moveEnd)
 
-	def move(self, direction):
+	def move(self, step):
+		self["list"].instance.moveSelection(step)
+		if self.timeout > 0:
+			self.stopTimer("Timeout stopped by user input!")
 		if self.closeOnAnyKey:
 			self.close(True)
-		self["list"].instance.moveSelection(direction)
-		if self.list:
-			self["selectedChoice"].setText(self["list"].getCurrent()[0])
-		self.stopTimer()
 
-	def __repr__(self):
-		return "%s(%s)" % (str(type(self)), self.text if hasattr(self, "text") else "<title>")
-
-	def getListWidth(self):
-		return self["list"].instance.getMaxItemTextWidth()
+	def autoResize(self):  # Dummy method place holder for some legacy skins.
+		pass
 
 	def createSummary(self):
 		return MessageBoxSummary
@@ -279,7 +260,7 @@ class ModalMessageBox:
 			self.dialog = session.instantiateDialog(MessageBox, "", enableInput=False, skinName="MessageBoxModal")
 			self.dialog.setAnimationMode(0)
 
-	def showMessageBox(self, text=None, timeout=-1, list=None, default=True, closeOnAnyKey=False, windowTitle=None, msgBoxID=None, typeIcon=MessageBox.TYPE_YESNO, enableInput=True, callback=None):
+	def showMessageBox(self, text=None, timeout=-1, list=None, default=True, closeOnAnyKey=False, timeoutDefault=None, windowTitle=None, msgBoxID=None, typeIcon=MessageBox.TYPE_YESNO, enableInput=True, callback=None):
 		self.dialog.text = text
 		self.dialog["text"].setText(text)
 		self.dialog.typeIcon = typeIcon
