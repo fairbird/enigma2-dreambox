@@ -1,9 +1,10 @@
+# -*- coding: utf-8 -*-
 from enigma import eTimer, eSize
 
 from Components.ActionMap import HelpableActionMap
 from Components.Label import Label
 from Components.MenuList import MenuList
-from Components.Pixmap import Pixmap, MultiPixmap
+from Components.Pixmap import MultiPixmap
 from Components.Sources.StaticText import StaticText
 from Screens.Screen import Screen, ScreenSummary
 
@@ -31,16 +32,9 @@ class MessageBox(Screen):
 	}
 
 	def __init__(self, session, text, type=TYPE_YESNO, timeout=-1, list=None, default=True, closeOnAnyKey=False, enableInput=True, msgBoxID=None, typeIcon=None, timeoutDefault=None, windowTitle=None, skinName=None, close_on_any_key=False, enable_input=True, timeout_default=None, title=None, picon=None, skin_name=None, simple=None):
-		Screen.__init__(self, session, enableHelp=True)
+		Screen.__init__(self, session, mandatoryWidgets=["icon", "list", "text"], enableHelp=True)
 		self.text = text
 		self["text"] = Label(text)
-		self["Text"] = StaticText(text)
-		self["selectedChoice"] = StaticText()
-		self["key_help"] = StaticText(_("HELP"))
-		self["ErrorPixmap"] = Pixmap()
-		self["QuestionPixmap"] = Pixmap()
-		self["InfoPixmap"] = Pixmap()
-		self["WarningPixmap"] = Pixmap()
 		self.type = type
 		if type == self.TYPE_YESNO:
 			self.list = [(_("Yes"), True), (_("No"), False)] if list is None else list
@@ -64,15 +58,6 @@ class MessageBox(Screen):
 		if enableInput:
 			self.createActionMap(0)
 		self.msgBoxID = msgBoxID
-		picon = picon or type
-		if picon != self.TYPE_ERROR:
-			self["ErrorPixmap"].hide()
-		if picon != self.TYPE_YESNO:
-			self["QuestionPixmap"].hide()
-		if picon != self.TYPE_INFO:
-			self["InfoPixmap"].hide()
-		if picon != self.TYPE_WARNING:
-			self["WarningPixmap"].hide()
 		if picon is not None:  # Process legacy picon argument.
 			typeIcon = picon
 		if typeIcon is None:
