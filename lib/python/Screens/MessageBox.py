@@ -89,25 +89,23 @@ class MessageBox(Screen):
 		self.onLayoutFinish.append(self.layoutFinished)
 
 	def createActionMap(self, prio):
-		if self.list:
-			self["actions"] = HelpableActionMap(self, ["MsgBoxActions", "NavigationActions"], {
-				"cancel": (self.cancel, _("Select the No / False response")),
-				"select": (self.select, _("Return the current selection response")),
-				"selectOk": (self.selectOk, _("Select the Yes / True response")),
-				"top": (self.top, _("Move to first line")),
-				"pageUp": (self.pageUp, _("Move up a page")),
-				"up": (self.up, _("Move up a line")),
-				# "first": (self.top, _("Move to first line")),
-				# "last": (self.bottom, _("Move to last line")),
-				"down": (self.down, _("Move down a line")),
-				"pageDown": (self.pageDown, _("Move down a page")),
-				"bottom": (self.bottom, _("Move to last line"))
-			}, prio=prio, description=_("Message Box Actions"))
-		else:
-			self["actions"] = HelpableActionMap(self, ["OkCancelActions"], {
-				"cancel": (self.cancel, _("Close the window")),
-				"ok": (self.select, _("Close the window"))
-			}, prio=prio, description=_("Message Box Actions"))
+		self["actions"] = HelpableActionMap(self, ["MsgBoxActions", "DirectionActions", "NavigationActions"], {
+			"cancel": (self.cancel, _("Select the No / False response")),
+			"select": (self.select, _("Return the current selection response")),
+			"selectOk": (self.selectOk, _("Select the Yes / True response")),
+			"top": (self.top, _("Move to first line")),
+			"pageUp": (self.pageUp, _("Move up a page")),
+			"up": (self.up, _("Move up a line")),
+			# "first": (self.top, _("Move to first line")),
+			# "last": (self.bottom, _("Move to last line")),
+			"down": (self.down, _("Move down a line")),
+			"pageDown": (self.pageDown, _("Move down a page")),
+			"bottom": (self.bottom, _("Move to last line")),
+			"upRepeated": (self.up, _("upRepeated a line")),
+			"downRepeated": (self.down, _("downRepeated a line")),
+			"leftRepeated":  (self.pageUp, _("leftRepeated a line")),
+			"rightRepeated": (self.pageDown, _("rightRepeated a line"))
+		}, prio=prio, description=_("Message Box Actions"))
 
 	def __repr__(self):
 		return f"{str(type(self))}({self.text})"
