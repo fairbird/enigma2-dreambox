@@ -103,7 +103,7 @@ class MessageBox(Screen):
 			"bottom": (self.bottom, _("Move to last line")),
 			"upRepeated": (self.up, _("upRepeated a line")),
 			"downRepeated": (self.down, _("downRepeated a line")),
-			"leftRepeated":  (self.pageUp, _("leftRepeated a line")),
+			"leftRepeated": (self.pageUp, _("leftRepeated a line")),
 			"rightRepeated": (self.pageDown, _("rightRepeated a line"))
 		}, prio=prio, description=_("Message Box Actions"))
 
