@@ -102,8 +102,8 @@ class PiconLocator:
 			#fallback to 1 for IPTV streams
 			fields[0] = "1"
 			pngname = self.findPicon("_".join(fields))
-		if not pngname and fields[2] != "2":
-			#fallback to 1 for TV services with non-standard service types
+		if not pngname and fields[2] != "1":
+			#fallback to 1 for TV services with non-standard service types. And radio services.
 			fields[2] = "1"
 			pngname = self.findPicon("_".join(fields))
 		if not pngname:  # picon by channel name
