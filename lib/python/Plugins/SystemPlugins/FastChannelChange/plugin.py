@@ -277,7 +277,7 @@ class FCCSupport:
 				idx = (curServiceIndex + idx) % serviceRefListSize  # calc wraparound
 				try:
 					fccZapUpDownList.append(serviceRefList[idx])
-				except:
+				except Exception:
 					print("[FCCCreateList] append error, idx : %d" % idx)
 					break
 

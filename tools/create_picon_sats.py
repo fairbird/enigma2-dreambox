@@ -70,17 +70,17 @@ while len(f) > 2:
 
 	try:
 		os.makedirs(sat + '/' + servicetype)
-	except:
+	except OSError:
 		pass
 
 	try:
 		os.rename(linkname, sat + '/' + servicetype + '/' + filename)
-	except:
+	except OSError:
 		pass
 
 	try:
 		os.symlink(filename, sat + '/' + servicetype + '/' + linkname)
-	except:
+	except OSError:
 		pass
 
 	f = f[3:]

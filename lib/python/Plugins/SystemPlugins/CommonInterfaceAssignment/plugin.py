@@ -181,7 +181,7 @@ class CIconfigMenu(Screen):
 		if answer:
 			try:
 				os.remove(self.filename)
-			except:
+			except Exception:
 				print("[CI_Config_CI%d] error remove xml..." % self.ci_slot)
 			else:
 				self.session.openWithCallback(self.restartGui, MessageBox, _("Restart GUI now?"), MessageBox.TYPE_YESNO)
@@ -298,7 +298,7 @@ class CIconfigMenu(Screen):
 			fp.write("\t</slot>\n")
 			fp.write("</ci>\n")
 			fp.close()
-		except:
+		except Exception:
 			print("[CI_Config_CI%d] xml not written" % self.ci_slot)
 			os.unlink(self.filename)
 
@@ -336,11 +336,11 @@ class CIconfigMenu(Screen):
 					self.read_providers.append((read_provider_name, read_provider_dvbname))
 
 				self.ci_config.append((int(read_slot), (self.read_services, self.read_providers, self.usingcaid)))
-		except:
+		except Exception:
 			print("[CI_Config_CI%d] error parsing xml..." % self.ci_slot)
 			try:
 				os.remove(self.filename)
-			except:
+			except Exception:
 				print("[CI_Activate_Config_CI%d] error remove damaged xml..." % self.ci_slot)
 
 		for item in self.read_services:
@@ -540,7 +540,7 @@ class myProviderSelection(ChannelSelectionBase):
 								try:
 									# why we need this cast?
 									service_name = str(nimmanager.getSatDescription(orbpos))
-								except:
+								except Exception:
 									if unsigned_orbpos == 0xFFFF:  # Cable
 										service_name = _("Cable")
 									elif unsigned_orbpos == 0xEEEE:  # Terrestrial

@@ -45,7 +45,7 @@ class FallbackTimerList():
 		if self.url:
 			try:
 				self.getUrl("api/timerlist").addCallback(self.gotFallbackTimerList).addErrback(self.fallback)
-			except:
+			except Exception:
 				self.fallback(_("Unexpected error while retrieving fallback tuner's timer information"))
 		else:
 			self.fallback()
@@ -146,7 +146,7 @@ class FallbackTimerList():
 				self.getFallbackTimerList()
 			else:
 				self.fallback(root[1].text)
-		except:
+		except Exception:
 				self.fallback("Unexpected Error")
 
 	def fallback(self, message=None):
@@ -165,7 +165,7 @@ class FallbackTimerDirs(FallbackTimerList):
 		if self.url:
 			try:
 				self.getUrl("web/getlocations").addCallback(self.getlocations).addErrback(self.fallbackFunction)
-			except:
+			except Exception:
 				self.fallbackFunction()
 		else:
 			self.fallbackFunction()
@@ -174,7 +174,7 @@ class FallbackTimerDirs(FallbackTimerList):
 		self.locations = [c.text for c in fromstring(data)]
 		try:
 			self.getUrl("web/getcurrlocation").addCallback(self.getcurrlocation).addErrback(self.fallbackFunction)
-		except:
+		except Exception:
 			self.fallbackFunction()
 
 	def getcurrlocation(self, data):

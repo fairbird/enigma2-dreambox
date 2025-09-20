@@ -73,7 +73,7 @@ try:
 	f = open("/etc/enigma2/settings")
 	lines = f.readlines()
 	f.close()
-except:
+except OSError:
 	print("Error opening /etc/enigma2/settings file")
 
 for line in lines:
@@ -94,7 +94,7 @@ for line in lines:
 packages = stdout.split('\n')
 try:
 	packages.remove("")
-except:
+except Exception:
 	pass
 
 # Check for packages which should not be upgraded and remove them from list

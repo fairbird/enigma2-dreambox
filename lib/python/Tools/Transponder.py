@@ -11,12 +11,12 @@ def orbpos(pos):
 def getTunerDescription(nim):
 	try:
 		return nimmanager.getTerrestrialDescription(nim)
-	except:
+	except Exception:
 		print("[Transponder] nimmanager.getTerrestrialDescription(nim) failed, nim:", nim)
 		try:
 			print("[Transponder] trying use fallback", config.usage.remote_fallback_dvbt_region.value)
 			return config.usage.remote_fallback_dvbt_region.value
-		except:
+		except Exception:
 			print("[Transponder] no description")
 	return ""
 
