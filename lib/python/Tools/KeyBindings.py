@@ -364,10 +364,7 @@ def removeKeyBinding(key, context, action, wild=True):
 
 
 def queryKeyBinding(context, action):
-	if (context, action) in keyBindings:
-		return [(x[0], x[2]) for x in keyBindings[(context, action)]]
-	else:
-		return []
+	return [(x[0], x[2]) for x in keyBindings[(context, action)]] if (context, action) in keyBindings else []
 
 
 def getKeyDescription(key):
