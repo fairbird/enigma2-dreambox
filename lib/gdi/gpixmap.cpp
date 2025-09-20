@@ -43,12 +43,8 @@ https://creativecommons.org/licenses/by-nc-sa/4.0/
 #include <lib/gdi/drawing.h>
 #include <byteswap.h>
 
-#ifdef __GLIBC__
 #ifndef BYTE_ORDER
 #error "no BYTE_ORDER defined!"
-#endif
-#else
-#define BYTE_ORDER __BYTE_ORDER
 #endif
 
 /* surface acceleration threshold: do not attempt to accelerate surfaces smaller than the threshold (measured in bytes) */
