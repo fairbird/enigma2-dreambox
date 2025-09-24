@@ -493,6 +493,7 @@ void eListbox::updateScrollBar()
 	}
 	if (scrollbarvisible != scrollbarvisibleOld)
 		recalcSizeAlignment(scrollbarvisible);
+}
 
 int eListbox::getScrollbarListOffset()
 {
