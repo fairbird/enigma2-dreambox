@@ -250,8 +250,7 @@ void eListboxPythonStringContent::paint(gPainter &painter, eWindowStyle &style, 
 	if (m_listbox)
 		local_style = m_listbox->getLocalStyle();
 
-	if (local_style)
-	{
+	if (local_style) {
 		border_size = local_style->m_border_size;
 		border_color = local_style->m_border_color;
 		itemZoomed = local_style->m_selection_zoom > 1.0;
@@ -440,8 +439,7 @@ void eListboxPythonStringContent::paint(gPainter &painter, eWindowStyle &style, 
 			if(m_listbox && selected && scroll_text_direction && m_scroll_index != m_cursor)
 				m_listbox->m_scroll_rect = position;
 
-			if (local_style)
-			{
+			if (local_style) {
 				text_offset += local_style->m_text_padding.topLeft();
 				// HACK VTI hat hier scheinbar einen Fehler und addiert den Textoffset zweimal auf, also machen wir das hier auch so
 				if (local_style->is_set.use_vti_workaround)
@@ -603,8 +601,7 @@ static eSize calculateTextSize(gFont* font, const std::string& string, eSize tar
 void eListboxPythonStringContent::updateTextSize(std::string &text, gFont* font, int flags, gRGB &border_color, int border_size) {
 	m_scroll_text = false;
 
-	if(m_listbox)
-	{
+	if(m_listbox) {
 		int scroll_text_direction = m_listbox->m_scroll_config.direction;
 
 		if (scroll_text_direction == eScrollConfig::scrollLeft || scroll_text_direction == eScrollConfig::scrollRight) {
@@ -683,7 +680,7 @@ void eListboxPythonStringContent::createScrollPixmap(std::string &text, gFont* f
 	p.setFont(font);
 	p.resetClip(eRect(ePoint(0, 0), s));
 
-	eListboxStyle *local_style = m_listbox->getLocalStyle();
+	const eListboxStyle* local_style = m_listbox->getLocalStyle();
 
 	int posX = 0;
 	int posY = 0;
@@ -852,8 +849,7 @@ void eListboxPythonConfigContent::paint(gPainter &painter, eWindowStyle &style, 
 	if (m_listbox)
 		local_style = m_listbox->getLocalStyle();
 
-	if (local_style)
-	{
+	if (local_style) {
 		border_size = local_style->m_border_size;
 		border_color = local_style->m_border_color;
 		fnt = local_style->m_font;
@@ -1330,8 +1326,7 @@ static void clearRegionHelper(gPainter &painter, eListboxStyle *local_style, con
 		uint32_t color = PyLong_AsUnsignedLongMask(pbackColor);
 		painter.setBackgroundColor(gRGB(color));
 	}
-	else if (local_style)
-	{
+	else if (local_style) {
 		if (local_style->is_set.background_color)
 			painter.setBackgroundColor(local_style->m_background_color);
 
@@ -1370,8 +1365,7 @@ static void clearRegionSelectedHelper(gPainter &painter, eListboxStyle *local_st
 		uint32_t color = PyLong_AsUnsignedLongMask(pbackColorSelected);
 		painter.setBackgroundColor(gRGB(color));
 	}
-	else if (local_style)
-	{
+	else if (local_style) {
 		if (local_style->is_set.background_color_selected)
 			painter.setBackgroundColor(local_style->m_background_color_selected);
 		if (local_style->m_background && cursorValid)
@@ -1669,8 +1663,7 @@ void eListboxPythonMultiContent::paint(gPainter &painter, eWindowStyle &style, c
 		defaultBackColor = style.getColor(selected ? eWindowStyleSkinned::colListboxBackgroundSelected : eWindowStyleSkinned::colListboxBackground);
 	}
 
-	if (local_style)
-	{
+	if (local_style) {
 		int mode = (selected) ? 1 : 0;
 		mode += (marked) ? 2 : 0;
 		int radius = local_style->cornerRadius(mode);
