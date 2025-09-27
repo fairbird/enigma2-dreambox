@@ -142,9 +142,9 @@ class Screen(dict):
 			self.instance.show()
 			for method in self.onShow:
 				method()
-			for value in list(self.values()) + self.renderer:
-				if isinstance(value, GUIComponent) or isinstance(value, Source):
-					value.onShow()
+			for val in list(self.values()) + self.renderer:
+				if isinstance(val, GUIComponent) or isinstance(val, Source):
+					val.onShow()
 
 	def hide(self):
 		if self.shown and self.instance:
@@ -152,9 +152,9 @@ class Screen(dict):
 			self.instance.hide()
 			for method in self.onHide:
 				method()
-			for value in list(self.values()) + self.renderer:
-				if isinstance(value, GUIComponent) or isinstance(value, Source):
-					value.onHide()
+			for val in list(self.values()) + self.renderer:
+				if isinstance(val, GUIComponent) or isinstance(val, Source):
+					val.onHide()
 
 	def isAlreadyShown(self):  # Already shown is false until the screen is really shown (after creation).
 		return self.alreadyShown
@@ -162,8 +162,8 @@ class Screen(dict):
 	def getStandAlone(self):  # Stand alone screens (for example web screens) don't care about having or not having focus.
 		return self.standAlone
 
-	def setStandAlone(self, value):  # Stand alone screens (for example web screens) don't care about having or not having focus.
-		self.standAlone = value
+	def setStandAlone(self, val):  # Stand alone screens (for example web screens) don't care about having or not having focus.
+		self.standAlone = val
 
 	def getScreenPath(self):
 		return self.screenPath
@@ -271,13 +271,13 @@ class Screen(dict):
 		bounds = (getDesktop(GUI_SKIN_ID).size().width(), getDesktop(GUI_SKIN_ID).size().height())
 		resolution = bounds
 		zPosition = 0
-		for (key, value) in self.skinAttributes:
+		for (key, val) in self.skinAttributes:
 			if key == "handledWidgets":
-				self.handledWidgets = [x.strip() for x in value.split(",")]
+				self.handledWidgets = [x.strip() for x in val.split(",")]
 			elif key == "resolution":
-				resolution = tuple([int(x.strip()) for x in value.split(",")])
+				resolution = tuple([int(x.strip()) for x in val.split(",")])
 			elif key == "zPosition":
-				zPosition = int(value)
+				zPosition = int(val)
 		if not self.instance:
 			self.instance = eWindow(self.desktop, zPosition)
 		if "title" not in self.skinAttributes and self.screenTitle:
@@ -291,22 +291,19 @@ class Screen(dict):
 		self.createGUIScreen(self.instance, self.desktop)
 
 	def createGUIScreen(self, parent, desktop, updateonly=False):
-
 		def addToStack(widget):
 			if hasattr(widget, "stackIndex") and widget.stackIndex != -1:
 				stack = self.stacks[widget.stackIndex]
 				stack.instance.addChild(widget.instance)
-
 		for widget in self.stacks:
 			widget.instance = widget.widget(parent, widget.layout)
 			applyAllAttributes(widget.instance, desktop, widget.skinAttributes, self.scale)
 			addToStack(widget)
-
 		for val in self.renderer:
 			if isinstance(val, GUIComponent):
 				if not updateonly:
 					val.GUIcreate(parent)
-					addToStack(value)
+					addToStack(val)
 				if not val.applySkin(desktop, self):
 					print("[Screen] Warning: Skin is missing renderer '%s' in %s." % (val, str(self)))
 		for key in self:
@@ -314,21 +311,26 @@ class Screen(dict):
 			if isinstance(val, GUIComponent):
 				if not updateonly:
 					val.GUIcreate(parent)
-					addToStack(value)
+					addToStack(val)
 				depr = val.deprecationInfo
 				if val.applySkin(desktop, self):
 					if depr:
 						print("[Screen] WARNING: OBSOLETE COMPONENT '%s' USED IN SKIN. USE '%s' INSTEAD!" % (key, depr[0]))
 						print("[Screen] OBSOLETE COMPONENT WILL BE REMOVED %s, PLEASE UPDATE!" % depr[1])
 				elif not depr and key not in self.handledWidgets:
-					print("[Screen] Warning: Skin is missing element '%s' in %s." % (key, str(self)))
-		for w in self.additionalWidgets:
+					try:
+						print(f"[Screen] Warning: Skin is missing element '{key}' in {str(self)} item {str(self[key])}.")
+					except Exception:
+						print(f"[Screen] Warning: Skin is missing element '{key}'.")
+		for widget in self.additionalWidgets:
 			if not updateonly:
-				w.instance = w.widget(parent)
+				widget.instance = widget.widget(parent)
 				# w.instance.thisown = 0
-			applyAllAttributes(w.instance, desktop, w.skinAttributes, self.scale)
+			applyAllAttributes(widget.instance, desktop, widget.skinAttributes, self.scale)
+			addToStack(widget)
 		if self.screenImage:
-			self["Image"].setPixmap(LoadPixmap(self.screenImage))
+			screenImage = LoadPixmap(self.screenImage)
+			self["Image"].instance.setPixmap(screenImage)
 		for f in self.onLayoutFinish:
 			if not isinstance(f, type(self.close)):
 				# exec f in globals(), locals()  # Python 2
