@@ -14,6 +14,7 @@ gui_libenigma_gui_a_SOURCES = \
 	gui/erectangle.cpp \
 	gui/epositiongauge.cpp \
 	gui/eslider.cpp \
+	gui/estack.cpp \
 	gui/esubtitle.cpp \
 	gui/evideo.cpp \
 	gui/ewidget.cpp \
@@ -38,6 +39,7 @@ guiinclude_HEADERS = \
 	gui/erectangle.h \
 	gui/epositiongauge.h \
 	gui/eslider.h \
+	gui/estack.h \
 	gui/esubtitle.h \
 	gui/evideo.h \
 	gui/ewidget.h \
