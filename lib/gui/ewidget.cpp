@@ -3,7 +3,7 @@
 
 extern void dumpRegion(const gRegion &region);
 
-eWidget::eWidget(eWidget *parent) : m_animation(this), m_parent(parent ? parent->child() : 0) {
+eWidget::eWidget(eWidget* parent) : m_animation(this), m_parent(parent ? parent->child() : 0) {
 	m_gradient_set = false;
 	m_gradient_direction = 0;
 	m_vis = 0;

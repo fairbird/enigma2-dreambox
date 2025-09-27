@@ -1,9 +1,10 @@
 #ifndef __lib_gui_ewidget_h
 #define __lib_gui_ewidget_h
 
-#include <lib/gui/ewindowstyle.h> /* for eWindowStyle */
+#include <lib/base/eptrlist.h> /* for eSmartPtrList */
 #include <lib/gdi/grc.h> /* for gRegion */
 #include <lib/gui/ewidgetanimation.h>
+#include <lib/gui/ewindowstyle.h> /* for eWindowStyle */
 #include <sstream>
 #include <vector>
 
@@ -52,6 +53,11 @@ public:
 	void setStyle(eWindowStyle* style) { m_style = style; }
 
 	virtual void setBackgroundColor(const gRGB& col);
+	virtual void clearBackgroundColor() { m_have_background_color = false; }
+
+	virtual void setBorderWidth(int width) { setWidgetBorderWidth(width); }
+	virtual void setBorderColor(const gRGB& color) { setWidgetBorderColor(color); }
+
 	virtual void setWidgetBorderWidth(int width) {
 		m_border_width = width;
 		invalidate();
@@ -75,7 +81,6 @@ public:
 
 	/* untested code */
 	int isVisible() { return (m_vis & wVisShow) && ((!m_parent) || m_parent->isVisible()); }
-	/* ... */
 
 	int isLowered() { return (m_lowered > 0); }
 
