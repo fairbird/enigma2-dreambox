@@ -29,6 +29,8 @@ protected:
 	int event(int event, void* data = 0, void* data2 = 0);
 	void checkSize();
 
+	std::string getClassName() const override { return std::string("ePixmap"); }
+
 private:
 	std::vector<ePtr<gPixmap>> m_frames;
 	std::vector<int> m_delays;
