@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from enigma import eTimer, eSize
+from enigma import eTimer
 
 from Components.ActionMap import HelpableActionMap
 from Components.Label import Label
