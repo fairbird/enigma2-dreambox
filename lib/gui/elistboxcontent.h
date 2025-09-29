@@ -67,6 +67,7 @@ private:
 	eSize m_text_size;
 	eSize m_scroll_size;
 	void updateScrollPosition();
+	void stopScroll();
 	void updateTextSize(std::string& text, gFont* font, int flags, gRGB& border_color, int border_size);
 	std::string m_scroll_text_str;
 	int m_scroll_index = -1;
