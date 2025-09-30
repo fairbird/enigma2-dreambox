@@ -3,7 +3,6 @@ from enigma import eListbox, eListboxPythonMultiContent, BT_ALIGN_CENTER, iPlaya
 from skin import parseScale, parseColor, parseFont, parameters
 
 from Components.Addons.GUIAddon import GUIAddon
-from Components.Converter.PliExtraInfo import createCurrentCaidLabel
 from Components.Converter.ServiceInfo import getVideoHeight
 from Components.Converter.VAudioInfo import StdAudioDesc
 from Components.Label import Label
@@ -13,6 +12,7 @@ from Components.Sources.StreamService import StreamServiceList
 from Components.NimManager import nimmanager
 from Screens.InfoBarGenerics import hasActiveSubservicesForCurrentChannel
 from Tools.Directories import resolveFilename, SCOPE_GUISKIN
+from Tools.GetEcmInfo import createCurrentCaidLabel
 from Tools.LoadPixmap import LoadPixmap
 from Tools.Hex2strColor import Hex2strColor
 
