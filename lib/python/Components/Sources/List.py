@@ -26,10 +26,10 @@ to generate HTML."""
 		self.listIndexNames = indexNames or {}
 		self.onSelectionChanged = []
 		self.onListUpdated = []
-		self.disableCallbacks = False
-		self.__current = None
-		self.__index = None
-		self.connectedGuiElement = None
+		self.disableCallbacks = False		
+		self.__current = None # current element set from connected GUI element
+		self.__index = None # current index set from connected GUI element
+		self.connectedGuiElement = None # manuallyconnected GUI element
 
 	def enableAutoNavigation(self, enabled):
 		try:
@@ -92,10 +92,7 @@ to generate HTML."""
 
 	@cached
 	def getCurrent(self):
-		if self.master:
-			if hasattr(self.master, "current"):
-				return self.master.current
-		return self.__current
+		return self.master.current if self.master and hasattr(self.master, "current") else self.__current
 
 	current = property(getCurrent)
 
@@ -187,8 +184,8 @@ to generate HTML."""
 	visible = property(getVisible, setVisible)
 
 	def listUpdated(self):
-		for x in self.onListUpdated:
-			x()
+		for method in self.onListUpdated:
+			method()
 
 	def show(self):
 		try:
