@@ -28,8 +28,6 @@ class ConfigList(GUIComponent):
 		self.list = list
 		self.onSelectionChanged = []
 		self.current = None
-		self.sepLineColor = 0xFFFFFF
-		self.sepLineThickness = 1
 		self.session = session
 
 	def execBegin(self):
@@ -111,7 +109,6 @@ class ConfigList(GUIComponent):
 		instance.selectionChanged.get().append(self.selectionChanged)
 		instance.setContent(self.l)
 		self.instance.setWrapAround(True)
-		instance.setSeparatorColor(gRGB(self.sepLineColor))
 
 	def preWidgetRemove(self, instance):
 		if isinstance(self.current, tuple) and len(self.current) >= 2:
@@ -174,6 +171,20 @@ class ConfigList(GUIComponent):
 
 	def moveBottom(self):
 		self.goBottom()
+
+	def applySkin(self, desktop, screen):
+		if self.skinAttributes is not None:
+			attribs = []
+			for (attrib, value) in self.skinAttributes:
+				if attrib == "sepLineColor":
+					attribs.append(("separatorColor", value))
+				elif attrib == "sepLineThickness":
+					pass
+					# self.sepLineThickness = int(value) # This is currently not working
+				else:
+					attribs.append((attrib, value))
+			self.skinAttributes = attribs
+		return GUIComponent.applySkin(self, desktop, screen)
 
 
 class ConfigListScreen:
