@@ -7,4 +7,4 @@ install_PYTHON = \
 	AnalogClockLCD.py Bhclock.py Cover.py EmptyEpg.py LcdPicon.py \
 	NextEvents.py PicCript.py PicEmu2.py PiconUni.py RollerCharLCD.py RollerCharLCDLong.py \
 	RunningText.py VolumeText.py VRunningText.py VWatches.py VtiEmuInfo.py VtiImageVersion.py \
-	AudioIcon.py RatingIcon.py RatingIconLabel.py
+	AudioIcon.py ModeronFHDAudioIcon.py SingleEpgList.py PrimeTime.py RatingIcon.py RatingIconLabel.py
