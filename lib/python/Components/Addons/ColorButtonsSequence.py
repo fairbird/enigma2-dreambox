@@ -1,9 +1,8 @@
-# -*- coding: utf-8 -*-
 from Components.Addons.GUIAddon import GUIAddon
 
-from enigma import eListbox, eListboxPythonMultiContent, BT_ALIGN_CENTER, RT_VALIGN_CENTER, RT_HALIGN_LEFT, RT_HALIGN_CENTER, BT_SCALE, eSize, getDesktop, gFont
+from enigma import eListbox, eListboxPythonMultiContent, BT_ALIGN_CENTER, RT_VALIGN_CENTER, RT_HALIGN_LEFT, RT_HALIGN_CENTER, RT_BLEND, BT_SCALE, eSize, getDesktop, gFont
 
-from skin import parseScale, parseColor, parseFont
+from skin import parseScale, parseColor, parseFont, applySkinFactor
 
 from Components.MultiContent import MultiContentEntryPixmapAlphaBlend, MultiContentEntryText
 from Components.Label import Label
@@ -21,8 +20,8 @@ class ColorButtonsSequence(GUIAddon):
 		self.l.setBuildFunc(self.buildEntry)
 		self.l.setItemHeight(35)
 		self.l.setItemWidth(35)
-		self.spacingButtons = 40
-		self.spacingPixmapText = 10
+		self.spacingButtons = applySkinFactor(40)
+		self.spacingPixmapText = applySkinFactor(10)
 		self.layoutStyle = "fixed"
 		self.colorIndicatorStyle = "pixmap"
 		self.orientations = {"orHorizontal": eListbox.orHorizontal, "orVertical": eListbox.orVertical}
@@ -46,9 +45,9 @@ class ColorButtonsSequence(GUIAddon):
 	GUI_WIDGET = eListbox
 
 	def updateAddon(self, sequence):
-		l_list = []
-		l_list.append((sequence,))
-		self.l.setList(l_list)
+		lList = []
+		lList.append((sequence,))
+		self.l.setList(lList)
 
 	def buildEntry(self, sequence):
 		res = [None]
@@ -61,7 +60,7 @@ class ColorButtonsSequence(GUIAddon):
 		minSectorWidth = width // 4
 
 		pic = None
-		pixd_width = 0
+		pixdWidth = 0
 
 		for x, val in sequence.items():
 			textColor = self.foreColor
@@ -76,18 +75,18 @@ class ColorButtonsSequence(GUIAddon):
 			if self.renderType != "ImageTextOver" and x in self.pixmaps:
 				pic = LoadPixmap(resolveFilename(SCOPE_GUISKIN, self.pixmaps[x]))
 				if pic:
-					pixd_size = pic.size()
-					pixd_width = pixd_size.width()
-					pic_x_pos = (xPos - pixd_width) if self.alignment == "right" else xPos
+					pixdSize = pic.size()
+					pixdWidth = pixdSize.width()
+					picXPos = (xPos - pixdWidth) if self.alignment == "right" else xPos
 					res.append(MultiContentEntryPixmapAlphaBlend(
-						pos=(pic_x_pos, yPos),
-						size=(pixd_width, height),
+						pos=(picXPos, yPos),
+						size=(pixdWidth, height),
 						png=pic,
 						backcolor=None, backcolor_sel=None, flags=BT_ALIGN_CENTER))
 					if self.alignment == "right":
-						xPos -= pixd_width + self.spacingPixmapText
+						xPos -= pixdWidth + self.spacingPixmapText
 					else:
-						xPos += pixd_width + self.spacingPixmapText
+						xPos += pixdWidth + self.spacingPixmapText
 			if hasattr(val, "text"):
 				buttonText = val.text
 			else:
@@ -98,8 +97,8 @@ class ColorButtonsSequence(GUIAddon):
 			else:
 				textWidth = 0
 			if self.layoutStyle != "fluid":
-				if textWidth < (minSectorWidth - self.spacingButtons - (self.spacingPixmapText if pic else 0) - pixd_width):
-					textWidth = minSectorWidth - self.spacingButtons - (self.spacingPixmapText if pic else 0) - pixd_width
+				if textWidth < (minSectorWidth - self.spacingButtons - (self.spacingPixmapText if pic else 0) - pixdWidth):
+					textWidth = minSectorWidth - self.spacingButtons - (self.spacingPixmapText if pic else 0) - pixdWidth
 			if buttonText:
 				textFlags = RT_HALIGN_LEFT | RT_VALIGN_CENTER
 				textPaddings = 0
@@ -110,6 +109,7 @@ class ColorButtonsSequence(GUIAddon):
 					backColor = buttonBgColor
 
 				if self.renderType == "ImageTextOver":
+					textFlags = textFlags | RT_BLEND
 					if x in self.pixmaps:
 						pic = LoadPixmap(resolveFilename(SCOPE_GUISKIN, self.pixmaps[x]))
 						if pic:
@@ -152,7 +152,7 @@ class ColorButtonsSequence(GUIAddon):
 		attribs = []
 		for (attrib, value) in self.skinAttributes[:]:
 			if attrib == "pixmaps":
-				self.pixmaps = dict(item.split(':') for item in value.split(','))
+				self.pixmaps = {k: v for k, v in (item.split(':') for item in value.split(','))}
 			elif attrib == "spacing":
 				self.spacingButtons = parseScale(value)
 			elif attrib == "spacingPixmapText":
@@ -174,7 +174,7 @@ class ColorButtonsSequence(GUIAddon):
 			elif attrib == "foregroundColor":
 				self.foreColor = parseColor(value).argb()
 			elif attrib == "textColors":
-				self.colors = dict(item.split(':') for item in value.split(','))
+				self.colors = {k: v for k, v in (item.split(':') for item in value.split(','))}
 			elif attrib == "buttonCornerRadius":
 				self.cornerRadius = parseScale(value)
 			elif attrib == "renderType":

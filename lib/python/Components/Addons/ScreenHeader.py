@@ -1,9 +1,8 @@
-# -*- coding: utf-8 -*-
 from Components.Addons.GUIAddon import GUIAddon
 
-from enigma import eListbox, eListboxPythonMultiContent, gFont, RT_HALIGN_LEFT, RT_VALIGN_CENTER
+from enigma import eListbox, eListboxPythonMultiContent, gFont, RT_BLEND, RT_HALIGN_LEFT, RT_VALIGN_CENTER
 
-from skin import parseFont, parseColor
+from skin import applySkinFactor, parseFont, parseColor
 
 from Components.MultiContent import MultiContentEntryText, MultiContentEntryPixmapAlphaBlend
 from Components.Sources.StaticText import StaticText
@@ -18,9 +17,9 @@ class ScreenHeader(GUIAddon):
 		self.l.setItemHeight(36)
 		self.l.setItemWidth(36)
 		self.orientation = eListbox.orHorizontal
-		self.titleFont = gFont("Regular", 22)
-		self.titleSingleFont = gFont("Regular", 24)
-		self.pathFont = gFont("Regular", 16)
+		self.titleFont = gFont("Regular", applySkinFactor(22))
+		self.titleSingleFont = gFont("Regular", applySkinFactor(24))
+		self.pathFont = gFont("Regular", applySkinFactor(16))
 		self.titleForeground = 0xffffff
 		self.pathForeground = 0xffffff
 		self.backgroundColor = 0x000000
@@ -87,7 +86,7 @@ class ScreenHeader(GUIAddon):
 				res.append(MultiContentEntryText(
 					pos=(xPos, yPos),
 					size=(self.instance.size().width() - xPos, itemHeight),
-					font=fontIndex, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER,
+					font=fontIndex, flags=RT_BLEND | RT_HALIGN_LEFT | RT_VALIGN_CENTER,
 					text=x.text,
 					color=foreColor, color_sel=foreColor,
 					backcolor=self.backgroundColor, backcolor_sel=self.backgroundColor))
@@ -104,8 +103,7 @@ class ScreenHeader(GUIAddon):
 			if isinstance(val, StaticText):
 				if hasattr(val, "text") and val.text and val not in sequence:
 					sequence.append(val)
-			elif isinstance(val, Pixmap):
-				if val and val not in sequence:
+			elif val and isinstance(val, Pixmap) and val not in sequence:
 					sequence.append(val)
 
 		self.updateAddon(sequence)

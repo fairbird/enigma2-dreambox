@@ -599,9 +599,9 @@ def parseParameter(value):
 		return colors[value].argb()
 	elif value.find(";") != -1:  # Font.
 		(font, size) = (x.strip() for x in value.split(";", 1))
-		return [font, parseScale(size)]
+		return [font, int(size)]
 	else:  # Integer.
-		return parseScale(value)
+		return int(value)
 
 
 def parsePixmap(path, desktop):
@@ -672,21 +672,7 @@ def parseValuePair(value, scale, object=None, desktop=None, size=None):
 	return (xValue, yValue)
 
 
-def parseScale(s):
-	orig = s
-	try:
-		val = int(s)
-	except ValueError:
-		f = getSkinFactor()  # noqa: F841
-		try:
-			val = int(eval(s))
-		except Exception as err:
-			print("[Skin] parseScale: %s '%s': formula '%s' cannot be evaluated!" % (type(err).__name__, err, s))
-			val = 0
-	return val
-
-
-def parseScale2(value):
+def parseScale(value):
 	options = {
 		"none": 0,
 		"0": 0,  # Legacy scale option.
@@ -1083,7 +1069,7 @@ class AttributeParser:
 	def horizontalAlignment(self, value):
 		self.guiObject.setHAlign(parseHorizontalAlignment(value))
 
-	def handledWidgets(self, value):  # This is only used for Screens to ignore optional widgets.
+	def ignoreWidgets(self, value):  # This is only used for Screens to ignore optional widgets.
 		pass
 
 	def includes(self, value):  # Same as conditional.  Created to partner new "excludes" attribute.
@@ -1179,7 +1165,7 @@ class AttributeParser:
 		pass
 
 	def scale(self, value):
-		self.guiObject.setPixmapScale(parseScale2(value))
+		self.guiObject.setPixmapScale(parseScale(value))
 
 	def scaleFlags(self, value):  # This is a temporary patch until the code and skins using this attribute is updated.
 		self.scale(value)
@@ -2069,7 +2055,7 @@ class TemplateParser():
 		attributes["_flags"] = horizontalAlignments.get(attributes.get("horizontalAlignment"), 1) + verticalAlignments.get(attributes.get("verticalAlignment"), 0) + wraps.get(attributes.get("wrap"), 0)
 		if attributes["type"] == "pixmap":
 			attributes["pixmapType"] = pixmapTypes.get(attributes.get("alpha", ""), eListboxPythonMultiContent.TYPE_PIXMAP)
-			attributes["pixmapFlags"] = parseScale2(attributes.get("scale", "off"))
+			attributes["pixmapFlags"] = parseScale(attributes.get("scale", "off"))
 		if "cornerRadius" in attributes:
 			attributes["_radius"] = parseRadius(attributes.get("cornerRadius"))
 		foregroundGradient = attributes.get("foregroundGradient")
@@ -2273,6 +2259,7 @@ def readSkin(screen, skin, names, desktop):
 		widgetName = widget.attrib.get("name")
 		widgetSource = widget.attrib.get("source")
 		wconnection = widget.attrib.get("connection")
+		widgetConnection = widget.attrib.get("connection")
 		widgetClass = widget.attrib.get("addon")
 		if widgetName is None and widgetSource is None and widgetClass is None:
 			raise SkinError("The widget has no addon, name or source")

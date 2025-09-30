@@ -1,6 +1,5 @@
-# -*- coding: utf-8 -*-
 from enigma import eListbox, eListboxPythonMultiContent, BT_ALIGN_CENTER, iPlayableService, iRecordableService, eServiceReference, iServiceInformation, gFont, RT_HALIGN_LEFT, RT_VALIGN_CENTER, RT_VALIGN_TOP, RT_HALIGN_CENTER, eTimer, getDesktop, eSize, eStreamServer
-from skin import parseScale, parseColor, parseFont, parameters
+from skin import parseScale, applySkinFactor, parseColor, parseFont, parameters
 
 from Components.Addons.GUIAddon import GUIAddon
 from Components.Converter.ServiceInfo import getVideoHeight
@@ -17,6 +16,7 @@ from Tools.LoadPixmap import LoadPixmap
 from Tools.Hex2strColor import Hex2strColor
 
 import NavigationInstance
+import re
 
 
 class ServiceInfoBar(GUIAddon):
@@ -33,7 +33,7 @@ class ServiceInfoBar(GUIAddon):
 		self.l.setBuildFunc(self.buildEntry)
 		self.l.setItemHeight(36)
 		self.l.setItemWidth(36)
-		self.spacing = 10
+		self.spacing = applySkinFactor(10)
 		self.orientations = {"orHorizontal": eListbox.orHorizontal, "orVertical": eListbox.orVertical}
 		self.orientation = eListbox.orHorizontal
 		self.alignment = "left"
@@ -46,7 +46,7 @@ class ServiceInfoBar(GUIAddon):
 		self.autoresizeMode = "auto"  # possible values: auto, fixed, condensed
 		self.font = gFont("Regular", 18)
 		self.__event_tracker = None
-		self.current_crypto = "---"
+		self.currentCrypto = ""
 		self.tuner_string = ""
 		self.textRenderer = Label("")
 		self.permanentIcons = []
@@ -54,7 +54,8 @@ class ServiceInfoBar(GUIAddon):
 		self.streamServer = eStreamServer.getInstance()
 		self.currentServiceSource = None
 		self.frontendInfoSource = None
-		self.tuner_colors = parameters.get("FrontendInfoColors", (0x0000FF00, 0x00FFFF00, 0x007F7F7F))  # tuner active, busy, available colors
+		self.isCryptedDetected = False
+		self.tunerColors = parameters.get("FrontendInfoColors", (0x0000FF00, 0x00FFFF00, 0x007F7F7F))  # tuner active, busy, available colors
 
 	def onContainerShown(self):
 		self.textRenderer.GUIcreate(self.relatedScreen.instance)
@@ -97,26 +98,26 @@ class ServiceInfoBar(GUIAddon):
 				yield item
 
 	def gotRecordEvent(self, service, event):
-		prev_records = self.records_running
+		prevRecords = self.records_running
 		if event in (iRecordableService.evEnd, iRecordableService.evStart, None):
 			recs = self.nav.getRecordings()
 			self.records_running = len(recs)
-			if self.records_running != prev_records:
+			if self.records_running != prevRecords:
 				self.updateAddon()
 
 	def scheduleAddonUpdate(self):
 		if hasattr(self, "refreshAddon"):
 			self.refreshAddon.stop()
-			self.refreshAddon.start(300)
+			self.refreshAddon.start(200)
 
 	def checkCrypto_update(self):
 		if NavigationInstance.instance is not None:
 			service = NavigationInstance.instance.getCurrentService()
 			info = service and service.info()
 			if info:
-				new_crypto = createCurrentCaidLabel(info)
-				if new_crypto != self.current_crypto:
-					self.current_crypto = new_crypto
+				newCrypto = createCurrentCaidLabel(info)
+				if newCrypto != self.currentCrypto and self.isCryptedDetected:
+					self.currentCrypto = newCrypto
 					self.updateAddon()
 
 	def updateAddon(self):
@@ -126,9 +127,12 @@ class ServiceInfoBar(GUIAddon):
 
 		for x in self.elements:
 			enabledKey = self.detectVisible(x) if x != "separator" else "separator"
+			is_off = enabledKey and "_off" in enabledKey
+			enabledKey = enabledKey and enabledKey.replace("_off", "")
 			if enabledKey:
-				filteredElements.append(enabledKey)
-			elif self.autoresizeMode in ["auto", "fixed"] or x in self.permanentIcons:
+				if not is_off:
+					filteredElements.append(enabledKey)
+			elif self.autoresizeMode in ["auto", "fixed"] or (x in self.permanentIcons and not is_off):
 				filteredElements.append(x + "!")
 
 		filteredElements = list(self.remove_doubles(filteredElements))
@@ -143,11 +147,17 @@ class ServiceInfoBar(GUIAddon):
 	def detectVisible(self, key):
 		if self.nav is not None:
 			service = self.nav.getCurrentService()
+			pending_service_ref = self.nav.getCurrentServiceReferenceOriginal()
+			pending_sref = pending_service_ref and pending_service_ref.toString() or ""
 			info = service and service.info()
 			isRef = isinstance(service, eServiceReference)
 			# self.current_info = info
 			if not info:
 				return None
+
+			if "%3a//" in pending_sref and pending_service_ref and not pending_service_ref.getStreamRelay():
+				self.isCryptedDetected = False
+
 			video_height = None
 			# video_aspect = None
 			video_height = getVideoHeight(info)
@@ -174,7 +184,10 @@ class ServiceInfoBar(GUIAddon):
 							return key
 						idx += 1
 			elif key == "crypt" and not isRef:
+				if "%3a//" in pending_sref and pending_service_ref and not pending_service_ref.getStreamRelay():
+					return key + "_off"
 				if info.getInfo(iServiceInformation.sIsCrypted) == 1:
+					self.isCryptedDetected = True
 					return key
 			elif key == "audiotrack" and not isRef:
 				audio = service.audioTracks()
@@ -197,8 +210,12 @@ class ServiceInfoBar(GUIAddon):
 				if service.streamed() is not None and ((self.streamServer.getConnectedClients() or StreamServiceList) and True or False):
 					return key
 			elif key == "currentCrypto":
+				if "%3a//" in pending_sref and pending_service_ref and not pending_service_ref.getStreamRelay():
+					self.refreshCryptoInfo.stop()
+					self.currentCrypto = ""
+					return key + "_off"
 				if not isRef:
-					self.current_crypto = createCurrentCaidLabel(info)
+					self.currentCrypto = createCurrentCaidLabel(info)
 				self.refreshCryptoInfo.start(1000)
 				return key
 			elif key == "record":
@@ -218,9 +235,9 @@ class ServiceInfoBar(GUIAddon):
 					for n in nimmanager.nim_slots:
 						if n.enabled:
 							if n.slot == self.frontendInfoSource.slot_number:
-								color = Hex2strColor(self.tuner_colors[0])
+								color = Hex2strColor(self.tunerColors[0])
 							elif self.frontendInfoSource.tuner_mask & 1 << n.slot:
-								color = Hex2strColor(self.tuner_colors[1])
+								color = Hex2strColor(self.tunerColors[1])
 							else:
 								continue
 							if string:
@@ -229,6 +246,24 @@ class ServiceInfoBar(GUIAddon):
 					self.tuner_string = string
 				if string:
 					return key
+			elif key == "catchup":
+				match = re.search(r"catchupdays=(\d*)", pending_sref)
+				if match and int(match.group(1)) > 0:
+					return key
+			elif key == "servicetype":
+				if "%3a//" in pending_sref.lower() and pending_service_ref and not pending_service_ref.getStreamRelay():
+					return "iptv"
+				elif not isRef:
+					if self.frontendInfoSource:
+						tuner_system = self.frontendInfoSource.frontend_type
+						if tuner_system:
+							if "DVB-S" in tuner_system:
+								return "sat"
+							elif "DVB-C" in tuner_system:
+								return "cable"
+							elif "DVB-T" in tuner_system:
+								return "terestrial"
+
 		return None
 
 	def buildEntry(self, sequence):
@@ -289,19 +324,20 @@ class ServiceInfoBar(GUIAddon):
 					if enabledKey == "tuners":
 						res_string = self.tuner_string
 					else:
-						res_string = self.current_crypto
-					textWidth = self._calcTextWidth(res_string, font=self.font, size=eSize(self.getDesktopWith() // 3, 0))
-					res.append(MultiContentEntryText(
-						pos=(xPos - textWidth - 2, yPos - 2), size=(textWidth + 2, self.instance.size().height()),
-						font=0, flags=RT_HALIGN_CENTER | RT_VALIGN_TOP,
-						text=res_string,
-						color=self.foreColor, color_sel=self.foreColor,
-						textBWidth=1, textBColor=0x000000,
-						backcolor=self.textBackColor, backcolor_sel=self.textBackColor))
-					if self.alignment == "right":
-						xPos -= textWidth + self.spacing
-					else:
-						xPos += textWidth + self.spacing
+						res_string = self.currentCrypto
+					if res_string:
+						textWidth = self._calcTextWidth(res_string, font=self.font, size=eSize(self.getDesktopWith() // 3, 0))
+						res.append(MultiContentEntryText(
+							pos=(xPos - textWidth - 2, yPos - 2), size=(textWidth + 2, self.instance.size().height()),
+							font=0, flags=RT_HALIGN_CENTER | RT_VALIGN_TOP,
+							text=res_string,
+							color=self.foreColor, color_sel=self.foreColor,
+							textBWidth=1, textBColor=0x000000,
+							backcolor=self.textBackColor, backcolor_sel=self.textBackColor))
+						if self.alignment == "right":
+							xPos -= textWidth + self.spacing
+						else:
+							xPos += textWidth + self.spacing
 		return res
 
 	def getDesktopWith(self):
@@ -324,9 +360,9 @@ class ServiceInfoBar(GUIAddon):
 		attribs = []
 		for (attrib, value) in self.skinAttributes[:]:
 			if attrib == "pixmaps":
-				self.pixmaps = dict(item.split(':') for item in value.split(','))
+				self.pixmaps = {k: v for k, v in (item.split(':') for item in value.split(','))}
 			if attrib == "pixmapsDisabled":
-				self.pixmapsDisabled = dict(item.split(':') for item in value.split(','))
+				self.pixmapsDisabled = {k: v for k, v in (item.split(':') for item in value.split(','))}
 			elif attrib == "spacing":
 				self.spacing = parseScale(value)
 			elif attrib == "alignment":
