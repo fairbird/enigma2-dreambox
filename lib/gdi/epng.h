@@ -40,7 +40,7 @@ SWIG_VOID(int) loadSVG(ePtr<gPixmap> &SWIG_OUTPUT, const char *filename, int cac
 
 SWIG_VOID(int) loadGIF(ePtr<gPixmap> &SWIG_OUTPUT, const char *filename, int accel = 0,int cached = 0);
 
-int loadImage(ePtr<gPixmap> &result, const char *filename, int accel = 0, int width = 0, int height = 0);
+SWIG_VOID(int) loadImage(ePtr<gPixmap> &SWIG_OUTPUT, const char *filename, int accel = 0, int width = 0, int height = 0, int cached = -1, float scale = 0, int keepAspect = 0, int align = 0);
 int savePNG(const char *filename, gPixmap *pixmap);
 
 #endif
