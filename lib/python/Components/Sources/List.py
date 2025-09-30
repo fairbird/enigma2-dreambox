@@ -26,7 +26,7 @@ to generate HTML."""
 		self.listIndexNames = indexNames or {}
 		self.onSelectionChanged = []
 		self.onListUpdated = []
-		self.disableCallbacks = False		
+		self.disableCallbacks = False
 		self.__current = None  # current element set from connected GUI element
 		self.__index = None  # current index set from connected GUI element
 		self.connectedGuiElement = None  # manuallyconnected GUI element
