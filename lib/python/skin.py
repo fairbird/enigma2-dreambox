@@ -204,7 +204,7 @@ def loadSkin(filename, scope=SCOPE_SKINS, desktop=getDesktop(GUI_SKIN_ID), scree
 
 
 def reloadSkins():
-	global colors, domScreens, fonts, menus, menuicons, parameters, screens, setups, switchPixmap
+	global colors, domScreens, fonts, menus, parameters, screens, setups, switchPixmap
 	domScreens.clear()
 	colors.clear()
 	colors = {
@@ -221,7 +221,6 @@ def reloadSkins():
 		"ChoiceList": ("Regular", 20, 24, 18)
 	}
 	menus.clear()
-	menuicons.clear()
 	parameters.clear()
 	screens.clear()
 	setups.clear()
@@ -1384,7 +1383,7 @@ def applyAllAttributes(guiObject, desktop, attributes, scale=((1, 1), (1, 1))):
 def loadSingleSkinData(desktop, screenID, domSkin, pathSkin, scope=SCOPE_GUISKIN):
 	"""Loads skin data like colors, windowstyle etc."""
 	assert domSkin.tag == "skin", "root element in skin must be 'skin'!"
-	global colors, fonts, menus, parameters, setups, screens, switchPixmap, resolutions, scrollLabelStyle, subtitleFonts
+	global colors, fonts, menus, menuicons, parameters, setups, screens, switchPixmap, resolutions, scrollLabelStyle, subtitleFonts
 	for tag in domSkin.findall("output"):
 		scrnID = parseInteger(tag.attrib.get("id", GUI_SKIN_ID), GUI_SKIN_ID)
 		if scrnID == GUI_SKIN_ID:
@@ -1478,9 +1477,9 @@ def loadSingleSkinData(desktop, screenID, domSkin, pathSkin, scope=SCOPE_GUISKIN
 			image = menuicon.attrib.get("image")
 			if key and image is not None:
 				menuicons[key] = image
-				# print("[Skin] DEBUG: Menu key='%s', image='%s'." % (key, image))
+				# print(f"[Skin] DEBUG: Menuicon key='{key}', image='{image}'.")
 			else:
-				raise SkinError("Tag 'menuicon' needs key and image, got key='%s' and image='%s'" % (key, image))
+				skinError(f"Tag 'menuicon' needs key and image, got key='{key}' and image='{image}'")
 	for tag in domSkin.findall("screens"):
 		for screen in tag.findall("screen"):
 			key = screen.attrib.get("key")
