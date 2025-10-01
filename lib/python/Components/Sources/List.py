@@ -28,7 +28,7 @@ to generate HTML."""
 		self.onListUpdated = []
 		self.disableCallbacks = False
 		self.__current = None  # current element set from connected GUI element
-		self.__index = None  # current index set from connected GUI element
+		self.__index = 0  # current index set from connected GUI element
 		self.connectedGuiElement = None  # manuallyconnected GUI element
 
 	def enableAutoNavigation(self, enabled):
