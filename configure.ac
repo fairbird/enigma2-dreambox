@@ -238,6 +238,10 @@ fi
 if test "$BOXTYPE" == "dm7080" -o "$BOXTYPE" == "dm820" -o "$BOXTYPE" == "dm900" -o "$BOXTYPE" == "dm920"; then
 	AC_DEFINE(HAVE_HDMIIN_DREAMBOX, 1,[has dreambox hdmi in])
 fi
+
+if test "$BOXTYPE" == "gb7252" -o "$BOXTYPE" == "dm900" -o "$BOXTYPE" == "dm920"; then
+	AC_DEFINE(LCD_FORCE_RGB, 1,[define 16 Bit LCD force rgb])
+fi
 AC_ARG_WITH(nolcd,
 	AC_HELP_STRING([--with-nolcd], [disable ascii based lcd, yes or no]),
 	[[withnolcd=$withval]],
