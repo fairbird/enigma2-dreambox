@@ -505,9 +505,24 @@ class PluginBrowserNew(Screen):
 			"left": self.keyLeft,
 			"up": self.keyUp,
 			"down": self.keyDown,
+			"moveUp": self.moveUp,
+			"moveDown": self.moveDown,
 			"ok": self.ok,
 			"menu": self.menu,
 		}, -1)
+		self["NumberActions"] = NumberActionMap(["NumberActions"],
+		{
+			"1": self.keyNumberGlobal,
+			"2": self.keyNumberGlobal,
+			"3": self.keyNumberGlobal,
+			"4": self.keyNumberGlobal,
+			"5": self.keyNumberGlobal,
+			"6": self.keyNumberGlobal,
+			"7": self.keyNumberGlobal,
+			"8": self.keyNumberGlobal,
+			"9": self.keyNumberGlobal,
+			"0": self.keyNumberGlobal
+		})
 		self.onFirstExecBegin.append(self.checkWarnings)
 		self.onLayoutFinish.append(self.setIcons)
 		self.onLayoutFinish.append(self.activeBox)
@@ -516,6 +531,44 @@ class PluginBrowserNew(Screen):
 		self.setTitle(_("Plugin browser"))
 		if config.pluginfilter.userfeed.value != "http://" and not fileExists("/etc/opkg/user-feed.conf"):
 			self.CreateFeedConfig()
+		self.number = 0
+		self.nextNumberTimer = eTimer()
+		self.nextNumberTimer.callback.append(self.okbuttonClick)
+
+	def keyNumberGlobal(self, number):
+		if number == 0 and self.number == 0:
+			if len(self.plugins) > 0 and config.misc.pluginbrowser.plugin_order.value != "":
+				self.session.openWithCallback(self.setDefaultList, MessageBox, _("Sort plugins list to default?\nWill be close the plugin Browser !"), MessageBox.TYPE_YESNO)
+		else:
+			self.number = self.number * 10 + number
+			if self.number and self.number <= len(self.plugins):
+				if number * 10 > len(self.plugins) or self.number >= 10:
+					self.okbuttonClick()
+				else:
+					self.nextNumberTimer.start(1400, True)
+			else:
+				self.resetNumberKey()
+
+	def okbuttonClick(self):
+		if self.number:
+			self.current = self.number - 1
+			self.activeBox()
+			self.resetNumberKey()
+
+	def resetNumberKey(self):
+		self.nextNumberTimer.stop()
+		self.number = 0
+
+	def setDefaultList(self, answer):
+		if answer:
+			config.misc.pluginbrowser.plugin_order.value = ""
+			config.misc.pluginbrowser.plugin_order.save()
+			self.plugins = []
+			self.plugins_pos = []
+			self.mainlist = []
+			self.current = 0
+			self.current_page = 0
+			self.close()
 
 	def exit(self):
 		self.close()
@@ -555,30 +608,36 @@ class PluginBrowserNew(Screen):
 			sizex1 = 900
 			sizey1 = 100
 			font1 = 75
-			# plugin_description
-			positionx2 = 50
-			positiony2 = 105
+			# sort
+			positionx2 = 1200
+			positiony2 = 1000
 			sizex2 = 900
 			sizey2 = 100
 			font2 = 40
-			# Time
-			positionx3 = 1617
-			positiony3 = 12
-			sizex3 = 273
+			# plugin_description
+			positionx3 = 50
+			positiony3 = 105
+			sizex3 = 900
 			sizey3 = 100
-			font3 = 80
+			font3 = 40
+			# Time
+			positionx4 = 1617
+			positiony4 = 12
+			sizex4 = 273
+			sizey4 = 100
+			font4 = 80
 			# Date
-			positionx4 = 1128
-			positiony4 = 105
-			sizex4 = 762
-			sizey4 = 50
-			font4 = 40
-			# pages
-			positionx5 = 1683
-			positiony5 = 975
-			sizex5 = 220
-			sizey5 = 85
+			positionx5 = 1128
+			positiony5 = 105
+			sizex5 = 762
+			sizey5 = 50
 			font5 = 40
+			# pages
+			positionx6 = 1600
+			positiony6 = 975
+			sizex6 = 220
+			sizey6 = 85
+			font6 = 40
 			# keys eLabel
 			eLabelx1 = 67
 			eLabely1 = 1065
@@ -625,30 +684,36 @@ class PluginBrowserNew(Screen):
 			sizex1 = 563
 			sizey1 = 45
 			font1 = 40
+			# sort
+			positionx2 = 830
+			positiony2 = 668
+			sizex2 = 220
+			sizey2 = 50
+			font2 = 25
 			# plugin_description
-			positionx2 = 20
-			positiony2 = 60
-			sizex2 = 567
-			sizey2 = 32
-			font2 = 28
+			positionx3 = 20
+			positiony3 = 60
+			sizex3 = 567
+			sizey3 = 32
+			font3 = 28
 			# Time
-			positionx3 = 1000
-			positiony3 = 12
-			sizex3 = 273
-			sizey3 = 100
-			font3 = 50
+			positionx4 = 1000
+			positiony4 = 12
+			sizex4 = 273
+			sizey4 = 100
+			font4 = 50
 			# Date
-			positionx4 = 813
-			positiony4 = 60
-			sizex4 = 462
-			sizey4 = 32
-			font4 = 28
+			positionx5 = 813
+			positiony5 = 60
+			sizex5 = 462
+			sizey5 = 32
+			font5 = 28
 			# pages
-			positionx5 = 1130
-			positiony5 = 655
-			sizex5 = 160
-			sizey5 = 50
-			font5 = 27
+			positionx6 = 1080
+			positiony6 = 655
+			sizex6 = 160
+			sizey6 = 50
+			font6 = 27
 			# keys eLabel
 			eLabelx1 = 67
 			eLabely1 = 712
@@ -674,27 +739,49 @@ class PluginBrowserNew(Screen):
 		list_dummy = []
 		skincontent = ""
 		skin = """
-			<screen name="PluginBrowserNew" position="%d,%d" size="%d,%d" flags="wfNoBorder" backgroundColor="%s">
-				%s
-				<eLabel text="Plugin Browser" position="%d,%d" size="%d,%d" font="Regular;%d" foregroundColor="#00ffffff" backgroundColor="#44000000" transparent="1" zPosition="2" />
-				<widget name="plugin_description" position="%d,%d" size="%d,%d" font="Regular;%d" foregroundColor="%s" backgroundColor="#44000000" transparent="1" zPosition="2" />
-				<widget source="global.CurrentTime" render="Label" position="%d,%d" size="%d,%d" font="Regular;%d" horizontalAlignment="right" backgroundColor="#44000000" transparent="1" foregroundColor="#00ffffff">
-					<convert type="ClockToText">
-				</convert>
-				</widget>
-				<widget backgroundColor="#44000000" position="%d,%d" size="%d,%d" font="Regular;%d" foregroundColor="#000080ff" horizontalAlignment="right" render="Label"  source="global.CurrentTime" transparent="1">
-				<convert type="ClockToText">FullDate</convert>
-				</widget>
-				<widget name="pages" foregroundColor="#000080ff" position="%d,%d" size="%d,%d" font="Regular;%d" zPosition="2" horizontalAlignment="center" verticalAlignment="center" transparent="1" />
-				<eLabel position="%d,%d" size="%d,%d" backgroundColor="#00ff2525" foregroundColor="#00ff2525" zPosition="4"/>
-				<eLabel position="%d,%d" size="%d,%d" backgroundColor="#00389416" foregroundColor="#00389416" zPosition="4"/>
-				<eLabel position="%d,%d" size="%d,%d" backgroundColor="#00bab329" foregroundColor="#00bab329" zPosition="4"/>
-				<widget name="key_red" position="%d,%d" size="%d,%d" font="Regular;%d" zPosition="1" horizontalAlignment="center" verticalAlignment="center" foregroundColor="#00ffffff" backgroundColor="#16000000" transparent="1"/>
-				<widget name="key_green" position="%d,%d" size="%d,%d" font="Regular;%d" zPosition="1" horizontalAlignment="center" verticalAlignment="center" foregroundColor="#00ffffff" backgroundColor="#16000000" transparent="1"/>
-				<widget name="key_yellow" position="%d,%d" size="%d,%d" font="Regular;%d" zPosition="1" horizontalAlignment="center" verticalAlignment="center" foregroundColor="#00ffffff" backgroundColor="#16000000" transparent="1"/>
-			""" % (positionx, positiony, sizex, sizey, backgroundColor, backgroundPixmap, positionx1, positiony1, sizex1, sizey1, font1, positionx2, positiony2, sizex2, sizey2, font2, foregroundColor, positionx3, positiony3, sizex3, sizey3, font3, positionx4, positiony4, sizex4, sizey4, font4, positionx5, positiony5, sizex5, sizey5, font5, eLabelx1, eLabely1, eLabel1ysizex, eLabel1ysizey, eLabelx2, eLabely2, eLabel1ysizex, eLabel1ysizey, eLabelx3, eLabely3, eLabel1ysizex, eLabel1ysizey, positionxkey1, positionykey, sizekeysx, sizekeysy, fontkey, positionxkey2, positionykey, sizekeysx, sizekeysy, fontkey, positionxkey3, positionykey, sizekeysx, sizekeysy, fontkey)
+  			<screen name="PluginBrowserNew" position="%d,%d" size="%d,%d" flags="wfNoBorder" backgroundColor="%s">
+  				%s
+  				<eLabel text="Plugin Browser" position="%d,%d" size="%d,%d" font="Regular;%d" foregroundColor="#00ffffff" backgroundColor="#44000000" transparent="1" zPosition="2" />
+  				<eLabel text="&lt; Move to Sort &gt;" position="%d,%d" size="%d,%d" font="Regular;%d" foregroundColor="#000080ff" backgroundColor="#44000000" transparent="1" zPosition="2" />
+  				<widget name="plugin_description" position="%d,%d" size="%d,%d" font="Regular;%d" foregroundColor="%s" backgroundColor="#44000000" transparent="1" zPosition="2" />
+  				<widget source="global.CurrentTime" render="Label" position="%d,%d" size="%d,%d" font="Regular;%d" horizontalAlignment="right" backgroundColor="#44000000" transparent="1" foregroundColor="#00ffffff">
+  					<convert type="ClockToText">
+  				</convert>
+  				</widget>
+  				<widget backgroundColor="#44000000" position="%d,%d" size="%d,%d" font="Regular;%d" foregroundColor="#000080ff" horizontalAlignment="right" render="Label" source="global.CurrentTime" transparent="1">
+  				<convert type="ClockToText">FullDate</convert>
+  				</widget>
+  				<widget name="pages" foregroundColor="#000080ff" position="%d,%d" size="%d,%d" font="Regular;%d" zPosition="2" horizontalAlignment="center" verticalAlignment="center" transparent="1" />
+  				<eLabel position="%d,%d" size="%d,%d" backgroundColor="#00ff2525" foregroundColor="#00ff2525" zPosition="4"/>
+  				<eLabel position="%d,%d" size="%d,%d" backgroundColor="#00389416" foregroundColor="#00389416" zPosition="4"/>
+  				<eLabel position="%d,%d" size="%d,%d" backgroundColor="#00bab329" foregroundColor="#00bab329" zPosition="4"/>
+  				<widget name="key_red" position="%d,%d" size="%d,%d" font="Regular;%d" zPosition="1" horizontalAlignment="center" verticalAlignment="center" foregroundColor="#00ffffff" backgroundColor="#16000000" transparent="1"/>
+  				<widget name="key_green" position="%d,%d" size="%d,%d" font="Regular;%d" zPosition="1" horizontalAlignment="center" verticalAlignment="center" foregroundColor="#00ffffff" backgroundColor="#16000000" transparent="1"/>
+  				<widget name="key_yellow" position="%d,%d" size="%d,%d" font="Regular;%d" zPosition="1" horizontalAlignment="center" verticalAlignment="center" foregroundColor="#00ffffff" backgroundColor="#16000000" transparent="1"/>
+			""" % (positionx, positiony, sizex, sizey, backgroundColor, backgroundPixmap,
+				positionx1, positiony1, sizex1, sizey1, font1,
+				positionx2, positiony2, sizex2, sizey2, font2,
+				positionx3, positiony3, sizex3, sizey3, font3, foregroundColor,
+				positionx4, positiony4, sizex4, sizey4, font4,
+				positionx5, positiony5, sizex5, sizey5, font5,
+				positionx6, positiony6, sizex6, sizey6, font6,
+				eLabelx1, eLabely1, eLabel1ysizex, eLabel1ysizey,
+				eLabelx2, eLabely2, eLabel1ysizex, eLabel1ysizey,
+				eLabelx3, eLabely3, eLabel1ysizex, eLabel1ysizey,
+				positionxkey1, positionykey, sizekeysx, sizekeysy, fontkey,
+				positionxkey2, positionykey, sizekeysx, sizekeysy, fontkey,
+				positionxkey3, positionykey, sizekeysx, sizekeysy, fontkey)
 		count = 0
-		for x, p in enumerate(plugins.getPlugins(PluginDescriptor.WHERE_PLUGINMENU)):
+		pluginlist = plugins.getPlugins(PluginDescriptor.WHERE_PLUGINMENU)[:]
+		ordered_plugins = []
+		# Apply saved plugin order
+		for x in config.misc.pluginbrowser.plugin_order.value.split(","):
+			plugin = next((p for p in pluginlist if p.path[24:] == x), None)
+			if plugin:
+				ordered_plugins.append(plugin)
+				pluginlist.remove(plugin)
+		ordered_plugins.extend(pluginlist)  # Append remaining plugins not in saved order
+		for x, p in enumerate(ordered_plugins):
 			x += 1
 			count += 1
 			if isFullHD():
@@ -788,8 +875,9 @@ class PluginBrowserNew(Screen):
 		for x, elem in enumerate(self.plugins):
 			x += 1
 			icon = elem[3] or LoadPixmap(resolveFilename(SCOPE_CURRENT_SKIN, "icons/plugin.png"))
-			self['icon_' + str(x)].instance.setScale(1)
-			self['icon_' + str(x)].instance.setPixmap(icon)
+			if self["icon_" + str(x)] and self["icon_" + str(x)].instance:
+				self["icon_" + str(x)].instance.setScale(1)
+				self["icon_" + str(x)].instance.setPixmap(icon)
 
 	def activeBox(self):
 		for index, plugin in enumerate(self.plugins):
@@ -856,6 +944,39 @@ class PluginBrowserNew(Screen):
 
 	def keyUp(self):
 		self.move(7, 'backwards')
+
+	def moveUp(self):
+		self.sort(-1)
+
+	def moveDown(self):
+		self.sort(1)
+
+	def sort(self, direction):
+		if len(self.plugins) > 1:
+			currentIndex = self.current
+			swapIndex = (currentIndex + direction) % len(self.plugins)
+			# Swap only the plugins, not their positions
+			self.plugins[currentIndex], self.plugins[swapIndex] = self.plugins[swapIndex], self.plugins[currentIndex]
+			self.current = swapIndex
+			# Update labels to reflect new plugin order
+			for x, elem in enumerate(self.plugins):
+				self["label_" + str(x + 1)].setText(elem[0])
+			# Update plugin order configuration
+			plugin_order = []
+			for x in self.plugins:
+				plugin_order.append(x[2].path[24:])
+			config.misc.pluginbrowser.plugin_order.value = ",".join(plugin_order)
+			config.misc.pluginbrowser.plugin_order.save()
+			# Update current_page based on new self.current
+			for i in range(self.total_pages):
+				if (self.current + 1) in self.mainlist[i]:
+					self.current_page = i
+					break
+			# Refresh the grid display
+			self.setIcons()
+			self.activeBox()
+			self.paint_hide()
+			self.currentPage()
 
 	def move(self, step, direction):
 		ls = [elem for elem in range(1, len(self.plugins_pos) + 1)]
