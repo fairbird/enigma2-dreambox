@@ -5,7 +5,7 @@ from enigma import eRCInput, eTimer, eWindow, getDesktop
 
 from skin import GUI_SKIN_ID, applyAllAttributes
 from skin import GUI_SKIN_ID, applyAllAttributes, menus, screens, setups
-from Components.ActionMap import ActionMap
+from Components.ActionMap import HelpableActionMap
 from Components.config import config
 from Components.GUIComponent import GUIComponent
 from Components.Pixmap import Pixmap
@@ -65,9 +65,10 @@ class Screen(dict):
 		self.ignoreWidgets = []
 		self.setImage(className)
 		if enableHelp:
-			self["helpActions"] = ActionMap(["HelpActions"], {
+			self["helpAction"] = HelpableActionMap(self, ["HelpAction"], {
+				# "displayHelp": (self.showHelp, _("Display the context sensitive help screen"))
 				"displayHelp": self.showHelp
-			}, prio=0)
+			}, prio=0, description=_("Help Action"))
 			self["key_help"] = StaticText(_("HELP"))
 
 	def __repr__(self):
