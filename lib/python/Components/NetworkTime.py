@@ -43,7 +43,7 @@ class NTPSyncPoller:
 			setRTCtime(nowTime)
 			eDVBLocalTimeHandler.getInstance().setUseDVBTime(timeSource == "0")
 			eEPGCache.getInstance().timeUpdated()
-			self.timer.startLongTimer(config.misc.useNTPminutes.value * 60)
+			self.timer.startLongTimer(int(config.misc.useNTPminutes.value) * 60)
 			if abs(time() - self.previousTime) > 60:
 				for func in self.onTimeUpdated:
 					if callable(func):
