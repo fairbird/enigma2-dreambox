@@ -27,7 +27,7 @@
 #include <lib/service/servicedvbfcc.h>
 #include "servicepeer.h"
 
-		/* for subtitles */
+/* for subtitles */
 #include <lib/gui/esubtitle.h>
 
 #include <sys/vfs.h>
@@ -1347,7 +1347,8 @@ void eDVBServicePlay::serviceEventTimeshift(int event)
 	switch (event)
 	{
 	case eDVBServicePMTHandler::eventNewProgramInfo:
-		eDebug("[eDVBServicePlay] eventNewProgramInfo TimeshiftS");
+	{
+		eDebug("[eDVBServicePlay] eventNewProgramInfo Timeshift");
 		if (m_timeshift_active)
 		{
 			updateDecoder();
@@ -1375,6 +1376,7 @@ void eDVBServicePlay::serviceEventTimeshift(int event)
 			m_event((iPlayableService*)this, evUpdatedInfo);
 		}
 		break;
+	}
 	case eDVBServicePMTHandler::eventSOF:
 #if 0
 		if (!m_timeshift_file_next.empty())
@@ -1515,7 +1517,7 @@ RESULT eDVBServicePlay::stop()
 		/* m_cutlist_enabled bit 2 is the "don't remember bit" */
 	if (m_is_pvr && ((m_cutlist_enabled & 2) == 0))
 	{
-		pts_t play_position, length;
+		pts_t play_position, length = 0;
 		if (!getPlayPosition(play_position))
 		{
 				/* remove last position */
@@ -1530,7 +1532,7 @@ RESULT eDVBServicePlay::stop()
 					++i;
 			}
 
-			if (getLength(length))
+			if (getLength(length) != 0)
 				length = 0;
 
 			if (length)
@@ -1590,6 +1592,7 @@ RESULT eDVBServicePlay::setTarget(int target, bool noaudio = false)
 		}
 		return -1;
 	}
+
 	m_is_primary = !target;
 	m_decoder_index = target;
 	m_noaudio = noaudio;
@@ -1726,7 +1729,7 @@ RESULT eDVBServicePlay::seek(ePtr<iSeekableService> &ptr)
 	return -1;
 }
 
-	/* TODO: when timeshift is enabled but not active, this doesn't work. */
+/* TODO: when time shift is enabled but not active, this doesn't work. */
 RESULT eDVBServicePlay::getLength(pts_t &len)
 {
 	ePtr<iDVBPVRChannel> pvr_channel;
@@ -2271,9 +2274,7 @@ int eDVBServicePlay::getCurrentTrack()
 		return 0;
 
 	int max = program.audioStreams.size();
-	int i;
-
-	for (i = 0; i < max; ++i)
+	for (int i = 0; i < max; ++i)
 		if (program.audioStreams[i].pid == m_current_audio_pid)
 			return i;
 
@@ -2808,8 +2809,11 @@ RESULT eDVBServicePlay::stopTimeshift(bool swToLive)
 
 	m_timeshift_enabled = 0;
 
-	m_record->stop();
-	m_record = 0;
+	if (m_record)
+	{
+		m_record->stop();
+		m_record = 0;
+	}
 
 	if (m_timeshift_fd >= 0)
 	{
@@ -2951,11 +2955,8 @@ void eDVBServicePlay::setCutList(ePyObject list)
 	if (!PyList_Check(list))
 		return;
 	int size = PyList_Size(list);
-	int i;
-
 	m_cue_entries.clear();
-
-	for (i=0; i<size; ++i)
+	for (int i=0; i<size; ++i)
 	{
 		ePyObject tuple = PyList_GET_ITEM(list, i);
 		if (!PyTuple_Check(tuple))
@@ -3284,10 +3285,7 @@ void eDVBServicePlay::updateDecoder(bool sendSeekableStateChanged)
 		{
 			m_decoder->setTextPID(tpid);
 		}
-
-		if (vpid > 0 && vpid < 0x2000)
-			;
-		else
+		if (vpid <= 0 || vpid >= 0x2000)
 		{
 			std::string value;
 			bool showRadioBackground = eSimpleConfig::getBool("config.misc.showradiopic", true);
@@ -3431,7 +3429,8 @@ void eDVBServicePlay::cutlistToCuesheet()
 
 	pts_t in = 0, out = 0, length = 0;
 
-	getLength(length);
+	if (getLength(length) != 0)
+		length = 0; // Corrected check
 
 	std::multiset<cueEntry>::iterator i(m_cue_entries.begin());
 
