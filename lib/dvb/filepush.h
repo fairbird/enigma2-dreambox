@@ -19,7 +19,7 @@ class eFilePushThread: public eThread, public sigc::trackable, public iObject
 {
 	DECLARE_REF(eFilePushThread);
 public:
-	eFilePushThread(int blocksize, size_t buffersize);
+	eFilePushThread(int blocksize, size_t buffersize, int flags=0);
 	~eFilePushThread();
 	void thread();
 	void stop();
@@ -47,6 +47,7 @@ private:
 	int m_fd_dest;
 	int m_send_pvr_commit;
 	int m_stream_mode;
+	int m_flags;
 	int m_sof;
 	int m_blocksize;
 	size_t m_buffersize;
@@ -71,7 +72,7 @@ public:
 	void stop();
 	void start(int sourcefd);
 
-	enum { evtEOF, evtReadError, evtWriteError, evtUser, evtStopped };
+	enum { evtEOF, evtReadError, evtWriteError, evtUser, evtStopped, evtStreamCorrupt };
 	sigc::signal<void(int)> m_event;
 
 	void sendEvent(int evt);

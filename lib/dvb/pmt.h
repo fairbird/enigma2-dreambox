@@ -118,6 +118,7 @@ public:
 		eventStopped,
 		eventStartPvrDescramble,   // start PVR Descramble Convert
 		eventChannelAllocated,
+		eventStreamCorrupt,
 	};
 #ifndef SWIG
 	sigc::signal<void(int)> serviceEvent;

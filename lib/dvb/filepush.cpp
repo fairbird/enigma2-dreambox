@@ -10,11 +10,12 @@
 
 DEFINE_REF(eFilePushThread);
 
-eFilePushThread::eFilePushThread(int blocksize, size_t buffersize):
+eFilePushThread::eFilePushThread(int blocksize, size_t buffersize, int flags):
 	 m_sg(NULL),
 	 m_stop(1),
 	 m_send_pvr_commit(0),
 	 m_stream_mode(0),
+	 m_flags(flags),
 	 m_blocksize(blocksize),
 	 m_buffersize(buffersize),
 	 m_buffer((unsigned char *)malloc(buffersize)),
@@ -66,6 +67,7 @@ void eFilePushThread::thread()
 
 		while (!m_stop)
 		{
+			// eTrace("[FilePushThread][DATA] Pumping data at pos=%lld", (long long)m_current_position);
 			if (m_sg && !current_span_remaining)
 			{
 				m_sg->getNextSourceSpan(m_current_position, bytes_read, current_span_offset, current_span_remaining, m_blocksize, m_sof);
@@ -136,7 +138,7 @@ void eFilePushThread::thread()
 								eDebug("[eFilePushThread] wait for driver eof timeout - %ds", poll_timeout_count / 4);
 							continue;
 						case 1:
-							eDebug("[eFilePushThread] wait for driver eof ok");
+							eDebug("[eFilePushThread] wait for driver eof ok / m_flags %d" , m_flags);
 							break;
 						default:
 							eDebug("[eFilePushThread] wait for driver eof aborted by signal");
@@ -160,10 +162,13 @@ void eFilePushThread::thread()
 				else
 					sendEvent(evtUser); // start of file event
 
-				if (m_stream_mode)
-				{
+				if (m_stream_mode) {
 					eDebug("[eFilePushThread] reached EOF, but we are in stream mode. delaying 1 second.");
 					sleep(1);
+					continue;
+				}
+				else if (m_flags == 1) { // timeshift
+					usleep(200000);  // 200 milliseconds
 					continue;
 				}
 				else if (++eofcount < 10)
@@ -381,7 +386,8 @@ void eFilePushThreadRecorder::thread()
 
 	hasStarted();
 
-	/* m_stop must be evaluated after each syscall. */
+	/* m_stop must be evaluated after each syscall */
+	/* if it isn't, there's a chance of the thread becoming deadlocked when recordings are finishing */
 	while (!m_stop)
 	{
 		bytes = ::read(m_fd_source, m_buffer, m_buffersize);
