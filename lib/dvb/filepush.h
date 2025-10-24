@@ -19,7 +19,7 @@ class eFilePushThread: public eThread, public sigc::trackable, public iObject
 {
 	DECLARE_REF(eFilePushThread);
 public:
-	eFilePushThread(int blocksize, size_t buffersize, int flags=0);
+	eFilePushThread(int prio_class=IOPRIO_CLASS_BE, int prio_level=0, int blocksize=188, size_t buffersize=188*1024, int flags=0);
 	~eFilePushThread();
 	void thread();
 	void stop();
@@ -41,9 +41,10 @@ public:
 protected:
 	virtual void filterRecordData(const unsigned char *data, int len);
 private:
+	int prio_class;
+	int prio;
 	iFilePushScatterGather *m_sg;
 	int m_stop;
-	bool m_stopped;
 	int m_fd_dest;
 	int m_send_pvr_commit;
 	int m_stream_mode;
@@ -67,7 +68,7 @@ private:
 class eFilePushThreadRecorder: public eThread, public sigc::trackable
 {
 public:
-	eFilePushThreadRecorder(unsigned char* buffer, size_t buffersize);
+	eFilePushThreadRecorder(unsigned char* buffer, size_t buffersize=188*1024);
 	void thread();
 	void stop();
 	void start(int sourcefd);
@@ -75,7 +76,14 @@ public:
 	enum { evtEOF, evtReadError, evtWriteError, evtUser, evtStopped, evtStreamCorrupt };
 	sigc::signal<void(int)> m_event;
 
+	int getProtocol() { return m_protocol;}
+	void setProtocol(int i){ m_protocol = i;}
+	void setSession(int se, int st) { m_session_id = se; m_stream_id = st;}
+	int read_dmx(int fd, void *m_buffer, int size);
+	int pushReply(void *buf, int len);
 	void sendEvent(int evt);
+	static int64_t getTick();
+	static int read_ts(int fd, unsigned char *buf, int size);
 protected:
 	// This method should write the data out and return the number of bytes written.
 	// If result <0, set 'errno'. The simplest implementation is just "::write(m_buffer, ...)"
@@ -91,9 +99,10 @@ protected:
 	unsigned int m_overflow_count;
 private:
 	int m_stop;
-	bool m_stopped;
 	eFixedMessagePump<int> m_messagepump;
 	void recvEvent(const int &evt);
+	int m_protocol, m_session_id, m_stream_id, m_packet_no;
+	std::vector<unsigned char> m_reply;
 };
 
 #endif
