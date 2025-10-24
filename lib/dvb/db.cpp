@@ -191,7 +191,7 @@ const eDVBService::cacheID eDVBService::audioCacheTags[] = {
 const int eDVBService::nAudioCacheTags = sizeof(eDVBService::audioCacheTags) / sizeof(eDVBService::audioCacheTags[0]);
 
 eDVBService::eDVBService()
-	:m_cache(0), m_flags(0), m_lcn(0)
+	:m_cache(0), m_lcn(0), m_flags(0)
 {
 }
 
@@ -861,7 +861,7 @@ void eDVBDB::loadServicelist(const char *file)
 				m_lcnmap.insert(std::pair<eServiceReferenceDVB, LCNData>(s, lcndata));
 		}
 		if(m_debug)
-			eDebug("[eDVBDB] Reading lcn db version %d done. %lu services found.", lcnversion, m_lcnmap.size());
+			eDebug("[eDVBDB] Reading lcn db version %d done. %u services found.", lcnversion, m_lcnmap.size());
 	}
 
 	if(lcnversion == 1)
@@ -1569,12 +1569,12 @@ void eDVBDB::setNumberingMode(int numberingMode)
 
 int eDVBDB::renumberBouquet(eBouquet &bouquet, int startChannelNum)
 {
-	if(m_numbering_mode == 2) // LCN
-		if(m_debug)
+	if(m_debug) {
+		if(m_numbering_mode == 2) // LCN
 			eDebug("[eDVBDB] Renumber '%s' via LCN.", bouquet.m_bouquet_name.c_str());
-	else
-		if(m_debug)
+		else
 			eDebug("[eDVBDB] Renumber '%s' starting at %d.", bouquet.m_bouquet_name.c_str(), startChannelNum);
+	}
 	std::list<eServiceReference> &list = bouquet.m_services;
 	bool addBQFlag = (bouquet.m_bouquet_name != "Last Scanned");
 
@@ -1643,6 +1643,7 @@ eDVBDB::eDVBDB()
 {
 	instance = this;
 	m_numbering_mode = eSimpleConfig::getInt("config.usage.numberMode", 0);
+	m_debug = eSimpleConfig::getBool("config.crash.debugDVBDB", false);
 	iptv_services.clear();
 	std::ifstream iptv_services_store_file;
 	iptv_services_store_file.open("/etc/enigma2/config_av");
@@ -2392,8 +2393,8 @@ RESULT eDVBDB::removeServices(eDVBChannelID chid, unsigned int orbpos)
 					ch.dvbnamespace.get(),
 					ch.original_network_id.get(),
 					ch.transport_stream_id.get());
-				removed_chids.insert(it->first);
-				m_channels.erase(it++);
+			removed_chids.insert(it->first);
+			m_channels.erase(it++);
 		}
 		else
 			++it;
