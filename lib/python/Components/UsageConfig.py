@@ -342,6 +342,7 @@ def InitUsageConfig():
 			pass
 	config.timeshift = ConfigSubsection()
 	defaultPath = resolveFilename(SCOPE_TIMESHIFT)
+	config.timeshift.recoveryBufferDelay = ConfigSelection(default=300, choices=[(x, _("%d ms") % x) for x in range(100, 1500, 100)])
 	config.timeshift.allowedPaths = ConfigLocations(default=[defaultPath])
 	config.usage.timeshift_path = ConfigText(default="")
 	if config.usage.timeshift_path.value:
