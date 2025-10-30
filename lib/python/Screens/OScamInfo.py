@@ -147,7 +147,7 @@ class OSCamGlobals():
 			url = f"{proto}://{ip}:{port}/shutdown.html?action={part}"
 		elif label:
 			key = "file" if part == "files" else "label"                         # e.g. http://127.0.0.1:8080/oscamapi.html?part=files&file=oscam.conf
-			url = f"{proto}://{ip}:{port}/{api}.{fmt}?part={part}&{key}={label}" # e.g. http://127.0.0.1:8080/oscamapi.json?part=entitlement&label=MyReader  # e.g. http://127.0.0.1:8080/oscamapi.json?part=entitlement&label=MyReader
+			url = f"{proto}://{ip}:{port}/{api}.{fmt}?part={part}&{key}={label}"  # e.g. http://127.0.0.1:8080/oscamapi.json?part=entitlement&label=MyReader  # e.g. http://127.0.0.1:8080/oscamapi.json?part=entitlement&label=MyReader
 		opener = build_opener(webhandler)
 		if username and password and url:
 			pwman = HTTPPasswordMgrWithDefaultRealm()
