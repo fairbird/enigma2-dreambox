@@ -6694,7 +6694,7 @@ msgstr "Veuillez changer l'heure de fin de l'enregistrement"
 msgid "Please choose an extension..."
 msgstr "Veuillez choisir une extension..."
 
-msgid "Please configure the fallback tuner setup"
+msgid "Please configure the fallback receiver setup"
 msgstr "Veuillez configurer le tuner de repli"
 
 msgid ""
@@ -8381,7 +8381,7 @@ msgstr "Sélectionnez le caractère décalé uniquement pour le suivant"
 msgid "Select the time zone within the area or region."
 msgstr "Sélectionnez le fuseau horaire dans la zone ou la région."
 
-msgid "Select the timer from the fallback tuner by default"
+msgid "Select the timer from the fallback receiver by default"
 msgstr "Sélectionner par défaut la minuterie du tuner de repli"
 
 msgid "Select the tuner that controls the motorised dish."
@@ -10707,7 +10707,7 @@ msgstr "HAUT"
 msgid "URL"
 msgstr "URL"
 
-msgid "URL of fallback remote receiver"
+msgid "URL of remote receiver for imports"
 msgstr ""
 "URL du récepteur distant de repli.\n"
 "Spécifier l'URL complète:\n"
@@ -11422,10 +11422,10 @@ msgstr "Lorsqu’il est activé, le récepteur en veille s’active automatiquem
 msgid "When enabled the set top box is able to wakeup on LAN"
 msgstr "Lorsqu'elle est activée, le récepteur est capable de réagir au réveil depuis le réseau (wakeup on LAN)"
 
-msgid "When enabled the timer from the fallback tuner is imported"
+msgid "When enabled the timer from the fallback receiver is imported"
 msgstr "Lorsque c’est activé les programmations du récepteur de repli sont importées"
 
-msgid "When enabled the timer from the fallback tuner is the default timer"
+msgid "When enabled the timer from the fallback receiver is the default timer"
 msgstr "Lorsqu'elle est activée, la minuterie du syntoniseur de repli est la minuterie par défaut"
 
 msgid "When enabled then when you select a new channel in the channel selection the channel selection will not close. It will only close when you select the current playing service. This is a kind of preview mode"
@@ -11434,7 +11434,7 @@ msgstr "Lorsqu'elle est activée, quand vous sélectionnez une chaîne dans la l
 msgid "When enabled you can control the volume with the arrow buttons instead of getting the channel selection list"
 msgstr "Lorsqu'elle est activée, vous pouvez contrôler le volume avec les flèches à la place d'avoir la liste des chaînes"
 
-msgid "When enabled you can customize the OpenWebIf settings for the fallback tuner"
+msgid "When enabled you can customize the OpenWebIf settings for the fallback receiver"
 msgstr "Lorsque cette option est activée, vous pouvez personnaliser les paramètres OpenWebIf pour le tuner de secours"
 
 msgid "When enabled you can specify a timeframe to ignore the shutdown timer when the receiver is in standby mode"

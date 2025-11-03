@@ -7561,7 +7561,7 @@ msgstr "Endre sluttid for opptaket"
 msgid "Please choose an extension..."
 msgstr "Velg en utvidelse..."
 
-msgid "Please configure the fallback tuner setup"
+msgid "Please configure the fallback receiver setup"
 msgstr "Konfigurer oppsettet for reservemottakeren"
 
 msgid ""
@@ -9463,7 +9463,7 @@ msgid "Select the time zone within the area or region."
 msgstr "Velg tidssone i området eller regionen."
 
 #, fuzzy
-msgid "Select the timer from the fallback tuner by default"
+msgid "Select the timer from the fallback receiver by default"
 msgstr "Hvis aktivert, vil timer fra reserve tuner bli importert"
 
 msgid "Select the tuner that controls the motorised dish."
@@ -12090,7 +12090,7 @@ msgstr ""
 msgid "URL"
 msgstr "URL"
 
-msgid "URL of fallback remote receiver"
+msgid "URL of remote receiver for imports"
 msgstr "URL for ekstra eksternmottaker"
 
 msgid "USALS automatically moves a motorised dish to the correct satellite based on the coordinates entered by the user. Without USALS each satellite will need to be setup and saved individually."
@@ -12864,11 +12864,11 @@ msgstr "Hvis aktivert, slås mottakeren på fra standby når TV-en blir slått p
 msgid "When enabled the set top box is able to wakeup on LAN"
 msgstr "Hvis aktivert, vil mottakeren slås på ved ved hjelp av Wake-on-LAN funksjonen"
 
-msgid "When enabled the timer from the fallback tuner is imported"
+msgid "When enabled the timer from the fallback receiver is imported"
 msgstr "Hvis aktivert, vil timer fra reserve tuner bli importert"
 
 #, fuzzy
-msgid "When enabled the timer from the fallback tuner is the default timer"
+msgid "When enabled the timer from the fallback receiver is the default timer"
 msgstr "Hvis aktivert, vil timer fra reserve tuner bli importert"
 
 msgid "When enabled then when you select a new channel in the channel selection the channel selection will not close. It will only close when you select the current playing service. This is a kind of preview mode"
@@ -12877,7 +12877,7 @@ msgstr "Hvis aktivert, vil kanallisten ikke lukkes selv om du velger en ny kanal
 msgid "When enabled you can control the volume with the arrow buttons instead of getting the channel selection list"
 msgstr "Hvis aktivert, kan du kontrollere volumet med pilknappene i stedet for å få kanallisten"
 
-msgid "When enabled you can customize the OpenWebIf settings for the fallback tuner"
+msgid "When enabled you can customize the OpenWebIf settings for the fallback receiver"
 msgstr "Hvis aktivert, kan du tilpasse OpenWebif innstillinger for reserve tuner"
 
 msgid "When enabled you can specify a timeframe to ignore the shutdown timer when the receiver is in standby mode"

@@ -11038,7 +11038,7 @@ msgstr "UPnP Sever Minidlha"
 msgid "URL"
 msgstr "الرابط"
 
-msgid "URL of fallback remote receiver"
+msgid "URL of remote receiver for imports"
 msgstr "عنوان الإنترنيت لجهاز الاستقبال البعيد الاحتياطي"
 
 msgid "USALS automatically moves a motorised dish to the correct satellite based on the coordinates entered by the user. Without USALS each satellite will need to be setup and saved individually."

@@ -6721,7 +6721,7 @@ msgstr "Lūdzu nomainiet ieraksta beigu laiku"
 msgid "Please choose an extension..."
 msgstr "Lūdzu izvēlieties paplašinājumu..."
 
-msgid "Please configure the fallback tuner setup"
+msgid "Please configure the fallback receiver setup"
 msgstr "Iestatiet attālināto uztvērēju"
 
 msgid ""
@@ -8411,7 +8411,7 @@ msgstr "Izvēlieties virtuālās tastatūras speciālo izkārtojumu nākošajam 
 msgid "Select the time zone within the area or region."
 msgstr "Izvēlieties laika zonu apgabalā vai reģionā."
 
-msgid "Select the timer from the fallback tuner by default"
+msgid "Select the timer from the fallback receiver by default"
 msgstr "Pēc noklusējuma atlasiet taimeri no attālinātā uztvērēja"
 
 msgid "Select the tuner that controls the motorised dish."
@@ -10734,7 +10734,7 @@ msgstr "UZ AUGŠU"
 msgid "URL"
 msgstr "Adrese"
 
-msgid "URL of fallback remote receiver"
+msgid "URL of remote receiver for imports"
 msgstr "Rezerves uztvērēja adrese (URL)"
 
 msgid "USALS automatically moves a motorised dish to the correct satellite based on the coordinates entered by the user. Without USALS each satellite will need to be setup and saved individually."
@@ -11446,10 +11446,10 @@ msgstr "Ja ieslēgts, uztvērējs automātiski pamodīsies no gaidstāves kad ie
 msgid "When enabled the set top box is able to wakeup on LAN"
 msgstr "Ja ieslēgts, tad uztvērēju var pamodināt no tīkla"
 
-msgid "When enabled the timer from the fallback tuner is imported"
+msgid "When enabled the timer from the fallback receiver is imported"
 msgstr "Ja ieslēgts, tad tiks importēti taimeri no attālinātā uztvērēja"
 
-msgid "When enabled the timer from the fallback tuner is the default timer"
+msgid "When enabled the timer from the fallback receiver is the default timer"
 msgstr "Ja ieslēgts tad taimeris no rezerves uztvērēja ir taimeris pēc noklusējuma"
 
 msgid "When enabled then when you select a new channel in the channel selection the channel selection will not close. It will only close when you select the current playing service. This is a kind of preview mode"
@@ -11458,7 +11458,7 @@ msgstr "Ja ieslēgts, tad ja kanālu izvēlnē izvēlēsieties jaunu kanālu, iz
 msgid "When enabled you can control the volume with the arrow buttons instead of getting the channel selection list"
 msgstr "Ja ieslēgts, ar virziena pogām ap OK jūs varat regulēt skaļumu, nevis atvērt kanālu sarakstu"
 
-msgid "When enabled you can customize the OpenWebIf settings for the fallback tuner"
+msgid "When enabled you can customize the OpenWebIf settings for the fallback receiver"
 msgstr "Ja ieslēgts, jūs varat pielāgot OpenWebIf iestatījumus attālinātam uztvērējam"
 
 msgid "When enabled you can specify a timeframe to ignore the shutdown timer when the receiver is in standby mode"

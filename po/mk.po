@@ -6860,7 +6860,7 @@ msgstr "Променете го времето на завршување на с
 msgid "Please choose an extension..."
 msgstr "Ве молиме изберете екстензија ..."
 
-msgid "Please configure the fallback tuner setup"
+msgid "Please configure the fallback receiver setup"
 msgstr "Да се ​​конфигурира поставката за резервен тјунер"
 
 msgid ""
@@ -8562,7 +8562,7 @@ msgid "Select the time zone within the area or region."
 msgstr "Изберете ја временската зона во областа или регионот."
 
 #, fuzzy
-msgid "Select the timer from the fallback tuner by default"
+msgid "Select the timer from the fallback receiver by default"
 msgstr "Ако ја активирате оваа опција, тајмерот од резервниот приемник се импортира"
 
 msgid "Select the tuner that controls the motorised dish."
@@ -10930,7 +10930,7 @@ msgstr ""
 msgid "URL"
 msgstr "URL"
 
-msgid "URL of fallback remote receiver"
+msgid "URL of remote receiver for imports"
 msgstr "Порт на резервен далечински приемник"
 
 msgid "USALS automatically moves a motorised dish to the correct satellite based on the coordinates entered by the user. Without USALS each satellite will need to be setup and saved individually."
@@ -11653,11 +11653,11 @@ msgstr "Ако ја активирате оваа опција, приемник
 msgid "When enabled the set top box is able to wakeup on LAN"
 msgstr "Ако ја активирате оваа опција, set top box може да се вклучи преку LAN"
 
-msgid "When enabled the timer from the fallback tuner is imported"
+msgid "When enabled the timer from the fallback receiver is imported"
 msgstr "Ако ја активирате оваа опција, тајмерот од резервниот приемник се импортира"
 
 #, fuzzy
-msgid "When enabled the timer from the fallback tuner is the default timer"
+msgid "When enabled the timer from the fallback receiver is the default timer"
 msgstr "Ако ја активирате оваа опција, тајмерот од резервниот приемник се импортира"
 
 msgid "When enabled then when you select a new channel in the channel selection the channel selection will not close. It will only close when you select the current playing service. This is a kind of preview mode"
@@ -11666,7 +11666,7 @@ msgstr "Ако ја активирате оваа опција, тогаш пр�
 msgid "When enabled you can control the volume with the arrow buttons instead of getting the channel selection list"
 msgstr "Ако ја активирате оваа опција, можете да ја контролирате јачината на звукот со копчињата со стрелки, наместо да ја добиете листата за избор на канали"
 
-msgid "When enabled you can customize the OpenWebIf settings for the fallback tuner"
+msgid "When enabled you can customize the OpenWebIf settings for the fallback receiver"
 msgstr "Ако ја активирате оваа опција, можете да ги прилагодите поставките OpenWebIf за резервниот приемник"
 
 msgid "When enabled you can specify a timeframe to ignore the shutdown timer when the receiver is in standby mode"

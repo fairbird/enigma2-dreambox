@@ -7724,7 +7724,7 @@ msgid "Please choose an extension..."
 msgstr "Vänligen välj en utökning..."
 
 #, fuzzy
-msgid "Please configure the fallback tuner setup"
+msgid "Please configure the fallback receiver setup"
 msgstr "URL för reserv fjärrmottagare"
 
 #
@@ -9702,7 +9702,7 @@ msgid "Select the time zone within the area or region."
 msgstr "Välj sorteringsmetod :"
 
 #, fuzzy
-msgid "Select the timer from the fallback tuner by default"
+msgid "Select the timer from the fallback receiver by default"
 msgstr "URL för reserv fjärrmottagare"
 
 msgid "Select the tuner that controls the motorised dish."
@@ -12414,7 +12414,7 @@ msgstr ""
 msgid "URL"
 msgstr ""
 
-msgid "URL of fallback remote receiver"
+msgid "URL of remote receiver for imports"
 msgstr "URL för reserv fjärrmottagare"
 
 msgid "USALS automatically moves a motorised dish to the correct satellite based on the coordinates entered by the user. Without USALS each satellite will need to be setup and saved individually."
@@ -13233,10 +13233,10 @@ msgstr "Vid aktiverad kommer mottagaren automatiskt använda ljudspåret som du 
 msgid "When enabled the set top box is able to wakeup on LAN"
 msgstr "Vid aktiverad kan mottagaren väckas upp från LAN (WoL)"
 
-msgid "When enabled the timer from the fallback tuner is imported"
+msgid "When enabled the timer from the fallback receiver is imported"
 msgstr ""
 
-msgid "When enabled the timer from the fallback tuner is the default timer"
+msgid "When enabled the timer from the fallback receiver is the default timer"
 msgstr ""
 
 msgid "When enabled then when you select a new channel in the channel selection the channel selection will not close. It will only close when you select the current playing service. This is a kind of preview mode"
@@ -13245,7 +13245,7 @@ msgstr "Vid aktiverad så när du väljer en ny kanal i kanallistan kommer kanal
 msgid "When enabled you can control the volume with the arrow buttons instead of getting the channel selection list"
 msgstr "Vid aktiverad kan du kontrollera volymen med pilknapparna istället för att få fram kanallistan."
 
-msgid "When enabled you can customize the OpenWebIf settings for the fallback tuner"
+msgid "When enabled you can customize the OpenWebIf settings for the fallback receiver"
 msgstr ""
 
 msgid "When enabled you can specify a timeframe to ignore the shutdown timer when the receiver is in standby mode"

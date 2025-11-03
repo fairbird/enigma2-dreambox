@@ -6807,7 +6807,7 @@ msgstr "Αλλάξτε την ώρα τερματισμού της εγγραφ�
 msgid "Please choose an extension..."
 msgstr "Επιλέξτε μία επέκταση..."
 
-msgid "Please configure the fallback tuner setup"
+msgid "Please configure the fallback receiver setup"
 msgstr "Ρυθμίστε το εφεδρικό tuner"
 
 msgid ""
@@ -8513,7 +8513,7 @@ msgid "Select the time zone within the area or region."
 msgstr "Επιλογή της χρονικής ζώνης εντός της αντίστοιχης περιοχής."
 
 #, fuzzy
-msgid "Select the timer from the fallback tuner by default"
+msgid "Select the timer from the fallback receiver by default"
 msgstr "Όταν είναι ενεργό, γίνεται εισαγωγή του χρονοδιακόπτη από το εφεδρικό tuner"
 
 msgid "Select the tuner that controls the motorised dish."
@@ -10880,7 +10880,7 @@ msgstr ""
 msgid "URL"
 msgstr "Διεύθυνση"
 
-msgid "URL of fallback remote receiver"
+msgid "URL of remote receiver for imports"
 msgstr "Διεύθυνση URL του εφεδρικού απομακρυσμένου δέκτη"
 
 msgid "USALS automatically moves a motorised dish to the correct satellite based on the coordinates entered by the user. Without USALS each satellite will need to be setup and saved individually."
@@ -11601,11 +11601,11 @@ msgstr "Όταν είναι ενεργό, ο δέκτης θα επανέρχε�
 msgid "When enabled the set top box is able to wakeup on LAN"
 msgstr "Όταν είναι ενεργό, ο δέκτης θα μπορεί να αφυπνίζεται από το τοπικό σας δίκτυο"
 
-msgid "When enabled the timer from the fallback tuner is imported"
+msgid "When enabled the timer from the fallback receiver is imported"
 msgstr "Όταν είναι ενεργό, γίνεται εισαγωγή του χρονοδιακόπτη από το εφεδρικό tuner"
 
 #, fuzzy
-msgid "When enabled the timer from the fallback tuner is the default timer"
+msgid "When enabled the timer from the fallback receiver is the default timer"
 msgstr "Όταν είναι ενεργό, γίνεται εισαγωγή του χρονοδιακόπτη από το εφεδρικό tuner"
 
 msgid "When enabled then when you select a new channel in the channel selection the channel selection will not close. It will only close when you select the current playing service. This is a kind of preview mode"
@@ -11614,7 +11614,7 @@ msgstr "Όταν είναι ενεργό, όταν θα επιλέγεται έ�
 msgid "When enabled you can control the volume with the arrow buttons instead of getting the channel selection list"
 msgstr "Όταν είναι ενεργό, μπορείτε να ελέγχετε την ένταση του ήχου με τα πλήκτρα βέλη αντί να μεταβαίνετε στη λίστα επιλογής καναλιών."
 
-msgid "When enabled you can customize the OpenWebIf settings for the fallback tuner"
+msgid "When enabled you can customize the OpenWebIf settings for the fallback receiver"
 msgstr "Όταν είναι ενεργό, μπορείτε να παραμετροποιήσετε τις ρυθμίσεις OpenWebIf για το εφεδρικό tuner"
 
 msgid "When enabled you can specify a timeframe to ignore the shutdown timer when the receiver is in standby mode"

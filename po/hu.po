@@ -6853,7 +6853,7 @@ msgstr "Kérem, változtassa meg a felvétel vége idejét"
 msgid "Please choose an extension..."
 msgstr "Kérem, válasszon egy funkciót..."
 
-msgid "Please configure the fallback tuner setup"
+msgid "Please configure the fallback receiver setup"
 msgstr "Kérjük, állítsa be a tartalék távoli vevőt"
 
 msgid ""
@@ -8555,7 +8555,7 @@ msgid "Select the time zone within the area or region."
 msgstr "Válassza ki az időzónáját a megadott területen vagy régióban."
 
 #, fuzzy
-msgid "Select the timer from the fallback tuner by default"
+msgid "Select the timer from the fallback receiver by default"
 msgstr "Ezzel engedélyezheti az időzítők importálását a tartalék tunerből"
 
 msgid "Select the tuner that controls the motorised dish."
@@ -10938,7 +10938,7 @@ msgstr ""
 msgid "URL"
 msgstr "URL"
 
-msgid "URL of fallback remote receiver"
+msgid "URL of remote receiver for imports"
 msgstr "Tartalék távoli vevő URL címe"
 
 msgid "USALS automatically moves a motorised dish to the correct satellite based on the coordinates entered by the user. Without USALS each satellite will need to be setup and saved individually."
@@ -11657,11 +11657,11 @@ msgstr "Ha engedélyezi, a készülék automatikusan felébred a készenlétből
 msgid "When enabled the set top box is able to wakeup on LAN"
 msgstr "Ha engedélyezi, a készülék képes lesz LAN-on keresztül bekapcsolni."
 
-msgid "When enabled the timer from the fallback tuner is imported"
+msgid "When enabled the timer from the fallback receiver is imported"
 msgstr "Ezzel engedélyezheti az időzítők importálását a tartalék tunerből"
 
 #, fuzzy
-msgid "When enabled the timer from the fallback tuner is the default timer"
+msgid "When enabled the timer from the fallback receiver is the default timer"
 msgstr "Ezzel engedélyezheti az időzítők importálását a tartalék tunerből"
 
 msgid "When enabled then when you select a new channel in the channel selection the channel selection will not close. It will only close when you select the current playing service. This is a kind of preview mode"
@@ -11670,7 +11670,7 @@ msgstr "Ha engedélyezi, akkor a csatornaválasztó listában egy új csatorna k
 msgid "When enabled you can control the volume with the arrow buttons instead of getting the channel selection list"
 msgstr "Ha engedélyezi, a nyíl gombok a hangerőt fogják változtatni, és nem a csatornalistát jelenítik meg."
 
-msgid "When enabled you can customize the OpenWebIf settings for the fallback tuner"
+msgid "When enabled you can customize the OpenWebIf settings for the fallback receiver"
 msgstr "Ha engedélyezi, testreszabhatja az OpenWebIf beállításait a tartalék tunerhez."
 
 msgid "When enabled you can specify a timeframe to ignore the shutdown timer when the receiver is in standby mode"

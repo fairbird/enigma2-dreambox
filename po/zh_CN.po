@@ -6723,7 +6723,7 @@ msgstr "请更改录制结束时间"
 msgid "Please choose an extension..."
 msgstr "请选择扩展名..."
 
-msgid "Please configure the fallback tuner setup"
+msgid "Please configure the fallback receiver setup"
 msgstr "请配置备用调谐器设置"
 
 msgid ""
@@ -8414,7 +8414,7 @@ msgstr "仅为下一个字符选择移位字符集"
 msgid "Select the time zone within the area or region."
 msgstr "选择该区域或地区内的时区。"
 
-msgid "Select the timer from the fallback tuner by default"
+msgid "Select the timer from the fallback receiver by default"
 msgstr "默认情况下，从备用调谐器中选择定时器"
 
 msgid "Select the tuner that controls the motorised dish."
@@ -10746,7 +10746,7 @@ msgstr "向上"
 msgid "URL"
 msgstr "URL"
 
-msgid "URL of fallback remote receiver"
+msgid "URL of remote receiver for imports"
 msgstr "备用远程接收器的 URL"
 
 msgid "USALS automatically moves a motorised dish to the correct satellite based on the coordinates entered by the user. Without USALS each satellite will need to be setup and saved individually."
@@ -11457,10 +11457,10 @@ msgstr "启用后，当电视打开时，接收机将自动从待机状态唤醒
 msgid "When enabled the set top box is able to wakeup on LAN"
 msgstr "启用后，机顶盒能够通过网络唤醒"
 
-msgid "When enabled the timer from the fallback tuner is imported"
+msgid "When enabled the timer from the fallback receiver is imported"
 msgstr "启用后，将导入备用调谐器的定时器"
 
-msgid "When enabled the timer from the fallback tuner is the default timer"
+msgid "When enabled the timer from the fallback receiver is the default timer"
 msgstr "启用后，备用调谐器的定时器将成为默认定时器"
 
 msgid "When enabled then when you select a new channel in the channel selection the channel selection will not close. It will only close when you select the current playing service. This is a kind of preview mode"
@@ -11469,7 +11469,7 @@ msgstr "启用后，当您在频道选择中选择一个新频道时，频道选
 msgid "When enabled you can control the volume with the arrow buttons instead of getting the channel selection list"
 msgstr "启用后，可使用方向键控制音量，而不是打开频道选择列表"
 
-msgid "When enabled you can customize the OpenWebIf settings for the fallback tuner"
+msgid "When enabled you can customize the OpenWebIf settings for the fallback receiver"
 msgstr "启用后，可自定义备用调谐器的 OpenWebIf 设置"
 
 msgid "When enabled you can specify a timeframe to ignore the shutdown timer when the receiver is in standby mode"

@@ -6928,7 +6928,7 @@ msgstr "Wijzig de opname-eindtijd aub."
 msgid "Please choose an extension..."
 msgstr "Kies een plugin aub..."
 
-msgid "Please configure the fallback tuner setup"
+msgid "Please configure the fallback receiver setup"
 msgstr "Configureer aub de installatie van de Fallback tuner"
 
 msgid ""
@@ -8655,7 +8655,7 @@ msgstr "Kies enkel een hoofdletter voor het volgende teken"
 msgid "Select the time zone within the area or region."
 msgstr "Kies de tijdzone binnen het gebied / regio."
 
-msgid "Select the timer from the fallback tuner by default"
+msgid "Select the timer from the fallback receiver by default"
 msgstr "Selecteer standaard de timer vanaf de fallback tuner"
 
 msgid "Select the tuner that controls the motorised dish."
@@ -11023,7 +11023,7 @@ msgstr "OMHOOG"
 msgid "URL"
 msgstr "URL"
 
-msgid "URL of fallback remote receiver"
+msgid "URL of remote receiver for imports"
 msgstr "Indien u hier kiest voor IPadres, dan voert u in de regels hieronder de URL in zoals in het onderstaande voorbeeld aangegeven wordt. Het volstaat om enkel het IPadres in te voeren zonder http:// of poortnummer. Deze worden standaard toegevoegd zodat het eindresultaat er bijvoorbeeld zo uit zal zien. http://192.168.100.202:8001"
 
 msgid "USALS automatically moves a motorised dish to the correct satellite based on the coordinates entered by the user. Without USALS each satellite will need to be setup and saved individually."
@@ -11757,10 +11757,10 @@ msgstr "Indien geactiveerd, dan zal ook de ontvanger opstarten zodra de TV wordt
 msgid "When enabled the set top box is able to wakeup on LAN"
 msgstr "Indien geactiveerd, dan is het mogelijk om de 'Wake On Lan functie' te gebruiken. Hiermee kunt u via het netwerk contact maken met de ontvanger waarna deze zal starten vanuit 'deep sleep'."
 
-msgid "When enabled the timer from the fallback tuner is imported"
+msgid "When enabled the timer from the fallback receiver is imported"
 msgstr "Indien geactiveerd, dan worden ook de timers van de externe tuner geïmporteerd."
 
-msgid "When enabled the timer from the fallback tuner is the default timer"
+msgid "When enabled the timer from the fallback receiver is the default timer"
 msgstr "Indien geactiveerd, dan is de timer van de fallback tuner de standaardtimer"
 
 msgid "When enabled then when you select a new channel in the channel selection the channel selection will not close. It will only close when you select the current playing service. This is a kind of preview mode"
@@ -11769,7 +11769,7 @@ msgstr "Indien geactiveerd, dan zal, indien u een keuze gemaakt heeft, het selec
 msgid "When enabled you can control the volume with the arrow buttons instead of getting the channel selection list"
 msgstr "Indien geactiveerd, dan kunt u het volume bedienen met de pijltjestoetsen, i.p.v. dat u hiermee de zenderlijst opent."
 
-msgid "When enabled you can customize the OpenWebIf settings for the fallback tuner"
+msgid "When enabled you can customize the OpenWebIf settings for the fallback receiver"
 msgstr "Indien geactiveerd, dan kunt u de instellingen van de Fallback tuner aanpassen in de Webinterface."
 
 msgid "When enabled you can specify a timeframe to ignore the shutdown timer when the receiver is in standby mode"

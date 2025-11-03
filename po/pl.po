@@ -6855,7 +6855,7 @@ msgid "Please choose an extension..."
 msgstr "Menu rozszerzeń."
 
 #, fuzzy
-msgid "Please configure the fallback tuner setup"
+msgid "Please configure the fallback receiver setup"
 msgstr "Ustawienia tunera rezerwowego"
 
 msgid ""
@@ -8564,7 +8564,7 @@ msgid "Select the time zone within the area or region."
 msgstr "Wybierz strefę czasową w obrębie obszaru lub regionu."
 
 #, fuzzy
-msgid "Select the timer from the fallback tuner by default"
+msgid "Select the timer from the fallback receiver by default"
 msgstr "Gdy włączone, timer ze zdalnego odbiornika jest importowany"
 
 msgid "Select the tuner that controls the motorised dish."
@@ -10956,7 +10956,7 @@ msgstr ""
 msgid "URL"
 msgstr ""
 
-msgid "URL of fallback remote receiver"
+msgid "URL of remote receiver for imports"
 msgstr "Adres zdalnego odbiornika rezerwowego"
 
 msgid "USALS automatically moves a motorised dish to the correct satellite based on the coordinates entered by the user. Without USALS each satellite will need to be setup and saved individually."
@@ -11682,11 +11682,11 @@ msgstr "Gdy włączone, odbiornik automatycznie wybudzi się ze stanu czuwania p
 msgid "When enabled the set top box is able to wakeup on LAN"
 msgstr "Gdy włączone, odbiornik może zostać wybudzony po LAN"
 
-msgid "When enabled the timer from the fallback tuner is imported"
+msgid "When enabled the timer from the fallback receiver is imported"
 msgstr "Gdy włączone, timer ze zdalnego odbiornika jest importowany"
 
 #, fuzzy
-msgid "When enabled the timer from the fallback tuner is the default timer"
+msgid "When enabled the timer from the fallback receiver is the default timer"
 msgstr "Gdy włączone, timer ze zdalnego odbiornika jest importowany"
 
 msgid "When enabled then when you select a new channel in the channel selection the channel selection will not close. It will only close when you select the current playing service. This is a kind of preview mode"
@@ -11695,7 +11695,7 @@ msgstr "Gdy włączone, jeśli wybierzesz nowy kanał w liście wyboru kanałów
 msgid "When enabled you can control the volume with the arrow buttons instead of getting the channel selection list"
 msgstr "Gdy włączone, strzałki prawa/lewa regulują głośność, a nie otwierają listy wyboru kanałów."
 
-msgid "When enabled you can customize the OpenWebIf settings for the fallback tuner"
+msgid "When enabled you can customize the OpenWebIf settings for the fallback receiver"
 msgstr "Gdy włączone, możesz dostosować ustawienia OpenWebIf dla tunera rezerwowego"
 
 msgid "When enabled you can specify a timeframe to ignore the shutdown timer when the receiver is in standby mode"

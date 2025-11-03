@@ -7053,7 +7053,7 @@ msgid "Please choose an extension..."
 msgstr "Silakan pilih ekstensi..."
 
 #, fuzzy
-msgid "Please configure the fallback tuner setup"
+msgid "Please configure the fallback receiver setup"
 msgstr "Mohon setel pengaturan penala digunakan"
 
 msgid ""
@@ -8800,7 +8800,7 @@ msgid "Select the time zone within the area or region."
 msgstr "Pilih resolusi horizontal:"
 
 #, fuzzy
-msgid "Select the timer from the fallback tuner by default"
+msgid "Select the timer from the fallback receiver by default"
 msgstr "Ketika diaktifkan, pewaktu dari penala digunakan diimpor"
 
 msgid "Select the tuner that controls the motorised dish."
@@ -11236,7 +11236,7 @@ msgstr ""
 msgid "URL"
 msgstr "URL"
 
-msgid "URL of fallback remote receiver"
+msgid "URL of remote receiver for imports"
 msgstr "Alamat URL rx jauh digunakan"
 
 msgid "USALS automatically moves a motorised dish to the correct satellite based on the coordinates entered by the user. Without USALS each satellite will need to be setup and saved individually."
@@ -11980,11 +11980,11 @@ msgstr "Ketika diaktifkan, rx akan secara otomatis menggunakan jalur audio yang 
 msgid "When enabled the set top box is able to wakeup on LAN"
 msgstr "Ketika diaktifkan, Rx bisa melakukan 'wakeup on LAN'"
 
-msgid "When enabled the timer from the fallback tuner is imported"
+msgid "When enabled the timer from the fallback receiver is imported"
 msgstr "Ketika diaktifkan, pewaktu dari penala digunakan diimpor"
 
 #, fuzzy
-msgid "When enabled the timer from the fallback tuner is the default timer"
+msgid "When enabled the timer from the fallback receiver is the default timer"
 msgstr "Ketika diaktifkan, pewaktu dari penala digunakan diimpor"
 
 msgid "When enabled then when you select a new channel in the channel selection the channel selection will not close. It will only close when you select the current playing service. This is a kind of preview mode"
@@ -11993,7 +11993,7 @@ msgstr "Ketika diaktifkan, jadinya saat anda memilih suatu kanal pada pemilihan 
 msgid "When enabled you can control the volume with the arrow buttons instead of getting the channel selection list"
 msgstr "Ketika diaktifkan, anda bisa mengatur volume suara dengan tombol panah daripada membuka daftar pemilihan kanal."
 
-msgid "When enabled you can customize the OpenWebIf settings for the fallback tuner"
+msgid "When enabled you can customize the OpenWebIf settings for the fallback receiver"
 msgstr "Ketika diaktifkan, anda bisa menyesuaikan setelan OpenWebif pada penala digunakan"
 
 msgid "When enabled you can specify a timeframe to ignore the shutdown timer when the receiver is in standby mode"

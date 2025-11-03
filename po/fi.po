@@ -7637,7 +7637,7 @@ msgstr "Aseta tallennuksen päättymisaika"
 msgid "Please choose an extension..."
 msgstr "Valitse laajennus..."
 
-msgid "Please configure the fallback tuner setup"
+msgid "Please configure the fallback receiver setup"
 msgstr ""
 
 #
@@ -9598,7 +9598,7 @@ msgid "Select the time zone within the area or region."
 msgstr ""
 
 #, fuzzy
-msgid "Select the timer from the fallback tuner by default"
+msgid "Select the timer from the fallback receiver by default"
 msgstr "Kun käytössä, ajastukset tuodaan etävastaanottimelta"
 
 msgid "Select the tuner that controls the motorised dish."
@@ -12270,7 +12270,7 @@ msgstr ""
 msgid "URL"
 msgstr "URL"
 
-msgid "URL of fallback remote receiver"
+msgid "URL of remote receiver for imports"
 msgstr "Etävastaanottimen URL-osoite"
 
 msgid "USALS automatically moves a motorised dish to the correct satellite based on the coordinates entered by the user. Without USALS each satellite will need to be setup and saved individually."
@@ -13073,11 +13073,11 @@ msgstr "Kun päällä, vastaanotin käyttää kanavalle aiemmin valitsemaasi ä�
 msgid "When enabled the set top box is able to wakeup on LAN"
 msgstr "Käy käytössä, vastaanotin voi käynnistyä verkkokomennolla"
 
-msgid "When enabled the timer from the fallback tuner is imported"
+msgid "When enabled the timer from the fallback receiver is imported"
 msgstr "Kun käytössä, ajastukset tuodaan etävastaanottimelta"
 
 #, fuzzy
-msgid "When enabled the timer from the fallback tuner is the default timer"
+msgid "When enabled the timer from the fallback receiver is the default timer"
 msgstr "Kun käytössä, ajastukset tuodaan etävastaanottimelta"
 
 msgid "When enabled then when you select a new channel in the channel selection the channel selection will not close. It will only close when you select the current playing service. This is a kind of preview mode"
@@ -13086,7 +13086,7 @@ msgstr "Kun käytössä, uuden kanavan valinta OK näppäimellä ei sulje kanava
 msgid "When enabled you can control the volume with the arrow buttons instead of getting the channel selection list"
 msgstr "Kun käytössä, nuolinäppäimet ohjaavat äänenvoimakkuutta kanavanvalinnan sijasta"
 
-msgid "When enabled you can customize the OpenWebIf settings for the fallback tuner"
+msgid "When enabled you can customize the OpenWebIf settings for the fallback receiver"
 msgstr "Käy käytössä, voit määritellä etävastaanottimen OpenWebIf asetuksia"
 
 msgid "When enabled you can specify a timeframe to ignore the shutdown timer when the receiver is in standby mode"

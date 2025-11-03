@@ -6869,7 +6869,7 @@ msgstr "Promijenite vrijeme završetka snimanja"
 msgid "Please choose an extension..."
 msgstr "Odaberite proširenje..."
 
-msgid "Please configure the fallback tuner setup"
+msgid "Please configure the fallback receiver setup"
 msgstr "Želite li konfigurirati rezervni prijemnik"
 
 msgid ""
@@ -8574,7 +8574,7 @@ msgid "Select the time zone within the area or region."
 msgstr "Odaberite vremensku zonu unutar područja ili regije."
 
 #, fuzzy
-msgid "Select the timer from the fallback tuner by default"
+msgid "Select the timer from the fallback receiver by default"
 msgstr "Kada je omogućeno, uvozi se tajmer iz rezervnog tjunera"
 
 msgid "Select the tuner that controls the motorised dish."
@@ -10943,7 +10943,7 @@ msgstr ""
 msgid "URL"
 msgstr "URL"
 
-msgid "URL of fallback remote receiver"
+msgid "URL of remote receiver for imports"
 msgstr "URL rezervnog daljinskog prijemnika"
 
 msgid "USALS automatically moves a motorised dish to the correct satellite based on the coordinates entered by the user. Without USALS each satellite will need to be setup and saved individually."
@@ -11667,11 +11667,11 @@ msgstr "Kad je omogućeno, resiver će se automatski probuditi iz stanja čekanj
 msgid "When enabled the set top box is able to wakeup on LAN"
 msgstr "Kada je omogućeno, uređaj za podešavanje može se probuditi putem LAN-a"
 
-msgid "When enabled the timer from the fallback tuner is imported"
+msgid "When enabled the timer from the fallback receiver is imported"
 msgstr "Kada je omogućeno, uvozi se tajmer iz rezervnog tjunera"
 
 #, fuzzy
-msgid "When enabled the timer from the fallback tuner is the default timer"
+msgid "When enabled the timer from the fallback receiver is the default timer"
 msgstr "Kada je omogućeno, uvozi se tajmer iz rezervnog tjunera"
 
 msgid "When enabled then when you select a new channel in the channel selection the channel selection will not close. It will only close when you select the current playing service. This is a kind of preview mode"
@@ -11680,7 +11680,7 @@ msgstr "Kada je omogućeno, odabir novog kanal u odabiru kanala neće se zatvori
 msgid "When enabled you can control the volume with the arrow buttons instead of getting the channel selection list"
 msgstr "Kada je omogućeno, možete kontrolirati glasnoću pomoću tipki sa strelicama umjesto da odaberete popis kanala."
 
-msgid "When enabled you can customize the OpenWebIf settings for the fallback tuner"
+msgid "When enabled you can customize the OpenWebIf settings for the fallback receiver"
 msgstr "Kada je omogućeno, možete prilagoditi OpenWebIf postavke za rezervni tjuner"
 
 msgid "When enabled you can specify a timeframe to ignore the shutdown timer when the receiver is in standby mode"

@@ -6740,7 +6740,7 @@ msgstr "Prosím, zmeňte koniec nahrávania"
 msgid "Please choose an extension..."
 msgstr "Prosím, zvoľte rozšírenie..."
 
-msgid "Please configure the fallback tuner setup"
+msgid "Please configure the fallback receiver setup"
 msgstr "Nakonfigurujte nastavenie záložného tuneru"
 
 msgid ""
@@ -8434,7 +8434,7 @@ msgstr "Vyberte znakovú sadu klávesnice po stlačení klávesy Shift iba pre �
 msgid "Select the time zone within the area or region."
 msgstr "Vyberte časovú zónu v rámci lokality alebo regiónu."
 
-msgid "Select the timer from the fallback tuner by default"
+msgid "Select the timer from the fallback receiver by default"
 msgstr "Predvolene vyberte časovač zo záložného tunera"
 
 msgid "Select the tuner that controls the motorised dish."
@@ -10769,7 +10769,7 @@ msgstr "HORE"
 msgid "URL"
 msgstr "URL"
 
-msgid "URL of fallback remote receiver"
+msgid "URL of remote receiver for imports"
 msgstr "URL záložného vzdialeného prijímača"
 
 msgid "USALS automatically moves a motorised dish to the correct satellite based on the coordinates entered by the user. Without USALS each satellite will need to be setup and saved individually."
@@ -11479,10 +11479,10 @@ msgstr "Ak povolené, prijímač sa automaticky prebudí z pohotovostného reži
 msgid "When enabled the set top box is able to wakeup on LAN"
 msgstr "Ak povolené, prijímač je schopný prebudenia v sieti LAN"
 
-msgid "When enabled the timer from the fallback tuner is imported"
+msgid "When enabled the timer from the fallback receiver is imported"
 msgstr "Ak je povolené, bude importovaný časovač zo záložného tuneru"
 
-msgid "When enabled the timer from the fallback tuner is the default timer"
+msgid "When enabled the timer from the fallback receiver is the default timer"
 msgstr "Ak je povolené, časovač zo záložného tuneru bude predvolený časovač"
 
 msgid "When enabled then when you select a new channel in the channel selection the channel selection will not close. It will only close when you select the current playing service. This is a kind of preview mode"
@@ -11491,7 +11491,7 @@ msgstr "Ak je táto možnosť povolená, pri výbere nového kanála vo výbere 
 msgid "When enabled you can control the volume with the arrow buttons instead of getting the channel selection list"
 msgstr "Ak povolené môžete ovládať hlasitosť pomocou tlačidiel so šípkami namiesto získania zoznamu výberu stanice"
 
-msgid "When enabled you can customize the OpenWebIf settings for the fallback tuner"
+msgid "When enabled you can customize the OpenWebIf settings for the fallback receiver"
 msgstr "Ak je povolené, môžete upravovať OpenWebIf nastavenia záložného tuneru"
 
 msgid "When enabled you can specify a timeframe to ignore the shutdown timer when the receiver is in standby mode"

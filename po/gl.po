@@ -7599,7 +7599,7 @@ msgstr "Por favor, cambia a hora de remate da gravación"
 msgid "Please choose an extension..."
 msgstr "Por favor, elixe unha extensión…"
 
-msgid "Please configure the fallback tuner setup"
+msgid "Please configure the fallback receiver setup"
 msgstr "Por favor, configura o sintonizador de reserva"
 
 #
@@ -9521,7 +9521,7 @@ msgid "Select the time zone within the area or region."
 msgstr "Seleccionar a zona horaria dentro da área ou rexión."
 
 #, fuzzy
-msgid "Select the timer from the fallback tuner by default"
+msgid "Select the timer from the fallback receiver by default"
 msgstr "Cando está activado, impórtanse os temporizadores desde o sintonizador de reserva"
 
 msgid "Select the tuner that controls the motorised dish."
@@ -12150,7 +12150,7 @@ msgstr ""
 msgid "URL"
 msgstr "URL"
 
-msgid "URL of fallback remote receiver"
+msgid "URL of remote receiver for imports"
 msgstr "URL do receptor de reserva remoto"
 
 msgid "USALS automatically moves a motorised dish to the correct satellite based on the coordinates entered by the user. Without USALS each satellite will need to be setup and saved individually."
@@ -12949,11 +12949,11 @@ msgstr "Cando está activado, o receptor activarase deso o modo de repouso ao ac
 msgid "When enabled the set top box is able to wakeup on LAN"
 msgstr "Cando está activado, o decodificador pode activarse desde a LAN (Wake On LAN)"
 
-msgid "When enabled the timer from the fallback tuner is imported"
+msgid "When enabled the timer from the fallback receiver is imported"
 msgstr "Cando está activado, impórtanse os temporizadores desde o sintonizador de reserva"
 
 #, fuzzy
-msgid "When enabled the timer from the fallback tuner is the default timer"
+msgid "When enabled the timer from the fallback receiver is the default timer"
 msgstr "Cando está activado, impórtanse os temporizadores desde o sintonizador de reserva"
 
 msgid "When enabled then when you select a new channel in the channel selection the channel selection will not close. It will only close when you select the current playing service. This is a kind of preview mode"
@@ -12962,7 +12962,7 @@ msgstr "Cando está activado, ao seleccionar unha canle non se pecha o selector 
 msgid "When enabled you can control the volume with the arrow buttons instead of getting the channel selection list"
 msgstr "Cando está activado, os botóns de frecha controlan o volume en vez de devolver a lista de selección de canles"
 
-msgid "When enabled you can customize the OpenWebIf settings for the fallback tuner"
+msgid "When enabled you can customize the OpenWebIf settings for the fallback receiver"
 msgstr "Cando está activado, podes personalizar a configuración de OpenWebIf no sintonizador de reserva"
 
 msgid "When enabled you can specify a timeframe to ignore the shutdown timer when the receiver is in standby mode"

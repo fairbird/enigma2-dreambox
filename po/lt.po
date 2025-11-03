@@ -6835,7 +6835,7 @@ msgstr "Pakeiskite įrašymo pabaigos laiką"
 msgid "Please choose an extension..."
 msgstr "Prašome išsirinkti papildymus..."
 
-msgid "Please configure the fallback tuner setup"
+msgid "Please configure the fallback receiver setup"
 msgstr "Konfigūruokite atsarginio imtuvo nustatymą"
 
 msgid ""
@@ -8539,7 +8539,7 @@ msgid "Select the time zone within the area or region."
 msgstr "Pasirinkite laiko juostą, toje teritorijoje arba regione."
 
 #, fuzzy
-msgid "Select the timer from the fallback tuner by default"
+msgid "Select the timer from the fallback receiver by default"
 msgstr "Kai įjungta, atsarginio imtuvo laikmatis yra importuojamas"
 
 msgid "Select the tuner that controls the motorised dish."
@@ -10909,7 +10909,7 @@ msgstr ""
 msgid "URL"
 msgstr "Internetinis adresas"
 
-msgid "URL of fallback remote receiver"
+msgid "URL of remote receiver for imports"
 msgstr "Atsarginio nuotolinio imtuvo internetinis adresas"
 
 msgid "USALS automatically moves a motorised dish to the correct satellite based on the coordinates entered by the user. Without USALS each satellite will need to be setup and saved individually."
@@ -11631,11 +11631,11 @@ msgstr "Kai įjungta, imtuvas automatiškai pažadins budėjimo režimą, kai te
 msgid "When enabled the set top box is able to wakeup on LAN"
 msgstr "Kai čia įjungta, aparatą galima pažadinti nuo tinklo veiklos"
 
-msgid "When enabled the timer from the fallback tuner is imported"
+msgid "When enabled the timer from the fallback receiver is imported"
 msgstr "Kai įjungta, atsarginio imtuvo laikmatis yra importuojamas"
 
 #, fuzzy
-msgid "When enabled the timer from the fallback tuner is the default timer"
+msgid "When enabled the timer from the fallback receiver is the default timer"
 msgstr "Kai įjungta, atsarginio imtuvo laikmatis yra importuojamas"
 
 msgid "When enabled then when you select a new channel in the channel selection the channel selection will not close. It will only close when you select the current playing service. This is a kind of preview mode"
@@ -11644,7 +11644,7 @@ msgstr "Kai čia įjungta, pasirinkus naują kanalą kanalų pasirinkime, kanala
 msgid "When enabled you can control the volume with the arrow buttons instead of getting the channel selection list"
 msgstr "Kai čia įjungta, rodyklių mygtukais, vietoj kanalų pasirinkimo sąrašo lango įjungimo, jūs galite kontroliuoti garsą"
 
-msgid "When enabled you can customize the OpenWebIf settings for the fallback tuner"
+msgid "When enabled you can customize the OpenWebIf settings for the fallback receiver"
 msgstr "Kai įjungta, galite pritaikyti OpenWebIf nustatymus atsarginiam imtuvui"
 
 msgid "When enabled you can specify a timeframe to ignore the shutdown timer when the receiver is in standby mode"

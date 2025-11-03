@@ -6759,7 +6759,7 @@ msgstr "Будь ласка, змініть час закінчення запи
 msgid "Please choose an extension..."
 msgstr "Будь ласка, виберіть розширення..."
 
-msgid "Please configure the fallback tuner setup"
+msgid "Please configure the fallback receiver setup"
 msgstr "Будь ласка, зробіть налаштування резервного тюнера"
 
 msgid ""
@@ -8455,7 +8455,7 @@ msgstr "Виберіть shift лише для наступного символ
 msgid "Select the time zone within the area or region."
 msgstr "Виберіть Ваш часовий пояс у межах області чи регіону."
 
-msgid "Select the timer from the fallback tuner by default"
+msgid "Select the timer from the fallback receiver by default"
 msgstr "Виберіть таймер із резервного тюнера за замовчуванням"
 
 msgid "Select the tuner that controls the motorised dish."
@@ -10796,7 +10796,7 @@ msgstr ""
 msgid "URL"
 msgstr "URL"
 
-msgid "URL of fallback remote receiver"
+msgid "URL of remote receiver for imports"
 msgstr "URL-адреса віддаленого резервного приймача"
 
 msgid "USALS automatically moves a motorised dish to the correct satellite based on the coordinates entered by the user. Without USALS each satellite will need to be setup and saved individually."
@@ -11510,10 +11510,10 @@ msgstr "Якщо увімкнено, приймач автоматично ви�
 msgid "When enabled the set top box is able to wakeup on LAN"
 msgstr "Якщо увімкнено, телеприставка може пробуджуватись у локальній мережі"
 
-msgid "When enabled the timer from the fallback tuner is imported"
+msgid "When enabled the timer from the fallback receiver is imported"
 msgstr "Якщо увімкнено, таймер із резервного тюнера імпортується"
 
-msgid "When enabled the timer from the fallback tuner is the default timer"
+msgid "When enabled the timer from the fallback receiver is the default timer"
 msgstr "Якщо ввімкнено, таймер із резервного тюнера є таймером за умовчанням"
 
 msgid "When enabled then when you select a new channel in the channel selection the channel selection will not close. It will only close when you select the current playing service. This is a kind of preview mode"
@@ -11522,7 +11522,7 @@ msgstr "Якщо увімкнено, тоді, коли Ви вибираєте 
 msgid "When enabled you can control the volume with the arrow buttons instead of getting the channel selection list"
 msgstr "Якщо ввімкнено, Ви можете регулювати гучність за допомогою кнопок зі стрілками, замість того, щоб отримувати список вибору каналів"
 
-msgid "When enabled you can customize the OpenWebIf settings for the fallback tuner"
+msgid "When enabled you can customize the OpenWebIf settings for the fallback receiver"
 msgstr "Якщо увімкнено, Ви можете налаштувати параметри OpenWebIf для резервного тюнера"
 
 msgid "When enabled you can specify a timeframe to ignore the shutdown timer when the receiver is in standby mode"
