@@ -69,13 +69,13 @@ class SetupFallbacktuner(Setup):
 			config.usage.remote_fallback_import,
 			_("Import channels and/or EPG from remote receiver URL when receiver is booted")))
 		if config.usage.remote_fallback_enabled.value:
-			self.list.append((_("Enable import timer from fallback tuner"),
+			self.list.append((_("Enable import timer from fallback receiver"),
 				config.usage.remote_fallback_external_timer,
-				_("When enabled the timer from the fallback tuner is imported")))
+				_("When enabled the timer from the fallback receiver is imported")))
 			if config.usage.remote_fallback_external_timer.value:
-				self.list.append((_("Select the timer from the fallback tuner by default"),
+				self.list.append((_("Select the timer from the fallback receiver by default"),
 					config.usage.remote_fallback_external_timer_default,
-					_("When enabled the timer from the fallback tuner is the default timer")))
+					_("When enabled timers are created on the fallback received by default")))
 			self.list.append((_("Fallback remote receiver"),
 				self.avahiselect,
 				_("Destination of fallback remote receiver")))
@@ -119,19 +119,19 @@ class SetupFallbacktuner(Setup):
 				config.usage.remote_fallback_nok,
 				_("Show notification when import channels and/or EPG from remote receiver URL did not complete")))
 		if config.usage.remote_fallback_enabled.value and config.usage.remote_fallback.value:
-			self.list.append((_("Customize OpenWebIF settings for fallback tuner"),
+			self.list.append((_("Customize OpenWebIF settings for fallback receiver"),
 				config.usage.remote_fallback_openwebif_customize,
-				_("When enabled you can customize the OpenWebIf settings for the fallback tuner")))
+				_("When enabled you can customize the OpenWebIf settings for the fallback receiver")))
 			if config.usage.remote_fallback_openwebif_customize.value:
 				self.list.append(("  %s" % _("User ID"),
 					config.usage.remote_fallback_openwebif_userid,
-					_("Set the User ID of the OpenWebif from your fallback tuner")))
+					_("Set the User ID of the OpenWebif from your fallback receiver")))
 				self.list.append(("  %s" % _("Password"),
 					config.usage.remote_fallback_openwebif_password,
-					_("Set the password of the OpenWebif from your fallback tuner")))
+					_("Set the password of the OpenWebif from your fallback receiver")))
 				self.list.append(("  %s" % _("Port"),
 					config.usage.remote_fallback_openwebif_port,
-					"  %s" % _("Set the port of the OpenWebif from your fallback tuner")))
+					"  %s" % _("Set the port of the OpenWebif from your fallback receiver")))
 			self.list.append((_("Alternative URLs for DVB-T/C or ATSC"),
 				config.usage.remote_fallback_alternative,
 				_("Set alternative fallback tuners for DVB-T/C or ATSC")))
