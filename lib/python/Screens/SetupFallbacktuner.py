@@ -16,11 +16,21 @@ class SetupFallbacktuner(Setup):
 	def createConfig(self):
 
 		def set_avahiselect_seperate(configElement):
-			self.seperateBoxes = [("same", _("Same as stream"))] + self.peerStreamingBoxes
+			self.seperateBoxes = self.peerStreamingBoxes
 			if configElement.value not in ("url", "ip") and configElement.value in self.seperateBoxes:
 				self.seperateBoxes.remove(configElement.value)
+			self.seperateBoxes = [("same", _("Same as stream"))] + self.seperateBoxes
+			# import URL's don't need a port, so strip them
+			webifBoxes = []
+			for el in self.seperateBoxes:
+				if isinstance(el, str) and el.count(":") > 1:
+					webifBoxes.append(el.rsplit(":", 1)[0])
+				else:
+					webifBoxes.append(el)
 			default = config.usage.remote_fallback_import_url.value if config.usage.remote_fallback_import_url.value and config.usage.remote_fallback_import_url.value != config.usage.remote_fallback.value else "same"
-			self.avahiselect_seperate = ConfigSelection(default=default, choices=self.seperateBoxes)
+			if default.count(":") > 1:
+				default = default.rsplit(":", 1)[0]
+			self.avahiselect_seperate = ConfigSelection(default=default, choices=webifBoxes)
 			default = config.usage.remote_fallback_dvb_t.value if config.usage.remote_fallback_dvb_t.value and config.usage.remote_fallback_dvb_t.value != config.usage.remote_fallback.value else "same"
 			self.avahi_dvb_t = ConfigSelection(default=default, choices=self.seperateBoxes)
 			default = config.usage.remote_fallback_dvb_c.value if config.usage.remote_fallback_dvb_c.value and config.usage.remote_fallback_dvb_c.value != config.usage.remote_fallback.value else "same"
@@ -186,7 +196,7 @@ class SetupFallbacktuner(Setup):
 		elif self.avahiselect.value != "url":
 			config.usage.remote_fallback.value = self.avahiselect.value
 		if self.avahiselect_seperate.value == "ip":
-			config.usage.remote_fallback_import_url.value = "http://%d.%d.%d.%d:%d" % (tuple(self.ip_seperate.value) + (80,))
+			config.usage.remote_fallback_import_url.value = "http://%d.%d.%d.%d" % (tuple(self.ip_seperate.value))
 		elif self.avahiselect_seperate.value == "same":
 			config.usage.remote_fallback_import_url.value = ""
 		elif self.avahiselect_seperate.value != "url":
