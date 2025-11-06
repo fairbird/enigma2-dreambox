@@ -48,7 +48,6 @@ class TimerEditList(Screen):
 		self["key_green"] = StaticText(_("Add"))
 		self["key_yellow"] = StaticText("")
 		self["key_blue"] = StaticText("")
-		self["key_menu"] = StaticText(_("MENU"))
 		self["key_info"] = StaticText(_("INFO"))
 
 		self["description"] = Label("")
