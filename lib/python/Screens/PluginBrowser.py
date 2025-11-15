@@ -64,7 +64,7 @@ config.pluginfilter.subscription = ConfigYesNo(default=True)
 config.pluginfilter.systemplugins = ConfigYesNo(default=True)
 config.pluginfilter.vix = ConfigYesNo(default=False)
 config.pluginfilter.weblinks = ConfigYesNo(default=True)
-config.pluginfilter.userfeed = ConfigText(default="http://", fixed_size=False)
+config.pluginfilter.userfeed = ConfigText(default="https://", fixed_size=False)
 
 MODULE_NAME = __name__.split(".")[-1]
 
@@ -227,7 +227,7 @@ class PluginBrowser(Screen, ProtectedScreen):
 		self.onChangedEntry = []
 		self["list"].onSelectionChanged.append(self.selectionChanged)
 		self.onLayoutFinish.append(self.saveListsize)
-		if config.pluginfilter.userfeed.value != "http://" and not fileExists("/etc/opkg/user-feed.conf"):
+		if config.pluginfilter.userfeed.value != "https://" and not fileExists("/etc/opkg/user-feed.conf"):
 			self.CreateFeedConfig()
 
 	def isProtected(self):
@@ -380,7 +380,7 @@ class PluginBrowser(Screen, ProtectedScreen):
 
 	def menu(self):
 		def keyMenuCallback():
-			if config.pluginfilter.userfeed.value != "http://":
+			if config.pluginfilter.userfeed.value != "https://":
 				self.createFeedConfig()
 			self.checkWarnings()
 			self.updateList()
@@ -529,7 +529,7 @@ class PluginBrowserNew(Screen):
 		self.onLayoutFinish.append(self.saveListsize)
 		self.onChangedEntry = []
 		self.setTitle(_("Plugin browser"))
-		if config.pluginfilter.userfeed.value != "http://" and not fileExists("/etc/opkg/user-feed.conf"):
+		if config.pluginfilter.userfeed.value != "https://" and not fileExists("/etc/opkg/user-feed.conf"):
 			self.CreateFeedConfig()
 		self.number = 0
 		self.nextNumberTimer = eTimer()
@@ -1029,7 +1029,7 @@ class PluginBrowserNew(Screen):
 
 	def menu(self):
 		def keyMenuCallback():
-			if config.pluginfilter.userfeed.value != "http://":
+			if config.pluginfilter.userfeed.value != "https://":
 				self.createFeedConfig()
 			self.checkWarnings()
 			self.updateList()
