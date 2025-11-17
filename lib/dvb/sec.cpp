@@ -1296,7 +1296,8 @@ RESULT eDVBSatelliteEquipmentControl::addLNB()
 	m_lnbidx++;
 	m_lnbs.push_back(lnb);
 	m_curSat = lnb.m_satellites.end();
-	eSecDebug("[eDVBSatelliteEquipmentControl::addLNB] lnb=%d)", m_lnbidx);
+	eSecDebug("[eDVBSatelliteEquipmentControl::addLNB] lnb=%d", m_lnbidx);
+	
 	return 0;
 }
 
