@@ -804,7 +804,7 @@ class InfoBarHotkey:
 				if os.path.isfile(command):
 					if ".hidden." in command:
 						from enigma import eConsoleAppContainer
-						eConsoleAppContainer().execute("python %s" % command)
+						eConsoleAppContainer().execute("python3 %s" % command)
 					else:
 						from Screens.Console import Console
 						self.session.open(Console, selected[1] + " pythonscript", "python3 %s" % command, closeOnSuccess=selected[1].startswith('!'), showStartStopText=False)
