@@ -99,7 +99,7 @@ commitLogs = [
 	("Aio Grab", API_GITHUB, "https://api.github.com/repos/oe-alliance/aio-grab/commits"),
 	("Plugin EPGImport", API_GITHUB, "https://api.github.com/repos/E2OpenPlugins/e2openplugin-OpenWebif/commits"),
 	("Skin PLi HD", API_GITHUB, "https://api.github.com/repos/fairbird/skin-PLiHD/commits"),
-	("OpenWebif", API_GITHUB, "https://api.github.com/repos/E2OpenPlugins/e2openplugin-OpenWebif/commits"),
+	("OpenWebif", API_GITHUB, "https://api.github.com/repos/oe-alliance/OpenWebif/commits"),
 	("Hans settings", API_GITLAB, "https://gitlab.openpli.org/api/v4/projects/5/repository/commits")
 ]
 BoxInfo.setItem("InformationCommitLogs", commitLogs)
