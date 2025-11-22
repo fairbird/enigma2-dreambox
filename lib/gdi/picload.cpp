@@ -1250,12 +1250,7 @@ int ePicLoad::startThread(int what, const char* file, int x, int y, bool async) 
 	int file_id = getFileType(file);
 	if (file_id < 0) {
 		eDebug("[ePicLoad] <format not supported>");
-		if (async) {
-			msg_thread.send(Message(Message::decode_error));
-			run();
-			return 0;
-		} else
-			return 1;
+		return 1;
 	}
 
 	m_filepara = new Cfilepara(file, file_id, getSize(file));
@@ -1266,12 +1261,7 @@ int ePicLoad::startThread(int what, const char* file, int x, int y, bool async) 
 		delete m_filepara;
 		m_filepara = NULL;
 		eDebug("[ePicLoad] <error in Para>");
-		if (async) {
-			msg_thread.send(Message(Message::decode_error));
-			run();
-			return 0;
-		} else
-			return 1;
+		return 1;
 	}
 	if (async) {
 		msg_thread.send(Message(what == 1 ? Message::decode_Pic : Message::decode_Thumb));
