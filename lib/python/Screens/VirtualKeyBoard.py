@@ -115,9 +115,9 @@ class VirtualKeyBoardEntryComponent:
 # For more information about using VirtualKeyBoard see /doc/VIRTUALKEYBOARD
 #
 class VirtualKeyBoard(Screen):
-	def __init__(self, session, title=_("Virtual KeyBoard Text:"), text="", maxSize=False, visible_width=False, type=Input.TEXT, currPos=None, allMarked=False, style=VKB_ENTER_ICON):
+	def __init__(self, session, title=_("Virtual KeyBoard Text:"), text="", maxSize=False, visible_width=False, type=Input.TEXT, currPos=None, allMarked=False, style=VKB_ENTER_ICON, windowTitle=None):
 		Screen.__init__(self, session, enableHelp=True)
-		self.setTitle(_("Virtual keyboard"))
+		self.setTitle(_("Virtual Keyboard") if windowTitle is None else windowTitle)
 		prompt = title  # Title should only be used for screen titles!
 		self["key_info"] = StaticText(_("INFO"))
 		self["key_text"] = StaticText(_("TEXT"))
@@ -1261,9 +1261,9 @@ class VirtualKeyBoard(Screen):
 
 
 class VirtualKeyBoardstyle(Screen):
-	def __init__(self, session, title=_("Virtual KeyBoard Text:"), text="", maxSize=False, visible_width=False, type=Input.TEXT, currPos=None, allMarked=False, style=VKB_ENTER_ICON):
+	def __init__(self, session, title=_("Virtual KeyBoard Text:"), text="", maxSize=False, visible_width=False, type=Input.TEXT, currPos=None, allMarked=False, style=VKB_ENTER_ICON, windowTitle=None):
 		Screen.__init__(self, session, enableHelp=True)
-		self.setTitle(_("Virtual keyboard"))
+		self.setTitle(_("Virtual Keyboard") if windowTitle is None else windowTitle)
 		prompt = title  # Title should only be used for screen titles!
 		greenLabel, self.green = {
 			VKB_DONE_ICON: ("Done", "ENTERICON"),
