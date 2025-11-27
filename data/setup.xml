@@ -434,8 +434,7 @@
 		<item level="1" text="Automatically start timeshift after" description="When enabled, timeshift starts automatically in background after the specified time.">config.usage.timeshift_start_delay</item>
 		<item level="1" text="Show warning when timeshift is stopped" description="When enabled, a warning will be displayed and the user will get an option to stop or to continue the timeshift.">config.usage.check_timeshift</item>
 		<item level="2" text="Skip jumping to live TV while timeshifting with plugins" description="If set to 'yes', allows you to use timeshift with alternative audio plugins.">config.timeshift.skipReturnToLive</item>
-		<item level="2" text="Streaming precise recovery" description="Select 'Yes' to enable handle streaming corruption issues and try to make a precise recovery.">config.timeshift.preciseRecovery</item>
-		<item level="2" text="Streaming recovery delay" description="Enter the duration to be added to the streaming buffer after a streaming error. This extra buffer can help to avoid further streaming issues due to a lack of buffer space." conditional="config.timeshift.preciseRecovery.value">config.timeshift.recoveryBufferDelay</item>
+		<item level="2" text="Streaming recovery delay" description="Enter the duration to be added to the streaming buffer after a streaming error. This extra buffer can help to avoid further streaming issues due to a lack of buffer space.">config.timeshift.recoveryBufferDelay</item>
 		<!--
 		<item level="2" text="Timeshift-save action on zap" description="Select if timeshift should continue when set to record.">config.timeshift.favoriteSaveAction</item>
 		<item level="2" text="Stop timeshift while recording?" description="Stops timeshift being used if a recording is in progress. (Advisable for USB sticks)">config.timeshift.stopwhilerecording</item>
