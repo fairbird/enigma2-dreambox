@@ -18,7 +18,7 @@ LIST_BLACKLIST = "blacklist"
 FLAG_IS_PARENTAL_PROTECTED_HIDDEN = 256
 
 config.ParentalControl = ConfigSubsection()
-config.ParentalControl.storeservicepin = ConfigSelection(default="never", choices=[("never", _("never")), ("5", _("%d minutes") % 5), ("15", _("%d minutes") % 15), ("30", _("%d minutes") % 30), ("60", _("%d minutes") % 60), ("120", _("%d minutes") % 120), ("standby", _("until standby/restart"))])
+config.ParentalControl.storeservicepin = ConfigSelection(default="never", choices=[("never", _("Never"))] + [(str(x), ngettext("%d Minute", "%d Minutes", x) % x) for x in [5, 15, 30, 60]] + [("standby", _("Until standby/restart"))])
 config.ParentalControl.configured = ConfigYesNo(default=False)
 config.ParentalControl.setuppinactive = ConfigYesNo(default=False)
 config.ParentalControl.retries = ConfigSubsection()

@@ -310,14 +310,8 @@ def InitLcd():
 			("300", _("Normal")),
 			("100", _("Fast"))
 		], default="300")
-		config.lcd.scroll_delay = ConfigSelection(choices=[
-			("10000", "10 %s" % _("seconds")),
-			("20000", "20 %s" % _("seconds")),
-			("30000", "30 %s" % _("seconds")),
-			("60000", "1 %s" % _("minute")),
-			("300000", "5 %s" % _("minutes")),
-			("noscrolling", _("Off"))
-		], default="10000")
+		delayChoices = [(x, ngettext("%d Second", "%d Seconds", x) % x) for x in (10, 20, 30, 40, 50)] + [(x * 60, ngettext("%d Minute", "%d Minutes", x) % x) for x in (1, 2, 3, 5, 10, 15)] + [(0, _("Off"))]
+		config.lcd.scroll_delay = ConfigSelection(default=10, choices=delayChoices)
 
 		def setLCDbright(configElement):
 			ilcd.setBright(configElement.value)
@@ -492,17 +486,8 @@ def InitLcd():
 		config.lcd.bright = ConfigSlider(default=BoxInfo.getItem("DefaultDisplayBrightness"), limits=(0, 10))
 		config.lcd.dimbright.addNotifier(setLCDdimbright)
 		config.lcd.dimbright.apply = lambda: setLCDdimbright(config.lcd.dimbright)
-		config.lcd.dimdelay = ConfigSelection(choices=[
-			("5", "5 %s" % _("seconds")),
-			("10", "10 %s" % _("seconds")),
-			("15", "15 %s" % _("seconds")),
-			("20", "20 %s" % _("seconds")),
-			("30", "30 %s" % _("seconds")),
-			("60", "1 %s" % _("minute")),
-			("120", "2 %s" % _("minutes")),
-			("300", "5 %s" % _("minutes")),
-			("0", _("Off"))
-		], default="0")
+		delayChoices = [(x, ngettext("%d Second", "%d Seconds", x) % x) for x in (5, 10, 15, 20, 30)] + [(x * 60, ngettext("%d Minute", "%d Minutes", x) % x) for x in (1, 2, 3, 5, 10)] + [(0, _("Off"))]
+		config.lcd.dimdelay = ConfigSelection(default=0, choices=delayChoices)
 		config.lcd.dimdelay.addNotifier(setLCDdimdelay)
 		config.lcd.standby.addNotifier(setLCDstandbybright)
 		config.lcd.standby.apply = lambda: setLCDstandbybright(config.lcd.standby)
@@ -584,14 +569,8 @@ def InitLcd():
 			def initial_scroll_delay(configElement):
 				eDBoxLCD.getInstance().set_VFD_initial_scroll_delay(int(configElement.value))
 
-			config.usage.vfd_initial_scroll_delay = ConfigSelection(choices=[
-				("3000", "3 %s" % _("seconds")),
-				("5000", "5 %s" % _("seconds")),
-				("10000", "10 %s" % _("seconds")),
-				("20000", "20 %s" % _("seconds")),
-				("30000", "30 %s" % _("seconds")),
-				("0", _("No delay"))
-			], default="10000")
+			delayChoices = [(x * 1000, ngettext("%d Second", "%d Seconds", x) % x) for x in (3, 5, 10, 20, 30)] + [(0, _("No delay"))]
+			config.usage.vfd_initial_scroll_delay = ConfigSelection(default=10000, choices=delayChoices)
 			config.usage.vfd_initial_scroll_delay.addNotifier(initial_scroll_delay, immediate_feedback=False)
 		else:
 			config.usage.vfd_initial_scroll_delay = ConfigNothing()
@@ -600,14 +579,8 @@ def InitLcd():
 			def final_scroll_delay(configElement):
 				eDBoxLCD.getInstance().set_VFD_final_scroll_delay(int(configElement.value))
 
-			config.usage.vfd_final_scroll_delay = ConfigSelection(choices=[
-				("3000", "3 %s" % _("seconds")),
-				("5000", "5 %s" % _("seconds")),
-				("10000", "10 %s" % _("seconds")),
-				("20000", "20 %s" % _("seconds")),
-				("30000", "30 %s" % _("seconds")),
-				("0", _("No delay"))
-			], default="10000")
+			delayChoices = [(x * 1000, ngettext("%d Second", "%d Seconds", x) % x) for x in (3, 5, 10, 20, 30)] + [(0, _("No delay"))]
+			config.usage.vfd_final_scroll_delay = ConfigSelection(default=10000, choices=delayChoices)
 			config.usage.vfd_final_scroll_delay.addNotifier(final_scroll_delay, immediate_feedback=False)
 		else:
 			config.usage.vfd_final_scroll_delay = ConfigNothing()
@@ -672,14 +645,8 @@ def InitLcd():
 			("300", _("Normal")),
 			("100", _("Fast"))
 		], default="300")
-		config.lcd.scroll_delay = ConfigSelection(choices=[
-			("10000", "10 %s" % _("seconds")),
-			("20000", "20 %s" % _("seconds")),
-			("30000", "30 %s" % _("seconds")),
-			("60000", "1 %s" % _("minute")),
-			("300000", "5 %s" % _("minutes")),
-			("noscrolling", _("Off"))
-		], default="10000")
+		delayChoices = [(x, ngettext("%d Second", "%d Seconds", x) % x) for x in (10, 20, 30, 40, 50)] + [(x * 60, ngettext("%d Minute", "%d Minutes", x) % x) for x in (1, 2, 3, 5, 10, 15)] + [(0, _("Off"))]
+		config.lcd.scroll_delay = ConfigSelection(default=10, choices=delayChoices)
 		config.lcd.showoutputresolution = ConfigNothing()
 		config.lcd.ledbrightness = ConfigNothing()
 		config.lcd.ledbrightness.apply = lambda: doNothing()
