@@ -477,7 +477,7 @@ class HdmiCec:
 			ctrl1 = message.getControl1()
 			ctrl2 = message.getControl2()
 			address = message.getAddress()
-			print(f"[hdmiCEC][messageReceived]1: address={address}  CECcmd={_CECcmd}, cmd = {cmd}, ctrl0={ctrl0}, length={length} \n")
+			#print(f"[hdmiCEC][messageReceived]1: address={address}  CECcmd={_CECcmd}, cmd = {cmd}, ctrl0={ctrl0}, length={length} \n")
 
 			if config.hdmicec.debug.value != "0":
 				self.debugRx(length, cmd, data)
