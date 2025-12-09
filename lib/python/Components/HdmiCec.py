@@ -56,6 +56,71 @@ cmdList = {
 	0xff: "<Abort>"
 	}
 
+CECcmd = {
+	0x00: "<Feature Abort>",
+	0x04: "<Image View On>",
+	0x05: "<Tuner Step Increment>",
+	0x06: "<Tuner Step Decrement>",
+	0x07: "<Tuner Device Status>",
+	0x08: "<Give Tuner Device Status>",
+	0x09: "<Record On>",
+	0x0A: "<Record Status>",
+	0x0B: "<Record Off>",
+	0x0D: "<Text View On>",
+	0x0F: "<Record TV Screen>",
+	0x1A: "<Give Deck Status>",
+	0x1B: "<Deck Status>",
+	0x32: "<Set Menu Language>",
+	0x33: "<Clear Analogue Timer>",
+	0x34: "<Set Analogue Timer>",
+	0x35: "<Timer Status>",
+	0x36: "<Standby>",
+	0x41: "<Play>",
+	0x42: "<Deck Control>",
+	0x43: "<Timer Cleared Status>",
+	0x44: "<User Control Pressed>",
+	0x45: "<User Control Released>",
+	0x46: "<Give OSD Name>",
+	0x47: "<Set OSD Name>",
+	0x64: "<Set OSD String>",
+	0x67: "<Set Timer Program Title>",
+	0x70: "<System Audio Mode Request>",
+	0x71: "<Give Audio Status>",
+	0x72: "<Set System Audio Mode>",
+	0x7A: "<Report Audio Status>",
+	0x7D: "<Give System Audio Mode Status>",
+	0x7E: "<System Audio Mode Status>",
+	0x80: "<Routing Change>",
+	0x81: "<Routing Information>",
+	0x82: "<Active Source>",
+	0x83: "<Give Physical Address>",
+	0x84: "<Report Physical Address>",
+	0x85: "<Request Active Source>",
+	0x86: "<Set Stream Path>",
+	0x87: "<Reporting Device Vendor ID>",  # Device (TV, AV receiver, audio device) returns its vendor ID (3 bytes).
+	0x89: "<Vendor Command><Vendor Specific Data>",
+	0x8A: "<Vendor Remote Button Down><Vendor Specific RC Code>",
+	0x8B: "<Vendor Remote Button Up>",
+	0x8C: "<Request Device Vendor ID>",  # Request vendor ID from device(TV, AV receiver, audio device).
+	0x8D: "<Menu Request>",
+	0x8E: "<Menu Status>",
+	0x8F: "<Give Device Power Status>",
+	0x90: "<Report Power Status>",
+	0x91: "<Get Menu Language>",
+	0x92: "<Select Analogue Service>",
+	0x93: "<Select Digital Service>",
+	0x97: "<Set Digital Timer>",
+	0x99: "<Clear Digital Timer>",
+	0x9A: "<Set Audio Rate>",
+	0x9D: "<Inactive Source>",
+	0x9E: "<CEC Version>",
+	0x9F: "<Get CEC Version>",
+	0xA0: "<Vendor Command With ID>",
+	0xA1: "<Clear External Timer>",
+	0xA2: "<Set External Timer>",
+	0xFF: "<Abort>"
+}
+
 config.hdmicec = ConfigSubsection()
 config.hdmicec.enabled = ConfigYesNo(default=False)
 config.hdmicec.control_tv_standby = ConfigYesNo(default=True)
@@ -405,11 +470,14 @@ class HdmiCec:
 		if config.hdmicec.enabled.value:
 			from Screens.Standby import inStandby
 			cmd = message.getCommand()
+			_CECcmd = CECcmd.get(cmd, "<Polling Message>")
 			data = 16 * '\x00'
 			length = message.getData(data, len(data))
 			ctrl0 = message.getControl0()
 			ctrl1 = message.getControl1()
 			ctrl2 = message.getControl2()
+			address = message.getAddress()
+			print(f"[hdmiCEC][messageReceived]1: address={address}  CECcmd={_CECcmd}, cmd = {cmd}, ctrl0={ctrl0}, length={length} \n")
 
 			if config.hdmicec.debug.value != "0":
 				self.debugRx(length, cmd, data)
