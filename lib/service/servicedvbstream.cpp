@@ -412,3 +412,9 @@ void eDVBServiceStream::gotNewEvent(int /*error*/)
 
 	/* TODO: inject EIT section into the stream */
 }
+
+RESULT eDVBServiceStream::frontendInfo(ePtr<iFrontendInformation> &ptr)
+{
+	ptr = this;
+	return 0;
+}
