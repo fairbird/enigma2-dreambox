@@ -575,7 +575,7 @@ class Network:
 	def deactivateInterface(self, ifaces, callback=None):
 		def buildCommands(iface):
 			commands.append(f"ifdown {iface}")
-			commands.append(f"ip addr flush dev {iface} scope global"
+			commands.append(f"ip addr flush dev {iface} scope global")
 			# The wpa_supplicant sometimes doesn't quit properly on SIGTERM.
 			if exists(f"/var/run/wpa_supplicant/{iface}"):
 				commands.append(f"wpa_cli -i{iface} terminate")
