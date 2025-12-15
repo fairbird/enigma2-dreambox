@@ -580,11 +580,11 @@ class Network:
 			if exists(f"/var/run/wpa_supplicant/{iface}"):
 				commands.append(f"wpa_cli -i{iface} terminate")
 
-		self.config_ready=False
+		self.config_ready = False
 		self.msgPlugins()
-		commands=[]
+		commands = []
 		if not self.deactivateInterfaceConsole:
-			self.deactivateInterfaceConsole=Console()
+			self.deactivateInterfaceConsole = Console()
 		if isinstance(ifaces, (list, tuple)):
 			for iface in ifaces:
 				if iface != "eth0" or not self.onRemoteRootFS():
@@ -600,13 +600,13 @@ class Network:
 	def deactivateInterfaceFinished(self, extra_args):
 		def checkCommandResult(iface):
 			if self.deactivateInterfaceConsole and f"ifdown {iface}" in self.deactivateInterfaceConsole.appResults:
-				result=str(self.deactivateInterfaceConsole.appResults.get(f"ifdown {iface}")).strip("\n")
+				result = str(self.deactivateInterfaceConsole.appResults.get(f"ifdown {iface}")).strip("\n")
 				if result == f"ifdown: interface {iface} not configured":
 					return False
 				else:
 					return True
 
-		(ifaces, callback)=extra_args
+		(ifaces, callback) = extra_args
 		# The ifdown command sometimes can't get the interface down.
 		if isinstance(ifaces, (list, tuple)):
 			for iface in ifaces:
@@ -621,19 +621,19 @@ class Network:
 
 	def activateInterface(self, iface, callback=None):
 		if self.config_ready:
-			self.config_ready=False
+			self.config_ready = False
 			self.msgPlugins()
 		if iface == "eth0" and self.onRemoteRootFS():
 			if callback is not None:
 				callback(True)
 			return
 		if not self.activateInterfaceConsole:
-			self.activateInterfaceConsole=Console()
-		commands=[f"/sbin/ifup {iface}"]
+			self.activateInterfaceConsole = Console()
+		commands = [f"/sbin/ifup {iface}"]
 		self.activateInterfaceConsole.eBatch(commands, self.activateInterfaceFinished, callback, debug=True)
 
 	def activateInterfaceFinished(self, extra_args):
-		callback=extra_args
+		callback = extra_args
 		if self.activateInterfaceConsole:
 			if len(self.activateInterfaceConsole.appContainers) == 0:
 				if callback is not None:
@@ -653,9 +653,9 @@ class Network:
 		if not exists("/proc/net/wireless"):
 			return False
 		# The r871x_usb_drv on kernel 2.6.12 is not identifiable over /sys/class/net/"ifacename"/wireless so look also inside /proc/net/wireless.
-		device=compile("[a-z]{2,}[0-9]*:")
-		ifnames=[]
-		fp=open("/proc/net/wireless")
+		device = compile("[a-z]{2,}[0-9]*:")
+		ifnames = []
+		fp = open("/proc/net/wireless")
 		for line in fp:
 			try:
 				ifnames.append(device.search(line).group()[:-1])
@@ -670,10 +670,10 @@ class Network:
 
 	def getWlanModuleDir(self, iface=None):
 		if self.sysfsPath(iface) == "/sys/class/net/wlan3" and exists(f"/tmp/bcm/{iface}"):
-			devicedir=f"{self.sysfsPath('sys0')}/device"
+			devicedir = f"{self.sysfsPath('sys0')}/device"
 		else:
-			devicedir=f"{self.sysfsPath(iface)}/device"
-		moduledir=f"{devicedir}/driver/module"
+			devicedir = f"{self.sysfsPath(iface)}/device"
+		moduledir = f"{devicedir}/driver/module"
 		if isdir(moduledir):
 			return moduledir
 		# Identification is not possible over default module directory.
@@ -681,11 +681,11 @@ class Network:
 			for x in listdir(devicedir):
 				# The rt3070 on kernel 2.6.18 registers wireless devices as usb_device (e.g. 1-1.3:1.0) and identification is only possible over /sys/class/net/"ifacename"/device/1-xxx.
 				if x.startswith("1-"):
-					moduledir=f"{devicedir}/{x}/driver/module"
+					moduledir = f"{devicedir}/{x}/driver/module"
 					if isdir(moduledir):
 						return moduledir
 			# The rt73, zd1211b, r871x_usb_drv on kernel 2.6.12 can be identified over /sys/class/net/"ifacename"/device/driver, so also look here.
-			moduledir=f"{devicedir}/driver"
+			moduledir = f"{devicedir}/driver"
 			if isdir(moduledir):
 				return moduledir
 		except Exception:
@@ -695,12 +695,12 @@ class Network:
 	def detectWlanModule(self, iface=None):
 		if not self.isWirelessInterface(iface):
 			return None
-		devicedir=f"{self.sysfsPath(iface)}/device"
+		devicedir = f"{self.sysfsPath(iface)}/device"
 		if isdir(f"{devicedir}/ieee80211"):
 			return "nl80211"
-		moduledir=self.getWlanModuleDir(iface)
+		moduledir = self.getWlanModuleDir(iface)
 		if moduledir:
-			module=basename(realpath(moduledir))
+			module = basename(realpath(moduledir))
 			if module in ("brcm-systemport",):
 				return "brcm-wl"
 			if module in ("ath_pci", "ath5k"):
@@ -714,14 +714,14 @@ class Network:
 	def calcNetmask(self, nmask):
 		# mask = 1 << 31
 		# xnet = (1 << 32) - 1
-		cidrRange=range(0, 32)
-		cidr=int(nmask)
+		cidrRange = range(0, 32)
+		cidr = int(nmask)
 		if cidr not in cidrRange:
 			print("[Network] cidr invalid: %d!" % cidr)
 			return None
 		else:
-			nm=((1 << cidr) - 1) << (32 - cidr)
-			netmask=str(inet_ntoa(pack(">L", nm)))
+			nm = ((1 << cidr) - 1) << (32 - cidr)
+			netmask = str(inet_ntoa(pack(">L", nm)))
 			return netmask
 
 	def msgPlugins(self):
@@ -730,10 +730,10 @@ class Network:
 				p(reason=self.config_ready)
 
 	def hotplug(self, event):
-		interface=event["INTERFACE"]
+		interface = event["INTERFACE"]
 		if self.isBlacklisted(interface):
 			return
-		action=event["ACTION"]
+		action = event["ACTION"]
 		if action == "add":
 			print(f"[Network] Add new interface: '{interface}'.")
 			self.getAddrInet(interface, None)
@@ -745,13 +745,13 @@ class Network:
 				pass
 
 	def getInterfacesNameserverList(self, iface):
-		result=[]
-		nameservers=self.getAdapterAttribute(iface, "dns-nameservers")
+		result = []
+		nameservers = self.getAdapterAttribute(iface, "dns-nameservers")
 		if nameservers:
-			ipRegexp=r"[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}"
-			ipPattern=compile(ipRegexp)
+			ipRegexp = r"[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}"
+			ipPattern = compile(ipRegexp)
 			for x in nameservers.split()[1:]:
-				ip=self.regExpMatch(ipPattern, x)
+				ip = self.regExpMatch(ipPattern, x)
 				if ip:
 					result.append([int(n) for n in ip.split(".")])
 		if len(self.nameservers) and not result:  # Also use global name server if we got none from the interface.
@@ -759,12 +759,12 @@ class Network:
 		return result
 
 
-iNetwork=Network()
+iNetwork = Network()
 
 
 class NetworkCheck:
 	def __init__(self):
-		self.Timer=eTimer()
+		self.Timer = eTimer()
 		self.Timer.callback.append(self.startCheckNetwork)
 
 	def startCheckNetwork(self):
@@ -775,17 +775,17 @@ class NetworkCheck:
 					print("[Network] NetworkCheck: Done.")
 					harddiskmanager.enumerateNetworkMounts(refresh=True)
 					return
-				self.Retry=self.Retry - 1
+				self.Retry = self.Retry - 1
 				self.Timer.start(1000, True)
 			except Exception as err:
 				print(f"[Network] NetworkCheck: Error {str(err)}!")
 
 	def Start(self):
-		self.Retry=10
+		self.Retry = 10
 		self.Timer.start(1000, True)
 
 
 def InitNetwork():
 	global networkCheck
-	networkCheck=NetworkCheck()
+	networkCheck = NetworkCheck()
 	networkCheck.Start()
