@@ -236,7 +236,7 @@ class Genres:
 		#
 		0xE0: _("Documentary")
 	}
-	levelOneAUSIceTV ={
+	levelOneAUSIceTV = {
 		0x0: _("Miscellaneous"),
 		0x1: _("Movie/Drama"),
 		0x2: _("News/Current affairs"),
