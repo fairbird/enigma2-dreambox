@@ -260,12 +260,11 @@
 	</screen>
 
 	<screen name="MessageBox_summary" position="0,0" size="240,80">
-		<widget source="parent.Text" render="Label" position="0,0" size="240,40" font="FdLcD;17" horizontalAlignment="center" />
-		<widget source="parent.selectedChoice" render="Label" position="0,40" size="240,28" font="FdLcD;26" horizontalAlignment="center" noWrap="1" />
+		<widget source="text" render="Label" position="0,0" size="240,40" font="FdLcD;17" horizontalAlignment="center" />
+		<widget source="option" render="Label" position="0,40" size="240,28" font="FdLcD;26" horizontalAlignment="center" noWrap="1" />
 	</screen>
 	<screen name="MessageBoxSimple_summary" position="0,0" size="240,80">
-		<widget source="parent.Text" render="Label" position="0,0" size="240,40" font="FdLcD;17" horizontalAlignment="center" />
-		<widget source="parent.selectedChoice" render="Label" position="0,40" size="240,28" font="FdLcD;26" horizontalAlignment="center" noWrap="1" />
+		<panel name="MessageBoxSummary" />
 	</screen>
 
 	<screen name="AboutSummary" position="0,0" size="240,80">
