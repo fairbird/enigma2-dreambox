@@ -43,6 +43,11 @@ jobs:
         sudo apt-get install mm-common
 
     - uses: actions/checkout@v4
+
+    - name: Fix git safe.directory
+      run: |
+        git config --global --add safe.directory "$GITHUB_WORKSPACE"
+
     - uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python }}
@@ -50,8 +55,6 @@ jobs:
     - name: Install python ${{ matrix.python }} packages
       run: |
         pip3 install flake8
-
-
 
     - name: Check format PEP8
       run: |
