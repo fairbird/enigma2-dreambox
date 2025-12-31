@@ -63,7 +63,7 @@ class EPGList(GUIComponent):
 		elif type == EPG_TYPE_MULTI:
 			self.l.setBuildFunc(self.buildMultiEntry)
 		else:
-			assert (type == EPG_TYPE_SIMILAR)
+			assert (type == EPG_TYPE_SIMILAR or type == EPG_TYPE_PARTIAL)
 			self.l.setBuildFunc(self.buildSimilarEntry)
 		self.epgcache = eEPGCache.getInstance()
 		main_icons = (
