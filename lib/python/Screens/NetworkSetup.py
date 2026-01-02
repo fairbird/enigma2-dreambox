@@ -63,7 +63,7 @@ class NetworkAdapterSelection(Screen):
 			"ok": (self.okbuttonClick, _("Select interface")),
 			"red": (self.close, _("Exit network interface list")),
 			"green": (self.okbuttonClick, _("Select interface")),
-			"blue": (self.restartLan, _("Restart network to with current setup"))
+			"blue": (self.restartLanAsk, _("Restart network to with current setup"))
 		}, prio=0, description=_("Network Adapter Actions"))
 		self.adapters = [(iNetwork.getFriendlyAdapterName(x), x) for x in iNetwork.getAdapterList()]
 		if not self.adapters:
@@ -142,11 +142,15 @@ class NetworkAdapterSelection(Screen):
 		iNetwork.stopLinkStateConsole()
 		iNetwork.stopRestartConsole()
 
-	def restartLan(self):
-		def restartfinishedCB():
-			self.updateList()
-			self.session.open(MessageBox, _("Finished configuring your network"), type=MessageBox.TYPE_INFO, timeout=10, default=False)
-		RestartNetworkNew.start(callback=restartfinishedCB)
+	def restartLanAsk(self):
+		self.session.openWithCallback(self.restartLan, MessageBox, _("Are you sure you want to restart your network interfaces?"))
+
+	def restartLan(self, ret=False):
+		if ret:
+			def restartfinishedCB():
+				self.updateList()
+				self.session.open(MessageBox, _("Finished configuring your network"), type=MessageBox.TYPE_INFO, timeout=10, default=False)
+			RestartNetworkNew.start(callback=restartfinishedCB)
 
 
 class DNSSettings(Setup):
@@ -853,11 +857,6 @@ class AdapterSetupConfiguration(Screen):
 					self.session.openWithCallback(self.WlanStatusClosed, WlanStatus, self.iface)
 				else:
 					self.showErrorMessage()	 # Display Wlan not available message.
-		if self["menulist"].getCurrent()[1] == "lanrestart":
-			self.session.openWithCallback(self.restartLan, MessageBox, "%s\n\n%s" % (_("Are you sure you want to restart your network interfaces?"), self.oktext))
-		if self["menulist"].getCurrent()[1] == "openwizard":
-			from Plugins.SystemPlugins.NetworkWizard.NetworkWizard import NetworkWizard
-			self.session.openWithCallback(self.AdapterSetupClosed, NetworkWizard, self.iface)
 		if self["menulist"].getCurrent()[1][0] == "extendedSetup":
 			self.extended = self["menulist"].getCurrent()[1][2]
 			self.extended(self.session, self.iface)
@@ -877,8 +876,6 @@ class AdapterSetupConfiguration(Screen):
 			self["description"].setText("%s\n\n%s" % (_("Scan your network for wireless access points and connect to them using your selected wireless device."), self.oktext))
 		if self["menulist"].getCurrent()[1] == "wlanstatus":
 			self["description"].setText("%s\n\n%s" % (_("Shows the state of your wireless LAN connection."), self.oktext))
-		if self["menulist"].getCurrent()[1] == "lanrestart":
-			self["description"].setText("%s\n\n%s" % (_("Restart your network connection and interfaces."), self.oktext))
 		if self["menulist"].getCurrent()[1][0] == "extendedSetup":
 			self["description"].setText("%s\n\n%s" % (_(self["menulist"].getCurrent()[1][1]), self.oktext))
 		item = self["menulist"].getCurrent()
@@ -915,8 +912,7 @@ class AdapterSetupConfiguration(Screen):
 		menu = [
 			(_("Adapter Settings"), "edit"),
 			(_("Nameserver settings"), "dns"),
-			(_("Network test"), "test"),
-			(_("Restart Network"), "lanrestart")
+			(_("Network test"), "test")
 		]
 		self.extended = None
 		self.extendedSetup = None
@@ -933,11 +929,6 @@ class AdapterSetupConfiguration(Screen):
 					menuEntryDescription = p.fnc["menuEntryDescription"](self.iface) if "menuEntryDescription" in p.fnc else _("Extended Networksetup Plugin...")
 					self.extendedSetup = ("extendedSetup", menuEntryDescription, self.extended)
 					menu.append((menuEntryName, self.extendedSetup))
-		if exists(resolveFilename(SCOPE_PLUGINS, "SystemPlugins/NetworkWizard/networkwizard.xml")):
-			menu.append((_("Network Wizard"), "openwizard"))
-		# Check which boxes support MAC change via the GUI.
-		if BoxInfo.getItem("machinebuild") not in ("DUMMY",) and self.iface == "eth0":
-			menu.append((_("Network MAC settings"), "mac"))
 		return menu
 
 	def AdapterSetupClosed(self, *ret):
@@ -975,13 +966,6 @@ class AdapterSetupConfiguration(Screen):
 			from Plugins.SystemPlugins.WirelessLan.Wlan import iStatus
 			iStatus.stopWlanConsole()
 			self.updateStatusbar()
-
-	def restartLan(self, ret=False):
-		if ret is True:
-			def restartfinishedCB():
-				self.updateStatusbar()
-				self.session.open(MessageBox, _("Finished configuring your network"), type=MessageBox.TYPE_INFO, timeout=10, default=False)
-			RestartNetworkNew.start(callback=restartfinishedCB)
 
 	def dataAvail(self, data):
 		self.LinkState = None
