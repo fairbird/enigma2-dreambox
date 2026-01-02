@@ -84,6 +84,9 @@ def InitUsageConfig():
 	config.usage.record_indicator_mode.addNotifier(refreshServiceList)
 
 	config.network = ConfigSubsection()
+
+	config.network.zerotierNetworkId = ConfigText(default=" " * 16, fixed_size=True)
+
 	choices = [
 		("dhcp-router", _("Router / Gateway")),
 		("custom", _("Static IP / Custom"))
