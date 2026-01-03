@@ -85,7 +85,7 @@ def InitUsageConfig():
 
 	config.network = ConfigSubsection()
 
-	config.network.zerotierNetworkId = ConfigText(default=" " * 16, fixed_size=True)
+	config.network.ZeroTierNetworkId = ConfigText(default=" " * 16, fixed_size=True)
 
 	choices = [
 		("dhcp-router", _("Router / Gateway")),
