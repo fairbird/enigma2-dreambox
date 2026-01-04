@@ -77,7 +77,7 @@ class NetworkAdapterSelection(Screen):
                 self.wlan_errortext = _("No working wireless network adapter found.\nPlease verify that you have attached a compatible WLAN device and your network is configured correctly.")
                 self.lan_errortext = _("No working local network adapter found.\nPlease verify that you have attached a network cable and your network is configured correctly.")
                 self.oktext = _("Press OK on your remote control to continue.")
-                self.edittext = _("Press OK to edit the settings.")
+                self.edittext = _("(OK) to edit the settings | (Menu) to show other features.")
                 self["key_red"] = StaticText(_("Close"))
                 self["key_green"] = StaticText(_("Select"))
                 self["key_yellow"] = StaticText("")
