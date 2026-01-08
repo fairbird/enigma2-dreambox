@@ -17,32 +17,32 @@
 		<item level="1" text="Long press volume steps" description="Select the size of the volume steps when the VOLUME buttons are held down.">config.volumeControl.longStep</item>
 		<item level="1" text="Volume/Mute display timer" description="Select how long, in seconds, that the volume and mute displays are shown before they automatically hide.">config.volumeControl.hideTimer</item>
 		<if requires="CanDownmixAC3">
-			<item level="1" text="AC3 downmix" description="Choose whether AC3 sound tracks should be downmixed to stereo.">config.av.downmix_ac3</item>
+			<item level="1" text="AC3 downmix" description="Select whether multichannel audio tracks should be output as PCM.">config.av.downmix_ac3</item>
 			<if requires="VuEAC3Fix" conditional="not config.av.downmix_ac3.value">
 				<item level="1" text="Passthrough audio handling delay AC3" description="Used to specify delay when switching between services and AC3 passthrough is enabled.">config.av.passthrough_fix_short</item>
 				<item level="1" text="Passthrough audio handling delay AC3+" description="Used to specify delay when switching between services and AC3+/Atmos passthrough is enabled.">config.av.passthrough_fix_long</item>
 			</if>
 		</if>
-		<item level="1" text="AC3 plus transcoding" description="Choose whether AC3 Plus sound tracks should be transcoded to AC3." requires="CanAC3plusTranscode">config.av.transcodeac3plus</item>
-		<item level="1" text="DTS downmix" description="Choose whether DTS channel sound tracks should be downmixed to stereo." requires="CanDownmixDTS">config.av.downmix_dts</item>
-		<item level="1" text="DTS/DTS-HD HR/DTS-HD MA/DTS:X" description="Choose whether DTS channel sound tracks should be downmixed or transcoded." requires="CanDTSHD">config.av.dtshd</item>
-		<item level="1" text="WMA Pro" description="Choose whether WMA Pro channel sound tracks should be downmixed or transcoded." requires="CanWMAPRO">config.av.wmapro</item>
-		<item level="1" text="AAC downmix" description="Choose whether multi channel sound tracks should be downmixed to stereo." requires="CanDownmixAAC">config.av.downmix_aac</item>
-		<item level="1" text="AAC plus downmix" description="Configure whether multi channel sound tracks should be downmixed to stereo." requires="CanDownmixAACPlus">config.av.downmix_aacplus</item>
-		<item level="1" text="Audio Source" description="Choose whether multi channel sound tracks should be convert to PCM, SPDIF or Bluetooth." requires="HDMIAudioSource">config.av.hdmi_audio_source</item>
-		<item level="1" text="AAC transcoding" description="Choose whether AAC sound tracks should be transcoded." requires="CanAACTranscode">config.av.transcodeaac</item>
-		<item level="1" text="General AC3 delay" description="This option configures the general audio delay of Dolby Digital sound tracks.">config.av.generalAC3delay</item>
-		<item level="1" text="General PCM delay" description="This option configures the general audio delay of stereo sound tracks.">config.av.generalPCMdelay</item>
+		<item level="1" text="AC3 plus transcoding" description="Select whether AC3 Plus audio tracks should be transcoded to AC3." requires="CanAC3plusTranscode">config.av.transcodeac3plus</item>
+		<item level="1" text="DTS downmix" description="Select whether DTS channel audio tracks should be downmixed to stereo." requires="CanDownmixDTS">config.av.downmix_dts</item>
+		<item level="1" text="DTS/DTS-HD HR/DTS-HD MA/DTS:X" description="Select whether DTS channel audio tracks should be downmixed or transcoded." requires="CanDTSHD">config.av.dtshd</item>
+		<item level="1" text="WMA Pro" description="Select whether WMA Pro channel audio tracks should be downmixed or transcoded." requires="CanWMAPRO">config.av.wmapro</item>
+		<item level="1" text="AAC downmix" description="Select whether multichannel audio tracks should be downmixed to stereo." requires="CanDownmixAAC">config.av.downmix_aac</item>
+		<item level="1" text="AAC plus downmix" description="Select whether multichannel audio tracks should be downmixed to stereo." requires="CanDownmixAACPlus">config.av.downmix_aacplus</item>
+		<item level="1" text="Audio Source" description="Select whether multichannel audio tracks should be converted to PCM or SPDIF." requires="HDMIAudioSource">config.av.hdmi_audio_source</item>
+		<item level="1" text="AAC transcoding" description="Select whether AAC audio tracks should be transcoded." requires="CanAACTranscode">config.av.transcodeaac</item>
+		<item level="1" text="General AC3 delay" description="This option selects configures the general audio delay of Dolby Digital sound tracks.">config.av.generalAC3delay</item>
+		<item level="1" text="General PCM delay" description="This option selects configures the general audio delay of stereo sound tracks.">config.av.generalPCMdelay</item>
 		<item level="1" text="Multichannel PCM" description="Configure whether multi channel PCM sound should be enabled." requires="CanPcmMultichannel">config.av.multichannel_pcm</item>
-		<item level="1" text="Audio Auto Volume Level" description="This option configures you can set Auto Volume Level." requires="HasAutoVolume">config.av.autovolume</item>
-		<item level="1" text="Audio Auto Volume Level" description="This option configures you can set Auto Volume Level." requires="HasAutoVolumeLevel">config.av.autovolumelevel</item>
+		<item level="1" text="Audio Auto Volume Level" description="This option allows you to set the Auto Volume Level output." requires="HasAutoVolume">config.av.autovolume</item>
+		<item level="1" text="Audio Auto Volume Level" description="This option allows you to set the Auto Volume Level output." requires="HasAutoVolumeLevel">config.av.autovolumelevel</item>
 		<item level="1" text="3D Surround" description="This option allows you to enable 3D Surround Sound." requires="Has3DSurround">config.av.surround_3d</item>
 		<item level="1" text="3D Surround Speaker Position" description="This option allows you to change the virtual loudspeaker position." requires="Has3DSpeaker" conditional="config.av.surround_3d.value != 'none'">config.av.speaker_3d</item>
 		<item level="1" text="3D surround speaker position" description="This option allows you to change the virtual loudspeaker position." requires="Has3DSurroundSpeaker" conditional="config.av.surround_3d.value != 'none'">config.av.surround_3d_speaker</item>
 		<item level="1" text="3D surround softlimiter" description="This option allows you to enable 3D surround softlimiter." requires="Has3DSurroundSoftLimiter" conditional="config.av.surround_3d_speaker.value != 'none'">config.av.surround_softlimiter_3d</item>
 		<item level="1" text="General audio delay" description="This option configures the general audio delay." requires="CanAudioDelay">config.av.audiodelay</item>
-		<item level="1" text="Enable BT audio" description="This option allows you to switch audio to BT speakers." requires="CanBTAudio">config.av.btaudio</item>
-		<item level="1" text="General BT Audio delay" description="This option configures the general audio delay for BT Speakers." requires="CanBTAudioDelay">config.av.btaudiodelay</item>
+		<item level="1" text="Enable BT audio" description="This option allows you to switch Audio to Bluetooth speakers." requires="CanBTAudio">config.av.btaudio</item>
+		<item level="1" text="General BT audio delay" description="This option configures the audio delay value for Bluetooth speakers." requires="CanBTAudioDelay">config.av.btaudiodelay</item>
 	</setup>
 	<setup key="Checkupdate" title="Check update Settings">
 		<item level="1" text="check for firmware updates every" description="Choose the time to check for update avilable every...">config.updatecheck.check_update_notifier</item>
@@ -181,7 +181,7 @@
 		<item level="0" text="Show time remaining/elapsed" description="This option allows you choose how to display remaining time, or elapsed time, or both.">config.usage.swap_time_remaining_on_osd</item>
 		<item level="0" text="Show time elapsed as positive" description="This option allows you choose how to display elapsed time as + or -">config.usage.elapsed_time_positive_osd</item>
 		<item level="0" text="Show transponder remaining/elapsed as" description="This option allows you to choose how to display the remaining/elapsed time for live TV.">config.usage.swap_time_display_on_osd</item>
-		<item level="0" text="Show subservices *" description="This option allows you choose the option for Subservice indicator or selection.">config.usage.showInfoBarSubservices</item>
+		<item level="0" text="Show subservices" description="This option allows you choose the option for Subservice indicator or selection." restart="gui">config.usage.showInfoBarSubservices</item>
 		<item level="0" text="Media playback Remaining/Elapsed as" description="This option allows you to choose how to display the remaining/elapsed time for media playback.">config.usage.swap_media_time_display_on_osd</item>
 		<item level="2" text="Hide zap errors" description="When enabled, error messages related to zapping will not be shown.">config.usage.hide_zap_errors</item>
 		<item level="2" text="Show crypto info in infobar" conditional="parameters.get('hasInfobarCryptoInfo', True)" description="When enabled, encryption info will be shown in the infobar (when supported by the skin).">config.usage.show_cryptoinfo</item>
