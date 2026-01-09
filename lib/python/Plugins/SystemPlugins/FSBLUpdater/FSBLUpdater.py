@@ -5,6 +5,7 @@ from shutil import which
 from Screens.Console import Console
 from Screens.MessageBox import MessageBox
 
+
 class FSBLCheckerBase:
 	def getCurrentHash(self):
 		data = None
