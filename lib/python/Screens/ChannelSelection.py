@@ -413,7 +413,11 @@ class ChannelContextMenu(Screen):
 		self.close()
 
 	def toggleStreamrelay(self):
+		from enigma import eTimer
 		Screens.InfoBar.InfoBar.instance.ToggleStreamrelay(self.csel.getCurrentSelection())
+		self.csel.refreshServiceListTimer = eTimer()
+		self.csel.refreshServiceListTimer.callback.append(self.csel.servicelist.resetRoot)
+		self.csel.refreshServiceListTimer.start(100, True)
 		self.close()
 
 	def addCenterDVBSubsFlag(self):
