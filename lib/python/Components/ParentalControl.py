@@ -180,7 +180,7 @@ class ParentalControl:
 		elif result:
 			self.setSessionPinCached()
 			self.hideBlacklist()
-			self.callback(ref=service)
+			self.callback(ref=service, forceRestart=True)
 		elif result == False:
 			messageText = _("The PIN code you entered is wrong.")
 			if self.session:
