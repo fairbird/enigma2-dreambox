@@ -80,7 +80,7 @@ class NetworkAdapterSelection(Screen):
                 self.edittext = _("(OK) to edit the settings | (Menu) to show other features.")
                 self["key_red"] = StaticText(_("Close"))
                 self["key_green"] = StaticText(_("Select"))
-                self["key_yellow"] = StaticText("Network Restart")
+                self["key_yellow"] = StaticText(_("Network Restart"))
                 self["key_blue"] = StaticText(_(""))
                 self["introduction"] = StaticText(self.edittext)
                 self["OkCancelActions"] = HelpableActionMap(self, ["OkCancelActions", "ColorActions", "MenuActions"], {
