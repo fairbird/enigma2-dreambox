@@ -196,7 +196,7 @@ class NetworkAdapterSelection(Screen):
 			def restartfinishedCB():
 				self.updateList()
 				self.session.open(MessageBox, _("Finished configuring your network"), type=MessageBox.TYPE_INFO, timeout=10, default=False)
-			RestartNetworkNew.start(callback=restartfinishedCB)
+			self.session.openWithCallback(self.close, RestartNetwork)
 
 	def openNetworkWizard(self):
 		try:
@@ -1016,7 +1016,7 @@ class AdapterSetupConfiguration(Screen):
 			def restartfinishedCB():
 				self.updateStatusbar()
 				self.session.open(MessageBox, _("Finished configuring your network"), type=MessageBox.TYPE_INFO, timeout=10, default=False)
-			RestartNetworkNew.start(callback=restartfinishedCB)
+			self.session.openWithCallback(self.close, RestartNetwork)
 
 	def dataAvail(self, data):
 		self.LinkState = None
