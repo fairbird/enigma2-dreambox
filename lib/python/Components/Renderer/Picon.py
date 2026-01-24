@@ -2,7 +2,7 @@
 from os import listdir
 from os.path import exists, getsize, isdir, join
 from re import sub
-from enigma import ePixmap
+from enigma import ePixmap, eServiceCenter, eServiceReference, iServiceInformation
 from Components.config import config, ConfigSubsection, ConfigSelection
 from Components.Harddisk import harddiskmanager
 from Components.Renderer.Renderer import Renderer
@@ -87,9 +87,14 @@ class PiconLocator:
 			if not value.startswith("/media/net") and not value.startswith("/media/autofs") and value not in self.searchPaths:
 				self.searchPaths.append(value)
 
-	def getPiconName(self, serviceName):
+	def getPiconName(self, serviceRef):
+		service = eServiceReference(serviceRef)
+		if service.getPath().startswith("/") and serviceRef.startswith("1:"):  # for when serviceRef is a recording path
+			info = eServiceCenter.getInstance().info(eServiceReference(serviceRef))
+			refstr = info and info.getInfoString(service, iServiceInformation.sServiceref)
+			serviceRef = refstr and eServiceReference(refstr).toCompareString()
 		#remove the path and name fields, and replace ":" by "_"
-		fields = GetWithAlternative(serviceName).split(":", 10)[:10]
+		fields = GetWithAlternative(serviceRef).split(":", 10)[:10]
 		if not fields or len(fields) < 10:
 			return ""
 		pngname = self.findPicon("_".join(fields))
@@ -106,7 +111,7 @@ class PiconLocator:
 			fields[2] = "1"
 			pngname = self.findPicon("_".join(fields))
 		if not pngname:  # picon by channel name
-			if (sname := ServiceReference(serviceName).getServiceName().replace('\x80', '').replace('\x86', '').replace('\x87', '')) and "SID 0x" not in sname and (utf8_name := sanitizeFilename(sname).lower()) and utf8_name != "__":  # avoid lookups on zero length service names
+			if (sname := ServiceReference(serviceRef).getServiceName().replace('\x80', '').replace('\x86', '').replace('\x87', '')) and "SID 0x" not in sname and (utf8_name := sanitizeFilename(sname).lower()) and utf8_name != "__":  # avoid lookups on zero length service names
 				legacy_name = sub("[^a-z0-9]", "", utf8_name.replace("&", "and").replace("+", "plus").replace("*", "star"))  # legacy ascii service name picons
 				pngname = self.findPicon(utf8_name) or legacy_name and self.findPicon(legacy_name) or self.findPicon(sub(r"(fhd|uhd|hd|sd|4k)$", "", utf8_name).strip()) or legacy_name and self.findPicon(sub(r"(fhd|uhd|hd|sd|4k)$", "", legacy_name).strip())
 				if not pngname and len(legacy_name) > 6:
@@ -136,8 +141,8 @@ def initPiconPaths():
 initPiconPaths()
 
 
-def getPiconName(serviceName):
-	return piconLocator.getPiconName(serviceName)
+def getPiconName(serviceRef):
+	return piconLocator.getPiconName(serviceRef)
 
 
 class Picon(Renderer):
