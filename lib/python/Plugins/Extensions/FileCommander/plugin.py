@@ -165,13 +165,13 @@ class StatInfo:
 
 class FileCommander(Screen, NumericalTextInput, StatInfo):
 	skin = """
-	<screen name="FileCommander" title="File Commander" position="center,center" size="1200,600" resolution="1280,720" backgroundColor="#80000000" flags="wfNoBorder">
+	<screen name="FileCommander" title="File Commander" position="center,center" size="1200,600" resolution="1280,720" backgroundColor="#16000000" flags="wfNoBorder">
 		<eLabel position="center,41" size="1200,2" zPosition="2" backgroundColor="#00ffffff"/>
 		<eLabel position="center,76" size="1200,2" zPosition="2" backgroundColor="#00ffffff"/>
 		<eLabel position="center,41" size="2,510" zPosition="2" backgroundColor="#00ffffff"/>
 		<eLabel position="center,531" size="1200,2" zPosition="2" backgroundColor="#00ffffff"/>
 		<eLabel position="center,552" size="1200,2" zPosition="2" backgroundColor="#00ffffff"/>
-		<widget source="headleft" render="Listbox" position="0,0" size="590,75" backgroundColor="#80000000" foregroundColor="#00fff000" selection="0">
+		<widget source="headleft" render="Listbox" position="0,0" size="590,75" backgroundColor="#16000000" foregroundColor="#00fff000" selection="0">
 			<templates>
 				<template name="Default" fonts="Regular;20" itemHeight="75">
 					<mode name="default">
@@ -183,9 +183,9 @@ class FileCommander(Screen, NumericalTextInput, StatInfo):
 				</template>
 			</templates>
 		</widget>
-		<widget name="listleft" position="0,80" size="590,450" backgroundColor="#80000000"/>
-		<widget name="sortleft" position="0,530" size="590,20" font="Regular;17" backgroundColor="#80000000" foregroundColor="#00fff000" halign="center" />
-		<widget source="headright" render="Listbox" position="610,0" size="590,75" backgroundColor="#80000000" foregroundColor="#00fff000" selection="0">
+		<widget name="listleft" position="0,80" size="590,450" backgroundColor="#16000000"/>
+		<widget name="sortleft" position="0,530" size="590,20" font="Regular;17" backgroundColor="#16000000" foregroundColor="#00fff000" halign="center" />
+		<widget source="headright" render="Listbox" position="610,0" size="590,75" backgroundColor="#16000000" foregroundColor="#00fff000" selection="0">
 			<templates>
 				<template name="Default" fonts="Regular;20" itemHeight="75">
 					<mode name="default">
@@ -197,9 +197,9 @@ class FileCommander(Screen, NumericalTextInput, StatInfo):
 				</template>
 			</templates>
 		</widget>
-		<widget name="listright" position="610,80" size="590,450" backgroundColor="#80000000"/>
-		<widget name="sortright" position="610,530" size="590,20" font="Regular;17" foregroundColor="#00fff000" backgroundColor="#80000000" halign="center" />
-		<widget name="quickselect" position="0,80" size="590,450" font="Regular;100" foregroundColor="#00fff000" backgroundColor="#80000000" halign="center" transparent="1" valign="center" zPosition="+1" />
+		<widget name="listright" position="610,80" size="590,450" backgroundColor="#16000000"/>
+		<widget name="sortright" position="610,530" size="590,20" font="Regular;17" foregroundColor="#00fff000" backgroundColor="#16000000" halign="center" />
+		<widget name="quickselect" position="0,80" size="590,450" font="Regular;100" foregroundColor="#00fff000" backgroundColor="#16000000" halign="center" transparent="1" valign="center" zPosition="+1" />
 		<widget name="status" position="0,515" size="1200,35" font="Regular;25" backgroundColor="#00fff000" borderColor="#00000000" borderWidth="2" foregroundColor="#00ffffff" halign="center" valign="center" zPosition="+1" />
 		<widget source="key_red" render="Label" position="0,e-40" size="180,40" backgroundColor="key_red" conditional="key_red" font="Regular;20" foregroundColor="key_text" halign="center" valign="center">
 			<convert type="ConditionalShowHide" />
