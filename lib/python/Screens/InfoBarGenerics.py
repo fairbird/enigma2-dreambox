@@ -19,11 +19,11 @@ from Components.Renderer.PositionGauge import PositionGauge
 from Components.Renderer.Progress import Progress
 from Components.Sources.StaticText import StaticText
 from Components.Task import job_manager
-from Screens.EpgSelection import EPGSelection
 from Plugins.Plugin import PluginDescriptor
 
 from Screens.Screen import Screen
-from Screens.ScreenSaver import InfoBarScreenSaver
+from Screens.EpgSelection import EPGSelection
+from Screens.ScreenSaver import ScreenSaver
 from Screens import Standby
 from Screens.ChoiceBox import ChoiceBox
 from Screens.Dish import Dish
@@ -369,6 +369,60 @@ class HideVBILine(Screen):
 	def __init__(self, session):
 		self.skin = """<screen position="0,0" size="%s,%s" flags="wfNoBorder" zPosition="1"/>""" % (getDesktop(0).size().width(), getDesktop(0).size().height() / 180 + 1)
 		Screen.__init__(self, session)
+
+
+class InfoBarScreenSaver:
+	def __init__(self):
+		self.screenSaverTimer = eTimer()
+		self.screenSaverTimer.callback.append(self.screenSaverTimeout)
+		self.screenSaver = self.session.instantiateDialog(ScreenSaver)
+		self.screenSaver.hide()
+		self.onExecBegin.append(self.__onExecBegin)
+		self.onExecEnd.append(self.__onExecEnd)
+		# self.onLayoutFinish.append(self.__layoutFinished)
+
+	def __onExecBegin(self):
+		self.screenSaverTimerStart()
+
+	def __onExecEnd(self):
+		if self.screenSaver.shown:
+			self.screenSaver.hide()
+			eActionMap.getInstance().unbindAction("", self.screenSaverKeyPress)
+		self.screenSaverTimer.stop()
+
+	# def __layoutFinished(self):
+	# 	self.screenSaver.hide()
+
+	def screenSaverTimeout(self):
+		if self.execing and not Screens.Standby.inStandby and not Screens.Standby.inTryQuitMainloop:
+			self.hide()
+			if hasattr(self, "pvrStateDialog"):
+				try:
+					self.pvrStateDialog.hide()
+				except Exception:
+					pass
+			self.screenSaver.show()
+			eActionMap.getInstance().bindAction("", -maxsize - 1, self.screenSaverKeyPress)
+
+	def screenSaverTimerStart(self):
+		startTimer = config.usage.screenSaverStartTimer.value
+		flag = self.seekstate[0]
+		if not flag:
+			ref = self.session.nav.getCurrentlyPlayingServiceOrGroup()
+			if ref and not (hasattr(self.session, "pipshown") and self.session.pipshown):
+				ref = ref.toString().split(":")
+				flag = ref[2] == "2" or ref[2] == "A" or splitext(ref[10])[1].lower() in AUDIO_EXTENSIONS
+		if startTimer and flag:
+			self.screenSaverTimer.startLongTimer(startTimer)
+		else:
+			self.screenSaverTimer.stop()
+
+	def screenSaverKeyPress(self, key, flag):
+		if flag:
+			self.screenSaver.hide()
+			self.show()
+			self.screenSaverTimerStart()
+			eActionMap.getInstance().unbindAction("", self.screenSaverKeyPress)
 
 
 class SecondInfoBar(Screen):

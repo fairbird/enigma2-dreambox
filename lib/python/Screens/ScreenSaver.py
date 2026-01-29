@@ -1,116 +1,96 @@
 # -*- coding: utf-8 -*-
-from Screens.Screen import Screen
-from Components.MovieList import AUDIO_EXTENSIONS
-from Components.ServiceEventTracker import ServiceEventTracker
-from Components.Pixmap import Pixmap
+from os.path import isfile
+from random import randrange
+
+from enigma import ePoint, eServiceReference, eSize, eTimer, iPlayableServicePtr, iServiceInformation
+
 from Components.config import config
-import Screens.Standby
-from enigma import ePoint, eTimer, iPlayableService, eActionMap
-import os
-import random
-from sys import maxsize
+from Components.Pixmap import Pixmap
+from Components.Renderer.Picon import getPiconName
+from Screens.Screen import Screen
 
 
-class InfoBarScreenSaver:
-	def __init__(self):
-		self.onExecBegin.append(self.__onExecBegin)
-		self.onExecEnd.append(self.__onExecEnd)
-		self.screenSaverTimer = eTimer()
-		self.screenSaverTimer.callback.append(self.screenSaverTimeout)
-		self.screenSaver = self.session.instantiateDialog(screenSaver)
-		self.onLayoutFinish.append(self.__layoutFinished)
-
-	def __layoutFinished(self):
-		self.screenSaver.hide()
-
-	def __onExecBegin(self):
-		self.screenSaverTimerStart()
-
-	def __onExecEnd(self):
-		if self.screenSaver.shown:
-			self.screenSaver.hide()
-			eActionMap.getInstance().unbindAction("", self.screenSaverKeyPress)
-		self.screenSaverTimer.stop()
-
-	def screenSaverTimerStart(self):
-		startTimer = config.usage.screenSaverStartTimer.value
-		time = int(config.usage.screenSaverStartTimer.value)
-		flag = hasattr(self, "seekstate") and self.seekstate[0]
-		pip_show = hasattr(self.session, "pipshown") and self.session.pipshown
-		if not flag:
-			ref = self.session.nav.getCurrentlyPlayingServiceReference()
-			if ref and not pip_show:
-				ref = ref.toString().split(":")
-				flag = ref[2] in ("2", "A") or os.path.splitext(ref[10])[1].lower() in AUDIO_EXTENSIONS
-		if startTimer and flag:
-			self.screenSaverTimer.startLongTimer(startTimer)
-		else:
-			self.screenSaverTimer.stop()
-
-	def screenSaverTimeout(self):
-		if self.execing and not Screens.Standby.inStandby and not Screens.Standby.inTryQuitMainloop:
-			self.hide()
-			if hasattr(self, "pvrStateDialog"):
-				self.pvrStateDialog.hide()
-			self.screenSaver.show()
-			eActionMap.getInstance().bindAction("", -maxsize - 1, self.screenSaverKeyPress)
-
-	def screenSaverKeyPress(self, key, flag):
-		if flag:
-			self.screenSaver.hide()
-			self.show()
-			self.screenSaverTimerStart()
-			eActionMap.getInstance().unbindAction("", self.screenSaverKeyPress)
-
-
-class screenSaver(Screen):
+class ScreenSaver(Screen):
 	def __init__(self, session):
-
-		self.skin = """
-			<screen name="Screensaver" position="fill" flags="wfNoBorder">
-				<eLabel position="fill" backgroundColor="#54000000" zPosition="0"/>
-				<widget name="picture" pixmap="screensaverpicture.png" position="0,0" size="150,119" alphaTest="blend" transparent="1" zPosition="1"/>
-			</screen>"""
-
 		Screen.__init__(self, session)
-
-		self.moveLogoTimer = eTimer()
-		self.moveLogoTimer.callback.append(self.movePicture)
-		self.onShow.append(self.__onShow)
-		self.onHide.append(self.__onHide)
-
-		self.__event_tracker = ServiceEventTracker(screen=self, eventmap={
-				iPlayableService.evStart: self.serviceStarted
-			})
-
+		self.skinName = ["ScreenSaver", "Screensaver"]
 		self["picture"] = Pixmap()
-
+		self.padding = 20  # Allow 20 pixels of edge padding to allow for screen over-scan.
+		self.picturePath = None
+		self.movePictureTimer = eTimer()
+		self.movePictureTimer.callback.append(self.movePicture)
 		self.onLayoutFinish.append(self.layoutFinished)
-
-	def layoutFinished(self):
-		picturesize = self["picture"].getSize()
-		self.maxx = self.instance.size().width() - picturesize[0]
-		self.maxy = self.instance.size().height() - picturesize[1]
-		self.movePicture(timerActive=False)
-
-	def __onHide(self):
-		self.moveLogoTimer.stop()
-
-	def __onShow(self):
-		self.moveTimer = config.usage.screenSaverMoveTimer.value
-		self.moveLogoTimer.startLongTimer(self.moveTimer)
-
-	def serviceStarted(self):
-		if self.shown:
-			ref = self.session.nav.getCurrentlyPlayingServiceReference()
-			if ref:
-				ref = ref.toString().split(":")
-				if not os.path.splitext(ref[10])[1].lower() in AUDIO_EXTENSIONS:
-					self.hide()
+		self.onShow.append(self.showScreenSaver)
+		self.onHide.append(self.hideScreenSaver)
 
 	def movePicture(self, timerActive=True):
-		self.posx = random.randint(1, self.maxx)
-		self.posy = random.randint(1, self.maxy)
-		self["picture"].instance.move(ePoint(self.posx, self.posy))
+		self["picture"].instance.move(ePoint(self.padding + randrange(self.maxX), self.padding + randrange(self.maxY)))
 		if timerActive:
-			self.moveLogoTimer.startLongTimer(self.moveTimer)
+			self.movePictureTimer.startLongTimer(config.usage.screenSaverMoveTimer.value)
+
+	def layoutFinished(self):
+		self.screenW = self.instance.size().width()
+		self.screenH = self.instance.size().height()
+		self.logoPath = [x[1] for x in self["picture"].skinAttributes if x[0] == "pixmap"]
+		self.logoPath = self.logoPath[0] if self.logoPath and isfile(self.logoPath[0]) else None
+		self.picturePath = self.logoPath
+		self.logoW = self["picture"].instance.size().width()
+		self.logoH = self["picture"].instance.size().height()
+		self.logoMaxX = self.screenW - self.logoW - (self.padding * 2)
+		self.logoMaxY = self.screenH - self.logoH - (self.padding * 2)
+		self.maxX = self.logoMaxX
+		self.maxY = self.logoMaxY
+		self.movePicture(timerActive=False)
+
+	def showScreenSaver(self):
+		def showLogo():
+			if self.logoPath and isfile(self.logoPath):
+				if self.logoPath != self.picturePath:
+					self["picture"].instance.setPixmapFromFile(self.logoPath)
+					self.picturePath = self.logoPath
+					self["picture"].instance.resize(eSize(self.logoW, self.logoH))
+					self.maxX = self.logoMaxX
+					self.maxY = self.logoMaxY
+				move = True
+			else:
+				move = False
+			return move
+
+		match config.usage.screenSaverMode.value:
+			case 0:  # Show blank screen saver.
+				self["picture"].instance.resize(eSize(0, 0))
+				move = False
+			case 1:  # Show logo screen saver.
+				move = showLogo()
+			case 2:  # Show picon screen saver.
+				try:
+					service = self.session.screen["CurrentService"].service
+					if isinstance(service, eServiceReference):
+						serviceReference = service.toString()
+					elif isinstance(service, iPlayableServicePtr):
+						info = service and service.info()
+						serviceReference = info.getInfoString(iServiceInformation.sServiceref)
+					else:
+						serviceReference = None
+					if serviceReference:
+						piconPath = getPiconName(serviceReference)
+						if isfile(piconPath):
+							if piconPath != self.picturePath:
+								self["picture"].instance.setPixmapFromFile(piconPath)
+								self.picturePath = piconPath
+								piconW = self["picture"].instance.getPixmapSize().width()
+								piconH = self["picture"].instance.getPixmapSize().height()
+								self["picture"].instance.resize(eSize(piconW, piconH))
+								self.maxX = self.screenW - piconW - (self.padding * 2)
+								self.maxY = self.screenH - piconH - (self.padding * 2)
+							move = True
+						else:
+							raise NameError("Picon not found")
+				except Exception as err:  # Picon is not available so show the logo.
+					print(f"[ScreenSaver] Error: Unable to display picon!  ({err})")
+					move = showLogo()
+		if move:
+			self.movePicture(timerActive=True)
+
+	def hideScreenSaver(self):
+		self.movePictureTimer.stop()

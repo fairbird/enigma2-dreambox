@@ -3033,7 +3033,7 @@ except Exception as e:
 	</screen>
 	<screen name="Screensaver" position="fill" flags="wfNoBorder">
 		<eLabel position="fill" backgroundColor="#54111112" zPosition="0"/>
-		<widget name="picture" pixmap="distro-logo.png" position="0,0" size="500,500" alphatest="on" zPosition="1"/>
+		<widget name="picture" pixmap="screensaverpicture.png" position="0,0" size="500,500" alphatest="on" zPosition="1"/>
 	</screen>
 	<screen name="AutoVideoModeLabel" position="910,40" size="330,55" flags="wfNoBorder">
 		<widget name="content" position="7,5" size="320,22" font="Regular;20" transparent="1"/>

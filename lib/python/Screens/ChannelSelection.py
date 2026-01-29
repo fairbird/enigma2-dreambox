@@ -2,7 +2,6 @@
 from Screens.Screen import Screen
 from Screens.Setup import Setup
 import Screens.InfoBar
-from Screens.ScreenSaver import InfoBarScreenSaver
 import Components.ParentalControl
 from Components.Button import Button
 from Components.Label import Label
@@ -413,6 +412,7 @@ class ChannelContextMenu(Screen):
 		self.close()
 
 	def toggleStreamrelay(self):
+		from enigma import eTimer
 		Screens.InfoBar.InfoBar.instance.ToggleStreamrelay(self.csel.getCurrentSelection())
 		self.csel.refreshServiceListTimer = eTimer()
 		self.csel.refreshServiceListTimer.callback.append(self.csel.servicelist.resetRoot)
@@ -1145,10 +1145,10 @@ class ChannelSelectionEdit:
 			flags = eServiceReference.isGroup | eServiceReference.canDescent | eServiceReference.mustDescent
 			if self.mode == MODE_TV:
 				ref = eServiceReference(eServiceReference.idDVB, flags, eServiceReferenceDVB.dTv)
-				ref.setPath(f"FROM BOUQUET \"alternatives.{self.buildBouquetID(name)}.tv\" ORDER BY bouquet")
+				ref.setPath('FROM BOUQUET "alternatives.%s.tv" ORDER BY bouquet' % self.buildBouquetID(name))
 			else:
 				ref = eServiceReference(eServiceReference.idDVB, flags, eServiceReferenceDVB.dRadio)
-				ref.setPath(f"FROM BOUQUET \"alternatives.{self.buildBouquetID(name)}.radio\" ORDER BY bouquet")
+				ref.setPath('FROM BOUQUET "alternatives.%s.radio" ORDER BY bouquet' % self.buildBouquetID(name))
 			new_ref = ServiceReference(ref)
 			if not mutableBouquet.addService(new_ref.ref, cur_service.ref):
 				mutableBouquet.removeService(cur_service.ref)
@@ -1182,11 +1182,11 @@ class ChannelSelectionEdit:
 			if self.mode == MODE_TV:
 				bName = f"{bName} {_('(TV)')}"
 				new_bouquet_ref = eServiceReference(service_types_tv_ref)
-				new_bouquet_ref.setPath(f"FROM BOUQUET \"userbouquet.{self.buildBouquetID(bName)}.tv\" ORDER BY bouquet")
+				new_bouquet_ref.setPath("FROM BOUQUET \"userbouquet.%s.tv\" ORDER BY bouquet" % self.buildBouquetID(bName))
 			else:
 				bName = f"{bName} {_('(Radio)')}"
 				new_bouquet_ref = eServiceReference(service_types_radio_ref)
-				new_bouquet_ref.setPath(f"FROM BOUQUET \"userbouquet.{self.buildBouquetID(bName)}.radio\" ORDER BY bouquet")
+				new_bouquet_ref.setPath("FROM BOUQUET \"userbouquet.%s.radio\" ORDER BY bouquet" % self.buildBouquetID(bName))
 			if not mutableBouquetList.addService(new_bouquet_ref):
 				mutableBouquetList.flushChanges()
 				eDVBDB.getInstance().reloadBouquets()
@@ -1670,7 +1670,7 @@ class ChannelSelectionBase(Screen):
 	def getServiceName(self, serviceReference):
 		serviceNameTmp = ServiceReference(serviceReference).getServiceName()
 		serviceName = serviceNameTmp.replace(_("(TV)") if self.mode == MODE_TV else _("(Radio)"), "").replace("  ", " ").strip()
-		# print(f"[ChannelSelection] getServiceName DEBUG: Service Name Before='{serviceNameTmp}', After='{serviceName}'.")
+		print(f"[ChannelSelection] getServiceName DEBUG: Service Name Before='{serviceNameTmp}', After='{serviceName}'.")
 		if "bouquets" in serviceName.lower():
 			return _("User bouquets")
 		if not serviceName:
@@ -1858,7 +1858,11 @@ class ChannelSelectionBase(Screen):
 						if cur_ref:
 							# pos = self.service_types.rfind(":")  # DEBUG NOTE: This doesn't appear to be used.
 							ref = eServiceReference(self.service_types_ref)
-							path = f"(channelID == {cur_ref.getUnsignedData(4):08x}{cur_ref.getUnsignedData(2):04x}{cur_ref.getUnsignedData(3):04x}) && {self.service_types_ref.getPath()} ORDER BY name"
+							path = '(channelID == %08x%04x%04x) && %s ORDER BY name' % (
+								cur_ref.getUnsignedData(4),  # NAMESPACE
+								cur_ref.getUnsignedData(2),  # TSID
+								cur_ref.getUnsignedData(3),  # ONID
+								self.service_types_ref.getPath())
 							ref.setPath(path)
 							ref.setName(_("Current transponder"))
 							self.servicelist.addService(ref, beforeCurrent=True)
@@ -1901,7 +1905,7 @@ class ChannelSelectionBase(Screen):
 							if info:
 								provider = info.getInfoString(iServiceInformation.sProvider)
 								ref = eServiceReference(eServiceReference.idDVB, eServiceReference.flagDirectory)
-								ref.setPath(f"(provider == \"{provider}\") && {self.service_types_ref.getPath()} ORDER BY name")
+								ref.setPath("(provider == \"%s\") && %s ORDER BY name" % (provider, self.service_types_ref.getPath()))
 								ref.setName(provider)
 								self.setCurrentSelectionAlternative(ref)
 
@@ -2139,7 +2143,7 @@ class ChannelSelectionBase(Screen):
 					provider = info.getInfoString(iServiceInformation.sProvider)
 					op = self.session.nav.getCurrentlyPlayingServiceOrGroup().getUnsignedData(4) >> 16
 					ref = eServiceReference(eServiceReference.idDVB, eServiceReference.flagDirectory)
-					ref.setPath(f"(provider == \"{provider}\") && (satellitePosition == {op}) && {self.service_types_ref.getPath()} ORDER BY name")
+					ref.setPath("(provider == \"%s\") && (satellitePosition == %d) && %s ORDER BY name" % (provider, op, self.service_types_ref.getPath()))
 					ref.setName(provider)
 					self.servicelist.setCurrent(eServiceReference(ref))
 		elif not self.isBasePathEqual(self.bouquet_root) or self.bouquet_mark_edit == EDIT_ALTERNATIVES or (self.startRoot and self.startRoot != ref):
@@ -2538,7 +2542,7 @@ class ChannelSelection(ChannelSelectionBase, ChannelSelectionEdit, ChannelSelect
 			if self.delhistpoint is not None:
 				x = self.delhistpoint
 				while x <= len(self.history) - 1:
-					del self.history[x]
+					del self.history[x]  # TODO This deletion is wrong
 			self.delhistpoint = None
 
 			if self.servicePath is not None:
@@ -2568,7 +2572,7 @@ class ChannelSelection(ChannelSelectionBase, ChannelSelectionEdit, ChannelSelect
 		if hlen > 1 and self.history_pos > 0:
 			self.history_pos -= 1
 			self.setHistoryPath()
-		self.delhistpoint = self.history_pos + 1
+		# self.delhistpoint = self.history_pos + 1 # TODO Do we need this?
 
 	def historyNext(self):
 		self.delhistpoint = None
@@ -2622,7 +2626,7 @@ class ChannelSelection(ChannelSelectionBase, ChannelSelectionEdit, ChannelSelect
 			if x[-1] == retval:
 				break
 			pos += 1
-		self.delhistpoint = pos + 1
+		# self.delhistpoint = pos + 1  # TODO Do we need this?
 		if pos < hlen and pos != self.history_pos:
 			tmp = self.history[pos]
 			# self.history.append(tmp)
@@ -2826,7 +2830,7 @@ class RadioInfoBar(Screen):
 		self["RdsDecoder"] = RdsDecoder(self.session.nav)
 
 
-class ChannelSelectionRadio(ChannelSelectionBase, ChannelSelectionEdit, ChannelSelectionEPG, InfoBarBase, SelectionEventInfo, InfoBarScreenSaver):
+class ChannelSelectionRadio(ChannelSelectionBase, ChannelSelectionEdit, ChannelSelectionEPG, InfoBarBase, SelectionEventInfo):
 
 	def __init__(self, session, infobar):
 		ChannelSelectionBase.__init__(self, session)
@@ -2836,7 +2840,6 @@ class ChannelSelectionRadio(ChannelSelectionBase, ChannelSelectionEdit, ChannelS
 		ChannelSelectionEPG.__init__(self)
 		InfoBarBase.__init__(self)
 		SelectionEventInfo.__init__(self)
-		InfoBarScreenSaver.__init__(self)
 		self.infobar = infobar
 		self.startServiceRef = None
 		self.onLayoutFinish.append(self.onCreate)
