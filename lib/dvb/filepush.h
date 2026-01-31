@@ -97,7 +97,6 @@ protected:
 	size_t m_buffersize;
 	unsigned char* m_buffer;
 	unsigned int m_overflow_count;
-private:
 	size_t m_buffer_fill;
 	size_t m_buffer_min_write;
 	int m_stop;
