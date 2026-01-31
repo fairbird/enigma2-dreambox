@@ -153,7 +153,8 @@ public:
 		scrambled_streamserver = 8,
 		streamclient = 9,
 		offline = 10,
-		pvrDescramble = 11
+		pvrDescramble = 11,
+		scrambled_livetv = 12
 	};
 
 	/* deprecated interface */
@@ -167,6 +168,7 @@ public:
 	bool isPmtReady() { return m_pmt_ready; }
 	void addCaHandler();
 	void removeCaHandler();
+	void allocatePVRChannel();
 private:
 	bool m_have_cached_program;
 	program m_cached_program;

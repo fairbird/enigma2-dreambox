@@ -2084,6 +2084,20 @@ def InitUsageConfig():
 	config.mediaplayer.useAlternateUserAgent = ConfigYesNo(default=False)
 	config.mediaplayer.alternateUserAgent = ConfigText(default="")
 
+	config.softcsa = ConfigSubsection()
+	config.softcsa.decoderRelease = ConfigSelection(default=0, choices=[
+			(0, _("Quick")),
+			(1, _("Normal"))
+	])
+	config.softcsa.syncMode = ConfigSelection(default=0, choices=[
+			(0, _("Automatic")),
+			(1, _("Synchronous"))
+	])
+	config.softcsa.waitForDataTimeout = ConfigSelection(
+		default=800,
+		choices=[(x, _("%d ms") % x) for x in range(100, 2001, 100)]
+	)
+
 	config.misc.softcam_setup = ConfigSubsection()
 	config.misc.softcam_setup.extension_menu = ConfigYesNo(default=True)
 	config.misc.softcam_streamrelay_url = ConfigIP(default=[127, 0, 0, 1], auto_jump=True)

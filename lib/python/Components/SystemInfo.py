@@ -5,7 +5,7 @@ from os import R_OK, access
 from os.path import exists as fileAccess, isdir, isfile, join
 from re import findall
 
-from enigma import eAVControl, Misc_Options, eDVBCIInterfaces, eDVBResourceManager, eGetEnigmaDebugLvl
+from enigma import eAVControl, Misc_Options, eDVBCIInterfaces, eDVBResourceManager, eGetEnigmaDebugLvl, eDVBCSAEngine
 from Tools.Directories import SCOPE_PLUGINS, SCOPE_LIBDIR, SCOPE_SKIN, fileCheck, fileReadLine, fileReadLines, resolveFilename, fileExists, fileHas, fileReadLine, pathExists
 from Tools.MultiBoot import MultiBoot
 
@@ -355,6 +355,7 @@ BoxInfo.setItem("HasColordepthChoices", fileCheck("/proc/stb/video/hdmi_colordep
 BoxInfo.setItem("HasHDMIin", BoxInfo.getItem("hdmifhdin") or BoxInfo.getItem("hdmihdin"))
 BoxInfo.setItem("HasHDMIinFHD", MODEL in ("dm900", "dm920", "dreamone", "dreamtwo"))
 BoxInfo.setItem("HasHDMIinPiP", BoxInfo.getItem("HasHDMIin") and BRAND != "dreambox")
+BoxInfo.setItem("HasSoftCSA", eDVBCSAEngine.isAvailable())
 BoxInfo.setItem("DreamBoxAudio", MODEL in ("dm7080", "dm800", "dm900", "dm920", "dreamone", "dreamtwo"))
 BoxInfo.setItem("DreamBoxDVI", MODEL in ("dm8000", "dm800"))
 BoxInfo.setItem("VFDSymbol", BoxInfo.getItem("vfdsymbol"))
