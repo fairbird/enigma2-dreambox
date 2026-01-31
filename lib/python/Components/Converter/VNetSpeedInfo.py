@@ -244,13 +244,13 @@ class VNetSpeedInfo(Poll, Converter, object):
 			self.receivemb = self.receive / 8
 			self.transmitmb = self.transmit / 8
 		if self.type == self.RCL:
-			return '%3.1fMb/s' % self.lanreceive
+			return "%3.2f Mb/s" % self.lanreceive
 		if self.type == self.TML:
-			return '%3.1fMb/s' % self.lantransmit
+			return "%3.2f Mb/s" % self.lantransmit
 		if self.type == self.RCW:
-			return '%3.1fMb/s' % self.wlanreceive
+			return "%3.2f Mb/s" % self.wlanreceive
 		if self.type == self.TMW:
-			return '%3.1fMb/s' % self.wlantransmit
+			return "%3.2f Mb/s" % self.wlantransmit
 		if self.type == self.RCLT:
 			return '%d' % self.lanreceivetotalout
 		if self.type == self.TMLT:
@@ -260,25 +260,25 @@ class VNetSpeedInfo(Poll, Converter, object):
 		if self.type == self.TMWT:
 			return '%d' % self.wlantransmittotalout
 		if self.type == self.RCL_MB:
-			return '%3.1fMb/s' % self.lanreceivemb
+			return "%3.2f Mb/s" % self.lanreceivemb
 		if self.type == self.TML_MB:
-			return '%3.1fMb/s' % self.lantransmitmb
+			return '%3.2f Mb/s' % self.lantransmitmb
 		if self.type == self.RCW_MB:
-			return '%3.1fMb/s' % self.wlanreceivemb
+			return '%3.2f Mb/s' % self.wlanreceivemb
 		if self.type == self.TMW_MB:
-			return '%3.1fMb/s' % self.wlantransmitmb
+			return '%3.2f Mb/s' % self.wlantransmitmb
 		if self.type == self.RC:
-			return '%3.1fMb/s' % self.receive
+			return '%3.2f Mb/s' % self.receive
 		if self.type == self.TM:
-			return '%3.1fMb/s' % self.transmit
+			return '%3.2f Mb/s' % self.transmit
 		if self.type == self.RCT:
 			return '%d' % self.receivetotalout
 		if self.type == self.TMT:
 			return '%d' % self.transmittotalout
 		if self.type == self.RC_MB:
-			return '%3.1fMb/s' % self.receivemb
+			return '%3.2f Mb/s' % self.receivemb
 		if self.type == self.TM_MB:
-			return '%3.1fMb/s' % self.transmitmb
+			return '%3.2f Mb/s' % self.transmitmb
 		if self.type == self.NET_TYP:
 			return '%s' % self.nettyp
 		if self.type == self.ERR_RCL:
