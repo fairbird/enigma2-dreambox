@@ -43,6 +43,7 @@ void ePMTClient::dataAvailable()
 	while (1)
 	{
 		/* this handler might be called multiple times (by the socket notifier), till we have the complete message */
+
 		if (receivedLength < 1)
 		{
 			if (bytesAvailable() < 6) return;
@@ -110,7 +111,6 @@ void ePMTClient::dataAvailable()
 		receivedData = NULL;
 		receivedLength = 0;
 		memset(receivedHeader, 0, 5);
-		}
 	}
 }
 
