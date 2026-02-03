@@ -559,29 +559,30 @@ void eDVBScan::PMTready(int err)
 								isvideo = 1;
 								break;
 							case REGISTRATION_DESCRIPTOR: /* some services don't have a separate AC3 descriptor */
-							{
-								RegistrationDescriptor *d = (RegistrationDescriptor*)(*desc);
-								switch (d->getFormatIdentifier())
 								{
-								case 0x44545331 ... 0x44545333: // DTS1/DTS2/DTS3
-									isaudio = 1;
-									currentAudioCacheId = eDVBService::cDTSPID;
-									break;
-								case 0x41432d33: // == 'AC-3'
-									isaudio = 1;
-									currentAudioCacheId = eDVBService::cAC3PID;
-									break;
-								case 0x42535344: // == 'BSSD' (LPCM)
-									isaudio = 1;
-									currentAudioCacheId = eDVBService::cLPCMPID;
-									break;
-								case 0x56432d31: // == 'VC-1'
-									isvideo = 1;
-									break;
-								default:
-									break;
+									RegistrationDescriptor *d = (RegistrationDescriptor*)(*desc);
+									switch (d->getFormatIdentifier())
+									{
+									case 0x44545331 ... 0x44545333: // DTS1/DTS2/DTS3
+										isaudio = 1;
+										currentAudioCacheId = eDVBService::cDTSPID;
+										break;
+									case 0x41432d33: // == 'AC-3'
+										isaudio = 1;
+										currentAudioCacheId = eDVBService::cAC3PID;
+										break;
+									case 0x42535344: // == 'BSSD' (LPCM)
+										isaudio = 1;
+										currentAudioCacheId = eDVBService::cLPCMPID;
+										break;
+									case 0x56432d31: // == 'VC-1'
+										isvideo = 1;
+										break;
+									default:
+										break;
+									}
 								}
-							}
+								[[fallthrough]];
 							default:
 								break;
 							}
@@ -595,6 +596,7 @@ void eDVBScan::PMTready(int err)
 								caids.push_back(caid);
 						}
 					}
+					[[fallthrough]];
 				default:
 					break;
 				}
@@ -608,6 +610,7 @@ void eDVBScan::PMTready(int err)
 					}
 				}
 				else if (isaudio)
+				{
 					have_audio = true;
 					if (audiopid == 0xFFFF)
 					{
