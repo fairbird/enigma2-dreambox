@@ -78,7 +78,7 @@ eDVBCSASession::~eDVBCSASession()
 
 #ifdef DREAMNEXTGEN
 	// Reset audio delay flag when session is destroyed
-	eAlsaOutput::setSoftDecoderActive(0);
+//	eAlsaOutput::setSoftDecoderActive(0);
 #endif
 }
 
@@ -256,14 +256,14 @@ void eDVBCSASession::setActive(bool active)
 	{
 		eDebug("[CSASession] ACTIVATED - CSA-ALT detected, SW-Descrambling active");
 #ifdef DREAMNEXTGEN
-		eAlsaOutput::setSoftDecoderActive(1);
+//		eAlsaOutput::setSoftDecoderActive(1);
 #endif
 	}
 	else
 	{
 		eDebug("[CSASession] DEACTIVATED - HW-Descrambling (passthrough)");
 #ifdef DREAMNEXTGEN
-		eAlsaOutput::setSoftDecoderActive(0);
+//		eAlsaOutput::setSoftDecoderActive(0);
 #endif
 		if (m_engine)
 			m_engine->clearKeys();
