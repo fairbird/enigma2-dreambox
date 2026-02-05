@@ -8,6 +8,7 @@
 #endif
 
 DEFINE_REF(eDVBCSASession);
+DEFINE_REF(iServiceScrambled);
 
 static const uint8_t DEFAULT_ECM_MODE = 0x04;
 
