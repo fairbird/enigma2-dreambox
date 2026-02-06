@@ -16,6 +16,7 @@
 		<item level="1" text="Volume steps" description="Select the size of the volume step when the VOLUME buttons are pressed.">config.volumeControl.pressStep</item>
 		<item level="1" text="Long press volume steps" description="Select the size of the volume steps when the VOLUME buttons are held down.">config.volumeControl.longStep</item>
 		<item level="1" text="Volume/Mute display timer" description="Select how long, in seconds, that the volume and mute displays are shown before they automatically hide.">config.volumeControl.hideTimer</item>
+		<item level="1" text="PCM Multichannel" description="Select whether multichannel audio tracks should be output as PCM." requires="CanPcmMultichannel">config.av.pcm_multichannel</item>
 		<if requires="CanDownmixAC3">
 			<item level="1" text="AC3 downmix" description="Select whether multichannel audio tracks should be output as PCM.">config.av.downmix_ac3</item>
 			<if requires="VuEAC3Fix" conditional="not config.av.downmix_ac3.value">

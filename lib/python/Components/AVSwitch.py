@@ -421,7 +421,8 @@ def InitAVSwitch():
 		config.av.sync_mode = ConfigNothing()
 
 	multiChannel = access("/proc/stb/audio/multichannel_pcm", W_OK)
-	if BoxInfo.getItem("HasMultichannelPCM"):
+	BoxInfo.setItem("supportPcmMultichannel", multiChannel)
+	if multiChannel:
 		def setPCMMultichannel(configElement):
 			fileWriteLine("/proc/stb/audio/multichannel_pcm", configElement.value and "enable" or "disable", source=MODULE_NAME)
 
