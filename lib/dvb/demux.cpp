@@ -591,7 +591,11 @@ int eDVBRecordFileThread::AsyncIO::poll()
 
 	if (r >= 0 && (size_t)r != aio.aio_nbytes)
 	{ // short write
+#ifdef GLIBC_64BIT_TIME_FLAGS
 		eDebug("[eDVBRecordFileThread] short write: %d of bytes %d written -> retry", r, aio.aio_nbytes);
+#else
+		eDebug("[eDVBRecordFileThread] short write: %d of bytes %lu written -> retry", r, aio.aio_nbytes);
+#endif
 		aio.aio_nbytes -= r;
 		aio.aio_offset += r;
 		aio.aio_buf = (volatile void*)((const char*)aio.aio_buf + r);
