@@ -17,6 +17,7 @@ MODULE_NAME = __name__.split(".")[-1]
 model = BoxInfo.getItem("model")
 AMLOGIC = BoxInfo.getItem("AmlogicFamily")
 
+
 class AVSwitch:
 	def setAspect(self, configElement):
 		eAVControl.getInstance().setAspect(configElement.value, 1)
