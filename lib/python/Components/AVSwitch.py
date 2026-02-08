@@ -15,7 +15,7 @@ iAVSwitch = None  # will be initialized later, allows to import name 'iAVSwitch'
 MODULE_NAME = __name__.split(".")[-1]
 
 model = BoxInfo.getItem("model")
-
+AMLOGIC = BoxInfo.getItem("AmlogicFamily")
 
 class AVSwitch:
 	def setAspect(self, configElement):
@@ -383,7 +383,7 @@ def InitAVSwitch():
 		config.av.allow_10bit.addNotifier(setDisable10Bit)
 
 	if BoxInfo.getItem("HDMIAudioSource"):
-		if BoxInfo.getItem("AmlogicFamily"):
+		if AMLOGIC:
 			choices = [
 				("0", _("PCM")),
 				("1", _("SPDIF")),
@@ -398,7 +398,7 @@ def InitAVSwitch():
 			default = "pcm"
 
 		def setAudioSource(configElement):
-			if BoxInfo.getItem("AmlogicFamily"):
+			if AMLOGIC:
 				fileWriteLine("/sys/devices/virtual/amhdmitx/amhdmitx0/audio_source", configElement.value, source=MODULE_NAME)
 			else:
 				fileWriteLine("/proc/stb/hdmi/audio_source", configElement.value, source=MODULE_NAME)
@@ -429,7 +429,7 @@ def InitAVSwitch():
 		config.av.pcm_multichannel = ConfigYesNo(default=False)
 		config.av.pcm_multichannel.addNotifier(setPCMMultichannel)
 
-	if BoxInfo.getItem("AmlogicFamily"):
+	if AMLOGIC:
 		downmixAC3 = True
 		BoxInfo.setItem("CanPcmMultichannel", True)
 	else:
@@ -441,7 +441,7 @@ def InitAVSwitch():
 			BoxInfo.setItem("CanPcmMultichannel", False)
 	if BoxInfo.getItem("CanDownmixAC3"):
 		def setAC3Downmix(configElement):
-			if BoxInfo.getItem("AmlogicFamily"):
+			if AMLOGIC:
 				fileWriteLine("/sys/class/audiodsp/digital_raw", configElement.value, source=MODULE_NAME)
 			else:
 				value = configElement.value and "downmix" or "passthrough"
