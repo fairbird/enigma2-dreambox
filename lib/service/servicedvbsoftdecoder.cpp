@@ -661,6 +661,7 @@ void eDVBSoftDecoder::updateDecoder(int vpid, int vpidtype, int pcrpid)
 		{
 			m_decoder->play();
 			eDebug("[SoftDecoder] Decoder PLAY with vpid=%04x vpidtype=%d", vpid, vpidtype);
+			m_decoder_ready();
 		}
 		else
 		{
