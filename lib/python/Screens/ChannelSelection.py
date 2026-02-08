@@ -2560,7 +2560,7 @@ class ChannelSelection(ChannelSelectionBase, ChannelSelectionEdit, ChannelSelect
 					hlen -= 1
 				else:
 					x += 1
-			if hlen > HISTORY_SIZE:
+			if hlen > HISTORYSIZE:
 				del self.history[0]
 				hlen -= 1
 			self.history_pos = hlen - 1
