@@ -420,6 +420,8 @@ BoxInfo.setItem("FrontpanelLEDBlinkControl", fileExists("/proc/stb/fp/led_blink"
 BoxInfo.setItem("FrontpanelLEDBrightnessControl", fileExists("/proc/stb/fp/led_brightness"))
 BoxInfo.setItem("FrontpanelLEDColorControl", fileExists("/proc/stb/fp/led_color"))
 BoxInfo.setItem("FrontpanelLEDFadeControl", fileExists("/proc/stb/fp/led_fade"))
+BoxInfo.setItem("DisplaySetup", MODEL not in ("dreamone",))
+BoxInfo.setItem("DM9X0", MODEL in ("dm900", "dm920"))
 
 # Network services.
 BoxInfo.setItem("inadyn", fileExists("/etc/init.d/inadyn-mt"))

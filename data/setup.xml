@@ -445,6 +445,7 @@
 		<item level="1" text="Show warning when timeshift is stopped" description="When enabled, a warning will be displayed and the user will get an option to stop or to continue the timeshift.">config.usage.check_timeshift</item>
 		<item level="2" text="Skip jumping to live TV while timeshifting with plugins" description="If set to 'yes', allows you to use timeshift with alternative audio plugins.">config.timeshift.skipReturnToLive</item>
 		<item level="2" text="Streaming recovery delay" description="Enter the duration to be added to the streaming buffer after a streaming error. This extra buffer can help to avoid further streaming issues due to a lack of buffer space.">config.timeshift.recoveryBufferDelay</item>
+		<item level="2" text="Hardware latency correction" description="Adjusts compensation for hardware buffer latency for DM9x0." requires="DM9X0">config.timeshift.hwLatencyCorrection</item>
 		<!--
 		<item level="2" text="Timeshift-save action on zap" description="Select if timeshift should continue when set to record.">config.timeshift.favoriteSaveAction</item>
 		<item level="2" text="Stop time shift while recording" description="Stops time shift being used if a recording is in progress. This is advisable for USB sticks.">config.timeshift.stopWhileRecording</item>
