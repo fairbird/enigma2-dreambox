@@ -146,12 +146,12 @@ void eDVBCSASession::startECMMonitor(iDVBDemux *demux, uint16_t ecm_pid, uint16_
 			m_csa_alt = true;
 			if (shouldSuppressActivation && shouldSuppressActivation())
 			{
-				eDebug("[eDVBCSASession] ECM Monitor: CSA-ALT cached but activation suppressed (CI module)");
+				eDebug("[CSASession] ECM Monitor: CSA-ALT cached but activation suppressed (CI module)");
 				stopECMMonitor();
 			}
 			else
 			{
-				eDebug("[eDVBCSASession] ECM Monitor: Activating from cache (CSA-ALT)");
+				eDebug("[CSASession] ECM Monitor: Activating from cache (CSA-ALT)");
 				setActive(true);
 			}
 		}
@@ -246,7 +246,7 @@ void eDVBCSASession::ecmDataReceived(const uint8_t *data)
 			{
 				if (shouldSuppressActivation && shouldSuppressActivation())
 				{
-					eDebug("[eDVBCSASession] Activation suppressed (CI module handles decryption)");
+					eDebug("[CSASession] Activation suppressed (CI module handles decryption)");
 					stopECMMonitor();
 				}
 				else
@@ -286,7 +286,7 @@ void eDVBCSASession::setActive(bool active)
 		// Replay buffered CW that arrived before activation
 		if (m_pending_cw.valid)
 		{
-			eDebug("[eDVBCSASession] Replaying buffered CW: parity=%d", m_pending_cw.parity);
+			eDebug("[CSASession] Replaying buffered CW: parity=%d", m_pending_cw.parity);
 			onCwReceived(m_service_ref, m_pending_cw.parity, m_pending_cw.cw,
 				m_pending_cw.caid, m_pending_cw.serviceId);
 			m_pending_cw.valid = false;
@@ -338,7 +338,7 @@ void eDVBCSASession::onCwReceived(eServiceReferenceDVB ref, int parity, const ch
 			m_pending_cw.caid = caid;
 			m_pending_cw.serviceId = serviceId;
 			m_pending_cw.valid = true;
-			eDebug("[eDVBCSASession] CW buffered (session not yet active): parity=%d", parity);
+			eDebug("[CSASession] CW buffered (session not yet active): parity=%d", parity);
 		}
 		return;
 	}
