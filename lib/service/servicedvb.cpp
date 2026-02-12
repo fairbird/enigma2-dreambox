@@ -4329,11 +4329,16 @@ void eDVBServicePlay::setAC3Delay(int delay)
 	if (m_dvb_service)
 		m_dvb_service->setCacheEntry(eDVBService::cAC3DELAY, delay ? delay : -1);
 	int generalAC3delay = eSimpleConfig::getInt("config.av.generalAC3delay");
-	if (m_decoder)
+	if (m_soft_decoder && m_csa_session && m_csa_session->isActive())
+	{
+		m_soft_decoder->setAC3Delay(delay + generalAC3delay);
+		eDebug("[eDVBServicePlay] Setting audio delay: setAC3Delay (SoftDecoder), %d + %d", delay, generalAC3delay);
+	}
+	else if (m_decoder)
+	{
 		m_decoder->setAC3Delay(delay + generalAC3delay);
 		eDebug("[eDVBServicePlay] Setting audio delay: setAC3Delay, %d + %d", delay, generalAC3delay);
-	else if (m_soft_decoder)
-		m_soft_decoder->setAC3Delay(delay + generalAC3delay);
+	}
 }
 
 void eDVBServicePlay::setPCMDelay(int delay)
@@ -4341,11 +4346,16 @@ void eDVBServicePlay::setPCMDelay(int delay)
 	if (m_dvb_service)
 		m_dvb_service->setCacheEntry(eDVBService::cPCMDELAY, delay ? delay : -1);
 	int generalPCMdelay = eSimpleConfig::getInt("config.av.generalPCMdelay");
-	if (m_decoder)
+	if (m_soft_decoder && m_csa_session && m_csa_session->isActive())
+	{
+		m_soft_decoder->setPCMDelay(delay + generalPCMdelay);
+		eDebug("[eDVBServicePlay] Setting audio delay: setPCMDelay (SoftDecoder), %d + %d", delay, generalPCMdelay);
+	}
+	else if (m_decoder)
+	{
 		m_decoder->setPCMDelay(delay + generalPCMdelay);
 		eDebug("[eDVBServicePlay] Setting audio delay: setPCMDelay, %d + %d", delay, generalPCMdelay);
-	else if (m_soft_decoder)
-		m_soft_decoder->setPCMDelay(delay + generalPCMdelay);
+	}
 }
 
 void eDVBServicePlay::video_event(struct iTSMPEGDecoder::videoEvent event)
