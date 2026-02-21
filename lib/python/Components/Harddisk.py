@@ -621,7 +621,7 @@ class HarddiskManager:
 			mounts = [x[1] for x in mounts if x[1].startswith("/media/")]
 			newFstab = fileReadLines("/etc/fstab", default=[], source=MODULE_NAME)
 			fstabReservesMediaHDD = checkFstabReservesMediaHDD(newFstab)
-			possibleMountPoints = [f"/media/{x}" for x in ("usb8","usb7","usb6","usb5","usb4","usb3","usb2","usb","hdd") if f"/media/{x}" not in mounts and not (x == "hdd" and fstabReservesMediaHDD)]
+			possibleMountPoints = [f"/media/{x}" for x in ("usb8", "usb7", "usb6", "usb5", "usb4", "usb3", "usb2", "usb", "hdd") if f"/media/{x}" not in mounts and not (x == "hdd" and fstabReservesMediaHDD)]
 
 			for device in devices:
 				if device["DEVNAME"] not in devmounts or "/media/hdd" in possibleMountPoints:
