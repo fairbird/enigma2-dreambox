@@ -34,7 +34,7 @@ from Components.Sources.List import List
 from Components.Sources.StaticText import StaticText
 from Plugins.Plugin import PluginDescriptor
 from Screens.MessageBox import MessageBox
-from Screens.RestartNetwork import RestartNetworkNew, RestartNetwork
+from Screens.RestartNetwork import RestartNetworkNew
 from Screens.Processing import Processing
 from Screens.Screen import Screen
 from Screens.Setup import Setup
@@ -196,7 +196,7 @@ class NetworkAdapterSelection(Screen):
 			def restartfinishedCB():
 				self.updateList()
 				self.session.open(MessageBox, _("Finished configuring your network"), type=MessageBox.TYPE_INFO, timeout=10, default=False)
-			self.session.openWithCallback(self.close, RestartNetwork)
+			RestartNetworkNew.start(callback=restartfinishedCB)
 
 	def openNetworkWizard(self):
 		try:
@@ -324,7 +324,7 @@ class DNSSettings(Setup):
 
 		if hasChanges:
 			self.saveAll()
-			self.session.openWithCallback(self.close, RestartNetwork)
+			RestartNetworkNew.start(callback=self.close)
 		else:
 			self.close()
 
@@ -1020,7 +1020,7 @@ class AdapterSetupConfiguration(Screen):
 			def restartfinishedCB():
 				self.updateStatusbar()
 				self.session.open(MessageBox, _("Finished configuring your network"), type=MessageBox.TYPE_INFO, timeout=10, default=False)
-			self.session.openWithCallback(self.close, RestartNetwork)
+			RestartNetworkNew.start(callback=restartfinishedCB)
 
 	def dataAvail(self, data):
 		self.LinkState = None

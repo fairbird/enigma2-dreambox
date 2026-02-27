@@ -1,32 +1,15 @@
 # -*- coding: utf-8 -*-
-import os
-
-from socket import socket, AF_UNIX, SOCK_STREAM
 from twisted.internet.reactor import callInThread
-
 from enigma import eTimer
 
-
 class ServiceHelper:
-	def __init__(self, serviceName):
-		self.serviceName = serviceName
+	def __init__(self, *args, **kwargs):
 		self.callbackTimer = eTimer()
-		self.deamonSocket = None
+		self.callbackTimer_conn = self.callbackTimer.timeout.get().append(self._closeSocket)
 		self.callback = None
 
 	def _action(self, action):
-		self.deamonSocket = socket(AF_UNIX, SOCK_STREAM)
-		if not os.path.exists("/tmp/deamon.socket"):
-			if self.callback:
-				self.callback()
-			return
-		try:
-			self.deamonSocket.connect("/tmp/deamon.socket")
-			self.deamonSocket.send(f"{action},{self.serviceName}".encode())
-			self._waitSocket()
-		except:
-			if self.callback:
-				self.callback()
+		self._waitSocket()
 
 	def restart(self, callback, timeout=5000):
 		self.callback = callback
@@ -44,20 +27,19 @@ class ServiceHelper:
 		self._action("STOP")
 
 	def _waitSocket(self):
-		self.callbackTimer.timeout.get().append(self._closeSocket)
 		self.callbackTimer.start(self.timeout, True)
 		callInThread(self._listenSocket)
 
 	def _listenSocket(self):
-		data = None
-		while not data:
-			data = self.deamonSocket.recv(256)
+		from Components.Network import iNetwork
+		iNetwork.restartNetwork(self._onNetworkRestarted)
+
+	def _onNetworkRestarted(self, data=None):
 		self._closeSocket()
 
 	def _closeSocket(self):
 		self.callbackTimer.stop()
-		if self.deamonSocket:
-			self.deamonSocket.close()
-			self.deamonSocket = None
-			if self.callback:
-				self.callback()
+		if self.callback:
+			callback = self.callback
+			self.callback = None
+			callback()
