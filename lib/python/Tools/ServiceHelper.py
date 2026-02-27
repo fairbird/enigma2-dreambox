@@ -2,6 +2,7 @@
 from twisted.internet.reactor import callInThread
 from enigma import eTimer
 
+
 class ServiceHelper:
 	def __init__(self, *args, **kwargs):
 		self.callbackTimer = eTimer()
