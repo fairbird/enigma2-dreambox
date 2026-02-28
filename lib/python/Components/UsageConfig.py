@@ -2098,6 +2098,10 @@ def InitUsageConfig():
 		default=800,
 		choices=[(0, _("Disabled"))] + [(x, _("%d ms") % x) for x in range(100, 2001, 100)]
 	)
+	config.softcsa.bufferTime = ConfigSelection(
+		default=0,
+		choices=[(0, _("Disabled"))] + [(x, _("%d ms") % x) for x in range(100, 2001, 100)]
+	)
 	config.softcsa.useStreamRelayWhitelist = ConfigYesNo(default=True)
 
 	config.misc.softcam_setup = ConfigSubsection()
