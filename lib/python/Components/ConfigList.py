@@ -201,13 +201,17 @@ class ConfigListScreen:
 				"close": (self.closeRecursive, _("Cancel any changed settings and exit all menus")),
 				"save": (self.keySave, _("Save all changed settings and exit"))
 				}, prio=1)
+			self.actionMaps = ["fullUIActions"]
 			if allowDefault:
 				if "key_yellow" not in self:
 					self["key_yellow"] = StaticText(_("Default"))
 				self["defaultAction"] = HelpableActionMap(self, ["ConfigListActions", "ColorActions"], {
 					"default": (self.keyDefault, _("Reset entries to their default values")),
 					"yellow": (self.keyDefault, _("Reset entries to their default values"))
-				}, prio=1)
+				}, prio=1, description=_("Common Setup Actions"))
+				self.actionMaps.append("defaultAction")
+		else:
+			self.actionMaps = []
 		if "HelpWindow" not in self:
 			self["HelpWindow"] = Pixmap()
 			self["HelpWindow"].hide()

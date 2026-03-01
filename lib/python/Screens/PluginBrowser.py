@@ -17,7 +17,7 @@ from Components.Language import language
 from Components.ServiceList import refreshServiceList
 from Components.Harddisk import harddiskmanager
 from Components.Sources.StaticText import StaticText
-from Components.SystemInfo import SystemInfo, hassoftcaminstalled, BoxInfo
+from Components.SystemInfo import BoxInfo, getBoxDisplayName
 from Components.Sources.List import List
 from Components import Opkg
 from Components.Opkg import opkgAddDestination, opkgExtraDestinations, opkgDestinations, OpkgComponent
@@ -29,7 +29,7 @@ from Screens.Screen import Screen, ScreenSummary
 from Screens.Console import Console
 from Screens.Setup import Setup
 from Plugins.Plugin import PluginDescriptor
-from Tools.Directories import fileExists, fileReadLines, fileAccess, fileWriteLines, resolveFilename, SCOPE_PLUGINS, SCOPE_CURRENT_SKIN, SCOPE_GUISKIN
+from Tools.Directories import fileExists, fileReadLines, fileAccess, fileWriteLine, fileWriteLines, resolveFilename, SCOPE_PLUGINS, SCOPE_CURRENT_SKIN, SCOPE_GUISKIN
 from Tools.LoadPixmap import LoadPixmap
 from Tools.NumericalTextInput import NumericalTextInput
 
@@ -228,7 +228,7 @@ class PluginBrowser(Screen, ProtectedScreen):
 		self["list"].onSelectionChanged.append(self.selectionChanged)
 		self.onLayoutFinish.append(self.saveListsize)
 		if config.pluginfilter.userfeed.value != "https://" and not fileExists("/etc/opkg/user-feed.conf"):
-			self.CreateFeedConfig()
+			self.createFeedConfig()
 
 	def isProtected(self):
 		return config.ParentalControl.setuppinactive.value and (not config.ParentalControl.config_sections.main_menu.value or hasattr(self.session, 'infobar') and self.session.infobar is None) and config.ParentalControl.config_sections.plugin_browser.value
@@ -254,36 +254,31 @@ class PluginBrowser(Screen, ProtectedScreen):
 			cb(name, desc)
 
 	def createFeedConfig(self):
+		if hasattr(self, "opkgComponent") and self.opkgComponent: return
 		def createFeedConfigCallback(event, eventData):
-			if event == opkgComponent.EVENT_CLEAN_ERROR:
+			if event == self.opkgComponent.EVENT_CLEAN_ERROR:
 				print("[PluginBrowser] Error: There was an issue in the feed update! Please reboot and check the file system for any errors.")
-			elif event in (opkgComponent.EVENT_DOWNLOAD, opkgComponent.EVENT_UPDATED):
-				print(f"[PluginBrowser] Feed '{eventData}' {'downloaded' if event == opkgComponent.EVENT_DOWNLOAD else 'updated'}.")
-			elif event == opkgComponent.EVENT_REFRESH_DONE:
+			elif event in (self.opkgComponent.EVENT_DOWNLOAD, self.opkgComponent.EVENT_UPDATED):
+				print(f"[PluginBrowser] Feed '{eventData}' {'downloaded' if event == self.opkgComponent.EVENT_DOWNLOAD else 'updated'}.")
+			elif event == self.opkgComponent.EVENT_REFRESH_DONE:
 				if eventData:
 					print(f"[PluginBrowser] Warning: {eventData} feed(s) were unable to be reloaded!")
-					self["pluginDownloadActions"].setEnabled(False)
+					self["PluginDownloadActions"].setEnabled(False)
 				else:
 					print("[PluginBrowser] Feed update completed successfully.")
-					self["pluginDownloadActions"].setEnabled(True)
-			elif event == opkgComponent.EVENT_DONE:
+					self["PluginDownloadActions"].setEnabled(True)
+			elif event == self.opkgComponent.EVENT_DONE:
 				Processing.instance.hideProgress()
 				self["actions"].setEnabled(True)
-				self["pluginRemoveActions"].setEnabled(True)
-				self["navigationActions"].setEnabled(True)
-				self["quickSelectActions"].setEnabled(True)
-
+				self.opkgComponent = None
 		fileWriteLine("/etc/opkg/user-feed.conf", f"src/gz user-feeds {config.pluginfilter.userfeed.value}\n", source=MODULE_NAME)
-		opkgComponent = OpkgComponent()
-		opkgComponent.addCallback(createFeedConfigCallback)
-		opkgComponent.runCommand(opkgComponent.CMD_CLEAN_REFRESH)
+		self.opkgComponent = OpkgComponent()
+		self.opkgComponent.addCallback(createFeedConfigCallback)
+		self.opkgComponent.runCommand(self.opkgComponent.CMD_CLEAN_REFRESH)
 		Processing.instance.setDescription(_("Please wait while feeds are updated..."))
 		Processing.instance.showProgress(endless=True)
 		self["actions"].setEnabled(False)
-		self["pluginRemoveActions"].setEnabled(False)
-		self["pluginDownloadActions"].setEnabled(False)
-		self["navigationActions"].setEnabled(False)
-		self["quickSelectActions"].setEnabled(False)
+		self["PluginDownloadActions"].setEnabled(False)
 
 	def checkWarnings(self):
 		if len(plugins.warnings):
@@ -380,11 +375,18 @@ class PluginBrowser(Screen, ProtectedScreen):
 
 	def menu(self):
 		def keyMenuCallback():
+			feed_file = "/etc/opkg/user-feed.conf"
 			if config.pluginfilter.userfeed.value != "https://":
-				self.createFeedConfig()
+				current_feed = ""
+				if exists(feed_file):
+					lines = fileReadLines(feed_file)
+					if lines: current_feed = lines[0].split(" ")[-1].strip()
+				if config.pluginfilter.userfeed.value != current_feed:
+					self.createFeedConfig()
+			elif exists(feed_file):
+				unlink(feed_file)
 			self.checkWarnings()
 			self.updateList()
-
 		self.session.openWithCallback(keyMenuCallback, PluginBrowserSetup)
 
 	def delete(self):
@@ -495,6 +497,12 @@ class PluginBrowserNew(Screen):
 		self["key_green"] = self["green"] = Label(_("Download plugins"))
 		self["key_yellow"] = self["yellow"] = Label(_("Update plugins"))
 
+		self["actions"] = ActionMap(["WizardActions", "MenuActions"],
+		{
+			"ok": self.ok,
+			"back": self.close,
+			"menu": self.menu,
+		})
 		self["PluginDownloadActions"] = ActionMap(["ColorActions", "SetupActions", "DirectionActions", "MenuActions"],
 		{
 			"red": self.delete,
@@ -530,7 +538,7 @@ class PluginBrowserNew(Screen):
 		self.onChangedEntry = []
 		self.setTitle(_("Plugin browser"))
 		if config.pluginfilter.userfeed.value != "https://" and not fileExists("/etc/opkg/user-feed.conf"):
-			self.CreateFeedConfig()
+			self.createFeedConfig()
 		self.number = 0
 		self.nextNumberTimer = eTimer()
 		self.nextNumberTimer.callback.append(self.okbuttonClick)
@@ -832,36 +840,31 @@ class PluginBrowserNew(Screen):
 		return skin
 
 	def createFeedConfig(self):
+		if hasattr(self, "opkgComponent") and self.opkgComponent: return
 		def createFeedConfigCallback(event, eventData):
-			if event == opkgComponent.EVENT_CLEAN_ERROR:
+			if event == self.opkgComponent.EVENT_CLEAN_ERROR:
 				print("[PluginBrowser] Error: There was an issue in the feed update! Please reboot and check the file system for any errors.")
-			elif event in (opkgComponent.EVENT_DOWNLOAD, opkgComponent.EVENT_UPDATED):
-				print(f"[PluginBrowser] Feed '{eventData}' {'downloaded' if event == opkgComponent.EVENT_DOWNLOAD else 'updated'}.")
-			elif event == opkgComponent.EVENT_REFRESH_DONE:
+			elif event in (self.opkgComponent.EVENT_DOWNLOAD, self.opkgComponent.EVENT_UPDATED):
+				print(f"[PluginBrowser] Feed '{eventData}' {'downloaded' if event == self.opkgComponent.EVENT_DOWNLOAD else 'updated'}.")
+			elif event == self.opkgComponent.EVENT_REFRESH_DONE:
 				if eventData:
 					print(f"[PluginBrowser] Warning: {eventData} feed(s) were unable to be reloaded!")
-					self["pluginDownloadActions"].setEnabled(False)
+					self["PluginDownloadActions"].setEnabled(False)
 				else:
 					print("[PluginBrowser] Feed update completed successfully.")
-					self["pluginDownloadActions"].setEnabled(True)
-			elif event == opkgComponent.EVENT_DONE:
+					self["PluginDownloadActions"].setEnabled(True)
+			elif event == self.opkgComponent.EVENT_DONE:
 				Processing.instance.hideProgress()
 				self["actions"].setEnabled(True)
-				self["pluginRemoveActions"].setEnabled(True)
-				self["navigationActions"].setEnabled(True)
-				self["quickSelectActions"].setEnabled(True)
-
+				self.opkgComponent = None
 		fileWriteLine("/etc/opkg/user-feed.conf", f"src/gz user-feeds {config.pluginfilter.userfeed.value}\n", source=MODULE_NAME)
-		opkgComponent = OpkgComponent()
-		opkgComponent.addCallback(createFeedConfigCallback)
-		opkgComponent.runCommand(opkgComponent.CMD_CLEAN_REFRESH)
+		self.opkgComponent = OpkgComponent()
+		self.opkgComponent.addCallback(createFeedConfigCallback)
+		self.opkgComponent.runCommand(self.opkgComponent.CMD_CLEAN_REFRESH)
 		Processing.instance.setDescription(_("Please wait while feeds are updated..."))
 		Processing.instance.showProgress(endless=True)
 		self["actions"].setEnabled(False)
-		self["pluginRemoveActions"].setEnabled(False)
-		self["pluginDownloadActions"].setEnabled(False)
-		self["navigationActions"].setEnabled(False)
-		self["quickSelectActions"].setEnabled(False)
+		self["PluginDownloadActions"].setEnabled(False)
 
 	def checkWarnings(self):
 		if len(plugins.warnings):
@@ -1029,11 +1032,18 @@ class PluginBrowserNew(Screen):
 
 	def menu(self):
 		def keyMenuCallback():
+			feed_file = "/etc/opkg/user-feed.conf"
 			if config.pluginfilter.userfeed.value != "https://":
-				self.createFeedConfig()
+				current_feed = ""
+				if exists(feed_file):
+					lines = fileReadLines(feed_file)
+					if lines: current_feed = lines[0].split(" ")[-1].strip()
+				if config.pluginfilter.userfeed.value != current_feed:
+					self.createFeedConfig()
+			elif exists(feed_file):
+				unlink(feed_file)
 			self.checkWarnings()
 			self.updateList()
-
 		self.session.openWithCallback(keyMenuCallback, PluginBrowserSetup)
 
 	def delete(self):
