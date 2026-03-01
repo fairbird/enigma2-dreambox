@@ -256,6 +256,7 @@ class PluginBrowser(Screen, ProtectedScreen):
 	def createFeedConfig(self):
 		if hasattr(self, "opkgComponent") and self.opkgComponent:
 		    return
+
 		def createFeedConfigCallback(event, eventData):
 			if event == self.opkgComponent.EVENT_CLEAN_ERROR:
 				print("[PluginBrowser] Error: There was an issue in the feed update! Please reboot and check the file system for any errors.")
@@ -844,6 +845,7 @@ class PluginBrowserNew(Screen):
 	def createFeedConfig(self):
 		if hasattr(self, "opkgComponent") and self.opkgComponent:
 		    return
+
 		def createFeedConfigCallback(event, eventData):
 			if event == self.opkgComponent.EVENT_CLEAN_ERROR:
 				print("[PluginBrowser] Error: There was an issue in the feed update! Please reboot and check the file system for any errors.")
