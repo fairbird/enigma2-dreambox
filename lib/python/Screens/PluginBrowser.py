@@ -254,7 +254,8 @@ class PluginBrowser(Screen, ProtectedScreen):
 			cb(name, desc)
 
 	def createFeedConfig(self):
-		if hasattr(self, "opkgComponent") and self.opkgComponent: return
+		if hasattr(self, "opkgComponent") and self.opkgComponent:
+		    return
 		def createFeedConfigCallback(event, eventData):
 			if event == self.opkgComponent.EVENT_CLEAN_ERROR:
 				print("[PluginBrowser] Error: There was an issue in the feed update! Please reboot and check the file system for any errors.")
@@ -380,7 +381,8 @@ class PluginBrowser(Screen, ProtectedScreen):
 				current_feed = ""
 				if exists(feed_file):
 					lines = fileReadLines(feed_file)
-					if lines: current_feed = lines[0].split(" ")[-1].strip()
+					if lines:
+					    current_feed = lines[0].split(" ")[-1].strip()
 				if config.pluginfilter.userfeed.value != current_feed:
 					self.createFeedConfig()
 			elif exists(feed_file):
@@ -840,7 +842,8 @@ class PluginBrowserNew(Screen):
 		return skin
 
 	def createFeedConfig(self):
-		if hasattr(self, "opkgComponent") and self.opkgComponent: return
+		if hasattr(self, "opkgComponent") and self.opkgComponent:
+		    return
 		def createFeedConfigCallback(event, eventData):
 			if event == self.opkgComponent.EVENT_CLEAN_ERROR:
 				print("[PluginBrowser] Error: There was an issue in the feed update! Please reboot and check the file system for any errors.")
@@ -1037,7 +1040,8 @@ class PluginBrowserNew(Screen):
 				current_feed = ""
 				if exists(feed_file):
 					lines = fileReadLines(feed_file)
-					if lines: current_feed = lines[0].split(" ")[-1].strip()
+					if lines:
+					    current_feed = lines[0].split(" ")[-1].strip()
 				if config.pluginfilter.userfeed.value != current_feed:
 					self.createFeedConfig()
 			elif exists(feed_file):
