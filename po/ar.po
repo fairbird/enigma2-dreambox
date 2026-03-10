@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: enigma2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-03-16 15:41+0100\n"
-"POT-Creation-Date: 2025-07-01 17:09+0200\n"
+"POT-Creation-Date: 2026-03-10 10:45+0100\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Shabah Net\n"
 "Language-Team: RAED - Fairbirb and Shabah Net\n"
@@ -601,6 +601,9 @@ msgstr "تحرير الاعدادات"
 msgid "Adjust the color settings so that all the color shades are distinguishable, but appear as saturated as possible. If you are happy with the result, press OK to close the video fine-tuning, or use the number keys to select other test screens."
 msgstr "أضبط إعدادات الالوان بحيث يمكن تمييز أطياف اللون، لكن تبدو مشبعه قدر الامكان. إذا كانت النتيجه مرضيه اضغط 'موافق' لإغلاق النافذه، أو أستخدم مفاتيح الارقام لاختيار شاشات اختبار أخرى."
 
+msgid "Adult Audience, Strong Violence 15+"
+msgstr "للبالغين فقط، عنف شديد +15"
+
 msgid "Advanced"
 msgstr "متقدم"
 
@@ -651,6 +654,10 @@ msgstr "محاذاة أسماء القنوات"
 
 msgid "All"
 msgstr "الكل"
+
+
+msgid "All active receivers in standby"
+msgstr "وضع التلفزيون في وضع الاستعداد"
 
 msgid "All ages"
 msgstr "جميع الاعمار"
@@ -1039,14 +1046,17 @@ msgstr "اكتمل التثبيت التلقائي"
 msgid "Autoinstalling please wait for packages being updated"
 msgstr "التثبيت التلقائي يرجى الانتظار حتى يتم تحديث الحزم"
 
+msgid "Automatic"
+msgstr "تلقائي"
+
 msgid "Automatic Language"
-msgstr "بحث آلـى"
+msgstr "بحث تلقائي"
 
 msgid "Automatic Scan"
-msgstr "بحث آلـى"
+msgstr "بحث تلقائي"
 
 msgid "Automatic bookmarks"
-msgstr "بحث آلـى"
+msgstr "بحث تلقائي"
 
 msgid "Automatic refresh"
 msgstr "التحديث التلقائي"
@@ -1055,7 +1065,7 @@ msgid "Automatic save"
 msgstr "حفظ تلقائي"
 
 msgid "Automatic scan"
-msgstr "بحث آلـى"
+msgstr "بحث تلقائي"
 
 msgid "Automatic"
 msgstr "أوتوماتيكي"
@@ -1089,6 +1099,9 @@ msgstr "B"
 
 msgid "BACK"
 msgstr "خلف"
+
+msgid "BC%d"
+msgstr ""
 
 msgid "BER"
 msgstr "معدل خطاء الإشارة:"
@@ -1239,6 +1252,10 @@ msgstr "اليونانية (اليونان)"
 
 msgid "Hebrew (IL)"
 msgstr "العبرية (إسرائيل)"
+
+
+msgid "Bambini Accompagnati"
+msgstr "الأطفال المرافقون"
 
 msgid "Band"
 msgstr "نطاق"
@@ -1709,6 +1726,12 @@ msgstr "تغيير اللغة"
 msgid "Change PIN"
 msgstr "تغيير الرقم السري"
 
+msgid "Change Password"
+msgstr "تغيير كلمة المرور"
+
+msgid "Change Root Password"
+msgstr "تغيير كلمة مرور الجذر"
+
 msgid "Change bouquets in quickzap"
 msgstr "التنقل بين الباقات بشكل أسرع"
 
@@ -1819,8 +1842,11 @@ msgid "Checking tuner %s\n"
 msgstr "التحقق من المؤالف %s\n"
 "منفذ الدايزك %s إلى %s"
 
+msgid "Children"
+msgstr "أطفال"
+
 msgid "Children/Youth/Education/Science"
-msgstr "التعليم/العلوم/الوقائع"
+msgstr "الأطفال/الشباب/التعليم/العلوم"
 
 msgid "Chile"
 msgstr "تشيلي"
@@ -1860,6 +1886,9 @@ msgstr "اختر ما إذا كنت تريد مسح مرسل مستجيب واح
 
 msgid "Choose whether to scan for free services only or whether to include paid/encrypted services too."
 msgstr "اختر ما إذا كنت تريد البحث عن خدمات مجانية فقط أو تضمين الخدمات المدفوعة / المشفرة أيضًا."
+
+msgid "Choose whether to use the streamrelay_whitelist file. The whitelist file should be disabled if you are using softcsa."
+msgstr "اختر ما إذا كنت تريد استخدام ملف streamrelay_whitelist. يجب تعطيل ملف القائمة البيضاء إذا كنت تستخدم softcsa."
 
 msgid "Choose which tuner to configure."
 msgstr "اختيار أي موالف لتكوين."
@@ -2526,6 +2555,9 @@ msgstr "انتهى الحدث الحالي.\n"
 msgid "Current mode: %s \n"
 msgstr "النظام الحالي: %s \n"
 
+msgid "Current password incorrect"
+msgstr "كلمة المرور الحالية غير صحيحة"
+
 msgid "Current rotor position: "
 msgstr ":مكان الدوارن الحالي"
 
@@ -2556,8 +2588,8 @@ msgstr "تخطي الوقت العادي مع المفاتيح '7'/'9'"
 msgid "Customize"
 msgstr "تخصيص"
 
-msgid "Customize OpenWebIF settings for fallback tuner"
-msgstr "للموالف الاحتياطي OpenWebIF تخصيص إعدادات"
+msgid "Customize OpenWebIF settings for fallback receiver"
+msgstr "لجهاز الاستقبال الاحتياطي OpenWebIF تخصيص إعدادات"
 
 msgid "Customize channel list cursor behavior"
 msgstr "تخصيص المؤشر في قائمة القنوات"
@@ -2636,6 +2668,15 @@ msgstr "صيغة بيانات الديفيدي"
 
 msgid "DVD file browser"
 msgstr "تصفح ملفات الديفيدي"
+
+msgid "Dai 12 anni in su"
+msgstr "للأعمار من 12 سنة فما فوق"
+
+msgid "Dai 14 anni in su"
+msgstr "للأعمار من 14 سنة فما فوق"
+
+msgid "Dai 18 anni in su"
+msgstr "للأعمار من 18 سنة فما فوق"
 
 msgid "DVD media toolbox"
 msgstr "أدوات مشغل الديفيدي"
@@ -2891,6 +2932,15 @@ msgstr "فشل المسح!"
 
 msgid "Delete file"
 msgstr "حذف الملف"
+
+msgid "Decoder release strategy"
+msgstr "استراتيجية إصدار جهاز فك التشفير"
+
+msgid "Decoder start delay"
+msgstr "تأخير بدء تشغيل جهاز فك التشفير"
+
+msgid "Decoder start timeout"
+msgstr "مهلة بدء تشغيل جهاز فك التشفير"
 
 msgid "Delete image"
 msgstr "حذف الصورة"
@@ -3224,6 +3274,9 @@ msgstr "لا تتنقل وأحذف التسجيل المؤقت"
 msgid "Don't show default"
 msgstr "تعيين افتراضي"
 
+msgid "Use streamrelay whitelist file"
+msgstr "StreamRelay استخدم ملف القائمة البيضاء لـ"
+
 msgid "Don't stop current event but disable coming events"
 msgstr "لا توقف الحدث الحالي لكن قم بتعطيل الأحداث القادمة"
 
@@ -3502,8 +3555,8 @@ msgstr "تفعيل تحرير المفضله"
 msgid "Enable freesat EPG"
 msgstr "تمكين دليل البرامج اليومية للأقمار المجانية"
 
-msgid "Enable import timer from fallback tuner"
-msgstr "تفعيل مؤقت الاستيراد من الموالف الاحتياطي"
+msgid "Enable import timer from fallback receiver"
+msgstr "تفعيل مؤقت الاستيراد من جهاز الرسيفر الاحتياطي"
 
 msgid "Enable move mode"
 msgstr "تمكين وضع التحريك للقنوات"
@@ -3623,6 +3676,9 @@ msgstr "أدخل الرقم السري"
 msgid "Enter URL"
 msgstr "أعاده إدخال الرقم السري"
 
+msgid "Enter current password"
+msgstr "أدخل كلمة المرور الحالية"
+
 msgid "Enter an URL where alternative images could be listed for FlashImage."
 msgstr "حيث يمكن إدراج الصور البديلة لـصورة الفلاش الداخلية URL أدخل عنوان"
 
@@ -3634,6 +3690,9 @@ msgstr "ادخل إذا كنت في الشمال أو الجنوب من خط ا�
 
 msgid "Enter main menu..."
 msgstr "دخول القائمه الرئيسية..."
+
+msgid "Enter new password"
+msgstr "أدخل كلمة المرور الجديدة"
 
 msgid "Enter persistent PIN code"
 msgstr "أدخل الرمز السري"
@@ -4278,6 +4337,9 @@ msgstr "غامبيا"
 msgid "Gateway"
 msgstr "المدخل"
 
+msgid "General"
+msgstr "عام"
+
 msgid "General AC3 delay"
 msgstr "تأخير ترميز الصوت الثلاثي العام"
 
@@ -4647,6 +4709,9 @@ msgstr "كم عدد الدقائق التي تريد إضافتها إلى ال�
 msgid "How many minutes do you want to record?"
 msgstr "كم عدد الدقائق التي تريد تسجيلها؟"
 
+msgid "How to release the hardware decoder when switching to software descrambling. 'Quick' releases immediately (faster zapping). 'Normal' performs clean shutdown first (more stable on some boxes)."
+msgstr "كيفية تحرير وحدة فك التشفير المادية عند التبديل إلى فك التشفير البرمجي. يقوم الوضع 'السريع' بالتحرير فورًا (لزيادة سرعة فك التشفير). يقوم الوضع 'العادي' بإيقاف التشغيل بشكل كامل أولًا (أكثر استقرارًا على بعض الأجهزة)"
+
 msgid "Http(s) stream start delay"
 msgstr "Http (s) تأخير بدء البث"
 
@@ -4957,6 +5022,9 @@ msgstr "تثبيت الملحقات"
 
 msgid "Install local extension"
 msgstr "تثبيت إضافات محليه"
+
+msgid "Install picons on"
+msgstr "قم بتثبيت أيقونات بيكونز على"
 
 msgid "Indian"
 msgstr "الهند"
@@ -5694,6 +5762,12 @@ msgstr "جزر مارشال"
 msgid "Martinique"
 msgstr "مارتينيك"
 
+msgid "Mature Adult Audience 15+"
+msgstr "للكبار فقط +15"
+
+msgid "Mature Audience 15+"
+msgstr "للكبار فقط +15"
+
 msgid "Manama"
 msgstr "المنامة"
 
@@ -5717,6 +5791,9 @@ msgstr "الحد الأقصى لعدد أيام دليل البرامج الإل
 
 msgid "Maximum space used (MB):"
 msgstr "أقصى مساحة مستخدمة (ميغا بايت):"
+
+msgid "Maximum time to wait for the first descrambling key (CW) before starting the decoder. 'Disabled' starts the decoder immediately without waiting."
+msgstr "الحد الأقصى للوقت الذي يجب انتظاره لمفتاح فك التشفير الأول (CW) قبل بدء تشغيل جهاز فك التشفير. يؤدي وضع 'معطل' إلى بدء تشغيل جهاز فك التشفير فورًا دون انتظار."
 
 msgid "Maybe the reason that recording is currently running. Please stop the recording before trying to configure the positioner."
 msgstr "ربما السبب في أن تسجيل قيد التشغيل حاليا. يرجى إيقاف التسجيل قبل محاولة تكوين النظام المتحرك."
@@ -6126,6 +6203,9 @@ msgstr "كاليدونيا الجديدة"
 msgid "New Zealand"
 msgstr "نيوزلندا"
 
+msgid "New password not the same as the repeat password"
+msgstr "رسالة كلمة المرور الجديدة ليست هي نفسها كلمة المرور المكررة"
+
 msgid "News/Current Affairs/Social"
 msgstr "الأخبار/الشؤون الجارية/الاجتماعية"
 
@@ -6295,6 +6375,9 @@ msgstr "لا,مطلقا"
 msgid "No, only download"
 msgstr "لا، حمل فقط"
 
+msgid "Non Classificato"
+msgstr "غير مصنف"
+
 msgid "None"
 msgstr "لاشيئ"
 
@@ -6324,6 +6407,9 @@ msgstr "النرويج"
 
 msgid "Norwegian"
 msgstr "النرويجية"
+
+msgid "Not Classified"
+msgstr "غير مصنف"
 
 msgid "Not Installed"
 msgstr "تثبيت"
@@ -6412,6 +6498,9 @@ msgid "Numberzap or seek backward medium step"
 msgstr ""
 
 msgid "Numberzap or seek backward small step"
+msgstr ""
+
+msgid "Numberzap or seek forward big step"
 msgstr ""
 
 msgid "Numberzap or seek forward medium step"
@@ -6549,6 +6638,9 @@ msgstr ".الحالة أثناء الجري LED حالة تشغيل"
 msgid "Opkg"
 msgstr "Opkg"
 
+msgid "Optional local NTP server"
+msgstr "محلي اختياري NTP خادم"
+
 msgid "Options disable timer"
 msgstr "تعطيل المؤقت"
 
@@ -6619,7 +6711,10 @@ msgid "PCR PID"
 msgstr "مرجع وقت البرامج"
 
 msgid "PDC"
-msgstr "PDC"
+msgstr ""
+
+msgid "PG - Parental Guidance"
+msgstr "PG - إرشادات الوالدين"
 
 msgid "PGS file"
 msgstr "ملف الترجمة"
@@ -6723,6 +6818,9 @@ msgstr "باراغواي"
 msgid "Parent directory"
 msgstr "الدليل الرئيسي"
 
+msgid "Parental Guidance Recommended"
+msgstr "يُنصح بإشراف الوالدين"
+
 msgid "Parental Control"
 msgstr "الرقابة الأبوية"
 
@@ -6761,6 +6859,9 @@ msgstr "إعدادات دعم PCSC للبطاقات الذكية"
 
 msgid "Pending restart"
 msgstr "وضع الإستعداد / إعادة التشغيل"
+
+msgid "Per Tutti"
+msgstr "للجميع"
 
 msgid "Percentage left"
 msgstr "النسبة المئوية في اليسار"
@@ -7249,6 +7350,9 @@ msgstr "المؤالف المفضل في التسجيلات"
 
 msgid "Preparing... Please wait"
 msgstr "جاري التجهيز... الرجاء الانتظار"
+
+msgid "Preschool"
+msgstr "مرحلة ما قبل المدرسة"
 
 msgid "Press '0' to toggle PiP mode"
 msgstr "اضغط علي ' 0 ' للتبديل بين وضع قناة داخل قناة"
@@ -7799,6 +7903,9 @@ msgstr "إعاده"
 msgid "Repeat leave standby messages"
 msgstr "كرر عرض الرسالة على الشاشة"
 
+msgid "Repeat new password"
+msgstr "أعد إدخال كلمة المرور الجديدة"
+
 msgid "Repeat playlist"
 msgstr "إعادة قائمة الاغاني"
 
@@ -7927,6 +8034,9 @@ msgstr "إستعادة النسخ الاحتياطية الخاصة بجهازك
 
 msgid "Restoring..."
 msgstr "جاري الاستعادة..."
+
+msgid "Restricted 18+"
+msgstr "مخصص لمن هم فوق 18 عامًا"
 
 msgid "Resume from last position"
 msgstr "إستعاده من الوضع السابق"
@@ -8478,6 +8588,9 @@ msgstr "حدد طريقه الفرز:"
 msgid "Select how quickly the dish should move between satellites."
 msgstr "حدد السرعة التي يجب ان يتحرك بها الطبق بين الأقمار الصناعية."
 
+msgid "Select how the descrambled data stream is processed. 'Automatic' uses asynchronous writes (lower CPU usage) with automatic fallback to synchronous if kernel AIO is not supported. 'Synchronous' forces blocking writes (stable, most compatible)."
+msgstr "حدد كيفية معالجة دفق البيانات الذي تم فك تشفيره. يستخدم الخيار 'تلقائي' عمليات كتابة غير متزامنة (استهلاك أقل لوحدة المعالجة المركزية) مع الرجوع التلقائي إلى الكتابة المتزامنة إذا لم يكن الإدخال/الإخراج المتزامن للنواة مدعومًا. يفرض الخيار 'متزامن' عمليات كتابة حظرية (مستقر، الأكثر توافقًا)."
+
 msgid "Select how the satellite dish is set up. i.e. fixed dish, single LNB, DiSEqC switch, positioner, etc."
 msgstr "حدد كيفية إعداد طبق القمر الصناعي. على سبيل المثال، طبق ثابت، لاقط منفرد، التحكم بالدايزك، نظام الطبق المتحرك، إلخ."
 
@@ -8534,6 +8647,9 @@ msgstr ".تمرير المرسل المستجيب المطلوب إلى المو
 
 msgid "Select the User Band to be assigned to this tuner. This is an index into the table of frequencies the SCR switch or SCR LNB uses to pass the requested transponder to the tuner."
 msgstr ".لتمرير المرسل المستجيب المطلوب إلى الموالف SCR LNB أو SCR حدد نطاق المستخدم الذي سيتم تعيينه لهذا الموالف. هذا فهرس في جدول الترددات الذي يستخدمه مفتاح"
+
+msgid "Select the delay to buffer descrambled data before starting playback. This can reduce AC3 audio dropouts by ensuring enough data is available when the decoder starts. Higher values are more stable but increase channel switch time."
+msgstr "حدد مدة التأخير لتخزين البيانات التي تم فك تشفيرها مؤقتًا قبل بدء التشغيل. يمكن أن يقلل هذا من انقطاعات صوت AC3 من خلال ضمان توفر بيانات كافية عند بدء تشغيل وحدة فك التشفير. القيم الأعلى أكثر استقرارًا ولكنها تزيد من وقت تبديل القنوات."
 
 msgid "Select the character or action under the keyboard cursor"
 msgstr "حدد الحرف أو الإجراء أسفل مؤشر لوحة المفاتيح"
@@ -9403,6 +9519,9 @@ msgstr "ناعم"
 msgid "SocketMMI"
 msgstr "SocketMMI"
 
+msgid "SoftCSA Settings"
+msgstr "SoftCSA إعدادات"
+
 msgid "SoftCam / CI"
 msgstr "CI / سوفتكام"
 
@@ -9417,6 +9536,9 @@ msgstr "الكام"
 
 msgid "Software"
 msgstr "البرامج"
+
+msgid "Software descrambling: "
+msgstr "فك تشفير البرامج: "
 
 msgid "Software management"
 msgstr "التحكم فى البرنامج التشغيلي"
@@ -9888,8 +10010,23 @@ msgstr "الحدود مفعلة"
 msgid "Succeeded:"
 msgstr ":نجح"
 
+msgid "Sucessfully changed password for root user"
+msgstr "تم تغيير كلمة مرور المستخدم الجذر بنجاح"
+
+msgid "Sucessfully cleared password for root user"
+msgstr "تم مسح كلمة مرور المستخدم الجذر بنجاح"
+
 msgid "Sudan"
 msgstr "السودان"
+
+msgid "Suitable for ages 12+"
+msgstr "مناسب للأعمار من ١٢ عامًا فما فوق"
+
+msgid "Suitable for ages 15+"
+msgstr "مناسب للأعمار من ١٥ عامًا فما فوق"
+
+msgid "Suitable only for Adults"
+msgstr "مناسب للبالغين فقط"
 
 msgid "Sun"
 msgstr "الاحد"
@@ -9937,6 +10074,9 @@ msgstr "تحول"
 
 msgid "Switch TV to correct input"
 msgstr "التبديل إلى مدخل التلفزيون الصحيح"
+
+msgid "Switch all other connected HDMI-CEC enabed receivers (not TV or audio systems) to standby when this box wakes up."
+msgstr "قم بتحويل جميع أجهزة الاستقبال الأخرى المتصلة المزودة بتقنية HDMI-CEC (باستثناء أجهزة التلفزيون أو أنظمة الصوت) إلى وضع الاستعداد عند استيقاظ هذا الصندوق."
 
 msgid "Switch between filelist/playlist"
 msgstr "التبديل بين قائمة الملفات/قائمة التشغيل"
@@ -10018,6 +10158,12 @@ msgstr "فشل المزامنة الانتقال مره أخرى إلى الأص
 
 msgid "Sync time using"
 msgstr "مزامنة الوقت باستخدام"
+
+msgid "Sync mode"
+msgstr "وضع التحجيم"
+
+msgid "Synchronous"
+msgstr ""
 
 msgid "Syrian Arab Republic"
 msgstr "الجمهورية العربية السورية"
@@ -11023,6 +11169,9 @@ msgstr "نوع اللأقط/الجهاز"
 msgid "Type of scan"
 msgstr "نوع البحث"
 
+msgid "U - Suitable for all"
+msgstr "مناسب للجميع"
+
 msgid "UNKNOWN"
 msgstr "مجهول"
 
@@ -11037,6 +11186,9 @@ msgstr "UPnP Sever Minidlha"
 
 msgid "URL"
 msgstr "الرابط"
+
+msgid "URL of fallback remote receiver"
+msgstr "تمكين الريموت الإحتياطي في الرسيفر"
 
 msgid "URL of remote receiver for imports"
 msgstr "عنوان الإنترنيت لجهاز الاستقبال البعيد الاحتياطي"
@@ -11061,6 +11213,12 @@ msgstr "الأوكرانية"
 
 msgid "Unable to backup settings as the AutoBackup plugin is missing, do you want to continue?"
 msgstr "غير قادر على الاحتفاظ بنسخة احتياطية من الإعدادات لأن المكون الإضافي للنسخ الاحتياطي التلقائي مفقود، هل تريد المتابعة؟"
+
+msgid "Unable to change password for root user"
+msgstr "تعذر تغيير كلمة مرور المستخدم الجذر"
+
+msgid "Unable to clear password for root user"
+msgstr "تعذر مسح كلمة مرور المستخدم الجذر"
 
 msgid "Unable to complete - Kexec Multiboot files missing!"
 msgstr "مفقودة Kexec Multiboot غير قادر على إكمال - ملفات"
@@ -11747,11 +11905,11 @@ msgstr "عند التمكين سيقوم جهاز الإستقبال تلقائ�
 msgid "When enabled the set top box is able to wakeup on LAN"
 msgstr "عند التمكين، يكون جهاز فك التشفير قادرًا على التنبيه على الشبكة المحلية"
 
-msgid "When enabled the timer from the fallback receiver is imported"
-msgstr "عند تمكين اندفاع اللاقط سيتم فرضه"
-
 msgid "When enabled then when you select a new channel in the channel selection the channel selection will not close. It will only close when you select the current playing service. This is a kind of preview mode"
 msgstr "عند التمكين، عند تحديد قناة جديدة في تحديد القناة، لن يتم إغلاق اختيار القناة. سيتم إغلاقه فقط عند تحديد خدمة التشغيل الحالية. هذا نوع من وضع المعاينة"
+
+msgid "When enabled the timer from the fallback receiver is imported"
+msgstr "عند تمكين اندفاع اللاقط سيتم فرضه"
 
 msgid "When enabled you can control the volume with the arrow buttons instead of getting the channel selection list"
 msgstr "عند التمكين، سيعرض أرقام القنوات في شاشة اختيار القناة."
@@ -12407,8 +12565,11 @@ msgstr "نسخة احتياطية مخزنة لدليل البرامج الإل�
 msgid "ballet"
 msgstr "رقصة الباليه"
 
+msgid "bc%d"
+msgstr ""
+
 msgid "bc%s"
-msgstr "bc%s"
+msgstr ""
 
 msgid "better"
 msgstr "أفضل"
