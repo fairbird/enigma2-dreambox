@@ -655,7 +655,6 @@ msgstr "محاذاة أسماء القنوات"
 msgid "All"
 msgstr "الكل"
 
-
 msgid "All active receivers in standby"
 msgstr "وضع التلفزيون في وضع الاستعداد"
 
@@ -1067,9 +1066,6 @@ msgstr "حفظ تلقائي"
 msgid "Automatic scan"
 msgstr "بحث تلقائي"
 
-msgid "Automatic"
-msgstr "أوتوماتيكي"
-
 msgid "Automatically power off box to deep standby mode."
 msgstr "إيقاف تشغيل الصندوق تلقائيًا إلى وضع الاستعداد العميق."
 
@@ -1252,7 +1248,6 @@ msgstr "اليونانية (اليونان)"
 
 msgid "Hebrew (IL)"
 msgstr "العبرية (إسرائيل)"
-
 
 msgid "Bambini Accompagnati"
 msgstr "الأطفال المرافقون"
