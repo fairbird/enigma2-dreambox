@@ -404,7 +404,7 @@ class Navigation:
 				originalPlayref = playref.toString()
 				for extensionFunc in Navigation.playServiceExtensions:
 					ret = extensionFunc(self, playref, event, InfoBarInstance)
-					if isinstance(ret, (ServiceReference, eServiceReference)):
+					if isinstance(ret, (ServiceReference.ServiceReference, eServiceReference)):
 						playref = ret
 					else:
 						playref, isAsyncPlay = ret
