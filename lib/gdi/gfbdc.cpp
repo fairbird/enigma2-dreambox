@@ -425,7 +425,9 @@ void gFBDC::reloadSettings()
 	setPalette();
 }
 
+#ifndef HWDREAMONE
 eAutoInitPtr<gFBDC> init_gFBDC(eAutoInitNumbers::graphic-1, "GFBDC");
+#endif
 
 #ifdef HAVE_OSDANIMATION
 void setAnimation_current(int a) {
