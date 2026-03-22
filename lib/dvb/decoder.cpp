@@ -42,7 +42,7 @@ DEFINE_REF(eDVBAudio);
 int eDVBAudio::m_debug = -1;
 
 eDVBAudio::eDVBAudio(eDVBDemux *demux, int dev)
-	:m_demux(demux), m_dev(dev)
+	:m_demux(demux), m_dev(dev), m_bypass(-1)
 {
 	char filename[128] = {};
 	sprintf(filename, "/dev/dvb/adapter%d/audio%d", demux ? demux->adapter : 0, dev);
@@ -167,17 +167,23 @@ int eDVBAudio::startPid(int pid, int type)
 		break;
 		}
 
-		if(eDVBAudio::m_debug)
-		{
-			eDebugNoNewLineStart("[eDVBAudio%d] AUDIO_SET_BYPASS bypass=%d ", m_dev, bypass);
-			if (::ioctl(m_fd, AUDIO_SET_BYPASS_MODE, bypass) < 0)
-				eDebugNoNewLine("failed: %m");
+		if (m_bypass != bypass) {
+
+			if(eDVBAudio::m_debug)
+			{
+				eDebugNoNewLineStart("[eDVBAudio%d] AUDIO_SET_BYPASS bypass=%d ", m_dev, bypass);
+				if (::ioctl(m_fd, AUDIO_SET_BYPASS_MODE, bypass) < 0)
+					eDebugNoNewLine("failed: %m");
+				else
+					eDebugNoNewLine("ok");
+			}
 			else
-				eDebugNoNewLine("ok");
+				::ioctl(m_fd, AUDIO_SET_BYPASS_MODE, bypass);
+			freeze();  // why freeze here?!? this is a problem when only a pid change is requested... because of the unfreeze logic in Decoder::setState
+			m_bypass = bypass;
+
 		}
-		else
-			::ioctl(m_fd, AUDIO_SET_BYPASS_MODE, bypass);
-		freeze();  // why freeze here?!? this is a problem when only a pid change is requested... because of the unfreeze logic in Decoder::setState
+
 
 		if(eDVBAudio::m_debug)
 		{
