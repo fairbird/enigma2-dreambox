@@ -365,6 +365,9 @@ class InfoBarUnhandledKey:
 			self.unhandledKeyDialog.show()
 			self.hideUnhandledKeySymbolTimer.start(2000, True)
 
+	def showUnhandledKey(self):
+		self.unhandledKeyDialog.show()
+
 
 class HideVBILine(Screen):
 	def __init__(self, session):
@@ -4877,6 +4880,36 @@ class InfoBarHDMI:
 		else:
 			self.hdmi_enabled_full = False
 			self.session.nav.playService(slist.servicelist.getCurrent())
+
+
+# ########################################################################################
+# For displayed power or record timer messages in foreground and for callback execution. #
+# ########################################################################################
+#
+class InfoBarOpenOnTopHelper:
+	def __init__(self):
+		pass
+
+	def openInfoBarMessage(self, message, messageboxtyp, timeout=-1):
+		try:
+			self.session.open(MessageBox, message, messageboxtyp, timeout=timeout)
+		except Exception as e:
+			print("[InfoBarOpenMessage] Exception:", e)
+
+	def openInfoBarMessageWithCallback(self, callback, message, messageboxtyp, timeout=-1, default=True):
+		try:
+			self.session.openWithCallback(callback, MessageBox, message, messageboxtyp, timeout=timeout, default=default)
+		except Exception as e:
+			print("[InfoBarGenerics] [openInfoBarMessageWithCallback] Exception:", e)
+
+	def openInfoBarSession(self, session, option=None):
+		try:
+			if option is None:
+				self.session.open(session)
+			else:
+				self.session.open(session, option)
+		except Exception as e:
+			print("[InfoBarGenerics] [openInfoBarSession] Exception:", e)
 
 
 # ################################################################
