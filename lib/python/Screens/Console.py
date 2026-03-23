@@ -40,7 +40,7 @@ class Console(Screen):
 			"red": self.cancel,
 		}, -1)
 
-		self.cmdlist = isinstance(cmdlist, list) and cmdlist or [cmdlist]
+		self.cmdlist = isinstance(cmdlist, (list, tuple)) and list(cmdlist) or [cmdlist]
 		self.newtitle = title == "Console" and _("Console") or title
 		self.cancel_msg = None
 
