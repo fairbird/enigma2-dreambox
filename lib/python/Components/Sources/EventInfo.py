@@ -119,18 +119,19 @@ class EventInfo(PerServiceBase, Source):
 
 	def __init__(self, navcore, now_or_next):
 		Source.__init__(self)
+		self.__service = None
 		PerServiceBase.__init__(self, navcore,
 			{
 				iPlayableService.evStart: self.gotEvent,
 				iPlayableService.evUpdatedInfo: self.gotEvent,
 				iPlayableService.evUpdatedEventInfo: self.gotEvent,
+				iPlayableService.evUser + 15: self.gotEvent,
 				iPlayableService.evEnd: self.gotEvent
 			}, with_event=True)
 		self.now_or_next = now_or_next
 		self.epgQuery = eEPGCache.getInstance().lookupEventTime
 		self.refreshTimer = eTimer()
 		self.refreshTimer.callback.append(self.gotEventPoll)
-		self.__service = None
 
 	@cached
 	def getEvent(self):
@@ -160,10 +161,10 @@ class EventInfo(PerServiceBase, Source):
 		self.gotEvent(iPlayableService.evUpdatedEventInfo)
 
 	def gotEvent(self, what):
-		if what == iPlayableService.evEnd:
-			self.__service = None
+		if what == iPlayableService.evEnd and not self.__service:
 			self.changed((self.CHANGED_CLEAR,))
 		else:
+			self.__service = None
 			self.changed((self.CHANGED_ALL,))
 
 	def updateSource(self, ref):
