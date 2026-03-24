@@ -1,10 +1,16 @@
 # -*- coding: utf-8 -*-
+from re import sub
+from time import localtime
 from enigma import eConsoleAppContainer
 from Screens.Screen import Screen
-from Components.ActionMap import ActionMap
+from Components.ActionMap import HelpableActionMap
 from Components.ScrollLabel import ScrollLabel
 from Components.Sources.StaticText import StaticText
 from Screens.MessageBox import MessageBox
+from Tools.Directories import fileWriteLines
+
+
+MODULE_NAME = __name__.split(".")[-1]
 
 
 class Console(Screen):
@@ -29,16 +35,23 @@ class Console(Screen):
 		self["text"] = ScrollLabel("")
 		self["key_red"] = StaticText(_("Cancel"))
 		self["key_green"] = StaticText(_("Hide"))
+		self["key_yellow"] = StaticText()
 		self["summary_description"] = StaticText()
-		self["actions"] = ActionMap(["WizardActions", "DirectionActions", "ColorActions"],
-		{
-			"ok": self.closeConsole,
-			"back": self.closeConsole,
-			"up": self["text"].pageUp,
-			"down": self["text"].pageDown,
-			"green": self.toggleHideShow,
-			"red": self.cancel,
-		}, -1)
+
+		self["actions"] = HelpableActionMap(self, ["OkCancelActions", "ColorActions", "NavigationActions"], {
+			"ok": (self.closeConsole, _("Close the screen")),
+			"cancel": (self.closeConsole, _("Close the screen")),
+			"red": (self.cancel, _("Close this screen")),
+			"up": (self["text"].pageUp, _("Move up a line")),
+			"down": (self["text"].pageDown, _("Move down a line"))
+		}, prio=0, description=_("Console Actions"))
+		self["hideAction"] = HelpableActionMap(self, ["ColorActions"], {
+			"green": (self.toggleHideShow, _("Hide/Show the console screen"), _("NOTE: While the console screen is hidden from view the buttons are still active. Pressing any enabled button will cause the screen to reappear but the button will not be actioned.")),
+		}, prio=0, description=_("Console Actions"))
+		self["saveAction"] = HelpableActionMap(self, ["ColorActions"], {
+			"yellow": (self.keySaveLog, _("Save the log of the console messages to a file")),
+		}, prio=0, description=_("Console Actions"))
+		self["saveAction"].setEnabled(False)
 
 		self.cmdlist = isinstance(cmdlist, (list, tuple)) and list(cmdlist) or [cmdlist]
 		self.newtitle = title == "Console" and _("Console") or title
@@ -89,6 +102,8 @@ class Console(Screen):
 				self["text"].appendText(_("\nPress OK or Exit to abort!"))
 				self["key_red"].setText(_("Exit"))
 				self["key_green"].setText("")
+				self["key_yellow"].setText(_("Save Log"))
+				self["saveAction"].setEnabled(True)
 
 	def toggleHideShow(self):
 		if self.finished:
@@ -124,3 +139,15 @@ class Console(Screen):
 		if isinstance(data, bytes):
 			data = data.decode(errors='ignore')
 		self["text"].appendText(data)
+
+	def keySaveLog(self):
+		def saveLogCallback(answer=None):
+			if answer:
+				text = sub(r"\\c[0-9A-F]{8}", "", self["text"].getText())
+				if not fileWriteLines(self.outputFile, text, source=MODULE_NAME):
+					self.session.open(MessageBox, _("Error: Unable to write log file '%s'!") % self.outputFile, type=MessageBox.TYPE_ERROR, windowTitle=self.getTitle())
+				self["key_yellow"].setText("")
+
+		localTime = localtime()
+		self.outputFile = f"/tmp/{localTime[3]:02d}{localTime[4]:02d}{localTime[5]:02d}_console.txt"
+		self.session.openWithCallback(saveLogCallback, MessageBox, f"{_("Save the commands and output to the log file?")}\n('{self.outputFile}')", type=MessageBox.TYPE_YESNO, default=True, windowTitle=self.getTitle())
