@@ -1870,7 +1870,7 @@ def InitUsageConfig():
 	])
 	config.subtitles.ai_connection_speed.addNotifier(setAiConnectionSpeed)
 
-	langs_ai = ["af", "sq", "am", "ar", "hy", "az", "eu", "be", "bn", "bs", "bg", "ca", "zh", "co", "hr", "cs", "da", "nl", "en", "eo", "fr", "fi", "fy", "gl", "ka", "de", "el", "ht", "ha", "hu", "is", "ig", "ga", "it", "ja", "jv", "kn", "kk", "km", "rw", "ko", "ku", "ky", "lo", "la", "lv", "lt", "lb", "mk", "mg", "ms", "mt", "mi", "mr", "mn", "no", "ny", "or", "ps", "fa", "pl", "pt", "ro", "ru", "sm", "gd", "sr", "st", "sn", "sk", "sl", "so", "es", "su", "sw", "sv", "tl", "tg", "te", "th", "tr", "tk", "uk", "ur", "ug", "uz", "cy", "xh", "yi", "yo", "zu", "et"]
+	langs_ai = ["af", "am", "ar", "hy", "az", "eu", "be", "bn", "bs", "bg", "ca", "zh", "co", "hr", "cs", "da", "nl", "en", "eo", "fr", "fi", "fy", "gl", "ka", "de", "el", "ht", "ha", "hu", "is", "ig", "ga", "it", "ja", "jv", "kn", "kk", "km", "rw", "ko", "ku", "ky", "lo", "la", "lv", "lt", "lb", "mk", "mg", "ms", "mt", "mi", "mr", "mn", "no", "ny", "or", "ps", "fa", "pl", "pt", "ro", "ru", "sm", "gd", "sr", "st", "sn", "sk", "sl", "so", "es", "su", "sw", "sv", "tl", "tg", "te", "th", "tr", "tk", "uk", "ur", "ug", "uz", "cy", "xh", "yi", "yo", "zu"]
 	langs_ai = [(x, international.LANGUAGE_DATA[x][1]) for x in langs_ai]
 	langs_ai.append(("zh-CN", _("Chinese (Simplified)")))
 	langs_ai.append(("ceb", _("Cebuano")))
