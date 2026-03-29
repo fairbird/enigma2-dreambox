@@ -147,4 +147,3 @@ def migrateFileCommander():
 			getattr(config.plugins.FileCommander, new).value = value
 		getattr(config.plugins.filecommander, old).value = ""
 	config.plugins.filecommander.save()
-	config.plugins.FileCommander.save()
