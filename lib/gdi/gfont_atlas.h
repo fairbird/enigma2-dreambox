@@ -1,11 +1,14 @@
 #pragma once
 
+#include <include/stb_rect_pack.h>
 #include <lib/gdi/gpixmap.h>
 #include <lib/gdi/erect.h>
-#include <map>
+#include <unordered_map>
+#include <vector>
 #include <stdint.h>
+#include <cstdint>
 
-typedef const void* glyph_key_t;
+typedef uintptr_t glyph_key_t;
 
 struct glyph_uv {
     float u0, v0;
@@ -22,19 +25,17 @@ private:
     
     bool m_is_dirty;
     eRect m_dirty_rect;
-    
-    int m_current_x;
-    int m_current_y;
-    int m_current_row_height;
 
-    std::map<glyph_key_t, glyph_uv> m_glyphs;
+    stbrp_context m_pack_context;
+    std::vector<stbrp_node> m_pack_nodes;
+
+    std::unordered_map<glyph_key_t, glyph_uv> m_glyphs;
 
 public:
     gFontAtlas();
     ~gFontAtlas();
 
     bool init(int width = 2048, int height = 2048);
-    void bind();
     
     bool getGlyph(glyph_key_t key, glyph_uv &uv);
     void addGlyph(glyph_key_t key, int width, int height, const uint8_t *data, glyph_uv &uv);
