@@ -562,6 +562,9 @@ lib/python/Plugins/Extensions/PicturePlayer/Makefile
 lib/python/Plugins/Extensions/SocketMMI/Makefile
 lib/python/Plugins/Extensions/SocketMMI/meta/Makefile
 lib/python/Plugins/Extensions/SocketMMI/src/Makefile
+lib/python/Plugins/Extensions/StreamlinkWrapper/Makefile
+lib/python/Plugins/Extensions/YTDLWrapper/Makefile
+lib/python/Plugins/Extensions/YTDLPWrapper/Makefile
 lib/python/Plugins/PLi/Makefile
 lib/python/Plugins/SystemPlugins/CommonInterfaceAssignment/Makefile
 lib/python/Plugins/SystemPlugins/CommonInterfaceAssignment/meta/Makefile
