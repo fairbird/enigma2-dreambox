@@ -1571,30 +1571,6 @@ def InitUsageConfig():
 	config.usage.QuadpipMode = NoSave(ConfigYesNo(default=False))
 	config.usage.QuadpipMode.addNotifier(quadpip_mode_notifier)
 
-	if BoxInfo.getItem("HasBypassEdidChecking"):
-		def setHasBypassEdidChecking(configElement):
-			with open(BoxInfo.getItem("HasBypassEdidChecking"), "w") as fd:
-				fd.write("00000001" if configElement.value else "00000000")
-		config.av.bypassEdidChecking = ConfigYesNo(default=False)
-		config.av.bypassEdidChecking.addNotifier(setHasBypassEdidChecking)
-
-	if BoxInfo.getItem("HasColorspace"):
-		def setHaveColorspace(configElement):
-			with open(BoxInfo.getItem("HasColorspace"), "w") as fd:
-				fd.write(configElement.value)
-		if BoxInfo.getItem("HasColorspaceSimple"):
-			config.av.hdmicolorspace = ConfigSelection(default="Edid(Auto)", choices={"Edid(Auto)": _("auto"), "Hdmi_Rgb": "RGB", "444": "YCbCr 4:4:4", "422": "YCbCr 4:2:2", "420": "YCbCr 4:2:0"})
-		else:
-			config.av.hdmicolorspace = ConfigSelection(default="auto", choices={"auto": _("auto"), "rgb": "RGB", "420": "4:2:0", "422": "4:2:2", "444": "4:4:4"})
-		config.av.hdmicolorspace.addNotifier(setHaveColorspace)
-
-	if BoxInfo.getItem("HasColordepth"):
-		def setHaveColordepth(configElement):
-			with open(BoxInfo.getItem("HasColordepth"), "w") as fd:
-				fd.write(configElement.value)
-		config.av.hdmicolordepth = ConfigSelection(default="auto", choices={"auto": _("auto"), "8bit": "8bit", "10bit": "10bit", "12bit": "12bit"})
-		config.av.hdmicolordepth.addNotifier(setHaveColordepth)
-
 	if BoxInfo.getItem("HasHDMIpreemphasis"):
 		def setHDMIpreemphasis(configElement):
 			with open(BoxInfo.getItem("HasHDMIpreemphasis"), "w") as fd:
@@ -1602,61 +1578,7 @@ def InitUsageConfig():
 		config.av.hdmipreemphasis = ConfigYesNo(default=False)
 		config.av.hdmipreemphasis.addNotifier(setHDMIpreemphasis)
 
-	if BoxInfo.getItem("HasColorimetry"):
-		def setColorimetry(configElement):
-			with open(BoxInfo.getItem("HasColorimetry"), "w") as fd:
-				fd.write(configElement.value)
-		config.av.hdmicolorimetry = ConfigSelection(default="auto", choices=[("auto", _("auto")), ("bt2020ncl", "BT 2020 NCL"), ("bt2020cl", "BT 2020 CL"), ("bt709", "BT 709")])
-		config.av.hdmicolorimetry.addNotifier(setColorimetry)
-
-	if BoxInfo.getItem("HasHdrType"):
-		def setHdmiHdrType(configElement):
-			with open(BoxInfo.getItem("HasHdrType"), "w") as fd:
-				fd.write(configElement.value)
-		config.av.hdmihdrtype = ConfigSelection(default="auto", choices={"auto": _("auto"), "none": "SDR", "hdr10": "HDR10", "hlg": "HLG", "dolby": "Dolby Vision"})
-		config.av.hdmihdrtype.addNotifier(setHdmiHdrType)
-
-	if BoxInfo.getItem("HDRSupport"):
-		def setHlgSupport(configElement):
-			with open("/proc/stb/hdmi/hlg_support", "w") as fd:
-				fd.write(configElement.value)
-		config.av.hlg_support = ConfigSelection(default="auto(EDID)",
-			choices=[("auto(EDID)", _("controlled by HDMI")), ("yes", _("force enabled")), ("no", _("force disabled"))])
-		config.av.hlg_support.addNotifier(setHlgSupport)
-
-		def setHdr10Support(configElement):
-			with open("/proc/stb/hdmi/hdr10_support", "w") as fd:
-				fd.write(configElement.value)
-		config.av.hdr10_support = ConfigSelection(default="auto(EDID)",
-			choices=[("auto(EDID)", _("controlled by HDMI")), ("yes", _("force enabled")), ("no", _("force disabled"))])
-		config.av.hdr10_support.addNotifier(setHdr10Support)
-
-		def setDisable12Bit(configElement):
-			with open("/proc/stb/video/disable_12bit", "w") as fd:
-				fd.write("on" if configElement.value else "off")
-		config.av.allow_12bit = ConfigYesNo(default=False)
-		config.av.allow_12bit.addNotifier(setDisable12Bit)
-
-		def setDisable10Bit(configElement):
-			with open("/proc/stb/video/disable_10bit", "w") as fd:
-				fd.write("on" if configElement.value else "off")
-		config.av.allow_10bit = ConfigYesNo(default=False)
-		config.av.allow_10bit.addNotifier(setDisable10Bit)
-
-	if BoxInfo.getItem("CanSyncMode"):
-		def setSyncMode(configElement):
-			print("[UsageConfig] Read /proc/stb/video/sync_mode")
-			with open("/proc/stb/video/sync_mode", "w") as fd:
-				fd.write(configElement.value)
-		config.av.sync_mode = ConfigSelection(default="slow", choices={
-			"slow": _("Slow motion"),
-			"hold": _("Hold first frame"),
-			"black": _("Black screen")
-		})
-		config.av.sync_mode.addNotifier(setSyncMode)
-
 	config.subtitles = ConfigSubsection()
-
 	config.subtitles.show = ConfigYesNo(default=True)
 
 	def setTTXSubtitleColors(configElement):
