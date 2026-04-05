@@ -502,7 +502,7 @@ def InitAVSwitch():
 	BoxInfo.setItem("CanDownmixAAC", aacDownmix)
 	if aacDownmix:
 		def setAACDownmix(configElement):
-			value = configElement.value if model in ("dm900", "dm920", "dm7080", "dm820", "dm520", "gbquad4k", "gbquad4kpro", "gbue4k", "gbx34k") else configElement.value and "downmix" or "passthrough"
+			value = configElement.value if model in ("dm900", "dm920", "dm7080", "dm820", "dm520") else configElement.value and "downmix" or "passthrough"
 			fileWriteLine("/proc/stb/audio/aac", value, source=MODULE_NAME)
 
 		if model in ("dm900", "dm920", "dm7080", "dm820", "dm520"):
@@ -511,15 +511,6 @@ def InitAVSwitch():
 				("passthrough", _("Pass-through")),
 				("multichannel", _("Convert to multi-channel PCM")),
 				("hdmi_best", _("Use best / Controlled by HDMI"))
-			])
-		elif model in ("gbquad4k", "gbquad4kpro", "gbue4k", "gbx34k"):
-			config.av.downmix_aac = ConfigSelection(default="downmix", choices=[
-				("downmix", _("Downmix")),
-				("passthrough", _("Pass-through")),
-				("multichannel", _("Convert to multi-channel PCM")),
-				("force_ac3", _("Convert to AC3")),
-				("force_dts", _("Convert to DTS")),
-				("use_hdmi_caps", _("Use best / Controlled by HDMI"))
 			])
 		else:
 			config.av.downmix_aac = ConfigYesNo(default=True)
@@ -614,14 +605,6 @@ def InitAVSwitch():
 					("multichannel", _("Convert to multi-channel PCM")),
 					("hdmi_best", _("Use best / Controlled by HDMI")),
 					("force_ddp", _("Force AC3plus"))
-				]
-		elif model in ("gbquad4k", "gbquad4kpro", "gbue4k", "gbx34k"):
-			choiceList = [
-					("downmix", _("Downmix")),
-					("passthrough", _("Pass-through")),
-					("force_ac3", _("Convert to AC3")),
-					("multichannel", _("Convert to multi-channel PCM")),
-					("force_dts", _("Convert to DTS"))
 				]
 		else:
 			choiceList = [
@@ -748,7 +731,7 @@ def InitAVSwitch():
 			else:
 				print(f"[AVSwitch] Setting scaler sharpness to '{configElement.value:08X}'.")
 
-		default = 5 if model in ("gbquad", "gbquadplus") else 13
+		default = 13
 		config.av.scaler_sharpness = ConfigSlider(default=default, limits=(0, 26))
 		config.av.scaler_sharpness.addNotifier(setScalerSharpness)
 	else:
