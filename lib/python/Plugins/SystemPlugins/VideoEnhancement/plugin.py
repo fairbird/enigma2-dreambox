@@ -1,44 +1,35 @@
 # -*- coding: utf-8 -*-
+from os import path as os_path
+
 from Plugins.Plugin import PluginDescriptor
 from Components.ConfigList import ConfigListScreen
-from Components.config import config, ConfigNothing
+from Components.config import getConfigListEntry, config, ConfigNothing
 from Components.ActionMap import ActionMap
+from Components.Label import Label
+from Components.Pixmap import Pixmap
+from Components.Sources.Boolean import Boolean
 from Components.Sources.StaticText import StaticText
 from Screens.Screen import Screen
 from Screens.MessageBox import MessageBox
-from .import VideoEnhancement
-import os
-import skin
+from . import VideoEnhancement  # noqa F401
 
 
 class VideoEnhancementSetup(ConfigListScreen, Screen):
-
-	skin = """
-		<screen name="VideoEnhancementSetup" position="center,center" size="560,440" title="VideoEnhancementSetup">
-			<ePixmap pixmap="buttons/red.png" position="0,0" size="140,40" alphaTest="on" />
-			<ePixmap pixmap="buttons/green.png" position="140,0" size="140,40" alphaTest="on" />
-			<ePixmap pixmap="buttons/yellow.png" position="280,0" size="140,40" alphaTest="on" />
-			<ePixmap pixmap="buttons/blue.png" position="420,0" size="140,40" alphaTest="on" />
-			<widget source="key_red" render="Label" position="0,0" zPosition="1" size="140,40" font="Regular;20" horizontalAlignment="center" verticalAlignment="center" backgroundColor="#9f1313" transparent="1" />
-			<widget source="key_green" render="Label" position="140,0" zPosition="1" size="140,40" font="Regular;20" horizontalAlignment="center" verticalAlignment="center" backgroundColor="#1f771f" transparent="1" />
-			<widget source="key_yellow" render="Label" position="280,0" zPosition="1" size="140,40" font="Regular;20" horizontalAlignment="center" verticalAlignment="center" backgroundColor="#a08500" transparent="1" />
-			<widget source="key_blue" render="Label" position="420,0" zPosition="1" size="140,40" font="Regular;20" horizontalAlignment="center" verticalAlignment="center" backgroundColor="#18188b" transparent="1" />
-			<widget name="config" position="5,50" size="550,350" scrollbarMode="showOnDemand" />
-			<ePixmap pixmap="div-h.png" position="0,400" zPosition="1" size="560,2" />
-			<widget source="introduction" render="Label" position="5,410" size="550,42" zPosition="10" font="Regular;20" horizontalAlignment="center" verticalAlignment="center" backgroundColor="#25062748" transparent="1" />
-		</screen>"""
-
 	def __init__(self, session):
 		Screen.__init__(self, session)
 		self.onChangedEntry = []
 		self.skinName = ["VideoEnhancementSetup"]
 		self.setTitle(_("Video enhancement setup"))
+		self["HelpWindow"] = Pixmap()
+		self["HelpWindow"].hide()
+		self["VKeyIcon"] = Boolean(False)
+		self['footnote'] = Label()
+		self["description"] = Label("")
 		self["introduction"] = StaticText()
 
 		self.list = []
 		self.xtdlist = []
-		self.seperation = skin.parameters.get("ConfigListSeperator", 300)
-		ConfigListScreen.__init__(self, self.list, session=self.session, on_change=self.changedEntry)
+		ConfigListScreen.__init__(self, self.list, session=session, on_change=self.changedEntry)
 		self.createSetup()
 
 		self["actions"] = ActionMap(["SetupActions", "ColorActions", "MenuActions"],
@@ -51,7 +42,7 @@ class VideoEnhancementSetup(ConfigListScreen, Screen):
 			}, -2)
 
 		self["key_red"] = StaticText(_("Cancel"))
-		self["key_green"] = StaticText(_("Save"))
+		self["key_green"] = StaticText(_("OK"))
 		self["key_yellow"] = StaticText(_("Last config"))
 		self["key_blue"] = StaticText(_("Default"))
 
@@ -77,11 +68,12 @@ class VideoEnhancementSetup(ConfigListScreen, Screen):
 		self.oldGreen_boost = config.pep.green_boost.value
 		self.oldBlue_boost = config.pep.blue_boost.value
 		self.oldDynamic_contrast = config.pep.dynamic_contrast.value
+		self.oldColor_space = config.pep.color_space.value
 
 	def addToConfigList(self, description, configEntry, hinttext, add_to_xtdlist=False):
 		if isinstance(configEntry, ConfigNothing):
 			return None
-		entry = (description, configEntry, hinttext)
+		entry = getConfigListEntry(description, configEntry, hinttext)
 		self.list.append(entry)
 		if add_to_xtdlist:
 			self.xtdlist.append(entry)
@@ -98,22 +90,24 @@ class VideoEnhancementSetup(ConfigListScreen, Screen):
 		self.brightnessEntry = addToConfigList(_("Brightness"), config.pep.brightness, _("This option sets the picture brightness."))
 		self.blue_boostEntry = addToConfigList(_("Boost blue"), config.pep.blue_boost, _("This option allows you to boost the blue tones in the picture."), add_to_xtdlist)
 		self.green_boostEntry = addToConfigList(_("Boost green"), config.pep.green_boost, _("This option allows you to boost the green tones in the picture."), add_to_xtdlist)
-		self.contrastEntry = addToConfigList(_("Contrast"), config.pep.contrast, _("This option sets the picture contrast."))
-		self.digital_contour_removalEntry = addToConfigList(_("Digital contour removal"), config.pep.digital_contour_removal, _("This option sets the surpression of false digital contours, that are the result of a limited number of discrete values."), add_to_xtdlist)
+		self.contrastEntry = addToConfigList(_("Contrast"), config.pep.contrast, _("This option sets  the picture contrast."))
+		self.digital_contour_removalEntry = addToConfigList(_("Digital contour removal"), config.pep.digital_contour_removal, _("This option sets the suppression of false digital contours, that are the result of a limited number of discrete values."), add_to_xtdlist)
 		self.dynamic_contrastEntry = addToConfigList(_("Dynamic contrast"), config.pep.dynamic_contrast, _("This option allows to set the level of dynamic contrast of the picture."), add_to_xtdlist)
 		self.hueEntry = addToConfigList(_("Hue"), config.pep.hue, _("This option sets the picture hue."))
-		self.mosquito_noise_reductionEntry = addToConfigList(_("Mosquito noise reduction"), config.pep.mosquito_noise_reduction, _("This option set the level of surpression of mosquito noise (Mosquito Noise is random aliasing as a result of strong compression). Obviously this goes at the cost of picture details."), add_to_xtdlist)
+		self.mosquito_noise_reductionEntry = addToConfigList(_("Mosquito noise reduction"), config.pep.mosquito_noise_reduction, _("This option set the level of suppression of mosquito noise (Mosquito Noise is random aliasing as a result of strong compression). Obviously this goes at the cost of picture details."), add_to_xtdlist)
 		self.scaler_sharpnessEntry = addToConfigList(_("Scaler sharpness"), config.av.scaler_sharpness, _("This option sets the scaler sharpness, used when stretching picture from 4:3 to 16:9."))
-		self.scaler_vertical_dejaggingEntry = addToConfigList(_("Scaler vertical dejagging"), config.pep.scaler_vertical_dejagging, _("This option allows you enable the vertical scaler dejagging."))
-		self.smoothEntry = addToConfigList(_("Smooth"), config.pep.smooth, _("This option allows you enable smoothing filter to control the dithering process."))
+		self.scaler_vertical_dejaggingEntry = addToConfigList(_("Scaler vertical anti-aliasing"), config.pep.scaler_vertical_dejagging, _("Control the use of vertical scaler anti-aliasing."))
+		self.smoothEntry = addToConfigList(_("Smooth"), config.pep.smooth, _("Control the smoothing filter used for the dithering process."))
 		self.sharpnessEntry = addToConfigList(_("Sharpness"), config.pep.sharpness, _("This option sets up the picture sharpness, used when the picture is being upscaled."), add_to_xtdlist)
 		self.saturationEntry = addToConfigList(_("Saturation"), config.pep.saturation, _("This option sets the picture saturation."))
+		self.color_spaceEntry = addToConfigList(_("Color space"), config.pep.color_space, _("This option sets the picture color space."))
 		self["config"].list = self.list
-		self["config"].l.setSeperation(self.seperation)
 		self["config"].l.setList(self.list)
+		#if config.usage.sort_settings.value:
+		#	self["config"].list.sort()
 
 	def SelectionChanged(self):
-		self["introduction"].setText(self["config"].getCurrent() and len(self["config"].getCurrent()[2]) > 2 and self["config"].getCurrent()[2] or "")
+		self["description"].setText(self["config"].getCurrent()[2])
 
 	def PreviewClosed(self):
 		self["config"].invalidate(self["config"].getCurrent())
@@ -121,34 +115,48 @@ class VideoEnhancementSetup(ConfigListScreen, Screen):
 
 	def keyLeft(self):
 		current = self["config"].getCurrent()
-		if current in (self.splitEntry, self.scaler_vertical_dejaggingEntry, self.smoothEntry):
+		if current == self.splitEntry or current == self.color_spaceEntry:
 			ConfigListScreen.keyLeft(self)
-		else:
-			if current in self.xtdlist:
-				self.previewlist = [current, self.splitEntry]
-				oldsplitmode = config.pep.split.value
-			else:
-				self.previewlist = [current]
-				oldsplitmode = None
+		elif (current == self.scaler_vertical_dejaggingEntry) or (current == self.smoothEntry):
+			ConfigListScreen.keyLeft(self)
+		elif current != self.splitEntry and current in self.xtdlist:
+			self.previewlist = [
+				current,
+				self.splitEntry
+			]
 			maxvalue = current[1].max
-			self.session.openWithCallback(self.PreviewClosed, VideoEnhancementPreview, configEntry=self.previewlist, oldSplitMode=oldsplitmode, maxValue=maxvalue)
+			self.session.openWithCallback(self.PreviewClosed, VideoEnhancementPreview, configEntry=self.previewlist, oldSplitMode=config.pep.split.value, maxValue=maxvalue)
+		else:
+			self.previewlist = [
+				current
+			]
+			maxvalue = current[1].max
+			self.session.openWithCallback(self.PreviewClosed, VideoEnhancementPreview, configEntry=self.previewlist, oldSplitMode=None, maxValue=maxvalue)
 
 	def keyRight(self):
 		current = self["config"].getCurrent()
-		if current in (self.splitEntry, self.scaler_vertical_dejaggingEntry, self.smoothEntry):
+		if current == self.splitEntry or current == self.color_spaceEntry:
 			ConfigListScreen.keyRight(self)
-		else:
-			if current in self.xtdlist:
-				self.previewlist = [current, self.splitEntry]
-				oldsplitmode = config.pep.split.value
-			else:
-				self.previewlist = [current]
-				oldsplitmode = None
+		elif (current == self.scaler_vertical_dejaggingEntry) or (current == self.smoothEntry):
+			ConfigListScreen.keyRight(self)
+		elif current != self.splitEntry and current in self.xtdlist:
+			self.previewlist = [
+				current,
+				self.splitEntry
+			]
 			maxvalue = current[1].max
-			self.session.openWithCallback(self.PreviewClosed, VideoEnhancementPreview, configEntry=self.previewlist, oldSplitMode=oldsplitmode, maxValue=maxvalue)
+			self.session.openWithCallback(self.PreviewClosed, VideoEnhancementPreview, configEntry=self.previewlist, oldSplitMode=config.pep.split.value, maxValue=maxvalue)
+		else:
+			self.previewlist = [
+				current
+			]
+			maxvalue = current[1].max
+			self.session.openWithCallback(self.PreviewClosed, VideoEnhancementPreview, configEntry=self.previewlist, oldSplitMode=None, maxValue=maxvalue)
 
 	def confirm(self, confirmed):
-		if confirmed:
+		if not confirmed:
+			print("not confirmed")
+		else:
 			if self.splitEntry is not None:
 				config.pep.split.setValue('off')
 			self.keySave()
@@ -162,8 +170,16 @@ class VideoEnhancementSetup(ConfigListScreen, Screen):
 		self.keyYellowConfirm(True)
 		self.close()
 
+	def keyCancel(self):
+		if self["config"].isChanged():
+			self.session.openWithCallback(self.cancelConfirm, MessageBox, _("Really close without saving settings?"), default=False)
+		else:
+			self.close()
+
 	def keyYellowConfirm(self, confirmed):
-		if confirmed:
+		if not confirmed:
+			print("not confirmed")
+		else:
 			if self.contrastEntry is not None:
 				config.pep.contrast.setValue(self.oldContrast)
 			if self.saturationEntry is not None:
@@ -196,13 +212,17 @@ class VideoEnhancementSetup(ConfigListScreen, Screen):
 				config.pep.blue_boost.setValue(self.oldBlue_boost)
 			if self.dynamic_contrastEntry is not None:
 				config.pep.dynamic_contrast.setValue(self.oldDynamic_contrast)
+			if self.color_spaceEntry is not None:
+				config.pep.color_space.setValue(self.oldColor_space)
 			self.keySave()
 
 	def keyYellow(self):
 		self.session.openWithCallback(self.keyYellowConfirm, MessageBox, _("Reset video enhancement settings to your last configuration?"), MessageBox.TYPE_YESNO, timeout=20, default=False)
 
 	def keyBlueConfirm(self, confirmed):
-		if confirmed:
+		if not confirmed:
+			print("not confirmed")
+		else:
 			if self.contrastEntry is not None:
 				config.pep.contrast.setValue(128)
 			if self.saturationEntry is not None:
@@ -235,34 +255,53 @@ class VideoEnhancementSetup(ConfigListScreen, Screen):
 				config.pep.blue_boost.setValue(0)
 			if self.dynamic_contrastEntry is not None:
 				config.pep.dynamic_contrast.setValue(0)
+			if self.color_spaceEntry is not None:
+				file = open("/proc/stb/video/hdmi_colorspace_choices")
+				modes = file.readline().split()
+				file.close()
+				config.pep.color_space.setValue(modes[0])
 			self.keySave()
 
 	def keyBlue(self):
 		self.session.openWithCallback(self.keyBlueConfirm, MessageBox, _("Reset video enhancement settings to system defaults?"), MessageBox.TYPE_YESNO, timeout=20, default=False)
 
+	# for summary:
+	def changedEntry(self):
+		for x in self.onChangedEntry:
+			x()
+
+	def getCurrentEntry(self):
+		return self["config"].getCurrent()[0]
+
+	def getCurrentValue(self):
+		return str(self["config"].getCurrent()[1].getText())
+
+	def createSummary(self):
+		from Screens.Setup import SetupSummary
+		return SetupSummary
+
 
 class VideoEnhancementPreview(ConfigListScreen, Screen):
 	skin = """
-		<screen name="VideoEnhancementPreview" position="center,e-170" size="560,170" title="VideoEnhancementPreview">
-			<ePixmap pixmap="buttons/red.png" position="0,0" size="140,40" alphaTest="on" />
-			<ePixmap pixmap="buttons/green.png" position="140,0" size="140,40" alphaTest="on" />
-			<widget source="key_red" render="Label" position="0,0" zPosition="1" size="140,40" font="Regular;20" horizontalAlignment="center" verticalAlignment="center" backgroundColor="#9f1313" transparent="1" />
-			<widget source="key_green" render="Label" position="140,0" zPosition="1" size="140,40" font="Regular;20" horizontalAlignment="center" verticalAlignment="center" backgroundColor="#1f771f" transparent="1" />
+		<screen name="VideoEnhancementPreview" position="center,e-170" size="560,170" title="VideoEnhancementPreview" resolution="1280,720">
+			<ePixmap pixmap="buttons/red.png" position="0,0" size="140,40" alphatest="on" />
+			<ePixmap pixmap="buttons/green.png" position="140,0" size="140,40" alphatest="on" />
+			<widget source="key_red" render="Label" position="0,0" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#9f1313" transparent="1" />
+			<widget source="key_green" render="Label" position="140,0" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#1f771f" transparent="1" />
 			<widget name="config" position="5,50" size="550,80" scrollbarMode="showOnDemand" />
 			<ePixmap pixmap="div-h.png" position="0,130" zPosition="1" size="560,2" />
-			<widget source="introduction" render="Label" position="0,140" size="550,25" zPosition="10" font="Regular;21" horizontalAlignment="center" verticalAlignment="center" backgroundColor="#25062748" transparent="1" />
+			<widget source="introduction" render="Label" position="0,140" size="550,25" zPosition="10" font="Regular;21" halign="center" valign="center" backgroundColor="#25062748" transparent="1" />
 		</screen>"""
 
 	def __init__(self, session, configEntry=None, oldSplitMode=None, maxValue=None):
 		Screen.__init__(self, session)
 
 		self.onChangedEntry = []
-		self.setTitle(_("Video enhancement preview"))
+		self.setup_title = "Videoenhancement"
 		self.oldSplitMode = oldSplitMode
 		self.maxValue = maxValue
 		self.configStepsEntry = None
 		self.isStepSlider = None
-		self.seperation = skin.parameters.get("ConfigListSeperator", 300)
 
 		self.list = []
 		self.configEntry = configEntry
@@ -279,11 +318,15 @@ class VideoEnhancementPreview(ConfigListScreen, Screen):
 		self["introduction"] = StaticText()
 
 		self.createSetup()
+		self.onLayoutFinish.append(self.layoutFinished)
+
+	def layoutFinished(self):
+		self.setTitle(_("Video enhancement preview"))
 
 	def createSetup(self):
 		self.list = []
 		if self.maxValue == 255:
-			self.configStepsEntry = (_("Change step size"), config.pep.configsteps)
+			self.configStepsEntry = getConfigListEntry(_("Change step size"), config.pep.configsteps)
 
 		if self.configEntry is not None:
 			self.list = self.configEntry
@@ -291,7 +334,7 @@ class VideoEnhancementPreview(ConfigListScreen, Screen):
 			self.list.append(self.configStepsEntry)
 
 		self["config"].list = self.list
-		self["config"].l.setSeperation(self.seperation)
+		self["config"].l.setSeperation(300)
 		self["config"].l.setList(self.list)
 		if self.selectionChanged not in self["config"].onSelectionChanged:
 			self["config"].onSelectionChanged.append(self.selectionChanged)
@@ -306,15 +349,15 @@ class VideoEnhancementPreview(ConfigListScreen, Screen):
 			else:
 				self.isStepSlider = False
 		except AttributeError:
-			print("[VideoEnhancement] no max value")
+			print("no max value")
 
 	def keyLeft(self):
-		if self.isStepSlider:
+		if self.isStepSlider is True:
 			self["config"].getCurrent()[1].increment = config.pep.configsteps.value
 		ConfigListScreen.keyLeft(self)
 
 	def keyRight(self):
-		if self.isStepSlider:
+		if self.isStepSlider is True:
 			self["config"].getCurrent()[1].increment = config.pep.configsteps.value
 		ConfigListScreen.keyRight(self)
 
@@ -350,6 +393,10 @@ class VideoEnhancementPreview(ConfigListScreen, Screen):
 	def getCurrentValue(self):
 		return str(self["config"].getCurrent()[1].getText())
 
+	def createSummary(self):
+		from Screens.Setup import SetupSummary
+		return SetupSummary
+
 
 def videoEnhancementSetupMain(session, **kwargs):
 	session.open(VideoEnhancementSetup)
@@ -362,7 +409,6 @@ def startSetup(menuid):
 
 
 def Plugins(**kwargs):
-	list = []
-	if config.usage.setup_level.index >= 2 and os.path.exists("/proc/stb/vmpeg/0/pep_apply"):
+	if config.usage.setup_level.index >= 2 and os_path.exists("/proc/stb/vmpeg/0/pep_apply"):
 		return PluginDescriptor(name=_("Video enhancement setup"), description=_("Advanced video enhancement setup"), where=PluginDescriptor.WHERE_MENU, needsRestart=False, fnc=startSetup)
 	return []

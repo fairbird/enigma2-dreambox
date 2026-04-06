@@ -591,7 +591,6 @@ lib/python/Plugins/SystemPlugins/Satfinder/meta/Makefile
 lib/python/Plugins/SystemPlugins/SoftwareManager/Makefile
 lib/python/Plugins/SystemPlugins/SoftwareManager/meta/Makefile
 lib/python/Plugins/SystemPlugins/VideoEnhancement/Makefile
-lib/python/Plugins/SystemPlugins/VideoEnhancement/meta/Makefile
 lib/python/Plugins/SystemPlugins/VideoEnhancementAML/Makefile
 lib/python/Plugins/SystemPlugins/VideoTune/Makefile
 lib/python/Plugins/SystemPlugins/VideoTune/meta/Makefile
