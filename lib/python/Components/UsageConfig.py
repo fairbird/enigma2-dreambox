@@ -508,6 +508,12 @@ def InitUsageConfig():
 	config.usage.informationShowAllMenuScreens = ConfigYesNo(default=False)
 	config.usage.informationExtraSpacing = ConfigYesNo(False)
 
+	# Settings for servicemp3 and handling from cue sheet file.
+	config.usage.useVideoCuesheet = ConfigYesNo(default=True)  # Use marker for video media file.
+	config.usage.useAudioCuesheet = ConfigYesNo(default=True)  # Use marker for audio media file.
+	config.usage.useChapterInfo = ConfigYesNo(default=True)  # Show chapter positions (gst >= 1 and supported media files).
+	config.usage.nativeCuesheetSupport = ConfigYesNo(default=False)  # Enable extended cut file support.
+
 	choicelist = [("0", _("Disabled"))]
 	for i in (2, 3, 4, 5, 10, 20, 30):
 		choicelist.append((str(i), ngettext("%d second", "%d seconds", i) % i))
