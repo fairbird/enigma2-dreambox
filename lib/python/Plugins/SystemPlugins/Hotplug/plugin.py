@@ -267,11 +267,11 @@ class HotPlugManager:
 					self.removeTimer.stop()
 					self.removeTimer.start(2000)
 			elif action == "ifup":
-				interface = eventData.get("INTERFACE")
+				interface = eventData.get("INTERFACE")  # noqa F841
 			elif action == "ifdown":
-				interface = eventData.get("INTERFACE")
+				interface = eventData.get("INTERFACE")  # noqa F841
 			elif action == "online":
-				state = eventData.get("STATE")
+				state = eventData.get("STATE")  # noqa F841
 
 		else:
 			device = eventData.get("DEVPATH", "").split("/")[-1]
@@ -396,5 +396,5 @@ def filescan(**kwargs):
 
 
 def Plugins(**kwargs):
-	return [PluginDescriptor(name=_("Hotplug"), description=_("listens to hotplug events"), where=PluginDescriptor.WHERE_AUTOSTART, needsRestart=True, fnc=autostart),
+	return [PluginDescriptor(name=_("Hotplug"), description=_("Hotplug handler."), where=PluginDescriptor.WHERE_AUTOSTART, needsRestart=True, fnc=autostart),
 		PluginDescriptor(name=_("Opkg"), where=PluginDescriptor.WHERE_FILESCAN, needsRestart=False, fnc=filescan)]
