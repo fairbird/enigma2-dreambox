@@ -609,7 +609,7 @@ def runScreenTest():
 	from Tools.StbHardware import setFPWakeuptime, setRTCtime
 	from Screens.SleepTimerEdit import isNextWakeupTime
 	#get currentTime
-	nowTime = time()
+	nowTime = int(time())
 	wakeupList = sorted([
 		x for x in ((session.nav.RecordTimer.getNextRecordingTime(), 0),
 					(session.nav.RecordTimer.getNextZapTime(isWakeup=True), 1),
