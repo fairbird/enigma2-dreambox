@@ -27,6 +27,7 @@
 
 #include <dvbsi++/ca_program_map_section.h>
 
+#ifdef DREAMBOX_DUAL_TUNER
 char* eDVBCISlot::readInputCI(int NimNumber)
 {
 	char id1[] = "NIM Socket";
@@ -92,6 +93,7 @@ std::string eDVBCISlot::getTunerLetterDM(int NimNumber)
 	}
 	return eDVBCISlot::getTunerLetter(NimNumber);
 }
+#endif
 
 eDVBCIInterfaces *eDVBCIInterfaces::instance = 0;
 

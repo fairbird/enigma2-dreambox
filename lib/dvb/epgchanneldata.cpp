@@ -57,7 +57,7 @@ void eEPGChannelData::startChannel()
 void eEPGChannelData::startEPG()
 {
 #ifdef GLIBC_64BIT_TIME_FLAGS
- 	eTrace("[eEPGChannelData] start reading events(%lld)", ::time(0));
+ 	eTrace("[eEPGChannelData] start reading events(%lld)", (long long)::time(0));
 #else
  	eTrace("[eEPGChannelData] start reading events(%ld)", ::time(0));
 #endif
@@ -284,7 +284,7 @@ void eEPGChannelData::finishEPG()
 	if (!isRunning)  // epg ready
 	{
 #ifdef GLIBC_64BIT_TIME_FLAGS
-		eTrace("[eEPGChannelData] stop caching events(%lld)", ::time(0));
+		eTrace("[eEPGChannelData] stop caching events(%lld)", (long long)::time(0));
 #else
 		eTrace("[eEPGChannelData] stop caching events(%ld)", ::time(0));
 #endif
@@ -515,7 +515,7 @@ void eEPGChannelData::readData( const uint8_t *data, int source)
 			default: eTraceNoNewLine("unknown");break;
 		}
 #ifdef GLIBC_64BIT_TIME_FLAGS
-		eTraceNoNewLine(" finished(%lld)\n", ::time(0));
+		eTraceNoNewLine(" finished(%lld)\n", (long long)::time(0));
 #else
 		eTraceNoNewLine(" finished(%ld)\n", ::time(0));
 #endif
@@ -1164,10 +1164,11 @@ void eEPGChannelData::readMHWData(const uint8_t *data)
 	}
 #ifdef GLIBC_64BIT_TIME_FLAGS
 	eTrace("[eEPGChannelData] mhw finished(%lld) %zu summaries not found",
+		(long long)::time(0),
 #else
 	eTrace("[eEPGChannelData] mhw finished(%ld) %zu summaries not found",
-#endif
 		::time(0),
+#endif
 		m_program_ids.size());
 	// Summaries have been read, titles that have summaries have been stored.
 	// Now store titles that do not have summaries.
@@ -1482,10 +1483,11 @@ void eEPGChannelData::readMHWData2(const uint8_t *data)
 				storeMHWTitle( itTitle, "", data );
 #ifdef GLIBC_64BIT_TIME_FLAGS
 			eTrace("[eEPGChannelData] mhw2 finished(%lld) %zu summaries not found",
+				(long long)::time(0),
 #else
 			eTrace("[eEPGChannelData] mhw2 finished(%ld) %zu summaries not found",
-#endif
 				::time(0),
+#endif
 				m_program_ids.size());
 		}
 	}

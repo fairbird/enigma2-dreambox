@@ -1051,7 +1051,7 @@ void eServiceDVD::loadCuesheet()
 			{
 				char buf[128];
 #ifdef GLIBC_64BIT_TIME_FLAGS
-				snprintf(buf, 128, "%llx", st.st_mtime);
+				snprintf(buf, 128, "%llx", (long long)st.st_mtime);
 #else
 				snprintf(buf, 128, "%lx", st.st_mtime);
 #endif
@@ -1155,7 +1155,7 @@ void eServiceDVD::saveCuesheet()
 			{
 				char buf[128];
 #ifdef GLIBC_64BIT_TIME_FLAGS
-				snprintf(buf, 128, "%llx", st.st_mtime);
+				snprintf(buf, 128, "%llx", (long long)st.st_mtime);
 #else
 				snprintf(buf, 128, "%lx", st.st_mtime);
 #endif
