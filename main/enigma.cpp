@@ -435,6 +435,15 @@ const char *getEnigmaVersionString()
 	return enigma2_version;
 }
 
+#ifndef IMAGE_FINGERPRINT
+#define IMAGE_FINGERPRINT 0
+#endif
+
+int getImageFingerprint()
+ {
+	return IMAGE_FINGERPRINT;
+ }
+
 const char *getBoxType()
 {
 	return BOXTYPE;
