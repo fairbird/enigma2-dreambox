@@ -193,7 +193,7 @@ class ServiceInfo(Converter):
 				return False
 			elif self.type == self.IS_CRYPTED:
 				return info.getInfo(iServiceInformation.sIsCrypted) == 1 and info.getInfo(iServiceInformation.sIsSoftCSA) != 1
-			elif self.IS_SOFTCSA:
+			elif self.type == self.IS_SOFTCSA:
 				return info.getInfo(iServiceInformation.sIsSoftCSA) == 1
 			elif self.type == self.SUBSERVICES_AVAILABLE:
 				return hasActiveSubservicesForCurrentChannel(service)
