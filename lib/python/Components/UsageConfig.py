@@ -2014,7 +2014,7 @@ def InitUsageConfig():
 	config.mediaplayer.alternateUserAgent = ConfigText(default="")
 
 	config.softcsa = ConfigSubsection()
-	config.softcsa.decoderRelease = ConfigSelection(default=0, choices=[
+	config.softcsa.decoderRelease = ConfigSelection(default=2, choices=[
 			(0, _("Quick")),
 			(1, _("Normal")),
 			(2, _("Aggressive"))
