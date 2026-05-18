@@ -31,6 +31,7 @@
 #include <lib/service/servicedvbfcc.h>
 #include <lib/service/eramserviceplay.h>
 #include "servicepeer.h"
+#include <lib/dvb/csaengine.h>
 
 /* for subtitles */
 #include <lib/gui/esubtitle.h>
@@ -4493,6 +4494,10 @@ void eDVBServicePlay::setupSpeculativeDescrambling()
 	if (m_is_pvr || m_is_stream)
 		return;
 
+	// libdvbcsa missing -> software descrambling not possible, skip all setup
+	if (!eDVBCSAEngine::isAvailable())
+		return;
+
 	eDebug("[eDVBServicePlay] Encrypted channel, creating speculative CSA session");
 
 	// Create session (starts INACTIVE, will activate when CSA-ALT detected from ECM)
@@ -4545,7 +4550,7 @@ void eDVBServicePlay::onSessionActivated(bool active)
 		if (m_decoder)
 		{
 			// 0 = Quick (no pause), 1 = Normal (pause), 2 = Aggressive (pause + slot reset)
-			int decoder_release = eSimpleConfig::getInt("config.softcsa.decoderRelease", 0);
+			int decoder_release = eSimpleConfig::getInt("config.softcsa.decoderRelease", 2);
 			bool needsPause = (decoder_release >= 1);
 
 			if (needsPause)
@@ -4631,7 +4636,7 @@ void eDVBServicePlay::cleanupSoftwareDescrambling()
 		m_service_handler.getProgramInfo(prog) == 0
 		&& prog.isCrypted()
 		&& m_csa_session
-		&& eSimpleConfig::getInt("config.softcsa.decoderRelease", 0) == 2)
+		&& eSimpleConfig::getInt("config.softcsa.decoderRelease", 2) == 2)
 		resetHwDescramblerSlot();
 
 	if (m_decoder)
@@ -4639,7 +4644,7 @@ void eDVBServicePlay::cleanupSoftwareDescrambling()
 		eDebug("[eDVBServicePlay] Cleaning up HW decoder for clean handover");
 
 		// 0 = Quick (no pause), 1 = Normal (pause), 2 = Aggressive (pause + slot reset)
-		int decoder_release = eSimpleConfig::getInt("config.softcsa.decoderRelease", 0);
+		int decoder_release = eSimpleConfig::getInt("config.softcsa.decoderRelease", 2);
 		bool needsPause = (decoder_release >= 1);
 
 		if (needsPause)

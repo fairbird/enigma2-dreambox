@@ -9,6 +9,7 @@
 #include <dvbsi++/program_map_section.h>
 #include <lib/base/eptrlist.h>
 #include <memory>
+#include <list>
 #include <lib/dvb/idvb.h>
 #include <lib/dvb/esection.h>
 
@@ -176,7 +177,14 @@ DECLARE_REF(eDVBCAHandler);
 	CAServiceMap services;
 	ePtrList<ePMTClient> clients;
 	ePtr<eTimer> serviceLeft;
-	std::map<eServiceReferenceDVB, ePtr<eTable<ProgramMapSection> > > pmtCache;
+	/* LRU cache for PMT tables - keeps last 20 entries to allow fast
+	 * re-registration without waiting for PMT from transponder */
+	static const size_t PMT_CACHE_MAX = 20;
+	typedef std::pair<eServiceReferenceDVB, ePtr<eTable<ProgramMapSection> > > pmtCacheEntry;
+	std::list<pmtCacheEntry> pmtCache;
+	ePtr<eTable<ProgramMapSection> > pmtCacheLookup(const eServiceReferenceDVB &ref);
+	void pmtCacheInsert(const eServiceReferenceDVB &ref, const ePtr<eTable<ProgramMapSection> > &ptr);
+	void pmtCacheRemove(const eServiceReferenceDVB &ref);
 	std::map<uint32_t, uint16_t> m_service_caid;  // serviceId -> CAID (from softcam ECM_INFO)
 	uint32_t serviceIdCounter;
 	bool m_protocol3_established;  // SERVER_INFO received from at least one client
