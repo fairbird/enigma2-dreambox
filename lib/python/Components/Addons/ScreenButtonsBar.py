@@ -41,6 +41,10 @@ class ScreenButtonsBar(GUIAddon):
 
 	def onContainerShown(self):
 		for x, val in self.sources.items():
+			# Some screens declare a connection key as a Widget (e.g. Pixmap()) instead
+			# of a Source - those have no .onChanged callback list, so skip them.
+			if not hasattr(val, "onChanged"):
+				continue
 			if x in ("key_red", "key_green", "key_yellow", "key_blue"):
 				self.colorButtonSources[x] = val
 			else:
