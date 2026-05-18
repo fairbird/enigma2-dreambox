@@ -3080,6 +3080,8 @@ class ExtensionsList(ChoiceBox):
 			key = extension[2]
 			if not key and allKeys:
 				key = allKeys.pop(0)
+			elif key in allKeys:  # Reserve hardcoded digit so it is not auto-assigned again later.
+				allKeys.remove(key)
 			extensionKeys.append(key or "")
 			extensionList.append((extension[0], extension[1]))
 
