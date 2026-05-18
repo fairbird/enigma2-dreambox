@@ -3749,7 +3749,7 @@ class InfoBarAudioSelection:
 				message = _("Dolby Digital downmix is now") + " " + _("enabled")
 				print('[InfoBarGenerics] [Audio] Dolby Digital downmix is now enabled')
 			if popup:
-				Notifications.AddPopup(text=message, type=MessageBox.TYPE_INFO, timeout=5, id="DDdownmixToggle")
+				AddPopup(text=message, type=MessageBox.TYPE_INFO, timeout=5, id="DDdownmixToggle")
 
 	def audioDownmixOn(self):
 		if not config.av.downmix_ac3.value:
