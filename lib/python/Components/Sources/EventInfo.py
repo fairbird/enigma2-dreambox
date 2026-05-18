@@ -120,6 +120,8 @@ class EventInfo(PerServiceBase, Source):
 	def __init__(self, navcore, now_or_next):
 		Source.__init__(self)
 		self.__service = None
+		self.refresh = True
+		self.__meta = {}
 		PerServiceBase.__init__(self, navcore,
 			{
 				iPlayableService.evStart: self.gotEvent,
@@ -161,18 +163,41 @@ class EventInfo(PerServiceBase, Source):
 		self.gotEvent(iPlayableService.evUpdatedEventInfo)
 
 	def gotEvent(self, what):
+		self.__meta = {}
 		if what == iPlayableService.evEnd and not self.__service:
+			self.refresh = False
 			self.changed((self.CHANGED_CLEAR,))
 		else:
 			self.__service = None
+			self.refresh = True
 			self.changed((self.CHANGED_ALL,))
 
 	def updateSource(self, ref):
+		self.__meta = {}
 		if not ref:
 			self.__service = None
+			self.refresh = False
 			self.changed((self.CHANGED_CLEAR,))
-		else:
-			self.__service = ref
+			return
+		self.__service = ref
+		self.refresh = True
+		self.changed((self.CHANGED_ALL,))
+
+	def refreshData(self):  # will be overwritten by plugins
+		pass
+
+	def getMeta(self, key=None):
+		if key is None:
+			return self.__meta if isinstance(self.__meta, dict) else {}
+		if self.refresh:
+			self.refresh = False
+			self.refreshData()
+		return self.__meta.get(key) if isinstance(self.__meta, dict) else None
+
+	def setMeta(self, meta):  # will be called by plugins
+		self.refresh = False
+		self.__meta = meta if isinstance(meta, dict) else {}
+		if self.__meta and self.__meta.get("source_key"):
 			self.changed((self.CHANGED_ALL,))
 
 	def destroy(self):
