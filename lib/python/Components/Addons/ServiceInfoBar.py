@@ -195,6 +195,8 @@ class ServiceInfoBar(GUIAddon):
 					return key + "_off"
 				if info.getInfo(iServiceInformation.sIsCrypted) == 1:
 					self.isCryptedDetected = True
+					if hasattr(iServiceInformation, "sIsSoftCSA") and info.getInfo(iServiceInformation.sIsSoftCSA) == 1:
+						return "IS_CRYPT_CSA"
 					return key
 			elif key == "audiotrack" and not isRef:
 				audio = service.audioTracks()
