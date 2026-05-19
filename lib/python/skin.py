@@ -604,12 +604,13 @@ def parseParameter(value):
 		return int(value)
 
 
-def parsePixmap(path, desktop):
+def parsePixmap(path, desktop, width=0, height=0):
 	option = path.find("#")
 	if option != -1:
 		path = path[:option]
 	if isfile(path):
-		pixmap = LoadPixmap(path, desktop=desktop)
+		# width/height are only consumed by the SVG rasterizer; raster loaders ignore them.
+		pixmap = LoadPixmap(path, desktop=desktop, width=width, height=height)
 		if pixmap is None:
 			skinError(f"Pixmap file '{path}' could not be loaded")
 	else:
@@ -930,7 +931,8 @@ class AttributeParser:
 		self.scaleTuple = scale
 
 	def applyAll(self, attributes):
-		# attributes.sort(key=lambda x: {"pixmap": 1}.get(x[0], 0))  # For SVG pixmap scale required the size, so sort pixmap last.
+		# Apply 'pixmap' last so 'size' is already set when SVGs rasterize.
+		attributes.sort(key=lambda x: {"pixmap": 1}.get(x[0], 0))
 		for attribute, value in attributes:
 			self.applyOne(attribute, value)
 
@@ -1153,7 +1155,10 @@ class AttributeParser:
 		self.guiObject.setPadding(eRect(self.applyHorizontalScale(leftPadding), self.applyVerticalScale(topPadding), self.applyHorizontalScale(rightPadding), self.applyVerticalScale(bottomPadding)))
 
 	def pixmap(self, value):
-		self.guiObject.setPixmap(parsePixmap(value, self.desktop))
+		if value.endswith(".svg"):  # SVG rasterizes to RGBA — force alpha-blend.
+			self.guiObject.setAlphatest(BT_ALPHABLEND)
+		size = self.guiObject.size()
+		self.guiObject.setPixmap(parsePixmap(value, self.desktop, size.width(), size.height()))
 
 	def pointer(self, value):
 		(name, pos) = (x.strip() for x in value.split(":", 1))
