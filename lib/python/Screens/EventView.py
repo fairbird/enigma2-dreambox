@@ -264,7 +264,7 @@ class EventViewBase:
 class EventViewSimple(Screen, EventViewBase):
 	def __init__(self, session, event, serviceRef, callback=None, similarEPGCB=None, singleEPGCB=None, multiEPGCB=None, skin="EventViewSimple"):
 		Screen.__init__(self, session, enableHelp=True)
-		EventViewBase.__init__(self, event, serviceRef, callback=callback, similarEPGCB=similarEPGCB)
+		EventViewBase.__init__(self, event, serviceRef, callback, similarEPGCB=similarEPGCB)
 		self.setTitle(_("Event View"))
 		self.skinName = [skin, "EventView"]
 		self.keyGreenAction = self.NO_ACTION
@@ -273,7 +273,7 @@ class EventViewSimple(Screen, EventViewBase):
 class EventViewEPGSelect(Screen, EventViewBase):
 	def __init__(self, session, event, serviceRef, callback=None, singleEPGCB=None, multiEPGCB=None, similarEPGCB=None, skinName=None):
 		Screen.__init__(self, session, enableHelp=True)
-		EventViewBase.__init__(self, event, serviceRef, callback=callback, similarEPGCB=similarEPGCB)
+		EventViewBase.__init__(self, event, serviceRef, callback, similarEPGCB=similarEPGCB)
 		self.keyGreenAction = self.ADD_TIMER
 		self["red"] = Pixmap()  # DEBUG: Are these backgrounds still required?
 		self["green"] = Pixmap()
