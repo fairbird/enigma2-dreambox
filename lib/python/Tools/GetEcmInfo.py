@@ -9,7 +9,7 @@ from Components.config import config
 from Components.SystemInfo import BoxInfo
 
 ECM_INFO = "/tmp/ecm.info"
-EMPTY_ECM_INFO = "", "0", "0", "0"
+EMPTY_ECM_INFO = "", "0", "0", "0", ""
 
 old_ecm_time = time()
 info = {}
@@ -108,7 +108,7 @@ class GetEcmInfo:
 				d = line.split(":", 1)
 				if len(d) > 1:
 					info[d[0].strip()] = d[1].strip()
-			if info and info.get("from") and config.softcam.hideServerName.value:
+			if info and info.get("from") and config.misc.softcam_hideServerName.value:
 				info["from"] = "".join(["\u2022"] * len(info.get("from")))
 			data = self.getText()
 			return True
@@ -205,7 +205,7 @@ class GetEcmInfo:
 			decCI = "0"
 			provid = "0"
 			ecmpid = "0"
-		return self.textValue, decCI, provid, ecmpid
+		return self.textValue, decCI, provid, ecmpid, info.get("device", "")
 
 	def createCurrentDevice(self, device, isLong):
 		if device:
