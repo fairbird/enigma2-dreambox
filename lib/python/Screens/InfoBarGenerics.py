@@ -3080,8 +3080,6 @@ class ExtensionsList(ChoiceBox):
 			key = extension[2]
 			if not key and allKeys:
 				key = allKeys.pop(0)
-			elif key in allKeys:  # Reserve hardcoded digit so it is not auto-assigned again later.
-				allKeys.remove(key)
 			extensionKeys.append(key or "")
 			extensionList.append((extension[0], extension[1]))
 
@@ -3751,7 +3749,7 @@ class InfoBarAudioSelection:
 				message = _("Dolby Digital downmix is now") + " " + _("enabled")
 				print('[InfoBarGenerics] [Audio] Dolby Digital downmix is now enabled')
 			if popup:
-				AddPopup(text=message, type=MessageBox.TYPE_INFO, timeout=5, id="DDdownmixToggle")
+				Notifications.AddPopup(text=message, type=MessageBox.TYPE_INFO, timeout=5, id="DDdownmixToggle")
 
 	def audioDownmixOn(self):
 		if not config.av.downmix_ac3.value:
