@@ -98,10 +98,7 @@ class SessionGlobals(Screen):
 		if nr_leds == 1:
 			FrontpanelLed(which=0, boolean=False, patterns=[PATTERN_OFF if have_display else PATTERN_ON, PATTERN_BLINK, PATTERN_OFF, PATTERN_BLINK]).connect(combine)
 		elif nr_leds == 2:
-			if MODEL in ("dm520"):
-				FrontpanelLed(which=0, boolean=False, patterns=[PATTERN_ON, PATTERN_BLINK, PATTERN_OFF, PATTERN_BLINK]).connect(combine)
-				FrontpanelLed(which=1, boolean=False, patterns=[PATTERN_OFF, PATTERN_OFF, PATTERN_OFF, PATTERN_OFF]).connect(combine)
-			elif MODEL in ("dm900", "dm920"):
+			if MODEL in ("dm900", "dm920", "dm520", "dm525"):
 				FrontpanelLed(which=0, boolean=False, patterns=[NormalLed0, RecLed0, StandbyLed0, RecstdbyLed0]).connect(combine)
 				FrontpanelLed(which=1, boolean=False, patterns=[NormalLed1, RecLed1, StandbyLed1, RecstdbyLed1]).connect(combine)
 			else:
