@@ -182,8 +182,7 @@ public:
 		DefaultScrollBarBorderWidth = 1,
 		DefaultScrollBarScroll = eListbox::byPage,
 		DefaultScrollBarMode = eListbox::showNever,
-		DefaultWrapAround = true,
-		DefaultPageSize = 0
+		DefaultWrapAround = true
 	};
 	enum
 	{
@@ -387,7 +386,7 @@ public:
 
 	void setPageSize(int size) { m_page_size = size; }
 
-	static void setDefaultScrollbarStyle(int width, int offset, int borderwidth, uint8_t scroll, uint8_t mode, bool enablewraparound, int pageSize)
+	static void setDefaultScrollbarStyle(int width, int offset, int borderwidth, uint8_t scroll, uint8_t mode, bool enablewraparound)
 	{
 		defaultScrollBarWidth = width;
 		defaultScrollBarOffset = offset;
@@ -395,7 +394,6 @@ public:
 		defaultScrollBarScroll = scroll;
 		defaultWrapAround = enablewraparound;
 		defaultScrollBarMode = mode;
-		defaultPageSize = pageSize;
 	}
 
 	static void setDefaultPadding(const eRect &padding) { defaultPadding = padding; }
@@ -425,6 +423,16 @@ public:
 	{
 		defaultItemRadius[3] = radius;
 		defaultItemRadiusEdges[3] = radiusEdges;
+	}
+
+	static void setDefaultHorizontalAlignment(int alignment)
+	{
+		defaultHorizontalAlignment = alignment;
+	}
+
+	static void setDefaultVerticalAlignment(int alignment)
+	{
+		defaultVerticalAlignment = alignment;
 	}
 
 	void setTopIndex(int idx);
@@ -535,13 +543,14 @@ private:
 	static int defaultScrollBarBorderWidth;
 	static uint8_t defaultScrollBarScroll;
 	static uint8_t defaultScrollBarMode;
-	static int defaultPageSize;
 	static bool defaultWrapAround;
 	static eRect defaultPadding;
 	static int defaultItemRadius[4];
 	static uint8_t defaultItemRadiusEdges[4];
 	static int defaultScrollbarRadius;
 	static uint8_t defaultScrollbarRadiusEdges;
+	static int defaultHorizontalAlignment;
+	static int defaultVerticalAlignment;
 
 	int m_prev_scrollbar_page;
 	uint8_t m_scrollbar_mode;
