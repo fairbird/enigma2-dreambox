@@ -123,11 +123,14 @@ class ResumePoints():
 					del self.resumePointCache[sref]
 					changed = True
 			else:
-				filepath = realpath(sref.split(':')[-1])
-				mountpoint = findMountPoint(filepath)
-				if ismount(mountpoint) and not exists(filepath):
-					del self.resumePointCache[sref]
-					changed = True
+				try:
+					filepath = realpath(sref.split(':')[-1])
+					mountpoint = findMountPoint(filepath)
+					if ismount(mountpoint) and not exists(filepath):
+						del self.resumePointCache[sref]
+						changed = True
+				except (UnicodeEncodeError, OSError):
+					pass
 		if changed:
 			self.saveResumePoints()
 		self.cacheCleanTimer.startLongTimer(24 * 60 * 60)  # clean up daily
