@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from os.path import isfile
 
-from enigma import eRCInput, eStack, eTimer, eWindow, getDesktop, eStack
+from enigma import eRCInput, eStack, eTimer, eWindow, getDesktop
 
 from skin import GUI_SKIN_ID, applyAllAttributes
 from skin import GUI_SKIN_ID, applyAllAttributes, menus, screens, setups
