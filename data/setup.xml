@@ -53,6 +53,7 @@
 		<item level="0" text="Menu icons" description="This option allows you to show icons of menu." requires="config.usage.menuType" value="standard">config.usage.showicons</item>
 		<item level="0" text="Menu entry sort order" description="Select the sort order of the menu entries. User defined also allows the menu entries to be hidden.">config.usage.menuSortOrder</item>
 		<item level="1" text="Sort order for setup entries" description="This option allows you to alphabetically sort setup menu entries.">config.usage.sort_settings</item>
+		<item level="1" text="File sorting mode" description="Control how files will be sorted in screens that show a file list. Case sensitive will group uppercase files first followed by lowercase files. Case insensitive will sort files alphabetically, ignoring case.">config.usage.fileSortCaseMode</item>
 		<item level="1" text="Show setup default values" description="In Setup screens choose whether to show the default value of the selected item in the description field.">config.usage.setupShowDefault</item>
 		<item level="1" text="Show screen path" description="This option allows you to show the full screen path leading to the current screen.">config.usage.showScreenPath</item>
 		<item level="1" text="Sort Extension Menu" description="Select the sort order of the Extension Menu entries.">config.usage.sortExtensionslist</item>
