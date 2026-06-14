@@ -439,6 +439,9 @@ class PowerKey:
 		globalActionMap.actions["deepstandby"] = self.shutdown  # Front panel  long power button press
 		globalActionMap.actions["discrete_off"] = self.standby
 
+	def MenuClosed(self, *val):
+		self.session.infobar = None
+
 	def shutdown(self):
 		print("[StartEnigma] PowerOff - Now!")
 		if not Screens.Standby.inTryQuitMainloop and self.session.current_dialog and self.session.current_dialog.ALLOW_SUSPEND:
