@@ -178,12 +178,11 @@ std::string fontRenderClass::AddFont(const std::string &filename, const std::str
 	return n->face;
 }
 
-fontRenderClass::fontListEntry::~fontListEntry() {}
+fontRenderClass::fontListEntry::~fontListEntry() = default;
 
-fontRenderClass::fontRenderClass(): fb(fbClass::getInstance())
+fontRenderClass::fontRenderClass(): fb(fbClass::getInstance()), fontFacesCacheValid(false)
 {
 	instance=this;
-	fontFacesCacheValid = false;
 	eDebug("[Font] Initializing lib.");
 	if (FT_Init_FreeType(&library))
 	{
@@ -432,10 +431,7 @@ int eTextPara::appendGlyph(Font *current_font, FT_Face current_face, FT_UInt gly
 		height = glyph->height;
 	}
 
-	int nx=cursor.x() + xadvance;
-
-
-	if ((rflags & RS_WRAP) && (nx > area.right()))
+	if (int nx = cursor.x() + xadvance; (rflags & RS_WRAP) && (nx > area.right()))
 	{
 		int cnt = 0, maycnt = -1;
 		glyphString::reverse_iterator i(glyphs.rbegin()), mayi(glyphs.rend());
@@ -799,8 +795,6 @@ int eTextPara::renderString(const char *string, int rflags, int border, int mark
 	std::vector<unsigned long> uc_shape;
 	int size;
 	FriBidiCharType dir = FRIBIDI_TYPE_LTR;
-	FriBidiChar *array = nullptr;
-	FriBidiChar *target = nullptr;
 
 	if (is_ltr_ascii)
 	{
@@ -818,16 +812,11 @@ int eTextPara::renderString(const char *string, int rflags, int border, int mark
 		dir = FRIBIDI_TYPE_ON;
 		uc_visual.resize(size);
 		// gaaanz lahm, aber anders geht das leider nicht, sorry.
-		array = new FriBidiChar[size];
-		target = new FriBidiChar[size];
-		std::copy(uc_shape.begin(), uc_shape.end(), array);
-		if(!fribidi_log2vis(array, size, &dir, target, 0, 0, 0))
-		{
-			delete [] target;
-			delete [] array;
+		std::vector<FriBidiChar> array(uc_shape.begin(), uc_shape.end());
+		std::vector<FriBidiChar> target(size);
+		if(!fribidi_log2vis(array.data(), size, &dir, target.data(), 0, 0, 0))
 			return -1;
-		}
-		uc_visual.assign(target, target+size);
+		uc_visual.assign(target.begin(), target.end());
 	}
 	/* ─────────────────────────────────────────────────────────────────────── */
 
@@ -998,8 +987,6 @@ nprint:				isprintable=0;
 		lineChars.push_back(charCount);
 		charCount=0;
 	}
-	delete [] target;
-	delete [] array;
 	return 0;
 }
 
@@ -1048,8 +1035,8 @@ void eTextPara::blit(gDC &dc, const ePoint &offset, const gRGB &cbackground, con
 	int buffer_stride=surface->stride;
 
 	bool setcolor = true;
-	std::vector<int>::reverse_iterator line_offs_it(lineOffsets.rbegin());
-	std::vector<int>::iterator line_chars_it(lineChars.begin());
+	auto line_offs_it = lineOffsets.rbegin();
+	auto line_chars_it = lineChars.begin();
 	int line_offs=0;
 	int line_chars=0;
 	for (glyphString::iterator i(glyphs.begin()); i != glyphs.end(); ++i, --line_chars)
