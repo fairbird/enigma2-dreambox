@@ -59,7 +59,7 @@ protected:
 	virtual uint8_t getOrientation() { return 1; }
 	virtual int getMaxItemTextWidth() { return 1; }
 	virtual int getListSize() { return 0; }
-	virtual int getScollPos() { return 0; }
+	virtual int getScrollPos() { return 0; }
 
 	eListbox *m_listbox;
 #endif
