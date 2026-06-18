@@ -102,6 +102,11 @@ void keyEvent(const eRCKey &key)
 #include <lib/dvb/dvbtime.h>
 #include <lib/dvb/epgcache.h>
 #include <lib/dvb/epgtransponderdatareader.h>
+#ifdef DREAMNEXTGEN
+extern "C" {
+#include <libavdevice/avdevice.h> 
+}
+#endif
 
 /* Defined in eerror.cpp */
 void setDebugTime(bool enable);
@@ -120,6 +125,9 @@ class eMain : public eApplication, public sigc::trackable
 public:
 	eMain()
 	{
+#ifdef DREAMNEXTGEN
+		avdevice_register_all();
+#endif
 		e2avahi_init(this);
 		init_servicepeer();
 		init.setRunlevel(eAutoInitNumbers::main);

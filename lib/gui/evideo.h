@@ -22,6 +22,7 @@ public:
 	void setDecoder(int target);
 	void setFBSize(eSize size);
 	void setFullScreenPosition(eRect pos);
+	void restoreFullsize();
 	static void setFullsize(bool force = false);
 protected:
 	int event(int event, void *data=0, void *data2=0);

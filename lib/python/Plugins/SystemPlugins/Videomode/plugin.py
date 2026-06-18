@@ -78,7 +78,7 @@ class VideoSetup(ConfigListScreen, Screen):
 		self.list.append((_("Force frame"), config.av.force, _("Allow forcing the frames per second.")))
 
 		if config.av.videoport.value == "HDMI":
-			if not BoxInfo.getItem("AmlogicFamily"):
+			if not eAVControl.getInstance().hasVideoAxis():
 				self.list.append((_("Aspect switch"), config.av.aspectswitch.enabled, _("This option allows you to set offset values for different Letterbox resolutions.")))
 				if config.av.aspectswitch.enabled.value:
 					for aspect in range(5):
