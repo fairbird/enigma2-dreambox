@@ -22,7 +22,7 @@ from Components.Sources.StaticText import StaticText
 from Components.SelectionList import SelectionList
 
 
-HOTPLUG_SOCKET = "/tmp/hotplug.socket"
+HOTPLUG_SOCKET = "/var/run/hotplug.socket"
 
 # globals
 hotplugNotifier = []
