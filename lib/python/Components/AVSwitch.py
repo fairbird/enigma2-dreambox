@@ -645,6 +645,17 @@ def InitAVSwitch():
 		if model not in ("dreamone", "dreamtwo"):
 			config.av.transcodeac3plus.addNotifier(setAC3plusTranscode)
 
+	AC4 = MACHINEBUILD in ("dreamone", "dreamtwo")
+	BoxInfo.setItem("CanAC4", AC4)
+	if AC4:
+		config.av.ac4 = ConfigSelection(default="hdmi_best", choices=[
+			("hdmi_best", _("Use best / Controlled by HDMI")),
+			("passthrough", _("Pass-through")),
+			("downmix", _("Downmix"))
+		])
+	else:
+		config.av.ac4 = ConfigNothing()
+
 	wmaPro = fileReadLine("/proc/stb/audio/wmapro_choices", default=None, source=MODULE_NAME)
 	wmaPro = wmaPro.split() if wmaPro else False
 	BoxInfo.setItem("CanWMAPRO", wmaPro)
