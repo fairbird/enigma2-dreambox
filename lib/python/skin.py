@@ -171,6 +171,9 @@ def InitSkins():
 	runCallbacks = True
 	# Load all XML templates.
 	reloadSkinTemplates()
+	resolved = resolveFilename(SCOPE_FONTS, "enigma2icons.ttf")
+	if isfile(resolved):
+		addFont(resolved, "enigma2icons", 100, False, 0)
 
 
 # Method to load a skin XML file into the skin data structures.

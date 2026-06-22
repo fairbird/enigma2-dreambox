@@ -243,6 +243,8 @@ class Session:
 
 		self.screen = SessionGlobals(self)
 		from Components.FrontPanelLed import frontPanelLed
+		from Tools.Notifications import notificationCenter
+		notificationCenter.session = self
 		frontPanelLed.init(self)
 		self.allDialogs = []
 
@@ -413,6 +415,7 @@ class Session:
 		for callback in self.onShutdown:
 			if callable(callback):
 				callback()
+		Toast.instance.doShutdown()
 
 	def reloadDialogs(self):
 		for dlg in self.allDialogs:
@@ -420,6 +423,16 @@ class Session:
 				oldDesktop = dlg.desktop
 				readSkin(dlg, None, dlg.skinName, oldDesktop)
 				dlg.applySkin()
+
+
+	def showInfo(self, text, timeout=4):
+		Toast.instance.showToast(text=text, toasttype=Toast.TYPE_INFO, timeout=timeout)
+
+	def showWarning(self, text, timeout=4):
+		Toast.instance.showToast(text=text, toasttype=Toast.TYPE_WARNING, timeout=timeout)
+
+	def showError(self, text, timeout=4):
+		Toast.instance.showToast(text=text, toasttype=Toast.TYPE_ERROR, timeout=timeout)
 
 
 enigma.eProfileWrite("Standby,PowerKey")
@@ -529,6 +542,7 @@ from Screens.Processing import Processing
 
 enigma.eProfileWrite("ModalMessageBox")
 from Screens.MessageBox import ModalMessageBox
+from Screens.Toast import Toast
 
 enigma.eProfileWrite("StackTracePrinter")
 from Components.StackTrace import StackTracePrinter
@@ -586,7 +600,8 @@ def runScreenTest():
 	enigma.eProfileWrite("InitProcessing")
 	processing = Processing(session)
 	enigma.eProfileWrite("Global MessageBox Screen")
-	modalmessagebox = ModalMessageBox(session)
+	modalMessagebox = ModalMessageBox(session)  # noqa F841
+	toast = Toast(session)  # noqa F841
 	enigma.eProfileWrite("Init:PowerKey")
 	power = PowerKey(session)
 

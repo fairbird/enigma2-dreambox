@@ -17,6 +17,7 @@ dist_install_DATA = \
 	LiberationSans-Regular.ttf \
 	wqy-microhei.ttc \
 	AbyssinicaSIL-Regular.ttf \
+	enigma2icons.ttf \
 	Roboto-Black.ttf \
 	Roboto-BlackItalic.ttf \
 	Roboto-Bold.ttf \

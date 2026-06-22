@@ -74,3 +74,24 @@ def removeCIdialog():
 			if hasattr(Screens.Ci.CiHandler.dlgs[slot], "forceExit"):
 				Screens.Ci.CiHandler.dlgs[slot].tag = "WAIT"
 				Screens.Ci.CiHandler.dlgs[slot].forceExit()
+
+
+def showError(text, timeout=5):
+	notificationCenter.session.showError(text, timeout)
+
+
+def showInfo(text, timeout=5):
+	notificationCenter.session.showInfo(text, timeout)
+
+
+def showWarning(text, timeout=5):
+	notificationCenter.session.showWarning(text, timeout)
+
+
+class NotificationCenter:
+
+	def __init__(self):
+		self.session = None
+
+
+notificationCenter = NotificationCenter()
