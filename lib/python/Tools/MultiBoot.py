@@ -181,6 +181,8 @@ class MultiBootClass():
 		finally:
 			self.console.ePopen([UMOUNT, UMOUNT, tempDir])
 			rmdir(tempDir)
+		if not name and slotCode.isdecimal():
+			name = f"BuildIn Slot {slotCode}"
 		return name
 
 	def updateDreamBootSection(self, slotCode, setDefault=False):
@@ -949,6 +951,8 @@ class MultiBootClass():
 			self.callback(3)
 		else:
 			rmdir(self.tempDir)
+			if exists(DREAM_BOOT_FILE):
+				self.updateDreamBootSection(self.slotCode)
 			self.callback(0)
 
 	def isFat32(self, device):
