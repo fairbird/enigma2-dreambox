@@ -424,7 +424,6 @@ class Session:
 				readSkin(dlg, None, dlg.skinName, oldDesktop)
 				dlg.applySkin()
 
-
 	def showInfo(self, text, timeout=4):
 		Toast.instance.showToast(text=text, toasttype=Toast.TYPE_INFO, timeout=timeout)
 
