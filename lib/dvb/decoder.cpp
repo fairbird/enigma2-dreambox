@@ -2,10 +2,10 @@
 #include <lib/base/ebase.h>
 #include <lib/base/eerror.h>
 #include <lib/base/nconfig.h> // access to python config
+#include <lib/base/esimpleconfig.h>
 #include <lib/base/wrappers.h>
 #include <lib/dvb/decoder.h>
 #include <lib/dvb/hevc_hdr_detector.h>
-#include <lib/base/esimpleconfig.h>
 #include <lib/components/tuxtxtapp.h>
 #include <linux/dvb/audio.h>
 #include <linux/dvb/video.h>
@@ -45,7 +45,7 @@ int eDVBAudio::m_debug = -1;
 eDVBAudio::eDVBAudio(eDVBDemux *demux, int dev)
 	:m_demux(demux), m_dev(dev), m_bypass(-1)
 {
-	char filename[128] = {};
+	char filename[128];
 	sprintf(filename, "/dev/dvb/adapter%d/audio%d", demux ? demux->adapter : 0, dev);
 	m_fd = ::open(filename, O_RDWR | O_CLOEXEC);
 	if (m_fd < 0)
@@ -60,12 +60,6 @@ eDVBAudio::eDVBAudio(eDVBDemux *demux, int dev)
 	else
 	{
 		m_fd_demux = -1;
-	}
-
-	if (demux && m_dev == 0)
-	{
-		m_hdr_detector = new eHEVCHDRDetector(demux, sigc::mem_fun(*this, &eDVBVideo::hdr_gamma_detected));
-		eDebug("[eHEVCHDRDetector] attached to video decoder %d (FCC=%d)", m_dev, m_fcc_enable);
 	}
 
 #ifndef DREAMNEXTGEN
@@ -87,6 +81,7 @@ int eDVBAudio::startPid(int pid, int type)
 	if (m_fd_demux >= 0)
 	{
 		dmx_pes_filter_params pes = {};
+		memset(&pes, 0, sizeof(pes));
 
 		pes.pid      = pid;
 		pes.input    = DMX_IN_FRONTEND;
@@ -418,6 +413,12 @@ eDVBVideo::eDVBVideo(eDVBDemux *demux, int dev, bool fcc_enable)
 		m_fd_demux = -1;
 	}
 
+	if (demux && m_dev == 0)
+	{
+		m_hdr_detector = new eHEVCHDRDetector(demux, sigc::mem_fun(*this, &eDVBVideo::hdr_gamma_detected));
+		eDebug("[eHEVCHDRDetector] attached to video decoder %d (FCC=%d)", m_dev, m_fcc_enable);
+	}
+
 std::string zapmodeDM = eConfigManager::getConfigValue("config.misc.zapmodeDM");
 if (zapmodeDM == "hold")
 {
@@ -544,6 +545,8 @@ int eDVBVideo::startPid(int pid, int type)
 	if (m_fd_demux >= 0)
 	{
 		dmx_pes_filter_params pes = {};
+		memset(&pes, 0, sizeof(pes));
+
 		pes.pid      = pid;
 		pes.input    = DMX_IN_FRONTEND;
 		pes.output   = DMX_OUT_DECODER;
@@ -847,7 +850,7 @@ void eDVBVideo::video_event(int)
 		{
 			if (evt.type == VIDEO_EVENT_SIZE_CHANGED)
 			{
-				struct iTSMPEGDecoder::videoEvent event = {};
+				struct iTSMPEGDecoder::videoEvent event;
 				event.type = iTSMPEGDecoder::videoEvent::eventSizeChanged;
 				m_aspect = event.aspect = evt.u.size.aspect_ratio == 0 ? 2 : 3;  // convert dvb api to etsi
 				m_height = event.height = evt.u.size.h;
@@ -858,7 +861,7 @@ void eDVBVideo::video_event(int)
 			}
 			else if (evt.type == VIDEO_EVENT_FRAME_RATE_CHANGED)
 			{
-				struct iTSMPEGDecoder::videoEvent event = {};
+				struct iTSMPEGDecoder::videoEvent event;
 				event.type = iTSMPEGDecoder::videoEvent::eventFrameRateChanged;
 				m_framerate = event.framerate = evt.u.frame_rate;
 				if(eDVBVideo::m_debug)
@@ -867,7 +870,7 @@ void eDVBVideo::video_event(int)
 			}
 			else if (evt.type == 16 /*VIDEO_EVENT_PROGRESSIVE_CHANGED*/)
 			{
-				struct iTSMPEGDecoder::videoEvent event = {};
+				struct iTSMPEGDecoder::videoEvent event;
 				event.type = iTSMPEGDecoder::videoEvent::eventProgressiveChanged;
 				m_progressive = event.progressive = evt.u.frame_rate;
 				if(eDVBVideo::m_debug)
@@ -1177,7 +1180,7 @@ int eDVBPCR::m_debug = -1;
 
 eDVBPCR::eDVBPCR(eDVBDemux *demux, int dev): m_demux(demux), m_dev(dev)
 {
-	char filename[128] = {};
+	char filename[128];
 	sprintf(filename, "/dev/dvb/adapter%d/demux%d", demux->adapter, demux->demux);
 	m_fd_demux = ::open(filename, O_RDWR | O_CLOEXEC);
 	if (m_fd_demux < 0)
@@ -1192,6 +1195,7 @@ int eDVBPCR::startPid(int pid)
 	if (m_fd_demux < 0)
 		return -1;
 	dmx_pes_filter_params pes = {};
+	memset(&pes, 0, sizeof(pes));
 
 	pes.pid      = pid;
 	pes.input    = DMX_IN_FRONTEND;
@@ -1279,6 +1283,7 @@ int eDVBTText::startPid(int pid)
 	if (m_fd_demux < 0)
 		return -1;
 	dmx_pes_filter_params pes = {};
+	memset(&pes, 0, sizeof(pes));
 
 	pes.pid      = pid;
 	pes.input    = DMX_IN_FRONTEND;
@@ -1825,7 +1830,7 @@ RESULT eTSMPEGDecoder::showSinglePic(const char *filename)
 				if ((iframe[3] >> 4) != 0xE) // no pes header
 					writeAll(m_video_clip_fd, pes_header, sizeof(pes_header));
 				else
-					iframe[4] = iframe[5] = 0x00;
+					iframe[4] = iframe[5] = 0x00; // NOSONAR
 				writeAll(m_video_clip_fd, iframe, s.st_size);
 				if (!seq_end_avail)
 				{
