@@ -332,6 +332,7 @@ class QuitMainloopScreen(Screen):
 
 
 inTryQuitMainloop = False
+quitMainloopCode = 1
 
 
 def getReasons(session, retvalue=QUIT_SHUTDOWN):
