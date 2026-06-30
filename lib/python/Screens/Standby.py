@@ -404,6 +404,7 @@ class TryQuitMainloop(MessageBox):
 			self.stopTimer()
 
 	def close(self, value):
+		global quitMainloopCode
 		if self.connected:
 			self.connected = False
 			self.session.nav.record_event.remove(self.getRecordEvent)
@@ -411,25 +412,22 @@ class TryQuitMainloop(MessageBox):
 			self.hide()
 			if self.retval == QUIT_SHUTDOWN:
 				config.misc.DeepStandby.value = True
-				if not inStandby:
-					if os.path.exists("/usr/script/standby_enter.sh"):
-						Console().ePopen("/usr/script/standby_enter.sh")
-					if BoxInfo.getItem("HasHDMI-CEC") and config.hdmicec.enabled.value and ((config.hdmicec.control_tv_standby.value and (config.hdmicec.next_boxes_detect.value or config.hdmicec.ethernet_pc_used.value)) or config.hdmicec.handle_deepstandby_events.value != "no"):
-						if config.hdmicec.control_tv_standby.value and config.hdmicec.next_boxes_detect.value:
-							import Components.HdmiCec
-							Components.HdmiCec.hdmi_cec.secondBoxActive()
-						if not hasattr(self, "quitScreen"):
-							self.quitScreen = self.session.instantiateDialog(QuitMainloopScreen)
-							self.quitScreen.show()
-						self.delay = eTimer()
-						self.delay.timeout.callback.append(self.quitMainloopDelay)
-						self.delay.start(1500, True)
-						return
-			elif not inStandby:
-				config.misc.RestartUI.value = True
-				config.misc.RestartUI.save()
-			self.quitMainloop()
+			self.session.nav.stopService()
+			self.quitScreen = self.session.instantiateDialog(QuitMainloopScreen, retvalue=self.retval)
+			self.quitScreen.show()
+			print("[Standby] quitMainloop #1")
+			quitMainloopCode = self.retval
+			if BoxInfo.getItem("Display") and BoxInfo.getItem("LCDMiniTV"):
+				# set LCDminiTV off / fix a deep-standby-crash on some boxes / gb4k
+				print("[Standby] LCDminiTV off")
+				setLCDModeMinitTV(0)
+
+			quitMainloop(self.retval)
 		else:
+			if self.descramble:
+				from Components.PvrDescrambleConvert import pvr_descramble_convert
+				if pvr_descramble_convert.scrambledRecordsLeft():
+					self.session.open(Standby2)
 			MessageBox.close(self, True)
 
 	def quitMainloopDelay(self):
