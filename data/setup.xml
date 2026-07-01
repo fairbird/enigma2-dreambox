@@ -50,7 +50,7 @@
 	</setup>
 	<setup key="Usage" title="Customize">
 		<item level="0" text="Menu style" description="Select the display design for menus.">config.usage.menuType</item>
-		<item level="0" text="Menu entry style" description="Select the display options for each menu entry item. If menu numbers are available then the number buttons can be used to select the numbered menu entries directly." requires="config.usage.menuType" value="standard">config.usage.menuEntryStyle</item>
+		<item level="0" text="Menu entry style" description="Select the display options for each menu entry item. If menu numbers are available, then the number buttons can be used to select the numbered menu entries directly." requires="config.usage.menuType" value="standard">config.usage.menuEntryStyle</item>
 		<item level="0" text="Menu icons" description="This option allows you to show icons of menu." requires="config.usage.menuType" value="standard">config.usage.showicons</item>
 		<item level="0" text="Menu entry sort order" description="Select the sort order of the menu entries. User defined also allows the menu entries to be hidden.">config.usage.menuSortOrder</item>
 		<item level="1" text="Sort order for setup entries" description="This option allows you to alphabetically sort setup menu entries.">config.usage.sort_settings</item>
@@ -102,7 +102,7 @@
 		<item level="2" text="Ignore DVB-T namespace sub network" description="On valid ONIDs, ignore frequency sub network part">config.usage.subnetwork_terrestrial</item>
 		<!--item level="2" text="Enable new GStreamer 1.x playback" description="If enabled, the new GStreamer 1.x playback engine will be used.">config.misc.usegstplaybin3</item-->
 	</setup>
-	<setup key="ChannelSelection" title="Channel Selection Settings" showOpenWebif="1">
+	<setup key="ChannelSelection" title="Channel Selection Settings" showOpenWebif="yes">
 		<item text="Channel Selection Screen" description="Select the screen layout, from the options provided by the skin, to be used for the ChannelSelection screen." conditional="len(config.channelSelection.screenStyle.choices) > 1">config.channelSelection.screenStyle</item>
 		<item text="Channel Selection List" description="Select the layout of the information in the services list, from the options provided by the skin, displayed within the ChannelSelection screen." conditional="config.channelSelection.screenStyle.value">config.channelSelection.widgetStyle</item>
 		<item level="0" text="Include CI assignment" description="Set CI assignment for detection of available services." >config.misc.use_ci_assignment</item>
@@ -242,7 +242,7 @@
 		<item level="2" text="EPG event name prefixes to remove" conditional="config.epg.eventNamePrefixMode.value > 0" description="| separated list of prefixes you'd like to be removed from event names, separated with |, e.g. New:|Live:">config.epg.eventNamePrefixes</item>
 	</setup>
 	<setup key="SoftCSA" title="SoftCSA Settings">
-		<item level="0" text="Decoder release strategy" description="How to release the hardware decoder when switching to software descrambling. 'Quick' releases immediately (faster zapping). 'Normal' performs clean shutdown first (more stable on some boxes). 'Aggressive' performs a full descrambler reset between encrypted channels." restart="gui">config.softcsa.decoderRelease</item>
+		<item level="0" text="Decoder release strategy" description="How to release the hardware decoder when switching to software descrambling. 'Quick' releases immediately (faster zapping). 'Normal' performs a clean shutdown first (more stable on some boxes). 'Aggressive' performs a full descrambler reset between encrypted channels." restart="gui">config.softcsa.decoderRelease</item>
 		<item level="0" text="Sync mode" description="Select how the descrambled data stream is processed. 'Automatic' uses asynchronous writes (lower CPU usage) with automatic fallback to synchronous if kernel AIO is not supported. 'Synchronous' forces blocking writes (stable, most compatible)." restart="gui">config.softcsa.syncMode</item>
 		<item level="2" text="Decoder start timeout" description="Maximum time to wait for the first descrambling key (CW) before starting the decoder. 'Disabled' starts the decoder immediately without waiting." restart="gui">config.softcsa.waitForDataTimeout</item>
 		<item level="2" text="Decoder start delay" description="Select the delay to buffer descrambled data before starting playback. This can reduce AC3 audio dropouts by ensuring enough data is available when the decoder starts. Higher values are more stable but increase channel switch time." restart="gui">config.softcsa.bufferTime</item>
@@ -284,7 +284,7 @@
 		<item level="2" text="HI-cleanup for external subtitles" description="Remove texts for the hearing impaired from external subtitles (instrumental music or environmental sounds, e.g., when a doorbell rings or a gun shot is heard).">config.subtitles.pango_subtitle_removehi</item>
 		<item level="2" text="Automatically turn on external subtitles" description="When enabled, external subtitles will be always turned on for playback movie.">config.subtitles.pango_autoturnon</item>
 	</setup>
-	<setup key="AutoLanguage" title="Auto Language Settings" level="1" showOpenWebif="1">
+	<setup key="AutoLanguage" title="Auto Language Settings" level="1" showOpenWebif="yes">
 		<item level="0" text="Audio language selection 1" description="Configure the first audio language (highest priority).">config.autolanguage.audio_autoselect1</item>
 		<item level="0" text="Audio language selection 2" conditional="config.autolanguage.audio_autoselect1.value" description="Configure the second audio language.">config.autolanguage.audio_autoselect2</item>
 		<item level="1" text="Audio language selection 3" conditional="config.autolanguage.audio_autoselect2.value" description="Configure the third audio language.">config.autolanguage.audio_autoselect3</item>
@@ -378,7 +378,7 @@
 		<item level="2" text="Quit Movie Player with EXIT button" description="When enabled, it is possible to leave the Movie Player with exit.">config.usage.leave_movieplayer_onExit</item>
 		-->
 	</setup>
-	<setup key="PluginBrowser" title="Plugin Browser Settings" showOpenWebif="1">
+	<setup key="PluginBrowser" title="Plugin Browser Settings" showOpenWebif="yes">
 		<item level="0" text="Plugin Browser layout" description="Select the layout of the installed plugins in the Plugin Browser screen. NOTE: The change is not immediate but will be seen when Plugin Browser is restarted!" restart="gui">config.misc.plugin_style</item>
 		<item level="0" text="Picon install location" description="Select the location where the picon files will be installed.">config.usage.piconInstallLocation</item>
 		<item level="0" text="Enable numbers" description="This option to enable numbers in Plugin Browser">config.misc.menu_show_numbers</item>
@@ -445,7 +445,7 @@
 		<item level="2" text="Default recording type" description="Descramble &amp; record ECM' gives the option to descramble afterwards if descrambling on recording failed. 'Don't descramble, record ECM' save a scramble recording that can be descrambled on playback. 'Normal' means descramble the recording and don't record ECM.">config.recording.ecm_data</item>
 		-->
 	</setup>
-	<setup key="Timeshift" title="Timeshift Setup" level="1" showOpenWebif="1">
+	<setup key="Timeshift" title="Timeshift Setup" level="1" showOpenWebif="yes">
 		<item level="0" text="Time shift buffer location" description="Set the default location to store your time shift buffer files. Press 'OK' to add new locations, press 'LEFT'/'RIGHT' to select from previously defined locations.">config.timeshift.path</item>
 		<item level="1" text="Automatically start timeshift after" description="When enabled, timeshift starts automatically in background after the specified time.">config.usage.timeshift_start_delay</item>
 		<item level="1" text="Show warning when timeshift is stopped" description="When enabled, a warning will be displayed and the user will get an option to stop or to continue the timeshift.">config.usage.check_timeshift</item>
@@ -475,7 +475,7 @@
 		<item level="0" text="Target location" description="Choose the target device for the slots.">self.UBISlotManagerLocation</item>
 		<item level="0" text="Slot count" description="Choose the amount of additional slots." conditional="self.UBISlotManagerLocation.value">self.UBISlotManagerSlots</item>
 	</setup>
-	<setup key="HardDisk" title="Hard Disk Settings" showOpenWebif="1">
+	<setup key="HardDisk" title="Hard Disk Settings" showOpenWebif="yes">
 		<item level="0" text="Hard disk standby after" description="Configure the hard disk drive to go to standby after the specified idle time.">config.usage.hdd_standby</item>
 		<item level="0" text="Hard disk standby in box standby after" description="Configure the hard disk drive to go to standby after the specified idle time when the box is in standby.">config.usage.hdd_standby_in_standby</item>
 		<item level="0" text="Use Harddisk Hardware Standby Timer" description="Option to enable the Hardware Standby Timer.">config.usage.hdd_timer</item>
@@ -582,7 +582,7 @@
 		<item text="Nameserver" description="Configure the nameserver (DNS).">config.network.dns</item>
 		<item text="Activate network settings" description="Activate the configured network settings.">config.network.activate</item>
 	</setup>
-	<setup key="NetworkSamba" title="Samba Settings" allowDefault="1">
+	<setup key="NetworkSamba" title="Samba Settings" allowDefault="yes">
 		<item text="Enable automatic shares" description="Select 'Yes' to allow each storage device detected to be automatically exported as samba share.">config.samba.enableAutoShare</item>
 		<item text="Automatic shares access" description="Select the access mode for the automatically exported samba shares." conditional="config.samba.enableAutoShare.value">config.samba.autoShareAccess</item>
 	</setup>
@@ -619,7 +619,7 @@
 		<item text="Brightness">config.osd.bright</item>
 		<item text="Contrast">config.osd.contrast</item>
 	</setup>
-	<setup key="OSD3DCalibration" title="OSD 3D Settings" showOpenWebif="1">
+	<setup key="OSD3DCalibration" title="OSD 3D Settings" showOpenWebif="yes">
 		<item level="0" text="3D Mode" description="This option lets you choose the 3D mode.">config.osd.threeDmode</item>
 		<item level="0" text="Depth" description="This option lets you adjust the 3D depth.">config.osd.threeDznorm</item>
 		<item level="0" text="Show in Extension Menu" description="This option lets you show the option in the Extension Menu screen.">config.osd.show3dextensions</item>
@@ -660,7 +660,7 @@
 		<item level="0" requires="LcdLiveTV" text="Clone TV screen to LCD" description="Shows live tv or informations on LCD.">config.lcd.fblcddisplay</item>
 		<item level="0" requires="ConfigDisplay" text="Show HDMI-Output Res" description="Show HDMI Output Resulution">config.lcd.showoutputresolution</item>
 	</setup>
-	<setup key="LedDisplay" title="LED Setup">
+	<setup key="LedDisplay" title="LED Setup" showOpenWebif="yes">
 		<item level="0" requires="LEDControl" text="LED color during normal operations" description="Configure front LED color during normal operations (this needs an enigma2 restart).">config.usage.frontled_color</item>
 		<item level="0" requires="LEDControl" text="LED color during recording" description="Configure front LED color during recording (this needs an enigma2 restart).">config.usage.frontledrec_color</item>
 		<item level="0" requires="LEDControl" text="LED color during standby" description="Configure front LED color during standby (this needs an enigma2 restart).">config.usage.frontledstdby_color</item>
