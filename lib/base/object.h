@@ -20,7 +20,7 @@ protected:
 	constexpr iObject() = default;
 	constexpr iObject(const iObject&) = default;
 #ifndef __EXCEPTIONS
-	void operator delete(void *p) { ::operator delete(p); }
+	void operator delete(void *p) { ::operator delete(p); } // NOSONAR - intentional: operator delete delegates to ::operator delete; no custom operator new needed as DEFINE_REF uses standard allocation via "delete this"
 #endif
 	virtual ~iObject() { }
 #ifdef SWIG

@@ -3092,7 +3092,7 @@ void eEPGCache::crossepgImportEPGv21(std::string dbroot)
 	char descriptors_file[dbroot.length()+25];
 	char aliases_file[dbroot.length()+21];
 	int channels_count, events_count = 0, aliases_groups_count;
-	unsigned char revision;
+	unsigned char revision = 0;
 
 	eDebug("[EPGC] start crossepg import");
 

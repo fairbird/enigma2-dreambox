@@ -30,8 +30,8 @@
 #endif
 
 #define ioctlMeasureStart \
-	struct timeval start, end; \
-	int duration; \
+	struct timeval start = {}, end = {}; \
+	int duration = 0; \
 	if (m_debuglevel==5) { gettimeofday(&start, NULL); }
 
 #define ioctlMeasureEval(x) \
