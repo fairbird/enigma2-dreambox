@@ -137,7 +137,7 @@ class Console(Screen):
 
 	def dataAvail(self, data):
 		if isinstance(data, bytes):
-			data = data.decode(errors='ignore')
+			data = data.decode("utf-8", errors="replace")
 		self["text"].appendText(data)
 
 	def keySaveLog(self):
