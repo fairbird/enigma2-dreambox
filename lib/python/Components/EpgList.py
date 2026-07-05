@@ -216,8 +216,8 @@ class EPGList(GUIComponent):
 		else:
 			return type
 
-	def buildSingleEntry(self, service, eventId, beginTime, duration, EventName, catchUpIcon):
-		clock_types = self.getClockTypesForEntry(service, eventId, beginTime, duration)
+	def buildSingleEntry(self, service, eventId, beginTime, duration, EventName):
+		clock_types = self.getClockTypesForEntry(service, eventId, beginTime, duration, self.catchUpIcon)
 		r1 = self.weekday_rect
 		r2 = self.datetime_rect
 		r3 = self.descr_rect
