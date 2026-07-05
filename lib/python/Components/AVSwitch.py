@@ -17,6 +17,7 @@ MODULE_NAME = __name__.split(".")[-1]
 
 model = BoxInfo.getItem("model")
 AMLOGIC = BoxInfo.getItem("AmlogicFamily")
+MACHINEBUILD = BoxInfo.getItem("machinebuild")
 
 
 class AVSwitch:
