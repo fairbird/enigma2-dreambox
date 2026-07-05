@@ -393,15 +393,35 @@ class VideoHardware:
 			if force == 50:
 				mode_30 = mode_50
 
-		eAVControl.getInstance().setVideoModeMulti(mode50, mode60, mode24, 1)
-		if eAVControl.getInstance().hasVideoAxis():
-			limits = [int(x) for x in eAVControl.getInstance().getVideoAxis(mode).split()]
-			config.osd.dst_left.setChoices(default=limits[0], first=limits[0] - 255, last=limits[0] + 255)
-			config.osd.dst_top.setChoices(default=limits[1], first=limits[1] - 255, last=limits[1] + 255)
-			config.osd.dst_width.setChoices(default=limits[2], first=limits[2] - 255, last=limits[2] + 255)
-			config.osd.dst_height.setChoices(default=limits[3], first=limits[3] - 255, last=limits[3] + 255)
-			print(f"[AVSwitch] Framebuffer mode '{getDesktop(0).size().width()}', axis '{eAVControl.getInstance().getVideoAxis(mode)}'.")
-		self.setColorFormat(config.av.colorformat.value)
+		if BoxInfo.getItem("AmlogicFamily"):
+			amlmode = list(modes.values())[0]
+			oldamlmode = fileReadLine("/sys/class/display/mode", default="", source=MODULE_NAME)
+			fileWriteLine("/sys/class/display/mode", amlmode, source=MODULE_NAME)
+			print("[AVSwitch] Amlogic setting videomode to mode: %s" % amlmode)
+			fileWriteLine("/etc/u-boot.scr.d/000_hdmimode.scr", "setenv hdmimode %s" % amlmode, source=MODULE_NAME)
+			fileWriteLine("/etc/u-boot.scr.d/000_outputmode.scr", "setenv outputmode %s" % amlmode, source=MODULE_NAME)
+			system("update-autoexec")
+			fileWriteLine("/sys/class/ppmgr/ppscaler", "1", source=MODULE_NAME)
+			fileWriteLine("/sys/class/ppmgr/ppscaler", "0", source=MODULE_NAME)
+			fileWriteLine("/sys/class/video/axis", self.axis[mode], source=MODULE_NAME)
+			stride = fileReadLine("/sys/class/graphics/fb0/stride", default="", source=MODULE_NAME)
+			limits = [int(x) for x in self.axis[mode].split()]
+			config.osd.dst_left = ConfigSelectionNumber(default=limits[0], stepwidth=1, min=limits[0] - 255, max=limits[0] + 255, wraparound=False)
+			config.osd.dst_top = ConfigSelectionNumber(default=limits[1], stepwidth=1, min=limits[1] - 255, max=limits[1] + 255, wraparound=False)
+			config.osd.dst_width = ConfigSelectionNumber(default=limits[2], stepwidth=1, min=limits[2] - 255, max=limits[2] + 255, wraparound=False)
+			config.osd.dst_height = ConfigSelectionNumber(default=limits[3], stepwidth=1, min=limits[3] - 255, max=limits[3] + 255, wraparound=False)
+
+			if oldamlmode != amlmode:
+				config.osd.dst_width.setValue(limits[0])
+				config.osd.dst_height.setValue(limits[1])
+				config.osd.dst_left.setValue(limits[2])
+				config.osd.dst_top.setValue(limits[3])
+				config.osd.dst_left.save()
+				config.osd.dst_width.save()
+				config.osd.dst_top.save()
+				config.osd.dst_height.save()
+			print("[AVSwitch] Framebuffer mode:%s  stride:%s axis:%s" % (getDesktop(0).size().width(), stride, self.axis[mode]))
+			return
 
 		success = fileWriteLine("/proc/stb/video/videomode_50hz", mode_50, source=MODULE_NAME)
 		if success:

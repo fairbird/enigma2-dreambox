@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from enigma import eAVControl
 from Screens.Screen import Screen
 from Plugins.Plugin import PluginDescriptor
 from Components.SystemInfo import BoxInfo
