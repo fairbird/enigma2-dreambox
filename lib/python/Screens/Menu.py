@@ -223,8 +223,11 @@ class Menu(Screen, ProtectedScreen):
 		# For the skin: first try a menu_<menuID>, then Menu.
 		self.skinName = []
 		if self.menuID is not None:
-			self.skinName.append(f"Menu{self.menuID}")
-			self.skinName.append(f"menu_{self.menuID}")
+			if config.usage.menuType.value == 1:
+				self.skinName.append("MenuHorizontal")
+			else:
+				self.skinName.append(f"Menu{self.menuID}")
+				self.skinName.append(f"menu_{self.menuID}")
 		self.skinName.append("Menu")
 		digitText = _("Direct menu item selection")
 		self["menuActions"] = HelpableNumberActionMap(self, ["OkCancelActions", "MenuActions", "ColorActions", "NumberActions", "TextActions"], {
