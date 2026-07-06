@@ -266,6 +266,48 @@
 			</convert>
 		</widget>
 	</screen>
+		<screen name="MenuHorizontal" title="Menu" position="center,400" size="1170,265" ignoreWidgets="menuimage" resolution="1280,720">
+		<widget source="menu" render="Listbox" position="10,10" size="e-20,115" listOrientation="horizontal">
+			<template name="Default" fonts="Regular;25" itemHeight="105" itemWidth="230">
+				<mode name="default">
+					<text index="NumberText" position="0,0" size="230,105" font="0" horizontalAlignment="center" padding="10" verticalAlignment="center" wrap="on" />
+				</mode>
+				<mode name="text">
+					<text index="Text" position="0,0" size="230,105" font="0" horizontalAlignment="center" padding="10" verticalAlignment="center" wrap="on" />
+				</mode>
+				<mode name="number">
+					<text index="Number" position="0,5" size="230,25" font="0" horizontalAlignment="center" verticalAlignment="center" />
+					<text index="Text" position="0,30" size="230,70" font="0" horizontalAlignment="center" padding="10" verticalAlignment="center" wrap="on" />
+				</mode>
+				<mode name="image">
+					<text index="Text" position="0,0" size="230,105" font="0" horizontalAlignment="center" padding="10" verticalAlignment="center" wrap="on" />
+				</mode>
+				<mode name="both">
+					<text index="Number" position="0,5" size="230,25" font="0" horizontalAlignment="center" verticalAlignment="center" />
+					<text index="Text" position="0,30" size="230,70" font="0" horizontalAlignment="center" padding="10" verticalAlignment="center" wrap="on" />
+				</mode>
+			</template>
+		</widget>
+		<widget source="description" render="Label" position="10,e-130" size="e-20,70" font="Regular;20" padding="10" verticalAlignment="center" widgetBorderColor="#00999999" widgetBorderWidth="1" />
+		<widget source="key_red" render="Label" position="10,e-50" size="180,40" backgroundColor="key_red" font="Regular;20" foregroundColor="key_text" horizontalAlignment="center" wrap="off" verticalAlignment="center">
+			<convert type="ConditionalShowHide" />
+		</widget>
+		<widget source="key_green" render="Label" position="200,e-50" size="180,40" backgroundColor="key_green" font="Regular;20" foregroundColor="key_text" horizontalAlignment="center" wrap="off" verticalAlignment="center">
+			<convert type="ConditionalShowHide" />
+		</widget>
+		<widget source="key_yellow" render="Label" position="390,e-50" size="180,40" backgroundColor="key_yellow" font="Regular;20" foregroundColor="key_text" horizontalAlignment="center" wrap="off" verticalAlignment="center">
+			<convert type="ConditionalShowHide" />
+		</widget>
+		<widget source="key_blue" render="Label" position="580,e-50" size="180,40" backgroundColor="key_blue" font="Regular;20" foregroundColor="key_text" horizontalAlignment="center" wrap="off" verticalAlignment="center">
+			<convert type="ConditionalShowHide" />
+		</widget>
+		<widget source="key_menu" render="Label" position="e-200,e-50" size="90,40" backgroundColor="key_back" font="Regular;20" foregroundColor="key_text" horizontalAlignment="center" wrap="off" verticalAlignment="center">
+			<convert type="ConditionalShowHide" />
+		</widget>
+		<widget source="key_help" render="Label" position="e-100,e-50" size="90,40" backgroundColor="key_back" font="Regular;20" foregroundColor="key_text" horizontalAlignment="center" wrap="off" verticalAlignment="center">
+			<convert type="ConditionalShowHide" />
+		</widget>
+	</screen>
 	<screen name="LanguageSelection" position="center,center" size="560,456">
 		<panel name="MenuRed3Panel"/>
 		<panel name="MenuGreen3Panel"/>
