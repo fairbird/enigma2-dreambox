@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 from gettext import dgettext
-from os.path import isdir, isfile
-from xml.etree.ElementTree import parse
+from os.path import getmtime, isdir, isfile
 
 from enigma import eTimer
 
-from skin import findSkinScreen, menus, parameters, menuicons
+from skin import menus, parameters, menuicons
 from Components.ActionMap import HelpableNumberActionMap, HelpableActionMap
 from Components.config import ConfigDictionarySet, NoSave, config, configfile
+from Components.Label import Label
 from Components.Pixmap import Pixmap
 from Components.PluginComponent import plugins
 from Components.Sources.List import List
@@ -18,7 +18,7 @@ from Screens.ParentalControlSetup import ProtectedScreen
 from Screens.Screen import Screen, ScreenSummary
 from Screens.Setup import Setup
 from Tools.BoundFunction import boundFunction
-from Tools.Directories import SCOPE_GUISKIN, SCOPE_SKINS, resolveFilename
+from Tools.Directories import SCOPE_GUISKIN, SCOPE_SKINS, fileReadXML, resolveFilename
 from Tools.LoadPixmap import LoadPixmap
 
 from Components.NimManager import nimmanager  # nimmanager is used in eval(conditional), do not remove this import
@@ -47,13 +47,10 @@ WIDGET_KEY = 5
 WIDGET_WEIGHT = 6
 WIDGET_MODULE = 7
 
+menuDomCache = {}
+menuDomModTime = {}
 imageCache = {}
 lastKey = None
-
-# Read the menu.
-file = open(resolveFilename(SCOPE_SKINS, "menu.xml"))
-mdom = parse(file)
-file.close()
 
 
 def E2DarkOS():
@@ -73,8 +70,24 @@ def MenuEntryPixmap(key, png_cache):
 	return png
 
 
+def menuDom():
+	menuFile = resolveFilename(SCOPE_SKINS, "menu.xml")
+	try:
+		modTime = getmtime(menuFile)
+	except OSError:
+		return menuDomCache.get(menuFile)
+	if menuDomCache.get(menuFile) is not None and menuDomModTime.get(menuFile) == modTime:
+		return menuDomCache[menuFile]
+	dom = fileReadXML(menuFile, source="Menu")
+	if dom is not None:
+		menuDomCache[menuFile] = dom
+		menuDomModTime[menuFile] = modTime
+	return menuDomCache.get(menuFile)
+
+
 def findMenu(key):
-	menuList = mdom.getroot().findall(f".//menu[@key='{key}']")
+	dom = menuDom()
+	menuList = ([dom] if dom is not None and dom.get("key") == key else []) + (dom.findall(".//menu[@key='%s']" % key) if dom is not None else [])
 	count = len(menuList)
 	if menuList:
 		for index, menu in enumerate(menuList):
@@ -130,62 +143,45 @@ def menuEntryName(name):
 
 class Menu(Screen, ProtectedScreen):
 	skin = """
-	<screen name="Menu" title="Menu"  position="center,center" size="980,600" resolution="1280,720">
-		<widget source="menu" render="Listbox" position="0,0" size="730,490">
-			<convert type="TemplatedMultiContent">
-				{
-				"templates":
-					{
-					"default": (35,
-						[
-						MultiContentEntryText(pos=(15, 0), size=(710, 35), font=0, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER, text=0)
-						]),
-					"text": (35,
-						[
-						MultiContentEntryText(pos=(20, 0), size=(660, 35), font=0, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER, text=3),
-						]),
-					"number": (35,
-						[
-						MultiContentEntryText(pos=(15, 0), size=(30, 35), font=0, flags=RT_HALIGN_RIGHT | RT_VALIGN_CENTER, text=2),
-						MultiContentEntryText(pos=(65, 0), size=(610, 35), font=0, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER, text=3),
-						]),
-					"image": (35,
-						[
-						MultiContentEntryPixmapAlphaBlend(pos=(15, 2), size=(31, 31), png=1, flags=BT_SCALE | BT_KEEP_ASPECT_RATIO),
-						MultiContentEntryText(pos=(65, 0), size=(610, 35), font=0, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER, text=3),
-						]),
-					"both": (35,
-						[
-						MultiContentEntryPixmapAlphaBlend(pos=(15, 2), size=(31, 31), png=1, flags=BT_SCALE | BT_KEEP_ASPECT_RATIO),
-						MultiContentEntryText(pos=(65, 0), size=(40, 35), font=0, flags=RT_HALIGN_RIGHT | RT_VALIGN_CENTER, text=2),
-						MultiContentEntryText(pos=(125, 0), size=(550, 35), font=0, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER, text=3),
-						])
-					},
-				"fonts": [parseFont("Regular;25")]
-				}
-			</convert>
+	<screen name="Menu" title="Menu" position="center,center" size="970,570" ignoreWidgets="menuimage" resolution="1280,720">
+		<widget source="menu" render="Listbox" position="10,10" size="e-20,e-150">
+			<template name="Default" fonts="Regular;25" itemHeight="35">
+				<mode name="default">
+					<text index="NumberText" position="10,0" size="880,35" font="0" horizontalAlignment="left" verticalAlignment="center" />
+				</mode>
+				<mode name="text">
+					<text index="Text" position="10,0" size="880,35" font="0" horizontalAlignment="left" verticalAlignment="center" />
+				</mode>
+				<mode name="number">
+					<text index="Number" position="10,0" size="30,35" font="0" horizontalAlignment="right" verticalAlignment="center" />
+					<text index="Text" position="50,0" size="830,35" font="0" horizontalAlignment="left" verticalAlignment="center" />
+				</mode>
+				<mode name="image">
+					<text index="Text" position="10,0" size="880,35" font="0" horizontalAlignment="left" verticalAlignment="center" />
+				</mode>
+				<mode name="both">
+					<text index="Number" position="10,0" size="30,35" font="0" horizontalAlignment="right" verticalAlignment="center" />
+					<text index="Text" position="50,0" size="830,35" font="0" horizontalAlignment="left" verticalAlignment="center" />
+				</mode>
+			</template>
 		</widget>
-		<widget name="menuimage" position="780,0" size="200,200" alphatest="blend" conditional="menuimage" scaleFlags="scaleCenter" transparent="1" />
-		<widget source="description" render="Label" position="0,e-110" size="e,50" conditional="description" font="Regular;20" valign="center" />
-		<widget source="key_red" render="Label" position="10,e-50" size="180,40" backgroundColor="key_red" font="Regular;20" foregroundColor="key_text" halign="center" noWrap="1" valign="center">
+		<widget source="description" render="Label" position="10,e-130" size="e-20,70" font="Regular;20" padding="10" verticalAlignment="center" widgetBorderColor="#00999999" widgetBorderWidth="1" />
+		<widget source="key_red" render="Label" position="10,e-50" size="180,40" backgroundColor="key_red" font="Regular;20" foregroundColor="key_text" horizontalAlignment="center" wrap="off" verticalAlignment="center">
 			<convert type="ConditionalShowHide" />
 		</widget>
-		<widget source="key_green" render="Label" position="200,e-50" size="180,40" backgroundColor="key_green" font="Regular;20" foregroundColor="key_text" halign="center" noWrap="1" valign="center">
+		<widget source="key_green" render="Label" position="200,e-50" size="180,40" backgroundColor="key_green" font="Regular;20" foregroundColor="key_text" horizontalAlignment="center" wrap="off" verticalAlignment="center">
 			<convert type="ConditionalShowHide" />
 		</widget>
-		<widget source="key_yellow" render="Label" position="390,e-50" size="180,40" backgroundColor="key_yellow" conditional="key_yellow" font="Regular;20" foregroundColor="key_text" halign="center" noWrap="1" valign="center">
+		<widget source="key_yellow" render="Label" position="390,e-50" size="180,40" backgroundColor="key_yellow" font="Regular;20" foregroundColor="key_text" horizontalAlignment="center" wrap="off" verticalAlignment="center">
 			<convert type="ConditionalShowHide" />
 		</widget>
-		<widget source="key_blue" render="Label" position="580,e-50" size="180,40" backgroundColor="key_blue" conditional="key_blue" font="Regular;20" foregroundColor="key_text" halign="center" noWrap="1" valign="center">
+		<widget source="key_blue" render="Label" position="580,e-50" size="180,40" backgroundColor="key_blue" font="Regular;20" foregroundColor="key_text" horizontalAlignment="center" wrap="off" verticalAlignment="center">
 			<convert type="ConditionalShowHide" />
 		</widget>
-		<widget source="key_menu" render="Label" position="e-300,e-50" size="90,40" backgroundColor="key_back" conditional="key_menu" font="Regular;20" foregroundColor="key_text" halign="center" noWrap="1" valign="center">
+		<widget source="key_menu" render="Label" position="e-200,e-50" size="90,40" backgroundColor="key_back" font="Regular;20" foregroundColor="key_text" horizontalAlignment="center" wrap="off" verticalAlignment="center">
 			<convert type="ConditionalShowHide" />
 		</widget>
-		<widget source="key_info" render="Label" position="e-200,e-50" size="90,40" backgroundColor="key_back" conditional="key_info" font="Regular;20" foregroundColor="key_text" halign="center" noWrap="1" valign="center">
-			<convert type="ConditionalShowHide" />
-		</widget>
-		<widget source="key_help" render="Label" position="e-100,e-50" size="90,40" backgroundColor="key_back" font="Regular;20" conditional="key_help" foregroundColor="key_text" halign="center" noWrap="1" valign="center">
+		<widget source="key_help" render="Label" position="e-100,e-50" size="90,40" backgroundColor="key_back" font="Regular;20" foregroundColor="key_text" horizontalAlignment="center" wrap="off" verticalAlignment="center">
 			<convert type="ConditionalShowHide" />
 		</widget>
 	</screen>"""
@@ -198,9 +194,18 @@ class Menu(Screen, ProtectedScreen):
 		self.pluginLanguageDomain = PluginLanguageDomain
 		Screen.__init__(self, session, enableHelp=True)
 		self.menuList = []
-		self["menu"] = List(self.menuList)
+		indexNames = {
+			"NumberText": WIDGET_NUMBER_TEXT,
+			"Image": WIDGET_IMAGE,
+			"Number": WIDGET_NUMBER,
+			"Text": WIDGET_TEXT,
+			"Description": WIDGET_DESCRIPTION,
+			"Key": WIDGET_KEY,
+			"Weight": WIDGET_WEIGHT
+		}
+		self["menu"] = List(self.menuList, indexNames=indexNames)
 		self["menu"].onSelectionChanged.append(self.selectionChanged)
-		self["menuimage"] = Pixmap()
+		self["menuimage"] = Label() if menus and all(len(v) == 1 for v in menus.values()) else Pixmap()
 		self["description"] = StaticText()
 		self["key_menu"] = StaticText(_("MENU"))
 		self["key_red"] = StaticText(_("Exit"))
@@ -218,34 +223,26 @@ class Menu(Screen, ProtectedScreen):
 		# For the skin: first try a menu_<menuID>, then Menu.
 		self.skinName = []
 		if self.menuID is not None:
-			if config.usage.menuType.value == "horzanim" and findSkinScreen("Animmain"):
-				self.skinName.append("Animmain")
-			elif config.usage.menuType.value == "horzicon" and findSkinScreen("Iconmain"):
-				self.skinName.append("Iconmain")
-			else:
-				self.skinName.append(f"Menu{self.menuID}")
-				self.skinName.append(f"menu_{self.menuID}")
+			self.skinName.append(f"Menu{self.menuID}")
+			self.skinName.append(f"menu_{self.menuID}")
 		self.skinName.append("Menu")
-		if config.usage.menuType.value == "horzanim" and findSkinScreen("Animmain"):
-			self.onShown.append(self.openTestA)
-		elif config.usage.menuType.value == "horzicon" and findSkinScreen("Iconmain"):
-			self.onShown.append(self.openTestB)
+		digitText = _("Direct menu item selection")
 		self["menuActions"] = HelpableNumberActionMap(self, ["OkCancelActions", "MenuActions", "ColorActions", "NumberActions", "TextActions"], {
 			"ok": (self.okbuttonClick, _("Select the current menu item")),
 			"cancel": (self.closeNonRecursive, _("Exit menu")),
 			"close": (self.closeRecursive, _("Exit all menus")),
 			"menu": (self.keySetupMenu, _("Change OSD Settings")),
 			"red": (self.closeNonRecursive, _("Exit menu")),
-			"1": (self.keyNumberGlobal, _("Direct menu item selection")),
-			"2": (self.keyNumberGlobal, _("Direct menu item selection")),
-			"3": (self.keyNumberGlobal, _("Direct menu item selection")),
-			"4": (self.keyNumberGlobal, _("Direct menu item selection")),
-			"5": (self.keyNumberGlobal, _("Direct menu item selection")),
-			"6": (self.keyNumberGlobal, _("Direct menu item selection")),
-			"7": (self.keyNumberGlobal, _("Direct menu item selection")),
-			"8": (self.keyNumberGlobal, _("Direct menu item selection")),
-			"9": (self.keyNumberGlobal, _("Direct menu item selection")),
-			"0": (self.keyNumberGlobal, _("Direct menu item selection"))
+			"1": (self.keyNumberGlobal, digitText),
+			"2": (self.keyNumberGlobal, digitText),
+			"3": (self.keyNumberGlobal, digitText),
+			"4": (self.keyNumberGlobal, digitText),
+			"5": (self.keyNumberGlobal, digitText),
+			"6": (self.keyNumberGlobal, digitText),
+			"7": (self.keyNumberGlobal, digitText),
+			"8": (self.keyNumberGlobal, digitText),
+			"9": (self.keyNumberGlobal, digitText),
+			"0": (self.keyNumberGlobal, digitText),
 		}, prio=0, description=_("Menu Common Actions"))
 		self["navigationActions"] = HelpableActionMap(self, ["NavigationActions"], {
 			"top": (self.keyTop, _("Move to first line / screen")),
@@ -256,7 +253,7 @@ class Menu(Screen, ProtectedScreen):
 			"down": (self.keyDown, _("Move down a line")),
 			"pageDown": (self.keyPageDown, _("Move down a screen")),
 			"bottom": (self.keyBottom, _("Move to last line / screen"))
-		}, prio=0 if E2DarkOS() else -1, description=_("Menu Navigation Actions"))
+		}, prio=0, description=_("Menu Navigation Actions"))
 		if config.usage.menuSortOrder.value == "user":
 			self["editActions"] = HelpableActionMap(self, ["ColorActions"], {
 				"green": (self.keyGreen, _("Toggle item move mode on/off")),
@@ -414,9 +411,9 @@ class Menu(Screen, ProtectedScreen):
 		else:
 			image = MenuEntryPixmap(key, self.png_cache)
 		if menu.get("flushConfigOnClose"):
-			module = boundFunction(self.session.openWithCallback, self.menuClosedWithConfigFlush, Menu, menu)
+			module = boundFunction(self.session.openWithCallback, self.menuClosedWithConfigFlush, self.__class__, menu)
 		else:
-			module = boundFunction(self.session.openWithCallback, self.menuClosed, Menu, menu)
+			module = boundFunction(self.session.openWithCallback, self.menuClosed, self.__class__, menu)
 		# TODO: Add check if !empty(menu.childNodes).
 		return (text, module, key, weight, description, image)
 
@@ -428,35 +425,41 @@ class Menu(Screen, ProtectedScreen):
 
 	def getMenuEntryImage(self, key, lastKey):
 		global imageCache
-		image = imageCache.get(key)
-		if image is None:
-			imageFile = resolveFilename(SCOPE_GUISKIN, f"mainmenu/{key}.png" if self.menuImageLibrary else menus.get(key, ""))
-			if imageFile and isfile(imageFile):
-				image = LoadPixmap(imageFile, cached=True)
-				if image:
-					print(f"[Menu] Menu image for menu ID '{key}' is '{imageFile}'.")
-					imageCache[key] = image
-				else:
-					print(f"[Menu] Error: Unable to load image '{imageFile}'!")
-					if lastKey:
-						image = imageCache.get(lastKey)
-		if image is None:
-			image = imageCache.get("default")
+		if isinstance(self["menuimage"], Pixmap):
+			image = imageCache.get(key)
 			if image is None:
-				imageFile = resolveFilename(SCOPE_GUISKIN, "mainmenu/missing.png" if self.menuImageLibrary else menus.get("default", ""))
+				skinPath = f"mainmenu/{key}.png" if self.menuImageLibrary else menus.get(key, "")
+				imageFile = resolveFilename(SCOPE_GUISKIN, skinPath) if skinPath else None
 				if imageFile and isfile(imageFile):
 					image = LoadPixmap(imageFile, cached=True)
 					if image:
-						print(f"[Menu] Default menu image is '{imageFile}'.")
-						imageCache["default"] = image
+						print(f"[Menu] Menu image for menu ID '{key}' is '{imageFile}'.")
+						imageCache[key] = image
 					else:
-						print(f"[Menu] Error: Unable to load default image '{imageFile}'!")
+						print(f"[Menu] Error: Unable to load image '{imageFile}'!")
+						if lastKey:
+							image = imageCache.get(lastKey)
+			if image is None:
+				image = imageCache.get("default")
+				if image is None:
+					skinPath = "mainmenu/missing.png" if self.menuImageLibrary else menus.get("default", "")
+					imageFile = resolveFilename(SCOPE_GUISKIN, skinPath) if skinPath else None
+					if imageFile and isfile(imageFile):
+						image = LoadPixmap(imageFile, cached=True)
+						if image:
+							print(f"[Menu] Default menu image is '{imageFile}'.")
+							imageCache["default"] = image
+						else:
+							print(f"[Menu] Error: Unable to load default image '{imageFile}'!")
+							imageCache["default"] = "N/A"
+					else:
+						if imageFile:
+							print(f"[Menu] Error: Default image '{imageFile}' is not a file!")
 						imageCache["default"] = "N/A"
-				else:
-					print(f"[Menu] Error: Default image '{imageFile}' is not a file!")
-					imageCache["default"] = "N/A"
-			elif image == "N/A":
-				image = None
+				elif image == "N/A":
+					image = None
+		else:
+			image = menus.get(key, menus.get("default", ""))
 		return image
 
 	def setMenuList(self, menuList):
@@ -480,7 +483,10 @@ class Menu(Screen, ProtectedScreen):
 		if current:
 			if not E2DarkOS():
 				if config.usage.showicons.value:
-					self["menuimage"].instance.setPixmap(current[WIDGET_IMAGE])
+					if isinstance(self["menuimage"], Pixmap):
+						self["menuimage"].instance.setPixmap(current[WIDGET_IMAGE])
+					else:
+						self["menuimage"].setText(current[WIDGET_IMAGE])
 			self["description"].setText(current[WIDGET_DESCRIPTION])
 			if self.sortMode:
 				self["key_yellow"].setText(_("Show") if self.subMenuSort.getConfigValue(current[WIDGET_KEY], "hidden") else _("Hide"))
@@ -528,30 +534,15 @@ class Menu(Screen, ProtectedScreen):
 	def openSetup(self, dialog):
 		self.session.openWithCallback(self.menuClosed, Setup, dialog)
 
-	def openTestA(self):
-		self.session.open(AnimMain, self.menuList, self.getTitle())
-		self.close()
-
-	def openTestB(self):
-		self.session.open(IconMain, self.menuList, self.getTitle())
-		self.close()
-
 	def singleItemMenu(self):
-		self.onExecBegin.remove(self.singleItemMenu)
-		if config.usage.menuType.value == "horzanim" and findSkinScreen("Animmain"):
-			return
-		elif config.usage.menuType.value == "horzicon" and findSkinScreen("Iconmain"):
-			return
-		else:
-			self.okbuttonClick()
+		self.okbuttonClick()
 
 	def closeRecursive(self):
 		self.resetNumberKey()
 		self.close(True)
 
 	def createSummary(self):
-		if config.usage.menuType.value == "standard":
-			return MenuSummary
+		return MenuSummary
 
 	def isProtected(self):
 		if config.ParentalControl.setuppinactive.value:
@@ -635,37 +626,37 @@ class Menu(Screen, ProtectedScreen):
 
 	def keyTop(self):
 		self.currentIndex = self["menu"].getSelectedIndex()
-		self["menu"].top()
+		self["menu"].goTop()
 		if self.sortMode and self.selectedEntry is not None:
 			self.moveAction()
 
 	def keyPageUp(self):
 		self.currentIndex = self["menu"].getSelectedIndex()
-		self["menu"].pageUp()
+		self["menu"].goPageUp()
 		if self.sortMode and self.selectedEntry is not None:
 			self.moveAction()
 
 	def keyUp(self):
 		self.currentIndex = self["menu"].getSelectedIndex()
-		self["menu"].up()
+		self["menu"].goLineUp()
 		if self.sortMode and self.selectedEntry is not None:
 			self.moveAction()
 
 	def keyDown(self):
 		self.currentIndex = self["menu"].getSelectedIndex()
-		self["menu"].down()
+		self["menu"].goLineDown()
 		if self.sortMode and self.selectedEntry is not None:
 			self.moveAction()
 
 	def keyPageDown(self):
 		self.currentIndex = self["menu"].getSelectedIndex()
-		self["menu"].pageDown()
+		self["menu"].goPageDown()
 		if self.sortMode and self.selectedEntry is not None:
 			self.moveAction()
 
 	def keyBottom(self):
 		self.currentIndex = self["menu"].getSelectedIndex()
-		self["menu"].bottom()
+		self["menu"].goBottom()
 		if self.sortMode and self.selectedEntry is not None:
 			self.moveAction()
 
@@ -866,236 +857,84 @@ class AnimMain(Screen):
 			selection[1]()
 
 
-class IconMain(Screen):
-	def __init__(self, session, tlist, menuTitle):
-		Screen.__init__(self, session)
-		self.tlist = tlist
-		self.setTitle(menuTitle)
-		self.skinName = "Iconmain"
-		ipage = 1
-		list = []
-		nopic = len(self.tlist)
-		self.pos = []
-		self.ipage = 1
-		self.index = 0
-		self.icons = []
-		self.indx = []
-		n1 = len(tlist)
-		self.picnum = n1
-		list = []
-		tlist = []
-		self["label1"] = StaticText()
-		self["label2"] = StaticText()
-		self["label3"] = StaticText()
-		self["label4"] = StaticText()
-		self["label5"] = StaticText()
-		self["label6"] = StaticText()
-		self["label1s"] = StaticText()
-		self["label2s"] = StaticText()
-		self["label3s"] = StaticText()
-		self["label4s"] = StaticText()
-		self["label5s"] = StaticText()
-		self["label6s"] = StaticText()
-		self["pointer"] = Pixmap()
-		self["pixmap1"] = Pixmap()
-		self["pixmap2"] = Pixmap()
-		self["pixmap3"] = Pixmap()
-		self["pixmap4"] = Pixmap()
-		self["pixmap5"] = Pixmap()
-		self["pixmap6"] = Pixmap()
-		self["key_red"] = StaticText(_("Exit"))
-		self["key_green"] = StaticText(_("Select"))
-		self["key_yellow"] = StaticText(_("Config"))
-		self["actions"] = HelpableNumberActionMap(self, ["OkCancelActions", "MenuActions", "DirectionActions", "NumberActions", "ColorActions"], {
-			"ok": self.okbuttonClick,
-			"cancel": self.closeNonRecursive,
-			"left": self.key_left,
-			"right": self.key_right,
-			"up": self.key_up,
-			"down": self.key_down,
-			"red": self.cancel,
-			"green": self.okbuttonClick,
-			"yellow": self.key_menu,
-			"menu": self.closeRecursive,
-			"1": self.keyNumberGlobal,
-			"2": self.keyNumberGlobal,
-			"3": self.keyNumberGlobal,
-			"4": self.keyNumberGlobal,
-			"5": self.keyNumberGlobal,
-			"6": self.keyNumberGlobal,
-			"7": self.keyNumberGlobal,
-			"8": self.keyNumberGlobal,
-			"9": self.keyNumberGlobal
-		}, prio=0)
-		self.index = 0
-		i = 0
-		self.maxentry = 29
-		self.istart = 0
-		i = 0
-		self.onShown.append(self.openTest)
+class MenuHorizontal(Menu):
+	skin = """
+	<screen name="MenuHorizontal" title="Menu" position="center,400" size="1170,265" ignoreWidgets="menuimage" resolution="1280,720">
+		<widget source="menu" render="Listbox" position="10,10" size="e-20,115" listOrientation="horizontal">
+			<template name="Default" fonts="Regular;25" itemHeight="105" itemWidth="230">
+				<mode name="default">
+					<text index="NumberText" position="0,0" size="230,105" font="0" horizontalAlignment="center" padding="10" verticalAlignment="center" wrap="on" />
+				</mode>
+				<mode name="text">
+					<text index="Text" position="0,0" size="230,105" font="0" horizontalAlignment="center" padding="10" verticalAlignment="center" wrap="on" />
+				</mode>
+				<mode name="number">
+					<text index="Number" position="0,5" size="230,25" font="0" horizontalAlignment="center" verticalAlignment="center" />
+					<text index="Text" position="0,30" size="230,70" font="0" horizontalAlignment="center" padding="10" verticalAlignment="center" wrap="on" />
+				</mode>
+				<mode name="image">
+					<text index="Text" position="0,0" size="230,105" font="0" horizontalAlignment="center" padding="10" verticalAlignment="center" wrap="on" />
+				</mode>
+				<mode name="both">
+					<text index="Number" position="0,5" size="230,25" font="0" horizontalAlignment="center" verticalAlignment="center" />
+					<text index="Text" position="0,30" size="230,70" font="0" horizontalAlignment="center" padding="10" verticalAlignment="center" wrap="on" />
+				</mode>
+			</template>
+		</widget>
+		<widget source="description" render="Label" position="10,e-130" size="e-20,70" font="Regular;20" padding="10" verticalAlignment="center" widgetBorderColor="#00999999" widgetBorderWidth="1" />
+		<widget source="key_red" render="Label" position="10,e-50" size="180,40" backgroundColor="key_red" font="Regular;20" foregroundColor="key_text" horizontalAlignment="center" wrap="off" verticalAlignment="center">
+			<convert type="ConditionalShowHide" />
+		</widget>
+		<widget source="key_green" render="Label" position="200,e-50" size="180,40" backgroundColor="key_green" font="Regular;20" foregroundColor="key_text" horizontalAlignment="center" wrap="off" verticalAlignment="center">
+			<convert type="ConditionalShowHide" />
+		</widget>
+		<widget source="key_yellow" render="Label" position="390,e-50" size="180,40" backgroundColor="key_yellow" font="Regular;20" foregroundColor="key_text" horizontalAlignment="center" wrap="off" verticalAlignment="center">
+			<convert type="ConditionalShowHide" />
+		</widget>
+		<widget source="key_blue" render="Label" position="580,e-50" size="180,40" backgroundColor="key_blue" font="Regular;20" foregroundColor="key_text" horizontalAlignment="center" wrap="off" verticalAlignment="center">
+			<convert type="ConditionalShowHide" />
+		</widget>
+		<widget source="key_menu" render="Label" position="e-200,e-50" size="90,40" backgroundColor="key_back" font="Regular;20" foregroundColor="key_text" horizontalAlignment="center" wrap="off" verticalAlignment="center">
+			<convert type="ConditionalShowHide" />
+		</widget>
+		<widget source="key_help" render="Label" position="e-100,e-50" size="90,40" backgroundColor="key_back" font="Regular;20" foregroundColor="key_text" horizontalAlignment="center" wrap="off" verticalAlignment="center">
+			<convert type="ConditionalShowHide" />
+		</widget>
+	</screen>"""
 
-	def key_menu(self):
-		pass
+	def __init__(self, session, parentMenu, PluginLanguageDomain=None):
+		Menu.__init__(self, session, parentMenu, PluginLanguageDomain)
+		self["navigationActions"] = HelpableActionMap(self, ["NavigationActions"], {
+			"first": (self.keyFirst, _("Move to first item / screen")),
+			"left": (self.keyLeft, _("Move left a item")),
+			"right": (self.keyRight, _("Move right a item")),
+			"last": (self.keyLast, _("Move to last item / screen"))
+		}, prio=0, description=_("Menu Navigation Actions"))
+		self.skinName.append("MenuHorizontal")
 
-	def cancel(self):
-		self.close()
+	def keyFirst(self):
+		self.currentIndex = self["menu"].getSelectedIndex()
+		self["menu"].goFirst()
+		if self.sortMode and self.selectedEntry is not None:
+			self.moveAction()
 
-	def paintFrame(self):
-		pass
+	def keyLeft(self):
+		self.currentIndex = self["menu"].getSelectedIndex()
+		self["menu"].goLeft()
+		if self.sortMode and self.selectedEntry is not None:
+			self.moveAction()
 
-	def openTest(self):
-		if self.ipage == 1:
-			ii = 0
-		elif self.ipage == 2:
-			ii = 6
-		elif self.ipage == 3:
-			ii = 12
-		elif self.ipage == 4:
-			ii = 18
-		elif self.ipage == 5:
-			ii = 24
-		dxml = config.skin.primary_skin.value
-		dskin = dxml.split("/")
-		j = 0
-		i = ii
-		while j < 6:
-			j = j + 1
-			if i > self.picnum - 1:
-				icon = f"{dskin[0]}/blank.png"
-				name = ""
-			else:
-				name = self.tlist[i][0]
-			name = menuEntryName(name)
-			if j == self.index + 1:
-				self[f"label{j}"].setText(" ")
-				self[f"label{j}s"].setText(name)
-			else:
-				self[f"label{j}"].setText(name)
-				self[f"label{j}s"].setText(" ")
-			i = i + 1
-		j = 0
-		i = ii
-		while j < 6:
-			j = j + 1
-			itot = (self.ipage - 1) * 6 + j
-			if itot > self.picnum:
-				icon = f"/usr/share/enigma2/{dskin[0]}/blank.png"
-			else:
-				icon = f"/usr/share/enigma2/{dskin[0]}/buttons/icon1.png"
-			pic = icon
-			self[f"pixmap{j}"].instance.setPixmapFromFile(pic)
-			i = i + 1
-		if self.picnum > 6:
-			try:
-				dpointer = f"/usr/share/enigma2/{dskin[0]}/pointer.png"
-				self["pointer"].instance.setPixmapFromFile(dpointer)
-			except:
-				dpointer = "/usr/share/enigma2/skin_default/pointer.png"
-				self["pointer"].instance.setPixmapFromFile(dpointer)
-		else:
-			try:
-				dpointer = f"/usr/share/enigma2/{dskin[0]}/blank.png"
-				self["pointer"].instance.setPixmapFromFile(dpointer)
-			except:
-				dpointer = "/usr/share/enigma2/skin_default/blank.png"
-				self["pointer"].instance.setPixmapFromFile(dpointer)
+	def keyRight(self):
+		self.currentIndex = self["menu"].getSelectedIndex()
+		self["menu"].goRight()
+		if self.sortMode and self.selectedEntry is not None:
+			self.moveAction()
 
-	def key_left(self):
-		self.index -= 1
-		if self.index < 0:
-			self.key_up(True)
-		else:
-			self.openTest()
-
-	def key_right(self):
-		self.index += 1
-		inum = self.picnum - 1 - (self.ipage - 1) * 6
-		if self.index > inum or self.index > 5:
-			self.key_down()
-		else:
-			self.openTest()
-
-	def key_up(self, focusLastPic=False):
-		self.ipage = self.ipage - 1
-		if self.ipage < 1 and 7 > self.picnum > 0:
-			self.ipage = 1
-			focusLastPic = focusLastPic or self.index == 0
-		elif self.ipage < 1 and 13 > self.picnum > 6:
-			self.ipage = 2
-		elif self.ipage < 1 and 19 > self.picnum > 12:
-			self.ipage = 3
-		elif self.ipage < 1 and 25 > self.picnum > 18:
-			self.ipage = 4
-		elif self.ipage < 1 and 31 > self.picnum > 24:
-			self.ipage = 5
-		if focusLastPic:
-			inum = self.picnum - 1 - (self.ipage - 1) * 6
-			self.index = inum if inum < 5 else 5
-		else:
-			self.index = 0
-		self.openTest()
-
-	def key_down(self, focusLastPic=False):
-		self.ipage = self.ipage + 1
-		if self.ipage == 2 and 7 > self.picnum > 0:
-			self.ipage = 1
-			focusLastPic = focusLastPic or self.index < self.picnum - 1 - (self.ipage - 1) * 6
-		elif self.ipage == 3 and 13 > self.picnum > 6:
-			self.ipage = 1
-		elif self.ipage == 4 and 19 > self.picnum > 12:
-			self.ipage = 1
-		elif self.ipage == 5 and 25 > self.picnum > 18:
-			self.ipage = 1
-		elif self.ipage == 6 and 31 > self.picnum > 24:
-			self.ipage = 1
-		if focusLastPic:
-			inum = self.picnum - 1 - (self.ipage - 1) * 6
-			self.index = inum if inum < 5 else 5
-		else:
-			self.index = 0
-		self.openTest()
-
-	def keyNumberGlobal(self, number):
-		if number == 7:
-			self.key_up()
-		elif number == 8:
-			self.closeNonRecursive()
-		elif number == 9:
-			self.key_down()
-		else:
-			number -= 1
-			if number <= self.picnum - 1 - (self.ipage - 1) * 6:
-				self.index = number
-				self.openTest()
-				self.okbuttonClick()
-
-	def closeNonRecursive(self):
-		self.close(False)
-
-	def closeRecursive(self):
-		self.close(True)
-
-	def createSummary(self):
-		pass
-
-	def okbuttonClick(self):
-		if self.ipage == 1:
-			idx = self.index
-		elif self.ipage == 2:
-			idx = self.index + 6
-		elif self.ipage == 3:
-			idx = self.index + 12
-		elif self.ipage == 4:
-			idx = self.index + 18
-		elif self.ipage == 5:
-			idx = self.index + 24
-		if idx > self.picnum - 1:
-			return
-		if idx is None:
-			return
-		selection = self.tlist[idx]
-		if selection is not None:
-			selection[1]()
+	def keyLast(self):
+		self.currentIndex = self["menu"].getSelectedIndex()
+		self["menu"].goLast()
+		if self.sortMode and self.selectedEntry is not None:
+			self.moveAction()
 
 
 class MenuSummary(ScreenSummary):

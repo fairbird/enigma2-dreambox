@@ -2137,10 +2137,9 @@ def preferredTunerChoicesUpdate(update=False):
 
 	config.usage.showicons = ConfigYesNo(default=True)
 
-	config.usage.menuType = ConfigSelection(default="standard", choices=[
-		("horzanim", _("Horizontal menu")),
-		("horzicon", _("Horizontal icons")),
-		("standard", _("Standard menu"))
+	config.usage.menuType = ConfigSelection(default=0, choices=[
+		(0, _("Vertical menu")),
+		(1, _("Horizontal menu"))
 	])
 
 	config.usage.menuEntryStyle = ConfigSelection(default="text", choices=[
