@@ -226,7 +226,7 @@ def reloadSkins():
 	global colors, domScreens, fonts, menus, menuicons, parameters, screens, setups, switchPixmap
 	domScreens.clear()
 	colors.clear()
-	colors = {
+	colors.update({
 		"key_back": gRGB(0x00313131),
 		"key_blue": gRGB(0x0018188B),
 		"key_green": gRGB(0x001F771F),
@@ -236,7 +236,7 @@ def reloadSkins():
 	}
 	gradients.clear()
 	fonts.clear()
-	fonts = {
+	fonts.update({
 		"Body": ("Regular", 18, 22, 16),
 		"ChoiceList": ("Regular", 20, 24, 18)
 	}
