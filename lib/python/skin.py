@@ -233,13 +233,13 @@ def reloadSkins():
 		"key_red": gRGB(0x009F1313),
 		"key_text": gRGB(0x00FFFFFF),
 		"key_yellow": gRGB(0x00A08500)
-	}
+	})
 	gradients.clear()
 	fonts.clear()
 	fonts.update({
 		"Body": ("Regular", 18, 22, 16),
 		"ChoiceList": ("Regular", 20, 24, 18)
-	}
+	})
 	menus.clear()
 	menuicons.clear()
 	parameters.clear()
