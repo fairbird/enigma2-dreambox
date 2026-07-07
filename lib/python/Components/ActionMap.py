@@ -6,6 +6,7 @@ from enigma import eActionMap
 from keyids import KEYIDS
 from Components.config import config
 from Tools.Directories import fileReadXML
+from Tools.KeyBindings import queryKeyBinding
 
 MODULE_NAME = __name__.split(".")[-1]
 
@@ -15,10 +16,6 @@ unmapDict = {}
 
 def addKeyBinding(filename, key, context, mapTo, flags):
 	keyBindings.setdefault((context, mapTo), []).append((key, filename, flags))
-
-
-def queryKeyBinding(context, mapTo):  # Returns a list of (key, flags) for a specified "mapTo" action in a context.
-	return [(x[0], x[2]) for x in keyBindings[(context, mapTo)]] if (context, mapTo) in keyBindings else []
 
 
 def getKeyBindingKeys(filterFunction=lambda x: True):

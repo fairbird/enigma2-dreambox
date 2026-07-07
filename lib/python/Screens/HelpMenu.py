@@ -3,7 +3,7 @@ from collections import defaultdict
 from sys import maxsize
 from enigma import eActionMap, eListboxPythonMultiContent, eListbox, gFont
 from keyids import KEYIDS
-from Components.ActionMap import ActionMap, HelpableActionMap, queryKeyBinding
+from Components.ActionMap import ActionMap, HelpableActionMap
 from Components.config import config
 from Components.GUIComponent import GUIComponent
 from Components.InputDevice import remoteControl
@@ -14,8 +14,8 @@ from Components.SystemInfo import BoxInfo
 from Components.Sources.List import List
 from Components.Sources.StaticText import StaticText
 from Screens.Screen import Screen
+from Tools.KeyBindings import getKeyDescription, queryKeyBinding
 from Tools.Directories import fileReadXML
-from Tools.KeyBindings import getKeyDescription
 from Tools.LoadPixmap import LoadPixmap
 from skin import parameters, fonts
 from functools import cmp_to_key
