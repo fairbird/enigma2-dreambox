@@ -72,7 +72,7 @@ from RecordTimer import RecordTimerEntry, RecordTimer, findSafeRecordPath
 from Components.AVSwitch import iAVSwitch
 
 # hack alert!
-from Screens.Menu import MainMenu, mdom
+from Screens.Menu import Menu, MenuHorizontal, findMenu, menuDom
 
 MODEL = BoxInfo.getItem("model")
 
@@ -1264,20 +1264,24 @@ class InfoBarMenu:
 	def __init__(self):
 		self["MenuActions"] = HelpableActionMap(self, ["InfobarMenuActions"],
 			{
-				"mainMenu": (self.mainMenu, _("Enter main menu...")),
+				"mainMenu": (self.showMainMenu, _("Open Main Menu...")),
 			})
 		self.session.infobar = None
 
-	def mainMenu(self):
-		print("loading mainmenu XML...")
-		menu = mdom.getroot()
-		assert menu.tag == "menu", "root element in menu must be 'menu'!"
+	def showMenuCallback(self, *val):
+		self.session.infobar = None
 
-		self.session.infobar = self
-		# so we can access the currently active infobar from screens opened from within the mainmenu
-		# at the moment used from the SubserviceSelection
+	def showMainMenu(self):
+		self._showMenu("mainmenu")
 
-		self.session.openWithCallback(self.mainMenuClosed, MainMenu, menu)
+	def _showMenu(self, menu):
+		menu = findMenu(menu)
+		if menu is not None:
+			# This is so we can access the currently active InfoBar from screens opened
+			# from within the menu at the moment. Used from the SubserviceSelection
+			# class latter in this module.
+			self.session.infobar = self
+			self.session.openWithCallback(self.showMenuCallback, Menu if config.usage.menuType.value == 0 else MenuHorizontal, menu)
 
 	def mainMenuClosed(self, *val):
 		self.session.infobar = None

@@ -8,6 +8,7 @@ from skin import GUI_SKIN_ID, applyAllAttributes, menus, screens, setups
 from Components.ActionMap import HelpableActionMap
 from Components.config import config
 from Components.GUIComponent import GUIComponent
+from Components.Label import Label
 from Components.Pixmap import Pixmap
 from Components.Sources.Source import Source
 from Components.Sources.StaticText import StaticText
@@ -59,6 +60,10 @@ class Screen(dict):
 		self.instance = None
 		self.summaries = CList()
 		self["Title"] = StaticText()
+		self.screenImageGlyph = None
+		self.screenImage = self.checkImage(className)  # This is the current screen image name (Pixmap path or Glyph unicode character).
+		if self.screenImage:
+			self["Image"] = Label() if self.screenImageGlyph else Pixmap()
 		self["ScreenPath"] = StaticText()
 		self.screenPath = ""  # This is the current screen path without the title.
 		self.screenTitle = ""  # This is the current screen title without the path.
@@ -175,6 +180,40 @@ class Screen(dict):
 	def getScreenPath(self):
 		return self.screenPath
 
+	def checkImage(self, image, source=None):
+		screenImage = None
+		if image and not isinstance(self, ScreenSummary):  # Ignore Summary Screens:
+			self.screenImageGlyph = False
+			images = {
+				# "screen": screens,
+				"menu": menus,
+				"setup": setups
+			}.get(source, screens)
+			defaultImage = images.get("default")
+			screenImage = images.get(image, defaultImage)
+			if screenImage is not None:
+				if len(screenImage) > 1:  # Use pixmap image.
+					screenImage = resolveFilename(SCOPE_GUISKIN, screenImage)
+					msg = f"{'Default' if screenImage == defaultImage and image != 'default' else 'Specified'} {source if source else 'screen'} image for '{image}' is '{screenImage}'"
+					if isfile(screenImage):
+						print(f"[Screen] {msg}.")
+					else:
+						print(f"[Screen] Error: {msg} but this is not a file!")
+						screenImage = None
+				else:  # Use glyph image.
+					self.screenImageGlyph = True
+		return screenImage
+
+	def setImage(self, image, source=None):
+		self.screenImage = self.checkImage(image, source=source)
+		if "Image" not in self and self.screenImage:
+			self["Image"] = Label() if self.screenImageGlyph else Pixmap()
+
+	def getImage(self):
+		return self.screenImage
+
+	image = property(getImage, setImage)
+
 	def setTitle(self, title, showPath=True):
 		try:  # This protects against calls to setTitle() before being fully initialised like self.session is accessed *before* being defined.
 			self.screenPath = ""
@@ -206,14 +245,6 @@ class Screen(dict):
 		return self.screenTitle
 
 	title = property(getTitle, setTitle)
-
-	def setImage(self, image, source=None):
-		self.screenImage = None
-		if image and (images := {"menu": menus, "setup": setups}.get(source, screens)):
-			if (x := images.get(image, images.get("default", ""))) and isfile(x := resolveFilename(SCOPE_GUISKIN, x)):
-				self.screenImage = x
-				if self.screenImage and "Image" not in self:
-					self["Image"] = Pixmap()
 
 	def setFocus(self, o):
 		self.instance.setFocus(o.instance)
@@ -336,8 +367,11 @@ class Screen(dict):
 			applyAllAttributes(widget.instance, desktop, widget.skinAttributes, self.scale)
 			addToStack(widget)
 		if self.screenImage:
-			screenImage = LoadPixmap(self.screenImage)
-			self["Image"].instance.setPixmap(screenImage)
+			if self.screenImageGlyph:
+				self["Image"].setText(self.screenImage)
+			else:
+				screenImage = LoadPixmap(self.screenImage)
+				self["Image"].instance.setPixmap(screenImage)
 		for f in self.onLayoutFinish:
 			if not isinstance(f, type(self.close)):
 				# exec f in globals(), locals()  # Python 2

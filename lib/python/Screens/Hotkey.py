@@ -809,8 +809,8 @@ class InfoBarHotkey:
 						from Screens.Console import Console
 						self.session.open(Console, selected[1] + " pythonscript", "python3 %s" % command, closeOnSuccess=selected[1].startswith('!'), showStartStopText=False)
 			elif selected[0] == "Menu":
-				from Screens.Menu import MainMenu, mdom
-				root = mdom.getroot()
+				from Screens.Menu import MainMenu, menuDom
+				root = menuDom()
 				for x in root.findall("menu"):
 					if x.get("key") == selected[1]:
 						menu_screen = self.session.open(MainMenu, x)
