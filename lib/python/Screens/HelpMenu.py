@@ -13,7 +13,6 @@ from Components.ScrollLabel import ScrollLabel
 from Components.SystemInfo import BoxInfo
 from Components.Sources.List import List
 from Components.Sources.StaticText import StaticText
-from Screens.Rc import Rc
 from Screens.Screen import Screen
 from Tools.Directories import fileReadXML
 from Tools.KeyBindings import getKeyDescription
