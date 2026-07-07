@@ -363,10 +363,6 @@ def removeKeyBinding(key, context, action, wild=True):
 #
 
 
-def queryKeyBinding(context, action):
-	return [(x[0], x[2]) for x in keyBindings[(context, action)]] if (context, action) in keyBindings else []
-
-
 def getKeyDescription(key):
 	rcType = config.plugins.remotecontroltype.rctype.value
 	# rcType = config.misc.inputdevices.rcType.value

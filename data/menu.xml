@@ -21,78 +21,78 @@
 	<code> .. code .. </code>
 		Python "exec"s code.
 -->
-		<menu key="timermenu" weight="7" level="0" text="Timers">
-			<item key="timer_edit" weight="0" level="0" text="Timers"><screen module="TimerEdit" screen="TimerEditList" /></item>
-			<item key="crontimer_edit" weight="10" level="0" text="CronTimers"><screen module="CronTimer" screen="CronTimers" /></item>
+		<menu key="timermenu" weight="7" level="0" text="Timers" description="This menu contains selections to display Timers.">
+			<item key="timer_edit" weight="0" level="0" text="Timers" description="This menu to edit timers"><screen module="TimerEdit" screen="TimerEditList" /></item>
+			<item key="crontimer_edit" weight="10" level="0" text="CronTimers" description="This menu to add cron timers"><screen module="CronTimer" screen="CronTimers" /></item>
 		</menu>
-		<item key="scart_switch" level="1" text="VCR scart" conditional="config.usage.show_vcr_scart.value" requires="ScartSwitch"><code>self.session.scart.VCRSbChanged(3)</code></item>
-
+		<item key="scart_switch" level="1" text="VCR scart" description="This options for VCR scart setup." conditional="config.usage.show_vcr_scart.value" requires="ScartSwitch"><code>self.session.scart.VCRSbChanged(3)</code></item>
+		<!-- Menu / Information -->
 		<menu key="information" level="0" text="Information" description="This menu contains selections to display information about the receiver." weight="5">
-			<item key="distribution_info_screen" level="0" text="About OpenPLI" weight="5"><screen module="Information" screen="DistributionInformation" /></item>
-			<item key="receiver_info_screen" level="0" text="Receiver" weight="10"><screen module="Information" screen="ReceiverInformation" /></item>
-			<item key="benchmark_info_screen" level="2" text="Benchmarks" weight="12" conditional="config.usage.informationShowAllMenuScreens.value"><screen module="Information" screen="BenchmarkInformation" /></item>
-			<item key="picture_info_screen" level="0" text="Pictures" weight="15" conditional="config.usage.informationShowAllMenuScreens.value"><screen module="Information" screen="PictureInformation" /></item>
-			<item key="tuner_info_screen" level="0" text="Tuners" weight="20"><screen module="Information" screen="TunerInformation" /></item>
-			<item key="storage_info_screen" level="0" text="Storage / Disks" weight="25"><screen module="Information" screen="StorageInformation" /></item>
-			<item key="memory_info_screen" level="0" text="Memory" weight="30"><screen module="Information" screen="MemoryInformation" /></item>
-			<item key="network_info_screen" level="0" text="Network" weight="35"><screen module="Information" screen="NetworkInformation" /></item>
-			<item key="multiboot_info_screen" level="0" text="MultiBoot" weight="40" requires="canMultiBoot"><screen module="Information" screen="MultiBootInformation" /></item>
-			<item key="streaming_info_screen" level="2" text="Streaming" weight="45"><screen module="Information" screen="StreamingInformation" /></item>
-			<item key="geolocation_info_screen" level="0" text="Geolocation" weight="50"><screen module="Information" screen="GeolocationInformation" /></item>
-			<item key="build_info_screen" level="2" text="Build" weight="55" conditional="config.usage.informationShowAllMenuScreens.value"><screen module="Information" screen="BuildInformation" /></item>
-			<item key="system_info_screen" level="2" text="System" weight="60" conditional="config.usage.informationShowAllMenuScreens.value"><screen module="Information" screen="SystemInformation" /></item>
-			<item key="commit_info_screen" level="2" text="Commit" weight="65" conditional="config.usage.informationShowAllMenuScreens.value"><screen module="Information" screen="CommitInformation" /></item>
-			<item key="debug_info_screen" level="2" text="Debug" weight="70" conditional="config.usage.informationShowAllMenuScreens.value"><screen module="Information" screen="DebugInformation" /></item>
-			<item key="translation_info_screen" level="2" text="Translation" weight="75" conditional="config.usage.informationShowAllMenuScreens.value"><screen module="Information" screen="TranslationInformation" /></item>
-			<item key="service_info_screen" level="1" text="Service" weight="80"><screen module="Information" screen="ServiceInformation" /></item>
+			<item key="distribution_info_screen" level="0" text="About OpenPLI" description="This options for distribution info." weight="5"><screen module="Information" screen="DistributionInformation" /></item>
+			<item key="receiver_info_screen" level="0" text="Receiver" description="This options for receiver info." weight="10"><screen module="Information" screen="ReceiverInformation" /></item>
+			<item key="benchmark_info_screen" level="2" text="Benchmarks" description="This options for benchmark info." weight="12" conditional="config.usage.informationShowAllMenuScreens.value"><screen module="Information" screen="BenchmarkInformation" /></item>
+			<item key="picture_info_screen" level="0" text="Pictures" description="This options for picture info." weight="15" conditional="config.usage.informationShowAllMenuScreens.value"><screen module="Information" screen="PictureInformation" /></item>
+			<item key="tuner_info_screen" level="0" text="Tuners" description="This options for tuner info." weight="20"><screen module="Information" screen="TunerInformation" /></item>
+			<item key="storage_info_screen" level="0" text="Storage / Disks" description="This options for storage info." weight="25"><screen module="Information" screen="StorageInformation" /></item>
+			<item key="memory_info_screen" level="0" text="Memory" description="This options for memory info." weight="30"><screen module="Information" screen="MemoryInformation" /></item>
+			<item key="network_info_screen" level="0" text="Network" description="This options for network info." weight="35"><screen module="Information" screen="NetworkInformation" /></item>
+			<item key="multiboot_info_screen" level="0" text="MultiBoot" description="This options for multiboot info." weight="40" requires="canMultiBoot"><screen module="Information" screen="MultiBootInformation" /></item>
+			<item key="streaming_info_screen" level="2" text="Streaming" description="This options for streaming info." weight="45"><screen module="Information" screen="StreamingInformation" /></item>
+			<item key="geolocation_info_screen" level="0" text="Geolocation" description="This options for geolocation info." weight="50"><screen module="Information" screen="GeolocationInformation" /></item>
+			<item key="build_info_screen" level="2" text="Build" description="This options for build info." weight="55" conditional="config.usage.informationShowAllMenuScreens.value"><screen module="Information" screen="BuildInformation" /></item>
+			<item key="system_info_screen" level="2" text="System" description="This options for system info." weight="60" conditional="config.usage.informationShowAllMenuScreens.value"><screen module="Information" screen="SystemInformation" /></item>
+			<item key="commit_info_screen" level="2" text="Commit" description="This options for commit info." weight="65" conditional="config.usage.informationShowAllMenuScreens.value"><screen module="Information" screen="CommitInformation" /></item>
+			<item key="debug_info_screen" level="2" text="Debug" description="This options for debug info." weight="70" conditional="config.usage.informationShowAllMenuScreens.value"><screen module="Information" screen="DebugInformation" /></item>
+			<item key="translation_info_screen" level="2" text="Translation" description="This options for translation info." weight="75" conditional="config.usage.informationShowAllMenuScreens.value"><screen module="Information" screen="TranslationInformation" /></item>
+			<item key="service_info_screen" level="1" text="Service" description="This options for service info." weight="80"><screen module="Information" screen="ServiceInformation" /></item>
 		</menu>
-		<item key="movie_selection" level="0" text="Movie Selection" weight="8" conditional="config.usage.movieSelectionInMenu.value"><screen module="MovieSelection" screen="MovieSelection" /></item>
-		<item key="plugin_selection" level="0" text="Plugin Browser"><screen module="PluginBrowser" screen="PluginBrowser"/></item>
-		<menu key="setup" level="0" text="Setup" flushConfigOnClose="1">
-			<menu key="scan" weight="7" level="0" text="Tuners &amp; Scanning">
-				<item key="tuner_setup"  text="Tuner configuration" conditional="nimmanager.nim_slots"><screen module="Satconfig" screen="NimSelection"/></item>
-				<item key="auto_scan"  text="Automatic scan" conditional="nimmanager.somethingConnected()"><screen module="ScanSetup" screen="ScanSimple"/></item>
-				<item key="manual_scan" text="Manual scan" conditional="nimmanager.somethingConnected()"><screen module="ScanSetup"/></item>
-				<item key="fallbacktuner_settings" text="Fallback remote receiver setup"><screen module="SetupFallbacktuner"/></item>
+		<item key="movie_selection" level="0" text="Movie Selection" description="This options for movie selection" weight="8" conditional="config.usage.movieSelectionInMenu.value"><screen module="MovieSelection" screen="MovieSelection" /></item>
+		<item key="plugin_selection" level="0" text="Plugin Browser" description="This menu contains plugins"><screen module="PluginBrowser" screen="PluginBrowser"/></item>
+		<menu key="setup" level="0" text="Setup" description="This menu contains selections to options of receiver." flushConfigOnClose="1">
+			<menu key="scan" weight="7" level="0" text="Tuners &amp; Scanning" description="This menu contains Tuners &amp; Scanning">
+				<item key="tuner_setup" text="Tuner configuration" description="This options for tuner setup." conditional="nimmanager.nim_slots"><screen module="Satconfig" screen="NimSelection"/></item>
+				<item key="auto_scan" text="Automatic scan" description="This options for auto scan." conditional="nimmanager.somethingConnected()"><screen module="ScanSetup" screen="ScanSimple"/></item>
+				<item key="manual_scan" text="Manual scan" description="This options for manual scan." conditional="nimmanager.somethingConnected()"><screen module="ScanSetup"/></item>
+				<item key="fallbacktuner_settings" text="Fallback remote receiver setup" description="This options for fallback remote receiver setup."><screen module="SetupFallbacktuner"/></item>
 			</menu>
-			<menu key="system" weight="5" level="0" text="System">
-				<item key="check_update" level="0" text="Check update Settings" weight="0"><setup setupKey="Checkupdate" /></item>
-				<menu key="AudioVideo" level="0" text="Audio &amp; Video">
-					<menu key="video" level="0" text="Video Settings">
-						<item key="av_setup" text="Video Setup" level="0"><setup setupKey="Video_setup"/></item>
-						<item key="osdsetup" level="1" text="OSD Calibration" weight="50" requires="OSDCalibration"><screen module="OSDCalibration" screen="OSDCalibration" /></item>
-						<item key="setup_osd3d" level="2" text="OSD 3D Settings" weight="60" requires="OSD3DCalibration"><screen module="OSDCalibration" screen="OSD3DCalibration" /></item>
-						<item key="hdmicec" level="0" text="HDMI-CEC Settings" weight="70" requires="HasHDMI-CEC"><screen module="HDMICEC" screen="HDMICECSetup" /></item>
+			<menu key="system" weight="5" level="0" text="System" description="This menu contains system options.">
+				<item key="check_update" level="0" text="Check update Settings" description="This options for check update from online." weight="0"><setup setupKey="Checkupdate" /></item>
+				<menu key="AudioVideo" level="0" text="Audio &amp; Video" description="This menu contains audio &amp; video settings.">
+					<menu key="video" level="0" text="Video Settings" description="This menu contains video settings.">
+						<item key="av_setup" text="Video Setup" description="This options for Video setup." level="0"><setup setupKey="Video_setup"/></item>
+						<item key="osdsetup" level="1" text="OSD Calibration" description="This options for osd calibration setup." weight="50" requires="OSDCalibration"><screen module="OSDCalibration" screen="OSDCalibration" /></item>
+						<item key="setup_osd3d" level="2" text="OSD 3D Settings" description="This options for osd 3D setup." weight="60" requires="OSD3DCalibration"><screen module="OSDCalibration" screen="OSD3DCalibration" /></item>
+						<item key="hdmicec" level="0" text="HDMI-CEC Settings" description="This options for HDMI CEC setup." weight="70" requires="HasHDMI-CEC"><screen module="HDMICEC" screen="HDMICECSetup" /></item>
 					</menu>
-					<menu key="audio" level="1" text="Audio Settings">
-						<item key="au_setup" text="Audio Setup" level="0"><setup setupKey="Audio_setup"/></item>
-						<item key="volume_adjust" text="Volume Adjust Settings" level="1" ><screen module="VolumeControl" screen="VolumeAdjustSettings"/></item>
-						<item key="subtitle_setup" level="2" text="Subtitle Setup"><setup setupKey="Subtitlesetup"/></item>
-						<item key="autolanguage_setup" level="1" text="Auto Language Settings"><setup setupKey="AutoLanguage" /></item>
+					<menu key="audio" level="1" text="Audio Settings" description="This menu contains audio settings.">
+						<item key="au_setup" text="Audio Setup" description="This options for audio setup." level="0"><setup setupKey="Audio_setup"/></item>
+						<item key="volume_adjust" text="Volume Adjust Settings" description="This options for volume adjust setup." level="1" ><screen module="VolumeControl" screen="VolumeAdjustSettings"/></item>
+						<item key="subtitle_setup" level="2" text="Subtitle Setup" description="This options for subtitle setup."><setup setupKey="Subtitlesetup"/></item>
+						<item key="autolanguage_setup" level="1" text="Auto Language Settings" description="This options for auto language setup."><setup setupKey="AutoLanguage" /></item>
 					</menu>
 				</menu>
-				<menu key="gui" level="0" text="GUI Settings">
-					<item key="locale_setup" level="0" text="Locale / Language Settings"><screen module="LocaleSelection"/></item>
+				<menu key="gui" level="0" text="GUI Settings" description="This menu contains GUI settings.">
+					<item key="locale_setup" level="0" text="Locale / Language Settings" description="This options for language setup."><screen module="LocaleSelection"/></item>
 					<!-- Menu / Setup / Time -->
-					<item key="time_setup" level="0" text="Time" weight="50"><screen module="Time" screen="Time" /></item>
-					<item key="user_interface" level="0" text="User Interface" ><setup setupKey="UserInterface"/></item>
-					<item key="usage_setup" level="0" text="Customize"><setup setupKey="Usage"/></item>
-					<item key="primary_skin_selector" level="0" text="Skin"><screen module="SkinSelector" screen="SkinSelector"/></item>
-					<menu key="lcd" level="0" text="Front Panel Display">
-						<item key="display_skin_selector" level="0" text="Skin Setup" weight="5" requires="Display"><screen module="SkinSelector" screen="LcdSkinSelector" /></item>
-						<item key="lcd_setup" level="1" text="LCD Setup" weight="10" requires="Display"><setup setupKey="FrontDisplay" /></item>
-						<item key="led_setup" level="1" text="LED Setup" weight="15"><setup setupKey="LedDisplay" /></item>
+					<item key="time_setup" level="0" text="Time" description="This options for time setup." weight="50"><screen module="Time" screen="Time" /></item>
+					<item key="user_interface" level="0" text="User Interface" description="This options for user interface setup." ><setup setupKey="UserInterface"/></item>
+					<item key="usage_setup" level="0" text="Customize" description="This options for usage setup."><setup setupKey="Usage"/></item>
+					<item key="primary_skin_selector" level="0" text="Skin" description="This options for primary skin selector setup."><screen module="SkinSelector" screen="SkinSelector"/></item>
+					<menu key="lcd" level="0" text="Front Panel Display" description="This menu contains front panel display settings.">
+						<item key="display_skin_selector" level="0" text="Skin Setup" description="This options for display skin selector setup setup." weight="5" requires="Display"><screen module="SkinSelector" screen="LcdSkinSelector" /></item>
+						<item key="lcd_setup" level="1" text="LCD Setup" description="This options for lcd setup." weight="10" requires="Display"><setup setupKey="FrontDisplay" /></item>
+						<item key="led_setup" level="1" text="LED Setup" description="This options for led setup." weight="15"><setup setupKey="LedDisplay" /></item>
 					</menu>
 				</menu>
-				<menu key="logs_menu" level="0" text="Log Manager" weight="2">
-					<item key="logs_setup" level="2" text="Settings"><setup setupKey="Logs" /></item>
-					<item key="logs_man" level="2" text="View Log Manager"><screen module="LogManager" screen="LogManager" /></item>
+				<menu key="logs_menu" level="0" text="Log Manager" description="This menu contains log manager settings." weight="2">
+					<item key="logs_setup" level="2" text="Settings" description="This options for logs setup."><setup setupKey="Logs" /></item>
+					<item key="logs_man" level="2" text="View Log Manager" description="This options for view log setup."><screen module="LogManager" screen="LogManager" /></item>
 				</menu>
 				<!-- Menu / Setup / EPG -->
-				<menu key="epg" level="0" text="EPG" weight="15">
-					<item key="epg_setup" level="0" text="EPG Setup" weight="5"><setup setupKey="EPG" /></item>
-					<menu key="epgloadsave_menu" level="2" text="Save, Load &amp; Delete EPG Cache" weight="10">
-						<item key="saveepgcache" level="0" text="Save EPG Cache">
+				<menu key="epg" level="0" text="EPG" description="This menu contains GUI settings." weight="15">
+					<item key="epg_setup" level="0" text="EPG Setup" description="This options for epg setup." weight="5"><setup setupKey="EPG" /></item>
+					<menu key="epgloadsave_menu" level="2" text="Save, Load &amp; Delete EPG Cache" description="This options for save, load &amp; delete epg cache setup." weight="10">
+						<item key="saveepgcache" level="0" text="Save EPG Cache" description="This options for save epg cache setup.">
 							<code>
 from Components.EpgLoadSave import EpgSaveMsg
 def msgClosed(ret):
@@ -131,65 +131,65 @@ self.session.openWithCallback(msgClosed, EpgDeleteMsg)
 						</item>
 					</menu>
 				</menu>
-				<menu key="expert" level="0" text="Expert settings">
-					<item key="accesslevel_setup" level="0" text="User Mode"><setup setupKey="Accesslevel"/></item>
+				<menu key="expert" level="0" text="Expert settings" description="This menu contains expert settings.">
+					<item key="accesslevel_setup" level="0" text="User Mode" description="This options for accesslevel setup."><setup setupKey="Accesslevel"/></item>
 					<!-- Menu / Setup / Recordings, Playback & Timeshift -->
-					<menu key="rec" level="1" text="Playback, Recording &amp; Timeshift">
-						<item key="playback_setup" level="0" text="Playback Setup" weight="5"><setup setupKey="Playback" /></item>
-						<item key="recording_setup" level="0" text="Recording Setup" weight="10"><screen module="Recording" screen="RecordingSettings" /></item>
-						<item key="timeshift_setup" level="0" text="Timeshift Setup" weight="15"><screen module="Timeshift" screen="TimeshiftSettings" /></item>
-						<item key="hdmirecord_setup" level="0" text="HDMI-IN Recording settings" weight="15" requires="HasHDMIin"><setup setupKey="HDMIRecord"/></item>
+					<menu key="rec" level="1" text="Playback, Recording &amp; Timeshift" description="This menu contains playback, recording &amp; timeshift settings.">
+						<item key="playback_setup" level="0" text="Playback Setup" description="This options for playback setup." weight="5"><setup setupKey="Playback" /></item>
+						<item key="recording_setup" level="0" text="Recording Setup" description="This options for recording setup." weight="10"><screen module="Recording" screen="RecordingSettings" /></item>
+						<item key="timeshift_setup" level="0" text="Timeshift Setup" description="This options for timeshift setup." weight="15"><screen module="Timeshift" screen="TimeshiftSettings" /></item>
+						<item key="hdmirecord_setup" level="0" text="HDMI-IN Recording settings" description="This options for hdmi-in recording setup." weight="15" requires="HasHDMIin"><setup setupKey="HDMIRecord"/></item>
 					</menu>
-					<menu key="harddisk" level="0" text="Storage Devices" requires="Harddisk">
-						<item key="device_manager" level="0" text="Device Manager" weight="20"><screen module="DeviceManager" screen="DeviceManager" /></item>
-						<item key="swap_manager" level="2" text="Swap Manager" weight="30"><screen module="SwapManager" screen="Swap" /></item>
-						<item key="flash_expander" level="2" text="Flash Expander" weight="40"><screen module="FlashExpander" screen="FlashExpander" /></item>
+					<menu key="harddisk" level="0" text="Storage Devices" description="This menu contains harddisk settings." requires="Harddisk">
+						<item key="device_manager" level="0" text="Device Manager" description="This options for device manager setup." weight="20"><screen module="DeviceManager" screen="DeviceManager" /></item>
+						<item key="swap_manager" level="2" text="Swap Manager" description="This options for swap manager setup." weight="30"><screen module="SwapManager" screen="Swap" /></item>
+						<item key="flash_expander" level="2" text="Flash Expander" description="This options for flash expander setup." weight="40"><screen module="FlashExpander" screen="FlashExpander" /></item>
 					</menu>
-					<menu key="network" level="0" text="Network">
-						<item key="network_setup" level="0" text="Device Settings" weight="7"><screen module="NetworkSetup" screen="NetworkAdapterSelection"/></item>
-						<item key="dns_setup" level="1" text="DNS Settings" weight="10"><screen module="NetworkSetup" screen="DNSSettings" /></item>
-						<item key="password_setup" level="2" text="Password Settings" weight="15"><screen module="NetworkSetup" screen="NetworkPassword" /></item>
-						<item key="networkservices_setup" level="2" text="Network Services" weight="20"><screen module="NetworkSetup" screen="NetworkServicesSetup" /></item>
-						<item key="Inadyn_setup" level="2" text="Inadyn Settings" weight="25" requires="inadyn"><screen module="NetworkSetup" screen="NetworkInadynSetup" /></item>
-						<item key="minidlna_setup" level="2" text="MiniDLNA Settings" weight="30" requires="minidlna"><screen module="NetworkSetup" screen="NetworkMiniDLNASetup" /></item>
-						<item key="netushare_setup" level="2" text="uShare Settings" weight="55" requires="ushare"><screen module="NetworkSetup" screen="NetworkuShareSetup" /></item>
-						<item key="netsamba_setup" level="2" text="Samba Settings" weight="60" requires="samba"><screen module="NetworkSetup" screen="NetworkSambaSetup" /></item>
-						<item key="zerotier_setup" level="2" text="ZeroTier Settings" weight="65" requires="zerotier"><screen module="NetworkSetup" screen="NetworkZeroTierSetup" /></item>
+					<menu key="network" level="0" text="Network" description="This menu contains network settings.">
+						<item key="network_setup" level="0" text="Device Settings" description="This options for network setup." weight="7"><screen module="NetworkSetup" screen="NetworkAdapterSelection"/></item>
+						<item key="dns_setup" level="1" text="DNS Settings" description="This options for dns setup." weight="10"><screen module="NetworkSetup" screen="DNSSettings" /></item>
+						<item key="password_setup" level="2" text="Password Settings" description="This options for password setup." weight="15"><screen module="NetworkSetup" screen="NetworkPassword" /></item>
+						<item key="networkservices_setup" level="2" text="Network Services" description="This options for network services setup." weight="20"><screen module="NetworkSetup" screen="NetworkServicesSetup" /></item>
+						<item key="Inadyn_setup" level="2" text="Inadyn Settings" description="This options for Inadyn setup." weight="25" requires="inadyn"><screen module="NetworkSetup" screen="NetworkInadynSetup" /></item>
+						<item key="minidlna_setup" level="2" text="MiniDLNA Settings" description="This options for minidlna setup." weight="30" requires="minidlna"><screen module="NetworkSetup" screen="NetworkMiniDLNASetup" /></item>
+						<item key="netushare_setup" level="2" text="uShare Settings" description="This options for ushare setup." weight="55" requires="ushare"><screen module="NetworkSetup" screen="NetworkuShareSetup" /></item>
+						<item key="netsamba_setup" level="2" text="Samba Settings" description="This options for samba setup." weight="60" requires="samba"><screen module="NetworkSetup" screen="NetworkSambaSetup" /></item>
+						<item key="zerotier_setup" level="2" text="ZeroTier Settings" description="This options for zerotier setup." weight="65" requires="zerotier"><screen module="NetworkSetup" screen="NetworkZeroTierSetup" /></item>
 					</menu>
-					<item key="input_device_setup" level="1" text="Input devices"><screen module="InputDeviceSetup" screen="InputDeviceSelection"/></item>
-					<item key="keyboard_setup" text="Keyboard"><setup setupKey="keyboard"/></item>
-					<item key="hotkey_setup" level="1" text="Hotkey"><screen module="Hotkey" screen="HotkeySetup"/></item>
+					<item key="input_device_setup" level="1" text="Input devices" description="This options for Input devices setup."><screen module="InputDeviceSetup" screen="InputDeviceSelection"/></item>
+					<item key="keyboard_setup" text="Keyboard" description="This options for keyboard setup."><setup setupKey="keyboard"/></item>
+					<item key="hotkey_setup" level="1" text="Hotkey" description="This options for hotkey setup."><screen module="Hotkey" screen="HotkeySetup"/></item>
 				</menu>
 			</menu>
 
-			<menu key="cam" weight="10" text="SoftCam / CI">
-				<item key="softcam_setup" weight="10" level="0" text="Softcam Setup"><screen module="SoftcamSetup" screen="SoftcamSetup"/></item>
-				<item key="ci_setup" weight="10" level="0" text="Common Interface" requires="CommonInterface"><screen module="Ci" screen="CiSelection"/></item>
-				<item key="softcsa_settings" level="0" text="SoftCSA Settings" weight="105" requires="HasSoftCSA"><setup setupKey="SoftCSA" /></item>
-				<item key="streamrelay_settings" weight="110" level="2" text="Stream Relay Settings"><screen module="SoftcamSetup" screen="StreamRelaySetup" /></item>
+			<menu key="cam" weight="10" text="SoftCam / CI" description="This menu contains SoftCam / CI settings.">
+				<item key="softcam_setup" weight="10" level="0" text="Softcam Setup" description="This options for softcam setup."><screen module="SoftcamSetup" screen="SoftcamSetup"/></item>
+				<item key="ci_setup" weight="10" level="0" text="Common Interface" description="This options for common interface setup." requires="CommonInterface"><screen module="Ci" screen="CiSelection"/></item>
+				<item key="softcsa_settings" level="0" text="SoftCSA Settings" description="This options for softcsa setup." weight="105" requires="HasSoftCSA"><setup setupKey="SoftCSA" /></item>
+				<item key="streamrelay_settings" weight="110" level="2" text="Stream Relay Settings" description="This options for streamrelay setup."><screen module="SoftcamSetup" screen="StreamRelaySetup" /></item>
 			</menu>
 
-			<item key="parental_setup" weight="15" level="0" text="Parental control"><screen module="ParentalControlSetup" screen="ParentalControlSetup"/></item>
-			<item key="factory_reset" weight="15" level="0" text="Factory reset"><screen module="FactoryReset" screen="FactoryReset"/></item>
-			<!--item key="flash_online" level="0" text="Flash image Online" description="Download and flash images on your device." weight="13"><screen module="FlashManager" screen="FlashManager" /></item-->
-			<!--item key="software_update" weight="15" level="0" text="Software update"><screen module="SoftwareUpdate" screen="UpdatePlugin"/></item-->
+			<item key="parental_setup" weight="15" level="0" text="Parental control" description="This options for parental control setup."><screen module="ParentalControlSetup" screen="ParentalControlSetup"/></item>
+			<item key="factory_reset" weight="15" level="0" text="Factory reset" description="This options for factory reset setup."><screen module="FactoryReset" screen="FactoryReset"/></item>
+			<!--item key="flash_online" level="0" text="Flash image Online" description="This options for Flash image Online setup." description="Download and flash images on your device." weight="13"><screen module="FlashManager" screen="FlashManager" /></item-->
+			<!--item key="software_update" weight="15" level="0" text="Software update" description="This options for Software update setup."><screen module="SoftwareUpdate" screen="UpdatePlugin"/></item-->
 		</menu>
 
-		<menu key="shutdown" text="Standby / restart">
-			<item key="sleep" text="Sleep timer"><screen module="SleepTimerEdit" screen="SleepTimerEdit"/></item>
-			<item key="standby" text="Standby"><screen module="Standby" screen="Standby"/></item>
-			<item key="restart" text="Full Restart"><screen module="Standby" screen="TryQuitMainloop">2</screen></item>
-			<item key="dualboot" weight="24" level="0" text="Switch to Android" requires="canDualBoot"><screen module="Standby" screen="SwitchToAndroid" /></item>
+		<menu key="shutdown" text="Standby / restart" description="This menu contains Power of receiver.">
+			<item key="sleep" text="Sleep timer" description="This option for set Sleep timer"><screen module="SleepTimerEdit" screen="SleepTimerEdit"/></item>
+			<item key="standby" text="Standby" description="This option to send the receiver to standby"><screen module="Standby" screen="Standby"/></item>
+			<item key="restart" text="Full Restart" description="This option to make the receiver full restart"><screen module="Standby" screen="TryQuitMainloop">2</screen></item>
+			<item key="dualboot" weight="24" level="0" text="Switch to Android" description="This option switch to android" requires="canDualBoot"><screen module="Standby" screen="SwitchToAndroid" /></item>
 			<!--item key="restart_enigma_debug" text="Restart enigma" requires="InDebugMode"><screen module="Standby" screen="TryQuitMainloop">6</screen></item>
 			<item key="restart_enigma" text="Restart enigma" requires="!InDebugMode"><screen module="Standby" screen="TryQuitMainloop">3</screen></item-->
-			<item key="restart_enigma" text="Restart enigma"><screen module="Standby" screen="TryQuitMainloop">3</screen></item>
+			<item key="restart_enigma" text="Restart enigma" description="This option to make the receiver restart enigma"><screen module="Standby" screen="TryQuitMainloop">3</screen></item>
 			<!--item key="restart_enigma" text="Restart enigma in standard mode" requires="InDebugMode"><screen module="Standby" screen="TryQuitMainloop">3</screen></item>
 			<item key="restart_enigma_debug" text="Restart enigma in debug mode" requires="!InDebugMode"><screen module="Standby" screen="TryQuitMainloop">6</screen></item-->
-			<item key="multiboot" level="0" text="MultiBoot Manager" weight="6" requires="canMultiBoot"><screen module="MultiBootManager" screen="MultiBootManager" /></item>
-			<item key="kexec_multiboot" level="2" text="Enable Kexec MultiBoot" weight="6" requires="cankexec"><screen module="MultiBootManager" screen="KexecInit">1</screen></item>
-			<item key="chroot_multiboot" level="2" text="Enable Chkroot MultiBoot" weight="6" requires="canchkroot"><screen module="MultiBootManager" screen="ChkrootInit">1</screen></item>
-			<item key="deep_standby" text="Deep standby" requires="DeepstandbySupport"><screen module="Standby" screen="TryQuitMainloop">1</screen></item>
-			<item key="deep_standby" text="Shutdown" requires="!DeepstandbySupport"><screen module="Standby" screen="TryQuitMainloop">1</screen></item>
-			<item key="maintenance_mode" level="0" text="Recovery Mode" weight="55" requires="RecoveryMode"><screen module="Standby" screen="TryQuitMainloop">16</screen></item>
+			<item key="multiboot" level="0" text="MultiBoot Manager" description="This option to open multiBoot manager" weight="6" requires="canMultiBoot"><screen module="MultiBootManager" screen="MultiBootManager" /></item>
+			<item key="kexec_multiboot" level="2" text="Enable Kexec MultiBoot" description="This option to nable kexec multiBoot" weight="6" requires="cankexec"><screen module="MultiBootManager" screen="KexecInit">1</screen></item>
+			<item key="chroot_multiboot" level="2" text="Enable Chkroot MultiBoot" description="This option to nable chkroot multiBoot" weight="6" requires="canchkroot"><screen module="MultiBootManager" screen="ChkrootInit">1</screen></item>
+			<item key="deep_standby" text="Deep standby" description="This option to send the receiver to deep standby" requires="DeepstandbySupport"><screen module="Standby" screen="TryQuitMainloop">1</screen></item>
+			<item key="deep_standby" text="Shutdown" description="This option to send the receiver to shutdown" requires="!DeepstandbySupport"><screen module="Standby" screen="TryQuitMainloop">1</screen></item>
+			<item key="maintenance_mode" level="0" text="Recovery Mode" description="This option to send the receiver to recovery mode" weight="55" requires="RecoveryMode"><screen module="Standby" screen="TryQuitMainloop">16</screen></item>
 		</menu>
 </menu>

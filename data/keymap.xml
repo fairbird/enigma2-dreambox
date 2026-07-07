@@ -68,9 +68,10 @@
 
 	<map context="HelpMenuListboxActions">
 		<!--
-		Map to catch break events for the ListboxActions keys
-		in Screens.HelpMenu so that those are not passed through
-		to the HelpMenu wildcard actions as unhandled keypresses.
+			Map to catch break events for the ListboxActions keys
+			in Screens.HelpMenu so that those are not passed
+			through to the HelpMenu wildcard actions as unhandled
+			keypresses.
 		-->
 		<device name="keyboard">
 			<key id="a" mapto="ignore" flags="b" />
