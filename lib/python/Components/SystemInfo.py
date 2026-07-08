@@ -218,19 +218,6 @@ def getChipSetString():
 		return str(chipset.lower().replace('\n', '').replace('bcm', '').replace('brcm', '').replace('sti', ''))
 
 
-def getModuleLayout():
-	module = None
-	modulePath = BoxInfo.getItem("enigmamodule")
-	if modulePath:
-		process = Popen(("/sbin/modprobe", "--dump-modversions", modulePath), stdout=PIPE, stderr=PIPE, universal_newlines=True)
-		stdout, stderr = process.communicate()
-		if process.returncode == 0:
-			for detail in stdout.split("\n"):
-				if "module_layout" in detail:
-					module = detail.split("\t")[0]
-	return module
-
-
 def getBoxName():
 	box = MACHINEBUILD
 	machinename = DISPLAYMODEL.lower()
@@ -267,7 +254,6 @@ def getBoxName():
 
 BoxInfo.setItem("DebugLevel", eGetEnigmaDebugLvl())
 BoxInfo.setItem("InDebugMode", eGetEnigmaDebugLvl() >= 4)
-BoxInfo.setItem("ModuleLayout", getModuleLayout())
 
 BoxInfo.setItem("BoxName", getBoxName())
 BoxInfo.setItem("RCImage", getRCFile("png"))
