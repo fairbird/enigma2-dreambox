@@ -266,7 +266,7 @@
 			</convert>
 		</widget>
 	</screen>
-		<screen name="MenuHorizontal" title="Menu" position="center,400" size="1170,265" ignoreWidgets="menuimage" resolution="1280,720">
+	<screen name="MenuHorizontal" title="Menu" position="center,400" size="1170,265" ignoreWidgets="menuimage" resolution="1280,720">
 		<widget source="menu" render="Listbox" position="10,10" size="e-20,115" listOrientation="horizontal">
 			<template name="Default" fonts="Regular;25" itemHeight="105" itemWidth="230">
 				<mode name="default">
