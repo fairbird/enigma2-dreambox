@@ -10,25 +10,11 @@ from ServiceReference import ServiceReference
 from Tools.Alternatives import GetWithAlternative
 from Tools.Directories import SCOPE_SKIN_IMAGE, SCOPE_CURRENT_SKIN, resolveFilename, sanitizeFilename
 
-config.picon = ConfigSubsection()
-config.picon.foldername = ConfigSelection(default="1", choices=[
-		("1", _("picon")),
-		("2", _("ZZPicon")),
-		("3", _("XPicon"))
-	])
-
 
 class PiconLocator:
 	def __init__(self, piconDirectories=["picon"]):
 		harddiskmanager.on_partition_list_change.append(self.onPartitionChange)
-		if config.picon.foldername.value == "1":
-			self.piconDirectories = piconDirectories
-		if config.picon.foldername.value == "2":
-			self.piconDirectories = ["ZZPicon"]
-		elif config.picon.foldername.value == "3":
-			self.piconDirectories = ["XPicon"]
-		else:
-			self.piconDirectories = piconDirectories
+		self.piconDirectories = piconDirectories
 		self.activePiconPath = None
 		self.searchPaths = []
 		for mp in ("/usr/share/enigma2/", "/"):
