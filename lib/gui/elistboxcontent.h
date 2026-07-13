@@ -4,6 +4,7 @@
 #include <lib/python/python.h>
 #include <lib/gui/elistbox.h>
 #include <unordered_map>
+#include <vector>
 
 class eListboxPythonStringContent : public virtual iListboxContent
 {
@@ -119,6 +120,8 @@ class eListboxPythonMultiContent : public eListboxPythonStringContent
 	ePyObject m_buildFunc;
 	ePyObject m_selectableFunc;
 	ePyObject m_template;
+	ePyObject m_templatesList;
+	std::vector<ePyObject> m_templates;
 	eRect m_selection_clip;
 	gRegion m_clip, m_old_clip;
 
@@ -148,6 +151,7 @@ public:
 	void resetClip();
 	void entryRemoved(int idx);
 	void setTemplate(SWIG_PYOBJECT(ePyObject) tmplate);
+	void setTemplates(SWIG_PYOBJECT(ePyObject) templates);
 	int getMaxItemTextWidth() override;
 	int getListSize() { return size(); }
 protected:
@@ -159,6 +163,7 @@ protected:
 private:
 	std::unordered_map<int, ePtr<gFont>> m_fonts;
 	std::unordered_map<int, ePtr<gFont>> m_fonts_zoomed;
+	ePyObject selectTemplate(ePyObject items);
 };
 
 #ifdef SWIG
