@@ -189,6 +189,13 @@ to generate HTML."""
 		for method in self.onListUpdated:
 			method()
 
+	def setLockFirstRow(self, enabled):
+		try:
+			instance = self.master.master.instance
+			instance.setLockFirstRow(enabled)
+		except AttributeError:
+			pass
+
 	def show(self):
 		try:
 			instance = self.master.master.instance
