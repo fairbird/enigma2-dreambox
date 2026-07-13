@@ -14,14 +14,14 @@ global_session = None
 
 def execute(option):
 	print("[MediaScanner] execute", option)
-	if option is None:
+	if not option:
 		return
 	(_, scanner, files, session) = option
 	scanner.open(files, session)
 
 
 def mountpoint_choosen(option):
-	if option is None:
+	if not option:
 		return
 	(description, mountpoint, session) = option
 	res = scanDevice(mountpoint)
