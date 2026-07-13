@@ -125,7 +125,7 @@ class PluginDescriptor:
 	def getWakeupTime(self):
 		return self.wakeupfnc and self.wakeupfnc() or -1
 
-	@ property
+	@property
 	def icon(self):
 		if self.iconstr and self.path:
 			from Tools.LoadPixmap import LoadPixmap
