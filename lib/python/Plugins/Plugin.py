@@ -84,12 +84,17 @@ class PluginDescriptor:
 	# Override internal RecordTimer navigation instance fnc must return the custom instance or None to skip it.
 	WHERE_RECORDTIMER = 20
 
-	def __init__(self, name="Plugin", where=[], description="", icon=None, fnc=None, wakeupfnc=None, needsRestart=None, internal=False, weight=0):
+	DO_CLOSE = 1
+
+	DO_CLOSE_RECURSIVE = 2
+
+	def __init__(self, name="Plugin", where=[], description="", icon=None, fnc=None, wakeupfnc=None, needsRestart=None, internal=False, weight=0, closeMode=0)):
 		self.name = name
 		self.internal = internal
 		self.needsRestart = needsRestart
 		self.path = None
 		self.key = name
+
 		if isinstance(where, list):
 			self.where = where
 		else:
@@ -104,10 +109,9 @@ class PluginDescriptor:
 			self._icon = icon
 
 		self.weight = weight
-
 		self.wakeupfnc = wakeupfnc
-
 		self.fnc = fnc
+		self.closeMode = closeMode
 
 	def __call__(self, *args, **kwargs):
 		if callable(self.fnc):
