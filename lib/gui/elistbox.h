@@ -240,6 +240,11 @@ public:
 	void setScrollbarMode(uint8_t mode);
 	void setWrapAround(bool state) { m_enabled_wrap_around = state; }
 
+	/* Pins entry 0 to a fixed on-screen slot (vertical orientation only);
+	   it stays visible while the remaining entries scroll below it. */
+	void setLockFirstRow(bool lock);
+	bool getLockFirstRow() { return m_lock_first_row; }
+
 	void setOrientation(uint8_t orientation);
 	void setContent(iListboxContent *content);
 
@@ -472,7 +477,7 @@ public:
 		else if (m_orientation == orGrid)
 			return m_max_columns * m_max_rows;
 		else
-			return m_max_rows;
+			return effectiveMaxRows();
 		}
 
 	int getCurrentPage()
@@ -483,7 +488,7 @@ public:
 			if (m_orientation == orGrid)
 				max = m_max_columns * m_max_rows;
 			else
-				max = (m_orientation == orHorizontal) ? m_max_columns : m_max_rows;
+				max = (m_orientation == orHorizontal) ? m_max_columns : effectiveMaxRows();
 			if (max > 0)
 			{
 				return (m_content->cursorGet() / max) + 1;
@@ -500,7 +505,7 @@ public:
 			if (m_orientation == orGrid)
 				max = m_max_columns * m_max_rows;
 			else
-				max = (m_orientation == orHorizontal) ? m_max_columns : m_max_rows;
+				max = (m_orientation == orHorizontal) ? m_max_columns : effectiveMaxRows();
 			if (max > 0)
 			{
 				return (int)std::ceil((float)m_content->size() / (float)max);
@@ -545,6 +550,8 @@ private:
 	ePoint getItemPostion(int index);
 	int moveSelectionLineMode(bool doUp, bool doDown, int dir, int oldSel, int oldTopLeft, int oldRow, int maxItems, bool indexChanged, int pageOffset, int topLeft);
 	void recalcSizeAlignment(bool scrollbarVisible);
+	/* row count available for scrolling; one less than m_max_rows when the first row is locked */
+	int effectiveMaxRows() { return (m_lock_first_row && m_orientation == orVertical && m_max_rows > 1) ? m_max_rows - 1 : m_max_rows; }
 	int setScrollbarPosition();
 	void setItemCornerRadiusInternal(uint8_t index, int radius, uint8_t edges);
 	void setItemGradientInternal(uint8_t index, const gRGB &startcolor, const gRGB &midcolor, const gRGB &endcolor, uint8_t direction, bool alphablend);
@@ -594,6 +601,7 @@ private:
 	int m_first_selectable_item;
 	int m_last_selectable_item;
 	int m_scrollbar_calcsize;
+	bool m_lock_first_row;
 
 	ePoint m_spacing;
 	ePoint m_defined_spacing;
