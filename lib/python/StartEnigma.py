@@ -598,7 +598,8 @@ def runScreenTest():
 	enigma.eProfileWrite("VolumeAdjust")
 	vol = VolumeAdjust(session)
 	enigma.eProfileWrite("InitProcessing")
-	processing = Processing(session)
+	enigma.eProfileWrite("Processing Screen")
+	processing = Processing(session)  # noqa F841
 	enigma.eProfileWrite("Global MessageBox Screen")
 	modalMessagebox = ModalMessageBox(session)  # noqa F841
 	toast = Toast(session)  # noqa F841
