@@ -119,6 +119,7 @@ public:
 		eventStartPvrDescramble,   // start PVR Descramble Convert
 		eventChannelAllocated,
 		eventStreamCorrupt,
+		eventSignalLost,       // frontend signal lost during stable operation
 	};
 #ifndef SWIG
 	sigc::signal<void(int)> serviceEvent;
