@@ -245,9 +245,9 @@ class Session:
 		self.screen = SessionGlobals(self)
 		from Components.FrontPanelLed import frontPanelLed
 		from Tools.Notifications import notificationCenter
-		notificationCenter.session = self
 		frontPanelLed.init(self)
 		self.allDialogs = []
+		notificationCenter.setup(self)
 
 		for p in plugins.getPlugins(PluginDescriptor.WHERE_SESSIONSTART):
 			try:
