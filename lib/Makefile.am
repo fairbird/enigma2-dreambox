@@ -31,6 +31,7 @@ include gui/Makefile.inc
 include mmi/Makefile.inc
 include network/Makefile.inc
 include python/Makefile.inc
+include timeshift/Makefile.inc
 
 # Build the subdirs without parallellism
 SUBDIRS = python
