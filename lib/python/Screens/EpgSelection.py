@@ -445,8 +445,7 @@ class EPGSelection(Screen, HelpableScreen):
 
 	def changeFiltering(self):
 		self.serviceToTitle(self.currentService)
-		title = self.instance.getTitle() + "   " + self.getTimespanText()
-		self.setTitle(title)
+		self.setSingleEpgTitle()
 		self["list"].fillSingleEPG(self.currentService, self.sort_type, self.filtering)
 
 	def getTimespanText(self):
@@ -473,10 +472,10 @@ class EPGSelection(Screen, HelpableScreen):
 		if self.type == EPG_TYPE_MULTI:
 			self["list"].updateMultiEPG(-1)
 		elif self.type == EPG_TYPE_SINGLE:
-			if self.sort_type == 0:
-				self.sort_type = 1
+			if config.epg.ratingsort.value:
+				self.sort_type = (self.sort_type + 1) % 3
 			else:
-				self.sort_type = 0
+				self.sort_type = (self.sort_type + 1) % 2
 			self["list"].sortSingleEPG(self.sort_type)
 			self.setSortDescription()
 		elif self.type == EPG_TYPE_SIMILAR:
@@ -487,12 +486,22 @@ class EPGSelection(Screen, HelpableScreen):
 				self.session.open(EPGSelection, None, None, event)
 
 	def setSortDescription(self):
-		if self.sort_type == 1:
-			# TRANSLATORS: This must fit into the header button in the EPG-List
-			self["key_yellow"].setText(_("Sort time"))
-		else:
-			# TRANSLATORS: This must fit into the header button in the EPG-List
+		# TRANSLATORS: This must fit into the header button in the EPG-List
+		if self.sort_type == 0:
 			self["key_yellow"].setText(_("Sort A-Z"))
+		elif self.sort_type == 1:
+			if config.epg.ratingsort.value:
+				self["key_yellow"].setText(_("Sort rating"))
+			else:
+				self["key_yellow"].setText(_("Sort time"))
+		else:
+			self["key_yellow"].setText(_("Sort time"))
+
+	def setSingleEpgTitle(self):
+		text = self.saved_title + ' - ' + self.currentService.getServiceName()
+		if self.filtering:
+			text += "   " + self.getTimespanText()
+		self.setTitle(text)
 
 	def resetSortStatus(self):
 		self.sort_type = 0

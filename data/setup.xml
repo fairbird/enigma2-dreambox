@@ -238,6 +238,7 @@
 		<item level="1" text="End time" indents="4" conditional="config.epg.filter.value" description="End of the time interval during which events must begin to be displayed. If the filter is active, use keys 3 and 6 to adjust the end time, and key 0 to save.">config.epg.filter_end</item>
 		<item level="1" text="Toggle Filter Order" indents="4" conditional="config.epg.filter.value" description="Using the 'Stop' button will cyclically switch displaying events starting: 'outside the interval', 'within the interval', and 'without filtering', instead of 'within the interval', 'outside the interval', and 'without filtering'.">config.epg.filter_reversal</item>
 		<item level="1" text="Keep sorting" indents="4" conditional="config.epg.filter.value" description="When switching the filter, the selected EPG sorting is preserved.">config.epg.filter_keepsorting</item>
+		<item level="1" text="Rating sort in SingleEPG" description="Enable sorting by rating under the yellow button in SingleEPG.">config.epg.ratingsort</item>
 		<item level="2" text="Enable EPG event name abbreviation removal" description="Broadcasters sometimes split long event names into the event description using ... Choose whether to prevent this behaviour.">config.epg.joinAbbreviatedEventNames</item>
 		<item level="2" text="EPG event name prefixes to remove" conditional="config.epg.eventNamePrefixMode.value > 0" description="| separated list of prefixes you'd like to be removed from event names, separated with |, e.g. New:|Live:">config.epg.eventNamePrefixes</item>
 	</setup>
