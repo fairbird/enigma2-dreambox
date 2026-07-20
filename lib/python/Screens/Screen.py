@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 from os.path import isfile
+from types import CodeType
 
 from enigma import eRCInput, eStack, eTimer, eWindow, getDesktop
 
-from skin import GUI_SKIN_ID, applyAllAttributes
-from skin import GUI_SKIN_ID, applyAllAttributes, menus, screens, setups
+from skin import GUI_SKIN_ID, applyAllAttributes, menus, readSkin, screens, setups
 from Components.ActionMap import HelpableActionMap
 from Components.config import config
 from Components.GUIComponent import GUIComponent
@@ -383,6 +383,27 @@ class Screen(dict):
 		for (name, val) in self.items():
 			if isinstance(val, GUIComponent):
 				val.GUIdelete()
+
+	def reloadSkin(self):
+		self.deleteGUIScreen()
+		if hasattr(self, "additionalWidgets"):
+			for widget in self.additionalWidgets:
+				if hasattr(widget, "instance") and widget.instance:
+					widget.instance.hide()
+			self.additionalWidgets = []
+		if hasattr(self, "renderer"):
+			for renderer in self.renderer:
+				renderer.disconnectAll()
+				if hasattr(renderer, "instance") and renderer.instance:
+					renderer.GUIdelete()
+			self.renderer = []
+		self.onLayoutFinish = [x for x in self.onLayoutFinish if not isinstance(x, CodeType)]
+		self.onContentChanged = [x for x in self.onContentChanged if not isinstance(x, CodeType)]
+		readSkin(self, None, self.skinName, self.desktop)
+		self.applySkin()
+		for renderer in self.renderer:
+			if hasattr(renderer, "instance") and renderer.instance:
+				renderer.changed((renderer.CHANGED_DEFAULT,))
 
 	def createSummary(self):
 		return None

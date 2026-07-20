@@ -418,12 +418,13 @@ class Session:
 				callback()
 		Toast.instance.doShutdown()
 
-	def reloadDialogs(self):
+	def reloadDialogs(self, exclude=None):
 		for dlg in self.allDialogs:
+			if exclude and id(dialog) in exclude:
+				continue
+			# print(f"[reloadDialogs] dialog={dialog.__class__.__name__} desktop={hasattr(dialog, 'desktop')}")
 			if hasattr(dlg, "desktop"):
-				oldDesktop = dlg.desktop
-				readSkin(dlg, None, dlg.skinName, oldDesktop)
-				dlg.applySkin()
+				dialog.reloadSkin()
 
 	def showInfo(self, text, timeout=4):
 		Toast.instance.showToast(text=text, toasttype=Toast.TYPE_INFO, timeout=timeout)
