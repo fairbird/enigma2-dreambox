@@ -897,7 +897,9 @@ int eTextPara::renderString(const char *string, int rflags, int border, int mark
 							{
 								if ((i + 2 + codeidx) == uc_visual.end()) break;
 								color[codeidx] = (char)((*(i + 2 + codeidx)) & 0xff);
-								if (!isxdigit((unsigned char)color[codeidx]))
+								// Hex digits + legacy color notation (: ; < = > ?)
+								unsigned char c = (unsigned char)color[codeidx];
+								if (!(isxdigit(c) || (c >= ':' && c <= '?')))
 									break;
 							}
 							isprintable = 0;
