@@ -898,20 +898,18 @@ int eTextPara::renderString(const char *string, int rflags, int border, int mark
 								if ((i + 2 + codeidx) == uc_visual.end()) break;
 								color[codeidx] = (char)((*(i + 2 + codeidx)) & 0xff);
 								// Hex digits + legacy color notation (: ; < = > ?)
-								unsigned char c = (unsigned char)color[codeidx];
-								if (!(isxdigit(c) || (c >= ':' && c <= '?')))
+								unsigned char cc = (unsigned char)color[codeidx];
+								if (!(isxdigit(cc) || (cc >= ':' && cc <= '?')))
 									break;
 							}
-							isprintable = 0;
 							if (codeidx == 8)
 							{
 								newcolor = gRGB(color).argb();
 								activate_newcolor = true;
 								activate_colorreset = false;
+								isprintable = 0;
 								i += 1 + codeidx;
 							}
-							else
-								i++;
 							break;
 						}
 						case 'C':
