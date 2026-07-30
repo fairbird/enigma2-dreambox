@@ -106,7 +106,9 @@ class VideoSetup(ConfigListScreen, Screen):
 		if BoxInfo.getItem("havecolorimetry"):
 			self.list.append((_("HDMI Colorimetry"), config.av.hdmicolorimetry, _("This option allows you to configure the Colorimetry for HDR.")))
 		if BoxInfo.getItem("havehdmihdrtype"):
-				self.list.append((_("HDMI HDR Type"), config.av.hdmihdrtype, _("This option allows you to configure the HDR type.")))
+			self.list.append((_("HDMI HDR Type"), config.av.hdmihdrtype, _("This option allows you to configure the HDR type.")))
+		if BoxInfo.getItem("havehdmihdrosd"):
+			self.list.append((_("HDR OSD adjustment"), config.av.hdmihdrosd, _("This option adjusts SDR graphics and OSD colors while the HDMI output is in HDR mode.")))
 		if BoxInfo.getItem("HasHDMIpreemphasis"):
 			self.list.append((_("Use HDMI pre-emphasis"), config.av.hdmipreemphasis, _("This option can be useful for long HDMI cables.")))
 		if BoxInfo.getItem("HDRSupport"):
