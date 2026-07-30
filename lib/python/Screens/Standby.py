@@ -427,10 +427,6 @@ class TryQuitMainloop(MessageBox):
 
 			quitMainloop(self.retval)
 		else:
-			if self.descramble:
-				from Components.PvrDescrambleConvert import pvr_descramble_convert
-				if pvr_descramble_convert.scrambledRecordsLeft():
-					self.session.open(Standby2)
 			MessageBox.close(self, True)
 
 	def quitMainloopDelay(self):
