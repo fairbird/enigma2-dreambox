@@ -213,7 +213,7 @@ class LocationBox(Screen, NumericalTextInput):
 			self.currList = "filelist"
 			self["filelist"].selectionEnabled(1)
 			self["booklist"].selectionEnabled(0)
-			self["key_blue"].setText(_("Add bookmark" if self.realBookmarks else None))
+			self["key_blue"].setText(_("Add bookmark") if self.realBookmarks else '')
 			self.updateTarget()
 
 	def switchToBookList(self):
