@@ -1,8 +1,8 @@
 #================ MenuGrid_PageInfo =============
 # ============================================================================
-# This file was created by italia2012. 
+# This file was created by italia2012.
 # Everyone can modify and use it ,
-# but don't tell it's yours, or your idea!		
+# but don't tell it's yours, or your idea!
 # =================================================================
 
 from Components.Converter.Converter import Converter

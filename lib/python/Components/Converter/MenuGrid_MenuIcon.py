@@ -1,9 +1,9 @@
 #================ MXGreytransparent_MenuIcon =============
 # ============================================================================
-# This file was created by italia2012. 
+# This file was created by italia2012.
 # Everyone can modify and use it ,
 # but don't tell it's yours, or your idea!
-# EDit by RAED 	
+# EDit by RAED
 # =================================================================
 
 from Components.Converter.Converter import Converter
@@ -19,7 +19,7 @@ class MenuGrid_MenuIcon(Converter, object):
 	def __init__(self, type):
 		Converter.__init__(self, type)
 		self.type = type
-		
+
 	@cached
 	def getPixmap(self):
 		png = None
@@ -32,17 +32,17 @@ class MenuGrid_MenuIcon(Converter, object):
 		except:
 			pass
 		return png
-	
+
 	pixmap = property(getPixmap)
-	
+
 	def selChanged(self):
-		self.downstream_elements.changed((self.CHANGED_ALL, 0))	
+		self.downstream_elements.changed((self.CHANGED_ALL, 0))
 
 	def changed(self, what):
 		if what[0] == self.CHANGED_DEFAULT:
 			self.source.onSelectionChanged.append(self.selChanged)
 		Converter.changed(self, what)
-		
+
 #getMenuIcon(Rend:MXGreytransparent_MenuWall,Conv:MXGreytransparent_MenuIcon)
 
 
@@ -52,7 +52,7 @@ def getMenuIcon(menuEntryID):
 	#iconName = menuEntryID
 	# Edit by RAED
 	iconName = menuEntryID.replace(" ", "")
-	
+
 	#png = LoadPixmap(cached = True, path = iconPath + iconName + ".png")
 	# Edit by RAED
 	skinPath = menus.get(iconName)
@@ -74,5 +74,5 @@ def getMenuIcon(menuEntryID):
 	if png == None:
 		png = LoadPixmap(cached=True, path=iconPath + "Undefined.png")
 	return png
-	
+
 # =========================================================
