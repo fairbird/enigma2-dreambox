@@ -139,14 +139,20 @@ class MenuGrid(Renderer, object):
 		if self.itemSelPixmap is None and self.itemBgPixmap is not None:
 			self.itemSelPixmap = self.itemBgPixmap  # فallback: نفس خلفية المربع العادي
 
-		self.iconX = int(iconPos[0]); self.iconY = int(iconPos[1])
-		self.iconW = int(iconPos[2]); self.iconH = int(iconPos[3])
+		self.iconX = int(iconPos[0])
+		self.iconY = int(iconPos[1])
+		self.iconW = int(iconPos[2])
+		self.iconH = int(iconPos[3])
 
-		self.iconXSel = int(iconPosSel[0]); self.iconYSel = int(iconPosSel[1])
-		self.iconWSel = int(iconPosSel[2]); self.iconHSel = int(iconPosSel[3])
+		self.iconXSel = int(iconPosSel[0])
+		self.iconYSel = int(iconPosSel[1])
+		self.iconWSel = int(iconPosSel[2])
+		self.iconHSel = int(iconPosSel[3])
 
-		self.textX = int(textPos[0]); self.textY = int(textPos[1])
-		self.textW = int(textPos[2]); self.textH = int(textPos[3])
+		self.textX = int(textPos[0])
+		self.textY = int(textPos[1])
+		self.textW = int(textPos[2])
+		self.textH = int(textPos[3])
 
 		if showOnlyText:
 			self.iconW = self.iconH = self.iconWSel = self.iconHSel = 0
