@@ -44,17 +44,13 @@ class MenuGrid_MenuIcon(Converter, object):
 		Converter.changed(self, what)
 
 #getMenuIcon(Rend:MXGreytransparent_MenuWall,Conv:MXGreytransparent_MenuIcon)
-
-
 def getMenuIcon(menuEntryID):
 	png = None
-	iconPath = resolveFilename(SCOPE_GUISKIN, "icons_Menu/")
+	# Edit by RAED
+	iconPath = "icons_Menu/"
 	#iconName = menuEntryID
-	# Edit by RAED
 	iconName = menuEntryID.replace(" ", "")
-
 	#png = LoadPixmap(cached = True, path = iconPath + iconName + ".png")
-	# Edit by RAED
 	skinPath = menus.get(iconName)
 	if not skinPath:
 		clean = lambda s: s.lower().replace(" ", "").replace("_", "").replace("-", "").replace("&", "")
@@ -64,15 +60,15 @@ def getMenuIcon(menuEntryID):
 				skinPath = v
 				break
 	if skinPath:
-		png = LoadPixmap(cached=True, path=resolveFilename(SCOPE_GUISKIN, skinPath))
+		png = LoadPixmap(cached = True, path = resolveFilename(SCOPE_GUISKIN, skinPath))
 	if png == None:
 		for name in (iconName, iconName.lower(), iconName.replace(" ", ""), iconName.replace(" ", "").lower()):
-			png = LoadPixmap(cached=True, path=iconPath + name + ".png")
+			png = LoadPixmap(cached = True, path = resolveFilename(SCOPE_GUISKIN, iconPath + name + ".png"))
 			if png:
 				break
-	#
+
 	if png == None:
-		png = LoadPixmap(cached=True, path=iconPath + "Undefined.png")
+		png = LoadPixmap(cached = True, path = resolveFilename(SCOPE_GUISKIN, iconPath + "Undefined.png"))
 	return png
 
 # =========================================================
