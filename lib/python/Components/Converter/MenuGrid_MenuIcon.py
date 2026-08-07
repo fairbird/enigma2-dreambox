@@ -44,6 +44,8 @@ class MenuGrid_MenuIcon(Converter, object):
 		Converter.changed(self, what)
 
 #getMenuIcon(Rend:MXGreytransparent_MenuWall,Conv:MXGreytransparent_MenuIcon)
+
+
 def getMenuIcon(menuEntryID):
 	png = None
 	# Edit by RAED
