@@ -48,7 +48,7 @@ class MenuGrid_MenuIcon(Converter, object):
 
 def getMenuIcon(menuEntryID):
 	png = None
-	iconPath = "/usr/share/enigma2/iFlatFHD/icons_Menu/"
+	iconPath = resolveFilename(SCOPE_GUISKIN, "icons_Menu/")
 	#iconName = menuEntryID
 	# Edit by RAED
 	iconName = menuEntryID.replace(" ", "")
