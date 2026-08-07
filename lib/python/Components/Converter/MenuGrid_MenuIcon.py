@@ -60,15 +60,15 @@ def getMenuIcon(menuEntryID):
 				skinPath = v
 				break
 	if skinPath:
-		png = LoadPixmap(cached = True, path = resolveFilename(SCOPE_GUISKIN, skinPath))
+		png = LoadPixmap(cached=True, path=resolveFilename(SCOPE_GUISKIN, skinPath))
 	if png == None:
 		for name in (iconName, iconName.lower(), iconName.replace(" ", ""), iconName.replace(" ", "").lower()):
-			png = LoadPixmap(cached = True, path = resolveFilename(SCOPE_GUISKIN, iconPath + name + ".png"))
+			png = LoadPixmap(cached=True, path=resolveFilename(SCOPE_GUISKIN, iconPath + name + ".png"))
 			if png:
 				break
 
 	if png == None:
-		png = LoadPixmap(cached = True, path = resolveFilename(SCOPE_GUISKIN, iconPath + "Undefined.png"))
+		png = LoadPixmap(cached=True, path=resolveFilename(SCOPE_GUISKIN, iconPath + "Undefined.png"))
 	return png
 
 # =========================================================
