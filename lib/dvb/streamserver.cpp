@@ -103,7 +103,7 @@ struct eStreamServerDBus: public sigc::trackable
 
 	eStreamServerDBus(eStreamServer *owner)
 		: owner(owner), connection(NULL), signal_connection(NULL), signal_context(NULL), signal_loop(NULL), signal_thread(NULL),
-		  name_watch_id(0), backend(NULL), stopping(0), available(false), rtsp_path("stream"), hls_path("stream"), event_pump(eApp, 0)
+		  name_watch_id(0), backend(NULL), stopping(0), available(false), rtsp_path("stream"), hls_path("stream"), event_pump(eApp, 0, "eStreamServerDBus")
 	{
 		CONNECT(event_pump.recv_msg, eStreamServerDBus::handleEvent);
 		signal_thread = g_thread_new("estreamserver-dbus", signalThread, this);
