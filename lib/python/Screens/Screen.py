@@ -383,6 +383,7 @@ class Screen(dict):
 		for (name, val) in self.items():
 			if isinstance(val, GUIComponent):
 				val.GUIdelete()
+				val.skinAttributes = []
 
 	def reloadSkin(self):
 		self.deleteGUIScreen()
