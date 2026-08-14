@@ -49,6 +49,7 @@ config.pluginfilter.display = ConfigYesNo(default=True)
 config.pluginfilter.drivers = ConfigYesNo(default=True)
 config.pluginfilter.extensions = ConfigYesNo(default=True)
 config.pluginfilter.extraopkgpackages = ConfigYesNo(default=False)
+config.pluginfilter.kodiaddons = ConfigYesNo(default=True)
 config.pluginfilter.kernel = ConfigYesNo(default=False)  # This uses the KERNEL_PREFIX rather than the standard ENIGMA_PREFIX!
 config.pluginfilter.m2k = ConfigYesNo(default=True)
 config.pluginfilter.picons = ConfigYesNo(default=True)
@@ -70,6 +71,7 @@ MODULE_NAME = __name__.split(".")[-1]
 
 FEED_SERVER = "google.com"
 ENIGMA_PREFIX = "enigma2-plugin-%s"
+KODI_ADDON_PREFIX = "kodi-addon-%s"
 PACKAGE_PREFIX = "%s"
 SOFTCAM_PREFIX = "enigma2-plugin-softcams-%s"
 KERNEL_PREFIX = "kernel-module-%s"
@@ -81,6 +83,7 @@ PLUGIN_CATEGORIES = {
 	"extensions": _("Extension Packages"),
 	"extraopkgpackages": _("Development Packages"),
 	"kernel": _("Kernel Packages"),
+	"kodiaddons": _("Kodi Add-on Packages"),
 	"m2k": _("M2k Packages"),
 	"picons": _("Picon Packages"),
 	"pli": _("OpenPLi Packages"),
@@ -1277,6 +1280,8 @@ class PackageAction(Screen, NumericalTextInput):
 		opkgFilterArguments = [self.modeData[self.DATA_FILTER] % "*"]
 		displayExclude = []
 		if mode <= self.MODE_MANAGE:
+			if config.pluginfilter.kodiaddons.value:
+				opkgFilterArguments.append(KODI_ADDON_PREFIX % "*")
 			if config.pluginfilter.kernel.value:
 				opkgFilterArguments.append(KERNEL_PREFIX % "*")
 			displayFilter = []
@@ -1284,7 +1289,8 @@ class PackageAction(Screen, NumericalTextInput):
 				if filter in ("", "extraopkgpackages", "src"):
 					continue
 				if getattr(config.pluginfilter, filter).value:
-					displayFilter.append((KERNEL_PREFIX % "")[:-1] if filter == "kernel" else self.modeData[self.DATA_FILTER] % filter)
+					prefix = (KERNEL_PREFIX % "")[:-1] if filter == "kernel" else (KODI_ADDON_PREFIX % "")[:-1] if filter == "kodiaddons" else self.modeData[self.DATA_FILTER] % filter
+					displayFilter.append(prefix)
 			self.displayFilter = compile(r"^(%s-)" % "-|".join(displayFilter)) if displayFilter else None
 			if not config.pluginfilter.extraopkgpackages.value:
 				displayExclude.extend(["-dev", "-dbg", "-doc", "-meta", "-staticdev"])
@@ -1626,7 +1632,9 @@ class PackageAction(Screen, NumericalTextInput):
 				if count > 2:
 					if parts[0] == "enigma2" and parts[1] == "plugin":
 						packageCategory = parts[2]
-						packageName = "-".join(parts[3:])
+					elif parts[0] == "kodi" and parts[1] == "addon":
+						packageCategory = "kodiaddons"
+						packageName = "-".join(parts[2:])
 					elif parts[0] == "kernel" and parts[1] == "module":
 						packageCategory = "kernel"
 						packageName = ("-".join(parts[2:])).replace(self.kernelVersion, "")
