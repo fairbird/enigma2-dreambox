@@ -453,7 +453,7 @@ class HelpMenuList(List):
 				# print("[HelpMenu] HelpMenuList DEBUG: Headings found.")
 				formatFlags |= self.HEADINGS
 			for (action, help) in actions:  # DEBUG: Should help be response?
-				helpTags = []  # if mapFlag else [pgettext("Abbreviation of 'Disabled'", "Disabled")]
+				helpTags = [_("Disabled")] if action in actionMap.disbledActions else []
 				if callable(help):
 					help = help()
 					helpTags.append(pgettext("Abbreviation of 'Configurable'", "Configurable"))
@@ -602,11 +602,10 @@ class HelpMenuList(List):
 	def select(self):
 		# A list entry has a "private" tuple as first entry...
 		item = self.getCurrent()
-		if item is None:
-			return
-		# ...containing (Actionmap, Context, Action, Buttondata).
-		# We returns this tuple to the callback.
-		self.callback(item[0], item[1], item[2])
+		if item is not None and item[2] not in item[0].disbledActions:  # Highlighting/navigation stays enabled, but OK does nothing for disabled actions.
+			# ...containing (Actionmap, Context, Action, Buttondata).
+			# We returns this tuple to the callback.
+			self.callback(item[0], item[1], item[2])
 
 
 class XMLHelp(Screen):
