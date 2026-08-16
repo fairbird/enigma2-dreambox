@@ -216,6 +216,9 @@ class LocationBox(Screen, NumericalTextInput):
 			self["key_blue"].setText(_("Add bookmark") if self.realBookmarks else '')
 			self.updateTarget()
 
+	def gotoStorageDevices(self):
+		self["filelist"].changeDir(None)
+
 	def switchToBookList(self):
 		if not self.realBookmarks:
 			return
@@ -455,6 +458,7 @@ class LocationBox(Screen, NumericalTextInput):
 		if not self.userMode and self.realBookmarks:
 			if self.currList == "filelist":
 				menu = [
+					(_("List of Storage Devices"), self.gotoStorageDevices)
 					(_("Switch to bookmarks"), self.switchToBookList),
 					(_("Add bookmark"), self.addRemoveBookmark),
 					(_("Update bookmarks"), self.updateBookmarks)
@@ -558,7 +562,7 @@ class LocationBox(Screen, NumericalTextInput):
 			self.quickselect = ""
 
 	def __repr__(self):
-		return str(type(self)) + "(" + self.text + ")"
+		return f"{type(self)}({self.text})"
 
 
 def MovieLocationBox(session, text, dir, filename="", minFree=None):
