@@ -44,8 +44,11 @@ is usually caused by not marking PSignals as immutable.
 #include <lib/base/e2avahi.h>
 #include <lib/base/internetcheck.h>
 #include <lib/base/profile.h>
+#include <lib/network/serviceactionclient.h>
 #include <lib/driver/rc.h>
 #include <lib/driver/rcinput_swig.h>
+#include <lib/driver/ehotplug_socket.h>
+#include <lib/driver/inputhotplug.h>
 #include <lib/service/event.h>
 #include <lib/service/iservice.h>
 #include <lib/service/service.h>
@@ -177,6 +180,7 @@ typedef long time_t;
 %include <lib/python/python_pcore.i>
 
 %immutable eSocketNotifier::activated;
+%immutable eHotplugSocket::dataReceived;
 %include <lib/base/ebase.h>
 %include <lib/base/smartptr.h>
 %include <lib/service/event.h>
@@ -188,6 +192,7 @@ typedef long time_t;
 
 // TODO: embed these...
 %immutable eInternetCheck::callback;
+%immutable eServiceActionClient::actionResult;
 %immutable ePicLoad::PictureData;
 %immutable eButton::selected;
 %immutable eInput::changed;
@@ -225,6 +230,7 @@ typedef long time_t;
 %immutable eDVBSatelliteEquipmentControl::slotRotorSatPosChanged;
 %include <lib/base/message.h>
 %include <lib/base/internetcheck.h>
+%include <lib/network/serviceactionclient.h>
 %include <lib/driver/rc.h>
 %include <lib/driver/rcinput_swig.h>
 %include <lib/gdi/fb.h>
@@ -278,6 +284,8 @@ typedef long time_t;
 %include <lib/components/scan.h>
 %include <lib/components/file_eraser.h>
 %include <lib/components/tuxtxtapp.h>
+%include <lib/driver/ehotplug_socket.h>
+%include <lib/driver/inputhotplug.h>
 %include <lib/driver/avswitch.h>
 %include <lib/driver/avcontrol.h>
 %include <lib/driver/hdmi_cec.h>

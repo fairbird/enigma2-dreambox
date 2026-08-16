@@ -1,62 +1,20 @@
-# -*- coding: utf-8 -*-
 from os import mkdir, remove
 from os.path import exists, isfile
-from twisted.internet import reactor
-from twisted.internet.protocol import Factory, Protocol
 
-from enigma import getDeviceDB, eTimer
+from enigma import eHotplugSocket, getDeviceDB, eTimer
 
 from Components.config import config
 from Components.Console import Console
 from Components.Harddisk import harddiskmanager
-from Screens.Screen import Screen
-from Screens.Opkg import Opkg
-from Components.Opkg import OpkgComponent
-from Components.ActionMap import ActionMap
 from Components.Storage import EXPANDER_MOUNT, cleanMediaDirs
 from Plugins.Plugin import PluginDescriptor
 from Screens.MessageBox import ModalMessageBox
 from Tools.Directories import fileReadLines, fileWriteLines
 from Tools.Conversions import scaleNumber
-from Components.Sources.StaticText import StaticText
-from Components.SelectionList import SelectionList
-
-
-HOTPLUG_SOCKET = "/var/run/hotplug.socket"
 
 # globals
 hotplugNotifier = []
 audiocd = False
-
-
-class Hotplug(Protocol):
-	def __init__(self):
-		self.received = ""
-
-	def connectionMade(self):
-		# print("[Hotplug] Connection made.")
-		self.received = ""
-
-	def dataReceived(self, data):
-		if isinstance(data, bytes):
-			data = data.decode()
-		self.received += data
-		print(f"[Hotplug] Data received: '{", ".join(self.received.split("\0")[:-1])}'.")
-
-	def connectionLost(self, reason):
-		# print(f"[Hotplug] Connection lost reason '{reason}'.")
-		eventData = {}
-		if "\n" in self.received:
-			data = self.received[:-1].split("\n")
-			eventData["mode"] = 1
-		else:
-			data = self.received.split("\0")[:-1]
-			eventData["mode"] = 0
-		for values in data:
-			variable, value = values.split("=", 1)
-			eventData[variable] = value
-		if data and eventData:
-			hotPlugManager.processHotplugData(eventData)
 
 
 def AudiocdAdded():
@@ -67,15 +25,8 @@ def AudiocdAdded():
 def autostart(reason, **kwargs):
 	if reason == 0:
 		print("[Hotplug] Starting hotplug handler.")
-		try:
-			if exists(HOTPLUG_SOCKET):
-				remove(HOTPLUG_SOCKET)
-		except OSError:
-			pass
 		cleanMediaDirs()  # Initial cleanup
-		factory = Factory()
-		factory.protocol = Hotplug
-		reactor.listenUNIX(HOTPLUG_SOCKET, factory)
+		eHotplugSocket.getInstance().dataReceived.get().append(hotPlugManager.processRawData)
 
 
 class HotPlugManager:
@@ -93,6 +44,21 @@ class HotPlugManager:
 		def debugStorageChanged(configElement):
 			self.debug = configElement.value
 		config.crash.debugStorage.addNotifier(debugStorageChanged)
+
+	def processRawData(self, raw):
+		eventData = {}
+		if "\n" in raw:
+			data = raw[:-1].split("\n")
+			eventData["mode"] = 1
+		else:
+			data = raw.split("\0")[:-1]
+			eventData["mode"] = 0
+		for values in data:
+			if "=" in values:
+				variable, value = values.split("=", 1)
+				eventData[variable] = value
+		if data and eventData:
+			self.processHotplugData(eventData)
 
 	def processAddDevice(self):
 		self.addTimer.stop()
@@ -169,7 +135,7 @@ class HotPlugManager:
 					if DEVPATH.startswith(physdevprefix):
 						description = f"\n{_(pdescription)}"
 
-				text = f"{_("A new storage device has been connected:")}\n{ID_MODEL} - ({scaleNumber(ID_PART_ENTRY_SIZE * 512, format="%.1f")})\n{description}"
+				text = f"{_('A new storage device has been connected:')}\n{ID_MODEL} - ({scaleNumber(ID_PART_ENTRY_SIZE * 512, format='%.1f')})\n{description}"
 
 				def newDeviceCallback(answer):
 					if answer:
@@ -322,79 +288,5 @@ class HotPlugManager:
 hotPlugManager = HotPlugManager()
 
 
-class OpkgInstaller(Screen):
-	skin = """
-		<screen name="OpkgInstaller" position="center,center" size="550,450" title="Install extensions" >
-			<ePixmap pixmap="buttons/red.png" position="0,0" size="140,40" alphatest="on" />
-			<ePixmap pixmap="buttons/green.png" position="140,0" size="140,40" alphatest="on" />
-			<ePixmap pixmap="buttons/yellow.png" position="280,0" size="140,40" alphatest="on" />
-			<ePixmap pixmap="buttons/blue.png" position="420,0" size="140,40" alphatest="on" />
-			<widget source="key_red" render="Label" position="0,0" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#9f1313" transparent="1" />
-			<widget source="key_green" render="Label" position="140,0" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#1f771f" transparent="1" />
-			<widget source="key_yellow" render="Label" position="280,0" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#a08500" transparent="1" />
-			<widget source="key_blue" render="Label" position="420,0" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#18188b" transparent="1" />
-			<widget name="list" position="5,50" size="540,360" />
-			<ePixmap pixmap="div-h.png" position="0,410" zPosition="10" size="560,2" transparent="1" alphatest="on" />
-			<widget source="introduction" render="Label" position="5,420" zPosition="10" size="550,30" halign="center" valign="center" font="Regular;22" transparent="1" shadowColor="black" shadowOffset="-1,-1" />
-		</screen>"""
-
-	def __init__(self, session, list):
-		Screen.__init__(self, session)
-
-		self.list = SelectionList()
-		self["list"] = self.list
-
-		p = 0
-		if len(list):
-			p = list[0].rfind("/")
-			title = list[0][:p]
-			self.title = ("%s %s %s") % (_("Install extensions"), _("from"), title)
-
-		for listindex in range(len(list)):
-			self.list.addSelection(list[listindex][p + 1:], list[listindex], listindex, False)
-		self.list.sort()
-
-		self["key_red"] = StaticText(_("Close"))
-		self["key_green"] = StaticText(_("Install"))
-		self["key_yellow"] = StaticText()
-		self["key_blue"] = StaticText(_("Invert"))
-		self["introduction"] = StaticText(_("Press OK to toggle the selection."))
-
-		self["actions"] = ActionMap(["OkCancelActions", "ColorActions"],
-		{
-			"ok": self.list.toggleSelection,
-			"cancel": self.close,
-			"red": self.close,
-			"green": self.install,
-			"blue": self.list.toggleAllSelection
-		}, -1)
-
-	def install(self):
-		list = self.list.getSelectionsList()
-		cmdList = []
-		for item in list:
-			cmdList.append((OpkgComponent.CMD_INSTALL, {"package": item[1]}))
-		self.session.open(Opkg, cmdList=cmdList)
-
-
-def filescan_open(list, session, **kwargs):
-	filelist = [x.path for x in list]
-	session.open(OpkgInstaller, filelist)  # list
-
-
-def filescan(**kwargs):
-	from Components.Scanner import Scanner, ScanPath
-	return \
-		Scanner(mimetypes=["application/x-debian-package"],
-			paths_to_scan=[
-					ScanPath(path="ipk", with_subdirs=True),
-					ScanPath(path="", with_subdirs=False),
-				],
-			name="Opkg",
-			description=_("Install extensions"),
-			openfnc=filescan_open, )
-
-
 def Plugins(**kwargs):
-	return [PluginDescriptor(name=_("Hotplug"), description=_("Hotplug handler."), where=PluginDescriptor.WHERE_AUTOSTART, needsRestart=True, fnc=autostart),
-		PluginDescriptor(name=_("Opkg"), where=PluginDescriptor.WHERE_FILESCAN, needsRestart=False, fnc=filescan)]
+	return PluginDescriptor(name="Hotplug", description="Hotplug handler.", where=PluginDescriptor.WHERE_AUTOSTART, needsRestart=True, fnc=autostart)
