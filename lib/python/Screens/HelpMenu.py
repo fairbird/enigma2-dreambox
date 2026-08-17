@@ -453,7 +453,7 @@ class HelpMenuList(List):
 				# print("[HelpMenu] HelpMenuList DEBUG: Headings found.")
 				formatFlags |= self.HEADINGS
 			for (action, help) in actions:  # DEBUG: Should help be response?
-				helpTags = [_("Disabled")] if action in actionMap.disbledActions else []
+				helpTags = [_("Disabled")] if action in actionmap.disbledActions else []
 				if callable(help):
 					help = help()
 					helpTags.append(pgettext("Abbreviation of 'Configurable'", "Configurable"))
