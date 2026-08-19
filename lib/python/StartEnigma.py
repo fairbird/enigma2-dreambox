@@ -160,10 +160,10 @@ else:
 # initialize autorun plugins and plugin menu entries
 from Components.PluginComponent import plugins
 
-enigma.eProfileWrite("Wizard")
+enigma.eProfileWrite("WizardStart")
 config.misc.rcused = ConfigInteger(default=1)
 from Screens.Wizard import wizardManager
-from Screens.StartWizard import *
+from Screens.WizardStart import *
 #import Screens.Rc
 from Tools.BoundFunction import boundFunction
 from Plugins.Plugin import PluginDescriptor

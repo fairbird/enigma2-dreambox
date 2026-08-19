@@ -7,7 +7,7 @@ install_PYTHON = \
 	Satconfig.py ScanSetup.py NetworkSetup.py Ci.py TimerEntry.py Volume.py VolumeControl.py \
 	EpgSelection.py EventView.py Standby.py ServiceInfo.py NetworkServices.py NetworkMounts.py \
 	InfoBarGenerics.py HelpMenu.py Wizard.py __init__.py \
-	Dish.py LocaleSelection.py StartWizard.py PiPSetup.py \
+	Dish.py LocaleSelection.py WizardStart.py PiPSetup.py \
 	PluginBrowser.py MinuteInput.py Scart.py PVRState.py \
 	Console.py InputBox.py ChoiceBox.py SimpleSummary.py Processing.py \
 	TimerSelection.py Timeshift.py PictureInPicture.py Picon.py TimeDateInput.py \
@@ -15,6 +15,6 @@ install_PYTHON = \
 	SleepTimerEdit.py Opkg.py RdsDisplay.py Globals.py RestartNetwork.py \
 	SessionGlobals.py LocationBox.py WizardLanguage.py TaskList.py TaskView.py Rc.py VirtualKeyBoard.py \
 	TextBox.py FactoryReset.py Recording.py UnhandledKey.py ServiceStopScreen.py SwapManager.py \
-	InputDeviceSetup.py DVD.py SoftwareUpdate.py AutoDiseqc.py InstallWizard.py ScreenSaver.py \
+	InputDeviceSetup.py DVD.py SoftwareUpdate.py AutoDiseqc.py WizardInstall.py ScreenSaver.py \
 	Hotkey.py StreamingClientsInfo.py SoftcamSetup.py FlashManager.py SetupFallbacktuner.py \
 	SkinSelector.py LogManager.py OScamInfo.py Time.py CronTimer.py OSDCalibration.py Toast.py HDMICEC.py

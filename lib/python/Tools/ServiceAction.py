@@ -1,149 +1,122 @@
+# -*- coding: utf-8 -*-
+# ===========================================================================
+# ServiceAction - direct Console-based implementation (no daemon dependency).
+#
+# OpenPLI does not ship OpenATV's eServiceActionClient/socketdaemon, so
+# instead of talking to /var/run/daemon.socket we spawn the same shell
+# commands directly through Components.Console (async, non-blocking, uses
+# the existing Twisted reactor already running in Enigma2).
+#
+# callback(exitCode: int) is called exactly once. exitCode == 0 -> success.
+# ===========================================================================
+from os.path import isfile
 
-# ===========================================================================
-# ServiceAction – Python wrapper around eServiceActionClient (C++)
-#
-# Keeps the same public API as before but delegates all I/O to the C++
-# singleton which uses eSocketNotifier (non-blocking, no Twisted thread).
-#
-# Protocol sent to socketdaemon:
-#   "ACTION <id> <TYPE> [<data>]\n"
-# Response:
-#   "DONE <id> <exitcode>\n"  or  "ERROR <id> <exitcode>\n"
-#
-# callback(exitCode: int) is called exactly once (on reply or timeout).
-# exitCode == 0  → success,  exitCode != 0  → failure/timeout.
-# ===========================================================================
-from enigma import eServiceActionClient as _C
+from Components.Console import Console
+
+ifupBin = "/sbin/ifup"
+ifdownBin = "/sbin/ifdown"
+
+
+def _netrestarterPath() -> str:
+    # Prefer /usr/sbin/netrestarter (correct install path); fall back to
+    # /etc/init.d/netrestarter for images built before the Makefile.am fix.
+    return "/usr/sbin/netrestarter" if isfile("/usr/sbin/netrestarter") else "/etc/init.d/netrestarter"
 
 
 class ServiceAction:
-    """Thin Python wrapper around eServiceActionClient.
+    """Console-based replacement for the old eServiceActionClient wrapper.
 
-    Usage is identical to the old Twisted-based version – the callback
-    receives one int: the daemon's shell exit code (0 = success).
-
-    Instance methods (restart/start/stop) use self.serviceName.
-    Class methods (ifup, ifdown, …) create and return a new instance.
+    Same public API as before (restart/start/stop + the ifup/ifdown/...
+    class-method factories) so callers need no changes.
     """
-
-    _cbs: dict[int, object] = {}
-    _hooked: bool = False
 
     def __init__(self, serviceName: str):
         self.serviceName = serviceName
-        ServiceAction._ensure_hooked()
+        self.console = None  # kept alive by the caller holding this instance
 
-    @classmethod
-    def _ensure_hooked(cls) -> None:
-        if not cls._hooked:
-            _C.getInstance().actionResult.get().append(cls._on_result)
-            cls._hooked = True
+    def _run(self, cmd: str, callback, timeout: int = 15000) -> None:
+        self.console = Console()
 
-    @classmethod
-    def _on_result(cls, reqId: int, exitCode: int) -> None:
-        print(f"[ServiceAction] DEBUG _on_result: reqId={reqId} exitCode={exitCode} hasCallback={reqId in cls._cbs}")
-        cb = cls._cbs.pop(reqId, None)
-        if cb and callable(cb):
-            cb(exitCode)
+        def _done(result, retval, extra_args=None):
+            if callback and callable(callback):
+                callback(retval)
 
-    @classmethod
-    def _dispatch(cls, action: str, data: str, callback, timeout: int) -> int:
-        cls._ensure_hooked()
-        reqId = int(_C.getInstance().sendAction(action, data, timeout))
-        print(f"[ServiceAction] DEBUG _dispatch: action={action} data={data!r} reqId={reqId} timeout={timeout}")
-        if callback and callable(callback):
-            cls._cbs[reqId] = callback
-        return reqId
+        self.console.ePopen(cmd, _done)
 
     # ---- instance methods ------------------------------------------------
 
     def restart(self, callback, timeout: int = 15000) -> None:
-        """RESTART,<serviceName> → callback(exitCode)"""
-        ServiceAction._dispatch("RESTART", self.serviceName, callback, timeout)
+        self._run(f"/etc/init.d/{self.serviceName} restart", callback, timeout)
 
     def start(self, callback, timeout: int = 15000) -> None:
-        """START,<serviceName> → callback(exitCode)"""
-        ServiceAction._dispatch("START", self.serviceName, callback, timeout)
+        self._run(f"/etc/init.d/{self.serviceName} start", callback, timeout)
 
     def stop(self, callback, timeout: int = 15000) -> None:
-        """STOP,<serviceName> → callback(exitCode)"""
-        ServiceAction._dispatch("STOP", self.serviceName, callback, timeout)
+        self._run(f"/etc/init.d/{self.serviceName} stop", callback, timeout)
 
-    # ---- class-method factories ------------------------------------------
+    # ---- class-method factories -------------------------------------------
 
     @classmethod
     def netrestart(cls, callback, iface: str = "", timeout: int = 15000) -> "ServiceAction":
-        """NETRESTART or NETRESTART,<iface> → callback(exitCode)"""
         data = iface if (iface and iface != "all") else ""
-        cls._dispatch("NETRESTART", data, callback, timeout)
-        obj = cls.__new__(cls)
-        obj.serviceName = data
+        obj = cls(data)
+        obj._run(f"{_netrestarterPath()} restart {data}".strip(), callback, timeout)
         return obj
 
     @classmethod
     def ifup(cls, iface: str, callback, timeout: int = 15000) -> "ServiceAction":
-        """IFUP,<iface> → /sbin/ifup <iface> → callback(exitCode)"""
-        cls._dispatch("IFUP", iface, callback, timeout)
-        return cls(iface)
+        obj = cls(iface)
+        obj._run(f"{ifupBin} {iface}", callback, timeout)
+        return obj
 
     @classmethod
     def ifdown(cls, ifaces: "str | list[str]", callback, timeout: int = 15000) -> "ServiceAction":
-        """IFDOWN,<iface[,iface…]> → /sbin/ifdown for each → callback(exitCode)"""
-        data = ",".join(ifaces) if isinstance(ifaces, list) else ifaces
-        cls._dispatch("IFDOWN", data, callback, timeout)
-        return cls(data)
+        data = " ".join(ifaces) if isinstance(ifaces, list) else ifaces
+        obj = cls(data)
+        obj._run(f"{ifdownBin} {data}", callback, timeout)
+        return obj
 
     @classmethod
     def wlanActivate(cls, iface: str, callback, networkId: "int | None" = None, timeout: int = 30000) -> "ServiceAction":
-        """WLANUP,<iface>[,<networkId>] → wlanactivator start <iface> [<networkId>] → callback(exitCode)
-
-        networkId pins wpa_supplicant to exactly that one saved network
-        instead of letting it auto-pick/roam among every enabled network in
-        wpa_supplicant.conf."""
-        data = f"{iface},{networkId}" if networkId is not None else iface
-        cls._dispatch("WLANUP", data, callback, timeout)
-        return cls(iface)
+        obj = cls(iface)
+        args = f"{iface} {networkId}" if networkId is not None else iface
+        obj._run(f"/etc/init.d/wlanactivator start {args}", callback, timeout)
+        return obj
 
     @classmethod
     def wlanDeactivate(cls, iface: str, callback, timeout: int = 15000) -> "ServiceAction":
-        """WLANDOWN,<iface> → wlanactivator stop <iface> → callback(exitCode)"""
-        cls._dispatch("WLANDOWN", iface, callback, timeout)
-        return cls(iface)
+        obj = cls(iface)
+        obj._run(f"/etc/init.d/wlanactivator stop {iface}", callback, timeout)
+        return obj
 
     @classmethod
     def switchSoftcam(cls, camName: str, callback, timeout: int = 15000) -> "ServiceAction":
-        """SWITCH_SOFTCAM,<camName> → callback(exitCode)"""
-        cls._dispatch("SWITCH_SOFTCAM", camName, callback, timeout)
-        return cls(camName)
+        obj = cls(camName)
+        obj._run(f"/etc/init.d/softcam.{camName} restart", callback, timeout)
+        return obj
 
     @classmethod
     def switchCardserver(cls, serverName: str, callback, timeout: int = 15000) -> "ServiceAction":
-        """SWITCH_CARDSERVER,<serverName> → callback(exitCode)"""
-        cls._dispatch("SWITCH_CARDSERVER", serverName, callback, timeout)
-        return cls(serverName)
+        obj = cls(serverName)
+        obj._run(f"/etc/init.d/cardserver.{serverName} restart", callback, timeout)
+        return obj
 
     @classmethod
     def ping(cls, iface: str, host: str, callback, timeout: int = 3000) -> "ServiceAction":
-        """PING,<iface>,<host> → one ICMP echo bound to iface → callback(exitCode)"""
-        cls._dispatch("PING", f"{iface},{host}", callback, timeout)
-        obj = cls.__new__(cls)
-        obj.serviceName = host
+        obj = cls(host)
+        secs = max(1, timeout // 1000)
+        obj._run(f"/bin/ping -I {iface} -c 1 -W {secs} {host}", callback, timeout)
         return obj
 
     @classmethod
     def resolve(cls, host: str, callback, timeout: int = 3000) -> "ServiceAction":
-        """RESOLVE,<host> → resolve host via getaddrinfo → callback(exitCode)"""
-        cls._dispatch("RESOLVE", host, callback, timeout)
-        obj = cls.__new__(cls)
-        obj.serviceName = host
+        obj = cls(host)
+        obj._run(f'python3 -c "import socket,sys;socket.gethostbyname(sys.argv[1])" {host}', callback, timeout)
         return obj
 
     @classmethod
     def netscan(cls, cidr: str, ports: "list[int]", callback, timeout: int = 10000) -> "ServiceAction":
-        """NETSCAN,<cidr>,<port>[,<port>…] → active TCP connect-scan of <cidr>
-        (max /24), writes /var/run/netscan → callback(exitCode)."""
-        data = cidr + "".join(f",{port}" for port in ports)
-        cls._dispatch("NETSCAN", data, callback, timeout)
-        obj = cls.__new__(cls)
-        obj.serviceName = cidr
+        obj = cls(cidr)
+        portArgs = " ".join(str(p) for p in ports)
+        obj._run(f"/usr/sbin/netscan {cidr} {portArgs}", callback, timeout)
         return obj

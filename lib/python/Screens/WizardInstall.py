@@ -4,7 +4,8 @@ from Components.ConfigList import ConfigListScreen, ConfigList
 from Components.ActionMap import HelpableActionMap
 from Components.Sources.StaticText import StaticText
 from Components.config import config, ConfigSubsection, ConfigBoolean, ConfigSelection, ConfigYesNo, ConfigIP, ConfigNothing
-from Components.Network import iNetwork
+from Components.NetworkManager import networkManager
+from Tools.ServiceAction import ServiceAction
 from Components.Opkg import OpkgComponent
 from enigma import eDVBDB
 
@@ -17,7 +18,7 @@ config.misc.installwizard.selectedchannellist = ConfigSelection(choices={"19e-23
 config.misc.installwizard.channellistdownloaded = ConfigBoolean(default=False)
 
 
-class InstallWizard(ConfigListScreen, Screen):
+class WizardInstall(ConfigListScreen, Screen):
 
 	STATE_UPDATE = 0
 	STATE_CHOISE_CHANNELLIST = 1
@@ -123,11 +124,11 @@ class InstallWizard(ConfigListScreen, Screen):
 
 	def run(self):
 		if self.index == self.STATE_UPDATE and config.misc.installwizard.hasnetwork.value:
-			self.session.open(InstallWizardOpkgUpdater, self.index, _('Please wait (updating packages)'), OpkgComponent.CMD_UPDATE)
+			self.session.open(WizardInstallOpkgUpdater, self.index, _('Please wait (updating packages)'), OpkgComponent.CMD_UPDATE)
 			self.doNextStep = True
 		elif self.index == self.STATE_CHOISE_CHANNELLIST:
 			if self.enabled.value:
-				self.session.open(InstallWizardOpkgUpdater, self.index, _('Please wait (downloading channel list)'), OpkgComponent.CMD_REMOVE, {'package': 'enigma2-plugin-settings-hans-' + self.channellist_type.value})
+				self.session.open(WizardInstallOpkgUpdater, self.index, _('Please wait (downloading channel list)'), OpkgComponent.CMD_REMOVE, {'package': 'enigma2-plugin-settings-hans-' + self.channellist_type.value})
 			self.doNextStep = True
 		elif self.index == self.INSTALL_PLUGINS:
 			if self["config"].getCurrent()[1] == self.doplugins:
@@ -151,14 +152,14 @@ class InstallWizard(ConfigListScreen, Screen):
 				self.doNextStep = True
 
 
-class InstallWizardOpkgUpdater(Screen):
+class WizardInstallOpkgUpdater(Screen):
 	skin = """
 	<screen position="c-300,c-25" size="600,50" title=" ">
 		<widget source="statusbar" render="Label" position="10,5" zPosition="10" size="e-10,30" halign="center" valign="center" font="Regular;22" transparent="1" shadowColor="black" shadowOffset="-1,-1" />
 	</screen>"""
 
 	def __init__(self, session, index, info, cmd, pkg=None):
-		self.skin = InstallWizardOpkgUpdater.skin
+		self.skin = WizardInstallOpkgUpdater.skin
 		Screen.__init__(self, session, enableHelp=True)
 		self["actions"] = HelpableActionMap(self, ["SelectCancelActions"], {
 			"cancel": (self.close, _("Close the screen")),
@@ -192,3 +193,49 @@ class InstallWizardOpkgUpdater(Screen):
 					eDVBDB.getInstance().reloadBouquets()
 					eDVBDB.getInstance().reloadServicelist()
 			self.close()
+
+
+class WizardInstallSmallBox(Screen):
+	skin = """
+	<screen name="WizardInstallSmallBox" position="center,center" size="520,185" resolution="1280,720">
+		<widget source="Title" render="Label" position="65,8" size="520,0" font="Regular;22" transparent="1"/>
+		<widget source="status" render="Label" position="75,10" size="435,55" font="Regular;22" transparent="1"/>
+	</screen>"""
+
+	def __init__(self, session):
+		Screen.__init__(self, session, enableHelp=True)
+		self.setTitle(_("Small Box Preparation"))
+		self.skinName = ["InstallWizardSmallBox"]
+		if isinstance(self.skinName, str):
+			self.skinName.insert(0, "InstallWizardSmallBox")
+		self["actions"] = HelpableActionMap(self, ["SelectCancelActions"], {
+			"cancel": (self.close, _("Close the screen")),
+			"select": (self.close, _("Close the screen"))
+		}, prio=0, description=_("Small Box Preparation Actions"))
+		self["actions"].setEnabled(False)
+		self["status"] = StaticText(_("Updating package list."))
+		self.opkgComponent = OpkgComponent()
+		self.opkgComponent.addCallback(self.opkgCallback)
+		self.onLayoutFinish.append(self.layoutFinished)
+
+	def layoutFinished(self):
+		self.opkgComponent.runCommand(self.opkgComponent.CMD_REFRESH_INSTALL, {"arguments": ["packagegroup-small"], "lineMode": True})
+
+	def opkgCallback(self, event, parameter):
+		# print(f"[WizardInstall] opkgCallback DEBUG: event='{self.opkgComponent.getEventText(event)}', parameter='{parameter}'.")
+		match event:
+			case self.opkgComponent.EVENT_REFRESH_DONE:
+				self["status"].setText(_("Installing package."))
+			case self.opkgComponent.EVENT_ERROR:
+				self["status"].setText(_("Package installation failed."))
+				self["actions"].setEnabled(True)
+			case self.opkgComponent.EVENT_INSTALL:
+				self["status"].setText(f"{_('Installing')}: '{parameter}'.")
+			case self.opkgComponent.EVENT_DOWNLOAD:
+				self["status"].setText(f"{_('Downloading')}: '{parameter}'.")
+			case self.opkgComponent.EVENT_CONFIGURING:
+				self["status"].setText(f"{_('Configuring')}: '{parameter}'.")
+			case self.opkgComponent.EVENT_DONE:
+				config.misc.installwizard.opkgloaded.value = True
+				self.opkgComponent.removeCallback(self.opkgCallback)
+				self.close()
