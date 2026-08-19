@@ -722,8 +722,9 @@ from Components.NetworkTime import ntpSyncPoller
 ntpSyncPoller.startTimer()
 
 enigma.eProfileWrite("Network")
-from Components.Network import InitNetwork
-InitNetwork()
+from Components.NetworkManager import discoveryManager, networkManager
+networkManager.startNetworkCheck()
+discoveryManager.start()  # one bounded SMB/NFS mDNS discovery pass per boot, auto-stops after DiscoveryManager.DEFAULT_RUN_MS
 
 enigma.eProfileWrite("LCD")
 import Components.Lcd

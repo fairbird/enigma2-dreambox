@@ -439,6 +439,10 @@
 		<key id="KEY_RIGHT" mapto="right" flags="mr" />
 	</map>
 
+	<map context="InfoActions">
+		<key id="KEY_INFO" mapto="info" flags="m" />
+	</map>
+
 	<map context="InfobarMenuActions">
 		<key id="KEY_MENU" mapto="mainMenu" flags="mr" />
 		<key id="KEY_SPACE" mapto="mainMenu" flags="mr" />

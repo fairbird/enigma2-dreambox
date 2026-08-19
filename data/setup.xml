@@ -429,6 +429,7 @@
 		<item level="0" text="Time style" description="Choose the display formatting style for times. 'H' / 'HH' is the hour for a 24 hour clock, 'h' / 'hh' is the hour for a 12 hour clock, 'mm' is the minutes and 'ss' is the seconds.  ('HH' and 'hh' have leading zeros for single digit values.) The screen display will be based on your choice but can be influenced by the skin." requires="config.usage.time.enabled">config.usage.time.long</item>
 	</setup>
 	<setup key="DNS" title="DNS Settings">
+		<item level="0" text="Hostname" description="Enter the network hostname to be used to identify this receiver.">self.hostname</item>
 		<item level="0" text="Domain name" description="Enter the network domain name suffix to be added to the hostname above. This helps the DNS resolver find other network devices on the network.">config.usage.dnsSuffix</item>
 		<item level="0" text="DNS protocol mode" description="Select whether IPv4, IPv6, or both protocols should be used. If both are enabled then select which should be preferred.">config.usage.dnsMode</item>
 		<item level="0" text="Use DNS rotation" description="Select 'Yes' to enable DNS entry rotation. This rotation changes the order in which the list of DNS servers is used and can avoid issues if a DNS server in the list becomes unavailable.">config.usage.dnsRotate</item>
@@ -590,14 +591,6 @@
 		<item level="2" text="e-Mail address" description="Enter your email address to send a copy of the log to.">config.logmanager.useremail</item>
 		<item level="2" text="Send yourself a copy ?" description="Allows you to send a copy of the log to yourself.">config.logmanager.usersendcopy</item>-->
 	</setup>
-	<setup key="Network" title="Network setup">
-		<item text="Use DHCP" description="When enabled, use DHCP for the IP configuration.">config.network.dhcp</item>
-		<item text="IP address" description="Configure the IP address.">config.network.ip</item>
-		<item text="Netmask" description="Configure the netmask.">config.network.netmask</item>
-		<item text="Gateway" description="Configure the gateway.">config.network.gateway</item>
-		<item text="Nameserver" description="Configure the nameserver (DNS).">config.network.dns</item>
-		<item text="Activate network settings" description="Activate the configured network settings.">config.network.activate</item>
-	</setup>
 	<setup key="NetworkAdapter" title="Network Adapter Settings">
 		<item level="0" text="Enabled" description="When enabled, this adapter will be initialized and activated at boot time.">self.cfgEnabled</item>
 		<if conditional="self.adapter.isWlan">
@@ -664,16 +657,6 @@
 		</if>
 		<item level="0" text="Optional arguments" description="Enter optional mount arguments not provided for in the configuration settings above. Multiple arguments should be comma-separated. Invalid/Inappropriate entries can cause the mount to fail!">self.options</item>
 	</setup>
-	<setup key="NetworkConnectionWiFi" title="Wi-Fi Connection Settings">
-		<item level="0" text="Network name (SSID)" description="Select the network name (SSID) of the wireless network to which the receiver should connect.">self.cfgSsid</item>
-		<item level="0" text="Enabled" description="When enabled, connection via saved network is attempted when the Wi-Fi adapter connects.">self.cfgEnabled</item>
-		<item level="0" text="Priority" description="Preferred connection priority when multiple Wi-Fi profiles are configured. Lower numbers have a higher priority." conditional="self._hasMultiplePriorities">self.cfgPriority</item>
-		<item level="1" text="Hidden network" description="When enabled, allow connection to access points that don't broadcast their SSID.">self.cfgHidden</item>
-		<item level="0" text="Encryption" description="Select the security protocol that will be used to access the selected wireless network.">self.cfgEncryption</item>
-		<if conditional="self.cfgEncryption.value != 'none'">
-			<item level="0" text="Password / Key" description="Enter the password, pass-phrase or pre-shared key for the selected wireless network.">self.cfgKey</item>
-		</if>
-	</setup>
 	<setup key="NetworkNFS" title="NFS Settings" allowDefault="yes">
 		<item text="NFS threads" description="Enter the number of NFS server threads to be allocated/used. Higher values improve performance with multiple clients but use more memory.">self.nfsThreads</item>
 		<item text="Enable NFSv3" description="When enabled, allow usage of the NFS version 3 protocols.">self.nfsVers3</item>
@@ -683,10 +666,20 @@
 		<item text="Root squash" description="When enabled, map root to nobody (more secure). When disabled, full root access is available.">self.nfsRootSquash</item>
 	</setup>
 	<setup key="NetworkSamba" title="Samba Settings" allowDefault="yes">
-		<item text="Enable automatic shares" description="Select 'Yes' to allow each storage device detected to be automatically exported as samba share.">config.samba.enableAutoShare</item>
+		<item text="Enable automatic shares" description="Select 'Yes' to allow each storage device detected to be authasMultiplePrioritiesomatically exported as samba share.">config.samba.enableAutoShare</item>
 		<item text="Access mode" description="Select the mode of access, Read/Write or Read-Only, applied to all automatically exported Samba shares." conditional="config.samba.enableAutoShare.value">config.samba.autoShareAccess</item>
 		<item text="Allow guest access" description="When enabled, allow Samba network access without a password.">self.guest</item>
 		<item text="Workgroup name" description="Enter the workgroup name to be used by this receiver for Samba based connections. (Default is 'WORKGROUP'.)">self.workgroup</item>
+	</setup>
+	<setup key="NetworkWiFi" title="Network Wi-Fi Settings">
+		<item level="0" text="Network name (SSID)" description="Select the network name (SSID) of the wireless network to which the receiver should connect.">self.cfgSsid</item>
+		<item level="0" text="Enabled" description="When enabled, connection via saved network is attempted when the Wi-Fi adapter connects.">self.cfgEnabled</item>
+		<item level="0" text="Priority" description="Preferred connection priority when multiple Wi-Fi profiles are configured. Lower numbers have a higher priority." conditional="self.hasMultiplePriorities">self.cfgPriority</item>
+		<item level="1" text="Hidden network" description="When enabled, allow connection to access points that don't broadcast their SSID.">self.cfgHidden</item>
+		<item level="0" text="Encryption" description="Select the security protocol that will be used to access the selected wireless network.">self.cfgEncryption</item>
+		<if conditional="self.cfgEncryption.value != 'none'">
+			<item level="0" text="Password / Key" description="Enter the password, pass-phrase or pre-shared key for the selected wireless network.">self.cfgKey</item>
+		</if>
 	</setup>
 	<setup key="NetworkZeroTier" title="ZeroTier Settings">
 		<item text="Network-ID" description="Enter the ZeroTier Network ID. The ID should be exactly 16 characters in length.">config.network.ZeroTierNetworkId</item>

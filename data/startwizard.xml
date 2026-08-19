@@ -1,53 +1,91 @@
 <wizard>
 		<step id="introduction" >
 			<buttons enable="OK,UP,DOWN" />
-			<text value="Welcome to OpenPLI.\n\nUse the UP/DOWN buttons on your remote control to select an option. Use the LEFT/RIGHT buttons to change the values of a configurable option. After that, press OK to proceed to the next screen." />
+			<text value="Welcome to OpenATV.\n\nUse the UP/DOWN buttons on your remote control to select an option. Use the LEFT/RIGHT buttons to change the values of a configurable option. After that, press OK to proceed to the next screen." />
 			<displaytext value="Use UP/DOWN buttons to select option then press OK" />
 			<list>
-				<listentry caption="Use the wizard to set up basic features" step="devices" />
+				<listentry caption="Use the wizard to set up basic features" step="nwifaceselect" />
 				<listentry caption="Exit the wizard" step="end" />
 			</list>
 		</step>
-		<step id="devices" nextstep="network">
-			<condition>
-self.condition = self.hasPartitions()
-			</condition>
-			<config screen="DeviceManagerMountPoints" module="DeviceManager" type="standalone"/>
-		</step>
-		<step id="network" >
-			<text value="Please connect your receiver to the internet"/>
-			<list>
-				<listentry caption="Check the internet connection" step="update"/>
-				<listentry caption="Skip internet connection check (disables automatic package installation)" step="nima"/>
-			</list>
+		<step id="nwifaceselect">
+			<displaytext value="Set up network" />
+			<text value="Select a network interface to configure, or skip to configure the network later in system settings." />
+			<list type="dynamic" source="nwListInterfaces" evaluation="nwIfaceSelected" onselect="nwIfaceMoved" />
 			<code>
-self.clearSelectedKeys()
-self.selectKey("UP")
-self.selectKey("DOWN")
+self.nwSelectedIface = None
+self.nwIpFound = ""
+self.nwSubFlowActive = False
+			</code>
+			<code pos="after" async="yes">
+self.nwAdvanceFromSelect()
 			</code>
 		</step>
-		<step id="update">
-			<text value="Checking the internet connection"/>
-			<config screen="InstallWizard" module="InstallWizard" args="0" type="ConfigList"/>
+		<step id="nwconfig">
+			<displaytext value="Configure network adapter" />
+			<text value="Opening network adapter configuration..." />
+			<code>
+self.clearSelectedKeys()
+			</code>
+			<code async="yes">
+self.nwOpenSetup()
+			</code>
+		</step>
+		<step id="nwstatus">
+			<displaytext value="Network adapter status" />
+			<text value="Network adapter setup result:" />
+			<code>
+self.nwShowStatus()
+			</code>
+			<list>
+				<listentry caption="Continue" step="nwdns" />
+				<listentry caption="Configure another network adapter" step="nwifaceselect" />
+			</list>
+		</step>
+
+		<step id="nwdns">
+			<text value="Configure or verify your DNS (Dynamic Name Server) settings by adjusting the values shown.\n\nWhen the settings are correct press OK to continue." />
+			<displaytext value="Configure DNS (Dynamic Name Server)" />
+			<config screen="DNSSettings" module="NetworkSetup" type="standalone" />
 			<code>
 self.clearSelectedKeys()
 self.selectKey("OK")
 			</code>
 		</step>
-		<step id="networkfailed" >
+		<step id="devices" nextstep="timezone">
 			<condition>
-self.condition = not config.misc.installwizard.opkgloaded.value
+self.condition = self.hasPartitions()
 			</condition>
-			<text value="Your receiver does not have an internet connection"/>
+			<config screen="DeviceManagerMountPoints" module="DeviceManager" type="standalone" />
+		</step>
+
+		<step id="network">
+			<buttons enable="OK,UP,DOWN" />
+			<text value="To complete the setup the %s %s must connect to the Internet.  Connect the %s %s to the Internet now." />
+			<displaytext value="Connect to the Internet" />
 			<list>
-				<listentry caption="Check the internet connection again" step="update"/>
-				<listentry caption="Skip internet connection check (disables automatic package installation)" step="nima"/>
+				<listentry caption="Continue with package download and installation" step="update" />
+				<listentry caption="Skip package installation, only core packages will be available" step="timezone" />
 			</list>
-			<code>
-self.clearSelectedKeys()
-self.selectKey("UP")
-self.selectKey("DOWN")
-			</code>
+		</step>
+		<step id="update">
+			<config screen="WizardInstallSmallBox" module="WizardInstall" type="standalone" />
+		</step>
+		<step id="networkfailed" >
+			<buttons enable="OK,UP,DOWN" />
+			<text value="The %s %s does not have an Internet connection." />
+			<displaytext value="No Internet connection" />
+			<list>
+				<listentry caption="Check the Internet connection again" step="update" />
+				<listentry caption="Skip package installation, only core packages will be available" step="timezone" />
+			</list>
+		</step>
+		<step id="timezone">
+			<buttons enable="OK,UP,DOWN,LEFT,RIGHT,YELLOW,1,2,3,4,5,6,7,8,9,0,BACKSPACE,DEL" />
+			<colorButtonLabels yellow="Use Geolocation" />
+			<text value="Set the time options.\n\nPress YELLOW to set the time zone via geolocation."/>
+			<displaytext value="Set time options"/>
+			<config screen="Time" module="Time" type="ConfigList"/>
 		</step>
 		<step id="nima">
 			<condition>
@@ -211,7 +249,7 @@ from Components.NimManager import nimmanager
 self.condition = nimmanager.somethingConnected() and config.misc.installwizard.hasnetwork.value and config.misc.installwizard.opkgloaded.value
 			</condition>
 			<text value="Do you want to install a channel list?"/>
-			<config screen="InstallWizard" module="InstallWizard" args="1" type="ConfigList"/>
+			<config screen="WizardInstall" module="WizardInstall" args="1" type="ConfigList"/>
 			<code>
 self.clearSelectedKeys()
 self.selectKey("LEFT")
@@ -237,18 +275,7 @@ self.selectKey("RIGHT")
 from Components.NimManager import nimmanager
 self.condition = nimmanager.somethingConnected()
 			</condition>
-			<config screen="InstallWizard" module="InstallWizard" args="3" type="ConfigList"/>
-			<code>
-self.clearSelectedKeys()
-self.selectKey("OK")
-			</code>
-		</step>
-		<step id="plugins">
-			<condition>
-self.condition = config.misc.installwizard.hasnetwork.value and config.misc.installwizard.opkgloaded.value
-			</condition>
-			<text value="Do you want to install Plugins?"/>
-			<config screen="InstallWizard" module="InstallWizard" args="2" type="ConfigList"/>
+			<config screen="WizardInstall" module="WizardInstall" args="3" type="ConfigList"/>
 			<code>
 self.clearSelectedKeys()
 self.selectKey("OK")
