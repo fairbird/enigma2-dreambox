@@ -1632,6 +1632,7 @@ class PackageAction(Screen, NumericalTextInput):
 				if count > 2:
 					if parts[0] == "enigma2" and parts[1] == "plugin":
 						packageCategory = parts[2]
+						packageName = "-".join(parts[3:])
 					elif parts[0] == "kodi" and parts[1] == "addon":
 						packageCategory = "kodiaddons"
 						packageName = "-".join(parts[2:])
