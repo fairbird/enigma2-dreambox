@@ -1,73 +1,67 @@
 # -*- coding: utf-8 -*-
-from Screens.InfoBar import InfoBar
-from Screens.ChoiceBox import ChoiceBox
-from Screens.MessageBox import MessageBox
+from os import access, F_OK, R_OK
 from Plugins.Plugin import PluginDescriptor
-from Tools.BoundFunction import boundFunction
 from Components.Scanner import scanDevice
 from Components.Harddisk import harddiskmanager
-import os
+from Screens.ChoiceBox import ChoiceBox
+from Screens.InfoBar import InfoBar
+from Screens.MessageBox import MessageBox
 
-
+parentScreen = None
 global_session = None
 
 
 def execute(option):
-	print("[MediaScanner] execute", option)
 	if not option:
+		if parentScreen:
+			parentScreen.close()
 		return
-	(_, scanner, files, session) = option
+
+	(_, scanner, files, session, _) = option
 	scanner.open(files, session)
+	if parentScreen:
+		parentScreen.close()
 
 
 def mountpoint_choosen(option):
 	if not option:
+		if parentScreen:
+			parentScreen.close()
 		return
-	(description, mountpoint, session) = option
+
+	(description, mountpoint, session, popup) = option
 	res = scanDevice(mountpoint)
-	files = [(r.description, r, res[r], session) for r in res]
-	if not files:
-		if os.access(mountpoint, os.F_OK | os.R_OK):
-			session.open(MessageBox, (_("%s connected successfully.") % description) + _("No displayable files on this medium found!"), MessageBox.TYPE_INFO, simple=True, timeout=5)
-		else:
-			session.open(MessageBox, _("Storage device not available or not initialized."), MessageBox.TYPE_ERROR, simple=True, timeout=10)
+
+	list = [(r.description, r, res[r], session, popup) for r in res]
+
+	if not list:
+		if popup:
+			if access(mountpoint, F_OK | R_OK):
+				session.open(MessageBox, _("No displayable files on this medium found!"), MessageBox.TYPE_INFO, simple=True, timeout=5)
+		if parentScreen:
+			parentScreen.close()
 		return
-	session.openWithCallback(execute, ChoiceBox, title=(_("%s connected successfully.") % description) + "\n" + _("The following files were found..."), list=files)
+
+	session.openWithCallback(execute, ChoiceBox, title=_("The following files were found..."), list=list)
 
 
-def scan(session):
-	parts = [(r.tabbedDescription(), r.mountpoint, session) for r in harddiskmanager.getMountedPartitions(onlyhotplug=False) if os.access(r.mountpoint, os.F_OK | os.R_OK)]
-	parts.append((_("Memory") + "\t/tmp", "/tmp", session))
-	session.openWithCallback(mountpoint_choosen, ChoiceBox, title=_("Please select medium to be scanned") + ":", list=parts)
+def scan(session, parent=None):
+	global parentScreen
+	parentScreen = parent
+	parts = [(r.tabbedDescription(), r.mountpoint, session, True) for r in harddiskmanager.getMountedPartitions(onlyhotplug=False) if access(r.mountpoint, F_OK | R_OK)]
+	parts.append((_("Temporary directory") + "\t/tmp", "/tmp", session, True))
+	session.openWithCallback(mountpoint_choosen, ChoiceBox, title=_("Please select medium to be scanned"), list=parts)
 
 
 def main(session, **kwargs):
 	scan(session)
 
 
-def menuEntry(*args):
-	mountpoint_choosen(args)
-
-
-def menuHook(menuid):
-	if menuid != "mainmenu":
-		return []
-	return [(_("%s (files)") % r.description, boundFunction(menuEntry, r.description, r.mountpoint), "hotplug_%s" % r.mountpoint, None) for r in harddiskmanager.getMountedPartitions(onlyhotplug=True)]
-
-
 def partitionListChanged(action, device):
 	if InfoBar.instance:
 		if InfoBar.instance.execing:
 			if action == 'add' and device.is_hotplug:
-				print("[MediaScanner] mountpoint", device.mountpoint)
-				print("[MediaScanner] description", device.description)
-				print("[MediaScanner] force_mounted", device.force_mounted)
-				print("[MediaScanner] scanning", device.description, device.mountpoint)
-				mountpoint_choosen((device.description, device.mountpoint, global_session))
-		else:
-			print("[MediaScanner] main infobar is not execing... so we ignore hotplug event!")
-	else:
-			print("[MediaScanner] hotplug event.. but no infobar")
+				mountpoint_choosen((device.description, device.mountpoint, global_session, False))
 
 
 def sessionstart(reason, session):
