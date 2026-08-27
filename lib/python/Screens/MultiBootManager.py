@@ -222,6 +222,12 @@ class MultiBootManager(Screen):
 			self["renameActions"].setEnabled(False)
 			self["key_text"].setText("")
 
+	def keyCancel(self):
+		self.close()
+
+	def keyCloseRecursive(self):
+		self.close(True)
+
 	def keyTop(self):
 		self["slotlist"].instance.moveSelection(self["slotlist"].instance.moveTop)
 		while self["slotlist"].getCurrent()[0][1] is None:
