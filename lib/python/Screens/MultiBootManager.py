@@ -177,7 +177,6 @@ class MultiBootManager(Screen):
 			self["key_yellow"].setText("")
 			self["key_blue"].setText("")
 			self["restartActions"].setEnabled(True)
-			self["deleteActions"].setEnabled(False)
 			self["emptyActions"].setEnabled(False)
 			self["restoreActions"].setEnabled(False)
 		elif status == "hidden":
