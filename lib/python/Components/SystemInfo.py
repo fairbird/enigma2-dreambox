@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from ast import literal_eval
 from hashlib import md5
-from os import R_OK, access
+from os import R_OK, access, listdir
 from os.path import exists as fileAccess, isdir, isfile, join
 from re import findall
 
