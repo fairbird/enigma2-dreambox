@@ -11,6 +11,7 @@ from Components.PluginComponent import plugins
 from Components.ServiceEventTracker import ServiceEventTracker
 from Components.Sources.ServiceEvent import ServiceEvent
 from Components.Sources.Boolean import Boolean
+from Components.Sources.RdsDecoder import RdsDecoder
 from Components.config import config, ConfigBoolean, ConfigClock
 from Components.SystemInfo import BoxInfo, getBoxDisplayName
 from Components.UsageConfig import preferredInstantRecordPath, defaultMoviePath
@@ -463,6 +464,7 @@ class InfoBarShowHide(InfoBarScreenSaver):
 		self.__state = self.STATE_SHOWN
 		self.__locked = 0
 
+		self["RdsDecoder"] = RdsDecoder(self.session.nav)
 		self.DimmingTimer = eTimer()
 		self.DimmingTimer.callback.append(self.doDimming)
 		self.unDimmingTimer = eTimer()
@@ -1640,6 +1642,7 @@ class InfoBarRdsDecoder:
 	"""provides RDS and Rass support/display"""
 
 	def __init__(self):
+		self["RdsDecoder"] = RdsDecoder(self.session.nav)
 		self.rds_display = self.session.instantiateDialog(RdsInfoDisplay)
 		self.session.instantiateSummaryDialog(self.rds_display)
 		self.rass_interactive = None

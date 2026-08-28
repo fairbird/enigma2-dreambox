@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from Components.Converter.Converter import Converter
-from enigma import iServiceInformation, iPlayableService, eServiceReference
+from enigma import iServiceInformation, eServiceReference, iPlayableService, eServiceReference
 from Screens.InfoBarGenerics import hasActiveSubservicesForCurrentChannel
 from Components.Element import cached
 
@@ -94,6 +94,7 @@ class ServiceInfo(Converter):
 	IS_VIDEO_AVC = 36
 	IS_VIDEO_HEVC = 37
 	IS_SOFTCSA = 38
+	IS_DAB = 39
 
 	def __init__(self, type):
 		Converter.__init__(self, type)
@@ -102,6 +103,7 @@ class ServiceInfo(Converter):
 				"IsMultichannel": (self.IS_MULTICHANNEL, (iPlayableService.evUpdatedInfo,)),
 				"IsStereo": (self.IS_STEREO, (iPlayableService.evUpdatedInfo,)),
 				"IsCrypted": (self.IS_CRYPTED, (iPlayableService.evUpdatedInfo,)),
+				"IsDAB": (self.IS_DAB, (iPlayableService.evStart, iPlayableService.evUpdatedInfo)),
 				"IsSoftCSA": (self.IS_SOFTCSA, (iPlayableService.evUpdatedInfo,)),
 				"IsWidescreen": (self.IS_WIDESCREEN, (iPlayableService.evVideoSizeChanged,)),
 				"IsNotWidescreen": (self.IS_NOT_WIDESCREEN, (iPlayableService.evVideoSizeChanged,)),
@@ -193,6 +195,9 @@ class ServiceInfo(Converter):
 				return False
 			elif self.type == self.IS_CRYPTED:
 				return info.getInfo(iServiceInformation.sIsCrypted) == 1 and info.getInfo(iServiceInformation.sIsSoftCSA) != 1
+			elif self.type == self.IS_DAB:
+					ref = info.getInfoString(iServiceInformation.sServiceref)
+					return bool(ref and eServiceReference(ref).type == eServiceReference.idServiceDAB)
 			elif self.type == self.IS_SOFTCSA:
 				return info.getInfo(iServiceInformation.sIsSoftCSA) == 1
 			elif self.type == self.SUBSERVICES_AVAILABLE:

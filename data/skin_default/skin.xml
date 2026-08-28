@@ -806,6 +806,13 @@
 		</widget>
 	</screen>
 	<screen name="RadioInfoBar" flags="wfNoBorder" position="center,548" size="843,162" backgroundColor="transparent">
+		<widget position="5,5" render="Picon" size="45,45" source="session.CurrentService" transparent="1" zPosition="3">
+			<convert type="ServiceName">Reference</convert>
+		</widget>
+		<widget alphatest="on" pixmap="icons/ico_dab-plus.png" position="15,62" render="Pixmap" size="25,25" source="session.CurrentService" zPosition="3">
+			<convert type="ServiceInfo">IsDAB</convert>
+			<convert type="ConditionalShowHide" />
+		</widget>
 		<ePixmap position="0,0" zPosition="-1" size="843,162" pixmap="infobar/radio-infobar-bg.png"/>
 		<widget source="session.CurrentService" render="Label" position="44,8" size="520,34" font="Boldit;30" backgroundColor="infobar-frgrnd-on" foregroundColor="infobar_service_frgrnd" transparent="1" valign="top" halign="left" noWrap="1">
 			<convert type="ServiceName">Name</convert>
@@ -945,6 +952,9 @@
 		</widget>
 		<widget source="RdsDecoder" render="Label" position="43,113" size="620,30" font="LCD;20" backgroundColor="#00d9dee2" transparent="1" halign="center" valign="center" foregroundColor="foreground">
 			<convert type="RdsInfo">RadioText</convert>
+		</widget>
+		<widget font="Regular;17" foregroundColor="grey" position="55,122" render="Label" size="610,24" source="RdsDecoder" zPosition="3">
+			<convert type="RdsInfo">RtpText</convert>
 		</widget>
 	</screen>
 	<screen name="QuickEPG" flags="wfNoBorder" position="center,415" size="974,295" title="InfoBar" backgroundColor="transparent">

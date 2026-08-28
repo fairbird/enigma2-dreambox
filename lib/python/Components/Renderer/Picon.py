@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 from os import listdir
-from os.path import exists, getsize, isdir, join
+from os.path import exists, getmtime, getsize, isdir, join
 from re import sub
 from enigma import ePixmap, eServiceCenter, eServiceReference, iServiceInformation
 from Components.config import config, ConfigSubsection, ConfigSelection
 from Components.Harddisk import harddiskmanager
 from Components.Renderer.Renderer import Renderer
+import NavigationInstance
 from ServiceReference import ServiceReference
 from Tools.Alternatives import GetWithAlternative
 from Tools.Directories import SCOPE_SKIN_IMAGE, SCOPE_CURRENT_SKIN, resolveFilename, sanitizeFilename
@@ -131,6 +132,19 @@ def getPiconName(serviceRef):
 	return piconLocator.getPiconName(serviceRef)
 
 
+def getDABImage(serviceName):
+	ref = eServiceReference(serviceName or "")
+	if ref.type != eServiceReference.idServiceDAB or NavigationInstance.instance is None:
+		return ""
+	playingRef = NavigationInstance.instance.getCurrentlyPlayingServiceReference()
+	if not playingRef or playingRef.toString().split(":", 10)[:10] != ref.toString().split(":", 10)[:10]:
+		return ""
+	service = NavigationInstance.instance.getCurrentService()
+	info = service and service.info()
+	image = info and info.getInfoString(iServiceInformation.sTagImage) or ""
+	return image if image and exists(image) else ""
+
+
 class Picon(Renderer):
 	def __init__(self):
 		Renderer.__init__(self)
@@ -153,19 +167,20 @@ class Picon(Renderer):
 	def changed(self, what):
 		if self.instance:
 			if what[0] in (self.CHANGED_DEFAULT, self.CHANGED_ALL, self.CHANGED_SPECIFIC):
-				pngname = piconLocator.getPiconName(self.source.text)
+				pngname = piconLocator.getDABImage(self.source.text) or piconLocator.getPiconName(self.source.text)
 				if not exists(pngname):  # no picon for service found
 					pngname = self.defaultpngname
 				if not config.usage.showpicon.value:  # disabe picon on infobar
 					pngname = self.defaultpngname
-				if self.pngname != pngname:
+				pngkey = (pngname, getmtime(pngname), getsize(pngname)) if pngname and exists(pngname) else pngname
+				if self.pngname != pngkey:
 					if pngname:
 						self.instance.setScale(1)
 						self.instance.setPixmapFromFile(pngname)
 						self.instance.show()
 					else:
 						self.instance.hide()
-					self.pngname = pngname
+					self.pngname = pngkey
 			elif what[0] == self.CHANGED_CLEAR:
 				self.pngname = None
 				self.instance.hide()

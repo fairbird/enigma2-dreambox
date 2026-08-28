@@ -53,6 +53,7 @@
 				<item key="tuner_setup" text="Tuner configuration" description="This options for tuner setup." conditional="nimmanager.nim_slots"><screen module="Satconfig" screen="NimSelection"/></item>
 				<item key="auto_scan" text="Automatic scan" description="This options for auto scan." conditional="nimmanager.somethingConnected()"><screen module="ScanSetup" screen="ScanSimple"/></item>
 				<item key="manual_scan" text="Manual scan" description="This options for manual scan." conditional="nimmanager.somethingConnected()"><screen module="ScanSetup"/></item>
+				<item key="dab_scan" level="0" text="DAB+ Scan" weight="15" conditional="nimmanager.getEnabledNimListOfType('DVB-S')"><screen module="DABScan" screen="DABScan" /></item>
 				<item key="fallbacktuner_settings" text="Fallback remote receiver setup" description="This options for fallback remote receiver setup."><screen module="SetupFallbacktuner"/></item>
 			</menu>
 			<menu key="system" weight="5" level="0" text="System" description="This menu contains system options.">

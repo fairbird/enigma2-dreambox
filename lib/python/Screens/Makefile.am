@@ -7,7 +7,7 @@ install_PYTHON = \
 	Satconfig.py ScanSetup.py NetworkSetup.py Ci.py TimerEntry.py Volume.py VolumeControl.py \
 	EpgSelection.py EventView.py Standby.py ServiceInfo.py NetworkServices.py NetworkMounts.py \
 	InfoBarGenerics.py HelpMenu.py Wizard.py __init__.py \
-	Dish.py LocaleSelection.py WizardStart.py PiPSetup.py \
+	Dish.py DABScan.py LocaleSelection.py WizardStart.py PiPSetup.py \
 	PluginBrowser.py MinuteInput.py Scart.py PVRState.py \
 	Console.py InputBox.py ChoiceBox.py SimpleSummary.py Processing.py \
 	TimerSelection.py Timeshift.py PictureInPicture.py Picon.py TimeDateInput.py \

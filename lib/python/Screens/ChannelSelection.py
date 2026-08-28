@@ -11,7 +11,7 @@ from Components.ServiceList import ServiceList, ServiceListLegacy, refreshServic
 from Components.ActionMap import NumberActionMap, ActionMap, HelpableActionMap, HelpableNumberActionMap
 from Components.MenuList import MenuList
 from Components.ServiceEventTracker import ServiceEventTracker, InfoBarBase
-from ServiceReference import ServiceReference, getStreamRelayRef, serviceRefAppendPath, service_types_radio_ref, service_types_tv_ref
+from ServiceReference import ServiceReference, getStreamRelayRef, isRadioServiceReference, serviceRefAppendPath, service_types_radio_ref, service_types_tv_ref
 from enigma import eServiceReference, eServiceReferenceDVB, eEPGCache, eServiceCenter, eRCInput, eTimer, eDVBDB, iPlayableService, iServiceInformation, getPrevAsciiCode, loadPNG, eProfileWrite
 eProfileWrite("ChannelSelection.py 1")
 from Screens.EpgSelection import EPGSelection
@@ -2881,6 +2881,7 @@ class ChannelSelectionRadio(ChannelSelectionBase, ChannelSelectionEdit, ChannelS
 		self.onClose.append(self.__onClose)
 		self.onExecBegin.append(self.__onExecBegin)
 		self.onExecEnd.append(self.__onExecEnd)
+		self.onShown.append(self.info.show)
 
 	def __onClose(self):
 		lastservice = eServiceReference(config.tv.lastservice.value)
@@ -2962,7 +2963,13 @@ class ChannelSelectionRadio(ChannelSelectionBase, ChannelSelectionEdit, ChannelS
 	def onCreate(self):
 		self.setRadioMode()
 		self.restoreRoot()
-		lastservice = eServiceReference(config.radio.lastservice.value)
+		currentservice = self.session.nav.getCurrentlyPlayingServiceOrGroup()
+		if isRadioServiceReference(currentservice):
+			lastservice = currentservice
+			config.radio.lastservice.value = lastservice.toString()
+			config.radio.lastservice.save()
+		else:
+			lastservice = eServiceReference(config.radio.lastservice.value)
 		if lastservice.valid():
 			self.servicelist.setCurrent(lastservice)
 			if config.usage.e1like_radio_mode_last_play.value:

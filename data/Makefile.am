@@ -4,6 +4,7 @@ dist_pkgdata_DATA = \
 	black.mvi \
 	radio.mvi \
 	encoding.conf \
+	dab.xml \
 	freesat.t1 \
 	freesat.t2 \
 	groupedservices \

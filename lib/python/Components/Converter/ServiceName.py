@@ -97,7 +97,7 @@ class ServiceName(Converter):
 	text = property(getText)
 
 	def changed(self, what):
-		if what[0] != self.CHANGED_SPECIFIC or what[1] in (iPlayableService.evStart, ):
+		if what[0] != self.CHANGED_SPECIFIC or what[1] == iPlayableService.evStart or self.type == self.REFERENCE and what[1] == iPlayableService.evUpdatedInfo:
 			Converter.changed(self, what)
 
 	def getName(self, ref, info):
