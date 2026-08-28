@@ -253,7 +253,7 @@ class ChannelContextMenu(Screen):
 							append_when_current_valid(current, menu, (_("Uncover dashed flickering line for this service"), self.toggleVBI), level=1)
 						else:
 							append_when_current_valid(current, menu, (_("Cover dashed flickering line for this service"), self.toggleVBI), level=1)
-						if config.softcsa.useStreamRelayWhitelist.value:
+						if BoxInfo.getItem("HAVEINITCAM"):
 							if Screens.InfoBar.InfoBar.instance.checkStreamrelay(current):
 								append_when_current_valid(current, menu, (_("Play service without Stream Relay"), self.toggleStreamrelay), level=1)
 							else:
@@ -303,9 +303,10 @@ class ChannelContextMenu(Screen):
 						else:
 							append_when_current_valid(current, menu, (_("Remove selected satellite"), self.removeSatelliteServices), level=0)
 					if haveBouquets:
-						if not self.inBouquet and not "PROVIDERS" in current_sel_path:
-							append_when_current_valid(current, menu, (_("Copy to bouquets"), self.copyCurrentToBouquetList), level=0)
-							append_when_current_valid(current, menu, (_("Copy To Stream Relay"), self.copyCurrentToStreamRelay), level=0)
+						if not self.inBouquet and "PROVIDERS" not in current_sel_path:
+							append_when_current_valid(current, menu, (_("Copy To Bouquet"), self.copyCurrentToBouquetList))
+							if BoxInfo.getItem("HAVEINITCAM"):
+								append_when_current_valid(current, menu, (_("Copy to bouquets"), self.copyCurrentToBouquetList), level=0)
 					if ("flags == %d" % (FLAG_SERVICE_NEW_FOUND)) in current_sel_path:
 						append_when_current_valid(current, menu, (_("Remove all new found flags"), self.removeAllNewFoundFlags), level=0)
 				if self.inBouquet:

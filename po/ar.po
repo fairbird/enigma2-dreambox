@@ -9514,8 +9514,8 @@ msgstr "ناعم"
 msgid "SocketMMI"
 msgstr "SocketMMI"
 
-msgid "SoftCSA Settings"
-msgstr "SoftCSA إعدادات"
+msgid "NDS CSA"
+msgstr "NDS CSA إعدادات"
 
 msgid "SoftCam / CI"
 msgstr "CI / سوفتكام"
@@ -9532,7 +9532,7 @@ msgstr "الكام"
 msgid "Software"
 msgstr "البرامج"
 
-msgid "Software descrambling: "
+msgid "CSA descrambling: "
 msgstr "فك تشفير البرامج: "
 
 msgid "Software management"

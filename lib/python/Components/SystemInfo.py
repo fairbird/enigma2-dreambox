@@ -218,6 +218,15 @@ def getChipSetString():
 		return str(chipset.lower().replace('\n', '').replace('bcm', '').replace('brcm', '').replace('sti', ''))
 
 
+def hasInitCam():
+	result = False
+	for cam in listdir("/etc/init.d"):
+		if cam.startswith("softcam.") and not cam.endswith("None"):
+			result = True
+			break
+	return result
+
+
 def getBoxName():
 	box = MACHINEBUILD
 	machinename = DISPLAYMODEL.lower()
@@ -332,6 +341,7 @@ BoxInfo.setItem("HasScaler_sharpness", pathExists("/proc/stb/vmpeg/0/pep_scaler_
 BoxInfo.setItem("HasHDMIin", BoxInfo.getItem("hdmifhdin") or BoxInfo.getItem("hdmihdin"))
 BoxInfo.setItem("HasHDMIinFHD", MODEL in ("dm900", "dm920", "dreamone", "dreamtwo"))
 BoxInfo.setItem("HasHDMIinPiP", BoxInfo.getItem("HasHDMIin") and BRAND != "dreambox")
+BoxInfo.setItem("HAVEINITCAM", hasInitCam())
 BoxInfo.setItem("HasSoftCSA", eDVBCSAEngine.isAvailable())
 BoxInfo.setItem("DreamBoxDVI", MODEL in ("dm8000", "dm800"))
 BoxInfo.setItem("VFDSymbol", BoxInfo.getItem("vfdsymbol"))
