@@ -265,7 +265,7 @@ public:
 	RESULT frontendInfo(ePtr<iFrontendInformation> &ptr) override;
 	RESULT stream(ePtr<iStreamableService> &ptr) override;
 	RESULT subServices(ePtr<iSubserviceList> &ptr) override;
-	RESULT getServiceType(int &serviceType) override;
+	RESULT getServiceType(int &serviceType);
 	RESULT getFilenameExtension(std::string &extension) override;
 
 private:
