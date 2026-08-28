@@ -167,7 +167,7 @@ class Picon(Renderer):
 	def changed(self, what):
 		if self.instance:
 			if what[0] in (self.CHANGED_DEFAULT, self.CHANGED_ALL, self.CHANGED_SPECIFIC):
-				pngname = piconLocator.getDABImage(self.source.text) or piconLocator.getPiconName(self.source.text)
+				pngname = getDABImage(self.source.text) or piconLocator.getPiconName(self.source.text)
 				if not exists(pngname):  # no picon for service found
 					pngname = self.defaultpngname
 				if not config.usage.showpicon.value:  # disabe picon on infobar
