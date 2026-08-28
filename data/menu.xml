@@ -50,10 +50,11 @@
 		<item key="plugin_selection" level="0" text="Plugin Browser" description="This menu contains plugins"><screen module="PluginBrowser" screen="PluginBrowser"/></item>
 		<menu key="setup" level="0" text="Setup" description="This menu contains selections to options of receiver." flushConfigOnClose="1">
 			<menu key="scan" weight="7" level="0" text="Tuners &amp; Scanning" description="This menu contains Tuners &amp; Scanning">
-				<item key="tuner_setup" text="Tuner configuration" description="This options for tuner setup." conditional="nimmanager.nim_slots"><screen module="Satconfig" screen="NimSelection"/></item>
-				<item key="auto_scan" text="Automatic scan" description="This options for auto scan." conditional="nimmanager.somethingConnected()"><screen module="ScanSetup" screen="ScanSimple"/></item>
-				<item key="manual_scan" text="Manual scan" description="This options for manual scan." conditional="nimmanager.somethingConnected()"><screen module="ScanSetup"/></item>
-				<item key="dab_scan" level="0" text="DAB+ Scan" weight="15" conditional="nimmanager.getEnabledNimListOfType('DVB-S')"><screen module="DABScan" screen="DABScan" /></item>
+				<item key="tuner_setup" level="0" text="Tuner configuration" description="This options for tuner setup." conditional="nimmanager.nim_slots" weight="0"><screen module="Satconfig" screen="NimSelection"/></item>
+				<item key="tuner_basic_settings" level="1" text="Tuner Settings" weight="1"><setup setupKey="Tuner" /></item>
+				<item key="auto_scan" level="0" text="Automatic scan" description="This options for auto scan." conditional="nimmanager.somethingConnected()" weight="5"><screen module="ScanSetup" screen="ScanSimple"/></item>
+				<item key="manual_scan" level="0" text="Manual scan" description="This options for manual scan." conditional="nimmanager.somethingConnected()" weight="10"><screen module="ScanSetup"/></item>
+				<item key="dab_scan" level="0" text="DAB+ Scan" conditional="nimmanager.getEnabledNimListOfType('DVB-S')" weight="15"><screen module="DABScan" screen="DABScan" /></item>
 				<item key="fallbacktuner_settings" text="Fallback remote receiver setup" description="This options for fallback remote receiver setup."><screen module="SetupFallbacktuner"/></item>
 			</menu>
 			<menu key="system" weight="5" level="0" text="System" description="This menu contains system options.">
