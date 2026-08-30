@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: enigma2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-07-01 17:09+0200\n"
+"POT-Creation-Date: 2026-03-11 07:29+0100\n"
 "PO-Revision-Date: 2024-12-12 17:09+0200\n"
 "Last-Translator: Dimitrij <Dima-73@inbox.lv>\n"
 "Language-Team: openPLi Dimitrij\n"
@@ -839,6 +839,9 @@ msgstr "Установка настроек 3D"
 msgid "Adjust the color settings so that all the color shades are distinguishable, but appear as saturated as possible. If you are happy with the result, press OK to close the video fine-tuning, or use the number keys to select other test screens."
 msgstr "Настройте параметры цвета, так чтобы все оттенки цветов были максимально видны, насколько это возможно. Если вы довольны результатом, нажмите кнопку ОК для закрытия видео настроек, или используйте цифровые клавиши для выбора других тестов экрана."
 
+msgid "Adult Audience, Strong Violence 15+"
+msgstr ""
+
 msgid "Advanced"
 msgstr "Расширенный"
 
@@ -889,6 +892,10 @@ msgstr "Выравнивание имени сервиса"
 
 msgid "All"
 msgstr "Все"
+
+#, fuzzy
+msgid "All active receivers in standby"
+msgstr "Перевод аудио/видео системы в режим ожидания"
 
 msgid "All ages"
 msgstr "Все категории"
@@ -1256,6 +1263,10 @@ msgstr "Авто инсталляция завершена."
 msgid "Autoinstalling please wait for packages being updated"
 msgstr "Автоматическая установка, пожалуйста, дождитесь обновления пакетов."
 
+#, fuzzy
+msgid "Automatic"
+msgstr "автоматически"
+
 msgid "Automatic Language"
 msgstr "Автоматический язык"
 
@@ -1294,6 +1305,10 @@ msgstr "B"
 
 msgid "BACK"
 msgstr "BACK"
+
+#, python-format
+msgid "BC%d"
+msgstr ""
 
 msgid "BER"
 msgstr "BER"
@@ -1352,6 +1367,9 @@ msgstr "Bahamas"
 
 msgid "Bahrain"
 msgstr "Bahrain"
+
+msgid "Bambini Accompagnati"
+msgstr ""
 
 msgid "Band"
 msgstr "Диапазон"
@@ -1735,6 +1753,13 @@ msgstr "Смена языка"
 msgid "Change PIN"
 msgstr "Сменить PIN-код"
 
+#, fuzzy
+msgid "Change Password"
+msgstr "Password"
+
+msgid "Change Root Password"
+msgstr ""
+
 msgid "Change bouquets in quickzap"
 msgstr "Сменить букеты при быстром переключении"
 
@@ -1850,6 +1875,10 @@ msgstr ""
 "Проверка тюнера %s\n"
 "DiSEqC порт %s для %s"
 
+#, fuzzy
+msgid "Children"
+msgstr "Chile"
+
 msgid "Children/Youth/Education/Science"
 msgstr "Дети/Молодежь/Образование/Наука"
 
@@ -1897,6 +1926,9 @@ msgstr "Выберите, сканировать ли один транспон�
 
 msgid "Choose whether to scan for free services only or whether to include paid/encrypted services too."
 msgstr "Выберите, следует ли сканировать только открытые сервисы или включать также платные/кодированные сервисы."
+
+msgid "Choose whether to use the streamrelay_whitelist file. The whitelist file should be disabled if you are using softcsa."
+msgstr ""
 
 msgid "Choose which tuner to configure."
 msgstr "Выберите тюнер для настройки."
@@ -2548,6 +2580,9 @@ msgstr ""
 msgid "Current mode: %s \n"
 msgstr "Текущий режим: %s \n"
 
+msgid "Current password incorrect"
+msgstr ""
+
 msgid "Current rotor position: "
 msgstr "Текущая позиция ротора: "
 
@@ -2575,7 +2610,8 @@ msgstr "Пользовательский интервал времени для 
 msgid "Customize"
 msgstr "Индивидуальные настройки"
 
-msgid "Customize OpenWebIF settings for fallback tuner"
+#, fuzzy
+msgid "Customize OpenWebIF settings for fallback receiver"
 msgstr "Настройте параметры OpenWebIF для резервного тюнера"
 
 msgid "Customize channel list cursor behavior"
@@ -2692,6 +2728,15 @@ msgstr "DVD список названий"
 msgid "DVDToolbox"
 msgstr "DVD - утилиты медиа"
 
+msgid "Dai 12 anni in su"
+msgstr ""
+
+msgid "Dai 14 anni in su"
+msgstr ""
+
+msgid "Dai 18 anni in su"
+msgstr ""
+
 msgid "Danish"
 msgstr "Датский"
 
@@ -2706,6 +2751,16 @@ msgstr "отладка"
 
 msgid "Debug to file"
 msgstr "Отладка в файл"
+
+msgid "Decoder release strategy"
+msgstr ""
+
+msgid "Decoder start delay"
+msgstr ""
+
+#, fuzzy
+msgid "Decoder start timeout"
+msgstr "Около времени начала на"
 
 msgid "Deep Standby LED"
 msgstr "LED в глубоком режиме ожидания"
@@ -3466,7 +3521,8 @@ msgstr "Включить Virgin EPG"
 msgid "Enable freesat EPG"
 msgstr "Включить freesat EPG"
 
-msgid "Enable import timer from fallback tuner"
+#, fuzzy
+msgid "Enable import timer from fallback receiver"
 msgstr "Включить импорт таймеров из резервного ресивера"
 
 msgid "Enable move mode"
@@ -3582,6 +3638,9 @@ msgstr "Ввод URL"
 msgid "Enter an URL where alternative images could be listed for FlashImage."
 msgstr "Введите URL для списка альтернативных имиджей."
 
+msgid "Enter current password"
+msgstr ""
+
 msgid "Enter if you are in the east or west hemisphere."
 msgstr "Ввод, где Вы находитесь, в восточном или западном полушарии."
 
@@ -3590,6 +3649,9 @@ msgstr "Ввод, где Вы находитесь, на севере или к 
 
 msgid "Enter main menu..."
 msgstr "Войти в главное меню..."
+
+msgid "Enter new password"
+msgstr ""
 
 msgid "Enter persistent PIN code"
 msgstr "Ввод постоянного PIN-кода"
@@ -4256,6 +4318,9 @@ msgstr "Gambia"
 msgid "Gateway"
 msgstr "Шлюз"
 
+msgid "General"
+msgstr ""
+
 msgid "General AC3 delay"
 msgstr "Общая задержка AC3"
 
@@ -4609,6 +4674,9 @@ msgstr "Сколько минут Вы хотите добавить к запи
 
 msgid "How many minutes do you want to record?"
 msgstr "Сколько минут Вы хотите записать?"
+
+msgid "How to release the hardware decoder when switching to software descrambling. 'Quick' releases immediately (faster zapping). 'Normal' performs clean shutdown first (more stable on some boxes)."
+msgstr ""
 
 msgid "Http(s) stream start delay"
 msgstr "Задержка старта стрима Http(s)"
@@ -4975,6 +5043,10 @@ msgstr "Инсталлировать дополнения"
 
 msgid "Install local extension"
 msgstr "Инсталляция локальных пакетов"
+
+#, fuzzy
+msgid "Install picons on"
+msgstr "Установка плагинов"
 
 msgid "Install plugin"
 msgstr "Установка плагинов"
@@ -5557,6 +5629,12 @@ msgstr "Marshall Islands"
 msgid "Martinique"
 msgstr "Martinique"
 
+msgid "Mature Adult Audience 15+"
+msgstr ""
+
+msgid "Mature Audience 15+"
+msgstr ""
+
 msgid "Mauritania"
 msgstr "Mauritania"
 
@@ -5571,6 +5649,9 @@ msgstr "Максимальная позиция памяти"
 
 msgid "Max. bitrate: "
 msgstr "Макс. битрейт:"
+
+msgid "Maximum time to wait for the first descrambling key (CW) before starting the decoder. 'Disabled' starts the decoder immediately without waiting."
+msgstr ""
 
 msgid "Maybe the reason that recording is currently running. Please stop the recording before trying to configure the positioner."
 msgstr "Может быть причина этого, что сейчас идет запись. Остановите пожалуйста запись,перед настройкой позиционера."
@@ -5902,9 +5983,6 @@ msgstr "НЕТ"
 msgid "NOW"
 msgstr "СЕЙЧАС"
 
-msgid "NTP Hostname"
-msgstr "Адрес хоста NTP"
-
 msgid "NTSC"
 msgstr "NTSC"
 
@@ -5998,6 +6076,9 @@ msgstr "New Caledonia"
 
 msgid "New Zealand"
 msgstr "New Zealand"
+
+msgid "New password not the same as the repeat password"
+msgstr ""
 
 msgid "News/Current Affairs/Social"
 msgstr "Новости/Текущие события/Социальные сети"
@@ -6186,6 +6267,9 @@ msgstr "Нет, никогда"
 msgid "No, only download"
 msgstr "Нет, только загрузить"
 
+msgid "Non Classificato"
+msgstr ""
+
 msgid "None"
 msgstr "Ничего"
 
@@ -6216,6 +6300,10 @@ msgstr "Norway"
 
 msgid "Norwegian"
 msgstr "Норвежский"
+
+#, fuzzy
+msgid "Not Classified"
+msgstr "Нет ассоциаций"
 
 msgid "Not Installed"
 msgstr "Не инсталлировано"
@@ -6291,6 +6379,9 @@ msgid "Numberzap or seek backward medium step"
 msgstr ""
 
 msgid "Numberzap or seek backward small step"
+msgstr ""
+
+msgid "Numberzap or seek forward big step"
 msgstr ""
 
 msgid "Numberzap or seek forward medium step"
@@ -6414,6 +6505,9 @@ msgstr "Состояние LED в режиме работы"
 msgid "Opkg"
 msgstr "Opkg"
 
+msgid "Optional local NTP server"
+msgstr "Адрес хоста NTP"
+
 msgid "Options disable timer"
 msgstr "Варианты отключения таймера"
 
@@ -6479,6 +6573,9 @@ msgstr "PCR PID"
 
 msgid "PDC"
 msgstr "PDC"
+
+msgid "PG - Parental Guidance"
+msgstr ""
 
 msgid "PGS file"
 msgstr "PGS файл"
@@ -6582,6 +6679,9 @@ msgstr "Paraguay"
 msgid "Parent directory"
 msgstr "Родительская директория"
 
+msgid "Parental Guidance Recommended"
+msgstr ""
+
 msgid "Parental control"
 msgstr "Родительский контроль"
 
@@ -6617,6 +6717,9 @@ msgstr "Пауза/продолжение воспроизведение"
 
 msgid "Pending restart"
 msgstr "Ожидание рестарта"
+
+msgid "Per Tutti"
+msgstr ""
 
 msgid "Percentage left"
 msgstr "Проценты слева"
@@ -6740,7 +6843,8 @@ msgstr "Пожалуйста, измените время окончания з�
 msgid "Please choose an extension..."
 msgstr "Пожалуйста, выберите дополнение..."
 
-msgid "Please configure the fallback receiver setup"
+#, fuzzy
+msgid "Please configure the fallback tuner setup"
 msgstr "Хотите сконфигурировать настройки запасного удаленного ресивера"
 
 msgid ""
@@ -7097,6 +7201,9 @@ msgstr "Приоритетный тюнер для записей"
 
 msgid "Preparing... Please wait"
 msgstr "Подготовка... Пожалуйста, подождите"
+
+msgid "Preschool"
+msgstr ""
 
 msgid "Press '0' to toggle PiP mode"
 msgstr "Нажмите '0', для смены режима PiP."
@@ -7626,6 +7733,9 @@ msgstr "Повтор"
 msgid "Repeat leave standby messages"
 msgstr "Повтор команд выхода из режима ожидания"
 
+msgid "Repeat new password"
+msgstr ""
+
 msgid "Repeat playlist"
 msgstr "Повторить плейлист"
 
@@ -7745,6 +7855,9 @@ msgstr "Восстановить настройки Вашего ресивер�
 
 msgid "Restoring..."
 msgstr "Востановление..."
+
+msgid "Restricted 18+"
+msgstr ""
 
 msgid "Resume from last position"
 msgstr "Возобновить с последней позиции"
@@ -8306,6 +8419,9 @@ msgstr "Выбор горизонтального разрешения:"
 msgid "Select how quickly the dish should move between satellites."
 msgstr "Выбор скорости перемещения мотоподвеса между спутниками."
 
+msgid "Select how the descrambled data stream is processed. 'Automatic' uses asynchronous writes (lower CPU usage) with automatic fallback to synchronous if kernel AIO is not supported. 'Synchronous' forces blocking writes (stable, most compatible)."
+msgstr ""
+
 msgid "Select how the satellite dish is set up. i.e. fixed dish, single LNB, DiSEqC switch, positioner, etc."
 msgstr "Выбор способ настройки спутниковой антенны, то есть фиксированной тарелки, одного LNB, переключателя DiSEqC, позиционера и т.д."
 
@@ -8384,6 +8500,9 @@ msgstr "Выберите пользовательский диапазон, ко
 
 msgid "Select the character or action under the keyboard cursor"
 msgstr "Выберите символ или действие под курсором виртуальной клавиатуры"
+
+msgid "Select the delay to buffer descrambled data before starting playback. This can reduce AC3 audio dropouts by ensuring enough data is available when the decoder starts. Higher values are more stable but increase channel switch time."
+msgstr ""
 
 msgid "Select the locale from a menu"
 msgstr "Выберите язык виртуальной клавиатуры из меню"
@@ -8702,13 +8821,16 @@ msgstr "Установите последовательность повторо
 msgid "Set startup service"
 msgstr "Установить сервис стартовым"
 
-msgid "Set the User ID of the OpenWebif from your fallback tuner"
+#, fuzzy
+msgid "Set the User ID of the OpenWebif from your fallback receiver"
 msgstr "Установить ID пользователя OpenWebif из вашего резервного ресивера"
 
-msgid "Set the password of the OpenWebif from your fallback tuner"
+#, fuzzy
+msgid "Set the password of the OpenWebif from your fallback receiver"
 msgstr "Установить пароль OpenWebif из вашего резервного ресивера"
 
-msgid "Set the port of the OpenWebif from your fallback tuner"
+#, fuzzy
+msgid "Set the port of the OpenWebif from your fallback receiver"
 msgstr "Установить порт OpenWebif из вашего резервного ресивера"
 
 msgid "Set the type of the progress indication in the channel selection screen (right alignment only available in single line mode)."
@@ -9232,6 +9354,10 @@ msgstr "Плавность"
 msgid "SocketMMI"
 msgstr "SocketMMI"
 
+#, fuzzy
+msgid "SoftCSA Settings"
+msgstr "Установки"
+
 msgid "SoftCam / CI"
 msgstr "Эмуляторы / CI"
 
@@ -9243,6 +9369,9 @@ msgstr "Настройки эмулятора"
 
 msgid "Software"
 msgstr "ПО"
+
+msgid "Software descrambling: "
+msgstr ""
 
 msgid "Software management"
 msgstr "Менеджер управления ПО"
@@ -9705,8 +9834,23 @@ msgstr "Субтитры включены"
 msgid "Succeeded:"
 msgstr "Успешных:"
 
+msgid "Successfully changed password for root user"
+msgstr ""
+
+msgid "Successfully cleared password for root user"
+msgstr ""
+
 msgid "Sudan"
 msgstr "Sudan"
+
+msgid "Suitable for ages 12+"
+msgstr ""
+
+msgid "Suitable for ages 15+"
+msgstr ""
+
+msgid "Suitable only for Adults"
+msgstr ""
 
 msgid "Sun"
 msgstr "Вс"
@@ -9750,6 +9894,9 @@ msgstr "переключатель"
 
 msgid "Switch TV to correct input"
 msgstr "Переключать ТВ на правильный вход"
+
+msgid "Switch all other connected HDMI-CEC enabled receivers (not TV or audio systems) to standby when this box wakes up."
+msgstr ""
 
 msgid "Switch between filelist/playlist"
 msgstr "Сменить список файлов/плейлист"
@@ -9828,6 +9975,13 @@ msgstr "Скорость потока:"
 
 msgid "Sync failure moving back to origin !"
 msgstr "Сбой синхронизации,возврат к оригиналу!"
+
+#, fuzzy
+msgid "Sync mode"
+msgstr "Режим вычисления"
+
+msgid "Synchronous"
+msgstr ""
 
 msgid "Syrian Arab Republic"
 msgstr "Syrian Arab Republic"
@@ -10019,7 +10173,7 @@ msgstr ""
 msgid "The following files were found..."
 msgstr "Следующие файлы были найдены..."
 
-msgid "The hostname or the IP address of the NTP server to synchronise the time with."
+msgid "The hostname or the IP address of a local NTP server to synchronise the time with."
 msgstr "Имя хоста или IP-адрес NTP-сервера, с которого нужно синхронизировать время."
 
 msgid ""
@@ -10754,6 +10908,9 @@ msgstr "Тип LNB/устройства"
 msgid "Type of scan"
 msgstr "Тип сканирования"
 
+msgid "U - Suitable for all"
+msgstr ""
+
 msgid "UNKNOWN"
 msgstr "НЕИЗВЕСТНО"
 
@@ -10762,6 +10919,10 @@ msgstr "UP"
 
 msgid "URL"
 msgstr "URL"
+
+#, fuzzy
+msgid "URL of fallback remote receiver"
+msgstr "IP запасного удаленного ресивера"
 
 msgid "URL of remote receiver for imports"
 msgstr "Впишите URL запасного удаленного ресивера"
@@ -10786,6 +10947,12 @@ msgstr "Украинский"
 
 msgid "Unable to backup settings as the AutoBackup plugin is missing, do you want to continue?"
 msgstr "Не удалось выполнить бекап настроек, так как не найден плагин 'AutoBackup', Вы хотите продолжить?"
+
+msgid "Unable to change password for root user"
+msgstr ""
+
+msgid "Unable to clear password for root user"
+msgstr ""
 
 msgid "Unable to complete - Kexec Multiboot files missing!"
 msgstr "Невозможно выполнить - отсутствуют файлы Vu+ мультибута!"
@@ -11016,6 +11183,9 @@ msgstr "Использовать измерение питания"
 
 msgid "Use skin default"
 msgstr "Использовать дефолтное значение скина"
+
+msgid "Use streamrelay whitelist file"
+msgstr ""
 
 msgid "Use the alternative screen"
 msgstr "Использование альтернативного экрана."
@@ -11478,11 +11648,12 @@ msgstr "Если включено и если спецификация реси�
 msgid "When enabled the timer from the fallback receiver is imported"
 msgstr "При включении, таймеры из резервного ресивера будут импортированы"
 
-msgid "When enabled the timer from the fallback receiver is the default timer"
-msgstr "Если этот параметр включен, таймер резервного ресивера является дефолтным таймером."
-
 msgid "When enabled then when you select a new channel in the channel selection the channel selection will not close. It will only close when you select the current playing service. This is a kind of preview mode"
 msgstr "Если включено, то при выборе нового канала, список выбора каналов не закроется. Он закроется кнопкой ОК только при выборе текущего игрового сервиса. Это является своего рода режимом предварительного просмотра."
+
+#, fuzzy
+msgid "When enabled timers are created on the fallback received by default"
+msgstr "Если этот параметр включен, таймер резервного ресивера является дефолтным таймером."
 
 msgid "When enabled you can control the volume with the arrow buttons instead of getting the channel selection list"
 msgstr "Если включено, то вы можете регулировать управление громкостью на кнопках (лево/право, вверх/вниз) около кнопки OK, вместо списка выбора каналов."
@@ -12184,6 +12355,10 @@ msgstr "бэкап кеша EPG"
 
 msgid "ballet"
 msgstr "балет"
+
+#, python-format
+msgid "bc%d"
+msgstr ""
 
 #, python-format
 msgid "bc%s"
