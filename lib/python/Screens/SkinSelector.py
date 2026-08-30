@@ -213,7 +213,7 @@ class SkinSelector(Screen):
 
 		if config.channelSelection.screenStyle.isChanged() or config.channelSelection.widgetStyle.isChanged():
 			from Screens.ChannelSelection import ChannelSelectionSetup
-			ChannelSelectionSetup.updateSettings(self.session)
+			ChannelSelectionSetup.updateSettings(self.session, force=True)
 
 	def restartGUI(self, answer):
 		if answer:
