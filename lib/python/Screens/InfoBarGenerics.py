@@ -2024,8 +2024,6 @@ class InfoBarSeek:
 
 			self["SeekActions"].setEnabledAction("left", False)
 			self["SeekActions"].setEnabledAction("right", False)
-			self["SeekActionsPTS"].setEnabledAction("left", False)
-			self["SeekActionsPTS"].setEnabledAction("right", False)
 
 		self.activity = 0
 		self.activityTimer = eTimer()
