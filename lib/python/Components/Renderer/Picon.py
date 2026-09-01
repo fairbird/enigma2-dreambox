@@ -111,10 +111,20 @@ def getPiconName(serviceName, mode=None):
 	if not pngname and fields[2] != "1":
 		fields[2] = "1"  # Fallback to 1 for services with different service types
 		pngname = findPicon("_".join(fields), mode)
-	if not pngname:
+	if not pngname:  # picon by channel name
 		if (sName := ServiceReference(serviceName).getServiceName().replace('\x80', '').replace('\x86', '').replace('\x87', '')) and "SID 0x" not in sName and (utf8Name := sanitizeFilename(sName).lower()) and utf8Name != "__":  # avoid lookups on zero length service names
 			legacyName = sub("[^a-z0-9]", "", utf8Name.replace("&", "and").replace("+", "plus").replace("*", "star"))  # legacy ascii service name picons
 			pngname = findPicon(utf8Name, mode) or legacyName and findPicon(legacyName, mode) or findPicon(sub(r"(fhd|uhd|hd|sd|4k)$", "", utf8Name).strip(), mode) or legacyName and findPicon(sub(r"(fhd|uhd|hd|sd|4k)$", "", legacyName).strip(), mode)
+	if not pngname:  # picon default
+		tmp = resolveFilename(SCOPE_SKINS, "picon_default.png")  # picon_default in current active skin
+		tmp2 = findPicon("picon_default")  # picon_default in picon folder
+		if exists(tmp2):
+			pngname = tmp2
+		else:
+			if exists(tmp):
+				pngname = tmp
+			else:
+				pngname = resolveFilename(SCOPE_SKINS, "picon_default.png")
 	return pngname
 
 
