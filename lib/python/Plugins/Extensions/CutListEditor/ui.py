@@ -195,6 +195,10 @@ class CutListEditor(Screen, InfoBarBase, InfoBarSeek, InfoBarCueSheetSupport):
 		self.old_service = session.nav.getCurrentlyPlayingServiceReference()
 		self.service = service
 		session.nav.playService(service)
+
+		if config.seek.arrowSkipMode.value != "t":
+			self["SeekActionsArrows"].setEnabled(False)
+
 		self.pauseService()
 
 		# disable cutlists. we want to freely browse around in the movie

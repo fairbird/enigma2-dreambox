@@ -536,6 +536,13 @@
 		<key id="KEY_PREVIOUS" mapto="deleteBackward" flags="mr" />
 	</map>
 
+	<map context="InfobarArrowSeekActions">
+		<key id="KEY_LEFT" mapto="left" flags="b" />
+		<key id="KEY_RIGHT" mapto="right" flags="b" />
+		<key id="KEY_UP" mapto="up" flags="b" />
+		<key id="KEY_DOWN" mapto="down" flags="b" />
+	</map>
+
 	<map context="InfobarSeekActions">
 		<key id="KEY_PREVIOUSSONG" mapto="seekBack" flags="b" />
 		<key id="KEY_NEXTSONG" mapto="seekFwd" flags="b" />
@@ -550,8 +557,8 @@
 		<key id="KEY_FASTFORWARD" mapto="seekFwdManual" flags="l" />
 		<key id="KEY_PREVIOUS" mapto="jumpPreviousMark" flags="m" />
 		<key id="KEY_NEXT" mapto="jumpNextMark" flags="m" />
-		<key id="KEY_LEFT" mapto="seekBack" flags="b" />
-		<key id="KEY_RIGHT" mapto="seekFwd" flags="b" />
+		<key id="KEY_LEFT" mapto="left" flags="b" />
+		<key id="KEY_RIGHT" mapto="right" flags="b" />
 		<key id="KEY_LEFT" mapto="seekBackManual" flags="l" />
 		<key id="KEY_RIGHT" mapto="seekFwdManual" flags="l" />
 		<key id="KEY_OK" mapto="okButton" flags="m" />
