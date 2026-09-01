@@ -79,6 +79,7 @@
 					<item key="time_setup" level="0" text="Time" description="This options for time setup." weight="50"><screen module="Time" screen="Time" /></item>
 					<item key="user_interface" level="0" text="User Interface" description="This options for user interface setup." ><setup setupKey="UserInterface"/></item>
 					<item key="usage_setup" level="0" text="Customize" description="This options for usage setup."><setup setupKey="Usage"/></item>
+					<item key="picon_setup" level="0" text="Picon Settings" weight="26" description="This options for Picon Settings."><screen module="Picon" screen="PiconSettings" /></item>
 					<item key="primary_skin_selector" level="0" text="Skin" description="This options for primary skin selector setup."><screen module="SkinSelector" screen="SkinSelector"/></item>
 					<menu key="lcd" level="0" text="Front Panel Display" description="This menu contains front panel display settings.">
 						<item key="display_skin_selector" level="0" text="Skin Setup" description="This options for display skin selector setup setup." weight="5" requires="Display"><screen module="SkinSelector" screen="LcdSkinSelector" /></item>

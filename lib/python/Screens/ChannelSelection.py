@@ -51,7 +51,7 @@ import os
 from time import time, localtime, strftime
 from Components.Sources.List import List
 from Components.Sources.StaticText import StaticText
-from Components.Renderer.Picon import getPiconName
+from Components.Renderer.Picon import getChannelSelectionPiconName
 eProfileWrite("ChannelSelection.py after imports")
 
 FLAG_SERVICE_NEW_FOUND = 64
@@ -3117,7 +3117,7 @@ class HistoryZapSelector(Screen):
 						localBegin = localtime(begin)
 						localEnd = localtime(end)
 						eventDuration = f"{strftime(config.usage.time.short.value, localBegin)}  -  {strftime(config.usage.time.short.value, localEnd)}    ({prefix}{ngettext('%d Min', '%d Mins', remaining) % remaining})"
-				servicePicon = getPiconName(str(ServiceReference(serviceReference)))
+				servicePicon = getChannelSelectionPiconName(str(ServiceReference(serviceReference)))
 				servicePicon = loadPNG(servicePicon) if servicePicon else ""
 				historyList.append(("", index == markedItem and "\u00BB" or "", serviceName, eventName, eventDescription, eventDuration, servicePicon, serviceReference))
 		if config.usage.zapHistorySort.value == 0:
