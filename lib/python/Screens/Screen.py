@@ -219,8 +219,8 @@ class Screen(dict):
 			self.screenPath = ""
 			if self.session.dialog_stack:
 				screenclasses = [ds[0].__class__.__name__ for ds in self.session.dialog_stack]
-				if "MainMenu" in screenclasses:
-					index = screenclasses.index("MainMenu")
+				if "MainMenu" in screenclasses or "Menu" in screenclasses:
+					index = screenclasses.index("MainMenu") if "MainMenu" in screenclasses else screenclasses.index("Menu")
 					if self.session and len(screenclasses) > index:
 						self.screenPath = " > ".join(ds[0].getTitle() for ds in self.session.dialog_stack[index:])
 			if self.instance:
