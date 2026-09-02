@@ -1291,7 +1291,7 @@ RESULT eEPGCache::lookupEventTime(const eServiceReference &service, time_t t, eP
 		result = new eServiceEvent();
 		int tsidonid, sid;
 		getEPGServiceIds(service, tsidonid, sid);
-		ret = result->parseFrom(&ev, tsidonid, sid);
+		ret = result->parseFrom(ev, tsidonid);
 		delete ev;
 	}
 	return ret;
@@ -1381,7 +1381,7 @@ RESULT eEPGCache::lookupEventId(const eServiceReference &service, int event_id, 
 		result = new eServiceEvent();
 		int tsidonid, sid;
 		getEPGServiceIds(service, tsidonid, sid);
-		ret = result->parseFrom(&ev, tsidonid, sid);
+		ret = result->parseFrom(&ev, tsidonid);
 	}
 	return ret;
 }
@@ -1524,7 +1524,7 @@ RESULT eEPGCache::getNextTimeEntry(ePtr<eServiceEvent> &result)
 	return -1;
 }
 
-void fillTuple(ePyObject tuple, const char *argstring, int argcount, ePyObject service_reference, eServiceEvent *ptr, ePyObject service_name, ePyObject nowTime, eventData *evData )
+void fillTuple(ePyObject tuple, const char *argstring, int argcount, ePyObject service_reference, eServiceEvent *ptr, ePyObject service_name, ePyObject nowTime, eventData *evData)
 {
 	// eDebug("[eEPGCache] fillTuple arg=%s argcnt=%d, ptr=%d evData=%d", argstring, argcount, ptr ? 1 : 0, evData ? 1 : 0);
 	ePyObject tmp;
@@ -1886,7 +1886,7 @@ PyObject *eEPGCache::lookupEvent(ePyObject list, ePyObject convertFunc)
 						Event ev((uint8_t *)ev_data->get());
 						int tsidonid, sid;
 						getEPGServiceIds(ref, tsidonid, sid);
-						evt.parseFrom(&ev, tsidonid, sid);
+						evt.parseFrom(&ev, tsidonid);
 					}
 				}
 				if (ev_data)
