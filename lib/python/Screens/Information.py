@@ -1537,6 +1537,7 @@ class InformationService(InformationBase):
 		def addIfAvailable(info, label, value):
 			if value not in (None, "", -1, _("N/A")):
 				info.append(self.formatLine("P1", label, value))
+
 		def formatHex(value):
 			return f"0x{value:04X}  ({value})" if value and isinstance(value, int) else ""
 
