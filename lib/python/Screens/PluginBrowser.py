@@ -4,7 +4,7 @@ from os import makedirs, symlink, unlink
 from os.path import exists, join, islink
 from Screens.Screen import Screen
 from Screens.ParentalControlSetup import ProtectedScreen
-from enigma import eConsoleAppContainer, eDVBDB, eTimer, eSize, ePoint, getDesktop
+from enigma import checkInternetAccess, eDVBDB, eTimer, gRGB, eSize, ePoint, getDesktop
 
 from Components.ActionMap import ActionMap, NumberActionMap, HelpableActionMap, HelpableNumberActionMap
 from Components.config import config, ConfigSubsection, ConfigSelection, ConfigYesNo, ConfigText, configfile
@@ -69,6 +69,7 @@ config.pluginfilter.userfeed = ConfigText(default="https://", fixed_size=False)
 
 MODULE_NAME = __name__.split(".")[-1]
 
+INTERNET_TIMEOUT = 2
 FEED_SERVER = "google.com"
 ENIGMA_PREFIX = "enigma2-plugin-%s"
 KODI_ADDON_PREFIX = "kodi-addon-%s"

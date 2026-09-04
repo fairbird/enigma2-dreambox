@@ -2,6 +2,8 @@
 import os
 import time
 import pickle
+from os import F_OK, R_OK, W_OK, access, listdir, makedirs, mkdir, stat  # noqa F401
+from os.path import dirname, exists, isdir, isfile, join as pathjoin
 from Plugins.Plugin import PluginDescriptor
 from Screens.ChoiceBox import ChoiceBox
 from Screens.MessageBox import MessageBox
@@ -1335,10 +1337,9 @@ class OPKGMenu(Screen):
 			<widget name="filelist" position="5,50" size="550,340" scrollbarMode="showOnDemand" />
 		</screen>"""
 
-	def __init__(self, session, plugin_path):
+	def __init__(self, session):
 		Screen.__init__(self, session)
 		self.setTitle(_("Select update source to edit"))
-		self.skin_path = plugin_path
 
 		self["key_red"] = StaticText(_("Close"))
 		self["key_green"] = StaticText(_("Edit"))
@@ -1791,6 +1792,154 @@ class PacketManager(Screen, NumericalTextInput):
 		plugins.readPluginList(resolveFilename(SCOPE_PLUGINS))
 
 
+class IPKGMenu(Screen):
+	skin = """
+		<screen name="IPKGMenu" position="center,center" size="560,400" resolution="1280,720">
+			<ePixmap pixmap="skin_default/buttons/red.png" position="0,0" size="140,40" alphatest="on" />
+			<ePixmap pixmap="skin_default/buttons/green.png" position="140,0" size="140,40" alphatest="on" />
+			<widget source="key_red" render="Label" position="0,0" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#9f1313" transparent="1" />
+			<widget source="key_green" render="Label" position="140,0" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#1f771f" transparent="1" />
+			<widget name="filelist" position="5,50" size="550,340" scrollbarMode="showOnDemand" />
+		</screen>"""
+
+	def __init__(self, session):
+		Screen.__init__(self, session)
+		self.setTitle(_("Select Upgrade Source To Edit"))
+		self["key_red"] = StaticText(_("Close"))
+		self["key_green"] = StaticText(_("Edit"))
+		self.sel = []
+		self.val = []
+		self.entry = False
+		self.exe = False
+		self.path = ""
+		self["actions"] = HelpableActionMap(self, ["OkCancelActions"], {
+			"ok": self.KeyOk,
+			"cancel": self.keyCancel
+		}, prio=-1)
+		self["shortcuts"] = HelpableActionMap(self, ["ColorActions"], {
+			"red": self.keyCancel,
+			"green": self.KeyOk,
+		})
+		self["filelist"] = MenuList([])
+		self.fill_list()
+
+	def fill_list(self):
+		flist = []
+		self.path = "/etc/opkg/"
+		if (exists(self.path) is False):
+			self.entry = False
+			return
+		for file in listdir(self.path):
+			if file.endswith(".conf"):
+				if file not in ("arch.conf", "opkg.conf"):
+					flist.append((file))
+					self.entry = True
+		self["filelist"].l.setList(flist)
+
+	def KeyOk(self):
+		if (self.exe is False) and (self.entry is True):
+			self.sel = self["filelist"].getCurrent()
+			self.val = self.path + self.sel
+			self.session.open(IPKGSource, self.val)
+
+	def keyCancel(self):
+		self.close()
+
+	def Exit(self):
+		self.close()
+
+
+class IPKGSource(Screen):
+	skin = """
+		<screen name="IPKGSource" position="center,center" size="560,80" title="Edit upgrade source url." resolution="1280,720">
+			<ePixmap pixmap="skin_default/buttons/red.png" position="0,0" size="140,40" alphatest="on" />
+			<ePixmap pixmap="skin_default/buttons/green.png" position="140,0" size="140,40" alphatest="on" />
+			<widget source="key_red" render="Label" position="0,0" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#9f1313" transparent="1" />
+			<widget source="key_green" render="Label" position="140,0" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#1f771f" transparent="1" />
+			<widget name="text" position="5,50" size="550,25" font="Regular;20" backgroundColor="background" foregroundColor="#cccccc" />
+		</screen>"""
+
+	def __init__(self, session, configfile=None):
+		Screen.__init__(self, session)
+		self.setTitle(_("Edit Upgrade Source URL"))
+		self.configfile = configfile
+		text = ""
+		if self.configfile:
+			try:
+				fp = open(configfile)
+				sources = fp.readlines()
+				if sources:
+					text = sources[0]
+				fp.close()
+			except OSError:
+				pass
+		desk = getDesktop(0)
+		x = int(desk.size().width())  # noqa F841
+		y = int(desk.size().height())
+		self["key_red"] = StaticText(_("Cancel"))
+		self["key_green"] = StaticText(_("Save"))
+		if (y >= 720):
+			self["text"] = Input(text, maxSize=False, type=Input.TEXT)
+		else:
+			self["text"] = Input(text, maxSize=False, visible_width=55, type=Input.TEXT)
+		self["actions"] = HelpableNumberActionMap(self, ["WizardActions", "InputActions", "TextEntryActions", "KeyboardInputActions", "ShortcutActions"], {
+			"ok": self.go,
+			"back": self.close,
+			"red": self.close,
+			"green": self.go,
+			"left": self.keyLeft,
+			"right": self.keyRight,
+			"home": self.keyHome,
+			"end": self.keyEnd,
+			"deleteForward": self.keyDeleteForward,
+			"deleteBackward": self.keyDeleteBackward,
+			"1": self.keyNumberGlobal,
+			"2": self.keyNumberGlobal,
+			"3": self.keyNumberGlobal,
+			"4": self.keyNumberGlobal,
+			"5": self.keyNumberGlobal,
+			"6": self.keyNumberGlobal,
+			"7": self.keyNumberGlobal,
+			"8": self.keyNumberGlobal,
+			"9": self.keyNumberGlobal,
+			"0": self.keyNumberGlobal
+		}, prio=-1)
+		self.onLayoutFinish.append(self.layoutFinished)
+
+	def layoutFinished(self):
+		self["text"].right()
+
+	def go(self):
+		text = self["text"].getText()
+		if text:
+			fp = open(self.configfile, "w")
+			fp.write(text)
+			fp.write("\n")
+			fp.close()
+		self.close()
+
+	def keyLeft(self):
+		self["text"].left()
+
+	def keyRight(self):
+		self["text"].right()
+
+	def keyHome(self):
+		self["text"].home()
+
+	def keyEnd(self):
+		self["text"].end()
+
+	def keyDeleteForward(self):
+		self["text"].delete()
+
+	def keyDeleteBackward(self):
+		self["text"].deleteBackward()
+
+	def keyNumberGlobal(self, number):
+		self["text"].number(number)
+
+
 class IpkgInstaller(Screen):
 	skin = """
 		<screen name="IpkgInstaller" position="center,center" size="550,450" title="Install extensions" resolution="1280,720">
@@ -1840,6 +1989,91 @@ class IpkgInstaller(Screen):
 		self.session.open(Opkg, cmdList=cmdList)
 
 
+class BackupHelper(Screen):
+	skin = """
+		<screen name="BackupHelper" position="0,0" size="1,1" title="SoftwareManager">
+		</screen>"""
+
+	def __init__(self, session, args=0):
+		Screen.__init__(self, session)
+		self.args = args
+		self.backuppath = getBackupPath()
+		if not isdir(self.backuppath):
+			self.backuppath = getOldBackupPath()
+		self.backupfile = getBackupFilename()
+		self.fullbackupfilename = pathjoin(self.backuppath, self.backupfile)
+		self.callLater(self.doAction)
+
+	def doAction(self):
+		doClose = True
+		if self.args == 1:
+			self.session.openWithCallback(self.backupDone, BackupScreen, runBackup=True, closeOnSuccess=5)
+			doClose = False
+		elif self.args == 2:
+			if isfile(self.fullbackupfilename):
+				self.session.openWithCallback(self.startRestore, MessageBox, _("Are you sure you want to restore the backup?\nYour receiver will restart after the backup has been restored!"), default=False)
+				doClose = False
+			else:
+				self.session.open(MessageBox, _("Sorry, no backups found!"), MessageBox.TYPE_INFO, timeout=10)
+		elif self.args == 3:
+			try:
+				from Plugins.Extensions.MediaScanner.plugin import scan
+				scan(self.session, self)
+				doClose = False
+			except ImportError:
+				self.session.open(MessageBox, _("Sorry, %s has not been installed!") % ("MediaScanner"), MessageBox.TYPE_INFO, timeout=10)
+		elif self.args == 5:
+			parts = [(r.description, r.mountpoint, self.session) for r in harddiskmanager.getMountedPartitions(onlyhotplug=False)]
+			for x in parts:
+				if not os.access(x[1], os.F_OK | os.R_OK | os.W_OK) or x[1] == '/':
+					parts.remove(x)
+			if len(parts):
+				self.session.openWithCallback(self.backuplocation_choosen, ChoiceBox, title=_("Please select medium to use as backup location"), list=parts)
+		elif self.args == 6:
+			self.session.openWithCallback(self.backupfiles_choosen, BackupSelection)
+		elif self.args == 7:
+			self.session.open(OPKGMenu, self.skin_path)
+		if doClose:
+			self.close()
+
+	def backupfiles_choosen(self, ret):
+		self.backupdirs = ' '.join(config.plugins.configurationbackup.backupdirs.value)
+		config.plugins.configurationbackup.backupdirs.save()
+		config.plugins.configurationbackup.save()
+		config.save()
+
+	def backuplocation_choosen(self, option):
+		oldpath = config.plugins.configurationbackup.backuplocation.getValue()
+		if option is not None:
+			config.plugins.configurationbackup.backuplocation.value = str(option[1])
+		config.plugins.configurationbackup.backuplocation.save()
+		config.plugins.configurationbackup.save()
+		config.save()
+		newpath = config.plugins.configurationbackup.backuplocation.getValue()
+		if newpath != oldpath:
+			self.createBackupfolders()
+
+	def createBackupfolders(self):
+		print("Creating backup folder if not already there...")
+		self.backuppath = getBackupPath()
+		try:
+			if not os.path.exists(self.backuppath):
+				os.makedirs(self.backuppath)
+		except OSError:
+			self.session.open(MessageBox, _("Sorry, your backup destination is not writeable.\nPlease select a different one."), MessageBox.TYPE_INFO, timeout=10)
+
+	def startRestore(self, ret=False):
+		if (ret is True):
+			self.exe = True
+			self.session.open(RestoreScreen, runRestore=True)
+		self.close()
+
+	def backupDone(self, retval=None):
+		message = _("Backup completed.") if retval else _("Backup failed.")
+		self.session.open(MessageBox, message, MessageBox.TYPE_INFO, timeout=10)
+		self.close()
+
+
 def filescan_open(list, session, **kwargs):
 	filelist = [x.path for x in list]
 	session.open(IpkgInstaller, filelist)  # List.
@@ -1877,11 +2111,11 @@ def Plugins(path, **kwargs):
 	plugin_path = path
 	list = [
 		PluginDescriptor(where=PluginDescriptor.WHERE_SESSIONSTART, fnc=sessionStart),  # starts AFTER the Enigma2 booting (For updatecheck)
-		PluginDescriptor(name=_("Software management"), description=_("Manage your receiver's software"), where=PluginDescriptor.WHERE_MENU, needsRestart=False, fnc=startSetup),
+#		PluginDescriptor(name=_("Software management"), description=_("Manage your receiver's software"), where=PluginDescriptor.WHERE_MENU, needsRestart=False, fnc=startSetup),
 		PluginDescriptor(name=_("Ipkg"), where=PluginDescriptor.WHERE_FILESCAN, needsRestart=False, fnc=filescan)
 	]
-	if not config.plugins.softwaremanager.onSetupMenu.value and not config.plugins.softwaremanager.onBlueButton.value:
-		list.append(PluginDescriptor(name=_("Software management"), description=_("Manage your receiver's software"), where=PluginDescriptor.WHERE_PLUGINMENU, needsRestart=False, fnc=UpgradeMain))
-	if config.plugins.softwaremanager.onBlueButton.value:
-		list.append(PluginDescriptor(name=_("Software management"), description=_("Manage your receiver's software"), where=PluginDescriptor.WHERE_EXTENSIONSMENU, needsRestart=False, fnc=UpgradeMain))
+#	if not config.plugins.softwaremanager.onSetupMenu.value and not config.plugins.softwaremanager.onBlueButton.value:
+#		list.append(PluginDescriptor(name=_("Software management"), description=_("Manage your receiver's software"), where=PluginDescriptor.WHERE_PLUGINMENU, needsRestart=False, fnc=UpgradeMain))
+#	if config.plugins.softwaremanager.onBlueButton.value:
+#		list.append(PluginDescriptor(name=_("Software management"), description=_("Manage your receiver's software"), where=PluginDescriptor.WHERE_EXTENSIONSMENU, needsRestart=False, fnc=UpgradeMain))
 	return list

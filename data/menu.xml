@@ -54,8 +54,7 @@
 				<item key="tuner_basic_settings" level="1" text="Tuner Settings" weight="1"><setup setupKey="Tuner" /></item>
 				<item key="auto_scan" level="0" text="Automatic scan" description="This options for auto scan." conditional="nimmanager.somethingConnected()" weight="5"><screen module="ScanSetup" screen="ScanSimple"/></item>
 				<item key="manual_scan" level="0" text="Manual scan" description="This options for manual scan." conditional="nimmanager.somethingConnected()" weight="10"><screen module="ScanSetup"/></item>
-				<item key="dab_scan" level="0" text="DAB+ Scan" weight="15" conditional="nimmanager.getEnabledNimListOfType('DVB-S') or canScanRTLSDR()"><screen module="DABScan" screen="DABScan" /></item>
-				<item key="dab_usb_setup" level="0" text="DAB+ USB receiver" weight="16" conditional="hasRTLSDRDevice()"><screen module="RTLSDRSetup" screen="RTLSDRSetup" /></item>
+				<item key="dab_scan" level="0" text="DAB+ Scan" conditional="nimmanager.getEnabledNimListOfType('DVB-S')" weight="15"><screen module="DABScan" screen="DABScan" /></item>
 				<item key="fallbacktuner_settings" text="Fallback remote receiver setup" description="This options for fallback remote receiver setup."><screen module="SetupFallbacktuner"/></item>
 			</menu>
 			<menu key="system" weight="5" level="0" text="System" description="This menu contains system options.">
@@ -165,6 +164,26 @@ self.session.openWithCallback(msgClosed, EpgDeleteMsg)
 					<item key="input_device_setup" level="1" text="Input devices" description="This options for Input devices setup."><screen module="InputDeviceSetup" screen="InputDeviceSelection"/></item>
 					<item key="keyboard_setup" text="Keyboard" description="This options for keyboard setup."><setup setupKey="keyboard"/></item>
 					<item key="hotkey_setup" level="1" text="Hotkey" description="This options for hotkey setup."><screen module="Hotkey" screen="HotkeySetup"/></item>
+				</menu>
+			</menu>
+
+			<!-- Menu / Setup / Software Management -->
+			<menu key="software_manager" level="0" text="Software Management" description="This menu offers options related managing the software on the %s %s." weight="50">
+				<item key="manage_plugins" level="0" text="Manage extensions" description="Manage extensions or plugins for your receiver" weight="10"><screen module="PluginBrowser" screen="PackageAction">3</screen></item>
+				<item key="software_update" level="0" text="Software Update" description="Online update of your %s %s software." weight="11"><screen module="SoftwareUpdate" screen="SoftwareUpdate" /></item>
+				<item key="flash_online" level="0" text="Flash Online" description="Download and flash images on your %s %s." weight="13"><screen module="FlashManager" screen="FlashManager" /></item>
+				<item key="backup_image" level="0" text="Image Backup" description="Backup your running %s %s image to HDD or USB." weight="14" requires="ImageBackup"><screen module="ImageBackup" screen="ImageBackup" /></item>
+				<item key="multiboot" level="0" text="MultiBoot Manager" description="Maintain your multi boot device." weight="15" requires="canMultiBoot"><screen module="MultiBootManager" screen="MultiBootManager" /></item>
+				<item key="backup_system" level="0" text="Backup System Settings" description="Backup your %s %s settings." weight="16"><plugin system="SoftwareManager" screen="BackupHelper">1</plugin></item>
+				<item key="restore_system" level="0" text="Restore System Settings" description="Restore your %s %s settings." weight="17"><plugin system="SoftwareManager" screen="BackupHelper">2</plugin></item>
+				<item key="install_local" level="0" text="Install Local Extension" description="Scan for local extensions and install them." weight="18"><plugin system="SoftwareManager" screen="BackupHelper">3</plugin></item>
+				<!-- Menu / Setup / Software Management / Advanced Options -->
+				<menu key="advanced_software" level="2" text="Advanced Options" description="Advanced options and settings." weight="20">
+					<item key="advanced_restore" level="2" text="Advanced Restore" description="Restore your backups by date." weight="16"><plugin system="SoftwareManager" screen="RestoreMenu" /></item>
+					<item key="backup_default" level="2" text="Select backup location" description="Select your backup device.\nCurrent device: " weight="16"><plugin system="SoftwareManager" screen="BackupHelper">5</plugin></item>
+					<item key="backup_additional" level="2" text="Select Additional Backup Files" description="Here you can specify additional files that should be added to the backup file." weight="16"><plugin system="SoftwareManager" screen="BackupHelper">6</plugin></item>
+					<item key="package_manager" level="2" text="Package Manager" description="View, install and remove available or installed packages." weight="16"><screen module="PluginBrowser" screen="PackageAction">4</screen></item>
+					<item key="upgrade_source" level="2" text="Select Upgrade Source" description="Edit the upgrade source address." weight="16"><plugin system="SoftwareManager" screen="OPKGMenu" /></item>
 				</menu>
 			</menu>
 
