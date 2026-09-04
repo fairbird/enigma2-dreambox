@@ -142,7 +142,7 @@ class DABScan(ServiceScan):
 			self.feeds.append({
 				"id": "rtlsdr_%s" % channel.lower(),
 				"name": _("DAB+ channel %s") % channel,
-				"satellite": _("RTL-SDR receiver"),
+				"satellite": _("RTL-SDR tuner"),
 				"orbitalPosition": 0,
 				"decoder": "rtlsdr",
 				"transport": channel,

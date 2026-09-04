@@ -566,6 +566,8 @@ def runScreenTest():
 	session = Session(desktop=enigma.getDesktop(0), summary_desktop=enigma.getDesktop(1), navigation=nav)
 
 	CiHandler.setSession(session)
+	from Components.RTLSDR import initRTLSDR
+	initRTLSDR(session)
 	powerOffTimer.setSession(session)
 
 	screensToRun = [p.fnc for p in plugins.getPlugins(PluginDescriptor.WHERE_WIZARD)]
