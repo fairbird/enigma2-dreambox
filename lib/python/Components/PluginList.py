@@ -4,7 +4,7 @@ from Components.MenuList import MenuList
 from Tools.Directories import resolveFilename, SCOPE_CURRENT_SKIN
 from Components.MultiContent import MultiContentEntryText, MultiContentEntryPixmapAlphaBlend, MultiContentEntryPixmapAlphaTest
 
-from enigma import eListboxPythonMultiContent, gFont, BT_SCALE, BT_KEEP_ASPECT_RATIO, BT_HALIGN_CENTER, BT_VALIGN_CENTER
+from enigma import eListboxPythonMultiContent, gFont, BT_SCALE, BT_HALIGN_CENTER, BT_VALIGN_CENTER
 from Tools.LoadPixmap import LoadPixmap
 from skin import applySkinFactor, fonts, parameters
 
@@ -13,12 +13,12 @@ def PluginEntryComponent(plugin, width=440):
 	png = plugin.icon or LoadPixmap(resolveFilename(SCOPE_CURRENT_SKIN, "icons/plugin.png"))
 	nx, ny, nh = parameters.get("PluginBrowserName", applySkinFactor(120, 5, 25))
 	dx, dy, dh = parameters.get("PluginBrowserDescr", applySkinFactor(120, 26, 17))
-	ix, iy, iw, ih = parameters.get("PluginBrowserIcon", applySkinFactor(10, 5, 100, 40))
+	ix, iy, iw, ih = parameters.get("PluginBrowserIcon", applySkinFactor(10, 5, 100, 100))
 	return [
 		plugin,
 		MultiContentEntryText(pos=(nx, ny), size=(width - nx, nh), font=0, text=plugin.name),
 		MultiContentEntryText(pos=(nx, dy), size=(width - dx, dh), font=1, text=plugin.description),
-		MultiContentEntryPixmapAlphaTest(pos=(ix, iy), size=(iw, ih), png=png, flags=BT_SCALE | BT_KEEP_ASPECT_RATIO | BT_HALIGN_CENTER | BT_VALIGN_CENTER)
+		MultiContentEntryPixmapAlphaTest(pos=(ix, iy), size=(iw, ih), png=png, flags=BT_SCALE | BT_HALIGN_CENTER | BT_VALIGN_CENTER)
 	]
 
 
