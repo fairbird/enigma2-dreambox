@@ -314,7 +314,6 @@ class ConfigListScreen:
 	def handleInputHelpers(self):
 		currConfig = self["config"].getCurrent(full=False)
 		if currConfig is not None:
-			if isinstance(currConfig[1], (ConfigInteger, ConfigMacText, ConfigSequence, ConfigText)):
 			if isinstance(currConfig[1], (ConfigInteger, ConfigSequence, ConfigText)) and not currConfig[1].isReadOnly():
 				self["editConfigActions"].setEnabled(True)
 			else:
