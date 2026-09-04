@@ -315,13 +315,14 @@ class ConfigListScreen:
 		currConfig = self["config"].getCurrent(full=False)
 		if currConfig is not None:
 			if isinstance(currConfig[1], (ConfigInteger, ConfigMacText, ConfigSequence, ConfigText)):
+			if isinstance(currConfig[1], (ConfigInteger, ConfigSequence, ConfigText)) and not currConfig[1].isReadOnly():
 				self["editConfigActions"].setEnabled(True)
 			else:
 				self["editConfigActions"].setEnabled(False)
 			if isinstance(currConfig[1], (ConfigText, ConfigMacText)) and "HelpWindow" in self and currConfig[1].help_window and currConfig[1].help_window.instance is not None:
 				helpwindowpos = self["HelpWindow"].getPosition()
 				currConfig[1].help_window.instance.move(ePoint(helpwindowpos[0], helpwindowpos[1]))
-			if isinstance(currConfig[1], ConfigText):
+			if isinstance(currConfig[1], ConfigText) and not currConfig[1].isReadOnly():
 				self.showVirtualKeyBoard(True)
 			else:
 				self.showVirtualKeyBoard(False)
@@ -353,7 +354,7 @@ class ConfigListScreen:
 			self.keyToggle()
 		elif isinstance(self.getCurrentItem(), ConfigSelection):
 			self.keySelection()
-		elif isinstance(self.getCurrentItem(), ConfigText) and not isinstance(self.getCurrentItem(), ConfigNumber):
+		elif isinstance(self.getCurrentItem(), ConfigText) and not isinstance(self.getCurrentItem(), (ConfigMACText, ConfigNumber)) and not self.getCurrentItem().isReadOnly():
 			self.keyText()
 		else:
 			self["config"].handleKey(ACTIONKEY_SELECT, self.entryChanged)
