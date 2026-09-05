@@ -7,9 +7,8 @@ from Components.Element import cached
 class TunerInfo(Converter):
 	def __init__(self, type):
 		Converter.__init__(self, type)
-		self.type = {
-				"TunerUseMask": TunerInfoSource.FE_USE_MASK
-			}[type]
+		self.type = {'TunerUseMask': TunerInfoSource.FE_USE_MASK,
+		'TunerAvailable': TunerInfoSource.TUNER_AVAILABLE}[type]
 
 	@cached
 	def getBoolean(self):

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from Components.Converter.Converter import Converter
-from enigma import iServiceInformation, eServiceReference, iPlayableService, eServiceReference
+from enigma import eAVControl,iServiceInformation, eServiceReference, iPlayableService
 from Screens.InfoBarGenerics import hasActiveSubservicesForCurrentChannel
 from Components.Element import cached
 
@@ -79,22 +79,26 @@ class ServiceInfo(Converter):
 	IS_STREAM = 21
 	IS_SD = 22
 	IS_HD = 23
-	IS_SD_AND_WIDESCREEN = 24
-	IS_SD_AND_NOT_WIDESCREEN = 25
-	IS_4K = 26
-	IS_STEREO = 27
-	IS_NOT_WIDESCREEN = 28
-	IS_1080 = 29
-	IS_720 = 30
-	IS_SDR = 31
-	IS_HDR = 32
-	IS_HDR10 = 33
-	IS_HLG = 34
-	IS_VIDEO_MPEG2 = 35
-	IS_VIDEO_AVC = 36
-	IS_VIDEO_HEVC = 37
-	IS_SOFTCSA = 38
-	IS_DAB = 39
+	IS_HDHDR = 24
+	IS_SD_AND_WIDESCREEN = 25
+	IS_SD_AND_NOT_WIDESCREEN = 26
+	IS_4K = 27
+	IS_STEREO = 28
+	IS_NOT_WIDESCREEN = 29
+	IS_1080 = 30
+	IS_720 = 31
+	IS_SDR = 32
+	IS_HDR = 33
+	IS_HDR10 = 34
+	IS_HLG = 35
+	IS_VIDEO_MPEG2 = 36
+	IS_VIDEO_AVC = 37
+	IS_VIDEO_HEVC = 38
+	IS_SOFTCSA = 39
+	IS_DAB = 40
+
+	VIDEO_INFO_WIDTH = 0
+	VIDEO_INFO_GAMMA = 1
 
 	def __init__(self, type):
 		Converter.__init__(self, type)
@@ -127,6 +131,7 @@ class ServiceInfo(Converter):
 				"IsStream": (self.IS_STREAM, (iPlayableService.evUpdatedInfo, iPlayableService.evStart)),
 				"IsSD": (self.IS_SD, (iPlayableService.evVideoSizeChanged, iPlayableService.evUpdatedInfo, iPlayableService.evStart)),
 				"IsHD": (self.IS_HD, (iPlayableService.evVideoSizeChanged, iPlayableService.evUpdatedInfo, iPlayableService.evStart)),
+				"IsHDHDR": (self.IS_HDHDR, (iPlayableService.evVideoSizeChanged, iPlayableService.evVideoGammaChanged)),
 				"IsSDAndWidescreen": (self.IS_SD_AND_WIDESCREEN, (iPlayableService.evVideoSizeChanged, iPlayableService.evUpdatedInfo)),
 				"IsSDAndNotWidescreen": (self.IS_SD_AND_NOT_WIDESCREEN, (iPlayableService.evVideoSizeChanged, iPlayableService.evUpdatedInfo)),
 				"Is4K": (self.IS_4K, (iPlayableService.evVideoSizeChanged, iPlayableService.evUpdatedInfo)),
@@ -170,6 +175,10 @@ class ServiceInfo(Converter):
 		isRef = isinstance(service, eServiceReference)
 		info = service.info() if (service and not isRef) else None
 		if info:
+			videoData = info.getInfoString(iServiceInformation.sVideoInfo) or "-1|-1|-1|-1|-1|-1"
+			videoData = [int(x) for x in videoData.split("|")]
+			self.videoWidth = videoData[self.VIDEO_INFO_WIDTH] if videoData[self.VIDEO_INFO_WIDTH] != -1 else eAVControl.getInstance().getResolutionX(0)
+			videoGamma = videoData[self.VIDEO_INFO_GAMMA]
 			if self.type == self.HAS_TELETEXT:
 				tpid = info.getInfo(iServiceInformation.sTXTPID)
 				return tpid != -1
@@ -240,6 +249,8 @@ class ServiceInfo(Converter):
 						return self.videoHeight and self.videoHeight < 720
 					elif self.type == self.IS_HD:
 						return self.videoHeight >= 720 and self.videoHeight < 1500
+					elif self.type == self.IS_HDHDR:
+						return self.videoWidth > 720 and self.videoWidth < 1980 and videoGamma > 0
 					elif self.type == self.IS_4K:
 						return self.videoHeight >= 1500
 					elif self.type == self.IS_1080:
