@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from Components.Converter.Converter import Converter
-from enigma import eAVControl,iServiceInformation, eServiceReference, iPlayableService
+from enigma import eAVControl, iServiceInformation, eServiceReference, iPlayableService
 from Screens.InfoBarGenerics import hasActiveSubservicesForCurrentChannel
 from Components.Element import cached
 
