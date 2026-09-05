@@ -758,6 +758,11 @@ class NimSetup(Setup, ServiceStopScreen):
 			for x in self["config"].list:
 				x[1].save()
 			configfile.save()
+		# DAB+ satellite choices are derived from the live tuner topology. Keep
+		# their menu gating and position list in sync when a tuner is changed
+		# without requiring an Enigma2 restart.
+		from Components.RTLSDR import updateDABBoxInfo
+		updateDABBoxInfo()
 		showrotorpositionChoicesUpdate(update=True)
 		preferredTunerChoicesUpdate(update=True)
 
