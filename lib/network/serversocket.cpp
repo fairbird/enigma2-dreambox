@@ -118,8 +118,9 @@ eServerSocket::eServerSocket(int port, eMainloop *ml): eSocket(ml, AF_INET6), m_
 		close();
 		return;
 	}
-	listen_result=listen(getDescriptor(), 0);
 
+	listen_result = listen(getDescriptor(), 0);
+	if (listen_result < 0)
 	{
 		eDebug("[eServerSocket] ERROR listening on port %d (%m)", port);
 		close();
