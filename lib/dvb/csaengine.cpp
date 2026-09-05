@@ -53,7 +53,7 @@ bool csa_load_library()
 
 	if (!g_csa_api.handle)
 	{
-		eWarning("[CSAEngine] libdvbcsa not found (dlopen failed)");
+		eWarning("[eDVBCSAEngine] libdvbcsa not found (dlopen failed)");
 		return false;
 	}
 
@@ -71,7 +71,7 @@ bool csa_load_library()
 		!g_csa_api.batch_size  ||
 		!g_csa_api.decrypt)
 	{
-		eWarning("[CSAEngine] %s loaded but missing required symbols", loaded_name);
+		eWarning("[eDVBCSAEngine] %s loaded but missing required symbols", loaded_name);
 		dlclose(g_csa_api.handle);
 		g_csa_api.handle    = 0;
 		g_csa_api.available = false;
@@ -80,7 +80,7 @@ bool csa_load_library()
 
 	g_csa_api.available = true;
 
-	eDebug("[CSAEngine] %s successfully loaded, software CSA enabled", loaded_name);
+	eDebug("[eDVBCSAEngine] %s successfully loaded, software CSA enabled", loaded_name);
 
 	return true;
 }
@@ -116,7 +116,7 @@ bool eDVBCSAEngine::init()
 {
 	if (!csa_load_library())
 	{
-		eWarning("[CSAEngine] init: csa_load_library failed");
+		eWarning("[eDVBCSAEngine] init: csa_load_library failed");
 		return false;
 	}
 
@@ -137,7 +137,7 @@ bool eDVBCSAEngine::init()
 	m_batch_even.resize(m_batch_size + 1);
 	m_batch_odd.resize(m_batch_size + 1);
 
-	eDebug("[CSAEngine] init: batch_size=%d", m_batch_size);
+	eDebug("[eDVBCSAEngine] init: batch_size=%d", m_batch_size);
 
 	return true;
 }
@@ -212,7 +212,7 @@ void eDVBCSAEngine::setKey(int parity, uint8_t ecm_mode, const uint8_t* cw)
 	if (!g_csa_api.available || !g_csa_api.key_set_ecm)
 		return;
 
-	CSA_LOG("[CSAEngine] setKey: parity=%d ecm_mode=%u CW=%02X %02X %02X %02X %02X %02X %02X %02X",
+	CSA_LOG("[eDVBCSAEngine] setKey: parity=%d ecm_mode=%u CW=%02X %02X %02X %02X %02X %02X %02X %02X",
 			parity, ecm_mode,
 			BYTE_HEX(cw[0]), BYTE_HEX(cw[1]), BYTE_HEX(cw[2]), BYTE_HEX(cw[3]),
 			BYTE_HEX(cw[4]), BYTE_HEX(cw[5]), BYTE_HEX(cw[6]), BYTE_HEX(cw[7]));
@@ -243,7 +243,7 @@ void eDVBCSAEngine::setKey(int parity, uint8_t ecm_mode, const uint8_t* cw)
 		uint8_t table_used = g_csa_api.get_ecm_table();
 		if (table_used != last_logged_table)
 		{
-			eDebug("[CSAEngine] libdvbcsa using table 0x%02X", table_used);
+			eDebug("[eDVBCSAEngine] libdvbcsa using table 0x%02X", table_used);
 			last_logged_table = table_used;
 		}
 	}
@@ -310,7 +310,7 @@ void eDVBCSAEngine::descramble(unsigned char* packets, int len)
 	dvbcsa_bs_batch_s* pcks_even = m_batch_even.data();
 	dvbcsa_bs_batch_s* pcks_odd = m_batch_odd.data();
 
-	CSA_LOG("[CSAEngine] descramble: len=%d batch_size=%d", len, m_batch_size);
+	CSA_LOG("[eDVBCSAEngine] descramble: len=%d batch_size=%d", len, m_batch_size);
 
 	while (i < len)
 	{
@@ -318,7 +318,7 @@ void eDVBCSAEngine::descramble(unsigned char* packets, int len)
 
 		if (!isPacketValid(pkt))
 		{
-			CSA_LOG("[CSAEngine] decrypt sync error at offset=%d", i);
+			CSA_LOG("[eDVBCSAEngine] decrypt sync error at offset=%d", i);
 			return;
 		}
 
@@ -367,7 +367,7 @@ void eDVBCSAEngine::descramble(unsigned char* packets, int len)
 		{
 			pcks_even[even_cnt].data = NULL;
 			g_csa_api.decrypt(key_even, pcks_even, 184);
-			CSA_LOG("[CSAEngine] decrypt even batch (%d)", m_batch_size);
+			CSA_LOG("[eDVBCSAEngine] decrypt even batch (%d)", m_batch_size);
 			even_cnt = 0;
 		}
 
@@ -376,7 +376,7 @@ void eDVBCSAEngine::descramble(unsigned char* packets, int len)
 		{
 			pcks_odd[odd_cnt].data = NULL;
 			g_csa_api.decrypt(key_odd, pcks_odd, 184);
-			CSA_LOG("[CSAEngine] decrypt odd batch (%d)", m_batch_size);
+			CSA_LOG("[eDVBCSAEngine] decrypt odd batch (%d)", m_batch_size);
 			odd_cnt = 0;
 		}
 
@@ -388,7 +388,7 @@ void eDVBCSAEngine::descramble(unsigned char* packets, int len)
 	{
 		pcks_even[even_cnt].data = NULL;
 		g_csa_api.decrypt(key_even, pcks_even, 184);
-		CSA_LOG("[CSAEngine] decrypt remaining even packets=%d", even_cnt);
+		CSA_LOG("[eDVBCSAEngine] decrypt remaining even packets=%d", even_cnt);
 	}
 
 	// flush remaining odd
@@ -396,8 +396,8 @@ void eDVBCSAEngine::descramble(unsigned char* packets, int len)
 	{
 		pcks_odd[odd_cnt].data = NULL;
 		g_csa_api.decrypt(key_odd, pcks_odd, 184);
-		CSA_LOG("[CSAEngine] decrypt remaining odd packets=%d", odd_cnt);
+		CSA_LOG("[eDVBCSAEngine] decrypt remaining odd packets=%d", odd_cnt);
 	}
 
-	CSA_LOG("[CSAEngine] descramble done");
+	CSA_LOG("[eDVBCSAEngine] descramble done");
 }

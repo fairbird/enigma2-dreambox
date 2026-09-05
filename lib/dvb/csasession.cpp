@@ -10,7 +10,6 @@
 #endif
 
 DEFINE_REF(eDVBCSASession);
-DEFINE_REF(iServiceScrambled);
 
 static const uint8_t DEFAULT_ECM_MODE = 0x04;
 
@@ -94,7 +93,7 @@ eDVBCSASession::~eDVBCSASession()
 
 #ifdef DREAMNEXTGEN
 	// Reset audio delay flag when session is destroyed
-//	eAlsaOutput::setSoftDecoderActive(0);
+	eAlsaOutput::setSoftDecoderActive(0);
 #endif
 }
 
@@ -138,7 +137,7 @@ void eDVBCSASession::startECMMonitor(iDVBDemux *demux, uint16_t ecm_pid, uint16_
 	// Cache-driven early activation: skip ECM section reader if CSA-ALT for
 	// this service is already known. Disabled in Aggressive mode (audio race on dm900).
 	const bool cache_early_activate_disabled =
-		(eSimpleConfig::getInt("config.softcsa.decoderRelease", 2) == 2);
+		(eSimpleConfig::getInt("config.softcsa.decoderRelease", 0) == 2);
 
 	if (!cache_early_activate_disabled)
 	{
@@ -300,7 +299,7 @@ void eDVBCSASession::setActive(bool active)
 	{
 		eDebug("[eDVBCSASession] ACTIVATED - CSA-ALT detected, SW-Descrambling active");
 #ifdef DREAMNEXTGEN
-//		eAlsaOutput::setSoftDecoderActive(1);
+		eAlsaOutput::setSoftDecoderActive(1);
 #endif
 		// Pre-register engine at CWHandler using cached serviceId.
 		// This closes the CW gap during PiP swap: when the old session is
@@ -332,7 +331,7 @@ void eDVBCSASession::setActive(bool active)
 	{
 		eDebug("[eDVBCSASession] DEACTIVATED - HW-Descrambling (passthrough)");
 #ifdef DREAMNEXTGEN
-//		eAlsaOutput::setSoftDecoderActive(0);
+		eAlsaOutput::setSoftDecoderActive(0);
 #endif
 		if (m_cw_handler_registered)
 		{
@@ -368,7 +367,6 @@ void eDVBCSASession::onCwReceived(eServiceReferenceDVB ref, int parity, const ch
 	if (!m_cw_handler_registered)
 		eDebug("[eDVBCSASession] onCwReceived: parity=%d for service %s", parity, ref.toString().c_str());
 
-	// Only process CWs when active
 	// Buffer CW if session not yet active (activation pending on ECM analysis)
 	if (!m_active)
 	{
@@ -424,6 +422,11 @@ void eDVBCSASession::onCwReceived(eServiceReferenceDVB ref, int parity, const ch
 		const uint8_t* cw_bytes = (const uint8_t*)cw;
 		eDebug("[eDVBCSASession] CW set: caid=0x%04X, parity=%d, hasEven=%d, hasOdd=%d, CW=%02X",
 			caid, parity, m_engine->hasEvenKey(), m_engine->hasOddKey(), cw_bytes[0]);
+
+		// Cache serviceId for future sessions (enables pre-registration on PiP swap)
+		auto& cached = s_csa_cache[svc_key];
+		cached.serviceId = serviceId;
+		cached.serviceId_valid = true;
 	}
 	else if (serviceId != 0 && serviceId != m_cw_service_id &&
 		serviceId != m_cw_alt_service_id &&
@@ -441,11 +444,6 @@ void eDVBCSASession::onCwReceived(eServiceReferenceDVB ref, int parity, const ch
 		const uint8_t* cw_bytes = (const uint8_t*)cw;
 		eDebug("[eDVBCSASession] CW set: caid=0x%04X, parity=%d, hasEven=%d, hasOdd=%d, CW=%02X",
 			caid, parity, m_engine->hasEvenKey(), m_engine->hasOddKey(), cw_bytes[0]);
-
-		// Cache serviceId for future sessions (enables pre-registration on PiP swap)
-		auto& cached = s_csa_cache[svc_key];
-		cached.serviceId = serviceId;
-		cached.serviceId_valid = true;
 	}
 	else
 	{
