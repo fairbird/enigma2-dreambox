@@ -81,7 +81,7 @@ void DumpUnfreed()
 #endif
 
 int debugLvl = lvlDebug;
-static bool debugTime = false;
+static int debugTime = 0; // Bitmap: 0 = none, 1 = secs since boot, 2 = local time, 3 = boot and local, 6 = local date/time, 7 = boot and date/time
 
 static pthread_mutex_t DebugLock = 
 #ifdef __GLIBC__
@@ -151,25 +151,47 @@ extern void bsodFatal(const char *component);
 
 #define eDEBUG_BUFLEN    1024
 
+int formatTime(char *buf, int bufferSize, int flags)
+{
+	int pos = 0;
+	if (!(flags & _DBGFLG_NOTIME))
+	{
+		if (debugTime & 6)
+		{
+			struct tm loctime = {};
+			struct timeval tim = {};
+			gettimeofday(&tim, NULL);
+			localtime_r(&tim.tv_sec, &loctime);
+			if (debugTime & 4)
+			{
+				pos += snprintf(buf + pos, bufferSize - pos, "%04d-%02d-%02d ", loctime.tm_year + 1900, loctime.tm_mon + 1, loctime.tm_mday);
+			}
+			if (debugTime & 2)
+			{
+				pos += snprintf(buf + pos, bufferSize - pos, "%02d:%02d:%02d.%04lld ", loctime.tm_hour, loctime.tm_min, loctime.tm_sec, (long long)tim.tv_usec / 100L);
+			}
+		}
+		if (debugTime & 1)
+		{
+			struct timespec tp = {};
+			clock_gettime(CLOCK_MONOTONIC, &tp);
+			pos += snprintf(buf + pos, bufferSize - pos, "<%6lld.%06lld> ", (long long)tp.tv_sec, (long long)tp.tv_nsec / 1000);
+		}
+	}
+	return pos;
+}
+
 void eDebugImpl(int flags, const char* fmt, ...)
 {
 	char * buf = new char[eDEBUG_BUFLEN];
-	int pos = 0;
-	struct timespec tp = {};
 
-	if (debugTime && !(flags & _DBGFLG_NOTIME)) {
-		clock_gettime(CLOCK_MONOTONIC, &tp);
-#ifdef GLIBC_64BIT_TIME_FLAGS
-		pos = snprintf(buf, eDEBUG_BUFLEN, "<%6llu.%03lu> ", tp.tv_sec, tp.tv_nsec/1000000);
-#else
-		pos = snprintf(buf, eDEBUG_BUFLEN, "<%6lu.%03lu> ", tp.tv_sec, tp.tv_nsec/1000000);
-#endif
-	}
+	int pos = formatTime(buf, eDEBUG_BUFLEN, flags);
 
 	va_list ap;
 	va_start(ap, fmt);
 	int vsize = vsnprintf(buf + pos, eDEBUG_BUFLEN - pos, fmt, ap);
 	va_end(ap);
+
 	if (vsize < 0) {
 		vsize = 0;
 		pos += snprintf(buf + pos, eDEBUG_BUFLEN - pos, " Error formatting: %s", fmt);
@@ -181,12 +203,8 @@ void eDebugImpl(int flags, const char* fmt, ...)
 		// pos still contains size of timestring
 		// +2 for \0 and optional newline
 		buf = new char[pos + vsize + 2];
-		if (debugTime && !(flags & _DBGFLG_NOTIME))
-#ifdef GLIBC_64BIT_TIME_FLAGS
-			pos = snprintf(buf, pos + vsize, "<%6llu.%03lu> ", tp.tv_sec, tp.tv_nsec/1000000);
-#else
-			pos = snprintf(buf, pos + vsize, "<%6lu.%03lu> ", tp.tv_sec, tp.tv_nsec/1000000);
-#endif
+		pos = formatTime(buf, pos + vsize, flags);
+
 		va_start(ap, fmt);
 		vsize = vsnprintf(buf + pos, vsize + 1, fmt, ap);
 		va_end(ap);
@@ -224,7 +242,7 @@ int eGetEnigmaDebugLvl()
 	return debugLvl;
 }
 
-void setDebugTime(bool enable)
+void setDebugTime(int flags)
 {
-	debugTime = enable;
+	debugTime = flags;
 }
