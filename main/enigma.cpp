@@ -109,7 +109,7 @@ extern "C" {
 #endif
 
 /* Defined in eerror.cpp */
-void setDebugTime(bool enable);
+void setDebugTime(int flags);
 
 class eMain : public eApplication, public sigc::trackable
 {
