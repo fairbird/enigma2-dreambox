@@ -13,4 +13,4 @@ install_PYTHON = \
 	MovieReference.py ProgressDiskSpaceInfo.py RefString.py RouteInfo.py ServiceInfo2.py ServiceInfoEX.py \
 	ServiceName2.py TextAddAfter.py TextAddBefore.py Textreplace.py TextToUpper.py VAudioInfo.py VExtraNumText.py \
 	VNetSpeedInfo.py VtiTempFan.py VWeather.py YWeather.py VtiInfo.py Bitrate2.py XmlMultiContent.py ModeronFHDAudioInfo.py \
-	MenuGrid_PageInfo.py MenuGrid_MenuIcon.py
+	MenuGrid_PageInfo.py MenuGrid_MenuIcon.py TrackInfo.py
