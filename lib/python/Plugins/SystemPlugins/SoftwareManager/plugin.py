@@ -1998,8 +1998,6 @@ class BackupHelper(Screen):
 		Screen.__init__(self, session)
 		self.args = args
 		self.backuppath = getBackupPath()
-		if not isdir(self.backuppath):
-			self.backuppath = getOldBackupPath()
 		self.backupfile = getBackupFilename()
 		self.fullbackupfilename = pathjoin(self.backuppath, self.backupfile)
 		self.callLater(self.doAction)
