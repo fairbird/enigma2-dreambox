@@ -138,6 +138,7 @@ class VirtualKeyBoard(Screen):
 			VKB_SAVE_TEXT: ("Save", _("Save")),
 			VKB_SEARCH_TEXT: ("Search", _("Search"))
 		}.get(style, ("Enter", "ENTERICON"))
+		loadKeyPixmap = (lambda **kwargs: None) if self.nativeKeys else LoadPixmap
 		self.bg = loadKeyPixmap(path=resolveFilename(SCOPE_CURRENT_SKIN, "buttons/vkey_bg.png"))  # Legacy support only!
 		self.bg_l = loadKeyPixmap(path=resolveFilename(SCOPE_CURRENT_SKIN, "buttons/vkey_bg_l.png"))
 		self.bg_m = loadKeyPixmap(path=resolveFilename(SCOPE_CURRENT_SKIN, "buttons/vkey_bg_m.png"))
