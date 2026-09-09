@@ -24,6 +24,7 @@ dist_pkgdata_DATA = \
 	dnsservers.xml \
 	unicable.xml \
 	hd-testcard.mvi \
+	picon_default.png \
 	lcd_picon_default.png
 
 iso-639-3.pck: $(srcdir)/iso-639-3.tab
