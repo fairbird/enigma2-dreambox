@@ -284,6 +284,7 @@ class PackageFeedEditor(VirtualKeyBoard):
 		self.skinName = "VirtualKeyBoard"
 		if hasattr(self, "skin") and hasattr(self.skin, "replace"):
 			self.skin = self.skin.replace('name="VirtualKeyBoard"', 'name="PackageFeedEditor"')
+
 	def save(self):
 		self.smsGotChar()
 		text = self["text"].getText().replace(self.TAB_GLYPH, "\t")
