@@ -14,7 +14,7 @@ from Components.Slider import Slider
 from Components.Sources.StaticText import StaticText
 from Screens.MessageBox import MessageBox
 from Screens.Screen import Screen
-from Screens.VirtualKeyBoard import VirtualKeyBoard, VKB_SAVE_ICON
+from Screens.VirtualKeyBoard import VirtualKeyBoard
 from Tools.Directories import fileReadLines, fileWriteLines
 
 MODULE_NAME = __name__.split(".")[-1]
@@ -280,7 +280,7 @@ class PackageFeedEditor(VirtualKeyBoard):
 	def __init__(self, session, configFile=None):
 		self.configFile = configFile
 		self.lines = fileReadLines(configFile, default=[], source=MODULE_NAME) if configFile else []
-		VirtualKeyBoard.__init__(self, session, title=_("Edit the feed URL:"), text=self.lines[0] if self.lines else "", style=VKB_SAVE_ICON, windowTitle=_("Package Feed Editor"))
+		VirtualKeyBoard.__init__(self, session, title=_("Edit the feed URL:"), text=self.lines[0] if self.lines else "", style=VirtualKeyBoard.VKB_SAVE_ICON, windowTitle=_("Package Feed Editor"))
 		self.skinName = "VirtualKeyBoard"
 		if hasattr(self, "skin") and hasattr(self.skin, "replace"):
 			self.skin = self.skin.replace('name="VirtualKeyBoard"', 'name="PackageFeedEditor"')

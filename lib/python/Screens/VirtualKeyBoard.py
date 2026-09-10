@@ -29,17 +29,6 @@ def isHD():
     return desktopSize[0] <= 1280
 
 
-VKB_DONE_ICON = 0
-VKB_ENTER_ICON = 1
-VKB_OK_ICON = 2
-VKB_SAVE_ICON = 3
-VKB_SEARCH_ICON = 4
-VKB_DONE_TEXT = 5
-VKB_ENTER_TEXT = 6
-VKB_OK_TEXT = 7
-VKB_SAVE_TEXT = 8
-VKB_SEARCH_TEXT = 9
-
 SPACE = "SPACEICON"  # Symbol to be used for a SPACE on the keyboard.  Must be "SPACE" (any case), "SPACEICON" or "SPACEICONALT".
 
 
@@ -118,6 +107,16 @@ class VirtualKeyBoardEntryComponent:
 # For more information about using VirtualKeyBoard see /doc/VIRTUALKEYBOARD
 #
 class VirtualKeyBoard(Screen):
+	VKB_DONE_ICON = 0
+	VKB_ENTER_ICON = 1
+	VKB_OK_ICON = 2
+	VKB_SAVE_ICON = 3
+	VKB_SEARCH_ICON = 4
+	VKB_DONE_TEXT = 5
+	VKB_ENTER_TEXT = 6
+	VKB_OK_TEXT = 7
+	VKB_SAVE_TEXT = 8
+	VKB_SEARCH_TEXT = 9
 	def __init__(self, session, title=_("Virtual KeyBoard Text:"), text="", maxSize=False, visible_width=False, type=Input.TEXT, currPos=None, allMarked=False, style=VKB_ENTER_ICON, windowTitle=None):
 		Screen.__init__(self, session, enableHelp=True)
 		self.nativeKeys = bool(parameters.get("VirtualKeyboardNative", 0))
@@ -127,16 +126,16 @@ class VirtualKeyBoard(Screen):
 		self["key_text"] = StaticText(_("TEXT"))
 		self["key_help"] = StaticText(_("HELP"))
 		greenLabel, self.green = {
-			VKB_DONE_ICON: ("Done", "ENTERICON"),
-			VKB_ENTER_ICON: ("Enter", "ENTERICON"),
-			VKB_OK_ICON: ("OK", "ENTERICON"),
-			VKB_SAVE_ICON: ("Save", "ENTERICON"),
-			VKB_SEARCH_ICON: ("Search", "ENTERICON"),
-			VKB_DONE_TEXT: ("Done", _("Done")),
-			VKB_ENTER_TEXT: ("Done", _("Enter")),
-			VKB_OK_TEXT: ("OK", _("OK")),
-			VKB_SAVE_TEXT: ("Save", _("Save")),
-			VKB_SEARCH_TEXT: ("Search", _("Search"))
+			self.VKB_DONE_ICON: ("Done", "ENTERICON"),
+			self.VKB_ENTER_ICON: ("Enter", "ENTERICON"),
+			self.VKB_OK_ICON: ("OK", "ENTERICON"),
+			self.VKB_SAVE_ICON: ("Save", "ENTERICON"),
+			self.VKB_SEARCH_ICON: ("Search", "ENTERICON"),
+			self.VKB_DONE_TEXT: ("Done", _("Done")),
+			self.VKB_ENTER_TEXT: ("Done", _("Enter")),
+			self.VKB_OK_TEXT: ("OK", _("OK")),
+			self.VKB_SAVE_TEXT: ("Save", _("Save")),
+			self.VKB_SEARCH_TEXT: ("Search", _("Search"))
 		}.get(style, ("Enter", "ENTERICON"))
 		loadKeyPixmap = (lambda **kwargs: None) if self.nativeKeys else LoadPixmap
 		self.bg = loadKeyPixmap(path=resolveFilename(SCOPE_CURRENT_SKIN, "buttons/vkey_bg.png"))  # Legacy support only!
@@ -1313,21 +1312,31 @@ class VirtualKeyBoard(Screen):
 
 
 class VirtualKeyBoardstyle(Screen):
+	VKB_DONE_ICON = 0
+	VKB_ENTER_ICON = 1
+	VKB_OK_ICON = 2
+	VKB_SAVE_ICON = 3
+	VKB_SEARCH_ICON = 4
+	VKB_DONE_TEXT = 5
+	VKB_ENTER_TEXT = 6
+	VKB_OK_TEXT = 7
+	VKB_SAVE_TEXT = 8
+	VKB_SEARCH_TEXT = 9
 	def __init__(self, session, title=_("Virtual KeyBoard Text:"), text="", maxSize=False, visible_width=False, type=Input.TEXT, currPos=None, allMarked=False, style=VKB_ENTER_ICON, windowTitle=None):
 		Screen.__init__(self, session, enableHelp=True)
 		self.setTitle(_("Virtual Keyboard") if windowTitle is None else windowTitle)
 		prompt = title  # Title should only be used for screen titles!
 		greenLabel, self.green = {
-			VKB_DONE_ICON: ("Done", "ENTERICON"),
-			VKB_ENTER_ICON: ("Enter", "ENTERICON"),
-			VKB_OK_ICON: ("OK", "ENTERICON"),
-			VKB_SAVE_ICON: ("Save", "ENTERICON"),
-			VKB_SEARCH_ICON: ("Search", "ENTERICON"),
-			VKB_DONE_TEXT: ("Done", _("Done")),
-			VKB_ENTER_TEXT: ("Done", _("Enter")),
-			VKB_OK_TEXT: ("OK", _("OK")),
-			VKB_SAVE_TEXT: ("Save", _("Save")),
-			VKB_SEARCH_TEXT: ("Search", _("Search"))
+			self.VKB_DONE_ICON: ("Done", "ENTERICON"),
+			self.VKB_ENTER_ICON: ("Enter", "ENTERICON"),
+			self.VKB_OK_ICON: ("OK", "ENTERICON"),
+			self.VKB_SAVE_ICON: ("Save", "ENTERICON"),
+			self.VKB_SEARCH_ICON: ("Search", "ENTERICON"),
+			self.VKB_DONE_TEXT: ("Done", _("Done")),
+			self.VKB_ENTER_TEXT: ("Done", _("Enter")),
+			self.VKB_OK_TEXT: ("OK", _("OK")),
+			self.VKB_SAVE_TEXT: ("Save", _("Save")),
+			self.VKB_SEARCH_TEXT: ("Search", _("Search"))
 		}.get(style, ("Enter", "ENTERICON"))
 		loadKeyPixmap = (lambda **kwargs: None) if self.nativeKeys else LoadPixmap
 		if isHD():
