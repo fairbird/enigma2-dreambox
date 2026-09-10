@@ -117,6 +117,7 @@ class VirtualKeyBoard(Screen):
 	VKB_OK_TEXT = 7
 	VKB_SAVE_TEXT = 8
 	VKB_SEARCH_TEXT = 9
+
 	def __init__(self, session, title=_("Virtual KeyBoard Text:"), text="", maxSize=False, visible_width=False, type=Input.TEXT, currPos=None, allMarked=False, style=VKB_ENTER_ICON, windowTitle=None):
 		Screen.__init__(self, session, enableHelp=True)
 		self.nativeKeys = bool(parameters.get("VirtualKeyboardNative", 0))
@@ -1322,6 +1323,7 @@ class VirtualKeyBoardstyle(Screen):
 	VKB_OK_TEXT = 7
 	VKB_SAVE_TEXT = 8
 	VKB_SEARCH_TEXT = 9
+
 	def __init__(self, session, title=_("Virtual KeyBoard Text:"), text="", maxSize=False, visible_width=False, type=Input.TEXT, currPos=None, allMarked=False, style=VKB_ENTER_ICON, windowTitle=None):
 		Screen.__init__(self, session, enableHelp=True)
 		self.setTitle(_("Virtual Keyboard") if windowTitle is None else windowTitle)
