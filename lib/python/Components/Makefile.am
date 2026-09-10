@@ -10,8 +10,8 @@ install_PYTHON = \
 	GUIComponent.py MenuList.py __init__.py MovieList.py                    \
 	InputDevice.py ServicePosition.py SetupDevices.py Harddisk.py           \
 	AVSwitch.py Network.py RFmod.py DiskInfo.py NimManager.py Lcd.py        \
-	EpgList.py ScrollLabel.py Timezones.py Language.py RTLSDR.py		\
-	BlinkingPixmap.py Pixmap.py ConditionalWidget.py Slider.py              \
+	EpgList.py ScrollLabel.py Timezones.py Timeshift.py Language.py		\
+	BlinkingPixmap.py Pixmap.py ConditionalWidget.py Slider.py RTLSDR.py    \
 	PluginList.py PluginComponent.py RecordingConfig.py About.py UsageConfig.py \
 	FIFOList.py ServiceEventTracker.py Input.py TimerSanityCheck.py FileList.py \
 	MultiContent.py MediaPlayer.py TunerInfo.py VideoWindow.py ChoiceList.py \
