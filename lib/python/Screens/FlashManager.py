@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from json import load
+from re import search
 from os import W_OK, access, listdir, major, makedirs, minor, mkdir, remove, sep, stat, statvfs, unlink, walk
 from os.path import basename, exists, isdir, isfile, islink, ismount, splitext, join, getsize
 from shutil import rmtree
@@ -33,6 +34,67 @@ FEED_JSON_URL = 1
 USER_AGENT = {"User-agent": "Mozilla/5.0 (Windows; U; Windows NT 5.1; en; rv:1.9.1.5) Gecko/20091102 Firefox/3.5.5"}
 
 
+MEDIAFIRE_FOLDERS = {
+	"BlackHole": {"dm920": "cdmen9tqtpwxk", "dm520": "gkhsdcxiikosk", "dm7080": "5cmni3i0rch9e"},
+	"OpenTSimage": {"dm920": "sbrjw60if73re", "dm520": "gnxuy5xl3vmjo", "dm7080": "tb1x6tmtglyw4"},
+	"OpenPli": "5mqob16bb176n"
+}
+
+
+def detectCustomDistribution():
+	try:
+		with open("/etc/issue", "r") as f:
+			issueText = f.read()
+	except Exception:
+		return None
+	for distribution in MEDIAFIRE_FOLDERS:
+		if distribution.lower() in issueText.lower():
+			return distribution
+	return None
+
+
+def getMediafireImages(distribution):
+	folder = MEDIAFIRE_FOLDERS.get(distribution)
+	folderKey = folder.get(BoxInfo.getItem("model")) if isinstance(folder, dict) else folder
+	if not folderKey:
+		return {}
+	apiURL = "https://www.mediafire.com/api/1.5/folder/get_content.php?folder_key=%s&content_type=files&response_format=json" % folderKey
+	boxname = BoxInfo.getItem("BoxName")
+	machinebuild = BoxInfo.getItem("machinebuild")
+	model = BoxInfo.getItem("model")
+	try:
+		req = Request(apiURL, None, USER_AGENT)
+		files = load(urlopen(req))["response"]["folder_content"]["files"]
+		return {distribution: {f["filename"]: {"link": f["links"]["normal_download"], "name": f["filename"]} for f in files if f["filename"].endswith(".zip") and (boxname in f["filename"] or machinebuild in f["filename"] or model in f["filename"])}}
+	except Exception:
+		print("[FlashManager] getMediafireImages Error: Unable to load Mediafire folder '%s'!" % folderKey)
+		return {}
+
+
+def resolveMediafireLink(url):
+	if "mediafire.com" not in url:
+		return url
+	try:
+		req = Request(url, None, USER_AGENT)
+		html = urlopen(req).read().decode("utf-8", "ignore")
+		match = search(r'href="(https?://download[^"]+)"', html)
+		return match.group(1) if match else url
+	except Exception:
+		print("[FlashManager] resolveMediafireLink Error: Unable to resolve direct link for '%s'!" % url)
+		return url
+
+
+def getDreamosLegacyImages():
+	feedURL = "https://images.mynonpublic.com/openatv/json/%s" % BoxInfo.getItem("BoxName")
+	try:
+		req = Request(feedURL, None, USER_AGENT)
+		data = dict(load(urlopen(req)))
+		return {"dreamos Legacy": data["dreamos Legacy"]} if "dreamos Legacy" in data else {}
+	except Exception:
+		print("[FlashManager] getDreamosLegacyImages Error: Unable to load json data from URL '%s'!" % feedURL)
+		return {}
+
+
 def checkImageFiles(files):
 	return sum(f.endswith((".nfi", ".tar.xz")) for f in files) == 1 or sum(("kernel" in f and f.endswith(".bin")) or f in {"zImage", "uImage", "root_cfe_auto.bin", "root_cfe_auto.jffs2", "oe_kernel.bin", "oe_rootfs.bin", "e2jffs2.img", "rootfs.ubi", "rootfs.bin", "rootfs.tar.bz2", "rootfs-one.tar.bz2", "rootfs-two.tar.bz2"} for f in files) >= 2
 
@@ -62,7 +124,7 @@ class FlashManager(Screen):
 	def __init__(self, session):
 		Screen.__init__(self, session, enableHelp=True)
 		self.skinName = ["FlashManager", "FlashOnline"]
-		self.imageFeed = "OpenPli"
+		self.imageFeed = detectCustomDistribution() or "OpenATV"
 		self.setTitle(_("Flash Manager - %s Images") % self.imageFeed)
 		self.imagesList = {}
 		self.expanded = []
@@ -97,7 +159,11 @@ class FlashManager(Screen):
 		self["description"] = StaticText()
 		self["list"] = ChoiceList(list=[ChoiceEntryComponent("", ((_("Retrieving image list, please wait...")), "Loading"))])
 		self.feedUrls = [
-			("OpenATV", "https://images.mynonpublic.com/openatv/json/%s" % BoxInfo.getItem("BoxName"))
+			("OpenATV", "https://images.mynonpublic.com/openatv/json/%s" % BoxInfo.getItem("BoxName")),
+			("BlackHole", "mediafire:BlackHole"),
+			("OpenTSimage", "mediafire:OpenTSimage"),
+			("OpenPli", "mediafire:OpenPli"),
+			("Dreamos Legacy", "dreamos:legacy")
 		]
 		self.callLater(self.getImagesList)
 
@@ -137,34 +203,36 @@ class FlashManager(Screen):
 			index = findInList(self.imageFeed)
 			box = machinebuild if index else boxname
 			feedURL = self.feedUrls[index][FEED_JSON_URL] if index else "https://images.mynonpublic.com/openatv/json/%s" % box
-			try:
-				req = Request(feedURL, None, USER_AGENT)
-				self.imagesList = dict(load(urlopen(req)))
-				# if config.usage.alternative_imagefeed.value:
-				# 	url = "%s%s" % (config.usage.alternative_imagefeed.value, box)
-				# 	self.imagesList.update(dict(load(urlopen(url))))
-			except Exception:
-				print("[FlashManager] getImagesList Error: Unable to load json data from URL '%s'!" % feedURL)
-				self.imagesList = {}
+			if feedURL.startswith("mediafire:"):
+				self.imagesList = getMediafireImages(feedURL.split(":", 1)[1])
+			elif feedURL == "dreamos:legacy":
+				self.imagesList = getDreamosLegacyImages()
+			else:
+				try:
+					req = Request(feedURL, None, USER_AGENT)
+					self.imagesList = dict(load(urlopen(req)))
+					self.imagesList.pop("dreamos Legacy", None)
+				except Exception:
+					print("[FlashManager] getImagesList Error: Unable to load json data from URL '%s'!" % feedURL)
+					self.imagesList = {}
 			searchFolders = []
-			# Get all folders of /media/ and /media/net/ and only if OpenATV
-			if not index:
-				for media in ["/media/%s" % x for x in listdir("/media")] + (["/media/net/%s" % x for x in listdir("/media/net")] if isdir("/media/net") else []):
-					# print("[FlashManager] getImagesList DEBUG: media='%s'." % media)
-					if not (BoxInfo.getItem("HasMMC") and "/mmc" in media) and isdir(media):
-						getImages(media, [join(media, x) for x in listdir(media) if splitext(x)[1] == ".zip" and (boxname in x or machinebuild in x or model in x)])
-						for folder in ["images", "downloaded_images", "imagebackups"]:
-							if folder in listdir(media):
-								subFolder = join(media, folder)
-								# print("[FlashManager] getImagesList DEBUG: subFolder='%s'." % subFolder)
-								if isdir(subFolder) and not islink(subFolder) and not ismount(subFolder):
-									# print("[FlashManager] getImagesList DEBUG: Next subFolder='%s'." % subFolder)
-									getImages(subFolder, [join(subFolder, x) for x in listdir(subFolder) if splitext(x)[1] == ".zip" and (boxname in x or machinebuild in x or model in x)])
-									for dir in [dir for dir in [join(subFolder, dir) for dir in listdir(subFolder)] if isdir(dir) and splitext(dir)[1] == ".unzipped"]:
-										try:
-											rmtree(dir)
-										except OSError as err:
-											print("[FlashManager] getImagesList Error %d: Unable to remove directory '%s'!  (%s)" % (err.errno, dir, err.strerror))
+			# Get all folders of /media/ and /media/net/ regardless of the selected distribution
+			for media in ["/media/%s" % x for x in listdir("/media")] + (["/media/net/%s" % x for x in listdir("/media/net")] if isdir("/media/net") else []):
+				# print("[FlashManager] getImagesList DEBUG: media='%s'." % media)
+				if not (BoxInfo.getItem("HasMMC") and "/mmc" in media) and isdir(media):
+					getImages(media, [join(media, x) for x in listdir(media) if splitext(x)[1] == ".zip" and (boxname in x or machinebuild in x or model in x)])
+					for folder in ["images", "downloaded_images", "imagebackups"]:
+						if folder in listdir(media):
+							subFolder = join(media, folder)
+							# print("[FlashManager] getImagesList DEBUG: subFolder='%s'." % subFolder)
+							if isdir(subFolder) and not islink(subFolder) and not ismount(subFolder):
+								# print("[FlashManager] getImagesList DEBUG: Next subFolder='%s'." % subFolder)
+								getImages(subFolder, [join(subFolder, x) for x in listdir(subFolder) if splitext(x)[1] == ".zip" and (boxname in x or machinebuild in x or model in x)])
+								for dir in [dir for dir in [join(subFolder, dir) for dir in listdir(subFolder)] if isdir(dir) and splitext(dir)[1] == ".unzipped"]:
+									try:
+										rmtree(dir)
+									except OSError as err:
+										print("[FlashManager] getImagesList Error %d: Unable to remove directory '%s'!  (%s)" % (err.errno, dir, err.strerror))
 
 		imageList = []
 		for catagory in sorted(self.imagesList.keys(), reverse=True):
@@ -235,7 +303,13 @@ class FlashManager(Screen):
 		self.selectionChanged()
 
 	def keyDistribution(self):
-		self.feedUrls = [["OpenATV", "https://images.mynonpublic.com/openatv/json/%s" % BoxInfo.getItem("BoxName")]]
+		self.feedUrls = [
+			["OpenATV", "https://images.mynonpublic.com/openatv/json/%s" % BoxInfo.getItem("BoxName")],
+			["BlackHole", "mediafire:BlackHole"],
+			["OpenTSimage", "mediafire:OpenTSimage"],
+			["OpenPli", "mediafire:OpenPli"],
+			["Dreamos Legacy", "dreamos:legacy"]
+		]
 		distributionList = []
 		default = 0
 		machine = BoxInfo.getItem("machinebuild")
@@ -593,7 +667,8 @@ class FlashImage(Screen):
 				self["header"].setText(_("Downloading Image"))
 				self["info"].setText(self.imageName)
 				self["summary_header"].setText(self["header"].getText())
-				self.downloader = downloadWithProgress(self.source.replace(" ", "%20"), self.zippedImage)
+				downloadURL = resolveMediafireLink(self.source)
+				self.downloader = downloadWithProgress(downloadURL.replace(" ", "%20"), self.zippedImage)
 				self.downloader.addProgress(self.downloadProgress)
 				self.downloader.addEnd(self.downloadEnd)
 				self.downloader.addError(self.downloadError)
@@ -604,7 +679,7 @@ class FlashImage(Screen):
 			self.keyCancel()
 
 	def downloadProgress(self, current, total):
-		self["progress"].setValue(100 * current // total)
+		self["progress"].setValue(100 * current // total if total else 0)
 
 	def downloadEnd(self, filename=None):
 		self.downloader.stop()
