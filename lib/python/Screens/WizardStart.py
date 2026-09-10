@@ -106,7 +106,7 @@ class WizardStart(Wizard, Rc):
 
 	def nwListInterfaces(self):
 		result = []
-		for interface, adapter in networkManager.adapters.items():
+		for interface, adapter in networkManager.getAdapters().items():
 			result.append((f"{_("Wi-Fi") if adapter.isWiFi else _("LAN")}  ({interface})  –  {networkManager.getFriendlyAdapterDescription(interface)}", interface))
 		result.append((_("Skip network setup"), "skip"))
 		return result
