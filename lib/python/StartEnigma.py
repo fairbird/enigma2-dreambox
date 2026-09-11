@@ -61,7 +61,7 @@ config.misc.plugin_style = ConfigSelection(default="grid3", choices=[
 config.misc.menu_show_numbers = ConfigYesNo(default=False)
 
 # New VirtualkeyBoard Style
-config.misc.virtualkeyBoardstyle = ConfigSelection(default="new", choices=[
+config.misc.virtualkeyBoardstyle = ConfigSelection(default="e2", choices=[
 	("new", _("New style")),
 	("e2", _("Enigma2 default"))])
 
