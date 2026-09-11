@@ -74,6 +74,8 @@ def formatError(error):
 # ------------------------------------------------------------
 # STREAM PROTOCOLS (no UI logic)
 # ------------------------------------------------------------
+
+
 class DiscardProtocol(Protocol):
 	""" Twisted only releases a connection once its response body has been
 		delivered somewhere. Responses we do not want (HTTP != 2xx, or a local
