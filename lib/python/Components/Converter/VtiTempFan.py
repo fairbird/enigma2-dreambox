@@ -16,6 +16,7 @@ class VtiTempFan(Poll, Converter):
 		self.type = type
 		self.poll_interval = 30000
 		self.poll_enabled = True
+
 		if type == 'TempInfo':
 			self.type = self.TEMPINFO
 		elif type == 'FanInfo':
@@ -30,31 +31,62 @@ class VtiTempFan(Poll, Converter):
 			textvalue = self.tempfile()
 		elif self.type == self.FANINFO:
 			textvalue = self.fanfile()
-		return textvalue
+		return textvalue or ''
 
 	text = property(getText)
 
 	def tempfile(self):
-		temp = ''
-		unit = ''
+		try:
+			with open('/sys/class/thermal/thermal_zone0/temp', 'rb') as fd:
+				temp = fd.readline().strip()
+
+			if not temp:
+				return ''
+
+			temp = int(temp)
+			temp = temp / 1000.0
+
+			return 'TEMP: %.1f\u00B0C' % temp
+
+		except (IOError, OSError, ValueError):
+			pass
+
 		try:
 			with open('/proc/stb/sensors/temp0/value', 'rb') as fd:
 				temp = fd.readline().strip()
+
 			with open('/proc/stb/sensors/temp0/unit', 'rb') as fd:
 				unit = fd.readline().strip()
-			return 'TEMP: %s %s%s' % (str(temp), u'\u00B0', str(unit))
-		except OSError:
-			pass
+
+			if not temp:
+				return ''
+
+			if not isinstance(temp, str):
+				temp = temp.decode('utf-8', 'ignore')
+
+			if not isinstance(unit, str):
+				unit = unit.decode('utf-8', 'ignore')
+
+			return 'TEMP: %s\u00B0%s' % (temp, unit)
+
+		except (IOError, OSError, ValueError):
+			return ''
 
 	def fanfile(self):
-		fan = ''
 		try:
 			with open('/proc/stb/fp/fan_speed', 'rb') as fd:
 				fan = fd.readline().strip()
-			faninfo = 'FAN: %s' % (str(fan))
-			return faninfo
-		except OSError:
-			pass
+
+			if not fan:
+				return ''
+
+			if not isinstance(fan, str):
+				fan = fan.decode('utf-8', 'ignore')
+
+			return 'FAN: %s' % fan
+
+		except (IOError, OSError):
+			return ''
 
 	def changed(self, what):
 		if what[0] == self.CHANGED_POLL:
