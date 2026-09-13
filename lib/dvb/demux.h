@@ -231,6 +231,7 @@ private:
 	std::string m_target_filename;
 	int m_packetsize;
 	bool m_ram_mode;
+	friend class eRTSPStreamClient;
 };
 
 #endif

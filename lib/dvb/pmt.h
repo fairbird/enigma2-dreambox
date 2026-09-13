@@ -45,6 +45,7 @@ class eDVBServicePMTHandler: public eDVBPMTParser
 {
 #ifndef SWIG
 	friend class eDVBCAService;
+	friend class eRTSPStreamClient;
 	eServiceReferenceDVB m_reference;
 	ePtr<eDVBService> m_service;
 

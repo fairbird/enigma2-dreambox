@@ -189,6 +189,7 @@ private:
 	static eDVBResourceManager *instance;
 	friend class eDVBChannel;
 	friend class eFBCTunerManager;
+	friend class eRTSPStreamClient;
 	ePtr<eFBCTunerManager> m_fbcmng;
 	RESULT addChannel(const eDVBChannelID &chid, eDVBChannel *ch);
 	RESULT removeChannel(eDVBChannel *ch);
