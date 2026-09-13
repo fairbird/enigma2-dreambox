@@ -21,11 +21,12 @@ from Components.Label import Label
 from Components.ScrollLabel import ScrollLabel
 from Components.SystemInfo import BoxInfo
 from Components.config import config, ConfigBoolean, configfile
+from Components.Harddisk import harddiskmanager
 from Tools.Directories import fileReadLines
 # from Screens.LocaleSelection import LocaleSelection
 from enigma import eConsoleAppContainer, eTimer, eActionMap
 from re import search
-import os
+import os, glob
 
 config.misc.firstrun = ConfigBoolean(default=True)
 config.misc.wizardLanguageEnabled = ConfigBoolean(default=True)
@@ -63,6 +64,22 @@ class WizardStart(Wizard, Rc):
 		config.misc.firstrun.value = 0
 		config.misc.firstrun.save()
 		configfile.save()
+
+	@staticmethod
+	def checkConfigBackup():
+		partitions = [(x.description, x.mountpoint) for x in harddiskmanager.getMountedPartitions(onlyhotplug=False) if x.mountpoint != "/"]
+		if partitions:
+			for partition in partitions:
+				matches = glob.glob(os.path.join(partition[1], "backup", "enigma2settingsbackup*.tar.gz"))
+				if matches:
+					config.plugins.configurationbackup.backuplocation.setValue(partition[1])
+					config.plugins.configurationbackup.backuplocation.save()
+					config.plugins.configurationbackup.save()
+					return partition
+			return None
+
+	def hasConfigBackup(self):  # Called by startwizard.xml's restorequestion condition.
+		return self.checkConfigBackup() is not None
 
 	def hasPartitions(self):
 		partitions = fileReadLines("/proc/partitions", source=MODULE_NAME)
