@@ -2509,14 +2509,20 @@ def readSkin(screen, skin, names, desktop):
 					if isinstance(element, converterClass) and element.converter_arguments == parms:
 						connection = element
 				if connection is None:
-					connection = converterClass(parms)
+					try:
+						connection = converterClass(parms)
+					except Exception as err:
+						raise SkinError(f"Converter '{converterType}' failed for argument '{parms}': {err}")
 					connection.connect(source)
 				source = connection
 			try:
 				rendererClass = my_import(".".join(("Components", "Renderer", widgetRenderer))).__dict__.get(widgetRenderer)
 			except ImportError:
 				raise SkinError(f"Renderer '{widgetRenderer}' not found")
-			renderer = rendererClass()  # Instantiate renderer.
+			try:
+				renderer = rendererClass()  # Instantiate renderer.
+			except Exception as err:
+				raise SkinError(f"Renderer '{widgetRenderer}' failed to instantiate: {err}")
 			if source:
 				renderer.connect(source)  # Connect to source.
 			renderer.label_name = widgetSource or widgetName  # allows that it can be checked a label exists in the skin
@@ -2625,7 +2631,9 @@ def readSkin(screen, skin, names, desktop):
 			try:
 				processor(widget, context, stack)
 			except SkinError as err:
-				print(f"[Skin] Error: Screen '{myName}' widget '{widget.tag}' {str(err)}!")
+				widgetName = widget.attrib.get("name") or widget.attrib.get("source") or widget.attrib.get("render")
+				widgetDesc = f"'{widget.tag}' '{widgetName}'" if widgetName else f"'{widget.tag}'"
+				print(f"[Skin] Error: Screen '{myName}' widget {widgetDesc} {str(err)}!")
 				print_exc()
 
 	def processPanel(widget, context, stack=None):
