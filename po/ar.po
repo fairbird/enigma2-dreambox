@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: enigma2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-03-16 15:41+0100\n"
-"POT-Creation-Date: 2026-03-10 10:45+0100\n"
+"POT-Creation-Date: 2026-09-11 14:52+0100\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Shabah Net\n"
 "Language-Team: RAED - Fairbirb and Shabah Net\n"
@@ -1885,6 +1885,9 @@ msgstr "اختر ما إذا كنت تريد البحث عن خدمات مجان
 msgid "Choose whether to use the streamrelay_whitelist file. The whitelist file should be disabled if you are using softcsa."
 msgstr "اختر ما إذا كنت تريد استخدام ملف streamrelay_whitelist. يجب تعطيل ملف القائمة البيضاء إذا كنت تستخدم softcsa."
 
+msgid "Disable SoftCSA descrambling(Off), enable SoftCSA decryption by whitelist(Whitelist) or use automatic detection of SoftCSA descrambling(Auto)."
+msgstr "عطّل فك تشفير SoftCSA (إيقاف)، أو فعّل فك تشفير SoftCSA عبر القائمة البيضاء (Whitelist)، أو استخدم الكشف التلقائي لفك تشفير SoftCSA (تلقائي)."
+
 msgid "Choose which tuner to configure."
 msgstr "اختيار أي موالف لتكوين."
 
@@ -2310,6 +2313,9 @@ msgstr ".قم بتكوين الطريقة التي يغير بها جهاز ال
 
 msgid "Configure this tuner using simple or advanced options, or loop it through to another tuner, or copy a configuration from another tuner, or disable it."
 msgstr "تشكيل هذا المؤالف باستخدام خيارات بسيطة أو متقدمة، أو قم بتكراره إلى مؤالف آخر، أو قم بنسخ التشكيل من مؤالف آخر، أو قم بتعطيله."
+
+msgid "Configure when the set-top box should enter standby after startup or restart."
+msgstr "حدد متى يجب أن ينتقل جهاز الاستقبال إلى وضع الاستعداد بعد التشغيل أو إعادة التشغيل."
 
 msgid "Configure where completed timers show up in the timer list."
 msgstr "تكوين عرض الايقونات في قائمة القنوات."
@@ -3391,6 +3397,9 @@ msgstr ":الدليل الإلكتروني"
 msgid "EPGFilter Actions"
 msgstr "إجراءات مرشح  الإلكتروني"
 
+msgid "EPGCatch Up Actions"
+msgstr "إجراءات المتابعة والاستدراك (دليل البرامج الإلكتروني)"
+
 msgid "EPGSETUP"
 msgstr "إعداد دليل البرامج الإلكتروني"
 
@@ -3573,6 +3582,9 @@ msgstr "http://second_box:8001 ورقم المنفذ (عادة ...:8001), على
 
 msgid "Enable setting a time interval for filtering events in SingleEPG using the 'Stop' button."
 msgstr "'قم بتمكين إعداد فترة زمنية لتصفية الأحداث في الدليل الإلكتروني المنفصل باستخدام زر 'إيقاف"
+
+msgid "Enable sorting by rating under the yellow button in SingleEPG."
+msgstr "فعّل خيار الترتيب حسب التقييم أسفل الزر الأصفر في واجهة دليل البرامج الإلكتروني الفردي."
 
 msgid "Enable teletext caching"
 msgstr "تمكين الترجمة المختبئة"
@@ -6421,8 +6433,8 @@ msgstr "مساحة غير كافيه في القرص الصلب. الرجاء ت
 msgid "Not tested:"
 msgstr "إختبار الشبكة: "
 
-msgid "Note: when enabled, and you do want standby mode after wake up, set option 'Startup to Standby' as 'No, except Wakeup timer'."
-msgstr "'ملاحظة: عند التمكين، وتريد وضع الاستعداد بعد الاستيقاظ، اضبط الخيار 'بدء التشغيل على الاستعداد' على أنه 'لا، باستثناء مؤقت التنبيه"
+msgid "Note: when enabled, and you do want standby mode after wake up, set option 'Startup to Standby' as 'Yes, only wake-up timers'."
+msgstr "'ملاحظة: عند التمكين، وتريد وضع الاستعداد بعد الاستيقاظ، اضبط الخيار 'بدء التشغيل على الاستعداد' على أنه 'نعم، مؤقتات التنبيه فقط."
 
 msgid "Nothing to install.\n"
 "You have to upload a bh.tgz package in the /tmp.\n"
@@ -6659,6 +6671,12 @@ msgstr "الصوت الأصلي"
 
 msgid "Osd Settings"
 msgstr "إعدادات شاشة العرض"
+
+msgid "Oscam Streamrelay"
+msgstr "Oscam Streamrelay ترحيل البث"
+
+msgid "Ncam Streamrelay"
+msgstr "Ncam Streamrelay ترحيل البث"
 
 msgid "Other"
 msgstr "أخرى"
@@ -6929,6 +6947,9 @@ msgstr "تشغيل ديفيدي"
 
 msgid "Play DVDs"
 msgstr "تشغيل ديفيدي"
+
+msgid "Play archive"
+msgstr "أرشيف العروض"
 
 msgid "Play as Picture in Picture"
 msgstr "تشغيل قناة داخل قناة"
@@ -7602,6 +7623,9 @@ msgstr "التصنيف المحدد بواسطة المذيع التلفزيون
 
 msgid "Rating undefined"
 msgstr "تصنيف غير معروف"
+
+msgid "Rating sort in SingleEPG"
+msgstr "ترتيب التصنيفات في دليل البرامج الإلكتروني الفردي"
 
 msgid "Really close without saving settings?"
 msgstr "هل تريد الإغلاق بدون حفظ الإعدادات؟"
@@ -8908,6 +8932,9 @@ msgstr "إعدادات سلوك عند بدء تشغيل الفيلم."
 msgid "Set all hotkey to default?"
 msgstr "فرز قائمه الإضافات إلى الافتراضي؟"
 
+msgid "Sort rating"
+msgstr "فرز حسب التقييم"
+
 msgid "Set all the settings back as they were"
 msgstr "قم بإعادة كافة الإعدادات كما كانت"
 
@@ -9514,8 +9541,11 @@ msgstr "ناعم"
 msgid "SocketMMI"
 msgstr "SocketMMI"
 
-msgid "NDS CSA"
-msgstr "NDS CSA إعدادات"
+msgid "SoftCSA Settings"
+msgstr "SoftCSA إعدادات"
+
+msgid "Activate SoftCSA descrambling"
+msgstr "تفعيل فك التشفير بنظام SoftCSA"
 
 msgid "SoftCam / CI"
 msgstr "CI / سوفتكام"
@@ -9532,8 +9562,8 @@ msgstr "الكام"
 msgid "Software"
 msgstr "البرامج"
 
-msgid "CSA descrambling: "
-msgstr "فك تشفير البرامج: "
+msgid "SoftCSA descrambling: "
+msgstr "SoftCSA فك تشفير: "
 
 msgid "Software management"
 msgstr "التحكم فى البرنامج التشغيلي"
@@ -12101,6 +12131,12 @@ msgstr ".عندما يستيقظ جهاز الاستقبال من وضع الا�
 msgid "Where to save temporary timeshift recordings?"
 msgstr "أين تحفظ تسجيلات التايم شفت المؤقتة؟"
 
+msgid "Whitelist"
+msgstr "القائمة البيضاء"
+
+msgid "Window Actions"
+msgstr "إجراءات النافذة"
+
 msgid "White"
 msgstr "أبيض"
 
@@ -12203,6 +12239,9 @@ msgstr "نعم للجميع"
 msgid "Yes, I do want to install plugins"
 msgstr "تستطيع تثبيت هذا الإضافة."
 
+msgid "Yes, after cold start only"
+msgstr "نعم، بعد التشغيل على البارد فقط."
+
 msgid "Yes, always"
 msgstr "نعم, دائمآ"
 
@@ -12218,8 +12257,12 @@ msgstr "الذهاب الى وضع الاستعداد العميق"
 msgid "Yes, only from standby"
 msgstr "تنبيه التلفزيون من وضع الإستعداد"
 
+
+msgid "Yes, only wake-up timers"
+msgstr "تمكين وضع التحريك للقنوات"
+
 msgid "Yes, returning to movie list"
-msgstr "نعم، والعودة إلى قائمه الأفلام"
+msgstr "نعم، مؤقتات التنبيه فقط."
 
 msgid "Yes, with backup"
 msgstr "نسخة احتياطية جديد"
@@ -12849,6 +12892,12 @@ msgstr "ساعات"
 
 msgid "in menu and plugins"
 msgstr "تحميل الإضافة"
+
+msgid "SoftCSA descrambing"
+msgstr "إلغاء تشفير (SoftCSA)"
+
+msgid "SoftCSA descrambling"
+msgstr "فك التشفير البرمجي (SoftCSA)"
 
 msgid "in menu only"
 msgstr "القائمة الرئيسية"
