@@ -9,7 +9,7 @@ from re import search
 from subprocess import PIPE, Popen
 from urllib.request import urlopen
 
-from enigma import eAVControl, eDVBCSAEngine, eDVBFrontendParametersSatellite, eDVBResourceManager, eGetEnigmaDebugLvl, eServiceCenter, eStreamServer, eTimer, getDesktop, getGStreamerVersionString, iFrontendInformation, iPlayableService, iServiceInformation
+from enigma import eAVControl, eDVBCSAEngine, eDVBFrontendParametersSatellite, eDVBResourceManager, eGetEnigmaDebugLvl, eRTSPStreamServer, eServiceCenter, eServiceReference, eStreamServer, eTimer, getDesktop, getGStreamerVersionString, iFrontendInformation, iPlayableService, iServiceInformation
 
 from ServiceReference import ServiceReference
 from Components.About import about
@@ -1978,12 +1978,14 @@ class InformationStreaming(InformationBase):
 	def keyStopStreams(self):
 		if eStreamServer.getInstance().getConnectedClients():
 			eStreamServer.getInstance().stopStream()
+		if eRTSPStreamServer.getInstance().getConnectedClients():
+			eRTSPStreamServer.getInstance().stopStream()
 
 	def displayInformation(self):
 		info = []
 		info.append(self.formatLine("H", _("Streaming tuner information for %s %s") % getBoxDisplayName()))
 		info.append("")
-		clientList = eStreamServer.getInstance().getConnectedClients()
+		clientList = eStreamServer.getInstance().getConnectedClients() + eRTSPStreamServer.getInstance().getConnectedClients()
 		if clientList:
 			self["key_blue"].setText(_("Stop Streams"))
 			self["streamActions"].setEnabled(True)
