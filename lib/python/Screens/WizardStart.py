@@ -26,7 +26,8 @@ from Tools.Directories import fileReadLines
 # from Screens.LocaleSelection import LocaleSelection
 from enigma import eConsoleAppContainer, eTimer, eActionMap
 from re import search
-import os, glob
+import os
+import glob
 
 config.misc.firstrun = ConfigBoolean(default=True)
 config.misc.wizardLanguageEnabled = ConfigBoolean(default=True)
