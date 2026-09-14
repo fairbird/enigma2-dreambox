@@ -431,6 +431,7 @@ class MovieList(GUIComponent):
 					data.txt = fileName
 			data.icon = None
 			data.part = None
+			data.partcol = None
 			if split(pathName)[1] in self.runningTimers:
 				if self.playInBackground and serviceref == self.playInBackground:
 					data.icon = self.iconMoviePlayRec
