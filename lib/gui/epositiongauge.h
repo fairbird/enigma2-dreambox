@@ -29,6 +29,8 @@ public:
 	void enableSeekPointer(int enable);
 	void setSeekPosition(const pts_t &pos);
 
+	void setHidePointerOnZeroLength(int hide);
+
 #ifndef SWIG
 protected:
 	int event(int event, void *data=0, void *data2=0);
@@ -68,6 +70,8 @@ private:
 
 	int m_have_foreground_color;
 	gRGB m_foreground_color;
+
+	int m_hidePointerOnZeroLength;
 #endif
 };
 

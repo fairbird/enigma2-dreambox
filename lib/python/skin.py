@@ -1358,6 +1358,9 @@ class AttributeParser:
 		pos = parsePosition(pos, self.scaleTuple)
 		self.guiObject.setPointer(1, ptr, pos)
 
+	def hidePointerOnZeroLength(self, value):
+		self.guiObject.setHidePointerOnZeroLength(int(parseBoolean("hidePointerOnZeroLength", value)))
+
 	def selection(self, value):
 		self.guiObject.setSelectionEnable(1 if parseBoolean("selection", value) else 0)
 
