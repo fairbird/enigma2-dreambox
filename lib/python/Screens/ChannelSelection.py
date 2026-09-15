@@ -200,7 +200,9 @@ class ChannelContextMenu(Screen):
 				"5": self.insertEntry,
 				"6": self.addServiceToBouquetOrAlternative,
 				"7": self.toggleMoveModeSelect,
-				"8": self.removeEntry
+				"8": self.removeEntry,
+				"9": self.startOrMoveSelection,
+				"0": self.copySelectionShortcut
 			})
 		menu = []
 
@@ -344,6 +346,8 @@ class ChannelContextMenu(Screen):
 					append_when_current_valid(current, menu, (_("Disable move mode"), self.toggleMoveMode), level=0, key="6")
 				else:
 					append_when_current_valid(current, menu, (_("Enable move mode"), self.toggleMoveMode), level=0, key="6")
+				if not csel.movemode and not inAlternativeList and not csel.channelMoveSelectMode:
+					append_when_current_valid(current, menu, (_("Enable multi selection"), self.startChannelMoveSelect), level=0, key="9")
 				if csel.entry_marked and not inAlternativeList:
 					append_when_current_valid(current, menu, (_("Remove entry"), self.removeEntry), level=0, key="8")
 					self.removeFunction = self.removeCurrentService
@@ -376,6 +380,16 @@ class ChannelContextMenu(Screen):
 				else:
 					append_when_current_valid(current, menu, (_("End alternatives edit"), self.bouquetMarkEnd), level=0)
 					append_when_current_valid(current, menu, (_("Abort alternatives edit"), self.bouquetMarkAbort), level=0)
+
+		if csel.channelMoveSelectMode:
+			menu = []
+			self.removeFunction = self.removeCurrentService
+			append_when_current_valid(current, menu, (_("Move selection to bouquet"), self.moveChannelsToBouquetSelected), level=0, key="9")
+			append_when_current_valid(current, menu, (_("Copy selection to bouquet"), self.copyChannelsToBouquetSelected), level=0, key="0")
+			append_when_current_valid(current, menu, (_("Remove selection from bouquet"), self.removeEntry), level=0, key="8")
+			append_when_current_valid(current, menu, (_("Cancel selection"), self.cancelChannelMoveSelect), level=0, key="7")
+			self["menu"] = ChoiceList(menu)
+			return
 
 		menu.append(ChoiceEntryComponent("menu", (_("Settings..."), self.openSetup)))
 		self["menu"] = ChoiceList(menu)
@@ -721,11 +735,39 @@ class ChannelContextMenu(Screen):
 			return 0
 
 	def toggleMoveModeSelect(self):
-		if self.inBouquet and self.csel.servicelist.getCurrent() and self.csel.servicelist.getCurrent().valid():
+		if self.csel.channelMoveSelectMode:
+			self.cancelChannelMoveSelect()
+		elif self.inBouquet and self.csel.servicelist.getCurrent() and self.csel.servicelist.getCurrent().valid():
 			self.csel.toggleMoveMode(True)
 			self.close()
 		else:
 			return 0
+
+	def startChannelMoveSelect(self):
+		self.csel.startChannelMoveSelect()
+		self.close()
+
+	def startOrMoveSelection(self):
+		if self.csel.channelMoveSelectMode:
+			self.moveChannelsToBouquetSelected()
+		else:
+			self.startChannelMoveSelect()
+
+	def moveChannelsToBouquetSelected(self):
+		self.csel.selectBouquetForChannelMove(True)
+		self.close()
+
+	def copyChannelsToBouquetSelected(self):
+		self.csel.selectBouquetForChannelMove(False)
+		self.close()
+
+	def copySelectionShortcut(self):
+		if self.csel.channelMoveSelectMode:
+			self.copyChannelsToBouquetSelected()
+
+	def cancelChannelMoveSelect(self):
+		self.csel.cancelChannelMoveSelect()
+		self.close()
 
 	def bouquetMarkStart(self):
 		self.csel.startMarkedEdit(EDIT_BOUQUET)
@@ -1051,6 +1093,10 @@ class ChannelSelectionEdit:
 		self.current_ref = None
 		self.editMode = False
 		self.confirmRemove = True
+		self.channelMoveSelectMode = False
+		self.channelsToMove = []
+		self.moveBouquetSelector = None
+		self.channelMoveIsCopy = False
 
 		class ChannelSelectionEditActionMap(ActionMap):
 			def __init__(self, csel, contexts=[], actions={}, prio=0):
@@ -1406,6 +1452,18 @@ class ChannelSelectionEdit:
 		if self.movemode and self.entry_marked:
 			self.toggleMoveMarked()  # unmark current entry
 		self.editMode = True
+		if self.channelMoveSelectMode:
+			marked = self.servicelist.getMarked()
+			refs = [eServiceReference(x) for x in marked] if marked else [self.servicelist.getCurrent()]
+			mutableList = self.getMutableList()
+			if mutableList is not None:
+				for ref in refs:
+					if ref.valid():
+						mutableList.removeService(ref)
+				mutableList.flushChanges()
+				self.servicelist.resetRoot()
+			self.cancelChannelMoveSelect()
+			return
 		ref = self.servicelist.getCurrent()
 		mutableList = self.getMutableList()
 		if ref.valid() and mutableList is not None:
@@ -1464,6 +1522,8 @@ class ChannelSelectionEdit:
 			self.toggleMoveMode()  # disable move mode
 		elif self.bouquet_mark_edit != OFF:
 			self.endMarkedEdit(True)  # abort edit mode
+		elif self.channelMoveSelectMode:
+			self.cancelChannelMoveSelect()
 
 	def toggleMoveMarked(self):
 		if self.entry_marked:
@@ -1474,6 +1534,85 @@ class ChannelSelectionEdit:
 			self.servicelist.setCurrentMarked(True)
 			self.entry_marked = True
 			self.pathChangeDisabled = True  # no path change allowed in movemod
+
+	def startChannelMoveSelect(self):
+		self.channelMoveSelectMode = True
+		self.clearMarks()
+		self.functiontitle = ' ' + _("[select channels to move]")
+		self.compileTitle()
+		self["Service"].editmode = True
+
+	def toggleChannelMoveMark(self):
+		ref = self.servicelist.getCurrent()
+		if ref and ref.valid():
+			if self.servicelist.isMarked(ref):
+				self.servicelist.removeMarked(ref)
+			else:
+				self.servicelist.addMarked(ref)
+
+	def cancelChannelMoveSelect(self):
+		self.channelMoveSelectMode = False
+		self.channelsToMove = []
+		self.clearMarks()
+		self.functiontitle = ""
+		self.compileTitle()
+
+	def collectBouquetFolders(self, root, prefix="", maxDepth=4):
+		result = []
+		serviceHandler = eServiceCenter.getInstance()
+		lst = serviceHandler.list(root)
+		if lst is None:
+			return result
+		while True:
+			s = lst.getNext()
+			if not s.valid():
+				break
+			if s.flags & eServiceReference.isDirectory and not s.flags & eServiceReference.isInvisible:
+				info = serviceHandler.info(s)
+				name = (info and info.getName(s)) or ServiceReference(s).getServiceName() or ""
+				name = name.replace('\xc2\x86', '').replace('\xc2\x87', '')
+				path = prefix + name
+				result.append((path, s))
+				if maxDepth > 0:
+					result += self.collectBouquetFolders(s, path + " > ", maxDepth - 1)
+		return result
+
+	def selectBouquetForChannelMove(self, doMove=True):
+		marked = self.servicelist.getMarked()
+		if not marked:
+			cur = self.servicelist.getCurrent()
+			if cur and cur.valid():
+				marked = [cur.toString()]
+		self.channelsToMove = [eServiceReference(x) for x in marked]
+		if not self.channelsToMove:
+			self.cancelChannelMoveSelect()
+			return
+		self.channelMoveIsCopy = not doMove
+		srcBouquet = self.getRoot()
+		bouquets = [b for b in self.collectBouquetFolders(self.bouquet_root) if not (srcBouquet and b[1].toString() == srcBouquet.toString())]
+		if bouquets:
+			self.moveBouquetSelector = self.session.openWithCallback(self.channelMoveBouquetSelClosed, BouquetSelector, bouquets, self.moveChannelsToBouquet)
+		else:
+			self.cancelChannelMoveSelect()
+
+	def moveChannelsToBouquet(self, dest):
+		mutableDst = self.getMutableList(dest)
+		mutableSrc = None if self.channelMoveIsCopy else self.getMutableList()
+		if mutableDst is not None and (self.channelMoveIsCopy or mutableSrc is not None):
+			for service in self.channelsToMove:
+				if not mutableDst.addService(service):
+					if mutableSrc is not None:
+						mutableSrc.removeService(service)
+			mutableDst.flushChanges()
+			if mutableSrc is not None:
+				mutableSrc.flushChanges()
+			self.servicelist.resetRoot()
+		if self.moveBouquetSelector is not None:
+			self.moveBouquetSelector.close(True)
+
+	def channelMoveBouquetSelClosed(self, recursive=False):
+		self.moveBouquetSelector = None
+		self.cancelChannelMoveSelect()
 
 	def doContext(self):
 		self.session.openWithCallback(self.exitContext, ChannelContextMenu, self)
@@ -2396,7 +2535,9 @@ class ChannelSelection(ChannelSelectionBase, ChannelSelectionEdit, ChannelSelect
 			doClose = False
 		if not self.startServiceRef and not doClose:
 			self.startServiceRef = playingref
-		if self.movemode and (self.isBasePathEqual(self.bouquet_root) or "userbouquet." in ref.toString()):
+		if self.channelMoveSelectMode:
+			self.toggleChannelMoveMark()
+		elif self.movemode and (self.isBasePathEqual(self.bouquet_root) or "userbouquet." in ref.toString()):
 			self.toggleMoveMarked()
 		elif (ref.flags & eServiceReference.flagDirectory) == eServiceReference.flagDirectory:
 			if self.isSubservices(ref):
@@ -2982,7 +3123,9 @@ class ChannelSelectionRadio(ChannelSelectionBase, ChannelSelectionEdit, ChannelS
 
 	def channelSelected(self, doClose=False):  # just return selected service
 		ref = self.getCurrentSelection()
-		if self.movemode:
+		if self.channelMoveSelectMode:
+			self.toggleChannelMoveMark()
+		elif self.movemode:
 			self.toggleMoveMarked()
 		elif (ref.flags & eServiceReference.flagDirectory) == eServiceReference.flagDirectory:
 			self.enterPath(ref)
