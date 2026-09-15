@@ -1571,6 +1571,9 @@ msgstr ""
 msgid "Cancel execution?"
 msgstr ""
 
+msgid "Cancel selection"
+msgstr ""
+
 msgid "Cancelled upon user request"
 msgstr ""
 
@@ -2348,6 +2351,9 @@ msgid "Copy"
 msgstr ""
 
 msgid "Copy to bouquets"
+msgstr ""
+
+msgid "Copy selection to bouquet"
 msgstr ""
 
 msgid "Correct invalid EPG data"
@@ -5574,6 +5580,9 @@ msgstr ""
 msgid "Move"
 msgstr ""
 
+msgid "Move selection to bouquet"
+msgstr ""
+
 msgid "Move PiP"
 msgstr ""
 
@@ -7396,6 +7405,9 @@ msgid "Remove plugin"
 msgstr ""
 
 msgid "Remove plugins"
+msgstr ""
+
+msgid "Remove selection from bouquet"
 msgstr ""
 
 msgid "Remove selected satellite"
@@ -11977,6 +11989,9 @@ msgid "enable intro screen"
 msgstr ""
 
 msgid "enabled"
+msgstr ""
+
+msgid "Enable multi selection"
 msgstr ""
 
 msgid "end cut here"

@@ -1665,7 +1665,10 @@ msgid "Cancel any text changes and exit"
 msgstr "قم بإلغاء أي تغييرات نصية واخرج"
 
 msgid "Cancel execution?"
-msgstr "إختيار القناة"
+msgstr "هل تود إلغاء التنفيذ؟"
+
+msgid "Cancel selection"
+msgstr "إلغاء التحديد"
 
 msgid "Cancelled upon user request"
 msgstr "إلغاء بناء علي طلب المستخدم"
@@ -2439,6 +2442,9 @@ msgstr "نسخ"
 
 msgid "Copy to bouquets"
 msgstr "نسخ إلى الباقات"
+
+msgid "Copy selection to bouquet"
+msgstr "نسخ التحديد إلى الباقة"
 
 msgid "Correct invalid EPG data"
 msgstr "تصحيح بيانات الدليل الإلركتروني غير الصالحة"
@@ -3615,6 +3621,9 @@ msgstr "تمكين/تعطيل التحقق من التحديث بعد إعادة
 
 msgid "Enabled"
 msgstr "تمكين"
+
+msgid "Enable multi selection"
+msgstr "تفعيل التحديد المتعدد"
 
 msgid "Encrypted: "
 msgstr "مشفر: "
@@ -5940,6 +5949,9 @@ msgstr "نقاط الربط مكونات"
 msgid "Move"
 msgstr "تحريك"
 
+msgid "Move selection to bouquet"
+msgstr "نقل التحديد إلى الباقة"
+
 msgid "Move PiP"
 msgstr "التنقل بين قناة داخل قناة"
 
@@ -7879,6 +7891,9 @@ msgstr "إزالة مجلد الإضافة"
 
 msgid "Remove plugins"
 msgstr "حذف الإضافة"
+
+msgid "Remove selection from bouquet"
+msgstr "حذف العنصر المختار من الباقة"
 
 msgid "Remove selected satellite"
 msgstr "حذف القمر المختار"
