@@ -217,6 +217,24 @@ class ServiceListTemplateParser(TemplateParser):
 						if newitems:
 							items += newitems
 
+					if modeName == "bouquets":
+						# The icon group (Number/Picon/Crypto/ServiceType/Recording/Marker/Folder)
+						# is laid out left-to-right inside a fixed-width inner panel. When some of
+						# these are hidden via the settings menu, the remaining ones stay flush
+						# left instead of re-centering. Re-center the group that's actually
+						# visible within that panel's width (210px in this skin).
+						iconGroupIndexes = ("Number", "Picon", "CryptoImage", "ServiceTypeImage", "RecordingIndicator", "MarkerImage", "FolderImage")
+						iconPanelWidth = 210
+						groupItems = [item for item in items if item.get("index") in iconGroupIndexes and item.get("position") is not None and item.get("size") is not None]
+						if groupItems:
+							groupLeft = min(item["position"][0] for item in groupItems)
+							groupRight = max(item["position"][0] + item["size"][0] for item in groupItems)
+							shift = int((iconPanelWidth - (groupRight - groupLeft)) / 2) - groupLeft
+							if shift:
+								for item in groupItems:
+									pos = item["position"]
+									item["position"] = SizeTuple((pos[0] + shift, pos[1]))
+
 					newitems = []
 					if self.debug:
 						print("[ServiceListTemplateParser] DEBUG newitems")
