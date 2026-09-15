@@ -221,6 +221,23 @@ class ChannelContextMenu(Screen):
 		from Components.ParentalControl import parentalControl
 		self.parentalControl = parentalControl
 		self.parentalControlEnabled = config.ParentalControl.servicepin[0].value and config.ParentalControl.servicepinactive.value
+
+		if csel.channelMoveSelectMode:
+			# skip all normal/plugin menu building entirely while in multi-select mode,
+			# so no plugin (e.g. WHERE_CHANNEL_CONTEXT_MENU entries) can inject itself here
+			self.removeFunction = self.removeCurrentService
+			append_when_current_valid(current, menu, (_("Move selection to bouquet"), self.moveChannelsToBouquetSelected), level=0, key="9")
+			append_when_current_valid(current, menu, (_("Copy selection to bouquet"), self.copyChannelsToBouquetSelected), level=0, key="0")
+			append_when_current_valid(current, menu, (_("Remove selection from bouquet"), self.removeEntry), level=0, key="8")
+			append_when_current_valid(current, menu, (_("Cancel selection"), self.cancelChannelMoveSelect), level=0, key="7")
+			self["menu"] = ChoiceList(menu)
+			# some plugins (e.g. TMBD) monkey-patch this whole __init__ and insert their
+			# own entry into self["menu"].list right after it returns; keep an independent
+			# copy (not the same list object) and re-force it once actually shown
+			self.restrictedMultiSelectMenu = list(menu)
+			self.onShown.append(self.enforceMultiSelectMenu)
+			return
+
 		if not (current_sel_path or current_sel_flags & (eServiceReference.isDirectory | eServiceReference.isMarker)) or current_sel_flags & eServiceReference.isGroup:
 			append_when_current_valid(current, menu, (_("Show transponder info"), self.showServiceInformations), level=2)
 		if self.subservices and not csel.isSubservices():
@@ -381,18 +398,11 @@ class ChannelContextMenu(Screen):
 					append_when_current_valid(current, menu, (_("End alternatives edit"), self.bouquetMarkEnd), level=0)
 					append_when_current_valid(current, menu, (_("Abort alternatives edit"), self.bouquetMarkAbort), level=0)
 
-		if csel.channelMoveSelectMode:
-			menu = []
-			self.removeFunction = self.removeCurrentService
-			append_when_current_valid(current, menu, (_("Move selection to bouquet"), self.moveChannelsToBouquetSelected), level=0, key="9")
-			append_when_current_valid(current, menu, (_("Copy selection to bouquet"), self.copyChannelsToBouquetSelected), level=0, key="0")
-			append_when_current_valid(current, menu, (_("Remove selection from bouquet"), self.removeEntry), level=0, key="8")
-			append_when_current_valid(current, menu, (_("Cancel selection"), self.cancelChannelMoveSelect), level=0, key="7")
-			self["menu"] = ChoiceList(menu)
-			return
-
 		menu.append(ChoiceEntryComponent("menu", (_("Settings..."), self.openSetup)))
 		self["menu"] = ChoiceList(menu)
+
+	def enforceMultiSelectMenu(self):
+		self["menu"].setList(self.restrictedMultiSelectMenu)
 
 	def insertEntry(self):
 		if self.inBouquetRootList:
@@ -494,7 +504,13 @@ class ChannelContextMenu(Screen):
 		if self.removeFunction and self.csel.servicelist.getCurrent() and self.csel.servicelist.getCurrent().valid():
 			if self.csel.confirmRemove:
 				list = [(_("yes"), True), (_("no"), False), (_("yes") + " " + _("and never ask in this session again"), "never")]
-				self.session.openWithCallback(self.removeFunction, MessageBox, f"{_('Are you sure to remove this entry?')}\n{self.getCurrentSelectionName()}", list=list)
+				if self.csel.channelMoveSelectMode:
+					marked = self.csel.servicelist.getMarked()
+					count = len(marked) if marked else 1
+					message = _("Are you sure you want to remove %d selected entries?") % count
+				else:
+					message = f"{_('Are you sure to remove this entry?')}\n{self.getCurrentSelectionName()}"
+				self.session.openWithCallback(self.removeFunction, MessageBox, message, list=list)
 			else:
 				self.removeFunction(True)
 		else:
