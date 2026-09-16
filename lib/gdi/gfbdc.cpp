@@ -305,6 +305,13 @@ void gFBDC::setResolution(int xres, int yres, int bpp)
 #endif
 	fb->SetMode(xres, yres, bpp);
 
+	/* fb->SetMode() may not have been able to apply the requested mode
+	 * (e.g. WQHD/4K on hardware that only supports up to FHD output);
+	 * always use what was actually applied, not what was requested,
+	 * or the compositor ends up drawing into a canvas size that doesn't
+	 * match the real framebuffer memory layout. */
+	fb->getMode(xres, yres, bpp);
+
 	unsigned char *base_addr = fb->lfb;
 	unsigned long base_phys = fb->getPhysAddr();
 
