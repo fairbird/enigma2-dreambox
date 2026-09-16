@@ -208,6 +208,17 @@ AS_IF([test "$BOXTYPE" == "dm500hd"],[AC_DEFINE(HWDM500HD, 1,[dm500hd])])
 AS_IF([test "$BOXTYPE" == "dm800sev2"],[AC_DEFINE(HWDM800SEV2, 1,[dm800sev2])])
 AS_IF([test "$BOXTYPE" == "dm500hdv2"],[AC_DEFINE(HWDM500HDV2, 1,[dm500hdv2])])
 
+AC_ARG_WITH(osdanimation,
+	AS_HELP_STRING([--with-osdanimation], [use osd animation, yes or no]),
+	[[withosdanimation=$withval]],
+	[[withosdanimation=no]]
+)
+if test x"$withosdanimation" != xno ; then
+
+	AC_DEFINE(HAVE_OSDANIMATION, 1,[Define if driver supports animation of osd])
+fi
+AM_CONDITIONAL(HAVE_OSDANIMATION, test x"$withosdanimation" != xno)
+
 if test `echo "$BOXTYPE" | cut -b 1-2` == "dm" -o `echo "$BOXTYPE" | cut -b 1-5` == "dream"; then
 	AC_DEFINE(DREAMBOX, 1, [Dreambox hardware])
 	AC_DEFINE(KEY_PLAY_ACTUALLY_IS_KEY_PLAYPAUSE, 1,[define when rc sends a KEY_PLAY event for its KEY_PLAYPAUSE key])
@@ -469,6 +480,15 @@ if test x"$with_accelerationaccumulation" = xyes ; then
 	AC_DEFINE(SUPPORT_ACCUMULATED_ACCELERATION_OPERATIONS, 1,[Accumulate blit/fill acceleration operations])
 fi
 
+AC_ARG_WITH(libvugles2,
+	AS_HELP_STRING([--with-libvugles2],[use libvugles2, yes or no]),
+	[with_libvugles2=$withval],[with_libvugles2=no])
+if test "$with_libvugles2" = "yes"; then
+	PKG_CHECK_MODULES(LIBVUGLES2, [libvugles2])
+	GLES_CFLAGS="-DUSE_LIBVUGLES2"
+fi
+AM_CONDITIONAL(HAVE_LIBVUGLES2, test "$with_libvugles2" = "yes")
+
 AC_ARG_WITH(olde2api,
 	AS_HELP_STRING([--with-olde2api],[use olde2api, yes or no]),
 	[with_olde2api=$withval],[with_olde2api=no])
@@ -561,6 +581,7 @@ lib/python/Plugins/SystemPlugins/FastScan/Makefile
 lib/python/Plugins/SystemPlugins/OSDPositionSetup/Makefile
 lib/python/Plugins/SystemPlugins/OSD3DSetup/Makefile
 lib/python/Plugins/SystemPlugins/VideoClippingSetup/Makefile
+lib/python/Plugins/SystemPlugins/AnimationSetup/Makefile
 lib/python/Plugins/Extensions/CutListEditor/Makefile
 lib/python/Plugins/Extensions/CutListEditor/meta/Makefile
 lib/python/Plugins/Extensions/DVDBurn/Makefile
