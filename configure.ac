@@ -315,6 +315,16 @@ if test "$with_libxine" = "yes"; then
 fi
 AM_CONDITIONAL(HAVE_LIBXINE, test "$with_libxine" = "yes")
 
+AC_ARG_WITH(gles,
+	AS_HELP_STRING([--with-gles],[enable OpenGL ES 2.0 hardware acceleration, yes or no]),
+	[with_gles=$withval],[with_gles=no])
+if test "$with_gles" = "yes"; then
+	PKG_CHECK_MODULES(GLES, egl glesv2)
+	AC_DEFINE([HAVE_GLES],[1],[Define to 1 if you have GLES support])
+	BASE_LIBS="$BASE_LIBS $GLES_LIBS"
+fi
+AM_CONDITIONAL(HAVE_GLES, test "$with_gles" = "yes")
+
 AC_ARG_WITH(debug,
 	AS_HELP_STRING([--without-debug],[disable debugging code]),
 	[with_debug="$withval"],[with_debug="yes"])
