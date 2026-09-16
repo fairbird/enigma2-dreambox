@@ -677,19 +677,19 @@
 		</if>
 		<item level="0" text="Optional arguments" description="Enter optional mount arguments not provided for in the configuration settings above. Multiple arguments should be comma-separated. Invalid/Inappropriate entries can cause the mount to fail!">self.options</item>
 	</setup>
-	<setup key="NetworkNFS" title="NFS Settings" allowDefault="yes">
-		<item text="NFS threads" description="Enter the number of NFS server threads to be allocated/used. Higher values improve performance with multiple clients but use more memory.">self.nfsThreads</item>
-		<item text="Enable NFSv3" description="When enabled, allow usage of the NFS version 3 protocols.">self.nfsVers3</item>
-		<item text="Enable NFSv4" description="When enabled, allow usage of the NFS version 4 protocols.">self.nfsVers4</item>
-		<item text="Access mode" description="Select the mode of access, Read/Write or Read-Only, applied to all exported directories.">self.nfsAccessMode</item>
-		<item text="Allowed clients" description="Enter the IP address or subnet (e.g. 192.168.1.0/24) to which NFS host access is granted. Enter '*', the default, for all host access.">self.nfsClients</item>
-		<item text="Root squash" description="When enabled, map root to nobody (more secure). When disabled, full root access is available.">self.nfsRootSquash</item>
+	<setup key="NetworkNFS" title="NFS Server Settings" allowDefault="yes">
+		<item level="0" text="NFS threads" description="Enter the number of NFS server threads to be allocated/used. Higher values improve performance with multiple clients but uses more memory.">self.nfsThreads</item>
+		<item level="0" text="Enable NFSv3" description="When enabled, allow usage of the NFS version 3 protocols.">self.nfsVers3</item>
+		<item level="0" text="Enable NFSv4" description="When enabled, allow usage of the NFS version 4 protocols.">self.nfsVers4</item>
+		<item level="0" text="Access mode" description="Select the mode of access, Read/Write or Read-Only, applied to all exported directories.">self.nfsAccessMode</item>
+		<item level="0" text="Allowed clients" description="Enter the IP address or subnet (e.g. 192.168.1.0/24) to which NFS host access is granted. Enter '*', the default, for all host access.">self.nfsClients</item>
+		<item level="0" text="Root squash" description="When enabled, map root to nobody (more secure). When disabled, full root access is available.">self.nfsRootSquash</item>
 	</setup>
-	<setup key="NetworkSamba" title="Samba Settings" allowDefault="yes">
-		<item text="Enable automatic shares" description="Select 'Yes' to allow each storage device detected to be authasMultiplePrioritiesomatically exported as samba share.">config.samba.enableAutoShare</item>
-		<item text="Access mode" description="Select the mode of access, Read/Write or Read-Only, applied to all automatically exported Samba shares." conditional="config.samba.enableAutoShare.value">config.samba.autoShareAccess</item>
-		<item text="Allow guest access" description="When enabled, allow Samba network access without a password.">self.guest</item>
-		<item text="Workgroup name" description="Enter the workgroup name to be used by this receiver for Samba based connections. (Default is 'WORKGROUP'.)">self.workgroup</item>
+	<setup key="NetworkSamba" title="Samba Server Settings" allowDefault="yes">
+		<item level="0" text="Enable automatic shares" description="When enabled, allow each storage device detected to be automatically exported as a Samba share.">config.samba.enableAutoShare</item>
+		<item level="0" text="Access mode" description="Select the mode of access, Read/Write or Read-Only, applied to all automatically exported Samba shares." conditional="config.samba.enableAutoShare.value">config.samba.autoShareAccess</item>
+		<item level="0" text="Allow guest access" description="When enabled, allow Samba network access without a password.">self.guest</item>
+		<item level="0" text="Workgroup name" description="Enter the workgroup name to be used by this server for Samba based connections. (Default is 'WORKGROUP'.)">self.workgroup</item>
 	</setup>
 	<setup key="NetworkWiFi" title="Network Wi-Fi Settings">
 		<item level="0" text="Network name (SSID)" description="Select the network name (SSID) of the wireless network to which the receiver should connect.">self.cfgSsid</item>
@@ -702,7 +702,7 @@
 		</if>
 	</setup>
 	<setup key="NetworkZeroTier" title="ZeroTier Settings">
-		<item text="Network-ID" description="Enter the ZeroTier Network ID. The ID should be exactly 16 characters in length.">config.network.ZeroTierNetworkId</item>
+		<item level="0" text="Network-ID" description="Enter the ZeroTier Network ID. The ID should be exactly 16 characters in length.">config.network.ZeroTierNetworkId</item>
 	</setup>
 	<setup key="OSCamInfoSetup" title="OSCam/NCam Information Settings">
 		<item level="0" text="Read Userdata from oscam/ncam.conf" description="Read Userdata from oscam/ncam.conf">config.oscaminfo.userDataFromConf</item>
