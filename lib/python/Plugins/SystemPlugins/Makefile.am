@@ -24,5 +24,14 @@ if DM920
 SUBDIRS += FSBLUpdater
 endif
 
+
+if HAVE_LIBVUGLES2
+SUBDIRS += AnimationSetup
+endif
+
+if HAVE_OSDANIMATION
+SUBDIRS += AnimationSetup
+endif
+
 install_PYTHON =	\
 	__init__.py
