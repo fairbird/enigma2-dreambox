@@ -443,7 +443,7 @@ class MoviePlayer(InfoBarBase, InfoBarShowHide, InfoBarMenu, InfoBarSeek, InfoBa
 					self.leavePlayerConfirmed([True, "quit"])
 		elif answer in ("repeatcurrent"):
 			if config.usage.next_movie_msg.value:
-				(item, lenght) = self.getPlaylistServiceInfo(self.cur_service)
+				(next_service, item, lenght) = self.getPlaylistServiceInfo(self.cur_service)
 				self.displayPlayedName(self.cur_service, item, lenght)
 			self.session.nav.stopService()
 			self.session.nav.playService(self.cur_service)
@@ -606,7 +606,7 @@ class MoviePlayer(InfoBarBase, InfoBarShowHide, InfoBarMenu, InfoBarSeek, InfoBa
 		for i, item in enumerate(playlist):
 			if item == service:
 				if config.usage.on_movie_eof.value == "repeatcurrent":
-					return (i + 1, len(playlist))
+					return (service, i + 1, len(playlist))
 				i += 1
 				if i < len(playlist):
 					return (playlist[i], i + 1, len(playlist))
