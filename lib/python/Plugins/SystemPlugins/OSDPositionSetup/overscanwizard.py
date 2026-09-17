@@ -11,7 +11,7 @@ from enigma import quitMainloop, eTimer, getDesktop
 class OverscanWizard(ConfigListScreen, Screen):
 	def __init__(self, session, timeOut=True):
 		if getDesktop(0).size().height() == 1080:
-			self.skin = """<screen position="fill" flags="wfNoBorder">
+			self.skin = """<screen position="fill" flags="wfNoBorder" resolution="1920,1080">
 				<ePixmap pixmap="overscan1920x1080.png" position="0,0" size="1920,1080" zPosition="3" alphaTest="on"/>
 				<widget name="title" position="380,212" size="1160,35" font="Regular;40" backgroundColor="black" foregroundColor="blue" horizontalAlignment="center" verticalAlignment="center" zPosition="4"/>
 				<widget name="introduction" position="380,247" size="1160,660" font="Regular;26" horizontalAlignment="center" verticalAlignment="center" backgroundColor="black" zPosition="4"/>

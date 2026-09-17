@@ -52,9 +52,11 @@ gFBDC::gFBDC()
 	fb->getMode(xres, yres, bpp);
 
 	/* we can only use one of these three modes: */
-	if (!((xres == 720 && yres == 576)
-		|| (xres == 1280 && yres == 720)
-		|| (xres == 1920 && yres == 1080)))
+	if (!((xres == 720 && yres == 576) ||
+		(xres == 1280 && yres == 720) ||
+		(xres == 1920 && yres == 1080) ||
+		(xres == 2560 && yres == 1440) ||
+		(xres == 3840 && yres == 2160)))
 	{
 		/* fallback to a decent default */
 		xres = 720;
@@ -69,6 +71,11 @@ gFBDC::gFBDC()
 
 gFBDC::~gFBDC()
 {
+	if (m_logical_surface.data_phys && gAccel::getInstance())
+	{
+		// eDebug("[gFBDC] freeing logical render surface on destruction");
+		gAccel::getInstance()->accelFree(&m_logical_surface);
+	}
 	delete fb;
 	delete[] surface.clut.data;
 }
@@ -224,6 +231,22 @@ void gFBDC::exec(const gOpcode *o)
 	case gOpcode::flush:
 		fb->blit();
 #if defined(CONFIG_ION)
+		if (m_scaled_output && m_logical_surface.data_phys && surface.data_phys)
+		{
+			timeval blit_start, blit_end;
+			gettimeofday(&blit_start, 0);
+
+			bcm_accel_blit(
+				m_logical_surface.data_phys, m_logical_surface.x, m_logical_surface.y, m_logical_surface.stride, 0,
+				surface.data_phys, surface.x, surface.y, surface.stride,
+				0, 0, m_logical_surface.x, m_logical_surface.y,
+				0, 0, surface.x, surface.y,
+				0, 0);
+
+			gettimeofday(&blit_end, 0);
+			int blit_ms = (blit_end.tv_sec - blit_start.tv_sec) * 1000 + (blit_end.tv_usec - blit_start.tv_usec) / 1000;
+			// eDebug("[gFBDC] scaled blit: logical %dx%d -> physical %dx%d took %d ms", m_logical_surface.x, m_logical_surface.y, surface.x, surface.y, blit_ms);
+		}
 		if (surface_back.data_phys)
 		{
 #if defined(DREAMBCM_ION_ACCEL)
@@ -372,9 +395,9 @@ void gFBDC::setResolution(int xres, int yres, int bpp)
 {
 	std::lock_guard<std::recursive_mutex> lock(m_graphics_mutex);
 	if (m_pixmap && (surface.x == xres) && (surface.y == yres) && (surface.bpp == bpp)
-	#if defined(CONFIG_HISILICON_FB)
+#if defined(CONFIG_HISILICON_FB)
 		&& islocked()==0
-	#endif
+#endif
 		)
 		return;
 #ifndef CONFIG_ION
@@ -385,7 +408,63 @@ void gFBDC::setResolution(int xres, int yres, int bpp)
 	if (grc)
 		grc->lock();
 #endif
+	int requested_xres = xres;
+	int requested_yres = yres;
+	int requested_bpp = bpp;
+
+	if (xres > 1920 || yres > 1080)
+	{
+		eDebug("[gFBDC] Setting high-resolution OSD mode: %dx%d", xres, yres);
+	}
 	fb->SetMode(xres, yres, bpp);
+
+	/* fb->SetMode() may not have been able to apply the requested mode
+	 * (e.g. WQHD/4K on hardware that only supports up to FHD output);
+	 * always use what was actually applied, not what was requested,
+	 * or the compositor ends up drawing into a canvas size that doesn't
+	 * match the real framebuffer memory layout. */
+	fb->getMode(xres, yres, bpp);
+
+	m_scaled_output = (xres != requested_xres || yres != requested_yres);
+	// eDebug("[gFBDC] requested %dx%d, hardware applied %dx%d, scaled_output=%d", requested_xres, requested_yres, xres, yres, m_scaled_output);
+
+	if (m_scaled_output)
+	{
+		eDebug("[gFBDC] Warning: Hardware forced resolution down to %dx%d (requested %dx%d). Falling back to scaled software canvas.", xres, yres, requested_xres, requested_yres);
+#if defined(CONFIG_ION)
+		if (m_logical_surface.data_phys && gAccel::getInstance())
+		{
+			eDebug("[gFBDC] freeing previous logical render surface before reallocating");
+			gAccel::getInstance()->accelFree(&m_logical_surface);
+		}
+		m_logical_surface.x = requested_xres;
+		m_logical_surface.y = requested_yres;
+		m_logical_surface.bpp = requested_bpp;
+		m_logical_surface.bypp = requested_bpp / 8;
+		m_logical_surface.stride = requested_xres * (requested_bpp / 8);
+		// eDebug("[gFBDC] allocating logical render surface %dx%d bpp=%d (stride=%d) via accel pool", requested_xres, requested_yres, requested_bpp, m_logical_surface.stride);
+		if (!gAccel::getInstance() || gAccel::getInstance()->accelAlloc(&m_logical_surface) != 0)
+		{
+			// eDebug("[gFBDC] ERROR: accelAlloc failed for logical render surface (out of accel memory?). Disabling scaled output, using hardware resolution directly.");
+			m_scaled_output = false;
+		}
+		else
+		{
+			// eDebug("[gFBDC] logical render surface allocated OK: data=%p data_phys=0x%lx stride=%d", m_logical_surface.data, (unsigned long)m_logical_surface.data_phys, m_logical_surface.stride);
+			// freshly allocated ION memory is not guaranteed to be zeroed and may
+			// contain stale/garbage data from a previous allocation elsewhere;
+			// without this the very first frames blitted show visual corruption
+			if (m_logical_surface.data)
+			{
+				// eDebug("[gFBDC] zeroing logical render surface (%d bytes)", m_logical_surface.stride * m_logical_surface.y);
+				memset(m_logical_surface.data, 0x00, m_logical_surface.stride * m_logical_surface.y);
+			}
+		}
+#else
+		// eDebug("[gFBDC] scaled output would be needed but CONFIG_ION is not defined in this build, ignoring");
+		m_scaled_output = false;
+#endif
+	}
 
 	unsigned char *base_addr = fb->lfb;
 	unsigned long base_phys = fb->getPhysAddr();
@@ -489,7 +568,15 @@ void gFBDC::setResolution(int xres, int yres, int bpp)
 	}
 #endif
 
-	m_pixmap = new gPixmap(&surface);
+	if (m_scaled_output)
+	{
+		// eDebug("[gFBDC] gPixmap now targets logical surface %dx%d (physical output stays %dx%d)", m_logical_surface.x, m_logical_surface.y, surface.x, surface.y);
+		m_pixmap = new gPixmap(&m_logical_surface);
+	}
+	else
+	{
+		m_pixmap = new gPixmap(&surface);
+	}
 
 #ifdef CONFIG_ION
 	if (grc)

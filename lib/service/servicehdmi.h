@@ -83,6 +83,7 @@ private:
 	bool m_noaudio;
 	ePtr<iTSMPEGDecoder> m_decoder;
 	bool m_b_hdmiin_fhd;
+	bool m_b_hdmiin_uhd;
 };
 
 class eServiceHDMIRecord: public eDVBServiceBase, public iRecordableService, public sigc::trackable
