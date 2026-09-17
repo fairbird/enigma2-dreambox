@@ -44,10 +44,10 @@ gFBDC::gFBDC()
 	fb->getMode(xres, yres, bpp);
 
 	/* we can only use one of these three modes: */
-	if (!((xres == 720 && yres == 576)
-		|| (xres == 1280 && yres == 720)
-		|| (xres == 1920 && yres == 1080)))
-		|| (xres == 3840 && yres == 2160)))
+	if (!((xres == 720 && yres == 576) ||
+		(xres == 1280 && yres == 720) ||
+		(xres == 1920 && yres == 1080) ||
+		(xres == 3840 && yres == 2160)))
 	{
 		/* fallback to a decent default */
 		xres = 720;
