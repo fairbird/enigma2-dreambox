@@ -666,13 +666,19 @@ static void dreamsource_normalize_resolution(int &width, int &height)
 
 	if ((width == 720 && height == 576) ||
 		(width == 1280 && height == 720) ||
-		(width == 1920 && height == 1080))
+		(width == 1920 && height == 1080) ||
+		(width == 3840 && height == 2160))
 		return;
 
 	if (width <= 720 && height <= 576)
 	{
 		width = 720;
 		height = 576;
+	}
+	else if (width > 1920 || height > 1080)
+	{
+		width = 3840;
+		height = 2160;
 	}
 	else if (width > 1280 || height > 720)
 	{

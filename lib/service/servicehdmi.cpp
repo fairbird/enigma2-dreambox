@@ -109,6 +109,7 @@ eServiceHDMI::eServiceHDMI(eServiceReference ref)
 {
 	eModelInformation &modelinformation = eModelInformation::getInstance();
 	m_b_hdmiin_fhd = modelinformation.getValue("hdmifhdin") == "True";
+	m_b_hdmiin_uhd = modelinformation.getValue("hdmiuhdin") == "True";
 }
 
 eServiceHDMI::~eServiceHDMI()
@@ -177,8 +178,8 @@ int eServiceHDMI::getInfo(int w)
 {
 	switch (w)
 	{
-		case sVideoHeight: return m_b_hdmiin_fhd ? 1080 : 720;
-		case sVideoWidth: return m_b_hdmiin_fhd ? 1920 : 1280;
+		case sVideoHeight: return m_b_hdmiin_uhd ? 2160 : (m_b_hdmiin_fhd ? 1080 : 720);
+		case sVideoWidth: return m_b_hdmiin_uhd ? 3840 : (m_b_hdmiin_fhd ? 1920 : 1280);
 		case sFrameRate: return 50;
 		case sProgressive: return 1;
 		case sGamma: return 0;
@@ -196,8 +197,8 @@ std::string eServiceHDMI::getInfoString(int w)
 	{
 		char buff[100];
 		snprintf(buff, sizeof(buff), "%d|%d|50|1|0|1",
-				m_b_hdmiin_fhd ? 1080 : 720,
-				m_b_hdmiin_fhd ? 1920 : 1280
+				m_b_hdmiin_uhd ? 2160 : (m_b_hdmiin_fhd ? 1080 : 720),
+				m_b_hdmiin_uhd ? 3840 : (m_b_hdmiin_fhd ? 1920 : 1280)
 				);
 		std::string videoInfo = buff;
 		return videoInfo;

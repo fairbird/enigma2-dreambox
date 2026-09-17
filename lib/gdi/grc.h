@@ -411,10 +411,11 @@ protected:
 	std::stack<gRegion> m_clip_stack;
 	gRegion m_current_clip;
 
-	ePtr<gPixmap> m_spinner_saved_HD, m_spinner_temp_HD, m_spinner_saved_FHD, m_spinner_temp_FHD;
+	ePtr<gPixmap> m_spinner_saved_HD, m_spinner_temp_HD, m_spinner_saved_FHD, m_spinner_temp_FHD, m_spinner_saved_UHD, m_spinner_temp_UHD;
 	ePtr<gPixmap> *m_spinner_pic;
 	eRect m_spinner_pos_HD;
 	eRect m_spinner_pos_FHD;
+	eRect m_spinner_pos_UHD;
 	int m_spinner_num, m_spinner_i;
 
 public:

@@ -1153,8 +1153,10 @@ void gDC::enableSpinner()
 {
 	ASSERT(m_spinner_saved_HD);
 	ASSERT(m_spinner_saved_FHD);
+	ASSERT(m_spinner_saved_UHD);
 
 	/* save the background to restore it later. We need to negative position because we want to blit from the middle of the screen. */
+	m_spinner_saved_UHD->blit(*m_pixmap, eRect(-m_spinner_pos_UHD.topLeft(), eSize()), gRegion(eRect(ePoint(0, 0), m_spinner_saved_UHD->size())), 0, 0 ,0);
 	m_spinner_saved_FHD->blit(*m_pixmap, eRect(-m_spinner_pos_FHD.topLeft(), eSize()), gRegion(eRect(ePoint(0, 0), m_spinner_saved_FHD->size())), 0, 0 ,0);
 	m_spinner_saved_HD->blit(*m_pixmap, eRect(-m_spinner_pos_HD.topLeft(), eSize()), gRegion(eRect(ePoint(0, 0), m_spinner_saved_HD->size())), 0, 0 ,0);
 
@@ -1167,7 +1169,9 @@ void gDC::disableSpinner()
 	ASSERT(m_spinner_saved_FHD);
 
 	/* restore background */
-	if (size().width() == 1920)
+	if (size().width() == 3840)
+		m_pixmap->blit(*m_spinner_saved_UHD, eRect(m_spinner_pos_UHD.topLeft(), eSize()), gRegion(m_spinner_pos_UHD), 0, 0, 0);
+	else if (size().width() == 1920)
 		m_pixmap->blit(*m_spinner_saved_FHD, eRect(m_spinner_pos_FHD.topLeft(), eSize()), gRegion(m_spinner_pos_FHD), 0, 0, 0);
 	else
 		m_pixmap->blit(*m_spinner_saved_HD, eRect(m_spinner_pos_HD.topLeft(), eSize()), gRegion(m_spinner_pos_HD), 0, 0, 0);
@@ -1194,7 +1198,16 @@ void gDC::incrementSpinner()
 	}
 #endif
 
-	if (size().width() == 1920)
+	if (size().width() == 3840)
+	{
+		m_spinner_temp_UHD->blit(*m_spinner_saved_UHD, eRect(0, 0, 0, 0), eRect(ePoint(0, 0), m_spinner_pos_UHD.size()), 0, 0, 0);
+
+		if (m_spinner_pic[m_spinner_i])
+			m_spinner_temp_UHD->blit(*m_spinner_pic[m_spinner_i], eRect(0, 0, 0, 0), eRect(ePoint(0, 0), m_spinner_pos_UHD.size()), 0, 0, gPixmap::blitAlphaBlend);
+
+		m_pixmap->blit(*m_spinner_temp_UHD, eRect(m_spinner_pos_UHD.topLeft(), eSize()), gRegion(m_spinner_pos_UHD), 0, 0, 0);
+	}
+	else if (size().width() == 1920)
 	{
 		m_spinner_temp_FHD->blit(*m_spinner_saved_FHD, eRect(0, 0, 0, 0), eRect(ePoint(0, 0), m_spinner_pos_FHD.size()), 0, 0, 0);
 
@@ -1227,10 +1240,15 @@ void gDC::setSpinner(eRect pos, ePtr<gPixmap> *pic, int len)
 	m_spinner_temp_HD = new gPixmap(pos.size(), m_pixmap->surface->bpp);
 	m_spinner_saved_FHD = new gPixmap(pos.size(), m_pixmap->surface->bpp);
 	m_spinner_temp_FHD = new gPixmap(pos.size(), m_pixmap->surface->bpp);
+	m_spinner_saved_UHD = new gPixmap(pos.size(), m_pixmap->surface->bpp);
+	m_spinner_temp_UHD = new gPixmap(pos.size(), m_pixmap->surface->bpp);
 	m_spinner_pos_HD = pos;
 	int x = (int)(float)pos.x() * 1.5;
 	int y = (int)(float)pos.y() * 1.5;
 	m_spinner_pos_FHD = eRect(ePoint(x, y), pos.size());
+	int ux = (int)(float)pos.x() * 3.0;
+	int uy = (int)(float)pos.y() * 3.0;
+	m_spinner_pos_UHD = eRect(ePoint(ux, uy), pos.size());
 
 	m_spinner_i = 0;
 	m_spinner_num = len;

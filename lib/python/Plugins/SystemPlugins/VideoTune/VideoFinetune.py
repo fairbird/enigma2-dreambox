@@ -21,7 +21,7 @@ class OverscanTestScreen(Screen):
 
 		self.skin = """<screen position="fill">
 				<ePixmap pixmap="%s" position="0,0" size="%s,%s" zPosition="2" alphaTest="on"/>
-			</screen>""" % (getDesktop(0).size().height() == 1080 and ("overscan1920x1080.png", 1920, 1080) or ("overscan1280x720.png", 1280, 720))
+			</screen>""" % (getDesktop(0).size().height() == 2160 and ("overscan3840x2160.png", 3840, 2160) or getDesktop(0).size().height() == 1080 and ("overscan1920x1080.png", 1920, 1080) or ("overscan1280x720.png", 1280, 720))
 
 		self["actions"] = NumberActionMap(["InputActions", "OkCancelActions"],
 		{
@@ -127,7 +127,7 @@ class VideoFinetune(Screen):
 		self["Canvas"] = CanvasSource()
 
 		self.basic_colors = [RGB(255, 255, 255), RGB(255, 255, 0), RGB(0, 255, 255), RGB(0, 255, 0), RGB(255, 0, 255), RGB(255, 0, 0), RGB(0, 0, 255), RGB(0, 0, 0)]
-		self.fontsize = getDesktop(0).size().height() == 1080 and 30 or 20
+		self.fontsize = getDesktop(0).size().height() == 2160 and 60 or getDesktop(0).size().height() == 1080 and 30 or 20
 
 		if fileExists("/proc/stb/fb/dst_left"):
 			self.left = open("/proc/stb/fb/dst_left", "r").read()
@@ -424,7 +424,7 @@ class PixelsTestScreen(Screen):
 		Screen.__init__(self, session)
 
 		self["Canvas"] = CanvasSource()
-		self.fontsize = getDesktop(0).size().height() == 1080 and 30 or 20
+		self.fontsize = getDesktop(0).size().height() == 2160 and 60 or getDesktop(0).size().height() == 1080 and 30 or 20
 		self.xres, self.yres = getDesktop(0).size().width(), getDesktop(0).size().height()
 
 		self["actions"] = NumberActionMap(["InputActions", "OkCancelActions", "ColorActions"],
