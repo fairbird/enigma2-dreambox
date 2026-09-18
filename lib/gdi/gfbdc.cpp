@@ -293,9 +293,9 @@ void gFBDC::setResolution(int xres, int yres, int bpp)
 	eDebug("[gFBDC] setResolution requested: %dx%d bpp=%d", xres, yres, bpp);
 
 	if (m_pixmap && (surface.x == xres) && (surface.y == yres) && (surface.bpp == bpp)
-	#if defined(CONFIG_HISILICON_FB)
+#if defined(CONFIG_HISILICON_FB)
 		&& islocked()==0
-	#endif
+#endif
 		)
 	{
 		eDebug("[gFBDC] Resolution %dx%d already active, skipping re-allocation.", xres, yres);
