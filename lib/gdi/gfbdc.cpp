@@ -306,11 +306,11 @@ void gFBDC::setGamma(int g)
 void gFBDC::setResolution(int xres, int yres, int bpp)
 {
 	if (m_pixmap && (surface.x == xres) && (surface.y == yres) && (surface.bpp == bpp)
-	#if defined(CONFIG_HISILICON_FB)
+#if defined(CONFIG_HISILICON_FB)
 		&& islocked()==0
-	#endif
-		)
-		return;
+#endif
+	)
+	return;
 #ifndef CONFIG_ION
 	if (gAccel::getInstance())
 		gAccel::getInstance()->releaseAccelMemorySpace();
