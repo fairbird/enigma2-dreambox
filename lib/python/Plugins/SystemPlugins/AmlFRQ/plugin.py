@@ -116,7 +116,7 @@ class AmlFRQ(ConfigListScreen, Screen):
 			</screen>"""
 		else:
 			self.skin = """
-			<screen  position="0,0" size="1920,1080" title="CPU Frequency Setup" flags="wfNoBorder" backgroundColor="#25062748">
+			<screen  position="0,0" size="1920,1080" resolution="1920,1080" title="CPU Frequency Setup" flags="wfNoBorder" backgroundColor="#25062748">
 			<widget source="Title" render="Label" position="210,140" size="1500,68" zPosition="2" horizontalAlignment="center" font="Regular; 36" backgroundColor="#25062748" transparent="1" verticalAlignment="center" />
 			<ePixmap name="" position="210,150" size="1500,820" pixmap="MetrixHD/ibts/background.png" zPosition="-10" />
 			<eLabel name="" position="235,227" size="1283,648" zPosition="-5" />

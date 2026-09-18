@@ -21,7 +21,7 @@ class OverscanTestScreen(Screen):
 
 		self.skin = """<screen position="fill">
 				<ePixmap pixmap="%s" position="0,0" size="%s,%s" zPosition="2" alphaTest="on"/>
-			</screen>""" % (getDesktop(0).size().height() == 2160 and ("overscan3840x2160.png", 3840, 2160) or getDesktop(0).size().height() == 1080 and ("overscan1920x1080.png", 1920, 1080) or ("overscan1280x720.png", 1280, 720))
+			</screen>""" % (getDesktop(0).size().height() == 2160 and ("overscan3840x2160.png", 3840, 2160) or getDesktop(0).size().height() == 1440 and ("overscan1920x1080.png", getDesktop(0).size().width(), getDesktop(0).size().height()) or getDesktop(0).size().height() == 1080 and ("overscan1920x1080.png", 1920, 1080) or ("overscan1280x720.png", 1280, 720))
 
 		self["actions"] = NumberActionMap(["InputActions", "OkCancelActions"],
 		{

@@ -1171,7 +1171,7 @@ void gDC::disableSpinner()
 	/* restore background */
 	if (size().width() == 3840)
 		m_pixmap->blit(*m_spinner_saved_UHD, eRect(m_spinner_pos_UHD.topLeft(), eSize()), gRegion(m_spinner_pos_UHD), 0, 0, 0);
-	else if (size().width() == 1920)
+	else if (size().width() >= 1920)
 		m_pixmap->blit(*m_spinner_saved_FHD, eRect(m_spinner_pos_FHD.topLeft(), eSize()), gRegion(m_spinner_pos_FHD), 0, 0, 0);
 	else
 		m_pixmap->blit(*m_spinner_saved_HD, eRect(m_spinner_pos_HD.topLeft(), eSize()), gRegion(m_spinner_pos_HD), 0, 0, 0);
@@ -1207,7 +1207,7 @@ void gDC::incrementSpinner()
 
 		m_pixmap->blit(*m_spinner_temp_UHD, eRect(m_spinner_pos_UHD.topLeft(), eSize()), gRegion(m_spinner_pos_UHD), 0, 0, 0);
 	}
-	else if (size().width() == 1920)
+	else if (size().width() >= 1920)
 	{
 		m_spinner_temp_FHD->blit(*m_spinner_saved_FHD, eRect(0, 0, 0, 0), eRect(ePoint(0, 0), m_spinner_pos_FHD.size()), 0, 0, 0);
 

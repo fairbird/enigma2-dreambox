@@ -754,7 +754,7 @@ class PluginBrowserNew(Screen):
 		list_dummy = []
 		skincontent = ""
 		skin = """
-  			<screen name="PluginBrowserNew" position="%d,%d" size="%d,%d" flags="wfNoBorder" backgroundColor="%s">
+  			<screen name="PluginBrowserNew" position="%d,%d" size="%d,%d" resolution="%d,%d" flags="wfNoBorder" backgroundColor="%s">
   				%s
   				<eLabel text="Plugin Browser" position="%d,%d" size="%d,%d" font="Regular;%d" foregroundColor="#00ffffff" backgroundColor="#44000000" transparent="1" zPosition="2" />
   				<eLabel text="&lt; Move to Sort &gt;" position="%d,%d" size="%d,%d" font="Regular;%d" foregroundColor="#000080ff" backgroundColor="#44000000" transparent="1" zPosition="2" />
@@ -773,7 +773,7 @@ class PluginBrowserNew(Screen):
   				<widget name="key_red" position="%d,%d" size="%d,%d" font="Regular;%d" zPosition="1" horizontalAlignment="center" verticalAlignment="center" foregroundColor="#00ffffff" backgroundColor="#16000000" transparent="1"/>
   				<widget name="key_green" position="%d,%d" size="%d,%d" font="Regular;%d" zPosition="1" horizontalAlignment="center" verticalAlignment="center" foregroundColor="#00ffffff" backgroundColor="#16000000" transparent="1"/>
   				<widget name="key_yellow" position="%d,%d" size="%d,%d" font="Regular;%d" zPosition="1" horizontalAlignment="center" verticalAlignment="center" foregroundColor="#00ffffff" backgroundColor="#16000000" transparent="1"/>
-			""" % (positionx, positiony, sizex, sizey, backgroundColor, backgroundPixmap,
+			""" % (positionx, positiony, sizex, sizey, sizex, sizey, backgroundColor, backgroundPixmap,
 				positionx1, positiony1, sizex1, sizey1, font1,
 				positionx2, positiony2, sizex2, sizey2, font2,
 				positionx3, positiony3, sizex3, sizey3, font3, foregroundColor,

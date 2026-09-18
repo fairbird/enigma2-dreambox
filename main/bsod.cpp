@@ -289,7 +289,7 @@ void bsodFatal(const char *component)
 	p.setForegroundColor(gRGB(0xFFFFFF));
 	p.clear();
 
-	int hd = (my_dc->size().width() == 1920 || my_dc->size().width() == 3840);
+	int hd = (my_dc->size().width() == 1920 || my_dc->size().width() == 2560 || my_dc->size().width() == 3840);
 	ePtr<gFont> font = new gFont("Regular", hd ? 30 : 20);
 	p.setFont(font);
 

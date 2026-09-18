@@ -110,9 +110,9 @@ def InitOSDCalibration():
 
 
 class OSDCalibration(ConfigListScreen, Screen):
-	if (getDesktop(0).size().width() == 1920):
+	if (getDesktop(0).size().width() >= 1920):
 		skin = """
-			<screen name="OSDCalibration" position="fill" backgroundColor="#1A0F0F0F" flags="wfNoBorder" title="OSD Calibration Settings">
+			<screen name="OSDCalibration" position="fill" backgroundColor="#1A0F0F0F" flags="wfNoBorder" title="OSD Calibration Settings" resolution="1920,1080">
 
 				<widget name="text" position="300,165" zPosition="+4" size="1320,180" font="Regular;32" halign="center" valign="center" foregroundColor="#00FFFF00" backgroundColor="#1f771f" transparent="1" />
 				<widget name="config" position="225,375" zPosition="1" size="1470,315" itemHeight="45" font="Regular;30" transparent="1" />

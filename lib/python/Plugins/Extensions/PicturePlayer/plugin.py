@@ -50,7 +50,7 @@ def filescan(**kwargs):
 
 def Plugins(**kwargs):
 	screenwidth = getDesktop(0).size().width()
-	icon = "pictureplayerhd.png" if screenwidth and screenwidth == 1920 else "pictureplayer.png"
+	icon = "pictureplayerhd.png" if screenwidth and screenwidth >= 1920 else "pictureplayer.png"
 
 	return [
 			PluginDescriptor(name=_("Picture player"), description=_("fileformats (BMP, PNG, JPG, GIF)"), icon=icon, where=PluginDescriptor.WHERE_PLUGINMENU, needsRestart=False, fnc=main),

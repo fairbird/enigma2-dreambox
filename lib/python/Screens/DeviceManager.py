@@ -535,7 +535,7 @@ class DeviceManager(Screen):
 		</screen>"""
 	else:
 		skin = """
-		<screen name="DeviceManager" title="Device Manager" position="0,0" size="1920,1080" backgroundColor="#1A0F0F0F" >
+		<screen name="DeviceManager" title="Device Manager" position="0,0" size="1920,1080" resolution="1920,1080" backgroundColor="#1A0F0F0F" >
 			<widget source="Title" render="Label" position="87,54" size="788,75" noWrap="1" valign="bottom" font="Regular;50" foregroundColor="#00FFFFFF" backgroundColor="#1A0F0F0F" halign="left" transparent="1" />
 			<widget source="devicelist" render="Listbox" backgroundColor="#1A0F0F0F" position="105,150" size="1710,630">
 				<templates>
