@@ -13,6 +13,8 @@ class gFBDC: public gMainDC
 	gUnmanagedSurface surface;
 	gUnmanagedSurface surface_back;
 	gUnmanagedSurface surface_third;
+	gUnmanagedSurface m_logical_surface; // full-resolution off-screen render target when scaled_output is active
+	bool m_scaled_output = false;
 	int m_number_of_pages = 1;
 	unsigned char ramp[256], rampalpha[256]; // RGB ramp 0..255
 	void exec(const gOpcode *opcode);
