@@ -290,12 +290,17 @@ void gFBDC::setGamma(int g)
 
 void gFBDC::setResolution(int xres, int yres, int bpp)
 {
+	eDebug("[gFBDC] setResolution requested: %dx%d bpp=%d", xres, yres, bpp);
+
 	if (m_pixmap && (surface.x == xres) && (surface.y == yres) && (surface.bpp == bpp)
 	#if defined(CONFIG_HISILICON_FB)
 		&& islocked()==0
 	#endif
 		)
+	{
+		eDebug("[gFBDC] Resolution %dx%d already active, skipping re-allocation.", xres, yres);
 		return;
+	}
 #ifndef CONFIG_ION
 	if (gAccel::getInstance())
 		gAccel::getInstance()->releaseAccelMemorySpace();
@@ -304,26 +309,13 @@ void gFBDC::setResolution(int xres, int yres, int bpp)
 	if (grc)
 		grc->lock();
 #endif
-	if (xres > 1920 || yres > 1080)
-	{
-		eDebug("[gFBDC] Setting high-resolution OSD mode: %dx%d", xres, yres);
-	}
+	eDebug("[gFBDC] Calling fb->SetMode(%d, %d, %d)", xres, yres, bpp);
 	fb->SetMode(xres, yres, bpp);
-
-	/* fb->SetMode() may not have been able to apply the requested mode
-	 * (e.g. WQHD/4K on hardware that only supports up to FHD output);
-	 * always use what was actually applied, not what was requested,
-	 * or the compositor ends up drawing into a canvas size that doesn't
-	 * match the real framebuffer memory layout. */
-	fb->getMode(xres, yres, bpp);
-
-	if (xres == 1920 && yres == 1080)
-	{
-		eDebug("[gFBDC] Warning: Hardware forced resolution down to FHD (1920x1080). OSD 4K/WQHD framebuffer allocation bypassed by driver.");
-	}
 
 	unsigned char *base_addr = fb->lfb;
 	unsigned long base_phys = fb->getPhysAddr();
+
+	eDebug("[gFBDC] Framebuffer memory allocated at virtual: %p, physical: 0x%lx", base_addr, base_phys);
 
 	surface.x = xres;
 	surface.y = yres;
