@@ -28,6 +28,7 @@ from Screens.Processing import Processing
 from Screens.Screen import Screen, ScreenSummary
 from Screens.Console import Console
 from Screens.Setup import Setup
+from Screens.Standby import TryQuitMainloop
 from Plugins.Plugin import PluginDescriptor
 from Tools.Directories import fileExists, fileReadLines, fileAccess, fileWriteLine, fileWriteLines, resolveFilename, SCOPE_PLUGINS, SCOPE_CURRENT_SKIN, SCOPE_GUISKIN
 from Tools.LoadPixmap import LoadPixmap
@@ -141,13 +142,18 @@ PACKAGE_CATEGORY_MAPPINGS = {
 
 
 def getDesktopSize():
-    s = getDesktop(0).size()
-    return (s.width(), s.height())
+	s = getDesktop(0).size()
+	return (s.width(), s.height())
 
 
 def isFullHD():
-    desktopSize = getDesktopSize()
-    return desktopSize[0] == 1920
+	desktopSize = getDesktopSize()
+	return desktopSize[0] == 1920
+
+
+def isUHD():
+	desktopSize = getDesktopSize()
+	return desktopSize[0] == 2560 or desktopSize[0] == 3840
 
 
 class PluginBrowserSummary(ScreenSummary):
@@ -380,7 +386,15 @@ class PluginBrowser(Screen, ProtectedScreen):
 			self.updateList(self.help)
 
 	def menu(self):
-		def keyMenuCallback():
+		old_style = config.misc.plugin_style.value
+
+		def restartGUICallback(answer):
+			if answer:
+				self.session.open(TryQuitMainloop, 3)
+			else:
+				self.close()
+
+		def keyMenuCallback(*args):
 			feed_file = "/etc/opkg/user-feed.conf"
 			if config.pluginfilter.userfeed.value != "https://":
 				current_feed = ""
@@ -392,8 +406,25 @@ class PluginBrowser(Screen, ProtectedScreen):
 					self.createFeedConfig()
 			elif exists(feed_file):
 				unlink(feed_file)
+
 			self.checkWarnings()
+
+			new_style = config.misc.plugin_style.value
+
+			if old_style != new_style:
+				if old_style == "list" or new_style == "list":
+					self.session.openWithCallback(
+						restartGUICallback,
+						MessageBox,
+						_("Restart Enigma2 GUI to apply the new Plugin Browser layout?"),
+						MessageBox.TYPE_YESNO
+					)
+				else:
+					self.close()
+				return
+
 			self.updateList()
+
 		self.session.openWithCallback(keyMenuCallback, PluginBrowserSetup)
 
 	def delete(self):
@@ -454,7 +485,9 @@ class PluginBrowserNew(Screen):
 			self.secondaryColor = "#696969"
 			self.secondaryColorLabel = "#00000000"
 		elif config.misc.plugin_style.value == "grid4":
-			if isFullHD():
+			if isUHD():
+				self.backgroundPixmap = '<ePixmap position="0,0" size="2560,1440" pixmap="skin_default/style4UHD.jpg" scale="1" transparent="1" zPosition="-1" />'
+			elif isFullHD():
 				self.backgroundPixmap = '<ePixmap position="0,0" size="1920,1080" pixmap="skin_default/style4.jpg" transparent="1" zPosition="-1" />'
 			else:
 				self.backgroundPixmap = '<ePixmap position="0,0" size="1280,720" pixmap="skin_default/style4hd.jpg" transparent="1" zPosition="-1" />'
@@ -465,7 +498,9 @@ class PluginBrowserNew(Screen):
 			self.secondaryColor = "#1b3c85"
 			self.secondaryColorLabel = "#00ffc000"
 		elif config.misc.plugin_style.value == "grid5":
-			if isFullHD():
+			if isUHD():
+				self.backgroundPixmap = '<ePixmap position="0,0" size="2560,1440" pixmap="skin_default/style5UHD.jpg" scale="1" transparent="1" zPosition="-1" />'
+			elif isFullHD():
 				self.backgroundPixmap = '<ePixmap position="0,0" size="1920,1080" pixmap="skin_default/style5.jpg" transparent="1" zPosition="-1" />'
 			else:
 				self.backgroundPixmap = '<ePixmap position="0,0" size="1280,720" pixmap="skin_default/style5hd.jpg" transparent="1" zPosition="-1" />'
@@ -476,7 +511,9 @@ class PluginBrowserNew(Screen):
 			self.secondaryColor = "#1b3c85"
 			self.secondaryColorLabel = "#00ffc000"
 		elif config.misc.plugin_style.value == "grid6":
-			if isFullHD():
+			if isUHD():
+				self.backgroundPixmap = '<ePixmap position="0,0" size="2560,1440" pixmap="skin_default/style6UHD.jpg" scale="1" transparent="1" zPosition="-1" />'
+			elif isFullHD():
 				self.backgroundPixmap = '<ePixmap position="0,0" size="1920,1080" pixmap="skin_default/style6.jpg" transparent="1" zPosition="-1" />'
 			else:
 				self.backgroundPixmap = '<ePixmap position="0,0" size="1280,720" pixmap="skin_default/style6hd.jpg" transparent="1" zPosition="-1" />'
@@ -597,7 +634,83 @@ class PluginBrowserNew(Screen):
 		return config.ParentalControl.setuppinactive.value and (not config.ParentalControl.config_sections.main_menu.value or hasattr(self.session, "infobar") and self.session.infobar is None) and config.ParentalControl.config_sections.plugin_browser.value
 
 	def buildSkin(self):
-		if isFullHD():
+		if isUHD():
+			# panel backgroundColor
+			backgroundColor = self.backgroundColor
+			# panel foregroundColor
+			foregroundColor = self.foregroundColor
+			# panel backgroundPixmap
+			backgroundPixmap = self.backgroundPixmap
+			# panel position
+			posxstart = 67
+			posystart = 253
+			# panel size
+			posxplus = 347
+			posyplus = 347
+			# plugins icon size
+			iconsize = "333,333"
+			# screen
+			positionx = 0
+			positiony = 0
+			sizex = 2560
+			sizey = 1440
+			# Title
+			positionx1 = 67
+			positiony1 = 16
+			sizex1 = 1200
+			sizey1 = 133
+			font1 = 100
+			# sort
+			positionx2 = 1600
+			positiony2 = 1333
+			sizex2 = 1200
+			sizey2 = 133
+			font2 = 53
+			# plugin_description
+			positionx3 = 67
+			positiony3 = 140
+			sizex3 = 1200
+			sizey3 = 133
+			font3 = 53
+			# Time
+			positionx4 = 2156
+			positiony4 = 16
+			sizex4 = 364
+			sizey4 = 133
+			font4 = 107
+			# Date
+			positionx5 = 1504
+			positiony5 = 140
+			sizex5 = 1016
+			sizey5 = 67
+			font5 = 53
+			# pages
+			positionx6 = 2133
+			positiony6 = 1300
+			sizex6 = 293
+			sizey6 = 113
+			font6 = 53
+			# keys eLabel
+			eLabelx1 = 89
+			eLabely1 = 1420
+			eLabelx2 = 524
+			eLabely2 = 1420
+			eLabelx3 = 959
+			eLabely3 = 1420
+			eLabelx4 = 1393
+			eLabely4 = 1420
+			eLabel1ysizex = 400
+			eLabel1ysizey = 11
+			# keys function
+			positionxkey1 = 89
+			positionxkey2 = 524
+			positionxkey3 = 959
+			positionxkey4 = 1393
+			positionykey = 1351
+			sizekeysx = 400
+			sizekeysy = 67
+			fontkey = 43
+		elif isFullHD():
 			# panel backgroundColor
 			backgroundColor = self.backgroundColor
 			# panel foregroundColor
@@ -754,7 +867,7 @@ class PluginBrowserNew(Screen):
 		list_dummy = []
 		skincontent = ""
 		skin = """
-  			<screen name="PluginBrowserNew" position="%d,%d" size="%d,%d" resolution="%d,%d" flags="wfNoBorder" backgroundColor="%s">
+  			<screen name="PluginBrowserNew" position="%d,%d" size="%d,%d" flags="wfNoBorder" backgroundColor="%s">
   				%s
   				<eLabel text="Plugin Browser" position="%d,%d" size="%d,%d" font="Regular;%d" foregroundColor="#00ffffff" backgroundColor="#44000000" transparent="1" zPosition="2" />
   				<eLabel text="&lt; Move to Sort &gt;" position="%d,%d" size="%d,%d" font="Regular;%d" foregroundColor="#000080ff" backgroundColor="#44000000" transparent="1" zPosition="2" />
@@ -773,7 +886,7 @@ class PluginBrowserNew(Screen):
   				<widget name="key_red" position="%d,%d" size="%d,%d" font="Regular;%d" zPosition="1" horizontalAlignment="center" verticalAlignment="center" foregroundColor="#00ffffff" backgroundColor="#16000000" transparent="1"/>
   				<widget name="key_green" position="%d,%d" size="%d,%d" font="Regular;%d" zPosition="1" horizontalAlignment="center" verticalAlignment="center" foregroundColor="#00ffffff" backgroundColor="#16000000" transparent="1"/>
   				<widget name="key_yellow" position="%d,%d" size="%d,%d" font="Regular;%d" zPosition="1" horizontalAlignment="center" verticalAlignment="center" foregroundColor="#00ffffff" backgroundColor="#16000000" transparent="1"/>
-			""" % (positionx, positiony, sizex, sizey, sizex, sizey, backgroundColor, backgroundPixmap,
+			""" % (positionx, positiony, sizex, sizey, backgroundColor, backgroundPixmap,
 				positionx1, positiony1, sizex1, sizey1, font1,
 				positionx2, positiony2, sizex2, sizey2, font2,
 				positionx3, positiony3, sizex3, sizey3, font3, foregroundColor,
@@ -799,10 +912,14 @@ class PluginBrowserNew(Screen):
 		for x, p in enumerate(ordered_plugins):
 			x += 1
 			count += 1
-			if isFullHD():
+			if isUHD():
+				skincontent += '<widget backgroundColor="' + self.primaryColor + '" name="plugin_' + str(x) + '" position="' + str(posx) + ',' + str(posy) + '" size="' + iconsize + '" />'
+				skincontent += '<widget foregroundColor="' + self.primaryColorLabel + '" name="label_' + str(x) + '" position="' + str(posx + 13) + ',' + str(posy + 185) + '" size="293,112" zPosition="3" font="Regular;43" horizontalAlignment="center" verticalAlignment="center" transparent="1" />'
+				skincontent += '<widget name="icon_' + str(x) + '" position="' + str(posx + 40) + ',' + str(posy + 53) + '" size="240,107" zPosition="3" alphaTest="on" transparent="1" />'
+			elif isFullHD():
 				skincontent += '<widget backgroundColor="' + self.primaryColor + '" name="plugin_' + str(x) + '" position="' + str(posx) + ',' + str(posy) + '" size="' + iconsize + '" />'
 				skincontent += '<widget foregroundColor="' + self.primaryColorLabel + '" name="label_' + str(x) + '" position="' + str(posx + 10) + ',' + str(posy + 139) + '" size="220,84" zPosition="3" font="Regular;32" horizontalAlignment="center" verticalAlignment="center" transparent="1" />'
-				skincontent += '<widget  name="icon_' + str(x) + '" position="' + str(posx + 30) + ',' + str(posy + 40) + '" size="180,80" zPosition="3" alphaTest="on" transparent="1" />'
+				skincontent += '<widget name="icon_' + str(x) + '" position="' + str(posx + 30) + ',' + str(posy + 40) + '" size="180,80" zPosition="3" alphaTest="on" transparent="1" />'
 			else:
 				skincontent += '<widget backgroundColor="' + self.primaryColor + '" name="plugin_' + str(x) + '" position="' + str(posx) + ',' + str(posy) + '" size="' + iconsize + '" />'
 				skincontent += '<widget foregroundColor="' + self.primaryColorLabel + '" name="label_' + str(x) + '" position="' + str(posx) + ',' + str(posy + 20) + '" size="150,65" zPosition="3" font="Regular;22" horizontalAlignment="center" verticalAlignment="center" transparent="1" />'
@@ -897,7 +1014,11 @@ class PluginBrowserNew(Screen):
 			if index == self.current + 1:
 				self["plugin_description"].setText(plugin[1])
 				pos = self.plugins_pos[self.current]
-				if isFullHD():
+				if isUHD():
+					self["plugin_" + str(index)].instance.resize(eSize(360, 360))
+					self["plugin_" + str(index)].instance.move(ePoint(pos[0] - 13, pos[1] - 13))
+					self["label_" + str(index)].instance.move(ePoint(pos[0] + 13, pos[1] + 207))
+				elif isFullHD():
 					self["plugin_" + str(index)].instance.resize(eSize(270, 270))
 					self["plugin_" + str(index)].instance.move(ePoint(pos[0] - 10, pos[1] - 10))
 					self["label_" + str(index)].instance.move(ePoint(pos[0] + 10, pos[1] + 155))
@@ -911,7 +1032,11 @@ class PluginBrowserNew(Screen):
 				self["label_" + str(index)].instance.setForegroundColor(parseColor(self.secondaryColorLabel))
 			else:
 				pos = self.plugins_pos[index - 1]
-				if isFullHD():
+				if isUHD():
+					self["plugin_" + str(index)].instance.resize(eSize(333, 333))
+					self["plugin_" + str(index)].instance.move(ePoint(pos[0], pos[1]))
+					self["label_" + str(index)].instance.move(ePoint(pos[0] + 13, pos[1] + 185))
+				elif isFullHD():
 					self["plugin_" + str(index)].instance.resize(eSize(250, 250))
 					self["plugin_" + str(index)].instance.move(ePoint(pos[0], pos[1]))
 					self["label_" + str(index)].instance.move(ePoint(pos[0] + 10, pos[1] + 139))
@@ -1040,7 +1165,15 @@ class PluginBrowserNew(Screen):
 			self.updateList(self.help)
 
 	def menu(self):
-		def keyMenuCallback():
+		old_style = config.misc.plugin_style.value
+
+		def restartGUICallback(answer):
+			if answer:
+				self.session.open(TryQuitMainloop, 3)
+			else:
+				self.close()
+
+		def keyMenuCallback(*args):
 			feed_file = "/etc/opkg/user-feed.conf"
 			if config.pluginfilter.userfeed.value != "https://":
 				current_feed = ""
@@ -1052,8 +1185,25 @@ class PluginBrowserNew(Screen):
 					self.createFeedConfig()
 			elif exists(feed_file):
 				unlink(feed_file)
+
 			self.checkWarnings()
+
+			new_style = config.misc.plugin_style.value
+
+			if old_style != new_style:
+				if old_style == "list" or new_style == "list":
+					self.session.openWithCallback(
+						restartGUICallback,
+						MessageBox,
+						_("Restart Enigma2 GUI to apply the new Plugin Browser layout?"),
+						MessageBox.TYPE_YESNO
+					)
+				else:
+					self.close()
+				return
+
 			self.updateList()
+
 		self.session.openWithCallback(keyMenuCallback, PluginBrowserSetup)
 
 	def delete(self):
