@@ -60,6 +60,44 @@ gFBDC::gFBDC()
 	reloadSettings();
 }
 
+void gFBDC::calc_overscan()
+{
+	int overscan_left = 0, overscan_top = 0, overscan_right = 0, overscan_bottom = 0;
+	ePyObject config = ePythonConfigQuery::getConfigValue("config.plugins.VideoFinetune.overscan_left");
+	if (config)
+		overscan_left = PyInt_AsLong(config);
+	config = ePythonConfigQuery::getConfigValue("config.plugins.VideoFinetune.overscan_top");
+	if (config)
+		overscan_top = PyInt_AsLong(config);
+	config = ePythonConfigQuery::getConfigValue("config.plugins.VideoFinetune.overscan_right");
+	if (config)
+		overscan_right = PyInt_AsLong(config);
+	config = ePythonConfigQuery::getConfigValue("config.plugins.VideoFinetune.overscan_bottom");
+	if (config)
+		overscan_bottom = PyInt_AsLong(config);
+	if (m_xres == 3840 && m_yres == 2160)
+	{
+		m_overscan_left = overscan_left * 3;
+		m_overscan_top = overscan_top * 3;
+		m_overscan_right = overscan_right * 3;
+		m_overscan_bottom = overscan_bottom * 3;
+	}
+	else if (m_xres == 1920 && m_yres == 1080)
+	{
+		m_overscan_left = (int)(overscan_left * 1.5);
+		m_overscan_top = (int)(overscan_top * 1.5);
+		m_overscan_right = (int)(overscan_right * 1.5);
+		m_overscan_bottom = (int)(overscan_bottom * 1.5);
+	}
+	else
+	{
+		m_overscan_left = overscan_left;
+		m_overscan_top = overscan_top;
+		m_overscan_right = overscan_right;
+		m_overscan_bottom = overscan_bottom;
+	}
+}
+
 gFBDC::~gFBDC()
 {
 	delete fb;
@@ -304,6 +342,10 @@ void gFBDC::setResolution(int xres, int yres, int bpp)
 	if (grc)
 		grc->lock();
 #endif
+	if (xres > 1920 || yres > 1080)
+	{
+		eDebug("[gFBDC] Setting high-resolution OSD mode: %dx%d", xres, yres);
+	}
 	fb->SetMode(xres, yres, bpp);
 
 	/* fb->SetMode() may not have been able to apply the requested mode
@@ -312,6 +354,11 @@ void gFBDC::setResolution(int xres, int yres, int bpp)
 	 * or the compositor ends up drawing into a canvas size that doesn't
 	 * match the real framebuffer memory layout. */
 	fb->getMode(xres, yres, bpp);
+
+	if (xres == 1920 && yres == 1080)
+	{
+		eDebug("[gFBDC] Warning: Hardware forced resolution down to FHD (1920x1080). OSD 4K/WQHD framebuffer allocation bypassed by driver.");
+	}
 
 	unsigned char *base_addr = fb->lfb;
 	unsigned long base_phys = fb->getPhysAddr();
