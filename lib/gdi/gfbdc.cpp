@@ -208,13 +208,19 @@ void gFBDC::exec(const gOpcode *o)
 #if defined(CONFIG_ION)
 		if (m_scaled_output && m_logical_surface.data_phys && surface.data_phys)
 		{
-			eDebug("[gFBDC] scaled blit: logical %dx%d -> physical %dx%d", m_logical_surface.x, m_logical_surface.y, surface.x, surface.y);
+			timeval blit_start, blit_end;
+			gettimeofday(&blit_start, 0);
+
 			bcm_accel_blit(
 				m_logical_surface.data_phys, m_logical_surface.x, m_logical_surface.y, m_logical_surface.stride, 0,
 				surface.data_phys, surface.x, surface.y, surface.stride,
 				0, 0, m_logical_surface.x, m_logical_surface.y,
 				0, 0, surface.x, surface.y,
 				0, 0);
+
+			gettimeofday(&blit_end, 0);
+			int blit_ms = (blit_end.tv_sec - blit_start.tv_sec) * 1000 + (blit_end.tv_usec - blit_start.tv_usec) / 1000;
+			eDebug("[gFBDC] scaled blit: logical %dx%d -> physical %dx%d took %d ms", m_logical_surface.x, m_logical_surface.y, surface.x, surface.y, blit_ms);
 		}
 		if (surface_back.data_phys)
 		{
@@ -363,6 +369,14 @@ void gFBDC::setResolution(int xres, int yres, int bpp)
 		else
 		{
 			eDebug("[gFBDC] logical render surface allocated OK: data=%p data_phys=0x%lx stride=%d", m_logical_surface.data, (unsigned long)m_logical_surface.data_phys, m_logical_surface.stride);
+			// freshly allocated ION memory is not guaranteed to be zeroed and may
+			// contain stale/garbage data from a previous allocation elsewhere;
+			// without this the very first frames blitted show visual corruption
+			if (m_logical_surface.data)
+			{
+				eDebug("[gFBDC] zeroing logical render surface (%d bytes)", m_logical_surface.stride * m_logical_surface.y);
+				memset(m_logical_surface.data, 0x00, m_logical_surface.stride * m_logical_surface.y);
+			}
 		}
 #else
 		eDebug("[gFBDC] scaled output would be needed but CONFIG_ION is not defined in this build, ignoring");
