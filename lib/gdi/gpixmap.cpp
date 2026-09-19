@@ -2100,7 +2100,23 @@ void gPixmap::blit(const gPixmap& src, const eRect& _pos, const gRegion& clip, i
 			/* we have hardware acceleration for this blit operation */
 			if (flag & (blitAlphaTest | blitAlphaBlend)) {
 				/* alpha blending is requested */
-				if (gAccel::getInstance()->hasAlphaBlendingSupport()) {
+				bool hwAlphaBlend = gAccel::getInstance()->hasAlphaBlendingSupport();
+#ifdef FORCE_ALPHABLENDING_ACCELERATION
+				static bool logged_force_alpha = false;
+				if (!logged_force_alpha)
+				{
+					eDebug("[gPixmap] FORCE_ALPHABLENDING_ACCELERATION is defined, hwAlphaBlendSupport=%d", hwAlphaBlend);
+					logged_force_alpha = true;
+				}
+#else
+				static bool logged_noforce_alpha = false;
+				if (!logged_noforce_alpha)
+				{
+					eDebug("[gPixmap] FORCE_ALPHABLENDING_ACCELERATION is NOT defined, hwAlphaBlendSupport=%d, blitScale=%d, blitAlphaTest=%d", hwAlphaBlend, (flag & blitScale) != 0, (flag & blitAlphaTest) != 0);
+					logged_noforce_alpha = true;
+				}
+#endif
+				if (hwAlphaBlend) {
 #ifdef FORCE_ALPHABLENDING_ACCELERATION
 					/* Hardware alpha blending is broken on the few
 					 * boxes that support it, so only use it
