@@ -47,6 +47,55 @@ https://creativecommons.org/licenses/by-nc-sa/4.0/
 #error "no BYTE_ORDER defined!"
 #endif
 
+#if defined(__ARM_NEON__) || defined(__ARM_NEON)
+#include <arm_neon.h>
+
+/* Vectorized version of gRGB::alpha_blend() (see gpixmap.h), processing 8
+ * BGRA pixels per call instead of 1. This hardware has no working 2D
+ * alpha-blending acceleration (confirmed via hasAlphaBlendingSupport()
+ * returning 0), so this path always runs in software - NEON gives real
+ * parallelism here without needing any GPU/driver support. Must stay
+ * numerically identical to gRGB::alpha_blend():
+ *   dst = dst + ((src - dst) * alpha) >> 8   per channel, and
+ *   alpha = alpha_dst + ((255 - alpha_dst) * alpha_src) >> 8
+ * The multiply is widened to 32-bit before shifting, matching the
+ * implicit int promotion the scalar BLEND() macro relies on in C -
+ * (src-dst)*alpha can reach +/-65025, which overflows a 16-bit lane.
+ */
+static inline void alpha_blend_8px_neon(uint8_t *dst_bytes, const uint8_t *src_bytes)
+{
+	uint8x8x4_t s = vld4_u8(src_bytes); // val[0]=B, [1]=G, [2]=R, [3]=A (little-endian gRGB layout)
+	uint8x8x4_t d = vld4_u8(dst_bytes);
+
+	int16x8_t alpha = vreinterpretq_s16_u16(vmovl_u8(s.val[3]));
+	int16x4_t alpha_lo = vget_low_s16(alpha);
+	int16x4_t alpha_hi = vget_high_s16(alpha);
+	uint8x8x4_t out;
+
+	for (int c = 0; c < 3; c++) { // B, G, R
+		int16x8_t sv = vreinterpretq_s16_u16(vmovl_u8(s.val[c]));
+		int16x8_t dv = vreinterpretq_s16_u16(vmovl_u8(d.val[c]));
+		int16x8_t diff = vsubq_s16(sv, dv);
+		int32x4_t prod_lo = vmull_s16(vget_low_s16(diff), alpha_lo);
+		int32x4_t prod_hi = vmull_s16(vget_high_s16(diff), alpha_hi);
+		int16x8_t scaled = vcombine_s16(vshrn_n_s32(prod_lo, 8), vshrn_n_s32(prod_hi, 8));
+		out.val[c] = vmovn_u16(vreinterpretq_u16_s16(vaddq_s16(dv, scaled)));
+	}
+
+	// alpha channel: BLEND(0xFF, a_dst, a_src)
+	{
+		int16x8_t da = vreinterpretq_s16_u16(vmovl_u8(d.val[3]));
+		int16x8_t diff = vsubq_s16(vdupq_n_s16(0xFF), da);
+		int32x4_t prod_lo = vmull_s16(vget_low_s16(diff), alpha_lo);
+		int32x4_t prod_hi = vmull_s16(vget_high_s16(diff), alpha_hi);
+		int16x8_t scaled = vcombine_s16(vshrn_n_s32(prod_lo, 8), vshrn_n_s32(prod_hi, 8));
+		out.val[3] = vmovn_u16(vreinterpretq_u16_s16(vaddq_s16(da, scaled)));
+	}
+
+	vst4_u8(dst_bytes, out);
+}
+#endif
+
 /* surface acceleration threshold: do not attempt to accelerate surfaces smaller than the threshold (measured in bytes) */
 #ifndef GFX_SURFACE_ACCELERATION_THRESHOLD
 #define GFX_SURFACE_ACCELERATION_THRESHOLD 48000
@@ -2326,6 +2375,14 @@ void gPixmap::blit(const gPixmap& src, const eRect& _pos, const gRegion& clip, i
 					int width = area.width();
 					gRGB* src = (gRGB*)srcptr;
 					gRGB* dst = (gRGB*)dstptr;
+#if defined(__ARM_NEON__) || defined(__ARM_NEON)
+					while (width >= 8) {
+						alpha_blend_8px_neon((uint8_t*)dst, (const uint8_t*)src);
+						dst += 8;
+						src += 8;
+						width -= 8;
+					}
+#endif
 					while (width--) {
 						dst->alpha_blend(*src++);
 						++dst;
