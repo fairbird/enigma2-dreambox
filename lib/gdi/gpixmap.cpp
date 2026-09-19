@@ -94,6 +94,17 @@ static inline void alpha_blend_8px_neon(uint8_t *dst_bytes, const uint8_t *src_b
 
 	vst4_u8(dst_bytes, out);
 }
+
+/* Vectorized version of the blitAlphaTest loop below: copies 4 pixels
+ * at once using a compare+select instead of a branch per pixel. Purely
+ * a masked copy (no blend math), so no overflow concerns here. */
+static inline void alpha_test_4px_neon(uint32_t *dst, const uint32_t *src)
+{
+	uint32x4_t s = vld1q_u32(src);
+	uint32x4_t d = vld1q_u32(dst);
+	uint32x4_t mask = vcgtq_u32(vshrq_n_u32(s, 24), vdupq_n_u32(0)); // alpha byte > 0 ?
+	vst1q_u32(dst, vbslq_u32(mask, s, d));
+}
 #endif
 
 /* surface acceleration threshold: do not attempt to accelerate surfaces smaller than the threshold (measured in bytes) */
@@ -2363,7 +2374,14 @@ void gPixmap::blit(const gPixmap& src, const eRect& _pos, const gRegion& clip, i
 					int width = area.width();
 					uint32_t* src = srcptr;
 					uint32_t* dst = dstptr;
-
+#if defined(__ARM_NEON__) || defined(__ARM_NEON)
+					while (width >= 4) {
+						alpha_test_4px_neon(dst, src);
+						dst += 4;
+						src += 4;
+						width -= 4;
+					}
+#endif
 					while (width--) {
 						if (!((*src) & 0xFF000000)) {
 							src++;
