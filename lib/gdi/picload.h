@@ -85,6 +85,15 @@ class ePicLoad : public eMainloop, public eThread, public sigc::trackable, publi
 	bool getExif(const char* filename, int fileType = F_JPEG, int Thumb = 0);
 	int getFileType(const char* file);
 
+	// remembers the most recent decode request that arrived while the
+	// background thread was still busy with a previous one, so it can be
+	// dispatched automatically once that one finishes, instead of being
+	// silently dropped (which made rapid navigation in any preview screen
+	// feel like it was skipping/freezing)
+	std::string m_pending_file;
+	int m_pending_x = 0, m_pending_y = 0, m_pending_what = 0;
+	bool m_pending_valid = false;
+
 public:
 	void waitFinished();
 	PSignal1<void, const char*> PictureData;

@@ -1221,6 +1221,11 @@ void ePicLoad::gotMessage(const Message& msg) {
 					m_exif = NULL;
 				}
 			}
+			if (m_pending_valid) {
+				m_pending_valid = false;
+				eDebug("[ePicLoad] dispatching most recent superseded request now: %s", m_pending_file.c_str());
+				startThread(m_pending_what, m_pending_file.c_str(), m_pending_x, m_pending_y, true);
+			}
 			break;
 		case Message::decode_error:
 			msg_main.send(Message(Message::decode_finished));
@@ -1232,8 +1237,13 @@ void ePicLoad::gotMessage(const Message& msg) {
 
 int ePicLoad::startThread(int what, const char* file, int x, int y, bool async) {
 	if (async && threadrunning && m_filepara != NULL) {
-		eDebug("[ePicLoad] thread running");
+		eDebug("[ePicLoad] thread running, remembering latest request instead of dropping it: %s", file);
 		m_filepara->callback = false;
+		m_pending_file = file;
+		m_pending_x = x;
+		m_pending_y = y;
+		m_pending_what = what;
+		m_pending_valid = true;
 		return 1;
 	}
 
