@@ -12,13 +12,9 @@ from enigma import BT_KEEP_ASPECT_RATIO, BT_SCALE, BT_ALIGN_CENTER, RT_HALIGN_LE
 
 from Components.GUIComponent import GUIComponent
 from skin import fonts, parameters
-from Tools.Directories import resolveFilename
-from Screens.LocationBox import defaultInhibitDirs
-import NavigationInstance
-
+from Components.SkinIcon import SkinIcon, loadSkinIcon
 from Tools.FuzzyDate import FuzzyTime
 from ServiceReference import ServiceReference
-from Components.SkinIcon import SkinIcon, loadSkinIcon
 from Components.MultiContent import MultiContentEntryText, MultiContentEntryPixmapAlphaBlend, MultiContentEntryProgress
 from Components.config import config
 from Components.FileList import AUDIO_EXTENSIONS, DVD_EXTENSIONS, IMAGE_EXTENSIONS, MOVIE_EXTENSIONS, KNOWN_EXTENSIONS
@@ -386,11 +382,11 @@ class MovieList(GUIComponent):
 				defaultSize = self.fontSizesMinimal[0]
 			font = fonts.get("MovieListIcons", ("enigma2icons", defaultSize))
 			self.iconFontSize = max(1, min(font[1], self.itemHeight - 4))
-			self.l.setFont(2, gFont(font[0], self.iconFontSize))
+			self.l.setFont(3, gFont(font[0], self.iconFontSize))
 
 	def iconEntry(self, icon, pos, size):
 		if isinstance(icon, SkinIcon):
-			return icon.entry(pos, size, 2)
+			return icon.entry(pos, size, 3)
 		return MultiContentEntryPixmapAlphaBlend(pos=pos, size=size, png=icon, flags=BT_SCALE | BT_KEEP_ASPECT_RATIO)
 
 	def invalidateItem(self, index):
