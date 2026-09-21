@@ -4,16 +4,21 @@ from os.path import join, normpath, realpath, split, splitext
 from struct import Struct
 from random import shuffle
 from time import localtime, strftime
-from Tools.LoadPixmap import LoadPixmap
-from Tools.Directories import SCOPE_CURRENT_SKIN, resolveFilename
+from Tools.Directories import resolveFilename
 from Screens.LocationBox import defaultInhibitDirs
 import NavigationInstance
 
 from enigma import BT_KEEP_ASPECT_RATIO, BT_SCALE, BT_ALIGN_CENTER, RT_HALIGN_LEFT, RT_HALIGN_RIGHT, RT_VALIGN_CENTER, eListbox, eListboxPythonMultiContent, eServiceCenter, eServiceReference, eSize, eTimer, gFont, iServiceInformation
 
 from Components.GUIComponent import GUIComponent
+from skin import fonts, parameters
+from Tools.Directories import resolveFilename
+from Screens.LocationBox import defaultInhibitDirs
+import NavigationInstance
+
 from Tools.FuzzyDate import FuzzyTime
 from ServiceReference import ServiceReference
+from Components.SkinIcon import SkinIcon, loadSkinIcon
 from Components.MultiContent import MultiContentEntryText, MultiContentEntryPixmapAlphaBlend, MultiContentEntryProgress
 from Components.config import config
 from Components.FileList import AUDIO_EXTENSIONS, DVD_EXTENSIONS, IMAGE_EXTENSIONS, MOVIE_EXTENSIONS, KNOWN_EXTENSIONS
@@ -196,14 +201,14 @@ class MovieList(GUIComponent):
 		self.onSelectionChanged = []
 		self.iconPart = []
 		for part in range(5):
-			self.iconPart.append(LoadPixmap(resolveFilename(SCOPE_CURRENT_SKIN, f"icons/part_{part}_4.png")))
-		self.iconMovieRec = LoadPixmap(resolveFilename(SCOPE_CURRENT_SKIN, "icons/part_new.png"))
-		self.iconMoviePlay = LoadPixmap(resolveFilename(SCOPE_CURRENT_SKIN, "icons/movie_play.png"))
-		self.iconMoviePlayRec = LoadPixmap(resolveFilename(SCOPE_CURRENT_SKIN, "icons/movie_play_rec.png"))
-		self.iconUnwatched = LoadPixmap(resolveFilename(SCOPE_CURRENT_SKIN, "icons/part_unwatched.png"))
-		self.iconFolder = LoadPixmap(resolveFilename(SCOPE_CURRENT_SKIN, "icons/folder.png"))
-		self.iconTrash = LoadPixmap(resolveFilename(SCOPE_CURRENT_SKIN, "icons/trashcan.png"))
-		self.iconCutting = LoadPixmap(resolveFilename(SCOPE_CURRENT_SKIN, "icons/cutting.png"))
+			self.iconPart.append(loadSkinIcon("MovieList", f"part_{part}_4", f"icons/part_{part}_4.png"))
+		self.iconMovieRec = loadSkinIcon("MovieList", "record", "icons/part_new.png")
+		self.iconMoviePlay = loadSkinIcon("MovieList", "play", "icons/movie_play.png")
+		self.iconMoviePlayRec = loadSkinIcon("MovieList", "play_record", "icons/movie_play_rec.png")
+		self.iconUnwatched = loadSkinIcon("MovieList", "unwatched", "icons/part_unwatched.png")
+		self.iconFolder = loadSkinIcon("MovieList", "folder", "icons/folder.png")
+		self.iconTrash = loadSkinIcon("MovieList", "trash", "icons/trashcan.png")
+		self.iconCutting = loadSkinIcon("MovieList", "cutting", "icons/cutting.png")
 		self.runningTimers = {}
 		self.updateRecordings()
 
@@ -369,6 +374,24 @@ class MovieList(GUIComponent):
 				self.l.setFont(i, gFont(self.fontName, self.fontSizesMinimal[i]))
 			self.itemHeight = self.itemHeights[2]
 		self.l.setItemHeight(self.itemHeight)
+		self.setIconFont()
+
+	def setIconFont(self):
+		if parameters.get("MovieListNativeIcons", 0):
+			if self.list_type == MovieList.LISTTYPE_ORIGINAL:
+				defaultSize = self.fontSizesOriginal[0]
+			elif self.list_type in (MovieList.LISTTYPE_COMPACT_DESCRIPTION, MovieList.LISTTYPE_COMPACT):
+				defaultSize = self.fontSizesCompact[0]
+			else:
+				defaultSize = self.fontSizesMinimal[0]
+			font = fonts.get("MovieListIcons", ("enigma2icons", defaultSize))
+			self.iconFontSize = max(1, min(font[1], self.itemHeight - 4))
+			self.l.setFont(2, gFont(font[0], self.iconFontSize))
+
+	def iconEntry(self, icon, pos, size):
+		if isinstance(icon, SkinIcon):
+			return icon.entry(pos, size, 2)
+		return MultiContentEntryPixmapAlphaBlend(pos=pos, size=size, png=icon, flags=BT_SCALE | BT_KEEP_ASPECT_RATIO)
 
 	def invalidateItem(self, index):
 		x = self.list[index]
@@ -402,13 +425,13 @@ class MovieList(GUIComponent):
 					p = split(p[0])  # If path ends in "/", p is blank.
 				txt = p[1]
 				if txt == TRASHCAN:
-					res.append(MultiContentEntryPixmapAlphaBlend(pos=(self.spaceLeft, self.trashShift), size=(iconSize, self.iconTrash.size().height()), png=self.iconTrash))
+					res.append(self.iconEntry(self.iconTrash, (self.spaceLeft, self.trashShift), (iconSize, iconSize)))
 					res.append(MultiContentEntryText(pos=(x + self.spaceLeft, 0), size=(width - x - tn - r - self.spaceLeft, self.itemHeight), font=0, flags=RT_HALIGN_LEFT | valign_center, text=_("Deleted items")))
 					res.append(MultiContentEntryText(pos=(width - tn - r, 0), size=(tn, self.itemHeight), font=1, flags=RT_HALIGN_RIGHT | valign_center, text=_("Trash can")))
 					return res
 			if not config.movielist.show_underlines.value:
 				txt = txt.replace("_", " ").strip()
-			res.append(MultiContentEntryPixmapAlphaBlend(pos=(self.spaceLeft, self.dirShift), size=(iconSize, iconSize), png=self.iconFolder, flags=BT_SCALE | BT_KEEP_ASPECT_RATIO | BT_ALIGN_CENTER))
+			res.append(self.iconEntry(self.iconFolder, (self.spaceLeft, self.dirShift), (iconSize, iconSize)))
 			res.append(MultiContentEntryText(pos=(x + self.spaceLeft, 0), size=(width - x - tn - r - self.spaceLeft, self.itemHeight), font=0, flags=RT_HALIGN_LEFT | valign_center, text=txt))
 			res.append(MultiContentEntryText(pos=(width - tn - r, 0), size=(tn, self.itemHeight), font=1, flags=RT_HALIGN_RIGHT | valign_center, text=_("Directory")))
 			return res
@@ -474,7 +497,7 @@ class MovieList(GUIComponent):
 				pos = (self.spaceLeft, self.partIconeShiftOriginal)
 			else:
 				pos = (self.spaceLeft, self.partIconeShiftMinimal)
-			res.append(MultiContentEntryPixmapAlphaBlend(pos=pos, size=(iconSize, data.icon.size().height()), png=data.icon))
+			res.append(self.iconEntry(data.icon, pos, (iconSize, iconSize)))
 		switch = config.usage.show_icons_in_movielist.value
 		if switch in ("p", "s"):
 			if switch == "p":
