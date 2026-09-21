@@ -676,7 +676,11 @@ def parseParameter(value):
 		(font, size) = (x.strip() for x in value.split(";", 1))
 		value = [font, int(size)]
 	else:  # Integer.
-		value = int(value)
+		try:
+			value = int(value)
+		except ValueError:
+			skinError(f"Parameter value '{value}' is not a number, a defined color or a font, using 0")
+			value = 0
 	return value
 
 
