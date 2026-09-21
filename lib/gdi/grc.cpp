@@ -12,6 +12,10 @@
 #include "../base/benchmark.h"
 #endif
 
+#ifdef HAVE_EGL
+#include <lib/gdi/egl/gegldc.h>
+#endif
+
 #ifndef SYNC_PAINT
 void *gRC::thread_wrapper(void *ptr)
 {
@@ -125,6 +129,17 @@ void gRC::submit(const gOpcode &o)
 void *gRC::thread()
 {
 	int need_notify = 0;
+#ifdef HAVE_EGL
+	// EGL contexts are bound per-thread via eglMakeCurrent(); this is the
+	// thread that actually executes every render opcode (o.dc->exec(&o)
+	// below), so the context must be made current here, not on the
+	// eInit/main thread that constructs gEGLDC (see egl_init.cpp).
+	if (gEGLDC::getInstance() && !gEGLDC::getInstance()->isInitialized())
+	{
+		if (!gEGLDC::getInstance()->initEGL())
+			eDebug("[gRC] gEGLDC::initEGL() failed on render thread.");
+	}
+#endif
 #ifndef SYNC_PAINT
 	while (1)
 	{
@@ -222,6 +237,23 @@ void *gRC::thread()
 #endif
 		}
 	}
+#ifdef HAVE_EGL
+	// Mirror the initEGL() call at the top of this function: EGL contexts
+	// are per-thread, and this is the thread the context was made current
+	// on, so it must also be torn down here, before this thread exits -
+	// not later from gEGLDC's destructor, which normally runs on a
+	// different thread (eInit's teardown, on the main thread) well after
+	// this thread has already terminated. gRC's own AutoInit priority
+	// (eAutoInitNumbers::graphic) is higher than gEGLDCAutoInit's
+	// (graphic-1), so LIFO close order tears gRC down - joining this
+	// thread - before gEGLDCAutoInit::closeNow() ever runs; by then there
+	// is no longer any thread left where eglMakeCurrent()/eglDestroyContext()
+	// etc. would be valid to call, which is what crashed the closed-source
+	// EGL driver on shutdown (segfault right after "gEGLDC" in the eInit
+	// teardown log, immediately following Ctrl+C).
+	if (gEGLDC::getInstance() && gEGLDC::getInstance()->isInitialized())
+		gEGLDC::getInstance()->cleanupEGL();
+#endif
 #ifndef SYNC_PAINT
 	pthread_exit(0);
 #endif
@@ -515,6 +547,18 @@ void gPainter::drawRectangle(const eRect &area, bool useNew) {
 	o.parm.rectangle->area = area;
 	o.parm.rectangle->useNew = useNew;
 	m_rc->submit(o);
+}
+
+bool gPainter::usingGLES() const {
+#ifdef HAVE_EGL
+	// Same instance/init check as gRC::thread()'s own gEGLDC use above -
+	// getInstance() is a plain static accessor (not virtual), so this has no
+	// effect on gDC/gMainDC's vtable layout, unlike a would-be gDC::isGLES()
+	// virtual reachable from every backend's header.
+	return gEGLDC::getInstance() && gEGLDC::getInstance()->isInitialized();
+#else
+	return false;
+#endif
 }
 
 void gPainter::setPalette(gRGB *colors, int start, int len)
