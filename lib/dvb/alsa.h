@@ -74,6 +74,12 @@ public:
     int start(unsigned int rate, unsigned int channels, unsigned int bits, unsigned int passthrough);
     void stop();
 
+    static void setSoftDecoderActive(int active)
+    {
+	static int softDecoderActive = 0;
+	softDecoderActive = active;
+    }
+
 private:
     int m_stop;
 };
