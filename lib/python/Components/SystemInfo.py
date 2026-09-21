@@ -269,7 +269,7 @@ BoxInfo.setItem("RCImage", getRCFile("png"))
 BoxInfo.setItem("RCMapping", getRCFile("xml"))
 
 BoxInfo.setItem("canMultiBoot", MultiBoot.getBootSlots())
-BoxInfo.setItem("HasNewNativeMultiboot", exists("/.newMB"))
+BoxInfo.setItem("HasNewNativeMultiboot", fileExists("/.newMB"))
 BoxInfo.setItem("HasKexecMultiboot", fileHas("/proc/cmdline", "kexec=1"))
 BoxInfo.setItem("cankexec", BoxInfo.getItem("kexecmb") and fileExists("/usr/bin/kernel_auto.bin") and fileExists("/usr/bin/STARTUP.cpio.gz") and not BoxInfo.getItem("HasKexecMultiboot"))
 BoxInfo.setItem("HasChkrootMultiboot", (MultiBoot.isFat32("/dev/block/by-name/others") or fileExists("/dev/block/by-name/startup")) and MODEL not in ("dreamone", "dreamtwo"))
