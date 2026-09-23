@@ -136,6 +136,9 @@ private:
 	// position on top of it.
 	bool m_cpu_overlay_dirty;
 
+	bool recreateEGLSurfaces(int xres, int yres);
+	void applyResolution(int xres, int yres, int bpp);
+
 	bool tryInitEGL(int version);
 
 	// Copies page `from`'s content into page `to` entirely through the GL

@@ -115,7 +115,7 @@ void gRC::submit(const gOpcode &o)
 		queue[wp++] = o;
 		if (wp == MAXSIZE)
 			wp = 0;
-		if (o.opcode == gOpcode::flush || o.opcode == gOpcode::shutdown || o.opcode == gOpcode::notify)
+		if (o.opcode == gOpcode::flush || o.opcode == gOpcode::shutdown || o.opcode == gOpcode::notify || o.opcode == gOpcode::setResolution)
 #ifndef SYNC_PAINT
 			pthread_cond_signal(&cond); // wakeup gdi thread
 		pthread_mutex_unlock(&mutex);

@@ -1194,6 +1194,14 @@ void gEGLDC::exec(const gOpcode* opcode) {
 			break;
 		}
 
+		case gOpcode::setResolution:
+			applyResolution(
+				opcode->parm.setResolution->xres,
+				opcode->parm.setResolution->yres,
+				opcode->parm.setResolution->bpp);
+			delete opcode->parm.setResolution;
+			break;
+
 		case gOpcode::clear:
 			executeClear(opcode);
 			gDC::exec(opcode);
@@ -1357,23 +1365,171 @@ void gEGLDC::cleanupEGL() {
 	gles::version = 0;
 }
 
-void gEGLDC::setResolution(int xres, int yres, int bpp) {
+bool gEGLDC::recreateEGLSurfaces(int xres, int yres)
+{
+	if (!isInitialized())
+		return false;
+
+	if (!eglMakeCurrent(m_egl_display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT))
+	{
+		eDebug("[EGLDC] eglMakeCurrent(NO_SURFACE) failed: 0x%x", eglGetError());
+		return false;
+	}
+
+	for (int i = 0; i < MAX_EGL_SURFACES; ++i)
+	{
+		if (m_egl_surfaces[i] != EGL_NO_SURFACE)
+		{
+			eglDestroySurface(m_egl_display, m_egl_surfaces[i]);
+			m_egl_surfaces[i] = EGL_NO_SURFACE;
+		}
+	}
+
+	if (!m_window_provider->init(xres, yres))
+	{
+		eDebug("[EGLDC] window provider reinit failed for %dx%d", xres, yres);
+		return false;
+	}
+
+	bool pixmap_mode = m_window_provider->usesPixmapSurface();
+
+	if (pixmap_mode)
+	{
+		PFNEGLCREATEPLATFORMPIXMAPSURFACEEXTPROC eglCreatePlatformPixmapSurfaceEXT =
+			(PFNEGLCREATEPLATFORMPIXMAPSURFACEEXTPROC)eglGetProcAddress("eglCreatePlatformPixmapSurfaceEXT");
+
+		if (!eglCreatePlatformPixmapSurfaceEXT)
+		{
+			eDebug("[EGLDC] eglCreatePlatformPixmapSurfaceEXT not available");
+			return false;
+		}
+
+		m_page_count = std::max(1, std::min(m_window_provider->getPageCount(), MAX_EGL_SURFACES));
+
+		for (int i = 0; i < m_page_count; ++i)
+		{
+			void *native_pixmap = m_window_provider->getNativePixmap(i);
+
+			m_egl_surfaces[i] = eglCreatePlatformPixmapSurfaceEXT(
+				m_egl_display,
+				m_egl_config,
+				native_pixmap,
+				nullptr);
+
+			if (m_egl_surfaces[i] == EGL_NO_SURFACE)
+			{
+				eDebug("[EGLDC] eglCreatePlatformPixmapSurfaceEXT failed for page %d: 0x%x", i, eglGetError());
+
+				for (int j = 0; j < i; ++j)
+				{
+					eglDestroySurface(m_egl_display, m_egl_surfaces[j]);
+					m_egl_surfaces[j] = EGL_NO_SURFACE;
+				}
+
+				return false;
+			}
+		}
+	}
+	else
+	{
+		m_page_count = 1;
+
+		EGLNativeWindowType native_window = m_window_provider->getNativeWindow();
+
+		m_egl_surfaces[0] = eglCreateWindowSurface(
+			m_egl_display,
+			m_egl_config,
+			native_window,
+			nullptr);
+
+		if (m_egl_surfaces[0] == EGL_NO_SURFACE)
+		{
+			eDebug("[EGLDC] eglCreateWindowSurface failed: 0x%x", eglGetError());
+			return false;
+		}
+	}
+
+	m_render_page = (m_page_count > 1) ? 1 : 0;
+
+	if (!eglMakeCurrent(
+		m_egl_display,
+		m_egl_surfaces[m_render_page],
+		m_egl_surfaces[m_render_page],
+		m_egl_context))
+	{
+		eDebug("[EGLDC] eglMakeCurrent(new surface) failed: 0x%x", eglGetError());
+
+		for (int i = 0; i < m_page_count; ++i)
+		{
+			if (m_egl_surfaces[i] != EGL_NO_SURFACE)
+			{
+				eglDestroySurface(m_egl_display, m_egl_surfaces[i]);
+				m_egl_surfaces[i] = EGL_NO_SURFACE;
+			}
+		}
+
+		return false;
+	}
+
+	return true;
+}
+
+void gEGLDC::applyResolution(int xres, int yres, int bpp)
+{
 	if (m_width == xres && m_height == yres)
 		return;
 
+	flushBlitBatch();
+	flushTextBatch();
+
+	glFinish();
+
+	if (!recreateEGLSurfaces(xres, yres))
+	{
+		eDebug("[EGLDC] resolution change to %dx%d failed", xres, yres);
+		return;
+	}
+
 	m_width = xres;
 	m_height = yres;
-	// See the constructor for why accelNever is required here.
+
 	m_pixmap = new gPixmap(eSize(xres, yres), bpp, gPixmap::accelNever);
-	// The new pixmap has no gl_texture_id and no content yet - any area
-	// tracked from the old one is meaningless now.
 	m_text_overlay_region = gRegion();
 
-	if (isInitialized()) {
-		m_basic_shader.setResolution((float)m_width, (float)m_height);
-		m_texture_shader.setResolution((float)m_width, (float)m_height);
-		m_text_shader.setResolution((float)m_width, (float)m_height);
-	}
+	m_current_offset = ePoint(0, 0);
+	m_current_clip = gRegion(eRect(ePoint(0, 0), eSize(m_width, m_height)));
+	m_clip_stack = std::stack<gRegion>();
+
+	glViewport(0, 0, m_width, m_height);
+	glScissor(0, 0, m_width, m_height);
+
+	m_basic_shader.setResolution((float)m_width, (float)m_height);
+	m_advanced_shader.setResolution((float)m_width, (float)m_height);
+	m_texture_shader.setResolution((float)m_width, (float)m_height);
+	m_text_shader.setResolution((float)m_width, (float)m_height);
+
+	eDebug("[EGLDC] resolution applied %dx%d", m_width, m_height);
+}
+
+void gEGLDC::setResolution(int xres, int yres, int bpp)
+{
+	if (m_width == xres && m_height == yres)
+		return;
+
+	gRC *grc = gRC::getInstance();
+	if (!grc)
+		return;
+
+	gOpcode o;
+	o.opcode = gOpcode::setResolution;
+	ePtr<gDC> dc = this;
+	o.dc = dc.grabRef();
+	o.parm.setResolution = new gOpcode::para::psetResolution;
+	o.parm.setResolution->xres = xres;
+	o.parm.setResolution->yres = yres;
+	o.parm.setResolution->bpp = bpp;
+
+	grc->submit(o);
 }
 
 bool gEGLDC::gpuCopyPageContent(int from, int to) {

@@ -60,6 +60,7 @@ struct gOpcode
 		setBorder,
 
 		setOffset,
+		setResolution,
 
 		setClip,
 		addClip,
@@ -193,6 +194,13 @@ struct gOpcode
 			ePoint value;
 			int rel;
 		} *setOffset;
+
+		struct psetResolution
+		{
+			int xres;
+			int yres;
+			int bpp;
+		} *setResolution;
 
 		gCompositingData *setCompositing;
 
