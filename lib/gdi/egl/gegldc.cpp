@@ -230,10 +230,54 @@ bool gEGLDC::initEGL() {
 	return true;
 }
 
+bool gEGLDC::createFBO(int w, int h) {
+	if (m_fbo != 0 && m_fbo_width == w && m_fbo_height == h)
+		return true;
+	destroyFBO();
+	glGenFramebuffers(1, &m_fbo);
+	glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
+	glGenTextures(1, &m_fbo_texture);
+	glBindTexture(GL_TEXTURE_2D, m_fbo_texture);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_fbo_texture, 0);
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+		eDebug("[gEGLDC] FBO incomplete");
+		destroyFBO();
+		return false;
+	}
+	glClearColor(0, 0, 0, 0);
+	glClear(GL_COLOR_BUFFER_BIT);
+	m_fbo_width = w;
+	m_fbo_height = h;
+	eDebug("[gEGLDC] FBO created %dx%d", w, h);
+	return true;
+}
+
+void gEGLDC::destroyFBO() {
+	if (m_fbo_texture) { glDeleteTextures(1, &m_fbo_texture); m_fbo_texture = 0; }
+	if (m_fbo) { glDeleteFramebuffers(1, &m_fbo); m_fbo = 0; }
+	m_fbo_width = 0;
+	m_fbo_height = 0;
+}
+
 void gEGLDC::setGlScissor(const eRect& rect) {
-	int sx = rect.x();
-	int sy = m_height - (rect.y() + rect.height());
-	glScissor(sx, sy, rect.width(), rect.height());
+	if (m_fbo) {
+		int sx = rect.x();
+		int sy = m_fbo_height - (rect.y() + rect.height());
+		glScissor(sx, sy, rect.width(), rect.height());
+	} else {
+		float x_scale = (float)m_surface_width / (float)m_width;
+		float y_scale = (float)m_surface_height / (float)m_height;
+		int sx = (int)(rect.x() * x_scale);
+		int sy = m_surface_height - (int)((rect.y() + rect.height()) * y_scale);
+		int sw = (int)(rect.width() * x_scale);
+		int sh = (int)(rect.height() * y_scale);
+		glScissor(sx, sy, sw, sh);
+	}
 }
 
 void gEGLDC::setAlphaBlendMode(bool trueAlphaBlend) {
@@ -1291,6 +1335,8 @@ gEGLDC::gEGLDC(INativeWindowProvider* window_provider, int width, int height) : 
 	m_window_provider = window_provider;
 	m_width = width;
 	m_height = height;
+	m_surface_width = width;
+	m_surface_height = height;
 	m_gles_version = 0;
 	m_egl_display = EGL_NO_DISPLAY;
 	for (int i = 0; i < MAX_EGL_SURFACES; ++i)
@@ -1299,6 +1345,10 @@ gEGLDC::gEGLDC(INativeWindowProvider* window_provider, int width, int height) : 
 	m_render_page = 0;
 	m_egl_context = EGL_NO_CONTEXT;
 	m_cpu_overlay_dirty = false;
+	m_fbo = 0;
+	m_fbo_texture = 0;
+	m_fbo_width = 0;
+	m_fbo_height = 0;
 
 	// accelNever: this pixmap is a plain CPU-side staging buffer for text
 	// compositing (see gOpcode::renderText handling below) that we
@@ -1309,6 +1359,8 @@ gEGLDC::gEGLDC(INativeWindowProvider* window_provider, int width, int height) : 
 	// calls (which assume the latter) operate on the wrong kind of texture
 	// object entirely - a very likely source of the wrong colors seen.
 	m_pixmap = new gPixmap(eSize(width, height), 32, gPixmap::accelNever);
+	if (m_pixmap && m_pixmap->surface && m_pixmap->surface->data)
+		memset(m_pixmap->surface->data, 0, m_pixmap->surface->stride * height);
 }
 
 gEGLDC::~gEGLDC() {
@@ -1325,6 +1377,7 @@ gEGLDC::~gEGLDC() {
 }
 
 void gEGLDC::cleanupEGL() {
+	destroyFBO();
 	if (m_egl_display != EGL_NO_DISPLAY) {
 		// Free every shader's GL objects (program/VBO/VAO) HERE, while this
 		// thread's context is still current, rather than leaving it to
@@ -1484,31 +1537,43 @@ void gEGLDC::applyResolution(int xres, int yres, int bpp)
 
 	glFinish();
 
-	if (!recreateEGLSurfaces(xres, yres))
-	{
-		eDebug("[EGLDC] resolution change to %dx%d failed", xres, yres);
-		return;
-	}
-
 	m_width = xres;
 	m_height = yres;
 
 	m_pixmap = new gPixmap(eSize(xres, yres), bpp, gPixmap::accelNever);
+	if (m_pixmap && m_pixmap->surface && m_pixmap->surface->data)
+		memset(m_pixmap->surface->data, 0, m_pixmap->surface->stride * yres);
 	m_text_overlay_region = gRegion();
 
 	m_current_offset = ePoint(0, 0);
 	m_current_clip = gRegion(eRect(ePoint(0, 0), eSize(m_width, m_height)));
 	m_clip_stack = std::stack<gRegion>();
 
-	glViewport(0, 0, m_width, m_height);
-	glScissor(0, 0, m_width, m_height);
+	if (m_width != m_surface_width || m_height != m_surface_height) {
+		if (!createFBO(m_width, m_height)) {
+			eDebug("[gEGLDC] FBO failed, direct render");
+		}
+	} else {
+		destroyFBO();
+	}
+
+	if (m_fbo) {
+		glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
+		glViewport(0, 0, m_fbo_width, m_fbo_height);
+		glScissor(0, 0, m_fbo_width, m_fbo_height);
+	} else {
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		glViewport(0, 0, m_surface_width, m_surface_height);
+		glScissor(0, 0, m_surface_width, m_surface_height);
+	}
 
 	m_basic_shader.setResolution((float)m_width, (float)m_height);
 	m_advanced_shader.setResolution((float)m_width, (float)m_height);
 	m_texture_shader.setResolution((float)m_width, (float)m_height);
 	m_text_shader.setResolution((float)m_width, (float)m_height);
 
-	eDebug("[EGLDC] resolution applied %dx%d", m_width, m_height);
+	eDebug("[EGLDC] resolution applied %dx%d (surface %dx%d, fbo=%d)",
+		m_width, m_height, m_surface_width, m_surface_height, m_fbo ? 1 : 0);
 }
 
 void gEGLDC::setResolution(int xres, int yres, int bpp)
@@ -1552,8 +1617,8 @@ bool gEGLDC::gpuCopyPageContent(int from, int to) {
 	// with whatever rect the last opcode drawn set - reset it to the full
 	// surface first or this copy would silently only cover a leftover
 	// unrelated widget's clip rect instead of the whole page.
-	glScissor(0, 0, m_width, m_height);
-	glBlitFramebuffer(0, 0, m_width, m_height, 0, 0, m_width, m_height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+	glScissor(0, 0, m_surface_width, m_surface_height);
+	glBlitFramebuffer(0, 0, m_surface_width, m_surface_height, 0, 0, m_surface_width, m_surface_height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
 	return true;
 #else
 	(void)from;
@@ -1564,6 +1629,15 @@ bool gEGLDC::gpuCopyPageContent(int from, int to) {
 
 void gEGLDC::flip() {
 	if (isInitialized() && m_egl_display != EGL_NO_DISPLAY && m_egl_surfaces[m_render_page] != EGL_NO_SURFACE) {
+		if (m_fbo) {
+			glBindFramebuffer(GL_READ_FRAMEBUFFER, m_fbo);
+			glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+			glDisable(GL_SCISSOR_TEST);
+			glBlitFramebuffer(0, 0, m_fbo_width, m_fbo_height,
+			                  0, 0, m_surface_width, m_surface_height,
+			                  GL_COLOR_BUFFER_BIT, GL_LINEAR);
+			glEnable(GL_SCISSOR_TEST);
+		}
 		// eglSwapBuffers() is only defined for window surfaces; a pixmap-surface
 		// platform (Dreambox) presents via the provider instead - see
 		// presentPixmap(). m_render_page is the page this frame was just
@@ -1656,5 +1730,9 @@ void gEGLDC::flip() {
 		} else {
 			eglSwapBuffers(m_egl_display, m_egl_surfaces[0]);
 		}
+	}
+
+	if (m_fbo) {
+		glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
 	}
 }

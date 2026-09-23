@@ -38,6 +38,14 @@ private:
 
 	int m_width;
 	int m_height;
+	int m_surface_width;
+	int m_surface_height;
+	GLuint m_fbo;
+	GLuint m_fbo_texture;
+	int m_fbo_width;
+	int m_fbo_height;
+	bool createFBO(int w, int h);
+	void destroyFBO();
 	int m_gles_version; // 2 or 3
 
 	gShader m_basic_shader;
