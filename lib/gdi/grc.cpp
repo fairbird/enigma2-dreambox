@@ -923,6 +923,10 @@ void gDC::exec(const gOpcode *o)
 		break;
 	case gOpcode::setGradient:
 		m_gradient_colors = o->parm.gradient->colors;
+		// eDebug("[gDC] setGradient orientation=%d colors=%d",
+		//	o->parm.gradient->orientation,
+		//	(int)o->parm.gradient->colors.size());
+
 		m_gradient_orientation = o->parm.gradient->orientation;
 		m_gradient_alphablend = o->parm.gradient->alphablend;
 		m_gradient_fullSize = o->parm.gradient->fullSize;

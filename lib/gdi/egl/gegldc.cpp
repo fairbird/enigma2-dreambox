@@ -410,7 +410,7 @@ void gEGLDC::executeRectangle(const gOpcode* op) {
 			setGlScissor(m_current_clip.rects[i]);
 			m_advanced_shader.drawAdvancedRect(op->parm.rectangle->area.x() + m_current_offset.x(), op->parm.rectangle->area.y() + m_current_offset.y(), op->parm.rectangle->area.width(),
 											   op->parm.rectangle->area.height(), m_radius, m_radius_edges, m_gradient_colors, m_gradient_orientation, m_gradient_alphablend > 0,
-											   1.0f - (m_background_color_rgb.a / 255.0f), m_background_color_rgb, m_border_width, m_border_color);
+											   1.0f - (m_background_color_rgb.a / 255.0f), m_background_color_rgb, m_border_width, m_border_color, m_gradient_fullSize);
 		}
 	} else {
 		float r = m_background_color_rgb.r / 255.0f;
@@ -674,6 +674,8 @@ void gEGLDC::executeBlit(const gOpcode* opcode) {
 
 	pos.moveBy(m_current_offset);
 
+	bool scaled_blit = (op->flags & gPixmap::blitScale) != 0 && pos.size() != src_size;
+
 	gRegion clip;
 	if (op->clip.valid()) {
 		eRect c = op->clip;
@@ -705,6 +707,8 @@ void gEGLDC::executeBlit(const gOpcode* opcode) {
 	// - harmless for its opaque interior (src.a=1 either way) and only
 	// matters for the 1px rounded-corner AA fringe.
 	bool true_alpha_blend = (op->flags & (gPixmap::blitAlphaBlend | gPixmap::blitAlphaTest)) != 0;
+
+	glBindTexture(GL_TEXTURE_2D, tex_id);
 
 	float x = pos.x();
 	float y = pos.y();

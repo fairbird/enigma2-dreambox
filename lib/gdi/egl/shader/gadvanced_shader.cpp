@@ -34,6 +34,7 @@ static const char* fragment_shader_es3 = R"(#version 300 es
     uniform float u_gradient_stops[16];
     uniform int u_gradient_orientation;
     uniform int u_alphablend;
+    uniform float u_gradient_full_size;
 
     float udRoundBox(vec2 p, vec2 b, float r) {
         vec2 d = abs(p) - b + vec2(r);
@@ -68,10 +69,12 @@ static const char* fragment_shader_es3 = R"(#version 300 es
 
         if (u_num_stops > 0) {
             float t = 0.0;
-            if (u_gradient_orientation == 1) {
-                t = (v_pos.x - u_rect_size.x) / u_rect_size.z;
+            if (u_gradient_orientation == 2) {
+                float gradient_size = u_gradient_full_size > 0.0 ? u_gradient_full_size : u_rect_size.z;
+                t = (v_pos.x - u_rect_size.x) / max(gradient_size - 1.0, 1.0);
             } else {
-                t = (v_pos.y - u_rect_size.y) / u_rect_size.w;
+                float gradient_size = u_gradient_full_size > 0.0 ? u_gradient_full_size : u_rect_size.w;
+                t = (v_pos.y - u_rect_size.y) / max(gradient_size - 1.0, 1.0);
             }
 
             vec4 grad_color = u_gradient_colors[0];
@@ -156,6 +159,7 @@ static const char* fragment_shader_es2 = R"(#version 100
     uniform float u_gradient_stops[16];
     uniform int u_gradient_orientation;
     uniform int u_alphablend;
+    uniform float u_gradient_full_size;
 
     float udRoundBox(vec2 p, vec2 b, float r) {
         vec2 d = abs(p) - b + vec2(r);
@@ -186,7 +190,7 @@ static const char* fragment_shader_es2 = R"(#version 100
 
         if (u_num_stops > 0) {
             float t = 0.0;
-            if (u_gradient_orientation == 1) {
+            if (u_gradient_orientation == 2) {
                 t = (v_pos.x - u_rect_size.x) / u_rect_size.z;
             } else {
                 t = (v_pos.y - u_rect_size.y) / u_rect_size.w;
@@ -313,6 +317,7 @@ bool gAdvancedShader::init() {
 	m_gradient_stops_location = glGetUniformLocation(m_program_id, "u_gradient_stops");
 	m_num_stops_location = glGetUniformLocation(m_program_id, "u_num_stops");
 	m_gradient_orientation_location = glGetUniformLocation(m_program_id, "u_gradient_orientation");
+	m_gradient_full_size_location = glGetUniformLocation(m_program_id, "u_gradient_full_size");
 
 	// ES2-only per-corner radius locations
 	if (!gles::isGLES3()) {
@@ -378,10 +383,23 @@ void gAdvancedShader::setResolution(float width, float height) {
 	glUniformMatrix4fv(m_projection_location, 1, GL_FALSE, ortho);
 }
 
-void gAdvancedShader::drawAdvancedRect(float x, float y, float width, float height, int radius, uint8_t edges, const std::vector<gRGB>& gradient_colors, uint8_t orientation, bool alphablend,
-									   float alpha, const gRGB& solid_color, int border_width, const gRGB& border_color) {
+void gAdvancedShader::drawAdvancedRect(float x, float y, float width, float height, int radius, uint8_t edges, const std::vector<gRGB>& gradient_colors, uint8_t orientation, bool alphablend, float alpha,
+									   const gRGB& solid_color, int border_width, const gRGB& border_color, int gradient_full_size) {
 	bind();
 
+	eDebug("[gAdvancedShader] rect=%d,%d %dx%d radius=%d stops=%d orientation=%d alphablend=%d fullSize=%d",
+		(int)x, (int)y, (int)width, (int)height, radius,
+		(int)gradient_colors.size(), orientation,
+		alphablend, gradient_full_size);
+
+	for (unsigned int i = 0; i < gradient_colors.size() && i < 4; ++i) {
+		eDebug("[gAdvancedShader] rect color[%d]=r%d g%d b%d a%d",
+			i,
+			gradient_colors[i].r,
+			gradient_colors[i].g,
+			gradient_colors[i].b,
+			gradient_colors[i].a);
+	}
 	glUniform4f(m_rect_size_location, x, y, width, height);
 	glUniform1f(m_radius_location, (float)radius);
 	glUniform4f(m_solid_color_location, solid_color.r / 255.0f, solid_color.g / 255.0f, solid_color.b / 255.0f, 1.0f - (solid_color.a / 255.0f));
@@ -404,6 +422,7 @@ void gAdvancedShader::drawAdvancedRect(float x, float y, float width, float heig
 		glUniform1i(m_num_stops_location, gradient_colors.size());
 		glUniform1i(m_gradient_orientation_location, orientation);
 		glUniform1i(m_alphablend_location, alphablend ? 1 : 0);
+		glUniform1f(m_gradient_full_size_location, (float)gradient_full_size);
 
 		float colors[16 * 4];
 		float stops[16];

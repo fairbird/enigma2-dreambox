@@ -31,6 +31,7 @@ private:
 	GLint m_gradient_stops_location; // array of floats
 	GLint m_num_stops_location;
 	GLint m_gradient_orientation_location;
+	GLint m_gradient_full_size_location;
 
 	// ES2-only per-corner radius uniforms (replaces integer bitmask u_edges)
 	// GLSL ES 1.00 does not support bitwise operations on integer uniforms.
@@ -57,5 +58,5 @@ public:
 	void setResolution(float width, float height);
 
 	void drawAdvancedRect(float x, float y, float width, float height, int radius, uint8_t edges, const std::vector<gRGB>& gradient_colors, uint8_t orientation, bool alphablend, float alpha,
-						  const gRGB& solid_color, int border_width, const gRGB& border_color);
+						  const gRGB& solid_color, int border_width, const gRGB& border_color, int gradient_full_size);
 };

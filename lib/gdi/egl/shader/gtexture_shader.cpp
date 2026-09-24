@@ -82,6 +82,7 @@ static const char *fragment_shader_es2 = R"(#version 100
 
     uniform sampler2D u_texture;
     uniform float u_global_alpha;
+    // uniform float u_alpha_test;
 
     uniform vec4 u_rect_size;
     uniform float u_radius;
@@ -113,6 +114,10 @@ static const char *fragment_shader_es2 = R"(#version 100
         }
 
         vec4 tex_color = texture2D(u_texture, v_uv);
+
+        // if (u_alpha_test > 0.5 && tex_color.a <= 0.5)
+        //    discard;
+
         gl_FragColor = vec4(tex_color.rgb, tex_color.a * u_global_alpha);
     }
 )";
