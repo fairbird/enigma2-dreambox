@@ -61,8 +61,8 @@ static const char* fragment_shader_es3 = R"(#version 300 es
             // distance is how many pixels outside the shape this fragment
             // is, so fading coverage to 0 across that last pixel replaces a
             // jagged binary edge with a soft one at the same per-pixel cost.
-            coverage = clamp(0.5 - dist, 0.0, 1.0);
-            if (coverage <= 0.0) discard;
+            if (dist > 0.0) discard;
+            coverage = 1.0;
         }
 
         vec4 final_color = u_solid_color;
@@ -182,8 +182,8 @@ static const char* fragment_shader_es2 = R"(#version 100
             float dist = udRoundBox(p, half_size, r);
             // See the ES3 fragment shader above for why this is a coverage
             // ramp instead of a hard discard.
-            coverage = clamp(0.5 - dist, 0.0, 1.0);
-            if (coverage <= 0.0) discard;
+            if (dist > 0.0) discard;
+            coverage = 1.0;
         }
 
         vec4 final_color = u_solid_color;
