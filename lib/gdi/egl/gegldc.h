@@ -96,6 +96,7 @@ private:
 	GLuint m_blit_batch_tex_id = 0;
 	bool m_blit_batch_blend = false;
 	bool m_blit_batch_true_alpha = false;
+	bool m_blit_batch_filter_linear = true;
 	eRect m_blit_batch_clip;
 	bool m_blit_batch_active = false;
 

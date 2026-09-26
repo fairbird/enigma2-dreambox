@@ -127,6 +127,29 @@ bool gEGLDC::tryInitEGL(int version) {
 	}
 
 	m_gles_version = version;
+	gles::version = m_gles_version;
+
+	// The framebuffer provider starts displaying page 0, while EGL starts
+	// rendering on page 1. Copy the currently displayed page into the first
+	// render page before the first flip, otherwise page 1 starts empty and
+	// the page rotation can erase the bootlogo.
+	if (m_page_count > 1) {
+		bool seeded = gpuCopyPageContent(0, m_render_page);
+
+		if (!seeded) {
+			if (eglMakeCurrent(m_egl_display, m_egl_surfaces[m_render_page], m_egl_surfaces[m_render_page], m_egl_context)) {
+				m_window_provider->copyPageContent(0, m_render_page);
+				seeded = true;
+			}
+		}
+
+		eDebug("[EGLDC] initial page seed 0 -> %d success=%d", m_render_page, seeded ? 1 : 0);
+
+		if (!eglMakeCurrent(m_egl_display, m_egl_surfaces[m_render_page], m_egl_surfaces[m_render_page], m_egl_context)) {
+			eDebug("[gEGLDC] eglMakeCurrent after initial page seed failed: 0x%x", eglGetError());
+			return false;
+		}
+	}
 
 	// One-time dump of what this driver/hardware actually advertises, as
 	// opposed to what the vendor SDK headers merely *declare* - header
@@ -708,6 +731,8 @@ void gEGLDC::executeBlit(const gOpcode* opcode) {
 	// matters for the 1px rounded-corner AA fringe.
 	bool true_alpha_blend = (op->flags & (gPixmap::blitAlphaBlend | gPixmap::blitAlphaTest)) != 0;
 
+	bool filter_linear = scaled_blit;
+
 	glBindTexture(GL_TEXTURE_2D, tex_id);
 
 	float x = pos.x();
@@ -725,6 +750,10 @@ void gEGLDC::executeBlit(const gOpcode* opcode) {
 	if (!can_batch) {
 		flushBlitBatch();
 		flushTextBatch();
+
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter_linear ? GL_LINEAR : GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter_linear ? GL_LINEAR : GL_NEAREST);
+
 		if (enable_blend) {
 			setAlphaBlendMode(true_alpha_blend);
 			glEnable(GL_BLEND);
@@ -740,7 +769,7 @@ void gEGLDC::executeBlit(const gOpcode* opcode) {
 	}
 
 	const eRect& r = clip.rects[0];
-	bool state_changed = m_blit_batch_active && (tex_id != m_blit_batch_tex_id || enable_blend != m_blit_batch_blend || true_alpha_blend != m_blit_batch_true_alpha || r != m_blit_batch_clip);
+	bool state_changed = m_blit_batch_active && (tex_id != m_blit_batch_tex_id || enable_blend != m_blit_batch_blend || true_alpha_blend != m_blit_batch_true_alpha || filter_linear != m_blit_batch_filter_linear || r != m_blit_batch_clip);
 	bool full = m_blit_batch_buffer.size() >= (size_t)gTextureShader::kMaxBatchQuads * 24;
 	if (state_changed || full)
 		flushBlitBatch();
@@ -754,8 +783,13 @@ void gEGLDC::executeBlit(const gOpcode* opcode) {
 		m_blit_batch_tex_id = tex_id;
 		m_blit_batch_blend = enable_blend;
 		m_blit_batch_true_alpha = true_alpha_blend;
+		m_blit_batch_filter_linear = filter_linear;
 		m_blit_batch_clip = r;
 		m_blit_batch_active = true;
+
+		glBindTexture(GL_TEXTURE_2D, m_blit_batch_tex_id);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, m_blit_batch_filter_linear ? GL_LINEAR : GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, m_blit_batch_filter_linear ? GL_LINEAR : GL_NEAREST);
 	}
 
 	// x, y, u, v per vertex - same layout/winding as gTextureShader::drawTexture().
@@ -779,6 +813,11 @@ void gEGLDC::flushBlitBatch() {
 		glDisable(GL_BLEND);
 
 	setGlScissor(m_blit_batch_clip);
+
+	glBindTexture(GL_TEXTURE_2D, m_blit_batch_tex_id);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, m_blit_batch_filter_linear ? GL_LINEAR : GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, m_blit_batch_filter_linear ? GL_LINEAR : GL_NEAREST);
+
 	int vertex_count = (int)(m_blit_batch_buffer.size() / 4);
 	m_texture_shader.drawBatch(m_blit_batch_buffer.data(), vertex_count, m_blit_batch_tex_id, 1.0f);
 
