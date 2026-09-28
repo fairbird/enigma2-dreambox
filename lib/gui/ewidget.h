@@ -86,6 +86,19 @@ public:
 
 	int isTransparent() { return m_vis & wVisTransparent; }
 
+		/* For a container whose *own* m_cornerRadius is 0 (so it looks like a
+		   flat, fully opaque rect to eWidgetDesktop::calcWidgetClipRegion) but
+		   which internally paints rounded content of its own -- e.g. eListbox,
+		   whose per-item corner radius lives in its style, never in the
+		   widget's own m_cornerRadius -- calcWidgetClipRegion would otherwise
+		   conclude nothing needs to stay visible behind it, and no backdrop
+		   ever gets painted there. That leaves the antialiased fringe of each
+		   rounded item blending against whatever the render target happened to
+		   already hold (typically nothing), which shows up as a dark/black
+		   halo hugging every rounded corner. Call this whenever such internal
+		   rounding is (or stops being) in effect. */
+	void setNeedsBackdrop(bool needs) { m_needs_backdrop = needs; }
+
 	/* m: 0 = not modal, 1 = modal, 2 = modal, dimming the full screen */
 	void setModal(int m) {
 		if (m) m_vis |= wVisModal; else m_vis &= ~wVisModal;
@@ -143,6 +156,7 @@ private:
 
 	int m_cornerRadius;
 	uint8_t m_cornerRadiusEdges;
+	bool m_needs_backdrop = false;
 	int m_tag;
 
 protected:

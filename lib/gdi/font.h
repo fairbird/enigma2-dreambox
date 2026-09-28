@@ -157,6 +157,12 @@ class eTextPara : public iObject
 	int cachedLineHeight      = 0;
 	int use_kerning           = 0;
 	int previous              = 0;
+	// The border width (in points, as passed to renderString()) this para's
+	// glyphs were rasterized/stroked with - pGlyph itself doesn't carry this
+	// per-glyph (every glyph in one eTextPara shares one border width), but
+	// blit() needs it to build a GPU-atlas cache key for i->image/i->borderimage
+	// that's actually unique to this border size (see blit()'s comment there).
+	int m_border_width;
 
 	int appendGlyph(Font *current_font, FT_Face current_face, FT_UInt glyphIndex, int flags, int rflags, int border, bool last,
 					bool activate_newcolor, unsigned long newcolor);
@@ -168,7 +174,7 @@ public:
 	eTextPara(eRect area, ePoint start = ePoint(-1, -1))
 		: current_font(0), replacement_font(0), fallback_font(0),
 		  current_face(0), replacement_face(0), fallback_face(0),
-		  area(area), cursor(start), left(start.x())
+		  area(area), cursor(start), left(start.x()), m_border_width(0)
 	{
 	}
 	virtual ~eTextPara();
