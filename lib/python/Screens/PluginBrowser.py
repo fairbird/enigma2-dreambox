@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 from re import compile
+from shutil import rmtree
+from time import time
 from os import makedirs, symlink, unlink
 from os.path import exists, join, islink
 from Screens.Screen import Screen
