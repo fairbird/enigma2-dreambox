@@ -1063,7 +1063,59 @@ void gEGLDC::compositeTextOverlay(eRect area, bool trueAlphaBlend) {
 	}
 }
 
+// The Dreambox EGL backend uses m_pixmap only as a CPU staging buffer; it is
+// not the displayed framebuffer as it is in the classic FBDC path. The base
+// gDC spinner code therefore needs the real GPU background copied into this
+// buffer before it saves/restores the spinner area.
+void gEGLDC::captureBackgroundIntoPixmap(const eRect& rect) {
+	flushBlitBatch();
+	flushTextBatch();
+
+	if (!m_pixmap || !m_pixmap->surface || !m_pixmap->surface->data)
+		return;
+
+	const int pw = m_pixmap->size().width();
+	const int ph = m_pixmap->size().height();
+	const int left = std::max(0, rect.left());
+	const int top = std::max(0, rect.top());
+	const int right = std::min(pw, rect.left() + rect.width());
+	const int bottom = std::min(ph, rect.top() + rect.height());
+	const int w = right - left;
+	const int h = bottom - top;
+	if (w <= 0 || h <= 0)
+		return;
+
+	glBindFramebuffer(GL_FRAMEBUFFER, m_fbo ? m_fbo : 0);
+
+	std::vector<uint8_t> pixels((size_t)w * (size_t)h * 4U);
+	glPixelStorei(GL_PACK_ALIGNMENT, 4);
+	const int fb_height = m_fbo ? m_fbo_height : m_surface_height;
+	glReadPixels(left, fb_height - top - h, w, h, GL_RGBA, GL_UNSIGNED_BYTE, pixels.data());
+	if (glGetError() != GL_NO_ERROR) {
+		eDebug("[gEGLDC] spinner background capture failed");
+		return;
+	}
+
+	uint8_t* dst_base = (uint8_t*)m_pixmap->surface->data;
+	const size_t dst_stride = (size_t)m_pixmap->surface->stride;
+	const size_t row_bytes = (size_t)w * 4U;
+	for (int row = 0; row < h; ++row) {
+		const uint8_t* src_row = pixels.data() + (size_t)(h - 1 - row) * row_bytes;
+		uint8_t* dst_row = dst_base + (size_t)(top + row) * dst_stride + (size_t)left * 4U;
+		memcpy(dst_row, src_row, row_bytes);
+		for (int x = 0; x < w; ++x)
+			std::swap(dst_row[x * 4 + 0], dst_row[x * 4 + 2]);
+	}
+}
+
 void gEGLDC::enableSpinner() {
+	// The Dreambox tree has three resolution-specific spinner rectangles;
+	// there is no generic m_spinner_pos member in this backend.
+	eRect spinner_pos =
+		size().width() == 3840 ? m_spinner_pos_UHD :
+		size().width() >= 1920 ? m_spinner_pos_FHD :
+		m_spinner_pos_HD;
+	captureBackgroundIntoPixmap(spinner_pos);
 	gDC::enableSpinner();
 	// m_spinner_pos is a screen-absolute rect (the spinner is a global
 	// overlay, not part of any widget's offset-relative coordinate space),
@@ -1076,10 +1128,7 @@ void gEGLDC::enableSpinner() {
 	// content to layer over whatever the GPU target previously held there,
 	// so it needs the same unconditional-overwrite blend disableSpinner()
 	// and incrementSpinner() use.
-	compositeTextOverlay(
-	size().width() == 3840 ? m_spinner_pos_UHD :
-	size().width() >= 1920 ? m_spinner_pos_FHD :
-	m_spinner_pos_HD, false);
+	compositeTextOverlay(spinner_pos, false);
 }
 
 void gEGLDC::disableSpinner() {

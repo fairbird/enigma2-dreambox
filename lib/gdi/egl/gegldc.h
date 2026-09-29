@@ -46,6 +46,7 @@ private:
 	int m_fbo_height;
 	bool createFBO(int w, int h);
 	void destroyFBO();
+	void captureBackgroundIntoPixmap(const eRect& rect);
 	int m_gles_version; // 2 or 3
 
 	gShader m_basic_shader;
