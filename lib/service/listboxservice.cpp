@@ -605,6 +605,68 @@ void eListboxServiceContent::setSize(const eSize &size)
 		setVisualMode(m_visual_mode);
 }
 
+bool eListboxServiceContent::getCachedEvent(const eServiceReference &ref, iStaticServiceInformation *service_info, time_t now, ePtr<eServiceEvent> &evt, ePtr<eServiceEvent> &evt_next)
+{
+	std::map<eServiceReference, EventCacheEntry>::iterator it = m_event_cache.find(ref);
+	if (it != m_event_cache.end() && now < it->second.validUntil)
+	{
+		evt = it->second.evt;
+		evt_next = it->second.evt_next;
+		return it->second.hasEvent;
+	}
+
+	EventCacheEntry entry;
+	entry.hasEvent = service_info && !service_info->getEvent(ref, entry.evt);
+	entry.validUntil = now + 60; // no event / lookup unavailable - avoid hammering this every repaint, recheck in a minute
+	if (entry.hasEvent)
+	{
+		time_t begin = entry.evt->getBeginTime();
+		time_t duration = entry.evt->getDuration();
+		entry.validUntil = (begin > 0 && duration > 0 && begin + duration > now) ? (begin + duration) : (now + 60);
+		if (m_has_next_event && begin > 0)
+			service_info->getEvent(ref, entry.evt_next, begin + duration);
+	}
+
+	m_event_cache[ref] = entry;
+	evt = entry.evt;
+	evt_next = entry.evt_next;
+	return entry.hasEvent;
+}
+
+void eListboxServiceContent::getPiconPixmap(const eServiceReference &ref, int width, ePtr<gPixmap> &pixmap, bool &isSVG)
+{
+	std::map<eServiceReference, PiconCacheEntry>::iterator it = m_picon_cache.find(ref);
+	if (it != m_picon_cache.end())
+	{
+		pixmap = it->second.pixmap;
+		isSVG = it->second.isSVG;
+		return;
+	}
+
+	PiconCacheEntry entry;
+	entry.isSVG = false;
+	ePyObject pArgs = PyTuple_New(1);
+	PyTuple_SET_ITEM(pArgs, 0, PyUnicode_FromString(ref.toString().c_str()));
+	ePyObject pRet = PyObject_CallObject(m_GetPiconNameFunc, pArgs);
+	Py_DECREF(pArgs);
+	if (pRet)
+	{
+		if (PyUnicode_Check(pRet))
+		{
+			std::string piconFilename = PyUnicode_AsUTF8(pRet);
+			if (endsWith(piconFilename, ".svg"))
+				entry.isSVG = true;
+			if (!piconFilename.empty())
+				loadImage(entry.pixmap, piconFilename.c_str(), 0, entry.isSVG ? width : 0);
+		}
+		Py_DECREF(pRet);
+	}
+
+	m_picon_cache[ref] = entry;
+	pixmap = entry.pixmap;
+	isSVG = entry.isSVG;
+}
+
 void eListboxServiceContent::setGetPiconNameFunc(ePyObject func)
 {
 	if (m_GetPiconNameFunc)
