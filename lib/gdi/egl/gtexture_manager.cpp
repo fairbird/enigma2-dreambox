@@ -3,7 +3,9 @@
 #include <lib/gdi/egl/gtexture_manager.h>
 #include <algorithm>
 #include <chrono>
+#include <cstdlib>
 #include <cstring>
+#include <vector>
 
 #ifndef GL_BGRA_EXT
 #define GL_BGRA_EXT 0x80E1
@@ -113,6 +115,29 @@ GLuint gTextureManager::createTextureFromDmabuf(gPixmap* pixmap) {
 #endif
 }
 
+// Diagnostic, opt-in via ENIGMA_EGL_TEX_CHECK=1: logs when a pixmap is about
+// to be uploaded with every source byte zero (in e2's inverted-alpha
+// convention that is fully OPAQUE BLACK) - i.e. a picture uploaded before its
+// decoder finished writing it, or from recycled/cleared memory. That texture
+// is then cached on the surface until the pixmap dies, which would show up as
+// a black square that stays black. Copies the source first (ION memory is
+// slow to read with scalar loads, see the palette branch below).
+static void checkPixmapAllZero(const gUnmanagedSurface* surface, int width, int height) {
+	static const bool enabled = getenv("ENIGMA_EGL_TEX_CHECK") && atoi(getenv("ENIGMA_EGL_TEX_CHECK")) != 0;
+	if (!enabled || !surface->data || surface->stride <= 0)
+		return;
+	std::vector<uint8_t> local((size_t)surface->stride * height);
+	memcpy(local.data(), surface->data, local.size());
+	const size_t row_bytes = (size_t)width * (surface->bpp == 32 ? 4 : 1);
+	for (int y = 0; y < height; ++y) {
+		const uint8_t* row = local.data() + (size_t)y * surface->stride;
+		for (size_t i = 0; i < row_bytes; ++i)
+			if (row[i])
+				return;
+	}
+	eDebug("[gTextureManager] TEX_CHECK: uploading ALL-ZERO pixmap %dx%d bpp=%d stride=%d data=%p - will render as black", width, height, surface->bpp, surface->stride, surface->data);
+}
+
 GLuint gTextureManager::createTextureFromPixmap(gPixmap* pixmap) {
 	m_last_upload_oom = false;
 	if (!pixmap || !pixmap->surface)
@@ -204,6 +229,20 @@ GLuint gTextureManager::createTextureFromPixmap(gPixmap* pixmap) {
 		// so we expand it to 32-bit rgba on the cpu before uploading.
 		std::vector<uint32_t> rgba_buffer(width * height);
 		uint8_t* src_pixels = (uint8_t*)surface->data;
+		// Same rule as gpixmap.cpp's convert_palette(): entries beyond the
+		// palette size are an opaque grey ramp. The previous direct
+		// palette[row[x]] had no bounds check, so an index >= clut.colors read
+		// past the end of the palette's heap block - zero/stale memory there
+		// is opaque BLACK (inverted alpha), a nondeterministic black picture.
+		uint32_t pal[256];
+		{
+			int n = std::min(surface->clut.colors, 256);
+			for (int i = 0; i < n; ++i)
+				pal[i] = surface->clut.data[i].argb() ^ 0xFF000000;
+			for (int i = std::max(n, 0); i < 256; ++i)
+				pal[i] = (0x010101 * i) | 0xFF000000;
+		}
+		int max_index = 0;
 		uint32_t pal[256];
 		int palette_size = std::min(surface->clut.colors, 256);
 		for (int i = 0; i < palette_size; ++i)
@@ -247,12 +286,32 @@ GLuint gTextureManager::createTextureFromPixmap(gPixmap* pixmap) {
 				// src_format telling GL the truth or the pre-swap lie as
 				// appropriate for this platform.
 				rgba_buffer[y * width + x] = pal[row[x]];
+				if (row[x] > max_index)
+					max_index = row[x];
 			}
 		}
 #if TEX_UPLOAD_TIMING
 		double expand_ms = ms_since(t_expand0);
 		auto t_upload0 = std::chrono::steady_clock::now();
 #endif
+
+		// ENIGMA_EGL_TEX_CHECK=1: one line per indexed upload with what was actually
+		// read - palette size/start, its first entries as uploaded, index range and
+		// how many pixels are index 0 - to tell an empty/zero palette or all-zero
+		// indices (both render black) from a rendering-side problem.
+		static const bool tex_check = getenv("ENIGMA_EGL_TEX_CHECK") && atoi(getenv("ENIGMA_EGL_TEX_CHECK")) != 0;
+		if (tex_check) {
+			size_t zero_px = 0, opaque_black = 0;
+			for (size_t i = 0; i < rgba_buffer.size(); ++i) {
+				zero_px += (local_src[(i / width) * src_stride + (i % width)] == 0);
+				opaque_black += (rgba_buffer[i] == 0xFF000000u);
+			}
+			eDebug("[gTextureManager] TEX_CHECK bpp8 %dx%d stride=%d clut.colors=%d clut.start=%d data=%p pal0=%08x pal1=%08x pal2=%08x maxIndex=%d index0Px=%zu/%zu opaqueBlackPx=%zu",
+				width, height, src_stride, surface->clut.colors, surface->clut.start, (void*)surface->clut.data, pal[0], pal[1], pal[2], max_index, zero_px, rgba_buffer.size(), opaque_black);
+		}
+
+		if (max_index >= surface->clut.colors)
+			eDebug("[gTextureManager] bpp8 %dx%d has pixel index %d beyond its palette size %d - unmapped entries use the CPU renderer's grey ramp", width, height, max_index, surface->clut.colors);
 
 		glTexImage2D(GL_TEXTURE_2D, 0, src_format, width, height, 0, src_format, GL_UNSIGNED_BYTE, rgba_buffer.data());
 #if TEX_UPLOAD_TIMING
@@ -320,10 +379,18 @@ GLuint gTextureManager::getTexture(gPixmap* pixmap) {
 		return sf->gl_texture_id;
 	}
 
+	if (surface->bpp == 32 || surface->bpp == 8)
+		checkPixmapAllZero(surface, width, height);
+
 	// See the bpp==32 branch below for the full explanation - shared here so
 	// the bpp==8 paletted branch (which uploads the same native BGRA memory
 	// order via gRGB::argb()) can use the same platform-dependent format.
 	GLenum src_format = gles::needsRBSwap ? GL_RGBA : GL_BGRA_EXT;
+
+	// Drain any error left over from earlier, unrelated GL calls so the
+	// glGetError() after the upload below can only be this upload's own.
+	for (int i = 0; i < 8 && glGetError() != GL_NO_ERROR; ++i) {
+	}
 
 	GLuint new_texture = createTextureFromPixmap(pixmap);
 	if (!new_texture && m_last_upload_oom) {
@@ -422,6 +489,11 @@ void gTextureManager::queueForDeletion(GLuint texture_id) {
 	eDebug("[gTextureManager] queued texture id=%u for deletion, pending=%zu", texture_id, m_pending_deletions.size());
 }
 
+bool gTextureManager::hasPendingDeletions() {
+	std::lock_guard<std::mutex> lock(m_deletion_mutex);
+	return !m_pending_deletions.empty();
+}
+
 void gTextureManager::processDeletions() {
 	std::lock_guard<std::mutex> lock(m_deletion_mutex);
 	if (!m_pending_deletions.empty()) {
@@ -437,6 +509,11 @@ void gTextureManager::processDeletions() {
 
 		PFNEGLDESTROYIMAGEKHRPROC eglDestroyImageKHR = (PFNEGLDESTROYIMAGEKHRPROC)eglGetProcAddress("eglDestroyImageKHR");
 		for (GLuint texture_id : m_pending_deletions) {
+			auto bit = m_texture_bytes.find(texture_id);
+			if (bit != m_texture_bytes.end()) {
+				m_live_texture_bytes -= std::min(m_live_texture_bytes, bit->second);
+				m_texture_bytes.erase(bit);
+			}
 			auto it = m_texture_to_image_map.find(texture_id);
 			if (it != m_texture_to_image_map.end()) {
 				if (eglDestroyImageKHR && m_egl_display != EGL_NO_DISPLAY) {
