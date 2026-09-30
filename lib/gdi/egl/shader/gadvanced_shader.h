@@ -58,5 +58,5 @@ public:
 	void setResolution(float width, float height);
 
 	void drawAdvancedRect(float x, float y, float width, float height, int radius, uint8_t edges, const std::vector<gRGB>& gradient_colors, uint8_t orientation, bool alphablend, float alpha,
-						  const gRGB& solid_color, int border_width, const gRGB& border_color, int gradient_full_size, bool coverage_alpha = false);
+						  const gRGB& solid_color, int border_width, const gRGB& border_color, int gradient_full_size, bool coverage_alpha = false, const float* quad = nullptr);
 };
