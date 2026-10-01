@@ -1456,6 +1456,19 @@ void gEGLDC::exec(const gOpcode* opcode) {
 
 gEGLDC* gEGLDC::s_instance = nullptr;
 
+// gDC::getRGB() resolves indexed gColor values through m_pixmap's clut.
+// The EGL staging pixmap is 32bpp but still serves legacy painters that use
+// setPalette() and then draw by colour index, so give it the same 256-entry
+// palette contract used by the framebuffer backend.
+static void allocStagingPalette(gPixmap* pixmap) {
+	if (!pixmap || !pixmap->surface || pixmap->surface->clut.data)
+		return;
+	pixmap->surface->clut.colors = 256;
+	pixmap->surface->clut.start = 0;
+	pixmap->surface->clut.data = new gRGB[256];
+	memset(static_cast<void*>(pixmap->surface->clut.data), 0, sizeof(gRGB) * 256);
+}
+
 gEGLDC::gEGLDC(INativeWindowProvider* window_provider, int width, int height) : gMainDC() {
 	s_instance = this;
 	int xres = width, yres = height, bpp = 32;
@@ -1500,6 +1513,9 @@ gEGLDC::gEGLDC(INativeWindowProvider* window_provider, int width, int height) : 
 	m_pixmap = new gPixmap(eSize(width, height), 32, gPixmap::accelNever);
 	if (m_pixmap && m_pixmap->surface && m_pixmap->surface->data)
 		memset(m_pixmap->surface->data, 0, m_pixmap->surface->stride * height);
+	// Keep the staging surface compatible with palette-index based legacy
+	// drawing paths even though its pixel storage is 32bpp.
+	allocStagingPalette(m_pixmap);
 }
 
 gEGLDC::~gEGLDC() {
@@ -1682,6 +1698,9 @@ void gEGLDC::applyResolution(int xres, int yres, int bpp)
 	m_pixmap = new gPixmap(eSize(xres, yres), bpp, gPixmap::accelNever);
 	if (m_pixmap && m_pixmap->surface && m_pixmap->surface->data)
 		memset(m_pixmap->surface->data, 0, m_pixmap->surface->stride * yres);
+	// Keep the staging surface compatible with palette-index based legacy
+	// drawing paths after a resolution change recreates the backing pixmap.
+	allocStagingPalette(m_pixmap);
 	m_text_overlay_region = gRegion();
 
 	m_current_offset = ePoint(0, 0);
