@@ -94,6 +94,7 @@ GLuint gTextureManager::createTextureFromDmabuf(gPixmap* pixmap) {
 }
 
 GLuint gTextureManager::createTextureFromPixmap(gPixmap* pixmap) {
+	m_last_upload_oom = false;
 	if (!pixmap || !pixmap->surface)
 		return 0;
 
@@ -104,6 +105,9 @@ GLuint gTextureManager::createTextureFromPixmap(gPixmap* pixmap) {
 	gUnmanagedSurface* surface = pixmap->surface;
 	int width = surface->x;
 	int height = surface->y;
+
+	for (int i = 0; i < 8 && glGetError() != GL_NO_ERROR; ++i) {
+	}
 
 	glGenTextures(1, &texture_id);
 	glBindTexture(GL_TEXTURE_2D, texture_id);
@@ -173,7 +177,12 @@ GLuint gTextureManager::createTextureFromPixmap(gPixmap* pixmap) {
 		// so we expand it to 32-bit rgba on the cpu before uploading.
 		std::vector<uint32_t> rgba_buffer(width * height);
 		uint8_t* src_pixels = (uint8_t*)surface->data;
-		gRGB* palette = surface->clut.data;
+		uint32_t pal[256];
+		int palette_size = std::min(surface->clut.colors, 256);
+		for (int i = 0; i < palette_size; ++i)
+			pal[i] = surface->clut.data[i].argb() ^ 0xFF000000;
+		for (int i = std::max(0, palette_size); i < 256; ++i)
+			pal[i] = (0x010101 * i) | 0xFF000000;
 		int src_stride = surface->stride; // bytes per row in the *source* -
 		// may differ from width for externally-loaded images (e.g. a PNG
 		// decoder's own row alignment), unlike gPixmap's own allocations
@@ -207,7 +216,7 @@ GLuint gTextureManager::createTextureFromPixmap(gPixmap* pixmap) {
 				// glTexImage2D it's GL_RGBA, already comes out pre-swapped
 				// in exactly the way needed to cancel this render target's
 				// own R/B swap on the way to the screen.
-				rgba_buffer[y * width + x] = palette[row[x]].argb() ^ 0xFF000000;
+				rgba_buffer[y * width + x] = pal[row[x]];
 			}
 		}
 
@@ -238,6 +247,14 @@ GLuint gTextureManager::createTextureFromPixmap(gPixmap* pixmap) {
 	}
 
 	glBindTexture(GL_TEXTURE_2D, 0);
+	GLenum upload_err = glGetError();
+	if (upload_err == GL_OUT_OF_MEMORY) {
+		// Do not cache a texture name whose storage allocation failed. A
+		// cached empty name would make the image stay black on later draws.
+		glDeleteTextures(1, &texture_id);
+		m_last_upload_oom = true;
+		return 0;
+	}
 	return texture_id;
 }
 
@@ -245,18 +262,93 @@ GLuint gTextureManager::getTexture(gPixmap* pixmap) {
 	if (!pixmap || !pixmap->surface)
 		return 0;
 
-	if (pixmap->surface->gl_texture_id != 0) {
-		return pixmap->surface->gl_texture_id;
+	gUnmanagedSurface* sf = pixmap->surface;
+	if (sf->gl_texture_id != 0) {
+		sf->gl_last_used_frame = m_frame;
+		return sf->gl_texture_id;
 	}
 
 	GLuint new_texture = createTextureFromPixmap(pixmap);
+	if (!new_texture && m_last_upload_oom) {
+		size_t need = (size_t)sf->x * sf->y * ((sf->bpp == 8 && !sf->clut.data) ? 1 : 4);
+		size_t want = std::max<size_t>(need * 2, 4u << 20);
+		for (int round = 0; round < 2 && !new_texture; ++round, want *= 4) {
+			if (evictLRU(want) == 0)
+				break;
+			new_texture = createTextureFromPixmap(pixmap);
+		}
+	}
 	if (new_texture) {
-		pixmap->surface->gl_texture_id = new_texture;
+		sf->gl_texture_id = new_texture;
+		sf->gl_last_used_frame = m_frame;
+		{
+			std::lock_guard<std::mutex> lock(m_deletion_mutex);
+			m_texture_owner[new_texture] = sf;
+		}
 		++m_live_texture_count;
-		eDebug("[gTextureManager] +texture id=%u live=%ld %dx%d bpp=%d", new_texture, m_live_texture_count,
-			pixmap->surface->x, pixmap->surface->y, pixmap->surface->bpp);
+		size_t bytes = (size_t)sf->x * sf->y * ((sf->bpp == 8 && !sf->clut.data) ? 1 : 4);
+		m_texture_bytes[new_texture] = bytes;
+		m_live_texture_bytes += bytes;
+		eDebug("[gTextureManager] +texture id=%u live=%ld ~%.1fMB %dx%d bpp=%d", new_texture, m_live_texture_count, m_live_texture_bytes / 1048576.0,
+			sf->x, sf->y, sf->bpp);
 	}
 	return new_texture;
+}
+
+// Free textures that were not used in the current frame, from oldest to
+// newest. The surface stays alive; clearing gl_texture_id makes the next
+// getTexture() call recreate the GPU object on demand.
+size_t gTextureManager::evictLRU(size_t bytes_wanted) {
+	struct Candidate {
+		unsigned int last_used;
+		GLuint id;
+		gUnmanagedSurface* surface;
+	};
+	std::vector<Candidate> candidates;
+	size_t freed = 0;
+	std::lock_guard<std::mutex> lock(m_deletion_mutex);
+	for (const auto& entry : m_texture_owner) {
+		gUnmanagedSurface* sf = entry.second;
+		if (sf->gl_texture_pinned || sf->gl_last_used_frame == m_frame)
+			continue;
+		if (m_texture_to_image_map.count(entry.first))
+			continue;
+		candidates.push_back({sf->gl_last_used_frame, entry.first, sf});
+	}
+	std::sort(candidates.begin(), candidates.end(), [](const Candidate& a, const Candidate& b) {
+		return a.last_used < b.last_used;
+	});
+	for (const Candidate& candidate : candidates) {
+		if (freed >= bytes_wanted)
+			break;
+		glDeleteTextures(1, &candidate.id);
+		candidate.surface->gl_texture_id = 0;
+		m_texture_owner.erase(candidate.id);
+		auto bit = m_texture_bytes.find(candidate.id);
+		if (bit != m_texture_bytes.end()) {
+			freed += bit->second;
+			m_live_texture_bytes -= std::min(m_live_texture_bytes, bit->second);
+			m_texture_bytes.erase(bit);
+		}
+		--m_live_texture_count;
+	}
+	return freed;
+}
+
+// Release only when the texture name is still owned by this exact surface.
+// This matters because LRU eviction can clear the cached name before the
+// surface destructor eventually runs.
+void gTextureManager::releaseSurfaceTexture(GLuint texture_id, const void* surface) {
+	if (texture_id == 0)
+		return;
+	{
+		std::lock_guard<std::mutex> lock(m_deletion_mutex);
+		auto it = m_texture_owner.find(texture_id);
+		if (it == m_texture_owner.end() || it->second != surface)
+			return;
+		m_texture_owner.erase(it);
+	}
+	queueForDeletion(texture_id);
 }
 
 void gTextureManager::queueForDeletion(GLuint texture_id) {
@@ -278,6 +370,13 @@ void gTextureManager::processDeletions() {
 	if (!m_pending_deletions.empty()) {
 		glDeleteTextures(m_pending_deletions.size(), m_pending_deletions.data());
 		m_live_texture_count -= (long)m_pending_deletions.size();
+		for (GLuint texture_id : m_pending_deletions) {
+			auto bit = m_texture_bytes.find(texture_id);
+			if (bit != m_texture_bytes.end()) {
+				m_live_texture_bytes -= std::min(m_live_texture_bytes, bit->second);
+				m_texture_bytes.erase(bit);
+			}
+		}
 
 		PFNEGLDESTROYIMAGEKHRPROC eglDestroyImageKHR = (PFNEGLDESTROYIMAGEKHRPROC)eglGetProcAddress("eglDestroyImageKHR");
 		for (GLuint texture_id : m_pending_deletions) {
@@ -290,20 +389,19 @@ void gTextureManager::processDeletions() {
 			}
 		}
 
-		eDebug("[gTextureManager] -texture count=%zu live=%ld", m_pending_deletions.size(), m_live_texture_count);
+		eDebug("[gTextureManager] -texture count=%zu live=%ld ~%.1fMB", m_pending_deletions.size(), m_live_texture_count, m_live_texture_bytes / 1048576.0);
 		m_pending_deletions.clear();
 	}
 }
 
-extern "C" void egl_queue_texture_deletion(unsigned int gl_texture_id);
-void egl_queue_texture_deletion(unsigned int gl_texture_id) {
+// gSurface::~gSurface() can run outside the EGL render thread, so it only
+// records ownership-aware release here; actual GL deletion remains queued for
+// the thread that owns the current EGL context.
+extern "C" void egl_release_surface_texture(unsigned int gl_texture_id, const void* surface);
+void egl_release_surface_texture(unsigned int gl_texture_id, const void* surface) {
 	if (s_active_manager) {
-		s_active_manager->queueForDeletion(gl_texture_id);
+		s_active_manager->releaseSurfaceTexture(gl_texture_id, surface);
 	} else {
-		// Diagnostic only: if this ever prints, ~gSurface() is running and
-		// trying to release its texture, but there is no live gTextureManager
-		// to hand it to - the id (and the GPU/ION memory behind it) is
-		// silently dropped on the floor right here instead of being queued.
-		eDebug("[gTextureManager] egl_queue_texture_deletion(%u) called with no active manager - texture leaked", gl_texture_id);
+		eDebug("[gTextureManager] egl_release_surface_texture(%u) called with no active manager - texture leaked", gl_texture_id);
 	}
 }

@@ -128,6 +128,11 @@ struct gUnmanagedSurface {
 	void* data;
 	int data_phys;
 	unsigned int gl_texture_id = 0; // cached GLES texture name for this surface, if any (see gTextureManager)
+	// EGL: frame of the last draw using this texture; used by LRU eviction.
+	unsigned int gl_last_used_frame = 0;
+	// EGL: texture is updated in place (font atlas/text overlay), so it must
+	// remain resident and cannot be evicted underneath a later sub-image upload.
+	bool gl_texture_pinned = false;
 	bool transparent = true;
 
 	gUnmanagedSurface();
