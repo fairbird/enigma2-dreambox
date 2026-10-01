@@ -349,6 +349,7 @@ private:
 	   parser. Written on the main thread, read on the gstreamer thread. */
 	std::atomic<int> m_subtitle_generation{0};
 	int selectAudioStream(int i, bool skipAudioFix = false);
+	GstElement* getAudioChannelSink();
 	std::vector<audioStream> m_audioStreams;
 	std::vector<subtitleStream> m_subtitleStreams;
 	iSubtitleUser* m_subtitle_widget;
