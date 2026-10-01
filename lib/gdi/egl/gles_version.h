@@ -7,6 +7,13 @@
 #else
 #include <GLES2/gl2.h>
 #include <GLES2/gl2ext.h>
+
+#ifndef GL_RED
+#define GL_RED 0x1903
+#endif
+#ifndef GL_R8
+#define GL_R8 0x8229
+#endif
 #endif
 
 // gles_version.h
