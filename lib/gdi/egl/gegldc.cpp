@@ -602,12 +602,16 @@ void gEGLDC::executeBlit(const gOpcode* opcode) {
 	// reference/allocation this specific opcode is responsible for.
 	struct BlitOpcodeGuard {
 		const gOpcode::para::pblit* op;
+		int& radius;
+		uint8_t& radius_edges;
 		~BlitOpcodeGuard() {
+			radius = 0;
+			radius_edges = 0;
 			if (op->pixmap)
 				op->pixmap->Release();
 			delete op;
 		}
-	} guard{op};
+	} guard{op, m_radius, m_radius_edges};
 
 	if (!op->pixmap)
 		return;
