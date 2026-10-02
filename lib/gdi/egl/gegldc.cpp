@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <vector>
 #include <cstring>
 #include <lib/base/eerror.h>
 #include <lib/base/init.h>
@@ -1132,6 +1133,13 @@ void gEGLDC::enableSpinner() {
 }
 
 void gEGLDC::disableSpinner() {
+	// The Dreambox tree has three resolution-specific spinner rectangles;
+	// there is no generic m_spinner_pos member in this backend.
+	eRect spinner_pos =
+		size().width() == 3840 ? m_spinner_pos_UHD :
+		size().width() >= 1920 ? m_spinner_pos_FHD :
+		m_spinner_pos_HD;
+	captureBackgroundIntoPixmap(spinner_pos);
 	gDC::disableSpinner();
 	// false, not the default true: gDC::disableSpinner() just restored
 	// m_spinner_pos back to fully-transparent pixels in m_pixmap, and this
@@ -1144,13 +1152,17 @@ void gEGLDC::disableSpinner() {
 	// incrementSpinner() calls to eventually paint over it). false makes
 	// this draw's own (transparent) alpha the absolute truth for that
 	// region instead, actually punching the hole back through to video.
-	compositeTextOverlay(
-	size().width() == 3840 ? m_spinner_pos_UHD :
-	size().width() >= 1920 ? m_spinner_pos_FHD :
-	m_spinner_pos_HD, false);
+	compositeTextOverlay(spinner_pos, false);
 }
 
 void gEGLDC::incrementSpinner() {
+	// The Dreambox tree has three resolution-specific spinner rectangles;
+	// there is no generic m_spinner_pos member in this backend.
+	eRect spinner_pos =
+		size().width() == 3840 ? m_spinner_pos_UHD :
+		size().width() >= 1920 ? m_spinner_pos_FHD :
+		m_spinner_pos_HD;
+	captureBackgroundIntoPixmap(spinner_pos);
 	gDC::incrementSpinner();
 	// false, not the default true - same reasoning as disableSpinner()
 	// above, just mid-animation instead of at the end. gDC::incrementSpinner()
@@ -1166,10 +1178,7 @@ void gEGLDC::incrementSpinner() {
 	// target as a trailing ghost for the whole animation. false makes this
 	// draw's alpha the absolute truth for the region instead, so the
 	// vacated pixels are actually erased back to background every frame.
-	compositeTextOverlay(
-	size().width() == 3840 ? m_spinner_pos_UHD :
-	size().width() >= 1920 ? m_spinner_pos_FHD :
-	m_spinner_pos_HD, false);
+	compositeTextOverlay(spinner_pos, false);
 }
 
 void gEGLDC::exec(const gOpcode* opcode) {
