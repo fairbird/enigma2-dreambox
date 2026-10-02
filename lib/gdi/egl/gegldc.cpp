@@ -1214,6 +1214,12 @@ void gEGLDC::exec(const gOpcode* opcode) {
 			clip_area.moveBy(m_current_offset);
 			m_current_clip = m_current_clip & clip_area;
 
+			if (opcode->parm.renderText->markedpos != -1) {
+				eRect clear_area = area;
+				clear_area.moveBy(m_current_offset);
+				clearOverlayArea(clear_area);
+			}
+
 			// Border text (textBColor/textBWidth) always takes the CPU
 			// fallback (eTextPara::blit()'s two-pass border+fill technique -
 			// see grc.cpp's renderText handling) - pre-clear its area to
