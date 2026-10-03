@@ -1066,8 +1066,13 @@ void gEGLDC::compositeTextOverlay(eRect area, bool trueAlphaBlend) {
 		// passes false, so its now-fully-transparent source pixels actually
 		// overwrite the destination's alpha instead of leaving whatever
 		// opaque content was already there untouched.
-		setAlphaBlendMode(trueAlphaBlend);
+		if (trueAlphaBlend)
+			setAlphaBlendMode(true);
+		else
+			glDisable(GL_BLEND);
 		m_texture_shader.drawTexture(0, 0, (float)m_width, (float)m_height, tex_id);
+		if (!trueAlphaBlend)
+			glEnable(GL_BLEND);
 
 		// Record that the overlay now has content here so executeClear()
 		// knows to erase-and-recomposite this area before painting a plain
@@ -1116,8 +1121,6 @@ void gEGLDC::captureBackgroundIntoPixmap(const eRect& rect) {
 		const uint8_t* src_row = pixels.data() + (size_t)(h - 1 - row) * row_bytes;
 		uint8_t* dst_row = dst_base + (size_t)(top + row) * dst_stride + (size_t)left * 4U;
 		memcpy(dst_row, src_row, row_bytes);
-		for (int x = 0; x < w; ++x)
-			std::swap(dst_row[x * 4 + 0], dst_row[x * 4 + 2]);
 	}
 }
 
