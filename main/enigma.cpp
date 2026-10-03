@@ -21,6 +21,9 @@
 #include <lib/base/init_num.h>
 #include <lib/base/nconfig.h>
 #include <lib/gdi/gmaindc.h>
+#ifdef HAVE_EGL
+#include <lib/gdi/egl/gles_version.h>
+#endif
 #include <lib/gdi/glcddc.h>
 #include <lib/gdi/grc.h>
 #include <lib/gdi/epng.h>
@@ -460,6 +463,25 @@ int getImageFingerprint()
 const char *getBoxType()
 {
 	return BOXTYPE;
+}
+
+// Driver-reported EGL / GLES version strings; empty when not running on the EGL backend.
+const char *getEGLVersionString()
+{
+#ifdef HAVE_EGL
+	return gles::eglVersionString.c_str();
+#else
+	return "";
+#endif
+}
+
+const char *getGLESVersionString()
+{
+#ifdef HAVE_EGL
+	return gles::glesVersionString.c_str();
+#else
+	return "";
+#endif
 }
 
 const char *getGStreamerVersionString()

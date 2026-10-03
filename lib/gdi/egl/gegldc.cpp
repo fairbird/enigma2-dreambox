@@ -130,6 +130,14 @@ bool gEGLDC::tryInitEGL(int version) {
 	m_gles_version = version;
 	gles::version = m_gles_version;
 
+	{
+		const char* egl_ver = eglQueryString(m_egl_display, EGL_VERSION);
+		const char* gl_ver = (const char*)glGetString(GL_VERSION);
+		gles::eglVersionString = egl_ver ? egl_ver : "";
+		gles::glesVersionString = gl_ver ? gl_ver : "";
+		eDebug("[gEGLDC] EGL_VERSION=%s GL_VERSION=%s", egl_ver ? egl_ver : "(null)", gl_ver ? gl_ver : "(null)");
+	}
+
 	// The framebuffer provider starts displaying page 0, while EGL starts
 	// rendering on page 1. Copy the currently displayed page into the first
 	// render page before the first flip, otherwise page 1 starts empty and

@@ -655,6 +655,8 @@ extern const char *getEnigmaVersionString();
 extern int getImageFingerprint();
 extern const char *getBoxType();
 extern const char *getGStreamerVersionString();
+extern const char *getEGLVersionString();
+extern const char *getGLESVersionString();
 extern void dump_malloc_stats(void);
 #ifndef HAVE_OSDANIMATION
 extern void setAnimation_current(int a);
@@ -680,6 +682,8 @@ extern const char *getEnigmaVersionString();
 extern int getImageFingerprint();
 extern const char *getBoxType();
 extern const char *getGStreamerVersionString();
+extern const char *getEGLVersionString();
+extern const char *getGLESVersionString();
 extern void dump_malloc_stats(void);
 #ifndef HAVE_OSDANIMATION
 extern void setAnimation_current(int a);

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstring>
+#include <string>
 
 #ifdef HAVE_GLES3
 #include <GLES3/gl3.h>
@@ -28,6 +29,13 @@ namespace gles
     extern int version;
 
     inline bool isGLES3() { return version >= 3; }
+
+    // Driver-reported version strings (eglQueryString(EGL_VERSION) and
+    // glGetString(GL_VERSION)), e.g. "1.4" / "OpenGL ES 3.0 Mesa 23.1".
+    // Empty until the context is created; exposed to Python through
+    // getEGLVersionString() / getGLESVersionString() (main/enigma.cpp).
+    extern std::string eglVersionString;
+    extern std::string glesVersionString;
 
     // Uploads `size` bytes into whatever GL_ARRAY_BUFFER is currently bound
     // (every call site here binds its own m_vbo right before calling this).
