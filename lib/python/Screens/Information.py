@@ -33,7 +33,7 @@ from Screens.Screen import Screen, ScreenSummary
 from Screens.Setup import Setup
 from Tools.Conversions import formatDate, scaleNumber
 from Tools.DAB import dabMetadata
-from Tools.Directories import SCOPE_SKINS, fileReadLine, fileReadLines, fileWriteLine, resolveFilename
+from Tools.Directories import SCOPE_SKINS, fileReadLine, fileReadLines, fileWriteLine, resolveFilename, eglStr, glesStr
 from Tools.Geolocation import geolocation
 from Tools.LoadPixmap import LoadPixmap
 from Tools.MultiBoot import MultiBoot
@@ -645,6 +645,9 @@ class InformationDistribution(InformationBase):
 		info.append(self.formatLine("P1", _("Distribution revision"), formatDate(BoxInfo.getItem("imgrevision"))))
 		info.append(self.formatLine("P1", _("Distribution language"), BoxInfo.getItem("imglanguage")))
 		info.append(self.formatLine("P1", _("OEM model"), BoxInfo.getItem("platform", _("Unknown"))))
+		egl = " / ".join([x for x in (eglStr(), glesStr()) if x])
+		if egl:
+			info.append(self.formatLine("P1", _("EGL/GLES"), egl))
 		slotCode, bootCode = MultiBoot.getCurrentSlotAndBootCodes()
 		if MultiBoot.canMultiBoot():
 			device = MultiBoot.getBootDevice()
