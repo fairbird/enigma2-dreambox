@@ -399,19 +399,6 @@ void gAdvancedShader::drawAdvancedRect(float x, float y, float width, float heig
 									   const gRGB& solid_color, int border_width, const gRGB& border_color, int gradient_full_size) {
 	bind();
 
-	eDebug("[gAdvancedShader] rect=%d,%d %dx%d radius=%d stops=%d orientation=%d alphablend=%d fullSize=%d",
-		(int)x, (int)y, (int)width, (int)height, radius,
-		(int)gradient_colors.size(), orientation,
-		alphablend, gradient_full_size);
-
-	for (unsigned int i = 0; i < gradient_colors.size() && i < 4; ++i) {
-		eDebug("[gAdvancedShader] rect color[%d]=r%d g%d b%d a%d",
-			i,
-			gradient_colors[i].r,
-			gradient_colors[i].g,
-			gradient_colors[i].b,
-			gradient_colors[i].a);
-	}
 	glUniform4f(m_rect_size_location, x, y, width, height);
 	glUniform1f(m_radius_location, (float)radius);
 	glUniform4f(m_solid_color_location, solid_color.r / 255.0f, solid_color.g / 255.0f, solid_color.b / 255.0f, 1.0f - (solid_color.a / 255.0f));
