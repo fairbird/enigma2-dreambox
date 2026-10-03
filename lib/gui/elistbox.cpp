@@ -1171,6 +1171,12 @@ void eListbox::entryChanged(int index)
 	// provider's build callback, which is exactly the kind of spurious,
 	// unbounded extra work orVertical/orHorizontal already guard against
 	// by simply not invalidating for an off-page index at all.
+	if (m_content && index == m_content->cursorGet())
+	{
+		invalidate();
+		return;
+	}
+
 	int gridStart = m_top * m_max_columns;
 	int gridEnd = gridStart + (m_orientation == orGrid ? m_max_columns * m_max_rows : (m_orientation == orHorizontal ? m_max_columns : m_max_rows));
 	if ((index >= gridStart) && (index < gridEnd))
