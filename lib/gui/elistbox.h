@@ -613,6 +613,9 @@ private:
 	eSlider *m_scrollbar = nullptr;
 	eListboxStyle m_style;
 	ePtr<gPixmap> m_scrollbarpixmap, m_scrollbarbackgroundpixmap;
+#ifdef USE_LIBVUGLES2
+	long m_dir;
+#endif
 #endif
 };
 
