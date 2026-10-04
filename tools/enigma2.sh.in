@@ -75,11 +75,6 @@ if [ -f /proc/stb/fp/nec_ir ]; then
 	[ -f /sys/class/remote/amremote/protocol ] && echo "2" > /sys/class/remote/amremote/protocol
 fi
 
-# hook to execute dhcp wait script
-if [ -x /usr/bin/enigma2_dhcp_wait.sh ]; then
-	/usr/bin/enigma2_dhcp_wait.sh
-fi
-
 # hook to execute scripts always before enigma2 start
 if [ -x /usr/bin/enigma2_pre_start.sh ]; then
 	/usr/bin/enigma2_pre_start.sh
