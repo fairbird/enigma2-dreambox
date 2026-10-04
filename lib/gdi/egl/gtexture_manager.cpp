@@ -98,9 +98,7 @@ GLuint gTextureManager::createTextureFromPixmap(gPixmap* pixmap) {
 	if (!pixmap || !pixmap->surface)
 		return 0;
 
-	GLuint texture_id = createTextureFromDmabuf(pixmap);
-	if (texture_id != 0)
-		return texture_id;
+	GLuint texture_id = 0;
 
 	gUnmanagedSurface* surface = pixmap->surface;
 	int width = surface->x;
