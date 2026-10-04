@@ -1803,6 +1803,15 @@ void gEGLDC::captureBackgroundIntoPixmap(const eRect& rect) {
 }
 
 void gEGLDC::enableSpinner() {
+	// The main thread (busy loading a skin - exactly when the spinner shows) has
+	// already swapped m_pixmap for the new size but the GL targets are still the
+	// old ones until applyPendingResolutionChange(): nothing valid to capture or
+	// draw into yet. incrementSpinner() restarts the spinner afterwards.
+	if (m_pending_resolution_change) {
+		m_spinner_active = false;
+		return;
+	}
+	m_spinner_active = true;
 	// The Dreambox tree has three resolution-specific spinner rectangles;
 	// there is no generic m_spinner_pos member in this backend.
 	eRect spinner_pos =
@@ -1826,6 +1835,13 @@ void gEGLDC::enableSpinner() {
 }
 
 void gEGLDC::disableSpinner() {
+	// Nothing of ours is on the current target (never enabled, or a resolution
+	// change recreated it): restoring m_spinner_saved would paint the old
+	// canvas' background over the new one.
+	const bool was_active = m_spinner_active;
+	m_spinner_active = false;
+	if (!was_active || m_pending_resolution_change)
+		return;
 	// The Dreambox tree has three resolution-specific spinner rectangles;
 	// there is no generic m_spinner_pos member in this backend.
 	eRect spinner_pos =
@@ -1849,6 +1865,15 @@ void gEGLDC::disableSpinner() {
 }
 
 void gEGLDC::incrementSpinner() {
+	if (m_pending_resolution_change)
+		return;
+	if (!m_spinner_active) {
+		// Spinner was running across a resolution change: start over against
+		// the new target (fresh background capture) instead of recompositing
+		// the stale one.
+		enableSpinner();
+		return;
+	}
 	// The Dreambox tree has three resolution-specific spinner rectangles;
 	// there is no generic m_spinner_pos member in this backend.
 	eRect spinner_pos =
@@ -2489,6 +2514,12 @@ void gEGLDC::applyPendingResolutionChange() {
 	// drawing paths after a resolution change recreates the backing pixmap.
 	allocStagingPalette(m_pixmap);
 	m_text_overlay_region = gRegion();
+	// Same for the spinner's saved background: it is for the old canvas, so it
+	// must never be restored/recomposited. Where the surface is recreated the
+	// icon is wiped with it; where it survives (fixed-size window, e.g. Hisi -
+	// see updatePhysicalSize()) the skin's full repaint covers the old icon.
+	// See m_spinner_active's comment (gegldc.h).
+	m_spinner_active = false;
 
 	// Physical size first: everything below that touches the real GL targets
 	// (native window, surface, viewport, shadow FBO) uses it, while shader
@@ -2744,19 +2775,38 @@ void gEGLDC::serviceOsdCapture() {
 	// bound explicitly so the readback never depends on that.
 	glBindFramebuffer(GL_FRAMEBUFFER, m_use_shadow_fbo ? m_shadow_fbo : 0);
 
+	const bool conservative_readback = m_window_provider && m_window_provider->conservativeReadback();
 	std::vector<uint8_t> pixels((size_t)width * (size_t)height * 4U);
 	glPixelStorei(GL_PACK_ALIGNMENT, 4);
 	if (!isScaled()) {
 		// glReadPixels' y is measured from the BOTTOM of the framebuffer (GL
 		// convention) - m_height (the real GPU canvas), not ph (m_pixmap can
 		// briefly differ right after setResolution(), see there).
-		glReadPixels(left, m_height - top - h, w, h, GL_RGBA, GL_UNSIGNED_BYTE, pixels.data());
+		if (conservative_readback) {
+			// Full-width rows, cropped afterwards, rather than a small sub-rect:
+			// libMali (Utgard) window-surface readbacks of a narrow, unaligned
+			// rect have come back striped, which then got baked into every
+			// spinner frame and the final restore. glFinish() first so the
+			// readback sees the completed (deferred, tile-based) render of the
+			// preserved frame. See INativeWindowProvider::conservativeReadback().
+			glFinish();
+			std::vector<uint8_t> band((size_t)m_width * (size_t)h * 4U);
+			glReadPixels(0, m_height - top - h, m_width, h, GL_RGBA, GL_UNSIGNED_BYTE, band.data());
+			for (int row = 0; row < h; ++row)
+				memcpy(pixels.data() + (size_t)row * w * 4U, band.data() + ((size_t)row * m_width + left) * 4U, (size_t)w * 4U);
+		} else {
+			glReadPixels(left, m_height - top - h, w, h, GL_RGBA, GL_UNSIGNED_BYTE, pixels.data());
+		}
 	} else {
 		// Canvas is rendered scaled down: read the physical pixels covering
 		// the rect, then nearest-neighbour them back up to logical size so the
 		// conversion loop below (and m_pixmap) stay in logical coordinates.
-		const int px0 = std::max(0, (int)std::floor(left * m_scale_x));
-		const int px1 = std::min(m_phys_width, std::max(px0 + 1, (int)std::ceil(right * m_scale_x)));
+		// Full physical width + glFinish() on conservativeReadback() platforms,
+		// same reason as the unscaled branch above.
+		if (conservative_readback)
+			glFinish();
+		const int px0 = conservative_readback ? 0 : std::max(0, (int)std::floor(left * m_scale_x));
+		const int px1 = conservative_readback ? m_phys_width : std::min(m_phys_width, std::max(px0 + 1, (int)std::ceil(right * m_scale_x)));
 		const int py0 = std::max(0, (int)std::floor(top * m_scale_y));
 		const int py1 = std::min(m_phys_height, std::max(py0 + 1, (int)std::ceil(bottom * m_scale_y)));
 		const int rw = px1 - px0;
