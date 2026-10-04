@@ -441,6 +441,7 @@ bool gEGLDC::initEGL() {
 	m_texture_shader.setResolution((float)m_width, (float)m_height);
 	m_text_shader.setResolution((float)m_width, (float)m_height);
 
+	createFBO(m_width, m_height);
 	eDebug("[gEGLDC] GLES%d successfully initialised (%dx%d)", m_gles_version, m_width, m_height);
 
 	if (!m_window_provider->usesPixmapSurface())
@@ -2464,7 +2465,7 @@ bool gEGLDC::recreateEGLSurfaces(int xres, int yres)
 
 void gEGLDC::applyResolution(int xres, int yres, int bpp)
 {
-	if (m_width == xres && m_height == yres)
+	if (m_width == xres && m_height == yres && m_fbo)
 		return;
 
 	flushBlitBatch();
@@ -2487,12 +2488,8 @@ void gEGLDC::applyResolution(int xres, int yres, int bpp)
 	m_current_clip = gRegion(eRect(ePoint(0, 0), eSize(m_width, m_height)));
 	m_clip_stack = std::stack<gRegion>();
 
-	if (m_width != m_surface_width || m_height != m_surface_height) {
-		if (!createFBO(m_width, m_height)) {
-			eDebug("[gEGLDC] FBO failed, direct render");
-		}
-	} else {
-		destroyFBO();
+	if (!createFBO(m_width, m_height)) {
+		eDebug("[gEGLDC] FBO failed, direct render");
 	}
 
 	if (m_fbo) {
