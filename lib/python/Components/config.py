@@ -10,6 +10,7 @@ from Tools.Directories import SCOPE_CONFIG, fileAccess, resolveFilename
 from Tools.NumericalTextInput import NumericalTextInput
 from Components.Harddisk import harddiskmanager  # This import is order critical!
 
+
 class ActionKeys:
 	LEFT = 0
 	RIGHT = 1
@@ -37,6 +38,7 @@ class ActionKeys:
 	PREV = 24
 	NEXT = 25
 	ERASE = 26
+
 
 # Deprecated / Legacy action key names...
 #
@@ -77,6 +79,7 @@ READONLY_COLOR = DEFAULT_READONLY_COLOR
 def setReadOnlyColor(value):
 	global READONLY_COLOR
 	READONLY_COLOR = value
+
 
 setupOnSave = {}  # This is used to trigger setup callbacks on save, it is populated by setup modules which want to use it. It's used in openwebif to trigger setup callbacks when saving settings via the web interface. It is a dictionary with section names as keys and callback functions as values.
 
