@@ -169,7 +169,7 @@ class StandbyScreen(Screen):
 			else:
 				self.timeHandler.m_timeUpdated.get().append(self.stopService)
 
-		if hasattr(self.session, "pipshown") and self.session.pipshown:
+		if getattr(self.session, "pipshown", False) and hasattr(self.session, "pip"):
 			self.infoBarInstance and hasattr(self.infoBarInstance, "showPiP") and self.infoBarInstance.showPiP()
 		if hasattr(self.session, "pip"):
 			del self.session.pip

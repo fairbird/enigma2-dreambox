@@ -3447,12 +3447,13 @@ class InfoBarPiP:
 			if slist and slist.dopipzap:
 				self.togglePipzap()
 			if self.session.pipshown:
-				lastPiPServiceTimeout = int(config.usage.pip_last_service_timeout.value)
-				if lastPiPServiceTimeout >= 0:
-					self.lastPiPService = self.session.pip.getCurrentServiceReference()
-					if lastPiPServiceTimeout:
-						self.lastPiPServiceTimeoutTimer.startLongTimer(lastPiPServiceTimeout)
-				del self.session.pip
+				if hasattr(self.session, "pip"):
+					lastPiPServiceTimeout = int(config.usage.pip_last_service_timeout.value)
+					if lastPiPServiceTimeout >= 0:
+						self.lastPiPService = self.session.pip.getCurrentServiceReference()
+						if lastPiPServiceTimeout:
+							self.lastPiPServiceTimeoutTimer.startLongTimer(lastPiPServiceTimeout)
+					del self.session.pip
 				self.session.pipshown = False
 			if hasattr(self, "screenSaverTimerStart"):
 				self.screenSaverTimerStart()
