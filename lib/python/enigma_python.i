@@ -580,6 +580,15 @@ void eProfileWrite(const char* checkPoint)
 %}
 
 
+void eProfileNotify(const char*);
+%{
+void eProfileNotify(const char* message)
+{
+	eProfile::notify(message);
+}
+%}
+
+
 /************** temp *****************/
 
 	/* need a better place for this, i agree. */
