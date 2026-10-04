@@ -316,6 +316,7 @@ class RecordTimerEntry(timer.TimerEntry):
 						AddNotification(MessageBox, _("In order to record a timer, the TV was switched to the recording service!\n"), type=MessageBox.TYPE_INFO, timeout=20)
 			self.log(1, "'record ref' %s" % rec_ref and rec_ref.toString())
 			self.setRecordingPreferredTuner()
+			NavigationInstance.instance.prepareDVBIFallbackForRecording(recordingReference)
 			self.record_service = rec_ref and NavigationInstance.instance.recordService(rec_ref)
 
 			if not self.record_service:

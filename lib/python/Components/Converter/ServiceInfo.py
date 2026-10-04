@@ -96,6 +96,7 @@ class ServiceInfo(Converter):
 	IS_VIDEO_HEVC = 38
 	IS_SOFTCSA = 39
 	IS_DAB = 40
+	IS_DVBI = 41
 
 	VIDEO_INFO_WIDTH = 0
 	VIDEO_INFO_GAMMA = 1
@@ -108,6 +109,7 @@ class ServiceInfo(Converter):
 				"IsStereo": (self.IS_STEREO, (iPlayableService.evUpdatedInfo,)),
 				"IsCrypted": (self.IS_CRYPTED, (iPlayableService.evUpdatedInfo,)),
 				"IsDAB": (self.IS_DAB, (iPlayableService.evStart, iPlayableService.evUpdatedInfo)),
+				"IsDVBI": (self.IS_DVBI, (iPlayableService.evStart, iPlayableService.evEnd, iPlayableService.evUpdatedInfo)),
 				"IsSoftCSA": (self.IS_SOFTCSA, (iPlayableService.evUpdatedInfo,)),
 				"IsWidescreen": (self.IS_WIDESCREEN, (iPlayableService.evVideoSizeChanged,)),
 				"IsNotWidescreen": (self.IS_NOT_WIDESCREEN, (iPlayableService.evVideoSizeChanged,)),
@@ -172,6 +174,8 @@ class ServiceInfo(Converter):
 	@cached
 	def getBoolean(self):
 		service = self.source.service
+		if self.token == self.IS_DVBI:
+			return bool(service and getattr(self.source, "isDVBI", False))
 		isRef = isinstance(service, eServiceReference)
 		info = service.info() if (service and not isRef) else None
 		if info:
