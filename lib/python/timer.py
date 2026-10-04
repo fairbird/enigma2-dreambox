@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 from bisect import insort
 from time import time, localtime, mktime
+from functools import total_ordering
 from enigma import eTimer
 import datetime
 
 
+@total_ordering
 class TimerEntry:
 	StateWaiting = 0
 	StatePrepared = 1
