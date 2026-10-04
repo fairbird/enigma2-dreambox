@@ -1850,10 +1850,16 @@ void gEGLDC::flip() {
 				// render into that same surface - the actual cause behind
 				// an infobar that looked "half updated" with the memcpy
 				// version despite the copied bytes being correct in memory.
-				bool gpu_copied = gpuCopyPageContent(shown_page, m_render_page);
-				bool seeded = gpu_copied;
+				bool gpu_copied = false;
+				bool seeded = false;
+				if (m_fbo) {
+					seeded = eglMakeCurrent(m_egl_display, m_egl_surfaces[m_render_page], m_egl_surfaces[m_render_page], m_egl_context);
+				} else {
+					gpu_copied = gpuCopyPageContent(shown_page, m_render_page);
+					seeded = gpu_copied;
+				}
 
-				if (gpu_copied) {
+				if (seeded) {
 					// gpuCopyPageContent() already left draw=m_render_page
 					// current (its read surface is stale/irrelevant now -
 					// normal rendering opcodes never read from the
