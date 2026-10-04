@@ -3,7 +3,7 @@ from enigma import eListbox, eListboxPythonConfigContent, ePoint, eRCInput, eTim
 from skin import parameters
 
 from Components.ActionMap import HelpableActionMap, HelpableNumberActionMap
-from Components.config import ConfigBoolean, ConfigElement, ConfigInteger, ConfigMacText, ConfigNothing, ConfigNumber, ConfigSelection, ConfigSequence, ConfigText, ACTIONKEY_0, ACTIONKEY_ASCII, ACTIONKEY_BACKSPACE, ACTIONKEY_DELETE, ACTIONKEY_ERASE, ACTIONKEY_FIRST, ACTIONKEY_LAST, ACTIONKEY_LEFT, ACTIONKEY_NUMBERS, ACTIONKEY_RIGHT, ACTIONKEY_SELECT, ACTIONKEY_TIMEOUT, ACTIONKEY_TOGGLE, configfile
+from Components.config import ActionKeys, ConfigBoolean, ConfigElement, ConfigInteger, ConfigMacText, ConfigNothing, ConfigNumber, ConfigSelection, ConfigSequence, ConfigText, configfile
 from Components.GUIComponent import GUIComponent
 from Components.Pixmap import Pixmap
 from Components.Sources.Boolean import Boolean
@@ -42,15 +42,17 @@ class ConfigList(GUIComponent):
 		self.timer.callback.remove(self.timeout)
 
 	def timeout(self):
-		self.handleKey(ACTIONKEY_TIMEOUT)
+		self.handleKey(ActionKeys.TIMEOUT)
 
 	def handleKey(self, key, callback=None):
 		selection = self.getCurrent(full=False)
-		if selection and len(selection) > 1 and selection[1].enabled:
+		if selection and selection[1].enabled and not selection[1].isReadOnly():
 			selection[1].handleKey(key, callback)
 			self.invalidateCurrent()
-			if key in ACTIONKEY_NUMBERS:
+			if key in ActionKeys.NUMBERS:
 				self.timer.start(1000, 1)
+			return changed
+		return False
 
 	def toggle(self):
 		self.getCurrent(full=False)[1].toggle()
@@ -312,26 +314,56 @@ class ConfigListScreen:
 		self["config"].instance.allowNativeKeys(False)
 
 	def handleInputHelpers(self):
+		def showVirtualKeyBoard(state):
+			if "key_text" in self or "VKeyIcon" in self:
+				self["key_text"].setText(_("TEXT") if state else "")
+				self["VKeyIcon"].boolean = state
+				self["virtualKeyBoardActions"].setEnabled(state)
+
 		currConfig = self["config"].getCurrent(full=False)
 		if currConfig is not None:
-			if isinstance(currConfig[1], (ConfigInteger, ConfigSequence, ConfigText)) and not currConfig[1].isReadOnly():
-				self["editConfigActions"].setEnabled(True)
-			else:
+			currentConfig = currConfig[1]
+			if currentConfig.isReadOnly():
+				self["configActions"].setEnabled(False)
+				self["navigationActions"].setEnabledAction("first", False)
+				self["navigationActions"].setEnabledAction("left", False)
+				self["navigationActions"].setEnabledAction("right", False)
+				self["navigationActions"].setEnabledAction("last", False)
+				self["menuConfigActions"].setEnabled(False)
+				self["key_menu"].setText("")
+				self["charConfigActions"].setEnabled(False)
 				self["editConfigActions"].setEnabled(False)
-			if isinstance(currConfig[1], (ConfigText, ConfigMacText)) and "HelpWindow" in self and currConfig[1].help_window and currConfig[1].help_window.instance is not None:
-				helpwindowpos = self["HelpWindow"].getPosition()
-				currConfig[1].help_window.instance.move(ePoint(helpwindowpos[0], helpwindowpos[1]))
-			if isinstance(currConfig[1], ConfigText) and not currConfig[1].isReadOnly():
-				self.showVirtualKeyBoard(True)
+				showVirtualKeyBoard(False)
 			else:
-				self.showVirtualKeyBoard(False)
-			if "description" in self:
-				self["description"].text = self.getCurrentDescription()
-
-	def showVirtualKeyBoard(self, state):
-		if "VKeyIcon" in self:
-			self["VKeyIcon"].boolean = state
-			self["virtualKeyBoardActions"].setEnabled(state)
+				self["configActions"].setEnabled(True)
+				self["navigationActions"].setEnabledAction("first", True)
+				self["navigationActions"].setEnabledAction("left", True)
+				self["navigationActions"].setEnabledAction("right", True)
+				self["navigationActions"].setEnabledAction("last", True)
+				if isinstance(currentConfig, (ConfigInteger, ConfigSequence, ConfigText)):
+					self["charConfigActions"].setEnabled(True)
+					self["editConfigActions"].setEnabled(True)
+				else:
+					self["charConfigActions"].setEnabled(False)
+					self["editConfigActions"].setEnabled(False)
+				if isinstance(currentConfig, ConfigSelection):
+					self["menuConfigActions"].setEnabled(True)
+					self["key_menu"].setText(_("MENU"))
+				else:
+					self["menuConfigActions"].setEnabled(False)
+					self["key_menu"].setText("")
+				if isinstance(currentConfig, ConfigText):
+					if "HelpWindow" in self and currentConfig.help_window and currentConfig.help_window.instance is not None:
+						helpWindowPos = self["HelpWindow"].getPosition()
+						currentConfig.help_window.instance.move(ePoint(helpWindowPos[0], helpWindowPos[1]))
+					showVirtualKeyBoard(True)
+				else:
+					showVirtualKeyBoard(False)
+				if isinstance(currentConfig, ConfigMACText):
+					self["editConfigActions"].setEnabled(False)
+					showVirtualKeyBoard(False)
+				if isinstance(currentConfig, ConfigNumber):
+					showVirtualKeyBoard(False)
 
 	def showHelpWindow(self):
 		self.displayHelp(True)
@@ -349,14 +381,16 @@ class ConfigListScreen:
 					currConf.help_window.hide()
 
 	def keySelect(self):
-		if isinstance(self.getCurrentItem(), ConfigBoolean):
-			self.keyToggle()
-		elif isinstance(self.getCurrentItem(), ConfigSelection):
-			self.keySelection()
-		elif isinstance(self.getCurrentItem(), ConfigText) and not isinstance(self.getCurrentItem(), (ConfigMACText, ConfigNumber)) and not self.getCurrentItem().isReadOnly():
-			self.keyText()
-		else:
-			self["config"].handleKey(ACTIONKEY_SELECT, self.entryChanged)
+		currentItem = self.getCurrentItem()
+		if currentItem and not currentItem.isReadOnly():
+			if isinstance(currentItem, ConfigBoolean):
+				self.keyToggle()
+			elif isinstance(currentItem, ConfigSelection):
+				self.keyMenu()
+			elif isinstance(currentItem, ConfigText) and not isinstance(currentItem, (ConfigMACText, ConfigNumber)):
+				self.keyText()
+			else:
+				self["config"].handleKey(ActionKeys.SELECT, self.entryChanged)
 
 	def keyOK(self):  # This is the deprecated version of keySelect!
 		self.keySelect()
@@ -400,16 +434,16 @@ class ConfigListScreen:
 		self["config"].moveUp()
 
 	def keyFirst(self):
-		self["config"].handleKey(ACTIONKEY_FIRST, self.entryChanged)
+		self["config"].handleKey(ActionKeys.FIRST, self.entryChanged)
 
 	def keyLeft(self):
-		self["config"].handleKey(ACTIONKEY_LEFT, self.entryChanged)
+		self["config"].handleKey(ActionKeys.LEFT, self.entryChanged)
 
 	def keyRight(self):
-		self["config"].handleKey(ACTIONKEY_RIGHT, self.entryChanged)
+		self["config"].handleKey(ActionKeys.RIGHT, self.entryChanged)
 
 	def keyLast(self):
-		self["config"].handleKey(ACTIONKEY_LAST, self.entryChanged)
+		self["config"].handleKey(ActionKeys.LAST, self.entryChanged)
 
 	def keyDown(self):
 		self["config"].moveDown()
@@ -421,22 +455,22 @@ class ConfigListScreen:
 		self["config"].moveBottom()
 
 	def keyBackspace(self):
-		self["config"].handleKey(ACTIONKEY_BACKSPACE, self.entryChanged)
+		self["config"].handleKey(ActionKeys.BACKSPACE, self.entryChanged)
 
 	def keyDelete(self):
-		self["config"].handleKey(ACTIONKEY_DELETE, self.entryChanged)
+		self["config"].handleKey(ActionKeys.DELETE, self.entryChanged)
 
 	def keyErase(self):
-		self["config"].handleKey(ACTIONKEY_ERASE, self.entryChanged)
+		self["config"].handleKey(ActionKeys.ERASE, self.entryChanged)
 
 	def keyToggle(self):
-		self["config"].handleKey(ACTIONKEY_TOGGLE, self.entryChanged)
+		self["config"].handleKey(ActionKeys.TOGGLE, self.entryChanged)
 
 	def keyGotAscii(self):
-		self["config"].handleKey(ACTIONKEY_ASCII, self.entryChanged)
+		self["config"].handleKey(ActionKeys.ASCII, self.entryChanged)
 
 	def keyNumberGlobal(self, number):
-		self["config"].handleKey(ACTIONKEY_0 + number, self.entryChanged)
+		self["config"].handleKey(ActionKeys.0 + number, self.entryChanged)
 
 	def keySave(self):
 		for notifier in self.onSave:
