@@ -223,6 +223,9 @@ bool gEGLDC::tryInitEGL(int version) {
 		updatePhysicalSize(m_width, m_height);
 
 		m_straight_alpha_present = m_window_provider && m_window_provider->needsStraightAlphaPresent();
+		m_premultiply_overwrites = m_window_provider && m_window_provider->premultipliesOverwrites();
+		if (m_premultiply_overwrites)
+			eDebug("[gEGLDC] raw-overwrite draws will write premultiplied colour");
 		if (m_straight_alpha_present)
 			eDebug("[gEGLDC] present pass will un-premultiply the frame (compositor blends this window as straight alpha)");
 	}
