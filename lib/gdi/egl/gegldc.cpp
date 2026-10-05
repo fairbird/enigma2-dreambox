@@ -2776,6 +2776,12 @@ void gEGLDC::serviceOsdCapture() {
 	// to fit the GPU's limits, that is what actually exists to read back.
 	const int width = m_phys_width;
 	const int height = m_phys_height;
+	const int left = 0;
+	const int top = 0;
+	const int right = width;
+	const int bottom = height;
+	const int w = width;
+	const int h = height;
 	if (width <= 0 || height <= 0) {
 		m_osd_capture.fail();
 		return;

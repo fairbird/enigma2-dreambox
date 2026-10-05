@@ -249,6 +249,10 @@ GLuint gTextureManager::createTextureFromPixmap(gPixmap* pixmap) {
 	gUnmanagedSurface* surface = pixmap->surface;
 	int width = surface->x;
 	int height = surface->y;
+	GLenum src_format = gles::needsRBSwap ? GL_RGBA : GL_BGRA_EXT;
+#if TEX_UPLOAD_TIMING
+	auto t_total0 = std::chrono::steady_clock::now();
+#endif
 
 	for (int i = 0; i < 8 && glGetError() != GL_NO_ERROR; ++i) {
 	}
@@ -509,13 +513,8 @@ GLuint gTextureManager::getTexture(gPixmap* pixmap) {
 		return sf->gl_texture_id;
 	}
 
-	if (surface->bpp == 32 || surface->bpp == 8)
-		checkPixmapAllZero(surface, width, height);
-
-	// See the bpp==32 branch below for the full explanation - shared here so
-	// the bpp==8 paletted branch (which uploads the same native BGRA memory
-	// order via gRGB::argb()) can use the same platform-dependent format.
-	GLenum src_format = gles::needsRBSwap ? GL_RGBA : GL_BGRA_EXT;
+	if (sf->bpp == 32 || sf->bpp == 8)
+		checkPixmapAllZero(sf, sf->x, sf->y);
 
 	// Drain any error left over from earlier, unrelated GL calls so the
 	// glGetError() after the upload below can only be this upload's own.

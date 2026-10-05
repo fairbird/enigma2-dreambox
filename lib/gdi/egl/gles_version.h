@@ -73,9 +73,10 @@ namespace gles
     // Core in GLES2, and in GLES3 as long as vertex array object 0 is bound
     // (client pointers are invalid with any other VAO), hence the explicit
     // glBindVertexArray(0) below.
-    inline void setVertexData(GLuint vao, GLuint vbo, const float* data, GLsizeiptr bytes, int stride_floats, const VertexAttrib* attribs, int count)
     extern std::string eglVersionString;
     extern std::string glesVersionString;
+
+    inline void setVertexData(GLuint vao, GLuint vbo, const float* data, GLsizeiptr bytes, int stride_floats, const VertexAttrib* attribs, int count)
     {
         const GLsizei stride = stride_floats * (GLsizei)sizeof(float);
         if (clientArrays) {
