@@ -2476,15 +2476,42 @@ void gEGLDC::applyResolution(int xres, int yres, int bpp)
 	m_height = yres;
 
 	m_pixmap = new gPixmap(eSize(xres, yres), bpp, gPixmap::accelNever);
+	if (m_pixmap && m_pixmap->surface && m_pixmap->surface->data)
+		memset(m_pixmap->surface->data, 0, m_pixmap->surface->stride * yres);
+	// Keep the staging surface compatible with palette-index based legacy
+	// drawing paths after a resolution change recreates the backing pixmap.
 	allocStagingPalette(m_pixmap);
-	// See m_pending_resolution_change's comment (gegldc.h) for why the rest
-	// of this can't happen here: it's GL/EGL work, only valid on gRC's
-	// render thread, which this call (from Python - skin.py/PicturePlayer/
-	// VideoFinetune) is not running on. applyPendingResolutionChange(),
-	// called from the top of flip(), does it instead.
-	m_pending_width = xres;
-	m_pending_height = yres;
-	m_pending_resolution_change = true;
+	m_text_overlay_region = gRegion();
+
+	m_current_offset = ePoint(0, 0);
+	m_current_clip = gRegion(eRect(ePoint(0, 0), eSize(m_width, m_height)));
+	m_clip_stack = std::stack<gRegion>();
+
+	if (m_width != m_surface_width || m_height != m_surface_height) {
+		if (!createFBO(m_width, m_height)) {
+			eDebug("[gEGLDC] FBO failed, direct render");
+		}
+	} else {
+		destroyFBO();
+	}
+
+	if (m_fbo) {
+		glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
+		glViewport(0, 0, m_fbo_width, m_fbo_height);
+		glScissor(0, 0, m_fbo_width, m_fbo_height);
+	} else {
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		glViewport(0, 0, m_surface_width, m_surface_height);
+		glScissor(0, 0, m_surface_width, m_surface_height);
+	}
+
+	m_basic_shader.setResolution((float)m_width, (float)m_height);
+	m_advanced_shader.setResolution((float)m_width, (float)m_height);
+	m_texture_shader.setResolution((float)m_width, (float)m_height);
+	m_text_shader.setResolution((float)m_width, (float)m_height);
+
+	eDebug("[EGLDC] resolution applied %dx%d (surface %dx%d, fbo=%d)",
+		m_width, m_height, m_surface_width, m_surface_height, m_fbo ? 1 : 0);
 }
 
 void gEGLDC::applyPendingResolutionChange() {
@@ -2496,7 +2523,7 @@ void gEGLDC::applyPendingResolutionChange() {
 	// gl_texture_id and no content yet - any area tracked from the old one
 	// is meaningless now.
 	if (m_pixmap && m_pixmap->surface && m_pixmap->surface->data)
-		memset(m_pixmap->surface->data, 0, m_pixmap->surface->stride * yres);
+		memset(m_pixmap->surface->data, 0, m_pixmap->surface->stride * m_pending_height);
 	// Keep the staging surface compatible with palette-index based legacy
 	// drawing paths after a resolution change recreates the backing pixmap.
 	allocStagingPalette(m_pixmap);
