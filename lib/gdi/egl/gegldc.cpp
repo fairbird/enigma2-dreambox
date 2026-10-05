@@ -2237,19 +2237,6 @@ static void allocStagingPalette(gPixmap* pixmap) {
 	memset(static_cast<void*>(pixmap->surface->clut.data), 0, sizeof(gRGB) * 256);
 }
 
-// gDC::getRGB() resolves indexed gColor values through m_pixmap's clut.
-// The EGL staging pixmap is 32bpp but still serves legacy painters that use
-// setPalette() and then draw by colour index, so give it the same 256-entry
-// palette contract used by the framebuffer backend.
-static void allocStagingPalette(gPixmap* pixmap) {
-	if (!pixmap || !pixmap->surface || pixmap->surface->clut.data)
-		return;
-	pixmap->surface->clut.colors = 256;
-	pixmap->surface->clut.start = 0;
-	pixmap->surface->clut.data = new gRGB[256];
-	memset(static_cast<void*>(pixmap->surface->clut.data), 0, sizeof(gRGB) * 256);
-}
-
 gEGLDC::gEGLDC(INativeWindowProvider* window_provider, int width, int height) : gMainDC() {
 	s_instance = this;
 	int xres = width, yres = height, bpp = 32;
