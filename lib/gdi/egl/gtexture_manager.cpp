@@ -379,12 +379,6 @@ GLuint gTextureManager::createTextureFromPixmap(gPixmap* pixmap) {
 				pal[i] = (0x010101 * i) | 0xFF000000;
 		}
 		int max_index = 0;
-		uint32_t pal[256];
-		int palette_size = std::min(surface->clut.colors, 256);
-		for (int i = 0; i < palette_size; ++i)
-			pal[i] = surface->clut.data[i].argb() ^ 0xFF000000;
-		for (int i = std::max(0, palette_size); i < 256; ++i)
-			pal[i] = (0x010101 * i) | 0xFF000000;
 		int src_stride = surface->stride; // bytes per row in the *source* -
 		// may differ from width for externally-loaded images (e.g. a PNG
 		// decoder's own row alignment), unlike gPixmap's own allocations

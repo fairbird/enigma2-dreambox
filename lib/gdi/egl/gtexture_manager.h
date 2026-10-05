@@ -54,17 +54,6 @@ private:
 	size_t evictLRU(size_t bytes_wanted);
 	size_t m_live_texture_bytes = 0;
 
-	// Approximate GPU storage tracked for each texture, used only when a
-	// GL_OUT_OF_MEMORY needs to trigger controlled LRU eviction.
-	std::unordered_map<GLuint, size_t> m_texture_bytes;
-	// texture name -> owning surface. This prevents a recycled GL name from
-	// being released by a different surface after an LRU eviction.
-	std::unordered_map<GLuint, gUnmanagedSurface*> m_texture_owner;
-	unsigned int m_frame = 0;
-	bool m_last_upload_oom = false;
-	size_t evictLRU(size_t bytes_wanted);
-	size_t m_live_texture_bytes = 0;
-
 	// unified method to generate and upload the texture based on bpp
 	GLuint createTextureFromPixmap(gPixmap* pixmap);
 	GLuint createTextureFromDmabuf(gPixmap* pixmap);
@@ -101,9 +90,6 @@ public:
 	// Called once per presented frame: defines 'this frame' for LRU purposes.
 	void nextFrame() { ++m_frame; }
 	// Release a surface's texture from ~gSurface(), only if it still owns it.
-	void releaseSurfaceTexture(GLuint texture_id, const void* surface);
-	// Called once after presenting a frame; defines the frame boundary for LRU.
-	void nextFrame() { ++m_frame; }
 	void releaseSurfaceTexture(GLuint texture_id, const void* surface);
 };
 
