@@ -2869,13 +2869,24 @@ void gEGLDC::flip() {
 
 	if (isInitialized() && m_egl_display != EGL_NO_DISPLAY && m_egl_surfaces[m_render_page] != EGL_NO_SURFACE) {
 		if (m_fbo) {
-			glBindFramebuffer(GL_READ_FRAMEBUFFER, m_fbo);
-			glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+			glBindFramebuffer(GL_FRAMEBUFFER, 0);
+			glViewport(0, 0, m_surface_width, m_surface_height);
 			glDisable(GL_SCISSOR_TEST);
-			glBlitFramebuffer(0, 0, m_fbo_width, m_fbo_height,
-			                  0, 0, m_surface_width, m_surface_height,
-			                  GL_COLOR_BUFFER_BIT, GL_LINEAR);
+			glDisable(GL_BLEND);
+			const float fw = (float)m_width;
+			const float fh = (float)m_height;
+			const float fbo_quad[24] = {
+				0.0f, 0.0f, 0.0f, 1.0f,
+				0.0f, fh, 0.0f, 0.0f,
+				fw, 0.0f, 1.0f, 1.0f,
+				fw, 0.0f, 1.0f, 1.0f,
+				0.0f, fh, 0.0f, 0.0f,
+				fw, fh, 1.0f, 0.0f
+			};
+			m_texture_shader.drawBatch(fbo_quad, 6, m_fbo_texture, 1.0f);
+			glEnable(GL_BLEND);
 			glEnable(GL_SCISSOR_TEST);
+			glViewport(0, 0, m_fbo_width, m_fbo_height);
 		}
 		// eglSwapBuffers() is only defined for window surfaces; a pixmap-surface
 		// platform (Dreambox) presents via the provider instead - see
