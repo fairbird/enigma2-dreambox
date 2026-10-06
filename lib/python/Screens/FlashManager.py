@@ -282,6 +282,7 @@ class FlashManager(Screen):
 	def getImagesList(self):
 		if not self.imagesListLoaded:
 			feedURL = next((feed[FEED_JSON_URL] for feed in self.feedUrls if feed[FEED_DISTRIBUTION] == self.imageFeed), self.feedUrls[0][FEED_JSON_URL])
+			if feedURL.startswith("mediafire:"):
 				self.imagesList = getMediafireImages(feedURL.split(":", 1)[1])
 			elif feedURL == "dreamos:legacy":
 				self.imagesList = getDreamosLegacyImages()
