@@ -25,6 +25,7 @@ class VideoWizard(Wizard, Rc):
 		self.port = None
 		self.mode = None
 		self.rate = None
+		self.lastVideoMode = None
 		self["portpic"] = Pixmap()
 		self["lab1"] = StaticText(_("OpenPLI"))
 		self["lab2"] = StaticText(_("Lets define enigma2 once more"))
@@ -113,17 +114,18 @@ class VideoWizard(Wizard, Rc):
 		self.portSelect(self.selection)
 
 	def portSelect(self, port):
-		modeList = self.avSwitch.getModeList(self.selection)
+		modeList = self.avSwitch.getModeList(port)
 		# print("[VideoWizard] inputSelect DEBUG: port='%s', modeList=%s." % (port, modeList))
 		self.port = port
 		if modeList:
 			ratesList = self.listRates(modeList[0][0])
-			self.avSwitch.setMode(port=port, mode=modeList[0][0], rate=ratesList[0][0])
+			if ratesList:
+				self.setVideoMode(port, modeList[0][0], ratesList[0][0])
 
 	def modeSelectionMade(self, index):  # Called by videowizard.xml
 		# print("[VideoWizard] modeSelectionMade DEBUG: index='%s'." % index)
-		self.mode = index
-		self.modeSelect(index)
+		if self.modeSelect(index):
+			self.mode = index
 
 	def modeSelectionMoved(self):  # Called by videowizard.xml
 		# print("[VideoWizard] modeSelectionMoved DEBUG: self.selection='%s'." % self.selection)
@@ -132,23 +134,34 @@ class VideoWizard(Wizard, Rc):
 	def modeSelect(self, mode):
 		rates = self.listRates(mode)
 		# print("[VideoWizard] modeSelect DEBUG: rates=%s." % rates)
-		if self.port == "HDMI" and mode in ("720p", "1080i", "1080p") and MODELBox not in ("dreamone", "dreamtwo"):
-			self.rate = "multi"
-			self.avSwitch.setMode(port=self.port, mode=mode, rate="multi")
-		else:
-			self.avSwitch.setMode(port=self.port, mode=mode, rate=rates[0][0])
+		if not rates:
+			return False
+		# listRates already prefers multi, but only if all required rates are available.
+		self.rate = rates[0][0]
+		self.setVideoMode(self.port, mode, self.rate)
+		return True
 
 	def rateSelectionMade(self, index):  # Called by videowizard.xml
 		# print("[VideoWizard] rateSelectionMade DEBUG: index='%s'." % index)
-		self.rate = index
-		self.rateSelect(index)
+		if self.rateSelect(index):
+			self.rate = index
 
 	def rateSelectionMoved(self):  # Called by videowizard.xml
 		# print("[VideoWizard] rateSelectionMade DEBUG: self.selection='%s'." % self.selection)
 		self.rateSelect(self.selection)
 
 	def rateSelect(self, rate):
-		self.avSwitch.setMode(port=self.port, mode=self.mode, rate=rate)
+		if any(item[0] == rate for item in self.listRates()):
+			self.setVideoMode(self.port, self.mode, rate)
+			return True
+		return False
+
+	def setVideoMode(self, port, mode, rate):
+		# Selection changes, OK and entry into the next step can request the same mode.
+		videoMode = (port, mode, rate)
+		if videoMode != self.lastVideoMode:
+			self.avSwitch.setMode(port=port, mode=mode, rate=rate)
+			self.lastVideoMode = videoMode
 
 	def keyNumberGlobal(self, number):
 		if number in (1, 2, 3):
