@@ -470,7 +470,7 @@ class ConfigListScreen:
 		self["config"].handleKey(ActionKeys.ASCII, self.entryChanged)
 
 	def keyNumberGlobal(self, number):
-		self["config"].handleKey(ActionKeys.0 + number, self.entryChanged)
+		self["config"].handleKey(ActionKeys.NUMBER_0 + number, self.entryChanged)
 
 	def keySave(self):
 		for notifier in self.onSave:
