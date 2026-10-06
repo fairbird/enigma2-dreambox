@@ -1,12 +1,10 @@
 # -*- coding: utf-8 -*-
 from re import compile
-from shutil import rmtree
-from time import time
 from os import makedirs, symlink, unlink
 from os.path import exists, join, islink
 from Screens.Screen import Screen
 from Screens.ParentalControlSetup import ProtectedScreen
-from enigma import checkInternetAccess, eDVBDB, eTimer, gRGB, eSize, ePoint, getDesktop
+from enigma import eDVBDB, eInternetCheck, eTimer, gRGB, eSize, ePoint, getDesktop
 
 from Components.ActionMap import ActionMap, NumberActionMap, HelpableActionMap, HelpableNumberActionMap
 from Components.config import config, ConfigSubsection, ConfigSelection, ConfigYesNo, ConfigText, configfile
@@ -30,6 +28,8 @@ from Screens.Processing import Processing
 from Screens.Screen import Screen, ScreenSummary
 from Screens.Console import Console
 from Screens.Setup import Setup
+from Screens.Toast import Toast
+from Screens.Standby import TryQuitMainloop
 from Plugins.Plugin import PluginDescriptor
 from Tools.Directories import fileExists, fileReadLines, fileAccess, fileWriteLine, fileWriteLines, resolveFilename, SCOPE_PLUGINS, SCOPE_CURRENT_SKIN, SCOPE_GUISKIN
 from Tools.LoadPixmap import LoadPixmap
@@ -71,7 +71,8 @@ config.pluginfilter.userfeed = ConfigText(default="https://", fixed_size=False)
 
 MODULE_NAME = __name__.split(".")[-1]
 
-INTERNET_TIMEOUT = 2
+INTERNET_TIMEOUT = 3
+INTERNET_CHECK_VALID = 30 * 60  # Re-check if the last successful check is older than this, in seconds.
 FEED_SERVER = "google.com"
 ENIGMA_PREFIX = "enigma2-plugin-%s"
 KODI_ADDON_PREFIX = "kodi-addon-%s"
@@ -143,13 +144,18 @@ PACKAGE_CATEGORY_MAPPINGS = {
 
 
 def getDesktopSize():
-    s = getDesktop(0).size()
-    return (s.width(), s.height())
+	s = getDesktop(0).size()
+	return (s.width(), s.height())
 
 
 def isFullHD():
-    desktopSize = getDesktopSize()
-    return desktopSize[0] == 1920
+	desktopSize = getDesktopSize()
+	return desktopSize[0] == 1920
+
+
+def isUHD():
+	desktopSize = getDesktopSize()
+	return desktopSize[0] == 2560 or desktopSize[0] == 3840
 
 
 class PluginBrowserSummary(ScreenSummary):
@@ -180,6 +186,8 @@ class PluginBrowser(Screen, ProtectedScreen):
 		ProtectedScreen.__init__(self)
 
 		self.firsttime = True
+		self.internetCheckedTime = None
+		self.internetCheckThread = None
 
 		self["key_red"] = self["red"] = Label(_("Remove plugins"))
 		self["key_green"] = self["green"] = Label(_("Download plugins"))
@@ -382,7 +390,15 @@ class PluginBrowser(Screen, ProtectedScreen):
 			self.updateList(self.help)
 
 	def menu(self):
-		def keyMenuCallback():
+		old_style = config.misc.plugin_style.value
+
+		def restartGUICallback(answer):
+			if answer:
+				self.session.open(TryQuitMainloop, 3)
+			else:
+				self.close()
+
+		def keyMenuCallback(*args):
 			feed_file = "/etc/opkg/user-feed.conf"
 			if config.pluginfilter.userfeed.value != "https://":
 				current_feed = ""
@@ -394,23 +410,79 @@ class PluginBrowser(Screen, ProtectedScreen):
 					self.createFeedConfig()
 			elif exists(feed_file):
 				unlink(feed_file)
+
 			self.checkWarnings()
+
+			new_style = config.misc.plugin_style.value
+
+			if old_style != new_style:
+				if old_style == "list" or new_style == "list":
+					self.session.openWithCallback(
+						restartGUICallback,
+						MessageBox,
+						_("Restart Enigma2 GUI to apply the new Plugin Browser layout?"),
+						MessageBox.TYPE_YESNO
+					)
+				else:
+					self.close()
+				return
+
 			self.updateList()
+
 		self.session.openWithCallback(keyMenuCallback, PluginBrowserSetup)
 
 	def delete(self):
 		self.session.openWithCallback(self.PackageActionClosed, PackageAction, PackageAction.MODE_REMOVE)
 
 	def download(self):
-		self.session.openWithCallback(self.PackageActionClosed, PackageAction, PackageAction.MODE_INSTALL)
-		self.firstTime = False
+		if self.isInternetCheckValid():
+			self.session.openWithCallback(self.PackageActionClosed, PackageAction, PackageAction.MODE_INSTALL)
+			self.firstTime = False
+		else:
+			self.startInternetCheck(PackageAction.MODE_INSTALL)
 
 	def update(self):
-		self.session.openWithCallback(self.PackageActionClosed, PackageAction, PackageAction.MODE_UPDATE)
+		if self.isInternetCheckValid():
+			self.session.openWithCallback(self.PackageActionClosed, PackageAction, PackageAction.MODE_UPDATE)
+		else:
+			self.startInternetCheck(PackageAction.MODE_UPDATE)
 
 	def PackageActionClosed(self):
 		self.checkWarnings()
 		self.updateList()
+
+	def startInternetCheck(self, mode):
+		self["key_green"].setText("")
+		self["key_yellow"].setText("")
+		self["PluginDownloadActions"].setEnabled(False)
+		self["actions"].setEnabled(False)
+		Processing.instance.setDescription(_("Please wait while the Internet connection is checked..."))
+		Processing.instance.showProgress(endless=True)
+		self.internetCheckThread = eInternetCheck()
+		self.internetCheckThread.callback.get().append(lambda result: self.internetCheckCallback(result, mode))
+		self.internetCheckThread.startThread(FEED_SERVER, INTERNET_TIMEOUT, True)
+
+	def internetCheckCallback(self, result, mode):
+		Processing.instance.hideProgress()
+		self["actions"].setEnabled(True)
+		self["PluginDownloadActions"].setEnabled(True)
+		self.internetCheckThread = None
+		if result == 0:
+			self.internetCheckedTime = time()
+			self.session.openWithCallback(self.PackageActionClosed, PackageAction, mode)
+			if mode == PackageAction.MODE_INSTALL:
+				self.firstTime = False
+		else:
+			text = {
+				1: _("Feed server DNS error!"),
+				2: _("Feed server access error!"),
+				3: _("Network adapter not connected to a network!"),
+				4: _("No network adapters enabled/available!")
+			}.get(result, _("No Internet connection available!"))
+			self.session.open(MessageBox, text=text, type=MessageBox.TYPE_ERROR, timeout=10)
+
+	def isInternetCheckValid(self):
+		return self.internetCheckedTime is not None and time() - self.internetCheckedTime < INTERNET_CHECK_VALID
 
 	def openExtensionmanager(self):
 		if fileExists(resolveFilename(SCOPE_PLUGINS, "SystemPlugins/SoftwareManager/plugin.py")):
@@ -456,7 +528,9 @@ class PluginBrowserNew(Screen):
 			self.secondaryColor = "#696969"
 			self.secondaryColorLabel = "#00000000"
 		elif config.misc.plugin_style.value == "grid4":
-			if isFullHD():
+			if isUHD():
+				self.backgroundPixmap = '<ePixmap position="0,0" size="2560,1440" pixmap="skin_default/style4UHD.jpg" scale="1" transparent="1" zPosition="-1" />'
+			elif isFullHD():
 				self.backgroundPixmap = '<ePixmap position="0,0" size="1920,1080" pixmap="skin_default/style4.jpg" transparent="1" zPosition="-1" />'
 			else:
 				self.backgroundPixmap = '<ePixmap position="0,0" size="1280,720" pixmap="skin_default/style4hd.jpg" transparent="1" zPosition="-1" />'
@@ -467,7 +541,9 @@ class PluginBrowserNew(Screen):
 			self.secondaryColor = "#1b3c85"
 			self.secondaryColorLabel = "#00ffc000"
 		elif config.misc.plugin_style.value == "grid5":
-			if isFullHD():
+			if isUHD():
+				self.backgroundPixmap = '<ePixmap position="0,0" size="2560,1440" pixmap="skin_default/style5UHD.jpg" scale="1" transparent="1" zPosition="-1" />'
+			elif isFullHD():
 				self.backgroundPixmap = '<ePixmap position="0,0" size="1920,1080" pixmap="skin_default/style5.jpg" transparent="1" zPosition="-1" />'
 			else:
 				self.backgroundPixmap = '<ePixmap position="0,0" size="1280,720" pixmap="skin_default/style5hd.jpg" transparent="1" zPosition="-1" />'
@@ -478,7 +554,9 @@ class PluginBrowserNew(Screen):
 			self.secondaryColor = "#1b3c85"
 			self.secondaryColorLabel = "#00ffc000"
 		elif config.misc.plugin_style.value == "grid6":
-			if isFullHD():
+			if isUHD():
+				self.backgroundPixmap = '<ePixmap position="0,0" size="2560,1440" pixmap="skin_default/style6UHD.jpg" scale="1" transparent="1" zPosition="-1" />'
+			elif isFullHD():
 				self.backgroundPixmap = '<ePixmap position="0,0" size="1920,1080" pixmap="skin_default/style6.jpg" transparent="1" zPosition="-1" />'
 			else:
 				self.backgroundPixmap = '<ePixmap position="0,0" size="1280,720" pixmap="skin_default/style6hd.jpg" transparent="1" zPosition="-1" />'
@@ -498,6 +576,8 @@ class PluginBrowserNew(Screen):
 			self.secondaryColorLabel = "#00000000"
 		self.skin = self.buildSkin()
 		self.firsttime = True
+		self.internetCheckedTime = None
+		self.internetCheckThread = None
 		self.list = []
 		self["list"] = PluginList(self.list)
 		self["pages"] = Label()
@@ -599,7 +679,83 @@ class PluginBrowserNew(Screen):
 		return config.ParentalControl.setuppinactive.value and (not config.ParentalControl.config_sections.main_menu.value or hasattr(self.session, "infobar") and self.session.infobar is None) and config.ParentalControl.config_sections.plugin_browser.value
 
 	def buildSkin(self):
-		if isFullHD():
+		if isUHD():
+			# panel backgroundColor
+			backgroundColor = self.backgroundColor
+			# panel foregroundColor
+			foregroundColor = self.foregroundColor
+			# panel backgroundPixmap
+			backgroundPixmap = self.backgroundPixmap
+			# panel position
+			posxstart = 67
+			posystart = 253
+			# panel size
+			posxplus = 347
+			posyplus = 347
+			# plugins icon size
+			iconsize = "333,333"
+			# screen
+			positionx = 0
+			positiony = 0
+			sizex = 2560
+			sizey = 1440
+			# Title
+			positionx1 = 67
+			positiony1 = 16
+			sizex1 = 1200
+			sizey1 = 133
+			font1 = 100
+			# sort
+			positionx2 = 1600
+			positiony2 = 1333
+			sizex2 = 1200
+			sizey2 = 133
+			font2 = 53
+			# plugin_description
+			positionx3 = 67
+			positiony3 = 140
+			sizex3 = 1200
+			sizey3 = 133
+			font3 = 53
+			# Time
+			positionx4 = 2156
+			positiony4 = 16
+			sizex4 = 364
+			sizey4 = 133
+			font4 = 107
+			# Date
+			positionx5 = 1504
+			positiony5 = 140
+			sizex5 = 1016
+			sizey5 = 67
+			font5 = 53
+			# pages
+			positionx6 = 2133
+			positiony6 = 1300
+			sizex6 = 293
+			sizey6 = 113
+			font6 = 53
+			# keys eLabel
+			eLabelx1 = 89
+			eLabely1 = 1420
+			eLabelx2 = 524
+			eLabely2 = 1420
+			eLabelx3 = 959
+			eLabely3 = 1420
+			eLabelx4 = 1393
+			eLabely4 = 1420
+			eLabel1ysizex = 400
+			eLabel1ysizey = 11
+			# keys function
+			positionxkey1 = 89
+			positionxkey2 = 524
+			positionxkey3 = 959
+			positionxkey4 = 1393
+			positionykey = 1351
+			sizekeysx = 400
+			sizekeysy = 67
+			fontkey = 43
+		elif isFullHD():
 			# panel backgroundColor
 			backgroundColor = self.backgroundColor
 			# panel foregroundColor
@@ -801,10 +957,14 @@ class PluginBrowserNew(Screen):
 		for x, p in enumerate(ordered_plugins):
 			x += 1
 			count += 1
-			if isFullHD():
+			if isUHD():
+				skincontent += '<widget backgroundColor="' + self.primaryColor + '" name="plugin_' + str(x) + '" position="' + str(posx) + ',' + str(posy) + '" size="' + iconsize + '" />'
+				skincontent += '<widget foregroundColor="' + self.primaryColorLabel + '" name="label_' + str(x) + '" position="' + str(posx + 13) + ',' + str(posy + 185) + '" size="293,112" zPosition="3" font="Regular;43" horizontalAlignment="center" verticalAlignment="center" transparent="1" />'
+				skincontent += '<widget name="icon_' + str(x) + '" position="' + str(posx + 40) + ',' + str(posy + 53) + '" size="240,107" zPosition="3" alphaTest="on" transparent="1" />'
+			elif isFullHD():
 				skincontent += '<widget backgroundColor="' + self.primaryColor + '" name="plugin_' + str(x) + '" position="' + str(posx) + ',' + str(posy) + '" size="' + iconsize + '" />'
 				skincontent += '<widget foregroundColor="' + self.primaryColorLabel + '" name="label_' + str(x) + '" position="' + str(posx + 10) + ',' + str(posy + 139) + '" size="220,84" zPosition="3" font="Regular;32" horizontalAlignment="center" verticalAlignment="center" transparent="1" />'
-				skincontent += '<widget  name="icon_' + str(x) + '" position="' + str(posx + 30) + ',' + str(posy + 40) + '" size="180,80" zPosition="3" alphaTest="on" transparent="1" />'
+				skincontent += '<widget name="icon_' + str(x) + '" position="' + str(posx + 30) + ',' + str(posy + 40) + '" size="180,80" zPosition="3" alphaTest="on" transparent="1" />'
 			else:
 				skincontent += '<widget backgroundColor="' + self.primaryColor + '" name="plugin_' + str(x) + '" position="' + str(posx) + ',' + str(posy) + '" size="' + iconsize + '" />'
 				skincontent += '<widget foregroundColor="' + self.primaryColorLabel + '" name="label_' + str(x) + '" position="' + str(posx) + ',' + str(posy + 20) + '" size="150,65" zPosition="3" font="Regular;22" horizontalAlignment="center" verticalAlignment="center" transparent="1" />'
@@ -899,7 +1059,11 @@ class PluginBrowserNew(Screen):
 			if index == self.current + 1:
 				self["plugin_description"].setText(plugin[1])
 				pos = self.plugins_pos[self.current]
-				if isFullHD():
+				if isUHD():
+					self["plugin_" + str(index)].instance.resize(eSize(360, 360))
+					self["plugin_" + str(index)].instance.move(ePoint(pos[0] - 13, pos[1] - 13))
+					self["label_" + str(index)].instance.move(ePoint(pos[0] + 13, pos[1] + 207))
+				elif isFullHD():
 					self["plugin_" + str(index)].instance.resize(eSize(270, 270))
 					self["plugin_" + str(index)].instance.move(ePoint(pos[0] - 10, pos[1] - 10))
 					self["label_" + str(index)].instance.move(ePoint(pos[0] + 10, pos[1] + 155))
@@ -913,7 +1077,11 @@ class PluginBrowserNew(Screen):
 				self["label_" + str(index)].instance.setForegroundColor(parseColor(self.secondaryColorLabel))
 			else:
 				pos = self.plugins_pos[index - 1]
-				if isFullHD():
+				if isUHD():
+					self["plugin_" + str(index)].instance.resize(eSize(333, 333))
+					self["plugin_" + str(index)].instance.move(ePoint(pos[0], pos[1]))
+					self["label_" + str(index)].instance.move(ePoint(pos[0] + 13, pos[1] + 185))
+				elif isFullHD():
 					self["plugin_" + str(index)].instance.resize(eSize(250, 250))
 					self["plugin_" + str(index)].instance.move(ePoint(pos[0], pos[1]))
 					self["label_" + str(index)].instance.move(ePoint(pos[0] + 10, pos[1] + 139))
@@ -1042,7 +1210,15 @@ class PluginBrowserNew(Screen):
 			self.updateList(self.help)
 
 	def menu(self):
-		def keyMenuCallback():
+		old_style = config.misc.plugin_style.value
+
+		def restartGUICallback(answer):
+			if answer:
+				self.session.open(TryQuitMainloop, 3)
+			else:
+				self.close()
+
+		def keyMenuCallback(*args):
 			feed_file = "/etc/opkg/user-feed.conf"
 			if config.pluginfilter.userfeed.value != "https://":
 				current_feed = ""
@@ -1054,23 +1230,79 @@ class PluginBrowserNew(Screen):
 					self.createFeedConfig()
 			elif exists(feed_file):
 				unlink(feed_file)
+
 			self.checkWarnings()
+
+			new_style = config.misc.plugin_style.value
+
+			if old_style != new_style:
+				if old_style == "list" or new_style == "list":
+					self.session.openWithCallback(
+						restartGUICallback,
+						MessageBox,
+						_("Restart Enigma2 GUI to apply the new Plugin Browser layout?"),
+						MessageBox.TYPE_YESNO
+					)
+				else:
+					self.close()
+				return
+
 			self.updateList()
+
 		self.session.openWithCallback(keyMenuCallback, PluginBrowserSetup)
 
 	def delete(self):
 		self.session.openWithCallback(self.PackageActionClosed, PackageAction, PackageAction.MODE_REMOVE)
 
 	def download(self):
-		self.session.openWithCallback(self.PackageActionClosed, PackageAction, PackageAction.MODE_INSTALL)
-		self.firstTime = False
+		if self.isInternetCheckValid():
+			self.session.openWithCallback(self.PackageActionClosed, PackageAction, PackageAction.MODE_INSTALL)
+			self.firstTime = False
+		else:
+			self.startInternetCheck(PackageAction.MODE_INSTALL)
 
 	def update(self):
-		self.session.openWithCallback(self.PackageActionClosed, PackageAction, PackageAction.MODE_UPDATE)
+		if self.isInternetCheckValid():
+			self.session.openWithCallback(self.PackageActionClosed, PackageAction, PackageAction.MODE_UPDATE)
+		else:
+			self.startInternetCheck(PackageAction.MODE_UPDATE)
 
 	def PackageActionClosed(self):
 		self.checkWarnings()
 		self.updateList()
+
+	def startInternetCheck(self, mode):
+		self["key_green"].setText("")
+		self["key_yellow"].setText("")
+		self["PluginDownloadActions"].setEnabled(False)
+		self["actions"].setEnabled(False)
+		Processing.instance.setDescription(_("Please wait while the Internet connection is checked..."))
+		Processing.instance.showProgress(endless=True)
+		self.internetCheckThread = eInternetCheck()
+		self.internetCheckThread.callback.get().append(lambda result: self.internetCheckCallback(result, mode))
+		self.internetCheckThread.startThread(FEED_SERVER, INTERNET_TIMEOUT, True)
+
+	def internetCheckCallback(self, result, mode):
+		Processing.instance.hideProgress()
+		self["actions"].setEnabled(True)
+		self["PluginDownloadActions"].setEnabled(True)
+		self.internetCheckThread = None
+		if result == 0:
+			self.internetCheckedTime = time()
+			self.session.openWithCallback(self.PackageActionClosed, PackageAction, mode)
+			if mode == PackageAction.MODE_INSTALL:
+				self.firstTime = False
+		else:
+			text = {
+				1: _("Feed server DNS error!"),
+				2: _("Feed server access error!"),
+				3: _("Network adapter not connected to a network!"),
+				4: _("No network adapters enabled/available!")
+			}.get(result, _("No Internet connection available!"))
+			self.session.open(MessageBox, text=text, type=MessageBox.TYPE_ERROR, timeout=10)
+
+	def isInternetCheckValid(self):
+		return self.internetCheckedTime is not None and time() - self.internetCheckedTime < INTERNET_CHECK_VALID
 
 	def openExtensionmanager(self):
 		if fileExists(resolveFilename(SCOPE_PLUGINS, "SystemPlugins/SoftwareManager/plugin.py")):
@@ -1324,25 +1556,24 @@ class PackageAction(Screen, NumericalTextInput):
 			case self.MODE_UPDATE:
 				self.opkgComponent.runCommand(self.opkgComponent.CMD_REFRESH_UPDATES, self.opkgFilterArguments)
 			case self.MODE_MANAGE:
-				match checkInternetAccess(FEED_SERVER, INTERNET_TIMEOUT):  # 0=Site reachable, 1=DNS error, 2=Other network error, 3=No link, 4=No active adapter.
-					case 0:
-						self.opkgComponent.runCommand(self.opkgComponent.CMD_REFRESH_INFO, self.opkgFilterArguments)
-					case 1:
-						self["description"].setText(_("Feed server DNS error!"))
-						print("[PluginBrowser] PackageAction Error: Feed server DNS error!")
-						self.setWaiting(None)
-					case 2:
-						self["description"].setText(_("Feed server access error!"))
-						print("[PluginBrowser] PackageAction Error: Feed server access error!")
-						self.setWaiting(None)
-					case 3:
-						self["description"].setText(_("Network adapter not connected to a network!"))
-						print("[PluginBrowser] PackageAction Error: Network adapter not connected to a network!")
-						self.setWaiting(None)
-					case 4:
-						self["description"].setText(_("No network adapters enabled/available!"))
-						print("[PluginBrowser] PackageAction Error: No network adapters enabled/available!")
-						self.setWaiting(None)
+				self.internetCheckThread = eInternetCheck()
+				self.internetCheckThread.callback.get().append(self.internetCheckCallback)
+				self.internetCheckThread.startThread(FEED_SERVER, INTERNET_TIMEOUT, True)
+
+	def internetCheckCallback(self, result):
+		self.internetCheckThread = None
+		if result == 0:
+			self.opkgComponent.runCommand(self.opkgComponent.CMD_REFRESH_INFO, self.opkgFilterArguments)
+		else:
+			text = {
+				1: _("Feed server DNS error!"),
+				2: _("Feed server access error!"),
+				3: _("Network adapter not connected to a network!"),
+				4: _("No network adapters enabled/available!")
+			}.get(result, _("No Internet connection available!"))
+			self["description"].setText(text)
+			print(f"[PluginBrowser] PackageAction Error: {text}")
+			self.setWaiting(None)
 
 	def selectionChanged(self):
 		label = ""
