@@ -91,7 +91,7 @@ def setOnSaveCallback(setup, callback):
 def getKeyNumber(key):
 	if key not in ActionKeys.NUMBERS:
 		raise ValueError(f"[Config] Error: The key '{key}' is not a numeric digit!")
-	return key - ActionKeys.0
+	return key - ActionKeys.NUMBER_0
 
 
 def getConfigListEntry(*args):
