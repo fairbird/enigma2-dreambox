@@ -20,17 +20,20 @@ class Console(Screen):
 			<widget name="text" position="0,0" size="550,400" font="Console;14" />
 		</screen>"""
 
-	def __init__(self, session, title="Console", cmdlist=None, finishedCallback=None, closeOnSuccess=False, showStartStopText=True, skin=None, windowTitle=None):
+	def __init__(self, session, title="Console", cmdlist=None, finishedCallback=None, closeOnSuccess=False, showStartStopText=True, skin=None, windowTitle=None, errorColored=False):
 		Screen.__init__(self, session)
 		if windowTitle:
 			title = windowTitle
 		self.finishedCallback = finishedCallback
 		self.closeOnSuccess = closeOnSuccess
 		self.showStartStopText = showStartStopText
+		self.errorColored = errorColored
 		if skin:
 			self.skinName = [skin, "Console"]
 
 		self.errorOcurred = False
+		self.commandOutput = ""
+		self.header = ""
 
 		self["text"] = ScrollLabel("")
 		self["key_red"] = StaticText(_("Cancel"))
@@ -71,7 +74,8 @@ class Console(Screen):
 
 	def startRun(self):
 		if self.showStartStopText:
-			self["text"].setText(_("Execution progress:") + "\n\n")
+			self.header = _("Execution progress:") + "\n\n"
+			self["text"].setText(self.header)
 		print("Console: executing in run", self.run, " the command:", self.cmdlist[self.run])
 		if self.container.execute(self.cmdlist[self.run]):  # start of container application failed...
 			self.runFinished(-1)  # so we must call runFinished manual
@@ -80,6 +84,11 @@ class Console(Screen):
 		if retval:
 			self.errorOcurred = True
 			self.show()
+			if self.errorColored:
+				lastpage = self["text"].isAtLastPage()
+				self["text"].setText(self.header + "\\c00FF4000%s\\C" % self.commandOutput)
+				if lastpage:
+					self["text"].lastPage()
 		self.run += 1
 		if self.run != len(self.cmdlist):
 			if self.container.execute(self.cmdlist[self.run]):  # start of container application failed...
@@ -92,7 +101,7 @@ class Console(Screen):
 			if self.cancel_msg:
 				self.cancel_msg.close()
 			if self.showStartStopText:
-				self["text"].appendText(_("Execution finished!!"))
+				self["text"].appendText("\n" + _("Execution finished!!"))
 			self["summary_description"].setText(text)
 			if self.finishedCallback is not None:
 				self.finishedCallback()
@@ -138,6 +147,8 @@ class Console(Screen):
 	def dataAvail(self, data):
 		if isinstance(data, bytes):
 			data = data.decode("utf-8", errors="replace")
+
+		self.commandOutput += data
 		self["text"].appendText(data)
 
 	def keySaveLog(self):
