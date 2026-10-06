@@ -281,6 +281,7 @@ class MovieBrowserConfiguration(Setup):
 	def createSetup(self):
 		configList = [
 			(_("Use 'Trash' in movie list"), config.usage.movielist_trashcan, _("When enabled, deleted recordings are moved to the trashcan, instead of being deleted immediately.")),
+			(_("Confirm moving files to the trashcan"), config.usage.movielistTrashcanConfirm, _("Ask for confirmation before moving individual files to the trashcan. Folder and permanent deletion confirmations remain unchanged.")),
 			(_("Purge 'Trash' after (days)"), config.usage.movielist_trashcan_days, _("Configure the number of days after which items are automatically removed from the trashcan.")),
 			(_("Clean network 'Trash"), config.usage.movielist_trashcan_network_clean, _("When enabled, network trashcans are probed for cleaning.")),
 			(_("Space to reserve for recordings (GB)"), config.usage.movielist_trashcan_reserve, _("Configure the minimum amount of disk space to be available for recordings. When the amount of space drops below this value, deleted items will be removed from the trashcan.")),
@@ -1990,6 +1991,9 @@ class MovieSelection(Screen, HelpableScreen, SelectionEventInfo, InfoBarBase, Pr
 						self.session.openWithCallback(self.delete, MessageBox, _("File appears to be busy.\n") + are_you_sure)
 						return
 			if config.usage.movielist_trashcan.value:
+				if not args and config.usage.movielistTrashcanConfirm.value:
+					self.session.openWithCallback(self.delete, MessageBox, _("Do you really want to move '%s' to the trashcan?") % name, type=MessageBox.TYPE_YESNO, default=False, windowTitle=self.getTitle())
+					return
 				try:
 					trash = createTrashFolder(cur_path)
 					# Also check whether we're INSIDE the trash, then it's a purge.
