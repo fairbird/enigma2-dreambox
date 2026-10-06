@@ -60,16 +60,21 @@ def getMediafireImages(distribution):
 	folderKey = folder.get(BoxInfo.getItem("model")) if isinstance(folder, dict) else folder
 	if not folderKey:
 		return {}
-	apiURL = "https://www.mediafire.com/api/1.5/folder/get_content.php?folder_key=%s&content_type=files&response_format=json" % folderKey
+	apiURL = "https://www.mediafire.com/api/1.5/folder/get_content.php?folder_key=%s&content_type=files&chunk_size=100&response_format=json" % folderKey
 	boxname = BoxInfo.getItem("BoxName")
 	machinebuild = BoxInfo.getItem("machinebuild")
 	model = BoxInfo.getItem("model")
 	try:
 		req = Request(apiURL, None, USER_AGENT)
-		files = load(urlopen(req))["response"]["folder_content"]["files"]
-		return {distribution: {f["filename"]: {"link": f["links"]["normal_download"], "name": f["filename"]} for f in files if f["filename"].endswith(".zip") and (boxname in f["filename"] or machinebuild in f["filename"] or model in f["filename"])}}
-	except Exception:
-		print("[FlashManager] getMediafireImages Error: Unable to load Mediafire folder '%s'!" % folderKey)
+		data = load(urlopen(req, timeout=10))
+		print("[FlashManager] getMediafireImages DEBUG: result='%s', files=%d." % (data["response"].get("result"), len(data["response"].get("folder_content", {}).get("files", []))))
+		files = data["response"]["folder_content"]["files"]
+		matched = {f["filename"]: {"link": f["links"]["normal_download"], "name": f["filename"]} for f in files if f["filename"].endswith((".zip", ".tar.bz2", ".tar.xz")) and (boxname in f["filename"] or machinebuild in f["filename"] or model in f["filename"])}
+		if not matched:
+			print("[FlashManager] getMediafireImages DEBUG: No match for boxname='%s' machinebuild='%s' model='%s'. Filenames=%s" % (boxname, machinebuild, model, [f["filename"] for f in files]))
+		return {distribution: matched}
+	except Exception as err:
+		print("[FlashManager] getMediafireImages Error: Unable to load Mediafire folder '%s'!  (%s)" % (folderKey, err))
 		return {}
 
 
