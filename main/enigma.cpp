@@ -399,7 +399,8 @@ int main(int argc, char **argv)
 	/* start at full size */
 	eVideoWidget::setFullsize(true);
 
-	python.execFile(eEnv::resolve("${libdir}/enigma2/python/StartEnigma.py").c_str());
+	if (python.execFile(eEnv::resolve("${libdir}/enigma2/python/StartEnigma.py").c_str()))
+		exit_code = 5; /* An exception at its top level, e.g. a missing module. */
 
 	/* restore both decoders to full size */
 	eVideoWidget::setFullsize(true);
