@@ -7,8 +7,6 @@
 #include <lib/python/python.h>
 #include <set>
 #include <lib/nav/core.h>
-#include <lib/service/event.h>
-#include <map>
 
 class eListboxServiceContent: public virtual iListboxContent
 {
@@ -106,7 +104,6 @@ public:
 	void setProgressTextWidth(int value) { m_progress_text_width = value; }
 	void setServicePiconDownsize(int value) { m_service_picon_downsize = value; }
 	void setServicePiconRatio(int value) { m_service_picon_ratio = value; }
-	void setHasNextEvent(bool b) { m_has_next_event = b; }
 	void setServiceTypeIconMode(int mode) { m_servicetype_icon_mode = mode; }
 	void setCryptoIconMode(int mode) { m_crypto_icon_mode = mode; }
 	void setRecordIndicatorMode(int mode) { m_record_indicator_mode = mode; }
@@ -175,23 +172,6 @@ protected:
 		/* the following functions always refer to the selected item */
 	void paint(gPainter &painter, eWindowStyle &style, const ePoint &offset, int selected);
 
-	struct PiconCacheEntry {
-		ePtr<gPixmap> pixmap;
-		bool isSVG;
-	};
-
-	std::map<eServiceReference, PiconCacheEntry> m_picon_cache;
-	void getPiconPixmap(const eServiceReference &ref, int width, ePtr<gPixmap> &pixmap, bool &isSVG);
-
-	struct EventCacheEntry {
-		bool hasEvent;
-		ePtr<eServiceEvent> evt;
-		ePtr<eServiceEvent> evt_next;
-		time_t validUntil;
-	};
-
-	std::map<eServiceReference, EventCacheEntry> m_event_cache;
-	bool getCachedEvent(const eServiceReference &ref, iStaticServiceInformation *service_info, time_t now, ePtr<eServiceEvent> &evt, ePtr<eServiceEvent> &evt_next);
 	int m_visual_mode;
 		/* for complex mode */
 	eRect m_element_position[celElements];
@@ -241,7 +221,6 @@ private:
 	int m_nonplayable_margins;
 	int m_items_distances;
 
-	bool m_has_next_event;
 	std::string m_progress_unit;
 	std::string m_separator;
 	int m_numbering_mode;

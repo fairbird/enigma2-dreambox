@@ -2,132 +2,9 @@
 #include <lib/gdi/egl/gles_version.h>
 #include <lib/gdi/egl/gtexture_manager.h>
 #include <algorithm>
-#include <chrono>
-#include <cmath>
-#include <cstdint>
-#include <cstdlib>
 #include <cstring>
-#include <vector>
-
-#ifndef GL_BGRA_EXT
-#define GL_BGRA_EXT 0x80E1
-#endif
-
-// Temporary diagnostic for the "scrolling a picon-heavy list starts slow
-// then speeds up" report: separates the CPU-side work this function does
-// itself (bpp==8 palette expansion, the GLES2 tight-repack fallback) from
-// the actual glTexImage2D upload, so the next device log says which one is
-// actually the cost instead of guessing - epng.cpp/picload.cpp already
-// force accelNever for HAVE_EGL (see project_egl_texture_leak.md - letting
-// these compete with the vendor driver's own ION pool crashed it), so every
-// picon takes this CPU-copy path, never the createTextureFromDmabuf() one.
-#define TEX_UPLOAD_TIMING 1
-#if TEX_UPLOAD_TIMING
-static inline double ms_since(const std::chrono::steady_clock::time_point& t0) {
-	return std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - t0).count();
-}
-#endif
 
 static gTextureManager* s_active_manager = nullptr;
-
-void gtexFitSize(int w, int h, int max_dim, int& out_w, int& out_h) {
-	out_w = w;
-	out_h = h;
-	if (max_dim <= 0 || w <= 0 || h <= 0)
-		return;
-	const int longest = std::max(w, h);
-	if (longest <= max_dim)
-		return;
-	const double s = (double)max_dim / (double)longest;
-	out_w = std::max(1, std::min(max_dim, (int)(w * s + 0.5)));
-	out_h = std::max(1, std::min(max_dim, (int)(h * s + 0.5)));
-}
-
-// Lerp of two packed 8-bit-per-channel pixels, t in 0..256, two channels per
-// 32-bit multiply (each 16-bit lane holds at most 255 * 256, so it never overflows).
-static inline uint32_t gtexLerp32(uint32_t a, uint32_t b, uint32_t t) {
-	const uint32_t ag = (((a >> 8) & 0x00FF00FFu) * (256 - t) + ((b >> 8) & 0x00FF00FFu) * t) & 0xFF00FF00u;
-	const uint32_t rb = ((((a & 0x00FF00FFu) * (256 - t)) + ((b & 0x00FF00FFu) * t)) >> 8) & 0x00FF00FFu;
-	return ag | rb;
-}
-
-// Translucent neighbourhood: bilinear weights, alpha-weighted colour.
-static uint32_t gtexBlendTranslucent(const uint32_t p[4], uint32_t wx0, uint32_t wx1, uint32_t wy0, uint32_t wy1) {
-	const uint32_t w[4] = {(wx0 * wy0) >> 8, (wx1 * wy0) >> 8, (wx0 * wy1) >> 8, (wx1 * wy1) >> 8};
-	const uint32_t wsum = w[0] + w[1] + w[2] + w[3];
-	uint32_t asum = 0, b = 0, g = 0, r = 0;
-	for (int i = 0; i < 4; ++i) {
-		const uint32_t wa = w[i] * (p[i] >> 24);
-		asum += wa;
-		b += wa * (p[i] & 0xFF);
-		g += wa * ((p[i] >> 8) & 0xFF);
-		r += wa * ((p[i] >> 16) & 0xFF);
-	}
-	if (asum == 0 || wsum == 0)
-		return 0;
-	const float inv = 1.0f / (float)asum;
-	const uint32_t a8 = std::min(255u, (uint32_t)((float)asum / (float)wsum + 0.5f));
-	const uint32_t r8 = std::min(255u, (uint32_t)((float)r * inv + 0.5f));
-	const uint32_t g8 = std::min(255u, (uint32_t)((float)g * inv + 0.5f));
-	const uint32_t b8 = std::min(255u, (uint32_t)((float)b * inv + 0.5f));
-	return (a8 << 24) | (r8 << 16) | (g8 << 8) | b8;
-}
-
-void gtexDownscaleBGRA(const uint32_t* src, int src_stride_px, int src_w, int src_h, int clip_l, int clip_t, int clip_r, int clip_b, uint32_t* dst, int dst_w, int dst_h, int dst_x0, int dst_y0,
-					   int dst_x1, int dst_y1) {
-	clip_l = std::max(0, clip_l);
-	clip_t = std::max(0, clip_t);
-	clip_r = std::min(src_w, clip_r);
-	clip_b = std::min(src_h, clip_b);
-	dst_x0 = std::max(0, dst_x0);
-	dst_y0 = std::max(0, dst_y0);
-	dst_x1 = std::min(dst_w, dst_x1);
-	dst_y1 = std::min(dst_h, dst_y1);
-	if (!src || !dst || dst_w <= 0 || dst_h <= 0 || clip_r <= clip_l || clip_b <= clip_t || dst_x1 <= dst_x0 || dst_y1 <= dst_y0)
-		return;
-
-	const float sx = (float)src_w / (float)dst_w;
-	const float sy = (float)src_h / (float)dst_h;
-	const int out_w = dst_x1 - dst_x0;
-
-	// Per destination column: the two source columns and the 0..256 weight of the
-	// second - computed once instead of per pixel.
-	struct Tap {
-		int x0, x1;
-		uint32_t f;
-	};
-	std::vector<Tap> taps((size_t)out_w);
-	for (int dx = dst_x0; dx < dst_x1; ++dx) {
-		const float fx = ((float)dx + 0.5f) * sx - 0.5f;
-		const int x0 = (int)std::floor(fx);
-		Tap& t = taps[(size_t)(dx - dst_x0)];
-		t.f = (uint32_t)((fx - (float)x0) * 256.0f + 0.5f);
-		t.x0 = std::min(std::max(x0, clip_l), clip_r - 1);
-		t.x1 = std::min(std::max(x0 + 1, clip_l), clip_r - 1);
-	}
-
-	for (int dy = dst_y0; dy < dst_y1; ++dy) {
-		const float fy = ((float)dy + 0.5f) * sy - 0.5f;
-		const int y0 = (int)std::floor(fy);
-		const uint32_t ty = (uint32_t)((fy - (float)y0) * 256.0f + 0.5f);
-		const uint32_t* r0 = src + (size_t)std::min(std::max(y0, clip_t), clip_b - 1) * src_stride_px;
-		const uint32_t* r1 = src + (size_t)std::min(std::max(y0 + 1, clip_t), clip_b - 1) * src_stride_px;
-		uint32_t* out = dst + (size_t)(dy - dst_y0) * out_w;
-
-		for (int i = 0; i < out_w; ++i) {
-			const Tap& t = taps[(size_t)i];
-			const uint32_t p00 = r0[t.x0], p01 = r0[t.x1], p10 = r1[t.x0], p11 = r1[t.x1];
-			if (((p00 & p01 & p10 & p11) >> 24) == 0xFFu) {
-				out[i] = gtexLerp32(gtexLerp32(p00, p01, t.f), gtexLerp32(p10, p11, t.f), ty);
-			} else if (((p00 | p01 | p10 | p11) >> 24) == 0) {
-				out[i] = 0;
-			} else {
-				const uint32_t p[4] = {p00, p01, p10, p11};
-				out[i] = gtexBlendTranslucent(p, 256 - t.f, t.f, 256 - ty, ty);
-			}
-		}
-	}
-}
 
 gTextureManager::gTextureManager() : m_egl_display(EGL_NO_DISPLAY) {
 	s_active_manager = this;
@@ -216,29 +93,6 @@ GLuint gTextureManager::createTextureFromDmabuf(gPixmap* pixmap) {
 #endif
 }
 
-// Diagnostic, opt-in via ENIGMA_EGL_TEX_CHECK=1: logs when a pixmap is about
-// to be uploaded with every source byte zero (in e2's inverted-alpha
-// convention that is fully OPAQUE BLACK) - i.e. a picture uploaded before its
-// decoder finished writing it, or from recycled/cleared memory. That texture
-// is then cached on the surface until the pixmap dies, which would show up as
-// a black square that stays black. Copies the source first (ION memory is
-// slow to read with scalar loads, see the palette branch below).
-static void checkPixmapAllZero(const gUnmanagedSurface* surface, int width, int height) {
-	static const bool enabled = getenv("ENIGMA_EGL_TEX_CHECK") && atoi(getenv("ENIGMA_EGL_TEX_CHECK")) != 0;
-	if (!enabled || !surface->data || surface->stride <= 0)
-		return;
-	std::vector<uint8_t> local((size_t)surface->stride * height);
-	memcpy(local.data(), surface->data, local.size());
-	const size_t row_bytes = (size_t)width * (surface->bpp == 32 ? 4 : 1);
-	for (int y = 0; y < height; ++y) {
-		const uint8_t* row = local.data() + (size_t)y * surface->stride;
-		for (size_t i = 0; i < row_bytes; ++i)
-			if (row[i])
-				return;
-	}
-	eDebug("[gTextureManager] TEX_CHECK: uploading ALL-ZERO pixmap %dx%d bpp=%d stride=%d data=%p - will render as black", width, height, surface->bpp, surface->stride, surface->data);
-}
-
 GLuint gTextureManager::createTextureFromPixmap(gPixmap* pixmap) {
 	m_last_upload_oom = false;
 	if (!pixmap || !pixmap->surface)
@@ -249,10 +103,6 @@ GLuint gTextureManager::createTextureFromPixmap(gPixmap* pixmap) {
 	gUnmanagedSurface* surface = pixmap->surface;
 	int width = surface->x;
 	int height = surface->y;
-	GLenum src_format = gles::needsRBSwap ? GL_RGBA : GL_BGRA_EXT;
-#if TEX_UPLOAD_TIMING
-	auto t_total0 = std::chrono::steady_clock::now();
-#endif
 
 	for (int i = 0; i < 8 && glGetError() != GL_NO_ERROR; ++i) {
 	}
@@ -265,65 +115,27 @@ GLuint gTextureManager::createTextureFromPixmap(gPixmap* pixmap) {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-	// Wider/taller than the GPU's max texture size (see setMaxTextureSize()):
-	// glTexImage2D would raise GL_INVALID_VALUE and leave the texture empty.
-	// Expand to BGRA on the CPU, box-downsample to the largest size that fits,
-	// and upload that. Only for the 32bpp / paletted formats, whose upload goes
-	// through full BGRA anyway; never taken when the pixmap already fits.
-	int tex_w = width, tex_h = height;
-	if (surface->bpp == 32 || (surface->bpp == 8 && surface->clut.data))
-		gtexFitSize(width, height, m_max_texture_size, tex_w, tex_h);
-
-	if (tex_w != width || tex_h != height) {
-		std::vector<uint32_t> full((size_t)width * height);
-		if (surface->bpp == 32) {
-			const uint8_t* src = (const uint8_t*)surface->data;
-			for (int row = 0; row < height; ++row)
-				memcpy(full.data() + (size_t)row * width, src + (size_t)row * surface->stride, (size_t)width * 4);
-		} else {
-			// Same palette rule as the paletted branch below.
-			uint32_t pal[256];
-			const int n = std::min(surface->clut.colors, 256);
-			for (int i = 0; i < n; ++i)
-				pal[i] = surface->clut.data[i].argb() ^ 0xFF000000;
-			for (int i = std::max(n, 0); i < 256; ++i)
-				pal[i] = (0x010101 * i) | 0xFF000000;
-			const uint8_t* src = (const uint8_t*)surface->data;
-			for (int y = 0; y < height; ++y) {
-				const uint8_t* row = src + (size_t)y * surface->stride;
-				uint32_t* out = full.data() + (size_t)y * width;
-				for (int x = 0; x < width; ++x)
-					out[x] = pal[row[x]];
-			}
-		}
-		std::vector<uint32_t> scaled((size_t)tex_w * tex_h);
-		gtexDownscaleBGRA(full.data(), width, width, height, 0, 0, width, height, scaled.data(), tex_w, tex_h, 0, 0, tex_w, tex_h);
-		glTexImage2D(GL_TEXTURE_2D, 0, src_format, tex_w, tex_h, 0, src_format, GL_UNSIGNED_BYTE, scaled.data());
-		eDebug("[gTextureManager] %dx%d bpp=%d exceeds GL_MAX_TEXTURE_SIZE=%d - uploaded downscaled to %dx%d", width, height, surface->bpp, m_max_texture_size, tex_w, tex_h);
-	} else if (surface->bpp == 32) {
-		// e2's 32bpp surfaces are natively BGRA in memory (see gpixmap.h's
-		// gRGB struct: {b,g,r,a} on little-endian). On a platform where this
-		// render target's fragment-shader output ends up read back by the
-		// display in the opposite R/B order from what GL writes (see
+	if (surface->bpp == 32) {
+		// This render target's fragment-shader output ends up read back by
+		// the display in the opposite R/B order from what GL writes (see
 		// gshader.cpp's fragment shader for the ground-truth test that
+		// proved this). A GL_TEXTURE_SWIZZLE here would have been the
+		// spec-correct way to compensate for a *sampler* quirk, but this
+		// isn't one - it's a *render-target-vs-scanout* mismatch, unrelated
+		// to how a texture is sampled. Adding a swizzle on top of data
+		// that's already the right bytes to compensate for the mismatch
+		// (see below) just swaps it back to wrong, which is exactly what a
+		// swizzle here did until this was untangled with a controlled
+		// synthetic-texture test.
 		//
-		// proved this true on Dreambox - gles::needsRBSwap, gles_version.h),
-		// uploading that memory as-is while *telling* glTexImage2D it's
-		// GL_RGBA means the sampler reads back (r=trueB, g=trueG, b=trueR) -
-		// i.e. already pre-swapped - which is exactly what's needed to
-		// cancel out the render target's own R/B swap on the way to the
-		// screen. A GL_TEXTURE_SWIZZLE here would have been the spec-correct
-		// way to compensate for a *sampler* quirk, but this isn't one - it's
-		// a *render-target-vs-scanout* mismatch, unrelated to how a texture
-		// is sampled; adding a swizzle on top of already-compensated data
-		// just swaps it back to wrong.
+		// e2's 32bpp surfaces are natively BGRA in memory (see gpixmap.h's
+		// gRGB struct: {b,g,r,a} on little-endian). Uploading that memory
+		// as-is while *telling* glTexImage2D it's GL_RGBA means the sampler
+		// reads back (r=trueB, g=trueG, b=trueR) - i.e. already pre-swapped
+		// - which is exactly what's needed to cancel out the render target's
+		// own R/B swap on the way to the screen. No CPU-side byte swapping,
+		// and no texture swizzle, needed.
 		//
-		// On a platform WITHOUT that scanout quirk (gles::needsRBSwap ==
-		// false), the correct upload instead just tells GL the truth about
-		// the source memory layout (GL_BGRA_EXT, confirmed advertised by
-		// this hardware's GL_EXTENSIONS as GL_EXT_texture_format_BGRA8888) -
-		// no pre-swap, no swizzle, the sampler just reads it right (src_format,
-		// declared above).
 		// glTexImage2D() assumes each row is tightly packed (row length ==
 		// width, no padding) - true for e2's own pixmap allocations, but
 		// NOT guaranteed for a pixmap loaded from an externally-decoded
@@ -336,18 +148,15 @@ GLuint gTextureManager::createTextureFromPixmap(gPixmap* pixmap) {
 		// never hits this because gPixmap::fill()/blit() always address
 		// rows via surface->stride explicitly, never assume width*bypp).
 		int row_pixels = surface->stride / surface->bypp;
-#if TEX_UPLOAD_TIMING
-		auto t_upload0 = std::chrono::steady_clock::now();
-#endif
 		if (row_pixels == width) {
-			glTexImage2D(GL_TEXTURE_2D, 0, src_format, width, height, 0, src_format, GL_UNSIGNED_BYTE, surface->data);
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, surface->data);
 #if defined(HAVE_GLES3)
 		} else if (gles::isGLES3()) {
 			// GL_UNPACK_ROW_LENGTH tells GL the source buffer's actual row
 			// length in pixels, so it can skip the padding itself instead
 			// of a CPU-side repack.
 			glPixelStorei(GL_UNPACK_ROW_LENGTH, row_pixels);
-			glTexImage2D(GL_TEXTURE_2D, 0, src_format, width, height, 0, src_format, GL_UNSIGNED_BYTE, surface->data);
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, surface->data);
 			glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
 #endif
 		} else {
@@ -358,31 +167,20 @@ GLuint gTextureManager::createTextureFromPixmap(gPixmap* pixmap) {
 			const uint8_t* src = (const uint8_t*)surface->data;
 			for (int row = 0; row < height; ++row)
 				memcpy(packed.data() + (size_t)row * width, src + (size_t)row * surface->stride, (size_t)width * 4);
-			glTexImage2D(GL_TEXTURE_2D, 0, src_format, width, height, 0, src_format, GL_UNSIGNED_BYTE, packed.data());
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, packed.data());
 		}
-#if TEX_UPLOAD_TIMING
-		eDebug("[gTextureManager] timing: bpp32 upload %dx%d (row_pixels=%d) took %.2fms", width, height, row_pixels, ms_since(t_upload0));
-#endif
 	} else if (surface->bpp == 8 && surface->clut.data) {
 		// 8-bit paletted image (often used for picons/skins).
 		// gles 3.0 does not support indexed color textures natively anymore,
 		// so we expand it to 32-bit rgba on the cpu before uploading.
 		std::vector<uint32_t> rgba_buffer(width * height);
 		uint8_t* src_pixels = (uint8_t*)surface->data;
-		// Same rule as gpixmap.cpp's convert_palette(): entries beyond the
-		// palette size are an opaque grey ramp. The previous direct
-		// palette[row[x]] had no bounds check, so an index >= clut.colors read
-		// past the end of the palette's heap block - zero/stale memory there
-		// is opaque BLACK (inverted alpha), a nondeterministic black picture.
 		uint32_t pal[256];
-		{
-			int n = std::min(surface->clut.colors, 256);
-			for (int i = 0; i < n; ++i)
-				pal[i] = surface->clut.data[i].argb() ^ 0xFF000000;
-			for (int i = std::max(n, 0); i < 256; ++i)
-				pal[i] = (0x010101 * i) | 0xFF000000;
-		}
-		int max_index = 0;
+		int palette_size = std::min(surface->clut.colors, 256);
+		for (int i = 0; i < palette_size; ++i)
+			pal[i] = surface->clut.data[i].argb() ^ 0xFF000000;
+		for (int i = std::max(0, palette_size); i < 256; ++i)
+			pal[i] = (0x010101 * i) | 0xFF000000;
 		int src_stride = surface->stride; // bytes per row in the *source* -
 		// may differ from width for externally-loaded images (e.g. a PNG
 		// decoder's own row alignment), unlike gPixmap's own allocations
@@ -402,9 +200,6 @@ GLuint gTextureManager::createTextureFromPixmap(gPixmap* pixmap) {
 		// then reading *that* in the loop, sidesteps it - this is what
 		// turned "screen takes 3s to open the first time" into a sub-second
 		// open.
-#if TEX_UPLOAD_TIMING
-		auto t_expand0 = std::chrono::steady_clock::now();
-#endif
 		std::vector<uint8_t> local_src((size_t)src_stride * height);
 		memcpy(local_src.data(), src_pixels, local_src.size());
 
@@ -414,43 +209,16 @@ GLuint gTextureManager::createTextureFromPixmap(gPixmap* pixmap) {
 				// gRGB::argb() returns the native {b,g,r,a} memory order
 				// (see gpixmap.h) with alpha still in enigma2's inverted
 				// "0=opaque" convention - XOR the top byte to fix alpha.
-				// No CPU-side R/B swap here regardless of platform (see the
-				// bpp==32 branch above and its src_format) - argb()'s native
-				// BGRA memory order is uploaded as-is either way, with
-				// src_format telling GL the truth or the pre-swap lie as
-				// appropriate for this platform.
+				// No R/B swap here (see the bpp==32 branch above): argb()'s
+				// native BGRA memory order, uploaded while telling
+				// glTexImage2D it's GL_RGBA, already comes out pre-swapped
+				// in exactly the way needed to cancel this render target's
+				// own R/B swap on the way to the screen.
 				rgba_buffer[y * width + x] = pal[row[x]];
-				if (row[x] > max_index)
-					max_index = row[x];
 			}
 		}
-#if TEX_UPLOAD_TIMING
-		double expand_ms = ms_since(t_expand0);
-		auto t_upload0 = std::chrono::steady_clock::now();
-#endif
 
-		// ENIGMA_EGL_TEX_CHECK=1: one line per indexed upload with what was actually
-		// read - palette size/start, its first entries as uploaded, index range and
-		// how many pixels are index 0 - to tell an empty/zero palette or all-zero
-		// indices (both render black) from a rendering-side problem.
-		static const bool tex_check = getenv("ENIGMA_EGL_TEX_CHECK") && atoi(getenv("ENIGMA_EGL_TEX_CHECK")) != 0;
-		if (tex_check) {
-			size_t zero_px = 0, opaque_black = 0;
-			for (size_t i = 0; i < rgba_buffer.size(); ++i) {
-				zero_px += (local_src[(i / width) * src_stride + (i % width)] == 0);
-				opaque_black += (rgba_buffer[i] == 0xFF000000u);
-			}
-			eDebug("[gTextureManager] TEX_CHECK bpp8 %dx%d stride=%d clut.colors=%d clut.start=%d data=%p pal0=%08x pal1=%08x pal2=%08x maxIndex=%d index0Px=%zu/%zu opaqueBlackPx=%zu",
-				width, height, src_stride, surface->clut.colors, surface->clut.start, (void*)surface->clut.data, pal[0], pal[1], pal[2], max_index, zero_px, rgba_buffer.size(), opaque_black);
-		}
-
-		if (max_index >= surface->clut.colors)
-			eDebug("[gTextureManager] bpp8 %dx%d has pixel index %d beyond its palette size %d - unmapped entries use the CPU renderer's grey ramp", width, height, max_index, surface->clut.colors);
-
-		glTexImage2D(GL_TEXTURE_2D, 0, src_format, width, height, 0, src_format, GL_UNSIGNED_BYTE, rgba_buffer.data());
-#if TEX_UPLOAD_TIMING
-		eDebug("[gTextureManager] timing: bpp8 palette-expand %dx%d took %.2fms, glTexImage2D took %.2fms", width, height, expand_ms, ms_since(t_upload0));
-#endif
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, rgba_buffer.data());
 	} else if (surface->bpp == 8) {
 		// Plain 8-bit grayscale surface with no palette - this is what the
 		// font glyph atlas (gFontAtlas) is: a single-channel coverage/alpha
@@ -477,9 +245,6 @@ GLuint gTextureManager::createTextureFromPixmap(gPixmap* pixmap) {
 	}
 
 	glBindTexture(GL_TEXTURE_2D, 0);
-#if TEX_UPLOAD_TIMING
-	eDebug("[gTextureManager] timing: createTextureFromPixmap total %dx%d bpp=%d took %.2fms", width, height, surface->bpp, ms_since(t_total0));
-#endif
 	GLenum upload_err = glGetError();
 	if (upload_err == GL_OUT_OF_MEMORY) {
 		// Do not cache a texture name whose storage allocation failed. A
@@ -495,30 +260,10 @@ GLuint gTextureManager::getTexture(gPixmap* pixmap) {
 	if (!pixmap || !pixmap->surface)
 		return 0;
 
-#if TEX_UPLOAD_TIMING
-	auto t_total0 = std::chrono::steady_clock::now();
-#endif
-
-	GLuint texture_id = createTextureFromDmabuf(pixmap);
-	if (texture_id != 0) {
-#if TEX_UPLOAD_TIMING
-		eDebug("[gTextureManager] timing: dmabuf import %dx%d bpp=%d took %.2fms", pixmap->surface->x, pixmap->surface->y, pixmap->surface->bpp, ms_since(t_total0));
-#endif
-		return texture_id;
-	}
-
 	gUnmanagedSurface* sf = pixmap->surface;
 	if (sf->gl_texture_id != 0) {
 		sf->gl_last_used_frame = m_frame;
 		return sf->gl_texture_id;
-	}
-
-	if (sf->bpp == 32 || sf->bpp == 8)
-		checkPixmapAllZero(sf, sf->x, sf->y);
-
-	// Drain any error left over from earlier, unrelated GL calls so the
-	// glGetError() after the upload below can only be this upload's own.
-	for (int i = 0; i < 8 && glGetError() != GL_NO_ERROR; ++i) {
 	}
 
 	GLuint new_texture = createTextureFromPixmap(pixmap);
@@ -618,11 +363,6 @@ void gTextureManager::queueForDeletion(GLuint texture_id) {
 	eDebug("[gTextureManager] queued texture id=%u for deletion, pending=%zu", texture_id, m_pending_deletions.size());
 }
 
-bool gTextureManager::hasPendingDeletions() {
-	std::lock_guard<std::mutex> lock(m_deletion_mutex);
-	return !m_pending_deletions.empty();
-}
-
 void gTextureManager::processDeletions() {
 	std::lock_guard<std::mutex> lock(m_deletion_mutex);
 	if (!m_pending_deletions.empty()) {
@@ -638,11 +378,6 @@ void gTextureManager::processDeletions() {
 
 		PFNEGLDESTROYIMAGEKHRPROC eglDestroyImageKHR = (PFNEGLDESTROYIMAGEKHRPROC)eglGetProcAddress("eglDestroyImageKHR");
 		for (GLuint texture_id : m_pending_deletions) {
-			auto bit = m_texture_bytes.find(texture_id);
-			if (bit != m_texture_bytes.end()) {
-				m_live_texture_bytes -= std::min(m_live_texture_bytes, bit->second);
-				m_texture_bytes.erase(bit);
-			}
 			auto it = m_texture_to_image_map.find(texture_id);
 			if (it != m_texture_to_image_map.end()) {
 				if (eglDestroyImageKHR && m_egl_display != EGL_NO_DISPLAY) {

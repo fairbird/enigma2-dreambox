@@ -35,8 +35,6 @@ static const char* fragment_shader_es3 = R"(#version 300 es
     uniform int u_gradient_orientation;
     uniform int u_alphablend;
     uniform float u_gradient_full_size;
-    uniform float u_rbswap;
-    uniform float u_coverage_alpha;
 
     float udRoundBox(vec2 p, vec2 b, float r) {
         vec2 d = abs(p) - b + vec2(r);
@@ -120,14 +118,13 @@ static const char* fragment_shader_es3 = R"(#version 300 es
             final_color = mix(u_border_color, final_color, inner_coverage);
         }
 
-        // u_coverage_alpha: output bare coverage as alpha so the blend
-        // equation can lerp by coverage alone - see gEGLDC::executeRectangle()'s
-        // coverage-lerp pass.
-        final_color.a = mix(final_color.a * coverage, coverage, u_coverage_alpha);
+        final_color.a *= coverage;
 
-        // See gshader.cpp's fragment shader / gles::needsRBSwap's comment
-        // (gles_version.h) for why this per-platform swap is here.
-        frag_color = mix(final_color, final_color.bgra, u_rbswap);
+        // See gshader.cpp's fragment shader for why this swap is here -
+        // same render-target-vs-scanout channel-order mismatch applies to
+        // every solid-color/gradient draw with no texture to compensate via
+        // GL_TEXTURE_SWIZZLE.
+        frag_color = final_color.bgra;
     }
 )";
 #endif
@@ -169,8 +166,6 @@ static const char* fragment_shader_es2 = R"(#version 100
     uniform int u_gradient_orientation;
     uniform int u_alphablend;
     uniform float u_gradient_full_size;
-    uniform float u_rbswap;
-    uniform float u_coverage_alpha;
 
     float udRoundBox(vec2 p, vec2 b, float r) {
         vec2 d = abs(p) - b + vec2(r);
@@ -245,11 +240,10 @@ static const char* fragment_shader_es2 = R"(#version 100
             final_color = mix(u_border_color, final_color, inner_coverage);
         }
 
-        // See the ES3 fragment shader above for u_coverage_alpha.
-        final_color.a = mix(final_color.a * coverage, coverage, u_coverage_alpha);
+        final_color.a *= coverage;
 
         // See gshader.cpp's fragment shader for why this swap is here.
-        gl_FragColor = mix(final_color, final_color.bgra, u_rbswap);
+        gl_FragColor = final_color.bgra;
     }
 )";
 
@@ -336,8 +330,6 @@ bool gAdvancedShader::init() {
 	m_num_stops_location = glGetUniformLocation(m_program_id, "u_num_stops");
 	m_gradient_orientation_location = glGetUniformLocation(m_program_id, "u_gradient_orientation");
 	m_gradient_full_size_location = glGetUniformLocation(m_program_id, "u_gradient_full_size");
-	m_rbswap_location = glGetUniformLocation(m_program_id, "u_rbswap");
-	m_coverage_alpha_location = glGetUniformLocation(m_program_id, "u_coverage_alpha");
 
 	// ES2-only per-corner radius locations
 	if (!gles::isGLES3()) {
@@ -371,7 +363,30 @@ bool gAdvancedShader::init() {
 
 void gAdvancedShader::bind() {
 	glUseProgram(m_program_id);
-	glUniform1f(m_rbswap_location, gles::needsRBSwap ? 1.0f : 0.0f);
+}
+
+void gAdvancedShader::bindVAO() {
+#if defined(HAVE_GLES3)
+	if (gles::isGLES3()) {
+		glBindVertexArray(m_vao);
+	} else
+#endif
+	{
+		glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
+		glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
+		glEnableVertexAttribArray(0);
+	}
+}
+
+void gAdvancedShader::unbindVAO() {
+#if defined(HAVE_GLES3)
+	if (gles::isGLES3()) {
+		glBindVertexArray(0);
+	} else
+#endif
+	{
+		glDisableVertexAttribArray(0);
+	}
 }
 
 void gAdvancedShader::setResolution(float width, float height) {
@@ -381,10 +396,9 @@ void gAdvancedShader::setResolution(float width, float height) {
 }
 
 void gAdvancedShader::drawAdvancedRect(float x, float y, float width, float height, int radius, uint8_t edges, const std::vector<gRGB>& gradient_colors, uint8_t orientation, bool alphablend, float alpha,
-									   const gRGB& solid_color, int border_width, const gRGB& border_color, int gradient_full_size, bool coverage_alpha, const float* quad) {
+									   const gRGB& solid_color, int border_width, const gRGB& border_color, int gradient_full_size) {
 	bind();
 
-	glUniform1f(m_coverage_alpha_location, coverage_alpha ? 1.0f : 0.0f);
 	glUniform4f(m_rect_size_location, x, y, width, height);
 	glUniform1f(m_radius_location, (float)radius);
 	glUniform4f(m_solid_color_location, solid_color.r / 255.0f, solid_color.g / 255.0f, solid_color.b / 255.0f, 1.0f - (solid_color.a / 255.0f));
@@ -427,18 +441,11 @@ void gAdvancedShader::drawAdvancedRect(float x, float y, float width, float heig
 		glUniform1i(m_num_stops_location, 0);
 	}
 
-	const float qx = quad ? quad[0] : x, qy = quad ? quad[1] : y;
-	const float qw = quad ? quad[2] : width, qh = quad ? quad[3] : height;
-	float vertices[6][2] = {{qx, qy}, {qx, qy + qh}, {qx + qw, qy}, {qx + qw, qy}, {qx, qy + qh}, {qx + qw, qy + qh}};
+	float vertices[6][2] = {{x, y}, {x, y + height}, {x + width, y}, {x + width, y}, {x, y + height}, {x + width, y + height}};
 
-	// position (x, y) - must match init()'s VAO layout.
-	static const gles::VertexAttrib attribs[] = {{0, 2, 0}};
-#if defined(HAVE_GLES3)
-	GLuint vao = m_vao;
-#else
-	GLuint vao = 0;
-#endif
-	gles::setVertexData(vao, m_vbo, &vertices[0][0], sizeof(vertices), 2, attribs, 1);
+	bindVAO();
+	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
+	gles::uploadDynamicVBO(sizeof(vertices), vertices);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
-	gles::endVertexData(attribs, 1);
+	unbindVAO();
 }
