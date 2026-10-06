@@ -216,7 +216,10 @@ void eWidget::hide()
 			   so the whole screen must be redrawn once it's gone. */
 			root->m_desktop->invalidate(gRegion(eRect(ePoint(0, 0), root->m_desktop->size())));
 		else
+		{
+			root->m_desktop->addEraseRegion(abs);
 			root->m_desktop->invalidate(abs);
+		}
 	}
 	if (m_stack)
 		m_stack->invalidateChilds();

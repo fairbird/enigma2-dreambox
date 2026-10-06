@@ -50,6 +50,7 @@ public:
 	void paintLayer(eWidget *widget, int layer);
 	void paintModalIm(eWidget *widget);
 	void paint();
+	void addEraseRegion(const gRegion &region) { m_erase_region |= region; }
 	void setDC(gDC *dc);
 
 	void setBackgroundColor(gRGB col);
@@ -91,6 +92,7 @@ private:
 	int m_require_redraw;
 
 	eWidgetDesktopCompBuffer m_screen;
+	gRegion m_erase_region;
 
 	void createBufferForWidget(eWidget *widget, int layer, const eRect *bboxOverride = 0);
 	void removeBufferForWidget(eWidget *widget, int layer);

@@ -388,7 +388,17 @@ void eWidgetDesktop::paint()
 			   composite over the windows below them. for regular
 			   (mutually disjoint) windows the order doesn't matter. */
 		gRegion dirty = m_screen.m_dirty_region;
+		gRegion erase = m_erase_region & dirty;
+		m_erase_region = gRegion();
+		erase -= m_screen.m_background_region;
 		paintBackground(&m_screen);
+		if (!erase.empty())
+		{
+			gPainter clearPainter(m_screen.m_dc);
+			clearPainter.resetClip(erase);
+			clearPainter.setBackgroundColor(m_screen.m_background_color);
+			clearPainter.clear();
+		}
 		m_screen.m_dirty_region = dirty;
 
 		ePtrList<eWidget>::iterator i(m_root.end());
