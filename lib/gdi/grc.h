@@ -89,6 +89,7 @@ struct gOpcode
 	} opcode;
 
 	gDC *dc;
+	unsigned int flush_id;
 	union para
 	{
 		struct pfillRect
@@ -249,6 +250,8 @@ class gRC: public iObject, public sigc::trackable
 
 	gOpcode queue[MAXSIZE];
 	int rp, wp;
+	unsigned int m_flush_issued;
+	unsigned int m_flush_completed;
 
 	eFixedMessagePump<int> m_notify_pump;
 	void recv_notify(const int &i);

@@ -34,7 +34,8 @@ gRC::gRC() : rp(0), wp(0)
 	m_notify_pump(eApp, 1, "gRC")
 #endif
 	,
-	m_spinner_enabled(0), m_spinneronoff(1), m_prev_idle_count(0) // NOSONAR
+	m_spinner_enabled(0), m_spinneronoff(1), m_prev_idle_count(0),
+	m_flush_issued(0), m_flush_completed(0) // NOSONAR
 {
 	ASSERT(!instance);
 	instance = this;
@@ -104,22 +105,39 @@ void gRC::submit(const gOpcode &o)
 #else
 			thread();
 #endif
-			// eDebug("[gRC] Render buffer full.");
-			// fflush(stdout);
-			usleep(1000); // wait 1 msec
+			usleep(1000);
 			continue;
 		}
-		int free = rp - wp;
-		if (free <= 0)
-			free += MAXSIZE;
-		queue[wp++] = o;
+
+		gOpcode queued = o;
+		unsigned int flush_id = 0;
+
+		if (queued.opcode == gOpcode::flush)
+		{
+			flush_id = ++m_flush_issued;
+			queued.flush_id = flush_id;
+		}
+
+		queue[wp++] = queued;
 		if (wp == MAXSIZE)
 			wp = 0;
-		if (o.opcode == gOpcode::flush || o.opcode == gOpcode::shutdown || o.opcode == gOpcode::notify || o.opcode == gOpcode::setResolution)
+
 #ifndef SYNC_PAINT
+		if (queued.opcode == gOpcode::flush || queued.opcode == gOpcode::shutdown || queued.opcode == gOpcode::notify || queued.opcode == gOpcode::setResolution)
 			pthread_cond_signal(&cond); // wakeup gdi thread
 		pthread_mutex_unlock(&mutex);
+
+#ifdef HAVE_EGL
+		if (queued.opcode == gOpcode::flush && queued.dc == gEGLDC::getInstance() && flush_id)
+		{
+			pthread_mutex_lock(&mutex);
+			while (m_flush_completed < flush_id)
+				pthread_cond_wait(&cond, &mutex);
+			pthread_mutex_unlock(&mutex);
+		}
+#endif
 #else
+		if (queued.opcode == gOpcode::flush || queued.opcode == gOpcode::shutdown || queued.opcode == gOpcode::notify || queued.opcode == gOpcode::setResolution)
 			thread(); // paint
 #endif
 		break;
@@ -183,6 +201,16 @@ void *gRC::thread()
 				// o.dc is a gDC* filled with grabref... so we must release it here
 				o.dc->Release();
 			}
+#ifndef SYNC_PAINT
+			if (o.opcode == gOpcode::flush && o.flush_id)
+			{
+				pthread_mutex_lock(&mutex);
+				if (o.flush_id > m_flush_completed)
+					m_flush_completed = o.flush_id;
+				pthread_cond_broadcast(&cond);
+				pthread_mutex_unlock(&mutex);
+			}
+#endif
 		}
 		else
 		{
