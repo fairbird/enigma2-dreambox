@@ -395,8 +395,8 @@ AC_SUBST([GLES2_LIBS])
 # is unrelated to, and independent of, the FORCE_ALPHABLENDING_ACCELERATION
 # workaround below (that one is about the older 2D/bcm blit accelerator being
 # unreliable on these boxes, not about this GPU path).
-AM_CONDITIONAL(HAVE_DREAMBOX_EGL, test "x$use_egl" = "xyes" -a \( "$BOXTYPE" == "dm900" -o "$BOXTYPE" == "dm920" \))
-if test "x$use_egl" = "xyes" -a \( "$BOXTYPE" == "dm900" -o "$BOXTYPE" == "dm920" \); then
+AM_CONDITIONAL(HAVE_DREAMBOX_EGL, test "x$use_egl" = "xyes" -a \( "$BOXTYPE" == "dm7080" -o "$BOXTYPE" == "dm820" -o "$BOXTYPE" == "dm900" -o "$BOXTYPE" == "dm920" \))
+if test "x$use_egl" = "xyes" -a \( "$BOXTYPE" == "dm7080" -o "$BOXTYPE" == "dm820" -o "$BOXTYPE" == "dm900" -o "$BOXTYPE" == "dm920" \); then
 	AC_DEFINE(HAVE_DREAMBOX_EGL, 1, [Dreambox VC5/BEGL EGL pixmap backend available])
 fi
 
