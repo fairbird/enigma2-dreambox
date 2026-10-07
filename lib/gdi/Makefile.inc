@@ -77,11 +77,13 @@ gdiinclude_HEADERS += \
 	gdi/egl/platform/dreambox/dreambox_window_provider.h
 endif
 
+if HAVE_EGL
 if DREAMNEXTGEN
 gdi_libenigma_gdi_a_SOURCES += \
 	gdi/egl/platform/amlogic/amlogic_window_provider.cpp
 gdiinclude_HEADERS += \
 	gdi/egl/platform/amlogic/amlogic_window_provider.h
+endif
 endif
 
 # gMainDC is a strict singleton (see gmaindc.cpp: ASSERT(m_instance == 0) in its
