@@ -1,4 +1,6 @@
 #include <algorithm>
+#include <chrono>
+#include <cmath>
 #include <vector>
 #include <cstring>
 #include <lib/base/eerror.h>
@@ -291,6 +293,9 @@ bool gEGLDC::createFBO(int w, int h) {
 }
 
 void gEGLDC::destroyFBO() {
+	if (m_anim_tex_before) { glDeleteTextures(1, &m_anim_tex_before); m_anim_tex_before = 0; }
+	if (m_anim_tex_after) { glDeleteTextures(1, &m_anim_tex_after); m_anim_tex_after = 0; }
+	m_anim_pending = false;
 	if (m_fbo_texture) { glDeleteTextures(1, &m_fbo_texture); m_fbo_texture = 0; }
 	if (m_fbo) { glDeleteFramebuffers(1, &m_fbo); m_fbo = 0; }
 	m_fbo_width = 0;
@@ -1431,6 +1436,8 @@ void gEGLDC::exec(const gOpcode* opcode) {
 			m_texture_manager.processDeletions();
 			flushBlitBatch();
 			flushTextBatch();
+			if (m_anim_pending)
+				animRun();
 			flip();
 			gDC::exec(opcode);
 			break;
@@ -1442,6 +1449,23 @@ void gEGLDC::exec(const gOpcode* opcode) {
 			flip();
 			gDC::exec(opcode);
 			break;
+
+		case gOpcode::sendShow:
+		case gOpcode::sendHide: {
+			const bool show = (opcode->opcode == gOpcode::sendShow);
+			const eRect rect(opcode->parm.setShowHideInfo->point, opcode->parm.setShowHideInfo->size);
+			delete opcode->parm.setShowHideInfo;
+			if (s_anim_current.load() > 0 && !m_anim_pending && rect.width() > 0 && rect.height() > 0) {
+				flushBlitBatch();
+				flushTextBatch();
+				if (animCapture(m_anim_tex_before)) {
+					m_anim_pending = true;
+					m_anim_show = show;
+					m_anim_rect = rect;
+				}
+			}
+			break;
+		}
 
 		default:
 			// Unknown to this backend's own opcode handlers - flush any
@@ -1467,6 +1491,9 @@ void gEGLDC::exec(const gOpcode* opcode) {
 }
 
 gEGLDC* gEGLDC::s_instance = nullptr;
+std::atomic<int> gEGLDC::s_anim_current(0);
+std::atomic<int> gEGLDC::s_anim_speed(20);
+std::atomic<int> gEGLDC::s_anim_listbox(0);
 
 // gDC::getRGB() resolves indexed gColor values through m_pixmap's clut.
 // The EGL staging pixmap is 32bpp but still serves legacy painters that use
@@ -1796,6 +1823,185 @@ bool gEGLDC::gpuCopyPageContent(int from, int to) {
 int gEGLDC::islocked() const {
 	fbClass* fb = fbClass::getInstance();
 	return fb ? fb->islocked() : 0;
+}
+
+bool gEGLDC::animCapture(GLuint &tex) {
+	if (!m_fbo || m_fbo_width <= 0 || m_fbo_height <= 0)
+		return false;
+	if (!tex) {
+		glGenTextures(1, &tex);
+		glBindTexture(GL_TEXTURE_2D, tex);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_fbo_width, m_fbo_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	}
+	glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
+	glBindTexture(GL_TEXTURE_2D, tex);
+	glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0, 0, m_fbo_width, m_fbo_height);
+	return true;
+}
+
+void gEGLDC::animDrawFrame(int mode, float v, GLuint bg, GLuint layer, const eRect &r) {
+	const float W = (float)m_fbo_width;
+	const float H = (float)m_fbo_height;
+	std::vector<float> q;
+	float alpha = 1.0f;
+
+	// The captured textures are copies of the FBO, whose row 0 is the bottom
+	// of the screen, so the v coordinate runs opposite to the screen y.
+	auto quad = [&](float dx, float dy, float dw, float dh, float sx, float sy, float sw, float sh) {
+		if (dw <= 0.0f || dh <= 0.0f)
+			return;
+		const float u0 = sx / W, u1 = (sx + sw) / W;
+		const float v0 = 1.0f - sy / H, v1 = 1.0f - (sy + sh) / H;
+		const float d[24] = {
+			dx, dy, u0, v0,
+			dx + dw, dy, u1, v0,
+			dx, dy + dh, u0, v1,
+			dx + dw, dy, u1, v0,
+			dx + dw, dy + dh, u1, v1,
+			dx, dy + dh, u0, v1
+		};
+		q.insert(q.end(), d, d + 24);
+	};
+
+	const float x = (float)r.x();
+	const float y = (float)r.y();
+	const float w = (float)r.width();
+	const float h = (float)r.height();
+
+	switch (mode) {
+		case 2: { // grow drop
+			const float dw = w * v, dh = h * v;
+			quad(x + (w - dw) / 2.0f, y, dw, dh, x, y, w, h);
+			alpha = std::min(1.0f, v * 2.0f);
+			break;
+		}
+		case 3: { // grow from left
+			const float dw = w * v, dh = h * v;
+			quad(x, y + (h - dh) / 2.0f, dw, dh, x, y, w, h);
+			alpha = std::min(1.0f, v * 2.0f);
+			break;
+		}
+		case 4: { // popup
+			const float s = 0.6f + 0.4f * v;
+			const float dw = w * s, dh = h * s;
+			quad(x + (w - dw) / 2.0f, y + (h - dh) / 2.0f, dw, dh, x, y, w, h);
+			alpha = v;
+			break;
+		}
+		case 5: // slide drop
+			quad(x, y - (1.0f - v) * h, w, h, x, y, w, h);
+			break;
+		case 6: // slide left to right
+			quad(x - (1.0f - v) * w, y, w, h, x, y, w, h);
+			break;
+		case 7: // wipe top to bottom
+			quad(x, y, w, h * v, x, y, w, h * v);
+			break;
+		case 8: { // stripes
+			const float stripe = 24.0f;
+			int i = 0;
+			for (float sy = y; sy < y + h; sy += stripe, ++i) {
+				const float sh = std::min(stripe, y + h - sy);
+				const float off = ((i & 1) ? 1.0f : -1.0f) * (1.0f - v) * w;
+				quad(x + off, sy, w, sh, x, sy, w, sh);
+			}
+			break;
+		}
+		default: // 1 = simple fade
+			quad(x, y, w, h, x, y, w, h);
+			alpha = v;
+			break;
+	}
+
+	glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
+
+	// background: the untouched full frame (copy, no blending)
+	glDisable(GL_SCISSOR_TEST);
+	glDisable(GL_BLEND);
+	{
+		const float bgq[24] = {
+			0, 0, 0, 1,
+			W, 0, 1, 1,
+			0, H, 0, 0,
+			W, 0, 1, 1,
+			W, H, 1, 0,
+			0, H, 0, 0
+		};
+		m_texture_shader.drawBatch(bgq, 6, bg, 1.0f);
+	}
+
+	// moving layer, clipped to the window rectangle
+	if (!q.empty()) {
+		glEnable(GL_SCISSOR_TEST);
+		setGlScissor(r);
+		glEnable(GL_BLEND);
+		setAlphaBlendMode(true);
+		m_texture_shader.drawBatch(q.data(), (int)(q.size() / 4), layer, alpha);
+	}
+}
+
+void gEGLDC::animRun() {
+	m_anim_pending = false;
+
+	const int mode = s_anim_current.load();
+	if (mode <= 0 || !animCapture(m_anim_tex_after))
+		return;
+
+	const eRect r = m_anim_rect & eRect(0, 0, m_fbo_width, m_fbo_height);
+	if (r.width() <= 0 || r.height() <= 0)
+		return;
+
+	const GLuint bg = m_anim_show ? m_anim_tex_before : m_anim_tex_after;
+	const GLuint layer = m_anim_show ? m_anim_tex_after : m_anim_tex_before;
+
+	const int speed = std::max(15, std::min(30, s_anim_speed.load()));
+	const double duration = 6.0 / (double)speed; // 0.30 s at the default speed 20
+
+	typedef std::chrono::steady_clock clock_t_;
+	const clock_t_::time_point t0 = clock_t_::now();
+	clock_t_::time_point last = t0;
+
+	for (int i = 0; i < 90; ++i) {
+		const clock_t_::time_point now = clock_t_::now();
+		const double t = std::chrono::duration<double>(now - t0).count() / duration;
+		if (t >= 1.0)
+			break;
+		// a slow frame means the GPU can't keep up: stop animating
+		if (std::chrono::duration<double>(now - last).count() > 0.15)
+			break;
+		last = now;
+
+		const double inv = 1.0 - t;
+		const double e = 1.0 - inv * inv * inv;
+		const float v = (float)(m_anim_show ? e : 1.0 - e);
+		animDrawFrame(mode, v, bg, layer, r);
+		flip();
+	}
+
+	// leave the FBO holding the final frame; the caller's flip() presents it
+	glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
+	glDisable(GL_SCISSOR_TEST);
+	glDisable(GL_BLEND);
+	{
+		const float W = (float)m_fbo_width;
+		const float H = (float)m_fbo_height;
+		const float fq[24] = {
+			0, 0, 0, 1,
+			W, 0, 1, 1,
+			0, H, 0, 0,
+			W, 0, 1, 1,
+			W, H, 1, 0,
+			0, H, 0, 0
+		};
+		m_texture_shader.drawBatch(fq, 6, m_anim_tex_after, 1.0f);
+	}
+	glEnable(GL_BLEND);
+	glEnable(GL_SCISSOR_TEST);
+	setGlScissor(eRect(0, 0, m_fbo_width, m_fbo_height));
 }
 
 void gEGLDC::flip() {

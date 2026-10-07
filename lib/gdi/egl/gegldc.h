@@ -1,5 +1,5 @@
 #pragma once
-
+#include <atomic>
 #include <EGL/egl.h>
 #ifdef HAVE_GLES3
 #include <GLES3/gl3.h>
@@ -167,6 +167,17 @@ private:
 	// afterward regardless of whether this returns true or false.
 	bool gpuCopyPageContent(int from, int to);
 
+
+	// window show/hide animation (see animRun())
+	GLuint m_anim_tex_before = 0;
+	GLuint m_anim_tex_after = 0;
+	bool m_anim_pending = false;
+	bool m_anim_show = true;
+	eRect m_anim_rect;
+	bool animCapture(GLuint &tex);
+	void animDrawFrame(int mode, float v, GLuint bg, GLuint layer, const eRect &r);
+	void animRun();
+
 	// dedicated opcode handlers
 	void executeFill(const gOpcode* op);
 	void executeFillRegion(const gOpcode* op);
@@ -261,6 +272,10 @@ public:
 
 	virtual void setResolution(int xres, int yres, int bpp = 32) override;
 	virtual void exec(const gOpcode* opcode);
+
+	static std::atomic<int> s_anim_current;
+	static std::atomic<int> s_anim_speed;
+	static std::atomic<int> s_anim_listbox;
 
 	void flip();
 	bool isInitialized() const { return m_egl_context != EGL_NO_CONTEXT; }

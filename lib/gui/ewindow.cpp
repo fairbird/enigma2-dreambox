@@ -15,18 +15,21 @@ eWindow::eWindow(eWidgetDesktop *desktop, int z): eWidget(0)
 
 	// check animation_mode once
 	if(eWindow::m_has_animation_mode==-1) {
+#ifdef HAVE_EGL
+		eWindow::m_has_animation_mode=1;
+#else
 		if (::access("/proc/stb/fb/animation_mode", R_OK) < 0)
 		{
 			eDebug("[eWindow] animation mode not supported");
-			m_animation_mode = 0;
 			eWindow::m_has_animation_mode=0;
 		}
 		else {
 			eDebug("[eWindow] animation mode supported");
-			m_animation_mode = 0x11;
 			eWindow::m_has_animation_mode=1;
 		}
+#endif
 	}
+	m_animation_mode = (eWindow::m_has_animation_mode==1) ? 0x11 : 0;
 
 	m_desktop = desktop;
 		/* ask style manager for current style */

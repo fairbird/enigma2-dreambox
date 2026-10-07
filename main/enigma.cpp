@@ -22,6 +22,7 @@
 #include <lib/base/nconfig.h>
 #include <lib/gdi/gmaindc.h>
 #ifdef HAVE_EGL
+#include <lib/gdi/egl/gegldc.h>
 #include <lib/gdi/egl/gles_version.h>
 #endif
 #include <lib/gdi/glcddc.h>
@@ -572,8 +573,14 @@ void setAnimation_current_listbox(int a)
 }
 #else
 #ifndef HAVE_OSDANIMATION
+#ifdef HAVE_EGL
+void setAnimation_current(int a) { gEGLDC::s_anim_current = a; }
+void setAnimation_speed(int speed) { gEGLDC::s_anim_speed = speed; }
+void setAnimation_current_listbox(int a) { gEGLDC::s_anim_listbox = a; }
+#else
 void setAnimation_current(int a) {}
 void setAnimation_speed(int speed) {}
 void setAnimation_current_listbox(int a) {}
+#endif
 #endif
 #endif
