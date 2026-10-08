@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from twisted.internet.defer import Deferred
+
 from Components.ActionMap import ActionMap, HelpableActionMap
 from Components.config import config
 from Components.ConfigList import ConfigListScreen
@@ -49,7 +51,10 @@ class Time(Setup):
 		Setup.selectionChanged(self)
 
 	def useGeolocation(self):
-		geolocationData = geolocation.getGeolocationData(fields="status,message,timezone,proxy")
+		Deferred.fromCoroutine(self.setGeolocationTimezone())
+
+	async def setGeolocationTimezone(self):
+		geolocationData = await geolocation.getGeolocationData(fields="status,message,timezone,proxy", screen=self)
 		if geolocationData.get("proxy", True):
 			self.setFootnote(_("Geolocation data is not available."))
 			return
