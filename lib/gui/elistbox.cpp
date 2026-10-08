@@ -39,6 +39,9 @@ https://creativecommons.org/licenses/by-nc-sa/4.0/
 #include <lib/gui/eslider.h>
 #include <lib/actions/action.h>
 #include <lib/base/nconfig.h>
+#ifdef DREAMNEXTGEN
+#include <lib/driver/inputdevicemanager.h>
+#endif
 
 eRect eListbox::defaultPadding = eRect(1, 1, 1, 1);
 int eListbox::defaultScrollBarWidth = eListbox::DefaultScrollBarWidth;
@@ -1415,6 +1418,18 @@ ePoint eListbox::getItemPostion(int index)
 	return ePoint(posx + xOffset, posy + yOffset);
 }
 
+#ifdef DREAMNEXTGEN
+void eListbox::hapticFeedback()
+{
+	if (!eConfigManager::getConfigBoolValue("config.inputDevices.settings.listboxFeedback", false))
+		return;
+
+	eInputDeviceManager *manager = eInputDeviceManager::getInstance();
+	if (manager && manager->available())
+		manager->vibrate();
+}
+#endif
+
 void eListbox::moveSelection(int dir)
 {
 	/* refuse to do anything without a valid list. */
@@ -1789,7 +1804,13 @@ void eListbox::moveSelection(int dir)
 	}
 
 	if (oldSel != m_selected) /* emit */
-		selectionChanged();
+	{
+#ifdef DREAMNEXTGEN
+		if (dir != justCheck)
+			hapticFeedback();
+#endif
+ 		selectionChanged();
+	}
 
 	updateScrollBar();
 
