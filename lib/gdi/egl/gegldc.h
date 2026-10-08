@@ -44,6 +44,23 @@ struct AnimSpec
 
 class gEGLDC : public gMainDC {
 private:
+	struct AnimProp {
+		int on = 0;
+		float a = 0.0f, b = 0.0f;
+		int ax = 1, ay = 1;
+		int centered = 0;
+		int type = -1;
+		float factor = 1.0f;
+	};
+
+	struct AnimSpec {
+		bool valid = false;
+		float duration = 0.25f;
+		int base_type = 0;
+		float base_factor = 1.0f;
+		AnimProp p[6]; // alpha show/hide, position show/hide, size show/hide
+	};
+
 	INativeWindowProvider* m_window_provider;
 	EGLDisplay m_egl_display;
 	EGLConfig m_egl_config;
@@ -311,21 +328,6 @@ public:
 	static std::atomic<int> s_anim_speed;
 	static std::atomic<int> s_anim_listbox;
 
-	struct AnimProp {
-		int on = 0;
-		float a = 0.0f, b = 0.0f;
-		int ax = 1, ay = 1;
-		int centered = 0;
-		int type = -1;
-		float factor = 1.0f;
-	};
-	struct AnimSpec {
-		bool valid = false;
-		float duration = 0.25f;
-		int base_type = 0;
-		float base_factor = 1.0f;
-		AnimProp p[6]; // alpha show/hide, position show/hide, size show/hide
-	};
 	static std::mutex s_anim_mutex;
 	static AnimSpec s_anim_spec;
 	static void setAnimationSpec(const char *spec);
