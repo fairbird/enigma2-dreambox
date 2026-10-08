@@ -1127,14 +1127,16 @@ eServiceMP3::eServiceMP3(eServiceReference ref)
 	m_decoder = NULL;
 	m_subs_to_pull_handler_id = m_notify_source_handler_id = m_notify_element_added_handler_id = 0;
 
-	std::string sref = ref.toString();
+	std::string sref = replace_all(ref.toString(), ",", "_");
 	if (!sref.empty()) {
-		std::vector<eIPTVDBItem> &iptv_services = eDVBDB::getInstance()->iptv_services;
-		for(std::vector<eIPTVDBItem>::iterator it = iptv_services.begin(); it != iptv_services.end(); ++it) {
-			if (sref.find(it->s_ref) != std::string::npos) {
-				m_currentAudioStream = it->ampeg_pid;
-				m_currentSubtitleStream = it->subtitle_pid;
+		std::vector<ePtr<eDVBService>>& iptv_services = eDVBDB::getInstance()->iptv_services;
+		for (std::vector<ePtr<eDVBService>>::iterator it = iptv_services.begin(); it != iptv_services.end(); ++it) {
+			if (sref.find((*it)->m_reference_str) != std::string::npos) {
+				if (eSettings::audio_usecache)
+					m_currentAudioStream = (*it)->getCacheEntry(eDVBService::cMPEGAPID);
+				m_currentSubtitleStream = (*it)->getCacheEntry(eDVBService::cSUBTITLE);
 				m_cachedSubtitleStream = m_currentSubtitleStream;
+				break;
 			}
 		}
 	}
@@ -1669,28 +1671,21 @@ DEFINE_REF(GstMessageContainer);
  */
 void eServiceMP3::setCacheEntry(bool isAudio, int pid) {
 	// eDebug("[eServiceMP3] setCacheEntry %d %d / %s", isAudio, pid, m_ref.toString().c_str());
+	std::string ref = replace_all(m_ref.toString(), ",", "_");
 	bool hasFoundItem = false;
-	std::vector<eIPTVDBItem> &iptv_services = eDVBDB::getInstance()->iptv_services;
-	for(std::vector<eIPTVDBItem>::iterator it = iptv_services.begin(); it != iptv_services.end(); ++it) {
-		if (m_ref.toString().find(it->s_ref) != std::string::npos) {
+	std::vector<ePtr<eDVBService>>& iptv_services = eDVBDB::getInstance()->iptv_services;
+	for (std::vector<ePtr<eDVBService>>::iterator it = iptv_services.begin(); it != iptv_services.end(); ++it) {
+		if (ref.find((*it)->m_reference_str) != std::string::npos) {
 			hasFoundItem = true;
-			if (isAudio) {
-				it->ampeg_pid = pid;
-			}
-			else
-			{
-				it->subtitle_pid = pid;
-			}
+			(*it)->setCacheEntry(isAudio ? eDVBService::cMPEGAPID : eDVBService::cSUBTITLE, pid);
 			break;
 		}
 	}
 	if (!hasFoundItem) {
-		std::vector<std::string> ref_split = split(m_ref.toString(), ":");
-		std::vector<std::string> ref_split_r(ref_split.begin(), ref_split.begin() + 10);
-		std::string ref_s;
-		join_str(ref_split_r, ':', ref_s);
-		eIPTVDBItem item(ref_s, isAudio ? pid : -1, -1, -1, -1, -1, -1, -1, isAudio ? -1 : pid, -1);
-		iptv_services.push_back(item);
+		ePtr<eDVBService> s = new eDVBService;
+		s->m_reference_str = ref;
+		s->setCacheEntry(isAudio ? eDVBService::cMPEGAPID : eDVBService::cSUBTITLE, pid);
+		iptv_services.push_back(s);
 	}
 }
 

@@ -129,33 +129,6 @@ public:
 
 };
 
-class eIPTVDBItem
-{
-	public:
-		std::string s_ref;
-		int ampeg_pid;
-		int aac3_pid;
-		int aac4_pid;
-		int addp_pid;
-		int aaach_pid;
-		int aaac_pid;
-		int adra_pid;
-		int subtitle_pid;
-		int v_pid;
-		eIPTVDBItem(const std::string sref, const int ampegpid, const int aac3pid, const int aac4pid, const int addppid, const int aaachpid, 
-					const int aaacpid, const int adrapid, const int subtitlepid, const int vpid) {
-			s_ref = sref;
-			ampeg_pid = ampegpid;
-			aac3_pid = aac3pid;
-			aac4_pid = aac4pid;
-			addp_pid = addppid;
-			aaach_pid = aaachpid;
-			aaac_pid = aaacpid;
-			adra_pid = adrapid;
-			subtitle_pid = subtitlepid;
-			v_pid = vpid;
-		};
-};
 #endif
 
 class eDVBDB: public iDVBChannelList
@@ -191,7 +164,6 @@ private:
 	std::map<eServiceReferenceDVB, LCNData> m_lcnmap;
 	bool m_debug;
 public:
-	std::vector<eIPTVDBItem> iptv_services;
 // iDVBChannelList
 	RESULT removeFlags(unsigned int flagmask, int dvb_namespace=-1, int tsid=-1, int onid=-1, unsigned int orb_pos=0xFFFFFFFF);
 	RESULT removeServices(int dvb_namespace=-1, int tsid=-1, int onid=-1, unsigned int orb_pos=0xFFFFFFFF);
@@ -239,6 +211,10 @@ public:
 	eDVBDB();
 	virtual ~eDVBDB();
 	int renumberBouquet(eBouquet &bouquet, int startChannelNum = 1);
+	void loadIPTVCachefile(const char *);
+	void parseIPTVServiceData(ePtr<eDVBService> s, std::string str);
+	void saveIptvServicelist(const char *file);
+	std::vector<ePtr<eDVBService>> iptv_services;
 	void addLcnToDB(int ns, int onid, int tsid, int sid, uint16_t lcn, uint32_t signal);
 	void saveLcnDB();
 #endif
