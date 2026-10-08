@@ -245,7 +245,7 @@ class Menu(Screen, ProtectedScreen):
 			"0": (self.keyNumberGlobal, digitText),
 		}, prio=0, description=_("Menu Common Actions"))
 		self["navigationActions"] = HelpableActionMap(self, ["NavigationActions"], {
-			"top": (self.keyTop, _("Move to first line / screen")),
+			"top": (self.keyTop, _("Move to the first line / screen")),
 			"pageUp": (self.keyPageUp, _("Move up a screen")),
 			"up": (self.keyUp, _("Move up a line")),
 			# "first": (self.keyFirst, _("Jump to first item in list or the start of text")),

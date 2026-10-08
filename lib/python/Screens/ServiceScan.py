@@ -78,7 +78,7 @@ class ServiceScan(Screen):
 			"close": (self.keyCloseRecursive, _("Select the previous service and close the scanner and exit all menus")),
 			"ok": (self.keySave, _("Select the currently highlighted service and exit")),
 			"save": (self.keySave, _("Select the currently highlighted service and exit")),
-			"top": (self["servicelist"].goTop, _("Move to first line / screen")),
+			"top": (self["servicelist"].goTop, _("Move to the first line / screen")),
 			"pageUp": (self["servicelist"].goPageUp, _("Move up a screen")),
 			"up": (self["servicelist"].goLineUp, _("Move up a line")),
 			"down": (self["servicelist"].goLineDown, _("Move down a line")),

@@ -111,7 +111,7 @@ class Opkg(Screen):
 		self.runNextCmd()
 
 		self["logactions"] = HelpableActionMap(self, ["NavigationActions"], {
-			"top": (self["log"].moveTop, _("Move to first line / screen")),
+			"top": (self["log"].moveTop, _("Move to the first line / screen")),
 			"pageUp": (self["log"].pageUp, _("Move up a screen")),
 			"up": (self["log"].moveUp, _("Move up a line")),
 			"down": (self["log"].moveDown, _("Move down a line")),

@@ -316,7 +316,7 @@ class FileCommander(Screen, NumericalTextInput, StatInfo):
 			# "bluelong": (self.keySortRight, _("Sort right column files by name, date or size")),
 		}, prio=0, description=_("File Commander Actions"))
 		self["navigationActions"] = HelpableActionMap(self, ["NavigationActions"], {
-			"top": (self.keyGoTop, _("Move to first line / screen")),
+			"top": (self.keyGoTop, _("Move to the first line / screen")),
 			"pageUp": (self.keyGoPageUp, _("Move up a screen")),
 			"up": (self.keyGoLineUp, _("Move up a line")),
 			"first": (self.keyGoLeftColumn, _("Switch to the left column")),
@@ -329,7 +329,7 @@ class FileCommander(Screen, NumericalTextInput, StatInfo):
 		}, prio=0, description=_("File Commander Navigation Actions"))
 		self["navigationActions"].setEnabled(not config.plugins.FileCommander.legacyNavigation.value)
 		self["legacyNavigationActions"] = HelpableActionMap(self, ["FileCommanderActions", "NavigationActions"], {
-			"top": (self.keyGoTop, _("Move to first line / screen")),
+			"top": (self.keyGoTop, _("Move to the first line / screen")),
 			"pageUp": (self.keyToggleColumn, _("Switch to the other column")),
 			"up": (self.keyGoLineUp, _("Move up a line")),
 			"left": (self.keyGoPageUp, _("Move up a screen")),
@@ -1947,12 +1947,12 @@ class FileCommanderData(Screen):
 		self["key_red"] = StaticText(_("Close"))
 		item = data.get("Description", _("File Commander Data Actions"))
 		self["actions"] = HelpableActionMap(self, ["OkCancelActions", "ColorActions"], {
-			"cancel": (self.close, _("Close this screen")),
-			"ok": (self.close, _("Close this screen")),
-			"red": (self.close, _("Close this screen"))
+			"cancel": (self.close, _("Close the screen")),
+			"ok": (self.close, _("Close the screen")),
+			"red": (self.close, _("Close the screen"))
 		}, prio=0, description=item)
 		self["navigationActions"] = HelpableActionMap(self, ["NavigationActions"], {
-			"top": (self["data"].goTop, _("Move to first line / screen")),
+			"top": (self["data"].goTop, _("Move to the first line / screen")),
 			"pageUp": (self["data"].goPageUp, _("Move up a screen")),
 			"up": (self["data"].goLineUp, _("Move up a line")),
 			# "left": (self["data"].goPageUp, _("Move up a screen")),
@@ -2211,7 +2211,7 @@ class FileCommanderFileViewer(Screen):
 			"cancel": (self.close, _("Exit viewer")),
 			"ok": (self.close, _("Exit viewer")),
 			"red": (self.close, _("Exit viewer")),
-			"top": (self["data"].goTop, _("Move to first line / screen")),
+			"top": (self["data"].goTop, _("Move to the first line / screen")),
 			"pageUp": (self["data"].goPageUp, _("Move up a screen")),
 			"up": (self["data"].goLineUp, _("Move up a line")),
 			"down": (self["data"].goLineDown, _("Move down a line")),
@@ -2727,7 +2727,7 @@ class FileCommanderTextEditor(Screen):
 			"yellowlong": (self.keyDeleteDuplicateLines, _("Delete all duplicated lines")),
 			"bluelong": (self.keyDuplicateCurrentLine, _("Duplicate the current line")),
 			"text": (self.keySortTextMenu, _("Open file sort menu")),
-			"top": (self["data"].goTop, _("Move to first line / screen")),
+			"top": (self["data"].goTop, _("Move to the first line / screen")),
 			"pageUp": (self["data"].goPageUp, _("Move up a screen")),
 			"up": (self["data"].goLineUp, _("Move up a line")),
 			"down": (self["data"].goLineDown, _("Move down a line")),
