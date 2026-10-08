@@ -4,7 +4,7 @@ from Components.ActionMap import ActionMap
 from Components.ConfigList import ConfigListScreen
 from Components.MenuList import MenuList
 from Components.Sources.StaticText import StaticText
-from Components.config import config, ConfigNumber, ConfigSelection, ConfigSelectionNumber, getConfigListEntry
+from Components.config import config, configfile, ConfigNumber, ConfigSelection, ConfigSelectionNumber, getConfigListEntry
 from Components.SystemInfo import BoxInfo
 from Plugins.Plugin import PluginDescriptor
 
@@ -76,6 +76,7 @@ class AnimationSetupConfig(ConfigListScreen, Screen):
 
 	def keyGreen(self):
 		config.misc.window_animation_speed.save()
+		configfile.save()
 		setAnimation_speed(int(config.misc.window_animation_speed.value))
 		config.misc.listbox_animation_default.save()
 		if not GIGABLUE:
@@ -203,6 +204,7 @@ class AnimationSetupScreen(Screen):
 			key = current[1]
 			config.misc.window_animation_default.value = key
 			config.misc.window_animation_default.save()
+			configfile.save()
 			setAnimation_current(key)
 			if not GIGABLUE:
 				setAnimation_current_listbox(int(config.misc.listbox_animation_default.value))
@@ -266,7 +268,7 @@ def startAnimationSetup(menuid):
 	if menuid != "video":
 		return []
 
-	return [(_("Animations"), animationSetupMain, "animation_setup", 30)]
+	return [(_("Animations"), animationSetupMain, "animation_setup", 45)]
 
 
 def sessionAnimationSetup(session, reason, **kwargs):
