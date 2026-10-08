@@ -90,61 +90,6 @@ static inline bool dreambcm_png32_trace_enabled()
 #endif
 
 
-/* Keep a table of already-loaded pixmaps, and return the old one when
- * needed. The "dispose" method isn't very efficient, but not having
- * to load the same pixmap twice will probably make up for that.
- * There is a race condition, when two threads load the same image,
- * the worst case scenario is then that the pixmap is loaded twice. This
- * isn't any worse than before, and all the UI pixmaps will be loaded
- * from the same thread anyway. */
-
-typedef std::map<std::string, gPixmap*> NameToPixmap;
-static eSingleLock pixmapTableLock;
-static NameToPixmap pixmapTable;
-
-static void pixmapDisposed(gPixmap* pixmap)
-{
-	eSingleLocker lock(pixmapTableLock);
-	for (NameToPixmap::iterator it = pixmapTable.begin();
-		 it != pixmapTable.end();
-		 ++it)
-	{
-		 if (it->second == pixmap)
-		 {
-			 pixmapTable.erase(it);
-			 break;
-		 }
-
-	}
-}
-
-static int pixmapFromTable(ePtr<gPixmap> &result, const char *filename)
-{
-	/* Prevent a deadlock: assigning a pixmap to result may cause the
-	 * previous to be destroyed, which would call pixmapDisposed which
-	 * in turn would aquire the lock a second time. */
-	ePtr<gPixmap> disposeMeOutsideTheLock(result);
-	{
-		eSingleLocker lock(pixmapTableLock);
-		NameToPixmap::iterator it = pixmapTable.find(filename);
-		if (it != pixmapTable.end())
-		{
-			result = it->second; /* Yay, re-use the pixmap */
-			return 0;
-		}
-		else
-		{
-			return -1;
-		}
-	}
-}
-
-static void pixmapToTable(ePtr<gPixmap> &result, const char *filename)
-{
-	eSingleLocker lock(pixmapTableLock);
-	pixmapTable[filename] = result;
-}
-
 /* TODO: I wonder why this function ALWAYS returns 0 */
 int loadPNG(ePtr<gPixmap> &result, const char *filename, int accel, int cached)
 {
@@ -212,6 +157,13 @@ int loadPNG(ePtr<gPixmap> &result, const char *filename, int accel, int cached)
 	png_get_IHDR(png_ptr, info_ptr, &width, &height, &bit_depth, &color_type, &interlace_type, 0, 0);
 	channels = png_get_channels(png_ptr, info_ptr);
 	trns = png_get_valid(png_ptr, info_ptr, PNG_INFO_tRNS);
+#ifdef DREAMBCM_ION_ACCEL
+	bool dreambcm_force_palette_png32 = dreambcm_png32_palette_enabled() &&
+		(color_type == PNG_COLOR_TYPE_PALETTE) &&
+		(!dreambcm_png32_palette_alpha_only() || trns);
+#else
+	bool dreambcm_force_palette_png32 = false;
+#endif
 	//eDebug("[ePNG] %s: before %dx%dx%dbpcx%dchan coltyp=%d", filename, (int)width, (int)height, bit_depth, channels, color_type);
 
 	/*
@@ -273,7 +225,7 @@ int loadPNG(ePtr<gPixmap> &result, const char *filename, int accel, int cached)
 
 	result = new gPixmap(width, height, bit_depth * channels, cached ? PixmapCache::PixmapDisposed : NULL, accel);
 	gUnmanagedSurface *surface = result->surface;
-
+	
 	png_bytep *rowptr = new png_bytep[height];
 	for (unsigned int i = 0; i < height; i++)
 		rowptr[i] = ((png_byte*)(surface->data)) + i * surface->stride;
@@ -292,7 +244,7 @@ int loadPNG(ePtr<gPixmap> &result, const char *filename, int accel, int cached)
 		png_get_tRNS(png_ptr, info_ptr, &trans_alpha, &num_trans, &trans_color);
 		surface->transparent = (trans_alpha != NULL);
 	}
-
+	
 	int num_palette = -1, num_trans = -1;
 	if (!dreambcm_force_palette_png32 && color_type == PNG_COLOR_TYPE_PALETTE) {
 		if (png_get_valid(png_ptr, info_ptr, PNG_INFO_PLTE)) {
@@ -410,7 +362,7 @@ int loadJPG(ePtr<gPixmap> &result, const char *filename, ePtr<gPixmap> alpha, in
 		}
 		if (grayscale)
 		{
-			eWarning("[loadJPG] no support for grayscale + alpha at the moment");
+			eWarning("[loadJPG] we don't support grayscale + alpha at the moment");
 			alpha = 0;
 		}
 	}
@@ -893,7 +845,7 @@ static void loadGIFFile(GifFile* filepara)
 #endif
 	return;
 ERROR_R:
-	eTrace("[loadGIFFile] <Error gif>");
+	eDebug("[loadGIFFile] <Error gif>");
 #if !defined(GIFLIB_MAJOR) || ( GIFLIB_MAJOR < 5) || (GIFLIB_MAJOR == 5 && GIFLIB_MINOR == 0)
 	DGifCloseFile(gft);
 #else
@@ -927,7 +879,6 @@ int loadGIF(ePtr<gPixmap> &result, const char *filename, int accel,int cached)
 	surface->clut.data = m_filepara->palette;
 	surface->clut.colors = m_filepara->palette_size;
 	m_filepara->palette = NULL; // transfer ownership
-	int o_y=0, u_y=0, v_x=0, h_x=0;
 	int extra_stride = surface->stride - surface->x;
 
 	unsigned char *tmp_buffer=((unsigned char *)(surface->data));
