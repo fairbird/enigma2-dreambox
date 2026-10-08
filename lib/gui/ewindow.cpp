@@ -147,7 +147,11 @@ void eWindow::show()
 	if (m_osdAutoHideActive && m_desktop->getStyleID() == 0 && eAVControl::getInstance())
 		eAVControl::getInstance()->setOSDWindowVisible(this, true);
 	if (m_animation_mode & 0x01)
+	{
 		m_desktop->sendShow(position(), size());
+		if (g_window_animation_current > 0)
+			requestLayerCapture();
+	}
 	eWidget::show();
 }
 
@@ -156,7 +160,11 @@ void eWindow::hide()
 	if (m_desktop->getStyleID() == 0 && eAVControl::getInstance())
 		eAVControl::getInstance()->setOSDWindowVisible(this, false);
 	if (m_animation_mode & 0x10)
+	{
+		if (g_window_animation_current > 0)
+			m_desktop->captureLayer(this);
 		m_desktop->sendHide(position(), size());
+	}
 	eWidget::hide();
 }
 

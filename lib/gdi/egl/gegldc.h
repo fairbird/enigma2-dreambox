@@ -171,10 +171,16 @@ private:
 	// window show/hide animation (see animRun())
 	GLuint m_anim_tex_before = 0;
 	GLuint m_anim_tex_after = 0;
+	GLuint m_anim_tex_layer = 0;
+	GLuint m_anim_fbo_layer = 0;
+	bool m_anim_layer_valid = false;
+	bool m_anim_in_layer = false;
 	bool m_anim_pending = false;
 	bool m_anim_show = true;
 	eRect m_anim_rect;
-	bool animCapture(GLuint &tex);
+	bool animCapture(GLuint &tex, const eRect &r);
+	void animBeginLayer();
+	void animEndLayer();
 	void animDrawFrame(int mode, float v, GLuint bg, GLuint layer, const eRect &r);
 	void animRun();
 

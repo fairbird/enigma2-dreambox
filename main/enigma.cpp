@@ -574,7 +574,7 @@ void setAnimation_current_listbox(int a)
 #else
 #ifndef HAVE_OSDANIMATION
 #ifdef HAVE_EGL
-void setAnimation_current(int a) { gEGLDC::s_anim_current = a; }
+void setAnimation_current(int a) { gEGLDC::s_anim_current = a; g_window_animation_current = a; }
 void setAnimation_speed(int speed) { gEGLDC::s_anim_speed = speed; }
 void setAnimation_current_listbox(int a) { gEGLDC::s_anim_listbox = a; }
 #else

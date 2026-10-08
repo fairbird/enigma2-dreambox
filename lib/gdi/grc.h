@@ -26,6 +26,8 @@
 #include <lib/gdi/gfont.h>
 #include <lib/gdi/compositing.h>
 
+extern int g_window_animation_current;
+
 class eTextPara;
 
 class gDC;
@@ -81,6 +83,8 @@ struct gOpcode
 		setCompositing,
 		sendShow,
 		sendHide,
+		beginLayer,
+		endLayer,
 #ifdef USE_LIBVUGLES2
 		sendShowItem,
 		setFlush,
@@ -402,6 +406,8 @@ public:
 	void flush();
 	void sendShow(ePoint point, eSize size);
 	void sendHide(ePoint point, eSize size);
+	void beginLayer();
+	void endLayer();
 #ifdef USE_LIBVUGLES2
 	void sendShowItem(long dir, ePoint point, eSize size);
 	void setFlush(bool val);

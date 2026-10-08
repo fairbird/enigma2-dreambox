@@ -7,6 +7,7 @@ eWidget::eWidget(eWidget* parent) : m_animation(this), m_parent(parent ? parent-
 	m_gradient_set = false;
 	m_gradient_direction = 0;
 	m_vis = 0;
+	m_layer_capture = false;
 	m_layer = 0;
 	m_desktop = 0;
 	m_z_position = 0;

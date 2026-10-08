@@ -81,6 +81,7 @@ public:
 
 	/* untested code */
 	int isVisible() { return (m_vis & wVisShow) && ((!m_parent) || m_parent->isVisible()); }
+	void requestLayerCapture() { m_layer_capture = true; }
 
 	int isLowered() { return (m_lowered > 0); }
 
@@ -126,7 +127,7 @@ private:
 	};
 
 	int m_vis;
-
+	bool m_layer_capture;
 	int m_layer;
 
 	ePtrList<eWidget> m_childs;

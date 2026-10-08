@@ -77,6 +77,7 @@ public:
 	eSize size() const { return m_screen.m_screen_size; }
 	void sendShow(ePoint point, eSize size);
 	void sendHide(ePoint point, eSize size);
+	void captureLayer(eWidget *widget);
 	eRect bounds() const; // returns area inside margins
 	eRect margins() const { return m_margins; }
 	void setMargins(const eRect& value) { m_margins = value; }

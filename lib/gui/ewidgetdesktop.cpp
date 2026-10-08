@@ -426,6 +426,15 @@ void eWidgetDesktop::paint()
 
 		m_screen.m_dirty_region = gRegion();
 
+		for (ePtrList<eWidget>::iterator c(m_root.begin()); c != m_root.end(); ++c)
+		{
+			if (c->m_layer_capture)
+			{
+				c->m_layer_capture = false;
+				captureLayer(c);
+			}
+		}
+
 		gPainter painter(m_screen.m_dc);
 		painter.flush();
 		return;
@@ -640,6 +649,20 @@ void eWidgetDesktop::resize(eSize size)
 	gPainter painter(m_screen.m_dc);
 	painter.setView(size);
 #endif
+}
+
+void eWidgetDesktop::captureLayer(eWidget *widget)
+{
+	if (m_comp_mode != cmImmediate || m_style_id != 0)
+		return;
+	if (!(widget->m_vis & eWidget::wVisShow) || widget->m_visible_with_childs.empty())
+		return;
+
+	gRegion region = gRegion(eRect(widget->position(), widget->size()));
+	gPainter painter(m_screen.m_dc);
+	painter.beginLayer();
+	widget->doPaint(painter, region, 0);
+	painter.endLayer();
 }
 
 void eWidgetDesktop::sendShow(ePoint point, eSize size)

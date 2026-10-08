@@ -296,6 +296,10 @@ void gEGLDC::destroyFBO() {
 	if (m_anim_tex_before) { glDeleteTextures(1, &m_anim_tex_before); m_anim_tex_before = 0; }
 	if (m_anim_tex_after) { glDeleteTextures(1, &m_anim_tex_after); m_anim_tex_after = 0; }
 	m_anim_pending = false;
+	m_anim_layer_valid = false;
+	m_anim_in_layer = false;
+	if (m_anim_fbo_layer) { glDeleteFramebuffers(1, &m_anim_fbo_layer); m_anim_fbo_layer = 0; }
+	if (m_anim_tex_layer) { glDeleteTextures(1, &m_anim_tex_layer); m_anim_tex_layer = 0; }
 	if (m_fbo_texture) { glDeleteTextures(1, &m_fbo_texture); m_fbo_texture = 0; }
 	if (m_fbo) { glDeleteFramebuffers(1, &m_fbo); m_fbo = 0; }
 	m_fbo_width = 0;
@@ -1455,10 +1459,12 @@ void gEGLDC::exec(const gOpcode* opcode) {
 			const bool show = (opcode->opcode == gOpcode::sendShow);
 			const eRect rect(opcode->parm.setShowHideInfo->point, opcode->parm.setShowHideInfo->size);
 			delete opcode->parm.setShowHideInfo;
+			if (show)
+				m_anim_layer_valid = false;
 			if (s_anim_current.load() > 0 && !m_anim_pending && rect.width() > 0 && rect.height() > 0) {
 				flushBlitBatch();
 				flushTextBatch();
-				if (animCapture(m_anim_tex_before)) {
+				if (animCapture(m_anim_tex_before, rect)) {
 					m_anim_pending = true;
 					m_anim_show = show;
 					m_anim_rect = rect;
@@ -1466,6 +1472,14 @@ void gEGLDC::exec(const gOpcode* opcode) {
 			}
 			break;
 		}
+
+		case gOpcode::beginLayer:
+			animBeginLayer();
+			break;
+
+		case gOpcode::endLayer:
+			animEndLayer();
+			break;
 
 		default:
 			// Unknown to this backend's own opcode handlers - flush any
@@ -1825,8 +1839,11 @@ int gEGLDC::islocked() const {
 	return fb ? fb->islocked() : 0;
 }
 
-bool gEGLDC::animCapture(GLuint &tex) {
+bool gEGLDC::animCapture(GLuint &tex, const eRect &r) {
 	if (!m_fbo || m_fbo_width <= 0 || m_fbo_height <= 0)
+		return false;
+	const eRect c = r & eRect(0, 0, m_fbo_width, m_fbo_height);
+	if (c.width() <= 0 || c.height() <= 0)
 		return false;
 	if (!tex) {
 		glGenTextures(1, &tex);
@@ -1839,8 +1856,56 @@ bool gEGLDC::animCapture(GLuint &tex) {
 	}
 	glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
 	glBindTexture(GL_TEXTURE_2D, tex);
-	glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0, 0, m_fbo_width, m_fbo_height);
+	const int gy = m_fbo_height - (c.y() + c.height());
+	glCopyTexSubImage2D(GL_TEXTURE_2D, 0, c.x(), gy, c.x(), gy, c.width(), c.height());
 	return true;
+}
+
+void gEGLDC::animBeginLayer() {
+	flushBlitBatch();
+	flushTextBatch();
+	m_anim_layer_valid = false;
+	m_anim_in_layer = false;
+	if (!m_fbo || m_fbo_width <= 0 || m_fbo_height <= 0)
+		return;
+	if (!m_anim_fbo_layer) {
+		glGenTextures(1, &m_anim_tex_layer);
+		glBindTexture(GL_TEXTURE_2D, m_anim_tex_layer);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_fbo_width, m_fbo_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glGenFramebuffers(1, &m_anim_fbo_layer);
+		glBindFramebuffer(GL_FRAMEBUFFER, m_anim_fbo_layer);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_anim_tex_layer, 0);
+		if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+			eDebug("[gEGLDC] animation layer FBO incomplete");
+			glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
+			glDeleteFramebuffers(1, &m_anim_fbo_layer);
+			glDeleteTextures(1, &m_anim_tex_layer);
+			m_anim_fbo_layer = 0;
+			m_anim_tex_layer = 0;
+			return;
+		}
+	}
+	glBindFramebuffer(GL_FRAMEBUFFER, m_anim_fbo_layer);
+	glDisable(GL_SCISSOR_TEST);
+	glClearColor(0, 0, 0, 0);
+	glClear(GL_COLOR_BUFFER_BIT);
+	glEnable(GL_SCISSOR_TEST);
+	m_anim_in_layer = true;
+}
+
+void gEGLDC::animEndLayer() {
+	flushBlitBatch();
+	flushTextBatch();
+	if (m_anim_in_layer) {
+		m_anim_in_layer = false;
+		m_anim_layer_valid = true;
+	}
+	if (m_fbo)
+		glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
 }
 
 void gEGLDC::animDrawFrame(int mode, float v, GLuint bg, GLuint layer, const eRect &r) {
@@ -1918,26 +1983,27 @@ void gEGLDC::animDrawFrame(int mode, float v, GLuint bg, GLuint layer, const eRe
 	}
 
 	glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
+	glEnable(GL_SCISSOR_TEST);
+	setGlScissor(r);
 
-	// background: the untouched full frame (copy, no blending)
-	glDisable(GL_SCISSOR_TEST);
+	// background: only the window rectangle, copied without blending
 	glDisable(GL_BLEND);
 	{
+		const float u0 = x / W, u1 = (x + w) / W;
+		const float v0 = 1.0f - y / H, v1 = 1.0f - (y + h) / H;
 		const float bgq[24] = {
-			0, 0, 0, 1,
-			W, 0, 1, 1,
-			0, H, 0, 0,
-			W, 0, 1, 1,
-			W, H, 1, 0,
-			0, H, 0, 0
+			x, y, u0, v0,
+			x + w, y, u1, v0,
+			x, y + h, u0, v1,
+			x + w, y, u1, v0,
+			x + w, y + h, u1, v1,
+			x, y + h, u0, v1
 		};
 		m_texture_shader.drawBatch(bgq, 6, bg, 1.0f);
 	}
 
-	// moving layer, clipped to the window rectangle
+	// moving layer: the window alone, clipped to its rectangle
 	if (!q.empty()) {
-		glEnable(GL_SCISSOR_TEST);
-		setGlScissor(r);
 		glEnable(GL_BLEND);
 		setAlphaBlendMode(true);
 		m_texture_shader.drawBatch(q.data(), (int)(q.size() / 4), layer, alpha);
@@ -1948,15 +2014,15 @@ void gEGLDC::animRun() {
 	m_anim_pending = false;
 
 	const int mode = s_anim_current.load();
-	if (mode <= 0 || !animCapture(m_anim_tex_after))
-		return;
-
 	const eRect r = m_anim_rect & eRect(0, 0, m_fbo_width, m_fbo_height);
-	if (r.width() <= 0 || r.height() <= 0)
+	if (mode <= 0 || r.width() <= 0 || r.height() <= 0 || !animCapture(m_anim_tex_after, r))
 		return;
 
 	const GLuint bg = m_anim_show ? m_anim_tex_before : m_anim_tex_after;
-	const GLuint layer = m_anim_show ? m_anim_tex_after : m_anim_tex_before;
+	GLuint layer = m_anim_show ? m_anim_tex_after : m_anim_tex_before;
+	if (m_anim_layer_valid && m_anim_tex_layer)
+		layer = m_anim_tex_layer;
+	m_anim_layer_valid = false;
 
 	const int speed = std::max(15, std::min(30, s_anim_speed.load()));
 	const double duration = 6.0 / (double)speed; // 0.30 s at the default speed 20
@@ -1982,25 +2048,29 @@ void gEGLDC::animRun() {
 		flip();
 	}
 
-	// leave the FBO holding the final frame; the caller's flip() presents it
+	// leave the window rectangle holding the final frame; the caller's flip() presents it
 	glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
-	glDisable(GL_SCISSOR_TEST);
+	glEnable(GL_SCISSOR_TEST);
+	setGlScissor(r);
 	glDisable(GL_BLEND);
 	{
 		const float W = (float)m_fbo_width;
 		const float H = (float)m_fbo_height;
+		const float x = (float)r.x(), y = (float)r.y();
+		const float w = (float)r.width(), h = (float)r.height();
+		const float u0 = x / W, u1 = (x + w) / W;
+		const float v0 = 1.0f - y / H, v1 = 1.0f - (y + h) / H;
 		const float fq[24] = {
-			0, 0, 0, 1,
-			W, 0, 1, 1,
-			0, H, 0, 0,
-			W, 0, 1, 1,
-			W, H, 1, 0,
-			0, H, 0, 0
+			x, y, u0, v0,
+			x + w, y, u1, v0,
+			x, y + h, u0, v1,
+			x + w, y, u1, v0,
+			x + w, y + h, u1, v1,
+			x, y + h, u0, v1
 		};
 		m_texture_shader.drawBatch(fq, 6, m_anim_tex_after, 1.0f);
 	}
 	glEnable(GL_BLEND);
-	glEnable(GL_SCISSOR_TEST);
 	setGlScissor(eRect(0, 0, m_fbo_width, m_fbo_height));
 }
 

@@ -784,6 +784,28 @@ void gPainter::end()
 		return;
 }
 
+int g_window_animation_current = 0;
+
+void gPainter::beginLayer()
+{
+	if (m_dc->islocked())
+		return;
+	gOpcode o;
+	o.opcode = gOpcode::beginLayer;
+	o.dc = m_dc.grabRef();
+	m_rc->submit(o);
+}
+
+void gPainter::endLayer()
+{
+	if (m_dc->islocked())
+		return;
+	gOpcode o;
+	o.opcode = gOpcode::endLayer;
+	o.dc = m_dc.grabRef();
+	m_rc->submit(o);
+}
+
 void gPainter::sendShow(ePoint point, eSize size)
 {
 	if (m_dc->islocked())
@@ -1344,6 +1366,10 @@ void gDC::exec(const gOpcode *o)
 	case gOpcode::sendShow:
 		break;
 	case gOpcode::sendHide:
+		break;
+	case gOpcode::beginLayer:
+		break;
+	case gOpcode::endLayer:
 		break;
 #ifdef USE_LIBVUGLES2
 	case gOpcode::sendShowItem:
