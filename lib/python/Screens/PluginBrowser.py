@@ -243,6 +243,13 @@ class PluginBrowser(Screen, ProtectedScreen):
 		self.onLayoutFinish.append(self.saveListsize)
 		if config.pluginfilter.userfeed.value != "https://" and not fileExists("/etc/opkg/user-feed.conf"):
 			self.createFeedConfig()
+		self.onClose.append(self.doClose)
+
+	def doClose(self):
+		if self.internetCheckThread:
+			Processing.instance.hideProgress()
+			self.internetCheckThread.callback.get().clear()
+			self.internetCheckThread = None
 
 	def isProtected(self):
 		return config.ParentalControl.setuppinactive.value and (not config.ParentalControl.config_sections.main_menu.value or hasattr(self.session, 'infobar') and self.session.infobar is None) and config.ParentalControl.config_sections.plugin_browser.value
@@ -462,11 +469,11 @@ class PluginBrowser(Screen, ProtectedScreen):
 		self.internetCheckThread.callback.get().append(lambda result: self.internetCheckCallback(result, mode))
 		self.internetCheckThread.startThread(FEED_SERVER, INTERNET_TIMEOUT, True)
 
-	def internetCheckCallback(self, result, mode):
+	def internetCheckCallback(self, result, mode):  # 0=Site reachable, 1=DNS error, 2=Other network error, 3=No link, 4=No active adapter.
+		# Keep the native check alive until doClose or the next check, after its signal has finished dispatching.
 		Processing.instance.hideProgress()
 		self["actions"].setEnabled(True)
 		self["PluginDownloadActions"].setEnabled(True)
-		self.internetCheckThread = None
 		if result == 0:
 			self.internetCheckedTime = time()
 			self.session.openWithCallback(self.PackageActionClosed, PackageAction, mode)
@@ -631,6 +638,13 @@ class PluginBrowserNew(Screen):
 		self.number = 0
 		self.nextNumberTimer = eTimer()
 		self.nextNumberTimer.callback.append(self.okbuttonClick)
+		self.onClose.append(self.doClose)
+
+	def doClose(self):
+		if self.internetCheckThread:
+			Processing.instance.hideProgress()
+			self.internetCheckThread.callback.get().clear()
+			self.internetCheckThread = None
 
 	def keyNumberGlobal(self, number):
 		if number == 0 and self.number == 0:
@@ -1282,11 +1296,11 @@ class PluginBrowserNew(Screen):
 		self.internetCheckThread.callback.get().append(lambda result: self.internetCheckCallback(result, mode))
 		self.internetCheckThread.startThread(FEED_SERVER, INTERNET_TIMEOUT, True)
 
-	def internetCheckCallback(self, result, mode):
+	def internetCheckCallback(self, result, mode):  # 0=Site reachable, 1=DNS error, 2=Other network error, 3=No link, 4=No active adapter.
+		# Keep the native check alive until doClose or the next check, after its signal has finished dispatching.
 		Processing.instance.hideProgress()
 		self["actions"].setEnabled(True)
 		self["PluginDownloadActions"].setEnabled(True)
-		self.internetCheckThread = None
 		if result == 0:
 			self.internetCheckedTime = time()
 			self.session.openWithCallback(self.PackageActionClosed, PackageAction, mode)
