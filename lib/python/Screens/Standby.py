@@ -199,6 +199,7 @@ class StandbyScreen(Screen):
 	def __onClose(self):
 		global inStandby
 		inStandby = None
+		self.session.isStandby = False
 		self.standbyTimeoutTimer.stop()
 		self.standbyStopServiceTimer.stop()
 		self.standbyWakeupTimer.stop()
@@ -226,6 +227,7 @@ class StandbyScreen(Screen):
 	def __onFirstExecBegin(self):
 		global inStandby
 		inStandby = self
+		self.session.isStandby = True
 		self.session.screen["Standby"].boolean = True
 		if self.StandbyCounterIncrease:
 			config.misc.standbyCounter.value += 1

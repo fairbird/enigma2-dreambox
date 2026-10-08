@@ -277,6 +277,7 @@ class Session:
 		self.in_exec = False
 
 		self.screen = SessionGlobals(self)
+		self.isStandby = False  # Set by Screens.Standby.
 		from Components.FrontPanelLed import frontPanelLed
 		from Tools.Notifications import notificationCenter
 		ormTimer = enigma.eTimer()  # ORM, started by enigma2.sh, learns that the main loop runs.
