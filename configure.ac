@@ -225,8 +225,9 @@ if test "$BOXTYPE" == "dreamtwo"; then
 	AC_DEFINE(LCD_COLOR_BYTESWAP_16, 1, [LCD 16-bit Byte-Swap])
 fi
 
-if test "$BOXTYPE" == "dm7080" -o "$BOXTYPE" == "dm520" -o "$BOXTYPE" == "dm820"  -o "$BOXTYPE" == "dm900" -o "$BOXTYPE" == "dm920"; then
+if test "$BOXTYPE" == "dm7080" -o "$BOXTYPE" == "dm820" -o "$BOXTYPE" == "dm900" -o "$BOXTYPE" == "dm920" -o "$BOXTYPE" == "dm520"; then
 	AC_DEFINE(CONFIG_ION, 1,[define BOX use ION Allocator])
+	AC_DEFINE(DREAMBCM_ION_ACCEL, 1,[define Dreambox Broadcom ION framebuffer acceleration])
 fi
 
 if test "$BOXTYPE" == "dm7080" -o "$BOXTYPE" == "dm820" -o "$BOXTYPE" == "dm900" -o "$BOXTYPE" == "dm920"; then
@@ -449,10 +450,16 @@ AC_ARG_WITH(blitaccelerationthreshold,
 
 AC_DEFINE_UNQUOTED(GFX_SURFACE_BLIT_ACCELERATION_THRESHOLD, $with_blitaccelerationthreshold,[Configure threshold for accelerated blit operations (in bytes)])
 
+if test "$BOXTYPE" == "dm7080" -o "$BOXTYPE" == "dm820" -o "$BOXTYPE" == "dm900" -o "$BOXTYPE" == "dm920" -o "$BOXTYPE" == "dm520"; then
+	default_accelerationaccumulation=yes
+else
+	default_accelerationaccumulation=no
+fi
+
 AC_ARG_WITH(accelerationaccumulation,
 	AC_HELP_STRING([--with-accelerationaccumulation], [accumulate blit/fill acceleration operations]),
 	[[with_accelerationaccumulation=$withval]],
-	[[with_accelerationaccumulation=no]]
+	[[with_accelerationaccumulation=$default_accelerationaccumulation]]
 )
 
 if test x"$with_accelerationaccumulation" = xyes ; then
