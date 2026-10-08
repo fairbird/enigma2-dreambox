@@ -263,7 +263,7 @@ def animationSetupMain(session, **kwargs):
 
 
 def startAnimationSetup(menuid):
-	if menuid != "video_menu":
+	if menuid != "video":
 		return []
 
 	return [(_("Animations"), animationSetupMain, "animation_setup", 30)]
