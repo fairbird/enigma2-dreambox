@@ -149,8 +149,6 @@ void eWindow::show()
 	if (m_animation_mode & 0x01)
 	{
 		m_desktop->sendShow(position(), size());
-		if (g_window_animation_current > 0)
-			requestLayerCapture();
 	}
 	eWidget::show();
 }

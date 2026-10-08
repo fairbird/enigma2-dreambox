@@ -1460,8 +1460,7 @@ void gEGLDC::exec(const gOpcode* opcode) {
 			const bool show = (opcode->opcode == gOpcode::sendShow);
 			const eRect rect(opcode->parm.setShowHideInfo->point, opcode->parm.setShowHideInfo->size);
 			delete opcode->parm.setShowHideInfo;
-			if (show)
-				m_anim_layer_valid = false;
+			m_anim_layer_valid = false;
 			AnimSpec spec;
 			{
 				std::lock_guard<std::mutex> lock(s_anim_mutex);

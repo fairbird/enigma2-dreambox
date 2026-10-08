@@ -19,29 +19,6 @@
 
 class gEGLDCAutoInit;
 
-struct AnimProp
-{
-	bool on;
-	float a;
-	float b;
-	bool ax;
-	bool ay;
-	bool centered;
-	int type;
-	float factor;
-	AnimProp() : on(false), a(0.0f), b(0.0f), ax(true), ay(true), centered(false), type(-1), factor(1.0f) {}
-};
-
-struct AnimSpec
-{
-	bool valid;
-	float duration;
-	int base_type;
-	float base_factor;
-	AnimProp p[6];
-	AnimSpec() : valid(false), duration(0.0f), base_type(0), base_factor(1.0f) {}
-};
-
 class gEGLDC : public gMainDC {
 private:
 	struct AnimProp {
