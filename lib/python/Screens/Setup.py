@@ -55,6 +55,7 @@ class Setup(ConfigListScreen, Screen, HelpableScreen):
 	def changedEntry(self):
 		if isinstance(self["config"].getCurrent()[1], (ConfigBoolean, ConfigSelection)):
 			self.createSetup()
+		ConfigListScreen.changedEntry(self)
 
 	def createSetup(self, appendItems=None, prependItems=None):
 		if self.setup:
