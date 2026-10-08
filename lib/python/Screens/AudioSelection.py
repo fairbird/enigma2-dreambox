@@ -384,6 +384,7 @@ class AudioSelection(ConfigListScreen, Screen):
 
 		self["streams"].list = streams
 		self["streams"].setIndex(selectedidx)
+		self.updateSummary()
 
 	def __updatedInfo(self):
 		self.fillList()
