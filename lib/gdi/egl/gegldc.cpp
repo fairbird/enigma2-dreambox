@@ -3,6 +3,7 @@
 #include <cmath>
 #include <vector>
 #include <cstring>
+#include <sstream>
 #include <lib/base/eerror.h>
 #include <lib/base/init.h>
 #include <lib/base/init_num.h>
@@ -1461,13 +1462,22 @@ void gEGLDC::exec(const gOpcode* opcode) {
 			delete opcode->parm.setShowHideInfo;
 			if (show)
 				m_anim_layer_valid = false;
-			if (s_anim_current.load() > 0 && !m_anim_pending && rect.width() > 0 && rect.height() > 0) {
+			AnimSpec spec;
+			{
+				std::lock_guard<std::mutex> lock(s_anim_mutex);
+				spec = s_anim_spec;
+			}
+			const eRect clipped = rect & eRect(0, 0, m_fbo_width, m_fbo_height);
+			if (spec.valid && !m_anim_pending && clipped.width() > 0 && clipped.height() > 0) {
 				flushBlitBatch();
 				flushTextBatch();
-				if (animCapture(m_anim_tex_before, rect)) {
+				const eRect region = animRegion(spec, clipped);
+				if (animCapture(m_anim_tex_before, region)) {
 					m_anim_pending = true;
 					m_anim_show = show;
-					m_anim_rect = rect;
+					m_anim_rect = clipped;
+					m_anim_region = region;
+					m_anim_active = spec;
 				}
 			}
 			break;
@@ -1508,6 +1518,29 @@ gEGLDC* gEGLDC::s_instance = nullptr;
 std::atomic<int> gEGLDC::s_anim_current(0);
 std::atomic<int> gEGLDC::s_anim_speed(20);
 std::atomic<int> gEGLDC::s_anim_listbox(0);
+std::mutex gEGLDC::s_anim_mutex;
+gEGLDC::AnimSpec gEGLDC::s_anim_spec;
+
+void gEGLDC::setAnimationSpec(const char *spec) {
+	AnimSpec s;
+	if (spec && *spec) {
+		std::istringstream in(spec);
+		float duration = 0.0f;
+		in >> duration >> s.base_type >> s.base_factor;
+		for (int i = 0; i < 6; ++i)
+			in >> s.p[i].on >> s.p[i].a >> s.p[i].b >> s.p[i].ax >> s.p[i].ay >> s.p[i].centered >> s.p[i].type >> s.p[i].factor;
+		if (!in.fail() && duration > 0.0f) {
+			s.duration = duration;
+			s.valid = true;
+		}
+	}
+	{
+		std::lock_guard<std::mutex> lock(s_anim_mutex);
+		s_anim_spec = s;
+	}
+	s_anim_current = s.valid ? 1 : 0;
+	g_window_animation_current = s.valid ? 1 : 0;
+}
 
 // gDC::getRGB() resolves indexed gColor values through m_pixmap's clut.
 // The EGL staging pixmap is 32bpp but still serves legacy painters that use
@@ -1839,6 +1872,33 @@ int gEGLDC::islocked() const {
 	return fb ? fb->islocked() : 0;
 }
 
+static float animInterp(int type, float factor, float t) {
+	t = std::max(0.0f, std::min(1.0f, t));
+	switch (type) {
+		case 1: // accelerate
+			return powf(t, 2.0f * factor);
+		case 2: // decelerate
+			return 1.0f - powf(1.0f - t, 2.0f * factor);
+		case 3: { // overshoot
+			const float s = t - 1.0f;
+			return s * s * ((factor + 1.0f) * s + factor) + 1.0f;
+		}
+		case 4: { // bounce
+			auto bounce = [](float x) { return x * x * 8.0f; };
+			t *= 1.1226f;
+			if (t < 0.3535f)
+				return bounce(t);
+			if (t < 0.7408f)
+				return bounce(t - 0.54719f) + 0.7f;
+			if (t < 0.9644f)
+				return bounce(t - 0.8526f) + 0.9f;
+			return bounce(t - 1.0435f) + 0.95f;
+		}
+		default:
+			return t;
+	}
+}
+
 bool gEGLDC::animCapture(GLuint &tex, const eRect &r) {
 	if (!m_fbo || m_fbo_width <= 0 || m_fbo_height <= 0)
 		return false;
@@ -1908,20 +1968,114 @@ void gEGLDC::animEndLayer() {
 		glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
 }
 
-void gEGLDC::animDrawFrame(int mode, float v, GLuint bg, GLuint layer, const eRect &r) {
+void gEGLDC::animState(const AnimSpec &s, bool show, const eRect &r, float t, float &alpha, float &x, float &y, float &w, float &h) const {
+	const float fx = (float)r.x(), fy = (float)r.y();
+	const float fw = (float)r.width(), fh = (float)r.height();
+	const float W = (float)m_fbo_width, H = (float)m_fbo_height;
+
+	auto progress = [&](const AnimProp &p) {
+		const int type = p.type >= 0 ? p.type : s.base_type;
+		const float factor = p.type >= 0 ? p.factor : s.base_factor;
+		return animInterp(type, factor, t);
+	};
+	auto lerp = [](float a, float b, float p) { return a + (b - a) * p; };
+
+	alpha = 1.0f;
+	x = fx;
+	y = fy;
+	w = fw;
+	h = fh;
+
+	// alpha: [0] show, [1] hide
+	{
+		const AnimProp &sh = s.p[0], &hd = s.p[1];
+		if (show) {
+			if (sh.on)
+				alpha = lerp(sh.a, 1.0f, progress(sh));
+		} else if (hd.on) {
+			alpha = lerp(1.0f, hd.a, progress(hd));
+		} else if (sh.on) {
+			alpha = lerp(sh.a, 1.0f, 1.0f - progress(sh));
+		}
+	}
+
+	// position: [2] show, [3] hide
+	{
+		const AnimProp &sh = s.p[2], &hd = s.p[3];
+		const AnimProp *a = nullptr;
+		float p = 0.0f;
+		bool toTarget = false;
+		if (show) {
+			if (sh.on) { a = &sh; p = progress(sh); }
+		} else if (hd.on) {
+			a = &hd; p = progress(hd); toTarget = true;
+		} else if (sh.on) {
+			a = &sh; p = 1.0f - progress(sh);
+		}
+		if (a) {
+			if (a->ax) {
+				const float v = a->a * W;
+				x = fx + (toTarget ? lerp(0.0f, v, p) : lerp(v, 0.0f, p));
+			}
+			if (a->ay) {
+				const float v = a->a * H;
+				y = fy + (toTarget ? lerp(0.0f, v, p) : lerp(v, 0.0f, p));
+			}
+		}
+	}
+
+	// size: [4] show, [5] hide
+	{
+		const AnimProp &sh = s.p[4], &hd = s.p[5];
+		const AnimProp *a = nullptr;
+		float p = 0.0f;
+		bool toTarget = false;
+		if (show) {
+			if (sh.on) { a = &sh; p = progress(sh); }
+		} else if (hd.on) {
+			a = &hd; p = progress(hd); toTarget = true;
+		} else if (sh.on) {
+			a = &sh; p = 1.0f - progress(sh);
+		}
+		if (a) {
+			if (a->ax)
+				w = toTarget ? lerp(fw, a->a, p) : lerp(a->a, fw, p);
+			if (a->ay)
+				h = toTarget ? lerp(fh, a->b, p) : lerp(a->b, fh, p);
+			if (a->centered) {
+				x += (fw - w) / 2.0f;
+				y += (fh - h) / 2.0f;
+			}
+		}
+	}
+}
+
+eRect gEGLDC::animRegion(const AnimSpec &s, const eRect &r) const {
+	int x0 = r.x(), y0 = r.y();
+	int x1 = r.x() + r.width(), y1 = r.y() + r.height();
+	for (int show = 0; show < 2; ++show) {
+		for (int i = 0; i <= 8; ++i) {
+			float alpha, x, y, w, h;
+			animState(s, show != 0, r, (float)i / 8.0f, alpha, x, y, w, h);
+			x0 = std::min(x0, (int)floorf(x));
+			y0 = std::min(y0, (int)floorf(y));
+			x1 = std::max(x1, (int)ceilf(x + w));
+			y1 = std::max(y1, (int)ceilf(y + h));
+		}
+	}
+	return eRect(x0, y0, x1 - x0, y1 - y0) & eRect(0, 0, m_fbo_width, m_fbo_height);
+}
+
+void gEGLDC::animDrawFrame(float alpha, float x, float y, float w, float h, GLuint bg, GLuint layer, const eRect &region, const eRect &r) {
 	const float W = (float)m_fbo_width;
 	const float H = (float)m_fbo_height;
-	std::vector<float> q;
-	float alpha = 1.0f;
 
 	// The captured textures are copies of the FBO, whose row 0 is the bottom
 	// of the screen, so the v coordinate runs opposite to the screen y.
-	auto quad = [&](float dx, float dy, float dw, float dh, float sx, float sy, float sw, float sh) {
-		if (dw <= 0.0f || dh <= 0.0f)
-			return;
+	auto quad = [&](float *d, float dx, float dy, float dw, float dh, float sx, float sy, float sw, float sh) {
 		const float u0 = sx / W, u1 = (sx + sw) / W;
 		const float v0 = 1.0f - sy / H, v1 = 1.0f - (sy + sh) / H;
-		const float d[24] = {
+		const float q[24] = {
 			dx, dy, u0, v0,
 			dx + dw, dy, u1, v0,
 			dx, dy + dh, u0, v1,
@@ -1929,93 +2083,39 @@ void gEGLDC::animDrawFrame(int mode, float v, GLuint bg, GLuint layer, const eRe
 			dx + dw, dy + dh, u1, v1,
 			dx, dy + dh, u0, v1
 		};
-		q.insert(q.end(), d, d + 24);
+		memcpy(d, q, sizeof(q));
 	};
-
-	const float x = (float)r.x();
-	const float y = (float)r.y();
-	const float w = (float)r.width();
-	const float h = (float)r.height();
-
-	switch (mode) {
-		case 2: { // grow drop
-			const float dw = w * v, dh = h * v;
-			quad(x + (w - dw) / 2.0f, y, dw, dh, x, y, w, h);
-			alpha = std::min(1.0f, v * 2.0f);
-			break;
-		}
-		case 3: { // grow from left
-			const float dw = w * v, dh = h * v;
-			quad(x, y + (h - dh) / 2.0f, dw, dh, x, y, w, h);
-			alpha = std::min(1.0f, v * 2.0f);
-			break;
-		}
-		case 4: { // popup
-			const float s = 0.6f + 0.4f * v;
-			const float dw = w * s, dh = h * s;
-			quad(x + (w - dw) / 2.0f, y + (h - dh) / 2.0f, dw, dh, x, y, w, h);
-			alpha = v;
-			break;
-		}
-		case 5: // slide drop
-			quad(x, y - (1.0f - v) * h, w, h, x, y, w, h);
-			break;
-		case 6: // slide left to right
-			quad(x - (1.0f - v) * w, y, w, h, x, y, w, h);
-			break;
-		case 7: // wipe top to bottom
-			quad(x, y, w, h * v, x, y, w, h * v);
-			break;
-		case 8: { // stripes
-			const float stripe = 24.0f;
-			int i = 0;
-			for (float sy = y; sy < y + h; sy += stripe, ++i) {
-				const float sh = std::min(stripe, y + h - sy);
-				const float off = ((i & 1) ? 1.0f : -1.0f) * (1.0f - v) * w;
-				quad(x + off, sy, w, sh, x, sy, w, sh);
-			}
-			break;
-		}
-		default: // 1 = simple fade
-			quad(x, y, w, h, x, y, w, h);
-			alpha = v;
-			break;
-	}
 
 	glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
 	glEnable(GL_SCISSOR_TEST);
-	setGlScissor(r);
+	setGlScissor(region);
 
-	// background: only the window rectangle, copied without blending
+	// background: the whole animated region, copied without blending
 	glDisable(GL_BLEND);
 	{
-		const float u0 = x / W, u1 = (x + w) / W;
-		const float v0 = 1.0f - y / H, v1 = 1.0f - (y + h) / H;
-		const float bgq[24] = {
-			x, y, u0, v0,
-			x + w, y, u1, v0,
-			x, y + h, u0, v1,
-			x + w, y, u1, v0,
-			x + w, y + h, u1, v1,
-			x, y + h, u0, v1
-		};
+		float bgq[24];
+		const float rx = (float)region.x(), ry = (float)region.y();
+		const float rw = (float)region.width(), rh = (float)region.height();
+		quad(bgq, rx, ry, rw, rh, rx, ry, rw, rh);
 		m_texture_shader.drawBatch(bgq, 6, bg, 1.0f);
 	}
 
-	// moving layer: the window alone, clipped to its rectangle
-	if (!q.empty()) {
+	// moving layer: the window alone, scaled and moved to its animated rectangle
+	if (w > 0.5f && h > 0.5f && alpha > 0.0f) {
+		float lq[24];
+		quad(lq, x, y, w, h, (float)r.x(), (float)r.y(), (float)r.width(), (float)r.height());
 		glEnable(GL_BLEND);
 		setAlphaBlendMode(true);
-		m_texture_shader.drawBatch(q.data(), (int)(q.size() / 4), layer, alpha);
+		m_texture_shader.drawBatch(lq, 6, layer, std::min(1.0f, alpha));
 	}
 }
 
 void gEGLDC::animRun() {
 	m_anim_pending = false;
 
-	const int mode = s_anim_current.load();
-	const eRect r = m_anim_rect & eRect(0, 0, m_fbo_width, m_fbo_height);
-	if (mode <= 0 || r.width() <= 0 || r.height() <= 0 || !animCapture(m_anim_tex_after, r))
+	const eRect r = m_anim_rect;
+	const eRect region = m_anim_region;
+	if (!m_anim_active.valid || r.width() <= 0 || r.height() <= 0 || !animCapture(m_anim_tex_after, region))
 		return;
 
 	const GLuint bg = m_anim_show ? m_anim_tex_before : m_anim_tex_after;
@@ -2024,16 +2124,15 @@ void gEGLDC::animRun() {
 		layer = m_anim_tex_layer;
 	m_anim_layer_valid = false;
 
-	const int speed = std::max(15, std::min(30, s_anim_speed.load()));
-	const double duration = 6.0 / (double)speed; // 0.30 s at the default speed 20
+	const AnimSpec spec = m_anim_active;
 
 	typedef std::chrono::steady_clock clock_t_;
 	const clock_t_::time_point t0 = clock_t_::now();
 	clock_t_::time_point last = t0;
 
-	for (int i = 0; i < 90; ++i) {
+	for (int i = 0; i < 120; ++i) {
 		const clock_t_::time_point now = clock_t_::now();
-		const double t = std::chrono::duration<double>(now - t0).count() / duration;
+		const double t = std::chrono::duration<double>(now - t0).count() / (double)spec.duration;
 		if (t >= 1.0)
 			break;
 		// a slow frame means the GPU can't keep up: stop animating
@@ -2041,23 +2140,22 @@ void gEGLDC::animRun() {
 			break;
 		last = now;
 
-		const double inv = 1.0 - t;
-		const double e = 1.0 - inv * inv * inv;
-		const float v = (float)(m_anim_show ? e : 1.0 - e);
-		animDrawFrame(mode, v, bg, layer, r);
+		float alpha, x, y, w, h;
+		animState(spec, m_anim_show, r, (float)t, alpha, x, y, w, h);
+		animDrawFrame(alpha, x, y, w, h, bg, layer, region, r);
 		flip();
 	}
 
-	// leave the window rectangle holding the final frame; the caller's flip() presents it
+	// leave the animated region holding the final frame; the caller's flip() presents it
 	glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
 	glEnable(GL_SCISSOR_TEST);
-	setGlScissor(r);
+	setGlScissor(region);
 	glDisable(GL_BLEND);
 	{
 		const float W = (float)m_fbo_width;
 		const float H = (float)m_fbo_height;
-		const float x = (float)r.x(), y = (float)r.y();
-		const float w = (float)r.width(), h = (float)r.height();
+		const float x = (float)region.x(), y = (float)region.y();
+		const float w = (float)region.width(), h = (float)region.height();
 		const float u0 = x / W, u1 = (x + w) / W;
 		const float v0 = 1.0f - y / H, v1 = 1.0f - (y + h) / H;
 		const float fq[24] = {

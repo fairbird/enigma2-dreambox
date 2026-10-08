@@ -664,6 +664,7 @@ extern void setAnimation_speed(int speed);
 extern void setAnimation_current_listbox(int a);
 #endif
 extern void pauseInit(void);
+extern void setAnimation_spec(const char *spec);
 extern void resumeInit(void);
 extern int checkInternetAccess(const char* host, int timeout = 3);
 extern int getE2Flags();
@@ -691,6 +692,7 @@ extern void setAnimation_speed(int speed);
 extern void setAnimation_current_listbox(int a);
 #endif
 extern void pauseInit(void);
+extern void setAnimation_spec(const char *spec);
 extern void resumeInit(void);
 extern int checkInternetAccess(const char* host, int timeout = 3);
 extern int getE2Flags();

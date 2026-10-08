@@ -584,3 +584,10 @@ void setAnimation_current_listbox(int a) {}
 #endif
 #endif
 #endif
+
+void setAnimation_spec(const char *spec)
+{
+#ifdef HAVE_EGL
+	gEGLDC::setAnimationSpec(spec);
+#endif
+}

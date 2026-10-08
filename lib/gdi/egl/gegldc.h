@@ -1,5 +1,6 @@
 #pragma once
 #include <atomic>
+#include <mutex>
 #include <EGL/egl.h>
 #ifdef HAVE_GLES3
 #include <GLES3/gl3.h>
@@ -178,10 +179,14 @@ private:
 	bool m_anim_pending = false;
 	bool m_anim_show = true;
 	eRect m_anim_rect;
+	eRect m_anim_region;
+	AnimSpec m_anim_active;
 	bool animCapture(GLuint &tex, const eRect &r);
 	void animBeginLayer();
 	void animEndLayer();
-	void animDrawFrame(int mode, float v, GLuint bg, GLuint layer, const eRect &r);
+	void animState(const AnimSpec &s, bool show, const eRect &r, float t, float &alpha, float &x, float &y, float &w, float &h) const;
+	eRect animRegion(const AnimSpec &s, const eRect &r) const;
+	void animDrawFrame(float alpha, float x, float y, float w, float h, GLuint bg, GLuint layer, const eRect &region, const eRect &r);
 	void animRun();
 
 	// dedicated opcode handlers
@@ -282,6 +287,25 @@ public:
 	static std::atomic<int> s_anim_current;
 	static std::atomic<int> s_anim_speed;
 	static std::atomic<int> s_anim_listbox;
+
+	struct AnimProp {
+		int on = 0;
+		float a = 0.0f, b = 0.0f;
+		int ax = 1, ay = 1;
+		int centered = 0;
+		int type = -1;
+		float factor = 1.0f;
+	};
+	struct AnimSpec {
+		bool valid = false;
+		float duration = 0.25f;
+		int base_type = 0;
+		float base_factor = 1.0f;
+		AnimProp p[6]; // alpha show/hide, position show/hide, size show/hide
+	};
+	static std::mutex s_anim_mutex;
+	static AnimSpec s_anim_spec;
+	static void setAnimationSpec(const char *spec);
 
 	void flip();
 	bool isInitialized() const { return m_egl_context != EGL_NO_CONTEXT; }

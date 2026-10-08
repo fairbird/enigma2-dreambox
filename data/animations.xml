@@ -1,0 +1,113 @@
+<!--
+An animation consists of a <animation> tag and a number of child-tags defining the type of animation.
+
+required <animation>-tag attributes are
+- key="unique_key" - Has to be unique
+- duration="xyz" - Duration of the complete animation in milliseconds (ms)
+
+optional <animation>-tag attributes are
+- title="User defined Name" - Display Name for the UI
+
+- interpolate="linear|accelerate|decelerate|overshoot|bounce" - Defines the Animation Progress interpolator.
+  - accelerate: An interpolator where the rate of change starts out slowly and then accelerates
+    - optional attribute: factor="1.0" - Degree (as float) to which the animation should be eased. Setting factor to 1.0f produces a y=x^2 parabola.
+                                           Increasing factor above 1.0f increases the ease-in effect (i.e., it starts even slower and ends even faster)
+
+  - decelerate: An interpolator where the rate of change starts out quickly and and then decelerates.
+    - optional attribute: factor="1.0" - Degree (as float) to which the animation should be eased. Setting factor to 1.0 produces an upside-down y=x^2 parabola.
+                                           Increasing factor above 1.0 makes increases the ease-out effect (i.e., it starts even faster and ends even slower)
+
+  - overshoot: An interpolator where the change flings forward and overshoots the last value then comes back.
+    - optional attribute: tension="2.0" - Amount of overshoot (as float). When tension equals 0.0f, there is no overshoot and the interpolator becomes a simple deceleration interpolator.
+
+  -bounce:  An interpolator where the change bounces at the end.
+
+Animating properties:
+One may currently animate:
+- alpha -> <alpha> and <alpha_hide>
+- position -> <position> and <position_hide>
+- size -> <size> and <size_hide>
+
+Tags without "_hide"-postfix are "show" animations. Tags with "_hide"-postfix are hide animations.
+When no explicit <*_hide> definition is present the "show" definition will be automatically reversed for hiding, this is especially useful for things like fade-in/fade-out.
+On "Auto-Reversed" hide-animations the PROGRESS value will be inverted - mathematically speaking it'll become "1.0 - progress" instead of "progress" where 0.0 = 0%, 1.0 = 100%.
+Please note that this also reverses the interpolation effects (which may look odd, depending on the interpolator).
+
+* Common Attributes:
+  - value
+    - for "show" animations it defines the start value
+    - for "hide" animations it defines the target value
+    - 0.0 = 0%
+    - 1.0 = 100%
+  - interpolate - exactly the same as interpolate in <animation>. When present overrides the interpolator defined in the <animation> tag.
+
+* <alpha>-specific attributes
+  -
+* <position>-specific optional attributes
+  - animateY="" - only Animate the Y Axis (="" makes the parser happy, value is of no matter)
+  - animateX="" - only Animate the X-Axis (="" makes the parser happy, value is of no matter)
+  -> if neither animateY nor animateX are present, X- and Y-Axis will be animated
+
+* <size>-specific optional attributes
+  - animateW="" - only Animate the width (="" makes the parser happy, value is of no matter)
+  - animateH="" - only Animate the height (="" makes the parser happy, value is of no matter)
+  - centered="" - center point based size animations
+                  this means the size animations will influence the current top-left position (="" makes the parser happy, value is of no matter)
+  -> if neither animateW nor animateH have been set, width and height will be animated
+
+You may combine all 3 types of animations, but only one of each kind for one type of animation (show/hide).
+-->
+
+<animations>
+	<animation key="simple_fade" title="Simple fade" duration="300" interpolate="linear">
+		<alpha val="0.0" interpolate="decelerate" factor="1.75"/>
+		<alpha_hide val="0.0" interpolate="accelerate" factor="1.75"/>
+	</animation>
+	<animation key="quick_fade" title="Quick fade" duration="200" interpolate="linear">
+		<alpha val="0.0" interpolate="decelerate" factor="1.75"/>
+		<alpha_hide val="0.0" interpolate="accelerate" factor="1.75"/>
+	</animation>
+	<animation key="slide_left_to_right" title="Slide in left + Slide out right" duration="250">
+		<position val="-1.0" animateX="" />
+		<position_hide val="2.0" animateX="" />
+	</animation>
+	<animation key="slide_right_to_left" title="Slide in right + Slide out left" duration="250">
+		<position val="2.0" animateX="" />
+		<position_hide val="-1.0" animateX="" />
+	</animation>
+	<animation key="slide_top_to_bottom" title="Slide in top + Slide out bottom" duration="250">
+		<position val="-1.0" animateY="" />
+		<position_hide val="2.0" animateY="" />
+	</animation>
+	<animation key="zoom_and_fade" title="Zoom in + Shrink out with crossfading" duration="250">
+		<alpha val="0.5" />
+		<size val="0,0" centered=""/>
+		<size_hide val="0,0" centered=""/>
+	</animation>
+	<animation key="grow_left_shrink_top" title="Grow from left + Shrink to top" duration="250">
+		<size val="0,0" animateW=""/>
+		<size_hide val="0,0" animateH=""/>
+	</animation>
+		<animation key="slide_zoom_left_to_right" title="Left to right slide + zoom" duration="250">
+		<position val="-1.0" animateX="" />
+		<position_hide val="2.0" animateX="" />
+		<size val="0,0" centered=""/>
+		<size_hide val="0,0" centered=""/>
+	</animation>
+	<animation key="slide_zoom_right_to_left" title="Right to left slide + zoom" duration="250">
+		<position val="2.0" animateX="" />
+		<position_hide val="-1.0" animateX="" />
+		<size val="0,0" centered=""/>
+		<size_hide val="0,0" centered=""/>
+	</animation>
+	<animation key="wizard_previous" title="Slide in left + Slide out right (Wizard)" duration="300">
+		<alpha val="0.0" interpolate="accelerate" factor="1.5"/>
+		<position val="-1.0" animateX="" interpolate="decelerate" factor="1.5"/>
+		<position_hide val="2.0" animateX="" interpolate="accelerate" factor="1.5"/>
+	</animation>
+	<animation key="wizard_next" title="Slide in right + Slide out left (Wizard)" duration="300">
+		<alpha val="0.0" interpolate="accelerate" factor="1.5"/>
+		<position val="2.0" animateX="" interpolate="decelerate" factor="1.5"/>
+		<position_hide val="-1.0" animateX="" interpolate="accelerate" factor="1.5"/>
+	</animation>
+</animations>
