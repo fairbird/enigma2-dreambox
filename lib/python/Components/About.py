@@ -232,7 +232,6 @@ def getRAMTemperature():
 	return ""
 
 
-
 def getCPUCurrentSpeed():
 	speeds = []
 	for policy in sorted(glob("/sys/devices/system/cpu/cpufreq/policy*")):
