@@ -47,7 +47,7 @@ class ConfigList(GUIComponent):
 	def handleKey(self, key, callback=None):
 		selection = self.getCurrent(full=False)
 		if selection and selection[1].enabled and not selection[1].isReadOnly():
-			selection[1].handleKey(key, callback)
+			changed = selection[1].handleKey(key, callback)
 			self.invalidateCurrent()
 			if key in ActionKeys.NUMBERS:
 				self.timer.start(1000, 1)
@@ -214,6 +214,15 @@ class ConfigListScreen:
 				self.actionMaps.append("defaultAction")
 		else:
 			self.actionMaps = []
+		if "key_menu" not in self:
+			self["key_menu"] = StaticText(_("MENU"))
+		if "key_text" not in self:
+			self["key_text"] = StaticText(_("TEXT"))
+		if "menuConfigActions" not in self:
+			self["menuConfigActions"] = HelpableActionMap(self, "ConfigListActions", {
+				"menu": (self.keyMenu, _("Display selection list as a selection menu")),
+			}, prio=1)
+		self["menuConfigActions"].setEnabled(False if fullUI else True)
 		if "HelpWindow" not in self:
 			self["HelpWindow"] = Pixmap()
 			self["HelpWindow"].hide()
@@ -234,11 +243,7 @@ class ConfigListScreen:
 			"pageDown": (self.keyPageDown, _("Move down a screen")),
 			"bottom": (self.keyBottom, _("Move to last line / screen"))
 		}, prio=1)
-		self["editConfigActions"] = HelpableNumberActionMap(self, ["NumberActions", "TextEditActions"], {
-			"backspace": (self.keyBackspace, _("Delete character to left of cursor or select AM times")),
-			"delete": (self.keyDelete, _("Delete character under cursor or select PM times")),
-			"erase": (self.keyErase, _("Delete all the text")),
-			"toggleOverwrite": (self.keyToggle, _("Toggle new text inserts before or overwrites existing text")),
+		self["charConfigActions"] = HelpableNumberActionMap(self, ["NumberActions", "InputAsciiActions"], {
 			"1": (self.keyNumberGlobal, _("Number or SMS style data entry")),
 			"2": (self.keyNumberGlobal, _("Number or SMS style data entry")),
 			"3": (self.keyNumberGlobal, _("Number or SMS style data entry")),
@@ -250,6 +255,13 @@ class ConfigListScreen:
 			"9": (self.keyNumberGlobal, _("Number or SMS style data entry")),
 			"0": (self.keyNumberGlobal, _("Number or SMS style data entry")),
 			"gotAsciiCode": (self.keyGotAscii, _("Keyboard data entry"))
+		}, prio=1)
+		self["charConfigActions"].setEnabled(False if fullUI else True)
+		self["editConfigActions"] = HelpableActionMap(self, ["TextEditActions"], {
+			"backspace": (self.keyBackspace, _("Delete character to left of cursor or select AM times")),
+			"delete": (self.keyDelete, _("Delete character under cursor or select PM times")),
+			"erase": (self.keyErase, _("Delete all the text")),
+			"toggleOverwrite": (self.keyToggle, _("Toggle new text inserts before or overwrites existing text")),
 		}, prio=1)
 		self["editConfigActions"].setEnabled(False if fullUI else True)
 		self["virtualKeyBoardActions"] = HelpableActionMap(self, "VirtualKeyboardActions", {
@@ -359,7 +371,7 @@ class ConfigListScreen:
 					showVirtualKeyBoard(True)
 				else:
 					showVirtualKeyBoard(False)
-				if isinstance(currentConfig, ConfigMACText):
+				if isinstance(currentConfig, ConfigMacText):
 					self["editConfigActions"].setEnabled(False)
 					showVirtualKeyBoard(False)
 				if isinstance(currentConfig, ConfigNumber):
@@ -380,6 +392,19 @@ class ConfigListScreen:
 				else:
 					currConf.help_window.hide()
 
+	def keyMenu(self):
+		def keyMenuCallback(answer):
+			if answer:
+				prev = str(self.getCurrentValue())
+				self["config"].getCurrent(full=False)[1].setValue(answer[1])
+				self["config"].invalidateCurrent()
+				if answer[1] != prev:
+					self.entryChanged()
+
+		currConfig = self["config"].getCurrent()
+		if currConfig and currConfig[1].enabled and hasattr(currConfig[1], "description"):
+			self.session.openWithCallback(keyMenuCallback, ChoiceBox, title=currConfig[0], list=list(zip(currConfig[1].description, currConfig[1].choices)), selection=currConfig[1].getIndex(), keys=[])
+
 	def keySelect(self):
 		currentItem = self.getCurrentItem()
 		if currentItem and not currentItem.isReadOnly():
@@ -387,7 +412,7 @@ class ConfigListScreen:
 				self.keyToggle()
 			elif isinstance(currentItem, ConfigSelection):
 				self.keyMenu()
-			elif isinstance(currentItem, ConfigText) and not isinstance(currentItem, (ConfigMACText, ConfigNumber)):
+			elif isinstance(currentItem, ConfigText) and not isinstance(currentItem, (ConfigMacText, ConfigNumber)):
 				self.keyText()
 			else:
 				self["config"].handleKey(ActionKeys.SELECT, self.entryChanged)
