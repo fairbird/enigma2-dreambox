@@ -9,7 +9,7 @@ from re import search
 from subprocess import PIPE, Popen
 from urllib.request import urlopen
 
-from enigma import eAVControl, eDVBCSAEngine, eDVBFrontendParametersSatellite, eDVBResourceManager, eGetEnigmaDebugLvl, eRTSPStreamServer, eServiceCenter, eServiceReference, eStreamServer, eTimer, getDesktop, getGStreamerVersionString, iFrontendInformation, iPlayableService, iServiceInformation
+from enigma import eAVControl, eDVBCSAEngine, eDVBFrontendParametersSatellite, eDVBResourceManager, eGetEnigmaDebugLvl, eInputDeviceManager, eRTSPStreamServer, eServiceCenter, eServiceReference, eStreamServer, eTimer, getDesktop, getGStreamerVersionString, iFrontendInformation, iPlayableService, iServiceInformation
 
 from ServiceReference import ServiceReference
 from Components.About import about
@@ -1344,6 +1344,14 @@ class InformationReceiver(InformationBase):
 		customCode = fileReadLine("/proc/stb/ir/rc/customcode", source=MODULE_NAME)
 		if customCode:
 			info.append(self.formatLine("P1", _("RC custom code"), customCode))
+		manager = eInputDeviceManager.getInstance()
+		if manager and manager.available():
+			for device in manager.getConnectedDevices():
+				info.append(self.formatLine("P1", _("Bluetooth remote"), f"{device.name()}  ({device.address()})"))
+				if device.batteryLevel() > 0:
+					info.append(self.formatLine("P2", _("Battery"), f"{device.batteryLevel()}%"))
+				if device.rssi():
+					info.append(self.formatLine("P2", _("Signal strength"), f"{device.rssi()} dBm"))
 		if BoxInfo.getItem("HasHDMI-CEC") and config.hdmicec.enabled.value:
 			info.append("")
 			address = config.hdmicec.fixed_physical_address.value if config.hdmicec.fixed_physical_address.value != "0.0.0.0" else _("N/A")
