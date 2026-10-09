@@ -4,7 +4,6 @@ from Screens.Screen import Screen
 from Screens.MessageBox import MessageBox
 # from Screens.WizardLanguage import WizardLanguage
 from Screens.Wizard import wizardManager, Wizard
-from Screens.Time import TimeWizard
 from Screens.HelpMenu import Rc
 from Screens.Standby import TryQuitMainloop, QUIT_RESTART
 from Screens.NetworkSetup import NetworkAdapterSetup, NetworkWiFiAddFlow
@@ -431,4 +430,3 @@ wizardManager.registerWizard(AutoRestoreWizard, config.misc.wizardLanguageEnable
 if OverscanWizard:
 	wizardManager.registerWizard(OverscanWizard, config.misc.do_overscanwizard.value, priority=30)
 wizardManager.registerWizard(WizardStart, config.misc.firstrun.value, priority=30)
-#wizardManager.registerWizard(TimeWizard, config.misc.firstrun.value, priority=40)
