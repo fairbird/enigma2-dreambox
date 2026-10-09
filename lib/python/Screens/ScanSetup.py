@@ -858,6 +858,8 @@ class ScanSetup(ConfigListScreen, Screen, CableTransponderSearchSupport, Terrest
 				pass  # FIXME
 		self.list.append((_("Network scan"), self.scan_networkScan, _("Scan using transponders on NIT table? 'No' will use transponders in xml file.")))
 		self.list.append((_("Clear before scan"), self.scan_clearallservices, _("Remove the services on scanned transponders before re-adding services?")))
+		if self.scan_clearallservices.value != "no":
+			self.list.append((_("Update outdated bouquet entries"), self.scan_updatebouquets, _("After a successful scan, replace missing bouquet services by uniquely named services of the same reception type and satellite position. Ambiguous matches are left unchanged. Bouquet order and custom names are preserved.")))
 		self.list.append((_("Only free scan"), self.scan_onlyfree, _("Choose whether to scan for free services only or whether to include paid/encrypted services too.")))
 		self["config"].list = self.list
 
@@ -870,6 +872,9 @@ class ScanSetup(ConfigListScreen, Screen, CableTransponderSearchSupport, Terrest
 	def newConfig(self):
 		cur = self["config"].getCurrent()
 		print("cur is", cur)
+		if cur is not None and len(cur) > 1 and cur[1] is self.scan_clearallservices:
+			self.createSetup()
+			return
 		if cur == self.typeOfScanEntry or \
 			cur == self.DVB_TypeEntry or \
 			cur == self.typeOfInputEntry or \
@@ -1265,6 +1270,7 @@ class ScanSetup(ConfigListScreen, Screen, CableTransponderSearchSupport, Terrest
 		self.scan_input_as = ConfigSelection(default="channel", choices=[("frequency", _("Frequency")), ("channel", _("Channel"))])
 		self.scan_ter_complete_type = ConfigSelection(default="all", choices=[("all", _("All frequency")), ("extended", _("Extended"))])
 		self.scan_clearallservices = ConfigSelection(default="no", choices=[("no", _("no")), ("yes", _("yes")), ("yes_hold_feeds", _("yes (keep feeds)"))])
+		self.scan_updatebouquets = ConfigYesNo(default=False)
 		self.scan_onlyfree = ConfigYesNo(default=False)
 		self.scan_networkScan = ConfigYesNo(default=False)
 		self.scan_terrestrial_binary_scan = ConfigYesNo(default=False)
@@ -1664,11 +1670,12 @@ class ScanSetup(ConfigListScreen, Screen, CableTransponderSearchSupport, Terrest
 
 	def startScan(self, tlist, flags, feid, networkid=0):
 		if len(tlist):
+			updateBouquets = self.scan_updatebouquets.value and bool(flags & eComponentScan.scanRemoveServices)
 			# flags |= eComponentScan.scanSearchBAT
 			if self.finished_cb:
-				self.session.openWithCallback(self.finished_cb, ServiceScan, [{"transponders": tlist, "feid": feid, "flags": flags, "networkid": networkid}])
+				self.session.openWithCallback(self.finished_cb, ServiceScan, [{"transponders": tlist, "feid": feid, "flags": flags, "networkid": networkid}], updateBouquets=updateBouquets)
 			else:
-				self.session.openWithCallback(self.startScanCallback, ServiceScan, [{"transponders": tlist, "feid": feid, "flags": flags, "networkid": networkid}])
+				self.session.openWithCallback(self.startScanCallback, ServiceScan, [{"transponders": tlist, "feid": feid, "flags": flags, "networkid": networkid}], updateBouquets=updateBouquets)
 		else:
 			if self.finished_cb:
 				self.session.openWithCallback(self.finished_cb, MessageBox, _("Nothing to scan!\nPlease setup your tuner settings before you start a service scan."), MessageBox.TYPE_ERROR)
@@ -1745,6 +1752,7 @@ class ScanSimple(ConfigListScreen, Screen, CableTransponderSearchSupport, Terres
 		if len(nims_to_scan):
 			self.scan_networkScan = ConfigYesNo(default=True)
 			self.scan_clearallservices = ConfigSelection(default="yes", choices=[("no", _("no")), ("yes", _("yes")), ("yes_hold_feeds", _("yes (keep feeds)"))])
+			self.scan_updatebouquets = ConfigYesNo(default=False)
 			self.list.append((_("Network scan"), self.scan_networkScan))
 			self.list.append((_("Clear before scan"), self.scan_clearallservices))
 
@@ -1759,7 +1767,17 @@ class ScanSimple(ConfigListScreen, Screen, CableTransponderSearchSupport, Terres
 				self.list.append((_("Blindscan terrestrial (if possible)"), self.scan_terrestrial_binary_scan))
 
 		ConfigListScreen.__init__(self, self.list, fullUI=True)
+		self.scanOptions = self.list[:]
+		if self.nim_enable:
+			self.scan_clearallservices.addNotifier(self.updateScanOptions, initial_call=True)
 		self["footer"] = Label(_("Press OK to scan"))
+
+	def updateScanOptions(self, element):
+		self.list = self.scanOptions[:]
+		if element.value != "no":
+			index = next(index for index, entry in enumerate(self.list) if entry[1] is element)
+			self.list.insert(index + 1, (_("Update outdated bouquet entries"), self.scan_updatebouquets, _("After a successful scan, replace missing bouquet services by uniquely named services of the same reception type and satellite position. Ambiguous matches are left unchanged. Bouquet order and custom names are preserved.")))
+		self["config"].setList(self.list)
 
 	def getNetworksForNim(self, nim):
 		if nim.isCompatible("DVB-S"):
@@ -1870,10 +1888,11 @@ class ScanSimple(ConfigListScreen, Screen, CableTransponderSearchSupport, Terres
 
 	def startScan(self, scanList):
 		if len(scanList):
+			updateBouquets = self.scan_updatebouquets.value and self.scan_clearallservices.value != "no"
 			if self.finished_cb:
-				self.session.openWithCallback(self.finished_cb, ServiceScan, scanList=scanList)
+				self.session.openWithCallback(self.finished_cb, ServiceScan, scanList=scanList, updateBouquets=updateBouquets)
 			else:
-				self.session.open(ServiceScan, scanList=scanList)
+				self.session.open(ServiceScan, scanList=scanList, updateBouquets=updateBouquets)
 		else:
 			if self.finished_cb:
 				self.session.openWithCallback(self.finished_cb, MessageBox, _("Nothing to scan!\nPlease setup your tuner settings before you start a service scan."), MessageBox.TYPE_ERROR)
