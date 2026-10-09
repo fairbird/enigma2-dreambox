@@ -1512,28 +1512,6 @@ void gEGLDC::exec(const gOpcode* opcode) {
 				fadeBegin(rect, (float)ms / 1000.0f);
 			break;
 		}
-				flushBlitBatch();
-				flushTextBatch();
-				const eRect region = animRegion(spec, clipped);
-				if (animCapture(m_anim_tex_before, region)) {
-					m_anim_pending = true;
-					m_anim_show = show;
-					m_anim_rect = clipped;
-					m_anim_region = region;
-					m_anim_active = spec;
-				}
-			}
-			break;
-		}
-
-		case gOpcode::beginLayer:
-			animBeginLayer();
-			break;
-
-		case gOpcode::endLayer:
-			animEndLayer();
-			break;
-
 		default:
 			// Unknown to this backend's own opcode handlers - flush any
 			// pending batch first in case it draws something (e.g. a
