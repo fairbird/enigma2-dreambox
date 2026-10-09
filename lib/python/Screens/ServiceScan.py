@@ -329,6 +329,7 @@ class ServiceScan(Screen):
 					self.timer.startLongTimer(2)  # Delay the next step by 2 seconds to give eComponentScan time to finish.
 				else:
 					self.finishBouquetRepair()
+
 					def delayNext2():
 						self.timer.stop()
 						self.timer.callback.remove(delayNext2)
