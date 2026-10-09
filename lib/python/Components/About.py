@@ -223,6 +223,15 @@ def getFlashType():
 	return result
 
 
+def getRAMTemperature():
+	for zone in glob("/sys/class/thermal/thermal_zone*"):
+		if fileReadLine(f"{zone}/type", default="", source=MODULE_NAME) == "ddr_thermal":
+			temperature = fileReadLine(f"{zone}/temp", default="", source=MODULE_NAME)
+			if temperature.lstrip("-").isdigit():
+				return f"{format_string('%.1f', int(temperature) / 1000)}{DEGREE}C"
+	return ""
+
+
 def getCPUBrand():
 	socFamily = BoxInfo.getItem("socfamily")
 	if BoxInfo.getItem("AmlogicFamily"):
