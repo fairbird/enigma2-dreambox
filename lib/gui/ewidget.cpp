@@ -135,6 +135,23 @@ void eWidget::invalidate(const gRegion &region)
 	}
 }
 
+void eWidget::fadeContent()
+{
+	if (!(m_vis & wVisShow) || m_visible_with_childs.empty())
+		return;
+	eWidget *root = this;
+	ePoint abspos = position();
+	while (root && !root->m_desktop)
+	{
+		root = root->m_parent;
+		if (!root)
+			return;
+		abspos += root->position();
+	}
+	if (root && root->m_desktop)
+		root->m_desktop->startFade(eRect(abspos, size()));
+}
+
 void eWidget::show()
 {
 	if (m_vis & wVisShow)

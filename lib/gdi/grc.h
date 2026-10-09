@@ -27,6 +27,8 @@
 #include <lib/gdi/compositing.h>
 
 extern int g_window_animation_current;
+extern int g_window_animation_id;
+extern int g_widget_fade_ms;
 
 class eTextPara;
 
@@ -85,6 +87,7 @@ struct gOpcode
 		sendHide,
 		beginLayer,
 		endLayer,
+		beginFade,
 #ifdef USE_LIBVUGLES2
 		sendShowItem,
 		setFlush,
@@ -213,6 +216,7 @@ struct gOpcode
 		{
 			ePoint point;
 			eSize size;
+			int anim_id;
 		} *setShowHideInfo;
 #ifdef USE_LIBVUGLES2
 		struct psetShowItemInfo
@@ -408,6 +412,7 @@ public:
 	void sendHide(ePoint point, eSize size);
 	void beginLayer();
 	void endLayer();
+	void beginFade(ePoint point, eSize size);
 #ifdef USE_LIBVUGLES2
 	void sendShowItem(long dir, ePoint point, eSize size);
 	void setFlush(bool val);

@@ -361,6 +361,7 @@ void eLabel::setText(const std::string& string) {
 	if (m_text == string)
 		return;
 	m_text = string;
+	fadeContent();
 	stopScroll();
 	updateTextSize();
 	event(evtChangedText);

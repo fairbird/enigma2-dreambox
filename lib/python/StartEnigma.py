@@ -594,6 +594,7 @@ def runScreenTest():
 	from Components.ScreenAnimations import ScreenAnimations, eWindowAnimationManager
 	ScreenAnimations().loadDefault()
 	eWindowAnimationManager.setDefault(config.osd.window_animation_default.value)
+	eWindowAnimationManager.setWidgetDefault()
 
 	toast = Toast()  # noqa F841
 

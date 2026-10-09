@@ -1,12 +1,14 @@
 # -*- coding: utf-8 -*-
 import xml.etree.ElementTree as ET
 
-from enigma import setAnimation_spec
-from Components.config import config, ConfigOnOff, ConfigText
+from enigma import getDesktop, setAnimation_spec
+from Components.config import config, ConfigInteger, ConfigOnOff, ConfigText
 from Tools.Directories import fileExists, resolveFilename, SCOPE_SKIN
 
 config.osd.window_animation = ConfigOnOff(default=True)
 config.osd.window_animation_default = ConfigText(default="simple_fade")
+config.osd.widget_animation = ConfigOnOff(default=False)
+config.osd.widget_animation_duration = ConfigInteger(default=400, limits=(50, 1000))
 
 INTERPOLATORS = {"linear": 0, "accelerate": 1, "decelerate": 2, "overshoot": 3, "bounce": 4}
 
@@ -41,7 +43,9 @@ class WindowAnimationManager:
 		setAnimation_spec(animset.spec if animset and config.osd.window_animation.value else "")
 
 	def setWidgetDefault(self):
-		pass
+		desktop = getDesktop(0)
+		desktop.setWidgetAnimationsEnabled(config.osd.widget_animation.value)
+		desktop.setWidgetAnimationDuration(config.osd.widget_animation_duration.value)
 
 
 eWindowAnimationManager = WindowAnimationManager()

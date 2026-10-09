@@ -295,6 +295,7 @@ bool gEGLDC::createFBO(int w, int h) {
 
 void gEGLDC::destroyFBO() {
 	if (m_anim_tex_before) { glDeleteTextures(1, &m_anim_tex_before); m_anim_tex_before = 0; }
+	fadeClear();
 	if (m_anim_tex_after) { glDeleteTextures(1, &m_anim_tex_after); m_anim_tex_after = 0; }
 	m_anim_pending = false;
 	m_anim_layer_valid = false;
@@ -1443,6 +1444,7 @@ void gEGLDC::exec(const gOpcode* opcode) {
 			flushTextBatch();
 			if (m_anim_pending)
 				animRun();
+			fadeDraw();
 			flip();
 			gDC::exec(opcode);
 			break;
@@ -1459,15 +1461,57 @@ void gEGLDC::exec(const gOpcode* opcode) {
 		case gOpcode::sendHide: {
 			const bool show = (opcode->opcode == gOpcode::sendShow);
 			const eRect rect(opcode->parm.setShowHideInfo->point, opcode->parm.setShowHideInfo->size);
+			const int spec_id = opcode->parm.setShowHideInfo->anim_id;
 			delete opcode->parm.setShowHideInfo;
 			m_anim_layer_valid = false;
 			AnimSpec spec;
 			{
 				std::lock_guard<std::mutex> lock(s_anim_mutex);
 				spec = s_anim_spec;
+				for (size_t i = 0; i < s_anim_history.size(); ++i) {
+					if (s_anim_history[i].id == spec_id) {
+						spec = s_anim_history[i];
+						break;
+					}
+				}
 			}
+			// a window shown in the same frame replaces a pending hide, so the new
+			// window animates in over the old one instead of the old one animating
+			// out over the already drawn new one
+			if (show && m_anim_pending && !m_anim_show)
+				m_anim_pending = false;
 			const eRect clipped = rect & eRect(0, 0, m_fbo_width, m_fbo_height);
 			if (spec.valid && !m_anim_pending && clipped.width() > 0 && clipped.height() > 0) {
+				flushBlitBatch();
+				flushTextBatch();
+				const eRect region = animRegion(spec, clipped);
+				if (animCapture(m_anim_tex_before, region)) {
+					m_anim_pending = true;
+					m_anim_show = show;
+					m_anim_rect = clipped;
+					m_anim_region = region;
+					m_anim_active = spec;
+				}
+			}
+			break;
+		}
+
+		case gOpcode::beginLayer:
+			animBeginLayer();
+			break;
+
+		case gOpcode::endLayer:
+			animEndLayer();
+			break;
+
+		case gOpcode::beginFade: {
+			const eRect rect(opcode->parm.setShowHideInfo->point, opcode->parm.setShowHideInfo->size);
+			delete opcode->parm.setShowHideInfo;
+			const int ms = g_widget_fade_ms;
+			if (ms > 0)
+				fadeBegin(rect, (float)ms / 1000.0f);
+			break;
+		}
 				flushBlitBatch();
 				flushTextBatch();
 				const eRect region = animRegion(spec, clipped);
@@ -1519,6 +1563,8 @@ std::atomic<int> gEGLDC::s_anim_speed(20);
 std::atomic<int> gEGLDC::s_anim_listbox(0);
 std::mutex gEGLDC::s_anim_mutex;
 gEGLDC::AnimSpec gEGLDC::s_anim_spec;
+int gEGLDC::s_anim_counter = 0;
+std::vector<gEGLDC::AnimSpec> gEGLDC::s_anim_history;
 
 void gEGLDC::setAnimationSpec(const char *spec) {
 	AnimSpec s;
@@ -1535,10 +1581,15 @@ void gEGLDC::setAnimationSpec(const char *spec) {
 	}
 	{
 		std::lock_guard<std::mutex> lock(s_anim_mutex);
+		s.id = ++s_anim_counter;
 		s_anim_spec = s;
+		s_anim_history.push_back(s);
+		if (s_anim_history.size() > 16)
+			s_anim_history.erase(s_anim_history.begin());
 	}
 	s_anim_current = s.valid ? 1 : 0;
 	g_window_animation_current = s.valid ? 1 : 0;
+	g_window_animation_id = s.id;
 }
 
 // gDC::getRGB() resolves indexed gColor values through m_pixmap's clut.
@@ -2119,7 +2170,7 @@ void gEGLDC::animRun() {
 
 	const GLuint bg = m_anim_show ? m_anim_tex_before : m_anim_tex_after;
 	GLuint layer = m_anim_show ? m_anim_tex_after : m_anim_tex_before;
-	if (m_anim_layer_valid && m_anim_tex_layer)
+	if (m_anim_show && m_anim_layer_valid && m_anim_tex_layer)
 		layer = m_anim_tex_layer;
 	m_anim_layer_valid = false;
 
@@ -2128,6 +2179,7 @@ void gEGLDC::animRun() {
 	typedef std::chrono::steady_clock clock_t_;
 	const clock_t_::time_point t0 = clock_t_::now();
 	clock_t_::time_point last = t0;
+	eRect prev = r;
 
 	for (int i = 0; i < 120; ++i) {
 		const clock_t_::time_point now = clock_t_::now();
@@ -2141,7 +2193,15 @@ void gEGLDC::animRun() {
 
 		float alpha, x, y, w, h;
 		animState(spec, m_anim_show, r, (float)t, alpha, x, y, w, h);
-		animDrawFrame(alpha, x, y, w, h, bg, layer, region, r);
+		const int cx0 = (int)floorf(x);
+		const int cy0 = (int)floorf(y);
+		const int cx1 = (int)ceilf(x + w);
+		const int cy1 = (int)ceilf(y + h);
+		const eRect cur(cx0, cy0, std::max(0, cx1 - cx0), std::max(0, cy1 - cy0));
+		const eRect dirty = (prev | cur) & region;
+		if (dirty.width() > 0 && dirty.height() > 0)
+			animDrawFrame(alpha, x, y, w, h, bg, layer, dirty, r);
+		prev = cur;
 		flip();
 	}
 
@@ -2168,6 +2228,88 @@ void gEGLDC::animRun() {
 		m_texture_shader.drawBatch(fq, 6, m_anim_tex_after, 1.0f);
 	}
 	glEnable(GL_BLEND);
+	setGlScissor(eRect(0, 0, m_fbo_width, m_fbo_height));
+}
+
+void gEGLDC::fadeClear() {
+	for (size_t i = 0; i < m_fades.size(); ++i) {
+		if (m_fades[i].tex)
+			glDeleteTextures(1, &m_fades[i].tex);
+	}
+	m_fades.clear();
+}
+
+void gEGLDC::fadeBegin(const eRect &area, float seconds) {
+	if (!m_fbo || m_fbo_width <= 0 || m_fbo_height <= 0 || seconds <= 0.0f || m_anim_pending)
+		return;
+	const eRect c = area & eRect(0, 0, m_fbo_width, m_fbo_height);
+	if (c.width() <= 0 || c.height() <= 0)
+		return;
+	if ((long)c.width() * (long)c.height() > ((long)m_fbo_width * (long)m_fbo_height) / 4)
+		return;
+	flushBlitBatch();
+	flushTextBatch();
+	for (size_t i = 0; i < m_fades.size();) {
+		const eRect old = m_fades[i].rect;
+		if (old.x() == c.x() && old.y() == c.y() && old.width() == c.width() && old.height() == c.height()) {
+			if (m_fades[i].tex)
+				glDeleteTextures(1, &m_fades[i].tex);
+			m_fades.erase(m_fades.begin() + i);
+		} else {
+			++i;
+		}
+	}
+	if (m_fades.size() >= 8)
+		return;
+	FadeItem f;
+	f.rect = c;
+	f.start = std::chrono::steady_clock::now();
+	f.duration = seconds;
+	glGenTextures(1, &f.tex);
+	glBindTexture(GL_TEXTURE_2D, f.tex);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, c.width(), c.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
+	glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, c.x(), m_fbo_height - (c.y() + c.height()), c.width(), c.height());
+	m_fades.push_back(f);
+}
+
+void gEGLDC::fadeDraw() {
+	if (m_fades.empty() || !m_fbo)
+		return;
+	const std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
+	glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
+	glEnable(GL_SCISSOR_TEST);
+	glEnable(GL_BLEND);
+	setAlphaBlendMode(true);
+	for (size_t i = 0; i < m_fades.size();) {
+		FadeItem &f = m_fades[i];
+		const float t = std::chrono::duration<float>(now - f.start).count() / f.duration;
+		if (t >= 1.0f) {
+			if (f.tex)
+				glDeleteTextures(1, &f.tex);
+			m_fades.erase(m_fades.begin() + i);
+			continue;
+		}
+		setGlScissor(f.rect);
+		const float x = (float)f.rect.x();
+		const float y = (float)f.rect.y();
+		const float w = (float)f.rect.width();
+		const float h = (float)f.rect.height();
+		const float q[24] = {
+			x, y, 0.0f, 1.0f,
+			x + w, y, 1.0f, 1.0f,
+			x, y + h, 0.0f, 0.0f,
+			x + w, y, 1.0f, 1.0f,
+			x + w, y + h, 1.0f, 0.0f,
+			x, y + h, 0.0f, 0.0f
+		};
+		m_texture_shader.drawBatch(q, 6, f.tex, 1.0f - t);
+		++i;
+	}
 	setGlScissor(eRect(0, 0, m_fbo_width, m_fbo_height));
 }
 

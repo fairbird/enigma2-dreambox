@@ -3,6 +3,8 @@
 
 #include <lib/gdi/grc.h>
 #include <lib/base/eptrlist.h>
+#include <vector>
+#include <stdint.h>
 
 class eWidget;
 class eMainloop;
@@ -78,6 +80,9 @@ public:
 	void sendShow(ePoint point, eSize size);
 	void sendHide(ePoint point, eSize size);
 	void captureLayer(eWidget *widget);
+	void setWidgetAnimationsEnabled(bool enabled);
+	void setWidgetAnimationDuration(int ms);
+	void startFade(const eRect &area);
 	eRect bounds() const; // returns area inside margins
 	eRect margins() const { return m_margins; }
 	void setMargins(const eRect& value) { m_margins = value; }
@@ -105,6 +110,17 @@ private:
 
 	int m_style_id;
 	eRect m_margins;
+
+	struct FadeEntry
+	{
+		eRect rect;
+		int64_t end_ms;
+	};
+	bool m_widget_anim;
+	int m_widget_anim_ms;
+	std::vector<FadeEntry> m_fades;
+	ePtr<eTimer> m_fade_timer;
+	void fadeTick();
 };
 
 #endif

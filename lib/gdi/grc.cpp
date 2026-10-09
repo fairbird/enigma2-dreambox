@@ -785,6 +785,8 @@ void gPainter::end()
 }
 
 int g_window_animation_current = 0;
+int g_window_animation_id = 0;
+int g_widget_fade_ms = 0;
 
 void gPainter::beginLayer()
 {
@@ -816,6 +818,7 @@ void gPainter::sendShow(ePoint point, eSize size)
 	o.parm.setShowHideInfo = new gOpcode::para::psetShowHideInfo;
 	o.parm.setShowHideInfo->point = point;
 	o.parm.setShowHideInfo->size = size;
+	o.parm.setShowHideInfo->anim_id = g_window_animation_id;
 	m_rc->submit(o);
 }
 
@@ -829,8 +832,23 @@ void gPainter::sendHide(ePoint point, eSize size)
 	o.parm.setShowHideInfo = new gOpcode::para::psetShowHideInfo;
 	o.parm.setShowHideInfo->point = point;
 	o.parm.setShowHideInfo->size = size;
+	o.parm.setShowHideInfo->anim_id = g_window_animation_id;
 	m_rc->submit(o);
 }
+void gPainter::beginFade(ePoint point, eSize size)
+{
+	if (m_dc->islocked())
+		return;
+	gOpcode o;
+	o.opcode = gOpcode::beginFade;
+	o.dc = m_dc.grabRef();
+	o.parm.setShowHideInfo = new gOpcode::para::psetShowHideInfo;
+	o.parm.setShowHideInfo->point = point;
+	o.parm.setShowHideInfo->size = size;
+	o.parm.setShowHideInfo->anim_id = 0;
+	m_rc->submit(o);
+}
+
 #ifdef USE_LIBVUGLES2
 void gPainter::sendShowItem(long dir, ePoint point, eSize size)
 {
@@ -1370,6 +1388,9 @@ void gDC::exec(const gOpcode *o)
 	case gOpcode::beginLayer:
 		break;
 	case gOpcode::endLayer:
+		break;
+	case gOpcode::beginFade:
+		delete o->parm.setShowHideInfo;
 		break;
 #ifdef USE_LIBVUGLES2
 	case gOpcode::sendShowItem:

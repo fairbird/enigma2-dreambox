@@ -1,6 +1,8 @@
 #pragma once
 #include <atomic>
 #include <mutex>
+#include <chrono>
+#include <vector>
 #include <EGL/egl.h>
 #ifdef HAVE_GLES3
 #include <GLES3/gl3.h>
@@ -32,6 +34,7 @@ private:
 
 	struct AnimSpec {
 		bool valid = false;
+		int id = 0;
 		float duration = 0.25f;
 		int base_type = 0;
 		float base_factor = 1.0f;
@@ -206,6 +209,18 @@ private:
 	void animDrawFrame(float alpha, float x, float y, float w, float h, GLuint bg, GLuint layer, const eRect &region, const eRect &r);
 	void animRun();
 
+	// widget cross-fade (see fadeBegin()/fadeDraw())
+	struct FadeItem {
+		eRect rect;
+		GLuint tex = 0;
+		std::chrono::steady_clock::time_point start;
+		float duration = 0.4f;
+	};
+	std::vector<FadeItem> m_fades;
+	void fadeBegin(const eRect &area, float seconds);
+	void fadeDraw();
+	void fadeClear();
+
 	// dedicated opcode handlers
 	void executeFill(const gOpcode* op);
 	void executeFillRegion(const gOpcode* op);
@@ -307,6 +322,8 @@ public:
 
 	static std::mutex s_anim_mutex;
 	static AnimSpec s_anim_spec;
+	static int s_anim_counter;
+	static std::vector<AnimSpec> s_anim_history;
 	static void setAnimationSpec(const char *spec);
 
 	void flip();

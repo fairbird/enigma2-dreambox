@@ -2,6 +2,7 @@
 #include <lib/gui/ewidget.h>
 #include <lib/base/ebase.h>
 #include <lib/gdi/grc.h>
+#include <chrono>
 
 extern void dumpRegion(const gRegion &region);
 
@@ -533,7 +534,9 @@ eWidgetDesktop::eWidgetDesktop(eSize size):
 	m_mainloop(0),
 	m_require_redraw(0),
 	m_style_id(0),
-	m_margins(0,0,0,0)
+	m_margins(0,0,0,0),
+	m_widget_anim(false),
+	m_widget_anim_ms(400)
 {
 	m_screen.m_dirty_region = gRegion(eRect(ePoint(0, 0), size));
 	m_screen.m_screen_size = size;
@@ -663,6 +666,86 @@ void eWidgetDesktop::captureLayer(eWidget *widget)
 	painter.beginLayer();
 	widget->doPaint(painter, region, 0);
 	painter.endLayer();
+}
+
+static int64_t fadeNowMs()
+{
+	return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now().time_since_epoch()).count();
+}
+
+void eWidgetDesktop::setWidgetAnimationsEnabled(bool enabled)
+{
+	m_widget_anim = enabled;
+	if (!enabled)
+	{
+		m_fades.clear();
+		if (m_fade_timer)
+			m_fade_timer->stop();
+	}
+}
+
+void eWidgetDesktop::setWidgetAnimationDuration(int ms)
+{
+	if (ms < 50)
+		ms = 50;
+	if (ms > 1000)
+		ms = 1000;
+	m_widget_anim_ms = ms;
+	g_widget_fade_ms = ms;
+}
+
+void eWidgetDesktop::startFade(const eRect &area)
+{
+	if (!m_widget_anim || m_style_id != 0 || m_comp_mode != cmImmediate || !m_mainloop)
+		return;
+	if (area.width() <= 0 || area.height() <= 0)
+		return;
+	{
+		gPainter painter(m_screen.m_dc);
+		painter.beginFade(ePoint(area.x(), area.y()), area.size());
+	}
+	const int64_t end = fadeNowMs() + m_widget_anim_ms + 80;
+	bool found = false;
+	for (size_t i = 0; i < m_fades.size(); ++i)
+	{
+		const eRect &r = m_fades[i].rect;
+		if (r.x() == area.x() && r.y() == area.y() && r.width() == area.width() && r.height() == area.height())
+		{
+			m_fades[i].end_ms = end;
+			found = true;
+		}
+	}
+	if (!found)
+	{
+		if (m_fades.size() >= 8)
+			return;
+		FadeEntry entry;
+		entry.rect = area;
+		entry.end_ms = end;
+		m_fades.push_back(entry);
+	}
+	if (!m_fade_timer)
+	{
+		m_fade_timer = eTimer::create(m_mainloop);
+		CONNECT(m_fade_timer->timeout, eWidgetDesktop::fadeTick);
+	}
+	if (!m_fade_timer->isActive())
+		m_fade_timer->start(33, false);
+}
+
+void eWidgetDesktop::fadeTick()
+{
+	const int64_t now = fadeNowMs();
+	for (size_t i = 0; i < m_fades.size();)
+	{
+		invalidate(gRegion(m_fades[i].rect));
+		if (now >= m_fades[i].end_ms)
+			m_fades.erase(m_fades.begin() + i);
+		else
+			++i;
+	}
+	if (m_fades.empty() && m_fade_timer)
+		m_fade_timer->stop();
 }
 
 void eWidgetDesktop::sendShow(ePoint point, eSize size)
