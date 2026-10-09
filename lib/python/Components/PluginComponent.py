@@ -68,7 +68,7 @@ class PluginComponent:
 							# supress errors due to missing plugin.py* files (badly removed plugin)
 							for fn in ('plugin.py', 'plugin.pyc'):
 								if os.path.exists(os.path.join(path, fn)):
-									self.pluginWarnings.append((c + "/" + pluginName, str(exc)))
+									self.pluginWarnings.append((pluginDirectory + "/" + pluginName, str(exc)))
 									from traceback import print_exc
 									print_exc()
 									break
@@ -95,7 +95,7 @@ class PluginComponent:
 								keymapparser.readKeymap(keymap)
 							except Exception as exc:
 								print("keymap for plugin %s/%s failed to load: " % (c, pluginName), exc)
-								self.pluginWarnings.append((c + "/" + pluginName, str(exc)))
+								self.pluginWarnings.append((pluginDirectory + "/" + pluginName, str(exc)))
 
 		# build a diff between the old list of plugins and the new one
 		# internally, the "fnc" argument will be compared with __eq__
