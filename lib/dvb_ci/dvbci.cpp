@@ -241,6 +241,8 @@ void eDVBCIInterfaces::gotMessageMain(const int &message)
 		if (!eDVBResourceManager::getInstance(manager) && manager)
 			manager->refreshNonCIDemuxSources();
 	}
+	else if (message == messageRetryReleasedRouting)
+		retryReleasedRouting();
 	else if (message >= messageRoutingChanged && message < messageRoutingChanged + 26)
 		m_routing_changed(message - messageRoutingChanged);
 	else
@@ -989,7 +991,7 @@ void eDVBCIInterfaces::refreshReleasedRouting()
 		else
 			eDebug("[CI] slot %d release refresh after demux handover: %s", *it, source.c_str());
 	}
-	// One attempt per real release; never periodically rewrite a healthy route.
+	// One attempt per release or startup authentication; no periodic rewrites.
 	m_pending_ci_releases.clear();
 }
 
@@ -1409,17 +1411,30 @@ void eDVBCIInterfaces::revertCIPlusRouting(int slotid)
 
 	eDebug("[CI] revertCIPlusRouting: camMgrActive=%d ciRoutingActive=%d slot=%d tuner=%d input=%s ci_input=%s", slot->isCamMgrRoutingActive(), slot->ciplusRoutingDone(), slotid, ciplus_routing_tunernum, ciplus_routing_input.c_str(), ciplus_routing_ci_input.c_str());
 
-	if (slot->isCamMgrRoutingActive() || // CamMgr has set up routing. Don't revert that.
-		slot->ciplusRoutingDone())       // need to only run once during CI initialization
+	if (ciplus_routing_tunernum < 0 || ciplus_routing_input.empty() || ciplus_routing_ci_input.empty())
 	{
-		slot->setCIPlusRoutingDone();
-		return;
+		eDebug("[CI] revertCIPlusRouting: no saved routing for slot %d, leaving sources unchanged", slotid);
+	}
+	else
+	{
+		slot->setSource(ciplus_routing_ci_input);
+		setInputSource(ciplus_routing_tunernum, ciplus_routing_input);
 	}
 
-	slot->setSource(ciplus_routing_ci_input);
-	setInputSource(ciplus_routing_tunernum, ciplus_routing_input);
-
 	slot->setCIPlusRoutingDone();
+	if (m_needs_ci_release_refresh)
+	{
+		// A GUI restart or temporary authentication route can leave a stale
+		// driver path even when proc sources look correct. Refresh only after
+		// authentication and demux handover; another active CAM defers this.
+		{
+			singleLock s(m_slot_lock);
+			m_pending_ci_releases.insert(slotid);
+		}
+		eDebug("[CI] slot %d startup refresh pending after authentication", slotid);
+		// Authentication runs in the CI thread; only arm timers in the mainloop.
+		m_messagepump_main.send(messageRetryReleasedRouting);
+	}
 }
 
 int eDVBCISlot::send(const unsigned char *data, size_t len)
@@ -1527,6 +1542,7 @@ eDVBCISlot::eDVBCISlot(eMainloop *context, int nr):
 	ca_manager = 0;
 	cc_manager = 0;
 	use_count = 0;
+	current_tuner = -1;
 	linked_next = 0;
 	user_mapped = false;
 	plugged = false;
