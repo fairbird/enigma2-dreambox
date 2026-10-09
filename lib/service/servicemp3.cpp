@@ -159,6 +159,16 @@ static void gstSetStringIfAvailable(GstElement* element, const char* property, c
 		g_object_set(G_OBJECT(element), property, value.c_str(), NULL);
 }
 
+/* PLAYING with no state change in flight; timeout 0, never blocks. */
+static bool pipelineSettledInPlaying(GstElement* pipeline)
+{
+	if (!pipeline) return false;
+	GstState state = GST_STATE_NULL, pending = GST_STATE_VOID_PENDING;
+	gst_element_get_state(pipeline, &state, &pending, 0);
+	return state == GST_STATE_PLAYING && pending == GST_STATE_VOID_PENDING;
+}
+
+
 static GstElement* createDashPlaybackPipeline(const std::string& uri, const std::string& useragent)
 {
 	/* HW audio sink expects stream-format=raw post-aacparse. */
@@ -1133,7 +1143,7 @@ eServiceMP3::eServiceMP3(eServiceReference ref)
 		for (std::vector<ePtr<eDVBService>>::iterator it = iptv_services.begin(); it != iptv_services.end(); ++it) {
 			if (sref.find((*it)->m_reference_str) != std::string::npos) {
 				if (eSettings::audio_usecache)
-					m_currentAudioStream = (*it)->getCacheEntry(eDVBService::cMPEGAPID);
+					m_initialAudioStream = (*it)->getCacheEntry(eDVBService::cMPEGAPID);
 				m_currentSubtitleStream = (*it)->getCacheEntry(eDVBService::cSUBTITLE);
 				m_cachedSubtitleStream = m_currentSubtitleStream;
 				break;
@@ -1157,6 +1167,7 @@ eServiceMP3::eServiceMP3(eServiceReference ref)
 
 	const char* filename;
 	std::string filename_str;
+	std::string audio_url_str;
 	size_t pos = m_ref.path.find('#');
 	if (pos != std::string::npos && (m_ref.path.compare(0, 4, "http") == 0 || m_ref.path.compare(0, 4, "rtsp") == 0)) {
 		filename_str = m_ref.path.substr(0, pos);
@@ -1177,16 +1188,34 @@ eServiceMP3::eServiceMP3(eServiceReference ref)
 
 	if (!m_ref.alternativeurl.empty())
 		filename = m_ref.alternativeurl.c_str();
+	{
+		const std::string marker = "&e2audiotrack=";
+		std::string url = filename;
+		size_t ppos = url.find(marker);
 
+		if (ppos != std::string::npos) {
+			size_t value_start = ppos + marker.size();
+			size_t value_end = url.find('&', value_start);
+			std::string value = url.substr(value_start,
+				value_end == std::string::npos ? std::string::npos : value_end - value_start);
+
+			m_initialAudioStream = atoi(value.c_str());
+			url.erase(ppos, (value_end == std::string::npos ? url.size() : value_end) - ppos);
+			audio_url_str = url;
+			filename = audio_url_str.c_str();
+			eDebug("[eServiceMP3] e2audiotrack=%d", m_initialAudioStream);
+		}
+	}
 	gchar* suburi = NULL;
 
 	m_external_subtitle_path = "";
 	m_external_subtitle_language = "";
 	m_external_subtitle_extension = "";
 
-	pos = m_ref.path.find("&suburi=");
+	std::string suburi_source = filename;
+	pos = suburi_source.find("&suburi=");
 	if (pos != std::string::npos) {
-		filename_str = filename;
+		filename_str = suburi_source;
 
 		std::string suburi_str = filename_str.substr(pos + 8);
 		filename = suburi_str.c_str();
@@ -2883,7 +2912,7 @@ int eServiceMP3::getNumberOfTracks() {
 int eServiceMP3::getCurrentTrack() {
 	if (m_is_dash_pipeline)
 		return m_currentAudioStream >= 0 ? m_currentAudioStream : 0;
-	if (m_currentAudioStream == -1)
+	if (m_gst_playbin)
 		g_object_get(m_gst_playbin, "current-audio", &m_currentAudioStream, NULL);
 	return m_currentAudioStream;
 }
@@ -2899,14 +2928,69 @@ int eServiceMP3::getCurrentTrack() {
  * @return RESULT Returns 0 on success, or an error code if the selection fails.
  */
 RESULT eServiceMP3::selectTrack(unsigned int i) {
+	if (i >= m_audioStreams.size())
+		return -1;
+	m_initialAudioSelection = false;
+	m_audio_switch_deferred = -1;
 	m_currentAudioStream = getCurrentTrack();
-	if (m_currentAudioStream == (int)i)
-		return m_currentAudioStream;
+	if (m_currentAudioStream == (int)i) {
+		setCacheEntry(true, i);
+		return 0;
+	}
 	eDebug("[eServiceMP3 selectTrack %d", i);
 
 	m_clear_buffers = true;
 	int result = selectAudioStream(i);
+	if (!result && m_audio_switch_deferred >= 0)
+		setCacheEntry(true, i);
 	return result;
+}
+
+void eServiceMP3::applyAudioSelection() {
+	if (m_is_dash_pipeline || m_audioStreams.empty() || !pipelineSettledInPlaying(m_gst_playbin))
+		return;
+
+	if (m_audio_switch_deferred >= 0) {
+		selectTrack(m_audio_switch_deferred);
+		return;
+	}
+
+	if (!m_initialAudioSelection)
+		return;
+
+	int wanted = m_initialAudioStream;
+	if (wanted < 0 || wanted >= (int)m_audioStreams.size()) {
+		wanted = getCurrentTrack();
+		if (wanted < 0 || wanted >= (int)m_audioStreams.size())
+			wanted = 0;
+
+		const std::string languages[] = {
+			eSettings::audio_autoselect1,
+			eSettings::audio_autoselect2,
+			eSettings::audio_autoselect3,
+			eSettings::audio_autoselect4
+		};
+
+		int best = 4;
+		for (unsigned int i = 0; i < m_audioStreams.size(); ++i) {
+			const std::string& language = m_audioStreams[i].language_code;
+			if (language.empty())
+				continue;
+
+			for (int priority = 0; priority < best; ++priority) {
+				if (!languages[priority].empty() &&
+					languages[priority].find(language) != std::string::npos) {
+					wanted = i;
+					best = priority;
+					break;
+				}
+			}
+		}
+	}
+
+	m_initialAudioSelection = false;
+	if (getCurrentTrack() != wanted)
+		selectAudioStream(wanted, true, false);
 }
 
 /**
@@ -2935,6 +3019,8 @@ void eServiceMP3::clearBuffers(bool force) {
 		/* flush */
 		int res = seekTo(ppos);
 		if (res == -1) {
+			m_initialAudioStream = getCurrentTrack();
+			m_initialAudioSelection = true;
 			m_clear_buffers = false;
 			m_send_ev_start = false;
 			stop();
@@ -2955,20 +3041,31 @@ void eServiceMP3::clearBuffers(bool force) {
  * @param[in] skipAudioFix If true, skips the audio fix logic.
  * @return int Returns 0 on success, or -1 if the selection fails.
  */
-int eServiceMP3::selectAudioStream(int i, bool skipAudioFix) {
+int eServiceMP3::selectAudioStream(int i, bool skipAudioFix, bool remember) {
 	if (m_is_dash_pipeline) {
 		/* Single-track DASH pipeline; any non-zero index = unsupported. */
 		m_currentAudioStream = 0;
 		return i == 0 ? 0 : -1;
 	}
+	if (!m_gst_playbin || i < 0 || i >= (int)m_audioStreams.size())
+		return -1;
+
+	if (!skipAudioFix && i != m_currentAudioStream &&
+		!pipelineSettledInPlaying(m_gst_playbin)) {
+		m_audio_switch_deferred = i;
+		return 0;
+	}
+
+	if (!skipAudioFix)
+		m_audio_switch_deferred = -1;
 	int current_audio, current_audio_orig;
 	g_object_get(m_gst_playbin, "current-audio", &current_audio_orig, NULL);
 	g_object_set(m_gst_playbin, "current-audio", i, NULL);
 	g_object_get(m_gst_playbin, "current-audio", &current_audio, NULL);
 	if (current_audio == i) {
+		m_currentAudioStream = i;
 		if (!skipAudioFix) {
 			eDebug("[eServiceMP3] switched to audio stream %d", current_audio);
-			m_currentAudioStream = i;
 
 #ifdef PASSTHROUGH_FIX
 			GstPad* pad = 0;
@@ -3004,7 +3101,8 @@ int eServiceMP3::selectAudioStream(int i, bool skipAudioFix) {
 #else
 			clearBuffers();
 #endif
-			setCacheEntry(true, i);
+			if (remember)
+				setCacheEntry(true, i);
 		}
 		return 0;
 	}
@@ -3311,50 +3409,7 @@ void eServiceMP3::gstBusCall(GstMessage* msg) {
 				} break;
 				case GST_STATE_CHANGE_PAUSED_TO_PLAYING: {
 					m_paused = false;
-					if (m_currentAudioStream < 0) {
-						unsigned int autoaudio = 0;
-						int autoaudio_level = 5;
-						std::string configvalue;
-						std::vector<std::string> autoaudio_languages;
-						configvalue = eSettings::audio_autoselect1;
-						if (configvalue != "")
-							autoaudio_languages.push_back(configvalue);
-						configvalue = eSettings::audio_autoselect2;
-						if (configvalue != "")
-							autoaudio_languages.push_back(configvalue);
-						configvalue = eSettings::audio_autoselect3;
-						if (configvalue != "")
-							autoaudio_languages.push_back(configvalue);
-						configvalue = eSettings::audio_autoselect4;
-						if (configvalue != "")
-							autoaudio_languages.push_back(configvalue);
-
-						for (unsigned int i = 0; i < m_audioStreams.size(); i++) {
-							if (!m_audioStreams[i].language_code.empty()) {
-								int x = 1;
-								for (std::vector<std::string>::iterator it = autoaudio_languages.begin();
-									 x < autoaudio_level && it != autoaudio_languages.end(); x++, it++) {
-									if ((*it).find(m_audioStreams[i].language_code) != std::string::npos) {
-										autoaudio = i;
-										autoaudio_level = x;
-										break;
-									}
-								}
-							}
-						}
-						if (autoaudio)
-#ifdef PASSTHROUGH_FIX
-							selectAudioStream(autoaudio);
-#else
-							selectTrack(autoaudio);
-#endif
-					} else {
-#ifdef PASSTHROUGH_FIX
-						selectAudioStream(m_currentAudioStream);
-#else
-						selectTrack(m_currentAudioStream);
-#endif
-					}
+					applyAudioSelection();
 #ifdef PASSTHROUGH_FIX
 					m_clear_buffers = false;
 					if (!m_initial_start) {
@@ -3548,18 +3603,17 @@ void eServiceMP3::gstBusCall(GstMessage* msg) {
 					GstTagList* tags = NULL;
 					GstPad* pad = 0;
 					g_signal_emit_by_name(m_gst_playbin, "get-audio-pad", i, &pad);
-					if(!pad)
-						continue;
-					GstCaps* caps = gst_pad_get_current_caps(pad);
-					gst_object_unref(pad);
-					if (!caps)
-						continue;
-					GstStructure* str = gst_caps_get_structure(caps, 0);
-					const gchar* g_type = gst_structure_get_name(str);
-					// eDebug("[eServiceMP3] AUDIO STRUCT=%s", g_type);
-					audio.type = gstCheckAudioPad(str);
+					GstCaps* caps = pad ? gst_pad_get_current_caps(pad) : NULL;
+					if (pad)
+						gst_object_unref(pad);
+					// Keep playbin's indices even if an unselected pad has no caps yet.
+					// Dropping it would make every subsequent cached/menu index incorrect.
+					if (caps && gst_caps_get_size(caps)) {
+						GstStructure* str = gst_caps_get_structure(caps, 0);
+						audio.type = gstCheckAudioPad(str);
+						audio.codec = gst_structure_get_name(str);
+					}
 					audio.language_code = "und";
-					audio.codec = g_type;
 					g_codec = NULL;
 					g_lang = NULL;
 					g_title = NULL;
@@ -3589,7 +3643,8 @@ void eServiceMP3::gstBusCall(GstMessage* msg) {
 					// audio.language_code.c_str()); codec_tofix = (audio.codec.find("MPEG-1 Layer 3 (MP3)") == 0 ||
 					// audio.codec.find("MPEG-2 AAC") == 0) && n_audio - n_video == 1;
 					audioStreams_temp.push_back(audio);
-					gst_caps_unref(caps);
+					if (caps)
+						gst_caps_unref(caps);
 				}
 
 				for (i = 0; i < n_text; i++) {
@@ -3665,6 +3720,8 @@ void eServiceMP3::gstBusCall(GstMessage* msg) {
 			} else {
 				m_send_ev_start = true;
 			}
+
+			applyAudioSelection();
 
 			if (m_errorInfo.missing_codec != "") {
 				if (m_errorInfo.missing_codec.find("video/") == 0 ||

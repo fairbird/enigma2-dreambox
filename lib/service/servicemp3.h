@@ -342,13 +342,17 @@ private:
 	static int pcm_delay;
 	static int ac3_delay;
 	int m_currentAudioStream;
+	int m_initialAudioStream = -1;
+	bool m_initialAudioSelection = true;
+	int m_audio_switch_deferred = -1;
+	void applyAudioSelection();
 	int m_currentSubtitleStream;
 	int m_cachedSubtitleStream;
 	/* bumped on every subtitle stream switch and on every seek; buffers stamped
 	   with an older generation are still in the pump queue and must not reach a
 	   parser. Written on the main thread, read on the gstreamer thread. */
 	std::atomic<int> m_subtitle_generation{0};
-	int selectAudioStream(int i, bool skipAudioFix = false);
+	int selectAudioStream(int i, bool skipAudioFix = false, bool remember = true);
 	GstElement* getAudioChannelSink();
 	std::vector<audioStream> m_audioStreams;
 	std::vector<subtitleStream> m_subtitleStreams;
