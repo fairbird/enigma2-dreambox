@@ -174,7 +174,7 @@ class ServiceInfo(Converter):
 	@cached
 	def getBoolean(self):
 		service = self.source.service
-		if self.token == self.IS_DVBI:
+		if self.type == self.IS_DVBI:
 			return bool(service and getattr(self.source, "isDVBI", False))
 		isRef = isinstance(service, eServiceReference)
 		info = service.info() if (service and not isRef) else None
