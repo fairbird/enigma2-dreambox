@@ -48,6 +48,7 @@ from Tools.ServiceReference import hdmiInServiceRef
 from keyids import KEYFLAGS, KEYIDS, KEYIDNAMES
 from Tools.Notifications import AddPopup, AddNotificationWithCallback, current_notifications, lock, notificationAdded, notifications, RemovePopup
 from Tools.BoundFunction import boundFunction
+from Tools.HybridService import HybridService
 
 from keyids import KEYFLAGS, KEYIDS, KEYIDNAMES
 
@@ -4116,6 +4117,7 @@ class InfoBarRedButton:
 			})
 		self.onHBBTVActivation = []
 		self.onRedButtonActivation = []
+		self.hybridService = HybridService(self) if isStandardInfoBar(self) else None
 
 	def activateRedButton(self):
 		service = self.session.nav.getCurrentService()
