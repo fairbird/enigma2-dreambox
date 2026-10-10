@@ -1756,6 +1756,12 @@ RESULT eServiceMP3::connectEvent(const sigc::slot<void(iPlayableService*, int)>&
  */
 RESULT eServiceMP3::start() {
 	ASSERT(m_state == stIdle);
+	if (eDVBIFallback::hasSchedule(m_ref))
+	{
+		m_dvbiAvailabilityTimer = eTimer::create(eApp);
+		CONNECT(m_dvbiAvailabilityTimer->timeout, eServiceMP3::checkDVBIAvailability);
+		m_dvbiAvailabilityTimer->start(1000);
+	}
 
 	m_subtitles_paused = false;
 	m_base_mpegts = -1;  // Reset MPEGTS base for WebVTT at new start
@@ -1811,6 +1817,8 @@ RESULT eServiceMP3::start() {
  * @return RESULT Returns 0 on success, or an error code if the service fails to stop.
  */
 RESULT eServiceMP3::stop() {
+	if (m_dvbiAvailabilityTimer)
+		m_dvbiAvailabilityTimer->stop();
 	if (!m_gst_playbin || m_state == stStopped)
 		return -1;
 
@@ -1836,6 +1844,18 @@ RESULT eServiceMP3::stop() {
 		   gst_element_state_get_name(pending), gst_element_state_change_return_get_name(ret));
 
 	return 0;
+}
+
+
+void eServiceMP3::checkDVBIAvailability()
+{
+	int available = eDVBIFallback::availability(m_ref);
+	if (available <= 0)
+	{
+		m_dvbiAvailabilityTimer->stop();
+		if (available < 0)
+			m_event((iPlayableService*)this, evTuneFailed);
+	}
 }
 
 /**
@@ -2057,6 +2077,8 @@ RESULT eServiceMP3::seekToImpl(pts_t to) {
 	if (m_paused || m_to_paused) {
 		m_last_seek_count = 0;
 		m_event((iPlayableService*)this, evUpdatedInfo);
+		if (eDVBIFallback::applications(m_ref))
+			m_event(this, evHBBTVInfo);
 	}
 	// eDebug("[eServiceMP3] seekToImpl DONE position %" G_GINT64_FORMAT, (gint64)m_last_seek_pos);
 	if (!m_paused) {
@@ -2532,6 +2554,16 @@ RESULT eServiceMP3::getEvent(ePtr<eServiceEvent>& evt, int nownext) {
  */
 int eServiceMP3::getInfo(int w) {
 	const gchar* tag = 0;
+	if (const auto *hbbtv = eDVBIFallback::applications(m_ref)) {
+		switch (w) {
+			case sHBBTVUrl: return resIsString;
+			case sTSID: return hbbtv->tsid;
+			case sONID: return hbbtv->onid;
+			case sSID: if (hbbtv->sid) return hbbtv->sid; break;
+			default: break;
+		}
+	}
+
 
 	switch (w) {
 		case sVideoHeight:
@@ -2657,6 +2689,13 @@ int eServiceMP3::getInfo(int w) {
  * @return std::string Returns the requested information as a string.
  */
 std::string eServiceMP3::getInfoString(int w) {
+	if (w == sHBBTVUrl) {
+		if (const auto *hbbtv = eDVBIFallback::applications(m_ref))
+			for (const auto &app : hbbtv->applications)
+				if (app.m_ControlCode == 1)
+					return app.m_HbbTVUrl;
+		return "";
+	}
 	if (m_sourceinfo.is_streaming) {
 		switch (w) {
 			case sProvider:
@@ -2812,6 +2851,23 @@ std::string eServiceMP3::getInfoString(int w) {
  * @param[in] w The tag for which to retrieve the information object.
  * @return ePtr<iServiceInfoContainer> Returns a pointer to the information container.
  */
+void eServiceMP3::getAITApplications(std::map<int, std::string>& aitlist) {
+	if (const auto *hbbtv = eDVBIFallback::applications(m_ref))
+		for (const auto &app : hbbtv->applications)
+			aitlist[app.m_AppId] = app.m_HbbTVUrl;
+}
+
+PyObject *eServiceMP3::getHbbTVApplications() {
+	PyObject *result = PyList_New(0);
+	if (const auto *hbbtv = eDVBIFallback::applications(m_ref))
+		for (const auto &app : hbbtv->applications) {
+			PyObject *entry = Py_BuildValue("isskii", app.m_ControlCode, app.m_ApplicationName.c_str(), app.m_HbbTVUrl.c_str(), static_cast<unsigned long>(static_cast<uint32_t>(app.m_OrgId)), app.m_AppId, app.m_ProfileCode);
+			PyList_Append(result, entry);
+			Py_DECREF(entry);
+		}
+	return result;
+}
+
 ePtr<iServiceInfoContainer> eServiceMP3::getInfoObject(int w) {
 	eServiceMP3InfoContainer* container = new eServiceMP3InfoContainer;
 	ePtr<iServiceInfoContainer> retval = container;
@@ -3341,6 +3397,8 @@ void eServiceMP3::gstBusCall(GstMessage* msg) {
 					m_event(this, evGstreamerStart);
 					if (m_send_ev_start)
 						m_event(this, evStart);
+					if (eDVBIFallback::applications(m_ref))
+						m_event(this, evHBBTVInfo);
 					if (!m_is_live)
 						gst_element_set_state(m_gst_playbin, GST_STATE_PAUSED);
 					ret = gst_element_get_state(m_gst_playbin, &state, &pending, 5LL * GST_SECOND);
@@ -3475,6 +3533,14 @@ void eServiceMP3::gstBusCall(GstMessage* msg) {
 				if (retry)
 					m_event((iPlayableService*)this, evStreamError);
 			}
+			if (eDVBIFallback::availability(m_ref))
+			{
+				// Navigation advances through the registered DVB-I alternatives.
+				m_errorInfo.error_message = err->message;
+				g_error_free(err);
+				m_event((iPlayableService*)this, evTuneFailed);
+				break;
+			}
 			if (err->domain == GST_STREAM_ERROR) {
 				if (err->code == GST_STREAM_ERROR_CODEC_NOT_FOUND) {
 					if (g_strrstr(sourceName, "videosink"))
@@ -3584,6 +3650,8 @@ void eServiceMP3::gstBusCall(GstMessage* msg) {
 				/* No playbin n-video/n-audio to introspect; streams pre-registered. */
 				if (m_send_ev_start) {
 					m_event((iPlayableService*)this, evUpdatedInfo);
+					if (eDVBIFallback::applications(m_ref))
+						m_event((iPlayableService*)this, evHBBTVInfo);
 					m_send_ev_start = false;
 				}
 				break;
@@ -3606,7 +3674,7 @@ void eServiceMP3::gstBusCall(GstMessage* msg) {
 				std::vector<subtitleStream> subtitleStreams_temp;
 
 				std::vector<audioMeta> audiometa;
-				if (m_sourceinfo.is_hls)
+				if (m_sourceinfo.is_hls && !(m_ref.data[7] & DVB_I_MEDIA_MASK))
 					audiometa = parse_hls_audio_meta("/tmp/gsthlsaudiometa.info");
 
 				for (i = 0; i < n_audio; i++) {
@@ -3641,6 +3709,10 @@ void eServiceMP3::gstBusCall(GstMessage* msg) {
 						}
 						if (gst_tag_list_get_string(tags, GST_TAG_TITLE, &g_title)) {
 							audio.title = std::string(g_title);
+							g_free(g_title);
+						}
+						if (audio.title.empty() && (m_ref.data[7] & DVB_I_MEDIA_MASK) && gst_tag_list_get_string(tags, GST_TAG_DESCRIPTION, &g_title)) {
+							audio.title = g_title;
 							g_free(g_title);
 						}
 						gst_tag_list_free(tags);
@@ -3720,6 +3792,8 @@ void eServiceMP3::gstBusCall(GstMessage* msg) {
 					m_audioStreams.assign(audioStreams_temp.begin(), audioStreams_temp.end());
 					m_subtitleStreams.assign(subtitleStreams_temp.begin(), subtitleStreams_temp.end());
 					eDebug("[eServiceMP3] GST_MESSAGE_ASYNC_DONE before evUpdatedInfo");
+					if (eDVBIFallback::applications(m_ref))
+						m_event((iPlayableService*)this, evHBBTVInfo);
 					m_event((iPlayableService*)this, evUpdatedInfo);
 				}
 

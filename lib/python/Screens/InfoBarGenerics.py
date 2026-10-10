@@ -4109,15 +4109,52 @@ class InfoBarSubserviceSelection:
 			self.bouquets = self.bsel = self.selectedSubservice = None
 
 
+from Components.Sources.HbbtvApplication import HbbtvApplication  # noqa F402
+gHbbtvApplication = HbbtvApplication()
+
+
 class InfoBarRedButton:
 	def __init__(self):
-		self["RedButtonActions"] = HelpableActionMap(self, ["InfobarRedButtonActions"],
-			{
-				"activateRedButton": (self.activateRedButton, _("Red button...")),
-			})
+		self["RedButtonActions"] = HelpableActionMap(self, ["InfobarRedButtonActions"], {
+			"activateRedButton": (self.activateRedButton, _("RED button / HbbTV")),
+		}, prio=0, description=_("Red/HbbTV Button Actions"))
+		self["HbbtvApplication"] = gHbbtvApplication
 		self.onHBBTVActivation = []
 		self.onRedButtonActivation = []
+		self.onReadyForAIT = []
 		self.hybridService = HybridService(self) if isStandardInfoBar(self) else None
+		self.__et = ServiceEventTracker(screen=self, eventmap={
+			iPlayableService.evHBBTVInfo: self.detectedHbbtvApplication,
+			iPlayableService.evUpdatedInfo: self.updateInfomation
+		})
+
+	def updateAIT(self, orgId=0):
+		for x in self.onReadyForAIT:
+			try:
+				x(orgId)
+			except Exception as err:
+				print(f"[InfoBarGenerics] updateAIT error {err}")
+				# self.onReadyForAIT.remove(x)
+
+	def updateInfomation(self):
+		try:
+			self["HbbtvApplication"].setApplicationName("")
+			self.updateAIT()
+		except Exception:
+			pass
+
+	def detectedHbbtvApplication(self):
+		service = self.session.nav.getCurrentService()
+		info = service and service.info()
+		try:
+			for x in info.getInfoObject(iServiceInformation.sHBBTVUrl):
+				print("[InfoBarGenerics] HbbtvApplication:", x)
+				if x[0] in (-1, 1):
+					self.updateAIT(x[3])
+					self["HbbtvApplication"].setApplicationName(x[1])
+					break
+		except Exception:
+			pass
 
 	def activateRedButton(self):
 		service = self.session.nav.getCurrentService()
@@ -4125,9 +4162,10 @@ class InfoBarRedButton:
 		if info and info.getInfoString(iServiceInformation.sHBBTVUrl) != "":
 			for x in self.onHBBTVActivation:
 				x()
-		elif False:  # TODO: other red button services
-			for x in self.onRedButtonActivation:
-				x()
+		# TODO: Other red button services.
+		# elif False:
+		# for x in self.onRedButtonActivation:
+		# x()
 
 
 class InfoBarAspectSelection:

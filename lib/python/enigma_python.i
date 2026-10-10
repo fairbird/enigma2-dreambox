@@ -105,6 +105,8 @@ is usually caused by not marking PSignals as immutable.
 #include <lib/dvb/pmt.h>
 #include <lib/dvb/cahandler.h>
 #include <lib/dvb/csaengine.h>
+#include <lib/hbbtv/oipfapplication.h>
+#include <lib/hbbtv/hbbtv.h>
 #include <lib/dvb/fastscan.h>
 #include <lib/dvb/cablescan.h>
 #include <lib/dvb/encoder.h>
@@ -181,6 +183,7 @@ typedef long time_t;
 %include <lib/python/python_service.i>
 %include <lib/python/python_pmt.i>
 %include <lib/python/python_pcore.i>
+%include <lib/python/python_hbbtv.i>
 
 %immutable eSocketNotifier::activated;
 %immutable eHotplugSocket::dataReceived;
@@ -386,6 +389,18 @@ public:
 	$1 = $input->get();
 }
 
+template<class R, class P0, class P1, class P2, class P3> class PSignal4
+{
+public:
+	PyObject *get();
+};
+
+%template(PSignal4VIIII) PSignal4<void,int,int,int,int>;
+
+%typemap(out) PSignal4VIIII {
+	$1 = $input->get();
+}
+
 %{
 RESULT SwigFromPython(ePtr<gPixmap> &result, PyObject *obj)
 {
@@ -429,9 +444,37 @@ PyObject *New_iCECMessagePtr(const ePtr<iCECMessage> &ptr)
 /* needed for service groups */
 
 int setDVBIFallbackServices(PyObject *services);
+int setDVBIServiceProfiles(PyObject *profiles);
+int setDVBIHbbTVApplications(PyObject *applications);
+PyObject *getDVBIPlaybackService(const eServiceReference &ref, const eServiceReference &after);
+int getDVBIServiceAvailability(const eServiceReference &ref);
+int getDVBIMinimumAge(const eServiceReference &ref);
 PyObject *getDVBIFallbackService(const eServiceReference &ref, bool force=false);
 bool canDVBIFallbackReleaseForRecording(const eServiceReference &live, const eServiceReference &recording);
 %{
+int setDVBIHbbTVApplications(PyObject *applications)
+{
+	return eDVBIFallback::setApplications(applications);
+}
+int setDVBIServiceProfiles(PyObject *profiles)
+{
+	return eDVBIFallback::setProfiles(profiles);
+}
+PyObject *getDVBIPlaybackService(const eServiceReference &ref, const eServiceReference &after)
+{
+	eServiceReference target = eDVBIFallback::playback(ref, after);
+	if (target)
+		return New_eServiceReference(target);
+	Py_RETURN_NONE;
+}
+int getDVBIServiceAvailability(const eServiceReference &ref)
+{
+	return eDVBIFallback::availability(ref);
+}
+int getDVBIMinimumAge(const eServiceReference &ref)
+{
+	return eDVBIFallback::minimumAge(ref);
+}
 int setDVBIFallbackServices(PyObject *services)
 {
 	return eDVBIFallback::setServices(services);

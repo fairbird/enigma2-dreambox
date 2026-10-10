@@ -8,6 +8,10 @@ PyObject *getInfoObject(int w)
 {
 	switch (w)
 	{
+		case iServiceInformation::sHBBTVUrl:
+		{
+			return self->getHbbTVApplications();
+		}
 		case iServiceInformation::sTransponderData:
 		{
 			ePyObject ret = PyDict_New();
