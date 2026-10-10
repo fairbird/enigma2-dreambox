@@ -424,7 +424,7 @@ int eDVBPMTParser::getProgramInfo(program &program)
 						}
 						case EXTENSION_DESCRIPTOR:
 						{
-							ExtensionDescriptor *d = (ExtensionDescriptor*)(*desc);
+							ExtensionDescriptor *d = (ExtensionDescriptor*)desc;
 							if (d->getExtensionTag() == 0x06) /* supplementary_audio_descriptor */
 							{
 								const SelectorByteVector *data = d->getSelectorBytes();
