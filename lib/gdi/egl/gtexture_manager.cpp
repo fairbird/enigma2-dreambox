@@ -6,11 +6,25 @@
 
 static gTextureManager* s_active_manager = nullptr;
 
+// Guards s_active_manager across check-and-use. egl_release_surface_texture()
+// runs from ~gSurface() on ANY thread (e.g. ePicLoad's decode thread, the main
+// thread), while ~gTextureManager() can run on another one (gEGLDC teardown).
+// Without this, the pointer could be cleared/freed between the null check and
+// the call, which then locked m_deletion_mutex through a null/dangling 'this'
+// (SIGSEGV in pthread_mutex_lock, fault address = offset of that mutex).
+// Intentionally leaked so it outlives any static destructor that frees a pixmap.
+static std::mutex& activeManagerMutex() {
+	static std::mutex* m = new std::mutex();
+	return *m;
+}
+
 gTextureManager::gTextureManager() : m_egl_display(EGL_NO_DISPLAY) {
+	std::lock_guard<std::mutex> guard(activeManagerMutex());
 	s_active_manager = this;
 }
 
 gTextureManager::~gTextureManager() {
+	std::lock_guard<std::mutex> guard(activeManagerMutex());
 	if (s_active_manager == this)
 		s_active_manager = nullptr;
 }
@@ -397,6 +411,7 @@ void gTextureManager::processDeletions() {
 // the thread that owns the current EGL context.
 extern "C" void egl_release_surface_texture(unsigned int gl_texture_id, const void* surface);
 void egl_release_surface_texture(unsigned int gl_texture_id, const void* surface) {
+	std::lock_guard<std::mutex> guard(activeManagerMutex());
 	if (s_active_manager) {
 		s_active_manager->releaseSurfaceTexture(gl_texture_id, surface);
 	} else {
