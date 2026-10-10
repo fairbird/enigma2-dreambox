@@ -1,18 +1,19 @@
 # -*- coding: utf-8 -*-
 from Components.ActionMap import ActionMap
+from Components.ConfigList import ConfigListScreen
 from Components.Label import Label
 from Components.MenuList import MenuList
 from Components.ScreenAnimations import eWindowAnimationManager
-from Components.config import config, configfile
+from Components.config import config, configfile, getConfigListEntry
 from Components.Sources.StaticText import StaticText
+from Screens.HelpMenu import HelpableScreen
 from Screens.MessageBox import MessageBox
 from Screens.Screen import Screen
-from Screens.Setup import Setup
 
 
 class AnimationSetup(Screen):
 	skin = """
-		<screen name="AnimationSetup" position="center,120" size="820,520" title="Animation Setup">
+		<screen name="AnimationSetup" position="center,120" size="820,520" title="Animation Setup" resolution="1280,720">
 			<ePixmap pixmap="skin_default/buttons/red.png" position="10,5" size="200,40" alphatest="on" />
 			<ePixmap pixmap="skin_default/buttons/green.png" position="210,5" size="200,40" alphatest="on" />
 			<ePixmap pixmap="skin_default/buttons/yellow.png" position="410,5" size="200,40" alphatest="on" />
@@ -22,7 +23,7 @@ class AnimationSetup(Screen):
 			<widget name="key_yellow" position="410,5" size="200,40" zPosition="1" font="Regular;20" halign="center" valign="center" backgroundColor="#a08500" transparent="1" shadowColor="black" shadowOffset="-2,-2" />
 			<widget name="key_blue" position="610,5" size="200,40" zPosition="1" font="Regular;20" halign="center" valign="center" backgroundColor="#18188b" transparent="1" shadowColor="black" shadowOffset="-2,-2" />
 			<eLabel position="10,50" size="800,1" backgroundColor="grey" />
-			<widget name="list" position="10,60" size="800,390" enableWrapAround="1" scrollbarMode="showOnDemand" />
+			<widget name="list" position="10,60" size="800,390" font="Regular;22" itemHeight="30" enableWrapAround="1" scrollbarMode="showOnDemand" />
 			<eLabel position="10,480" size="800,1" backgroundColor="grey" />
 			<widget name="selected_info" position="10,488" size="800,25" font="Regular;22" halign="center" />
 		</screen>"""
@@ -80,7 +81,34 @@ class AnimationSetup(Screen):
 		self.session.open(ExtendedAnimationsSetup)
 
 
-class ExtendedAnimationsSetup(Setup):
+class ExtendedAnimationsSetup(ConfigListScreen, Screen, HelpableScreen):
 	def __init__(self, session):
-		Setup.__init__(self, session=session, setup="AnimationExtended")
-		self.addSaveNotifier(eWindowAnimationManager.setWidgetDefault)
+		Screen.__init__(self, session)
+		HelpableScreen.__init__(self)
+		self.skinName = ["ExtendedAnimationsSetup", "Setup"]
+		self.setTitle(_("Extend Animations Configuration"))
+		self["key_red"] = StaticText(_("Cancel"))
+		self["key_green"] = StaticText(_("OK"))
+		self["footnote"] = Label()
+		self["footnote"].hide()
+		self["description"] = Label()
+		ConfigListScreen.__init__(self, [], session=session, on_change=self.createSetup, fullUI=True)
+		self.createSetup()
+
+	def createSetup(self):
+		entries = [
+			(_("OSD"),),
+			getConfigListEntry(_("OSD cross-fading for text and pictures"), config.osd.widget_animation),
+		]
+		if config.osd.widget_animation.value:
+			entries.extend([
+				(_("General Settings"),),
+				getConfigListEntry(_("Cross-fading duration"), config.osd.widget_animation_duration),
+			])
+		if len(entries) != len(self["config"].list or []):
+			self["config"].list = entries
+
+	def saveAll(self):
+		quitData = ConfigListScreen.saveAll(self)
+		eWindowAnimationManager.setWidgetDefault()
+		return quitData

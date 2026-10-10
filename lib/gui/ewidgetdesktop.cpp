@@ -738,7 +738,6 @@ void eWidgetDesktop::fadeTick()
 	const int64_t now = fadeNowMs();
 	for (size_t i = 0; i < m_fades.size();)
 	{
-		invalidate(gRegion(m_fades[i].rect));
 		if (now >= m_fades[i].end_ms)
 			m_fades.erase(m_fades.begin() + i);
 		else

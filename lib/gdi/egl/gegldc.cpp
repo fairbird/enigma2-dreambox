@@ -298,6 +298,7 @@ void gEGLDC::destroyFBO() {
 	fadeClear();
 	if (m_anim_tex_after) { glDeleteTextures(1, &m_anim_tex_after); m_anim_tex_after = 0; }
 	m_anim_pending = false;
+	m_anim_running = false;
 	m_anim_layer_valid = false;
 	m_anim_in_layer = false;
 	if (m_anim_fbo_layer) { glDeleteFramebuffers(1, &m_anim_fbo_layer); m_anim_fbo_layer = 0; }
@@ -1444,7 +1445,6 @@ void gEGLDC::exec(const gOpcode* opcode) {
 			flushTextBatch();
 			if (m_anim_pending)
 				animRun();
-			fadeDraw();
 			flip();
 			gDC::exec(opcode);
 			break;
@@ -1464,6 +1464,7 @@ void gEGLDC::exec(const gOpcode* opcode) {
 			const int spec_id = opcode->parm.setShowHideInfo->anim_id;
 			delete opcode->parm.setShowHideInfo;
 			m_anim_layer_valid = false;
+			m_anim_running = false;
 			AnimSpec spec;
 			{
 				std::lock_guard<std::mutex> lock(s_anim_mutex);
@@ -1952,6 +1953,7 @@ bool gEGLDC::animCapture(GLuint &tex, const eRect &r) {
 void gEGLDC::animBeginLayer() {
 	flushBlitBatch();
 	flushTextBatch();
+	m_anim_running = false;
 	m_anim_layer_valid = false;
 	m_anim_in_layer = false;
 	if (!m_fbo || m_fbo_width <= 0 || m_fbo_height <= 0)
@@ -2114,10 +2116,6 @@ void gEGLDC::animDrawFrame(float alpha, float x, float y, float w, float h, GLui
 		memcpy(d, q, sizeof(q));
 	};
 
-	glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
-	glEnable(GL_SCISSOR_TEST);
-	setGlScissor(region);
-
 	// background: the whole animated region, copied without blending
 	glDisable(GL_BLEND);
 	{
@@ -2140,73 +2138,67 @@ void gEGLDC::animDrawFrame(float alpha, float x, float y, float w, float h, GLui
 
 void gEGLDC::animRun() {
 	m_anim_pending = false;
+	m_anim_running = false;
 
 	const eRect r = m_anim_rect;
 	const eRect region = m_anim_region;
 	if (!m_anim_active.valid || r.width() <= 0 || r.height() <= 0 || !animCapture(m_anim_tex_after, region))
 		return;
 
-	const GLuint bg = m_anim_show ? m_anim_tex_before : m_anim_tex_after;
-	GLuint layer = m_anim_show ? m_anim_tex_after : m_anim_tex_before;
+	m_anim_run_bg = m_anim_show ? m_anim_tex_before : m_anim_tex_after;
+	m_anim_run_layer = m_anim_show ? m_anim_tex_after : m_anim_tex_before;
 	if (m_anim_show && m_anim_layer_valid && m_anim_tex_layer)
-		layer = m_anim_tex_layer;
+		m_anim_run_layer = m_anim_tex_layer;
 	m_anim_layer_valid = false;
 
-	const AnimSpec spec = m_anim_active;
+	// The animation is drawn as an overlay on top of the presented frame (see
+	// animOverlay()), so the persistent FBO always keeps the real final content
+	// and this call returns at once instead of blocking the UI for the whole
+	// animation.
+	m_anim_t0 = std::chrono::steady_clock::now();
+	m_anim_running = true;
+}
 
-	typedef std::chrono::steady_clock clock_t_;
-	const clock_t_::time_point t0 = clock_t_::now();
-	clock_t_::time_point last = t0;
-	eRect prev = r;
+void gEGLDC::overlayScissor(const eRect &rect) {
+	const float xs = (float)m_surface_width / (float)m_fbo_width;
+	const float ys = (float)m_surface_height / (float)m_fbo_height;
+	const int x0 = (int)floorf(rect.x() * xs);
+	const int y0 = (int)floorf(rect.y() * ys);
+	const int x1 = (int)ceilf((rect.x() + rect.width()) * xs);
+	const int y1 = (int)ceilf((rect.y() + rect.height()) * ys);
+	glScissor(x0, m_surface_height - y1, std::max(0, x1 - x0), std::max(0, y1 - y0));
+}
 
-	for (int i = 0; i < 120; ++i) {
-		const clock_t_::time_point now = clock_t_::now();
-		const double t = std::chrono::duration<double>(now - t0).count() / (double)spec.duration;
-		if (t >= 1.0)
-			break;
-		// a slow frame means the GPU can't keep up: stop animating
-		if (std::chrono::duration<double>(now - last).count() > 0.15)
-			break;
-		last = now;
+void gEGLDC::animOverlay() {
+	if (!m_anim_running && m_fades.empty())
+		return;
 
-		float alpha, x, y, w, h;
-		animState(spec, m_anim_show, r, (float)t, alpha, x, y, w, h);
-		const int cx0 = (int)floorf(x);
-		const int cy0 = (int)floorf(y);
-		const int cx1 = (int)ceilf(x + w);
-		const int cy1 = (int)ceilf(y + h);
-		const eRect cur(cx0, cy0, std::max(0, cx1 - cx0), std::max(0, cy1 - cy0));
-		const eRect dirty = (prev | cur) & region;
-		if (dirty.width() > 0 && dirty.height() > 0)
-			animDrawFrame(alpha, x, y, w, h, bg, layer, dirty, r);
-		prev = cur;
-		flip();
-	}
-
-	// leave the animated region holding the final frame; the caller's flip() presents it
-	glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glViewport(0, 0, m_surface_width, m_surface_height);
 	glEnable(GL_SCISSOR_TEST);
-	setGlScissor(region);
-	glDisable(GL_BLEND);
-	{
-		const float W = (float)m_fbo_width;
-		const float H = (float)m_fbo_height;
-		const float x = (float)region.x(), y = (float)region.y();
-		const float w = (float)region.width(), h = (float)region.height();
-		const float u0 = x / W, u1 = (x + w) / W;
-		const float v0 = 1.0f - y / H, v1 = 1.0f - (y + h) / H;
-		const float fq[24] = {
-			x, y, u0, v0,
-			x + w, y, u1, v0,
-			x, y + h, u0, v1,
-			x + w, y, u1, v0,
-			x + w, y + h, u1, v1,
-			x, y + h, u0, v1
-		};
-		m_texture_shader.drawBatch(fq, 6, m_anim_tex_after, 1.0f);
+
+	if (m_anim_running) {
+		const double t = std::chrono::duration<double>(std::chrono::steady_clock::now() - m_anim_t0).count() / (double)m_anim_active.duration;
+		if (t >= 1.0) {
+			m_anim_running = false;
+		} else {
+			float alpha, x, y, w, h;
+			animState(m_anim_active, m_anim_show, m_anim_rect, (float)t, alpha, x, y, w, h);
+			overlayScissor(m_anim_region);
+			animDrawFrame(alpha, x, y, w, h, m_anim_run_bg, m_anim_run_layer, m_anim_region, m_anim_rect);
+		}
 	}
+	fadeDraw();
+
 	glEnable(GL_BLEND);
+	glViewport(0, 0, m_fbo_width, m_fbo_height);
 	setGlScissor(eRect(0, 0, m_fbo_width, m_fbo_height));
+}
+
+void gEGLDC::animTick() {
+	if (!animActive() || !isInitialized())
+		return;
+	flip();
 }
 
 void gEGLDC::fadeClear() {
@@ -2259,7 +2251,6 @@ void gEGLDC::fadeDraw() {
 	if (m_fades.empty() || !m_fbo)
 		return;
 	const std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
-	glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
 	glEnable(GL_SCISSOR_TEST);
 	glEnable(GL_BLEND);
 	setAlphaBlendMode(true);
@@ -2272,7 +2263,7 @@ void gEGLDC::fadeDraw() {
 			m_fades.erase(m_fades.begin() + i);
 			continue;
 		}
-		setGlScissor(f.rect);
+		overlayScissor(f.rect);
 		const float x = (float)f.rect.x();
 		const float y = (float)f.rect.y();
 		const float w = (float)f.rect.width();
@@ -2288,7 +2279,6 @@ void gEGLDC::fadeDraw() {
 		m_texture_shader.drawBatch(q, 6, f.tex, 1.0f - t);
 		++i;
 	}
-	setGlScissor(eRect(0, 0, m_fbo_width, m_fbo_height));
 }
 
 void gEGLDC::flip() {
@@ -2301,6 +2291,7 @@ void gEGLDC::flip() {
 			                  0, 0, m_surface_width, m_surface_height,
 			                  GL_COLOR_BUFFER_BIT, GL_LINEAR);
 			glEnable(GL_SCISSOR_TEST);
+			animOverlay();
 		}
 		// eglSwapBuffers() is only defined for window surfaces; a pixmap-surface
 		// platform (Dreambox) presents via the provider instead - see

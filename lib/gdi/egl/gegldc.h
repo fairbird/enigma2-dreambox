@@ -208,6 +208,12 @@ private:
 	eRect animRegion(const AnimSpec &s, const eRect &r) const;
 	void animDrawFrame(float alpha, float x, float y, float w, float h, GLuint bg, GLuint layer, const eRect &region, const eRect &r);
 	void animRun();
+	void animOverlay();
+	void overlayScissor(const eRect &rect);
+	bool m_anim_running = false;
+	std::chrono::steady_clock::time_point m_anim_t0;
+	GLuint m_anim_run_bg = 0;
+	GLuint m_anim_run_layer = 0;
 
 	// widget cross-fade (see fadeBegin()/fadeDraw())
 	struct FadeItem {
@@ -327,6 +333,8 @@ public:
 	static void setAnimationSpec(const char *spec);
 
 	void flip();
+	bool animActive() const { return m_anim_running || !m_fades.empty(); }
+	void animTick();
 	bool isInitialized() const { return m_egl_context != EGL_NO_CONTEXT; }
 	int getGLESVersion() const { return m_gles_version; }
 

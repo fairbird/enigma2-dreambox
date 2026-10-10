@@ -241,9 +241,33 @@ void *gRC::thread()
 				else
 					timeout.tv_sec += 2;
 
+#ifdef HAVE_EGL
+				const bool egl_animating = gEGLDC::getInstance() && gEGLDC::getInstance()->isInitialized() && gEGLDC::getInstance()->animActive();
+				if (egl_animating)
+				{
+					clock_gettime(CLOCK_REALTIME, &timeout);
+					timeout.tv_nsec += 4 * 1000 * 1000;
+					if (timeout.tv_nsec >= 1000 * 1000 * 1000)
+					{
+						timeout.tv_nsec -= 1000 * 1000 * 1000;
+						timeout.tv_sec++;
+					}
+				}
+#endif
+
 				int idle = 1;
 
-				if (pthread_cond_timedwait(&cond, &mutex, &timeout) == ETIMEDOUT)
+				const int wait_result = pthread_cond_timedwait(&cond, &mutex, &timeout);
+#ifdef HAVE_EGL
+				if (wait_result == ETIMEDOUT && egl_animating && rp == wp)
+				{
+					pthread_mutex_unlock(&mutex);
+					gEGLDC::getInstance()->animTick();
+					pthread_mutex_lock(&mutex);
+					continue;
+				}
+#endif
+				if (wait_result == ETIMEDOUT)
 				{
 					if (eApp && !eApp->isIdle())
 					{
