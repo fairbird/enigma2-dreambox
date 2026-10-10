@@ -64,7 +64,7 @@ typedef std::list<HbbTVApplicationInfo *> HbbTVApplicationInfoList;
 typedef HbbTVApplicationInfoList::iterator HbbTVApplicationInfoListIterator;
 typedef HbbTVApplicationInfoList::const_iterator HbbTVApplicationInfoListConstIterator;
 
-class eDVBServicePMTHandler: public eDVBPMTParserclass eDVBServicePMTHandler: public eDVBPMTParser
+class eDVBServicePMTHandler: public eDVBPMTParser
 {
 #ifndef SWIG
 	friend class eDVBCAService;
