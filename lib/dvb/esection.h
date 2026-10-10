@@ -123,6 +123,16 @@ class eAUTable: public eAUGTable
 	}
 
 public:
+
+	eAUTable()
+	{
+	}
+
+	~eAUTable()
+	{
+		stop();
+	}
+
 	void stop()
 	{
 		current = next = 0;
