@@ -246,9 +246,9 @@ class ChannelContextMenu(Screen):
 			if not self.inBouquetRootList:
 				isPlayable = not (current_sel_flags & (eServiceReference.isMarker | eServiceReference.isDirectory))
 				if isPlayable:
-					for p in plugins.getPlugins(PluginDescriptor.WHERE_CHANNEL_CONTEXT_MENU):
+					for plugin in plugins.getPlugins(PluginDescriptor.WHERE_CHANNEL_CONTEXT_MENU):
 						if plugin.serviceFilter is None or plugin.serviceFilter(current):
-							append_when_current_valid(current, menu, (p.name, boundFunction(self.runPlugin, p)), key="bullet")
+							appendWhenValid(current, menu, (plugin.name, boundFunction(self.runPlugin, plugin)), key="bullet")
 					if config.servicelist.startupservice.value == current.toString():
 						append_when_current_valid(current, menu, (_("Stop using as startup service"), self.unsetStartupService), level=0)
 					else:
