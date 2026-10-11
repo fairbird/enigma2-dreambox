@@ -193,7 +193,7 @@ const eDVBService::cacheID eDVBService::audioCacheTags[] = {
 const int eDVBService::nAudioCacheTags = sizeof(eDVBService::audioCacheTags) / sizeof(eDVBService::audioCacheTags[0]);
 
 eDVBService::eDVBService()
-	:m_cache(0), m_lcn(0), m_flags(0)
+	:m_cache(0), m_aus_da_flag(0), m_lcn(0), m_flags(0)
 {
 }
 
@@ -209,6 +209,8 @@ eDVBService &eDVBService::operator=(const eDVBService &s)
 	m_service_name_sort = s.m_service_name_sort;
 	m_provider_name = s.m_provider_name;
 	m_provider_display_name = s.m_provider_display_name;
+	m_default_authority = s.m_default_authority;
+	m_aus_da_flag = s.m_aus_da_flag;
 	m_flags = s.m_flags;
 	m_ca = s.m_ca;
 	copyCache(s.m_cache);
@@ -581,8 +583,17 @@ void eDVBDB::parseServiceData(ePtr<eDVBService> s, std::string str)
 			sscanf(v.c_str(), "%x", &val);
 			s->m_ca.push_back((uint16_t)val);
 		}
+		else if (p == 'a') {
+			std::string da = urlDecode(v);
+			std::transform(da.begin(), da.end(), da.begin(), ::tolower);
+			s->m_default_authority = da;
+		}
+		else if (p == 'A') {
+			uint32_t val;
+			sscanf(v.c_str(), "%x", &val);
+			s->m_aus_da_flag = val;
+		}
 	}
-
 }
 
 static ePtr<eDVBFrontendParameters> parseFrontendData(char* line, int version)
@@ -1212,6 +1223,22 @@ void eDVBDB::saveServicelist(const char *file)
 			fprintf(f, ",f:%x", sflags);
 			if (g)
 				fprintf(g, ",f:%x", sflags);
+		}
+
+		if (!i->second->m_default_authority.empty()) {
+			std::string da = i->second->m_default_authority;
+			std::transform(da.begin(), da.end(), da.begin(), ::tolower);
+			da = encode(da);
+
+			fprintf(f, ",a:%s", da.c_str());
+			if (g)
+				fprintf(g, ",a:%s", da.c_str());
+		}
+
+		if (i->second->m_aus_da_flag) {
+			fprintf(f, ",A:%x", i->second->m_aus_da_flag);
+			if (g)
+				fprintf(g, ",A:%x", i->second->m_aus_da_flag);
 		}
 
 		fprintf(f, "\n");
