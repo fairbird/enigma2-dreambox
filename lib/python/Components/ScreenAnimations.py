@@ -4,10 +4,12 @@ import xml.etree.ElementTree as ET
 from enigma import getDesktop, setAnimation_spec
 from Components.config import config, ConfigOnOff, ConfigSelection, ConfigText
 from Tools.Directories import fileExists, resolveFilename, SCOPE_SKIN
+from Tools.HardwareInfo import HardwareInfo
 
 config.osd.window_animation = ConfigOnOff(default=True)
 config.osd.window_animation_default = ConfigText(default="simple_fade")
 config.osd.widget_animation = ConfigSelection(default="off", choices=[("off", _("off")), ("on", _("on"))])
+config.osd.widget_animation_display = ConfigSelection(default="off", choices=[("off", _("off")), ("on", _("on"))])
 config.osd.widget_animation_duration = ConfigSelection(default="400", choices=[(str(ms), "%04d" % ms) for ms in (50, 100, 150, 200, 250, 300, 400, 500, 600, 700, 800, 900, 1000)])
 
 INTERPOLATORS = {"linear": 0, "accelerate": 1, "decelerate": 2, "overshoot": 3, "bounce": 4}
@@ -46,6 +48,10 @@ class WindowAnimationManager:
 		desktop = getDesktop(0)
 		desktop.setWidgetAnimationsEnabled(config.osd.widget_animation.value == "on")
 		desktop.setWidgetAnimationDuration(int(config.osd.widget_animation_duration.value))
+		if HardwareInfo().get_device_name() in ("dm900", "dm920"):
+			lcd = getDesktop(1)
+			if lcd:
+				lcd.setWidgetAnimationsEnabled(config.osd.widget_animation_display.value == "on")
 
 
 eWindowAnimationManager = WindowAnimationManager()

@@ -6,9 +6,9 @@ from Components.MenuList import MenuList
 from Components.ScreenAnimations import eWindowAnimationManager
 from Components.config import config, configfile, getConfigListEntry
 from Components.Sources.StaticText import StaticText
-from Screens.HelpMenu import HelpableScreen
 from Screens.MessageBox import MessageBox
 from Screens.Screen import Screen
+from Tools.HardwareInfo import HardwareInfo
 
 
 class AnimationSetup(Screen):
@@ -81,29 +81,21 @@ class AnimationSetup(Screen):
 		self.session.open(ExtendedAnimationsSetup)
 
 
-class ExtendedAnimationsSetup(ConfigListScreen, Screen, HelpableScreen):
-	skin = """
-		<screen name="ExtendedAnimationsSetup" position="center,center" size="900,300" title="Extend Animations Configuration" backgroundColor="#c8000000" flags="wfNoBorder" resolution="1280,720">
-			<widget source="window_title" render="Label" position="25,10" size="850,45" font="Regular;32" halign="left" valign="center" foregroundColor="#ffffff" backgroundColor="#c8000000" transparent="1" />
-			<widget name="config" position="10,65" size="880,160" font="Regular;22" itemHeight="32" scrollbarMode="showOnDemand" transparent="1" />
-			<eLabel position="10,235" size="880,1" backgroundColor="#aaaaaa" />
-			<eLabel position="190,252" size="28,28" backgroundColor="#e00000" cornerRadius="14" />
-			<widget source="key_red" render="Label" position="235,248" size="200,36" font="Regular;24" halign="left" valign="center" foregroundColor="#ffffff" backgroundColor="#c8000000" transparent="1" />
-			<eLabel position="510,252" size="28,28" backgroundColor="#00b000" cornerRadius="14" />
-			<widget source="key_green" render="Label" position="555,248" size="200,36" font="Regular;24" halign="left" valign="center" foregroundColor="#ffffff" backgroundColor="#c8000000" transparent="1" />
-		</screen>"""
+class ExtendedAnimationsSetup(ConfigListScreen, Screen):
+	DEVICES_TO_ANIMATE = ["dm900", "dm920"]
 
 	def __init__(self, session):
 		Screen.__init__(self, session)
-		HelpableScreen.__init__(self)
+		self.skinName = ["ExtendedAnimationsSetup", "Setup"]
 		self.setTitle(_("Extend Animations Configuration"))
-		self["window_title"] = StaticText(_("Extend Animations Configuration"))
 		self["key_red"] = StaticText(_("Cancel"))
 		self["key_green"] = StaticText(_("OK"))
 		self["footnote"] = Label()
 		self["footnote"].hide()
 		self["description"] = Label()
-		ConfigListScreen.__init__(self, [], session=session, on_change=self.createSetup, fullUI=True)
+		self.hasDisplay = HardwareInfo().get_device_name() in self.DEVICES_TO_ANIMATE
+		ConfigListScreen.__init__(self, [], session=session, on_change=self.createSetup)
+		self["actions"] = ActionMap(["SetupActions"], {"cancel": self.keyCancel, "save": self.keySave}, -2)
 		self.createSetup()
 
 	def createSetup(self):
@@ -111,13 +103,17 @@ class ExtendedAnimationsSetup(ConfigListScreen, Screen, HelpableScreen):
 			(_("OSD"),),
 			getConfigListEntry(_("OSD cross-fading for text and pictures"), config.osd.widget_animation),
 		]
-		if config.osd.widget_animation.value == "on":
+		if self.hasDisplay:
+			entries.extend([
+				(_("Display"),),
+				getConfigListEntry(_("Display cross-fading for text and pictures"), config.osd.widget_animation_display),
+			])
+		if config.osd.widget_animation.value == "on" or (self.hasDisplay and config.osd.widget_animation_display.value == "on"):
 			entries.extend([
 				(_("General Settings"),),
 				getConfigListEntry(_("Cross-fading duration"), config.osd.widget_animation_duration),
 			])
-		if len(entries) != len(self["config"].list or []):
-			self["config"].list = entries
+		self["config"].list = entries
 
 	def saveAll(self):
 		quitData = ConfigListScreen.saveAll(self)
