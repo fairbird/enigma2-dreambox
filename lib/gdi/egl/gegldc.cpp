@@ -2263,6 +2263,7 @@ void gEGLDC::animTick() {
 	if (m_frame_open && std::chrono::steady_clock::now() - m_last_op < std::chrono::milliseconds(40))
 		return;
 	flip();
+}
 
 void gEGLDC::fadeClear() {
 	for (size_t i = 0; i < m_fades.size(); ++i) {
