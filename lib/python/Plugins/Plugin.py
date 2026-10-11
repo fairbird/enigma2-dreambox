@@ -110,7 +110,7 @@ class PluginDescriptor:
 
 		self.weight = weight
 		self.wakeupfnc = wakeupfnc
-		self.fnc = fnc
+		self.fnc = self.function = fnc
 		self.closeMode = closeMode
 		self.serviceFilter = serviceFilter
 
