@@ -97,6 +97,7 @@ class ServiceInfo(Converter):
 	IS_SOFTCSA = 39
 	IS_DAB = 40
 	IS_DVBI = 41
+	VIDEO_INFORMATION = 42
 
 	VIDEO_INFO_WIDTH = 0
 	VIDEO_INFO_GAMMA = 1
@@ -105,6 +106,7 @@ class ServiceInfo(Converter):
 		Converter.__init__(self, type)
 		self.type, self.interesting_events = {
 				"HasTelext": (self.HAS_TELETEXT, (iPlayableService.evUpdatedInfo,)),
+				"HasTeletext": (self.HAS_TELETEXT, (iPlayableService.evUpdatedInfo,)),
 				"IsMultichannel": (self.IS_MULTICHANNEL, (iPlayableService.evUpdatedInfo,)),
 				"IsStereo": (self.IS_STEREO, (iPlayableService.evUpdatedInfo,)),
 				"IsCrypted": (self.IS_CRYPTED, (iPlayableService.evUpdatedInfo,)),
@@ -146,6 +148,7 @@ class ServiceInfo(Converter):
 				"IsVideoMPEG2": (self.IS_VIDEO_MPEG2, (iPlayableService.evUpdatedInfo,)),
 				"IsVideoAVC": (self.IS_VIDEO_AVC, (iPlayableService.evUpdatedInfo,)),
 				"IsVideoHEVC": (self.IS_VIDEO_HEVC, (iPlayableService.evUpdatedInfo,)),
+				"VideoInfo": (self.VIDEO_INFORMATION, (iPlayableService.evVideoSizeChanged, iPlayableService.evVideoFramerateChanged, iPlayableService.evVideoProgressiveChanged, iPlayableService.evVideoGammaChanged, iPlayableService.evUpdatedInfo)),
 			}[type]
 		if self.type in (self.IS_SD, self.IS_HD, self.IS_SD_AND_WIDESCREEN, self.IS_SD_AND_NOT_WIDESCREEN, self.IS_4K, self.IS_1080, self.IS_720):
 			self.videoHeight = 0
@@ -295,6 +298,14 @@ class ServiceInfo(Converter):
 				return self.getServiceInfoString(info, iServiceInformation.sTransferBPS, lambda x: _("%d kB/s") % (x / 1024))
 			elif self.type == self.HAS_HBBTV:
 				return info.getInfoString(iServiceInformation.sHBBTVUrl)
+			elif self.type == self.VIDEO_INFORMATION:
+				if frameRate > 0:
+					if progressive == "i":
+						frameRate *= 2
+					frameRate = f" {(frameRate + 500) // 1000}Hz"
+				else:
+					frameRate = ""
+				return f"{videoWidth}x{videoHeight}{progressive}{frameRate}" if videoWidth != -1 and videoHeight != -1 else ""
 			elif self.isVideoService(info):
 				if self.type == self.XRES:
 					return self.getServiceInfoString(info, iServiceInformation.sVideoWidth)
