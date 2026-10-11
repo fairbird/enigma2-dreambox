@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
-from Components.Element import cached
 from enigma import eServiceCenter
+
+from Components.Element import cached
 from Components.Sources.Source import Source
 
 
@@ -28,11 +29,12 @@ class ServiceEvent(Source):
 		else:
 			return self.service and self.info and self.info.getEvent(self.service)
 
+	event = property(getCurrentEvent)
+
 	@cached
 	def getInfo(self):
 		return self.service and eServiceCenter.getInstance().info(self.service)
 
-	event = property(getCurrentEvent)
 	info = property(getInfo)
 
 	def newService(self, ref, event=None):
