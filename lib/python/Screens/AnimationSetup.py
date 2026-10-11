@@ -83,19 +83,21 @@ class AnimationSetup(Screen):
 
 class ExtendedAnimationsSetup(ConfigListScreen, Screen, HelpableScreen):
 	skin = """
-		<screen name="ExtendedAnimationsSetup" position="center,center" size="900,235" title="Extend Animations Configuration" resolution="1280,720">
-			<widget name="config" position="10,10" size="880,150" font="Regular;22" itemHeight="30" scrollbarMode="showOnDemand" />
-			<eLabel position="10,170" size="880,1" backgroundColor="grey" />
-			<ePixmap pixmap="skin_default/buttons/red.png" position="190,185" size="200,40" alphatest="on" />
-			<ePixmap pixmap="skin_default/buttons/green.png" position="510,185" size="200,40" alphatest="on" />
-			<widget source="key_red" render="Label" position="190,185" size="200,40" zPosition="1" font="Regular;20" halign="center" valign="center" backgroundColor="#9f1313" transparent="1" shadowColor="black" shadowOffset="-2,-2" />
-			<widget source="key_green" render="Label" position="510,185" size="200,40" zPosition="1" font="Regular;20" halign="center" valign="center" backgroundColor="#1f771f" transparent="1" shadowColor="black" shadowOffset="-2,-2" />
+		<screen name="ExtendedAnimationsSetup" position="center,center" size="900,300" title="Extend Animations Configuration" backgroundColor="#c8000000" flags="wfNoBorder" resolution="1280,720">
+			<widget source="window_title" render="Label" position="25,10" size="850,45" font="Regular;32" halign="left" valign="center" foregroundColor="#ffffff" backgroundColor="#c8000000" transparent="1" />
+			<widget name="config" position="10,65" size="880,160" font="Regular;22" itemHeight="32" scrollbarMode="showOnDemand" transparent="1" />
+			<eLabel position="10,235" size="880,1" backgroundColor="#aaaaaa" />
+			<eLabel position="190,252" size="28,28" backgroundColor="#e00000" cornerRadius="14" />
+			<widget source="key_red" render="Label" position="235,248" size="200,36" font="Regular;24" halign="left" valign="center" foregroundColor="#ffffff" backgroundColor="#c8000000" transparent="1" />
+			<eLabel position="510,252" size="28,28" backgroundColor="#00b000" cornerRadius="14" />
+			<widget source="key_green" render="Label" position="555,248" size="200,36" font="Regular;24" halign="left" valign="center" foregroundColor="#ffffff" backgroundColor="#c8000000" transparent="1" />
 		</screen>"""
 
 	def __init__(self, session):
 		Screen.__init__(self, session)
 		HelpableScreen.__init__(self)
 		self.setTitle(_("Extend Animations Configuration"))
+		self["window_title"] = StaticText(_("Extend Animations Configuration"))
 		self["key_red"] = StaticText(_("Cancel"))
 		self["key_green"] = StaticText(_("OK"))
 		self["footnote"] = Label()
@@ -109,7 +111,7 @@ class ExtendedAnimationsSetup(ConfigListScreen, Screen, HelpableScreen):
 			(_("OSD"),),
 			getConfigListEntry(_("OSD cross-fading for text and pictures"), config.osd.widget_animation),
 		]
-		if config.osd.widget_animation.value:
+		if config.osd.widget_animation.value == "on":
 			entries.extend([
 				(_("General Settings"),),
 				getConfigListEntry(_("Cross-fading duration"), config.osd.widget_animation_duration),

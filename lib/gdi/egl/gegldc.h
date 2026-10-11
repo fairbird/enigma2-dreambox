@@ -210,6 +210,12 @@ private:
 	void animRun();
 	void animOverlay();
 	void overlayScissor(const eRect &rect);
+	bool animCaptureBlit(GLuint &tex, GLuint &fbo, const eRect &r);
+	void animAbort();
+	GLuint m_anim_fbo_before = 0;
+	bool m_anim_clean_pending = false;
+	bool m_frame_open = false;
+	std::chrono::steady_clock::time_point m_last_op;
 	bool m_anim_running = false;
 	std::chrono::steady_clock::time_point m_anim_t0;
 	GLuint m_anim_run_bg = 0;
@@ -333,7 +339,7 @@ public:
 	static void setAnimationSpec(const char *spec);
 
 	void flip();
-	bool animActive() const { return m_anim_running || !m_fades.empty(); }
+	bool animActive() const { return m_anim_running || m_anim_clean_pending || !m_fades.empty(); }
 	void animTick();
 	bool isInitialized() const { return m_egl_context != EGL_NO_CONTEXT; }
 	int getGLESVersion() const { return m_gles_version; }

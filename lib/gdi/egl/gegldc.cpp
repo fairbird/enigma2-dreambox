@@ -295,10 +295,12 @@ bool gEGLDC::createFBO(int w, int h) {
 
 void gEGLDC::destroyFBO() {
 	if (m_anim_tex_before) { glDeleteTextures(1, &m_anim_tex_before); m_anim_tex_before = 0; }
+	if (m_anim_fbo_before) { glDeleteFramebuffers(1, &m_anim_fbo_before); m_anim_fbo_before = 0; }
 	fadeClear();
 	if (m_anim_tex_after) { glDeleteTextures(1, &m_anim_tex_after); m_anim_tex_after = 0; }
 	m_anim_pending = false;
 	m_anim_running = false;
+	m_anim_clean_pending = false;
 	m_anim_layer_valid = false;
 	m_anim_in_layer = false;
 	if (m_anim_fbo_layer) { glDeleteFramebuffers(1, &m_anim_fbo_layer); m_anim_fbo_layer = 0; }
@@ -1213,6 +1215,11 @@ void gEGLDC::exec(const gOpcode* opcode) {
 	if (!isInitialized())
 		return;
 
+	// a frame is open from its first drawing opcode until its flush: the
+	// animation overlay is only presented between frames, never in the middle of one
+	m_frame_open = (opcode->opcode != gOpcode::flush && opcode->opcode != gOpcode::flip);
+	m_last_op = std::chrono::steady_clock::now();
+
 	switch (opcode->opcode) {
 		// fill/fillRegion/rectangle/line/blit are all handled entirely by
 		// this backend's own executeXXX() helpers instead of falling through
@@ -1464,7 +1471,7 @@ void gEGLDC::exec(const gOpcode* opcode) {
 			const int spec_id = opcode->parm.setShowHideInfo->anim_id;
 			delete opcode->parm.setShowHideInfo;
 			m_anim_layer_valid = false;
-			m_anim_running = false;
+			animAbort();
 			AnimSpec spec;
 			{
 				std::lock_guard<std::mutex> lock(s_anim_mutex);
@@ -1486,7 +1493,7 @@ void gEGLDC::exec(const gOpcode* opcode) {
 				flushBlitBatch();
 				flushTextBatch();
 				const eRect region = animRegion(spec, clipped);
-				if (animCapture(m_anim_tex_before, region)) {
+				if (animCaptureBlit(m_anim_tex_before, m_anim_fbo_before, region)) {
 					m_anim_pending = true;
 					m_anim_show = show;
 					m_anim_rect = clipped;
@@ -2138,25 +2145,77 @@ void gEGLDC::animDrawFrame(float alpha, float x, float y, float w, float h, GLui
 
 void gEGLDC::animRun() {
 	m_anim_pending = false;
-	m_anim_running = false;
+	animAbort();
 
-	const eRect r = m_anim_rect;
-	const eRect region = m_anim_region;
-	if (!m_anim_active.valid || r.width() <= 0 || r.height() <= 0 || !animCapture(m_anim_tex_after, region))
+	if (!m_anim_active.valid || m_anim_rect.width() <= 0 || m_anim_rect.height() <= 0 || !m_anim_tex_before || !m_fbo_texture)
 		return;
 
-	m_anim_run_bg = m_anim_show ? m_anim_tex_before : m_anim_tex_after;
-	m_anim_run_layer = m_anim_show ? m_anim_tex_after : m_anim_tex_before;
-	if (m_anim_show && m_anim_layer_valid && m_anim_tex_layer)
-		m_anim_run_layer = m_anim_tex_layer;
+	// show: the saved screen is the background and the window is the live
+	// framebuffer; hide: the live framebuffer is the background and the saved
+	// screen (still holding the window) is the moving layer. Sampling the live
+	// framebuffer means no second screen copy is needed and the window content
+	// keeps updating while it animates.
+	m_anim_run_bg = m_anim_show ? m_anim_tex_before : m_fbo_texture;
+	m_anim_run_layer = m_anim_show ? m_fbo_texture : m_anim_tex_before;
 	m_anim_layer_valid = false;
 
-	// The animation is drawn as an overlay on top of the presented frame (see
-	// animOverlay()), so the persistent FBO always keeps the real final content
-	// and this call returns at once instead of blocking the UI for the whole
-	// animation.
 	m_anim_t0 = std::chrono::steady_clock::now();
 	m_anim_running = true;
+}
+
+void gEGLDC::animAbort() {
+	// an overlay frame may be on screen: one more clean frame has to be presented
+	if (m_anim_running)
+		m_anim_clean_pending = true;
+	m_anim_running = false;
+	fadeClear();
+}
+
+bool gEGLDC::animCaptureBlit(GLuint &tex, GLuint &fbo, const eRect &r) {
+	if (!m_fbo || m_fbo_width <= 0 || m_fbo_height <= 0)
+		return false;
+	const eRect c = r & eRect(0, 0, m_fbo_width, m_fbo_height);
+	if (c.width() <= 0 || c.height() <= 0)
+		return false;
+#ifdef HAVE_GLES3
+	if (!gles::isGLES3())
+		return animCapture(tex, r);
+	if (!fbo) {
+		if (!tex) {
+			glGenTextures(1, &tex);
+			glBindTexture(GL_TEXTURE_2D, tex);
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_fbo_width, m_fbo_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		}
+		glGenFramebuffers(1, &fbo);
+		glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex, 0);
+		if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+			eDebug("[gEGLDC] animation capture FBO incomplete, using texture copy");
+			glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
+			glDeleteFramebuffers(1, &fbo);
+			fbo = 0;
+			return animCapture(tex, r);
+		}
+	}
+	// GPU side copy of the region (the old glCopyTexSubImage2D() path stalled on
+	// large regions, i.e. on full screen windows of graphic heavy skins)
+	const int gy = m_fbo_height - (c.y() + c.height());
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, m_fbo);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbo);
+	glDisable(GL_SCISSOR_TEST);
+	glBlitFramebuffer(c.x(), gy, c.x() + c.width(), gy + c.height(),
+	                  c.x(), gy, c.x() + c.width(), gy + c.height(),
+	                  GL_COLOR_BUFFER_BIT, GL_NEAREST);
+	glEnable(GL_SCISSOR_TEST);
+	glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
+	return true;
+#else
+	return animCapture(tex, r);
+#endif
 }
 
 void gEGLDC::overlayScissor(const eRect &rect) {
@@ -2198,8 +2257,12 @@ void gEGLDC::animOverlay() {
 void gEGLDC::animTick() {
 	if (!animActive() || !isInitialized())
 		return;
+	// never present in the middle of a frame the main thread is still painting
+	if (m_anim_pending)
+		return;
+	if (m_frame_open && std::chrono::steady_clock::now() - m_last_op < std::chrono::milliseconds(40))
+		return;
 	flip();
-}
 
 void gEGLDC::fadeClear() {
 	for (size_t i = 0; i < m_fades.size(); ++i) {
@@ -2210,7 +2273,7 @@ void gEGLDC::fadeClear() {
 }
 
 void gEGLDC::fadeBegin(const eRect &area, float seconds) {
-	if (!m_fbo || m_fbo_width <= 0 || m_fbo_height <= 0 || seconds <= 0.0f || m_anim_pending)
+	if (!m_fbo || m_fbo_width <= 0 || m_fbo_height <= 0 || seconds <= 0.0f || m_anim_pending || m_anim_running)
 		return;
 	const eRect c = area & eRect(0, 0, m_fbo_width, m_fbo_height);
 	if (c.width() <= 0 || c.height() <= 0)
@@ -2292,6 +2355,7 @@ void gEGLDC::flip() {
 			                  GL_COLOR_BUFFER_BIT, GL_LINEAR);
 			glEnable(GL_SCISSOR_TEST);
 			animOverlay();
+			m_anim_clean_pending = false;
 		}
 		// eglSwapBuffers() is only defined for window surfaces; a pixmap-surface
 		// platform (Dreambox) presents via the provider instead - see
