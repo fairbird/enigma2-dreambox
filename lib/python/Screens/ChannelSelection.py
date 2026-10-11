@@ -10,7 +10,7 @@ from Components.Pixmap import Pixmap
 from Components.ServiceList import ServiceList, ServiceListLegacy, refreshServiceList
 from Components.ActionMap import NumberActionMap, ActionMap, HelpableActionMap, HelpableNumberActionMap
 from Components.MenuList import MenuList
-from Components.ServiceEventTracker import ServiceEventTracker, InfoBarBase
+from Components.ServiceEventTracker import InfoBarBase, ServiceEventTracker
 from ServiceReference import ServiceReference, getStreamRelayRef, isRadioServiceReference, serviceRefAppendPath, service_types_radio_ref, service_types_tv_ref
 from enigma import eServiceReference, eServiceReferenceDVB, eEPGCache, eServiceCenter, eRCInput, eTimer, eDVBDB, iPlayableService, iServiceInformation, getPrevAsciiCode, loadPNG, eProfileWrite
 eProfileWrite("ChannelSelection.py 1")
@@ -2663,8 +2663,12 @@ class ChannelSelection(ChannelSelectionBase, ChannelSelectionEdit, ChannelSelect
 
 	#called from infoBar and channelSelected
 	def zap(self, enable_pipzap=False, preview_zap=False, checkParentalControl=True, ref=None, doPlay=True):
+		nref = ref if ref is not None else self.getCurrentSelection()
+		# IPTV may have zero DVB identifiers; valid() only rejects idInvalid.
+		if nref is None or not nref.valid():
+			print("[ChannelSelection] Ignore zap without a valid service reference.")
+			return
 		self.curRoot = self.startRoot
-		nref = ref or self.getCurrentSelection()
 		ref = self.session.nav.getCurrentlyPlayingServiceOrGroup()
 		if enable_pipzap and self.dopipzap:
 			ref = self.session.pip.getCurrentService()
