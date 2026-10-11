@@ -3851,7 +3851,7 @@ class InfoBarInstantRecord:
 			common = ()
 		if self.isInstantRecordRunning():
 			title = _("A recording is currently running.\nWhat do you want to do?")
-			list = common + \
+			list = common +
 				((_("Change recording (duration)"), "changeduration"),
 				(_("Change recording (add time)"), "addrecordingtime"),
 				(_("Change recording (endtime)"), "changeendtime"),)
