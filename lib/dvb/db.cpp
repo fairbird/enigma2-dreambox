@@ -1021,6 +1021,26 @@ void eDVBDB::addLcnToDB(int ns, int onid, int tsid, int sid, uint16_t lcn, uint3
 	}
 }
 
+static std::string encode(const std::string s)
+{
+	int len = s.size();
+	std::string res;
+	int i;
+	for (i=0; i<len; ++i)
+	{
+		unsigned char c = s[i];
+		if ((c == ':') || (c < 32) || (c == '%') || (c == ','))
+		{
+			res += "%";
+			char hex[8];
+			snprintf(hex, 8, "%02x", c);
+			res += hex;
+		} else
+			res += c;
+	}
+	return res;
+}
+
 void eDVBDB::saveServicelist(const char *file)
 {
 	if(m_debug)
