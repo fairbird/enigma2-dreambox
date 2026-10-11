@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from ast import literal_eval
 from binascii import hexlify
+from glob import glob
 from hashlib import md5
 from locale import format_string
 from os import R_OK, access, listdir, readlink, stat
@@ -14,6 +15,7 @@ from time import localtime, strftime
 from enigma import eAVControl, Misc_Options, eDVBCIInterfaces, eDVBResourceManager, eGetEnigmaDebugLvl, eDVBCSAEngine
 from Tools.Directories import SCOPE_PLUGINS, SCOPE_LIBDIR, SCOPE_SKIN, fileCheck, fileReadLine, fileReadLines, resolveFilename, fileExists, fileHas, fileReadLine, pathExists
 from Tools.MultiBoot import MultiBoot
+
 
 MODULE_NAME = __name__.split(".")[-1]
 DEGREE = "\u00B0"
