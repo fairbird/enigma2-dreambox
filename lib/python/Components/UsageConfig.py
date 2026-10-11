@@ -4,7 +4,7 @@ from Components.International import international
 from Components.Console import Console
 from Components.config import ConfigSubsection, ConfigDirectory, ConfigYesNo, config, ConfigSelection, ConfigText, ConfigNumber, ConfigSet, ConfigLocations, ConfigSelectionNumber, ConfigSelectionInteger, ConfigClock, ConfigSlider, ConfigEnableDisable, ConfigSubDict, ConfigDictionarySet, ConfigInteger, ConfigIP, ConfigPassword, ConfigSequence, NoSave, ConfigBoolean, configfile
 from Tools.Directories import SCOPE_HDD, SCOPE_TIMESHIFT, defaultRecordingLocation, fileContains, resolveFilename, fileHas, fileReadXML, fileWriteLine, fileWriteLines, SCOPE_SKIN
-from enigma import setTunerTypePriorityOrder, setPreferredTuner, setSpinnerOnOff, setEnableTtCachingOnOff, eActionMap, eEnv, eDVBDB, Misc_Options, eBackgroundFileEraser, eServiceEvent, eSubtitleSettings, eSettings, eDVBLocalTimeHandler, eEPGCache
+from enigma import eAVControl, setTunerTypePriorityOrder, setPreferredTuner, setSpinnerOnOff, setEnableTtCachingOnOff, eActionMap, eEnv, eDVBDB, Misc_Options, eBackgroundFileEraser, eServiceEvent, eSubtitleSettings, eSettings, eDVBLocalTimeHandler, eEPGCache
 from Components.About import GetIPsFromNetworkInterfaces
 from Components.NimManager import nimmanager
 from Components.Renderer.FrontpanelLed import ledPatterns, PATTERN_ON, PATTERN_OFF, PATTERN_BLINK
@@ -1223,6 +1223,22 @@ def InitUsageConfig():
 		config.osd.dst_height = ConfigSelectionInteger(default=576, first=0, last=576, step=1, wrap=False)
 
 	config.osd.alpha = ConfigSelectionInteger(default=255, first=0, last=255, step=1, wrap=False)
+	config.osd.autoHide = ConfigYesNo(default=False)
+	config.osd.autoHideDelay = ConfigSelectionInteger(default=30, first=10, last=300, step=10, wrap=False, units=_("seconds"))
+
+	def setOSDAutoHide(configElement):
+		eAVControl.getInstance().setOSDAutoHideTimeout(config.osd.autoHideDelay.value if config.osd.autoHide.value else 0)
+
+	config.osd.autoHide.addNotifier(setOSDAutoHide)
+	config.osd.autoHideDelay.addNotifier(setOSDAutoHide)
+
+	def osdAutoHidePauseChanged(paused):
+		from Screens.Toast import Toast  # Import after screen initialization to avoid circular imports.
+		if Toast.instance:
+			text = _("OSD auto-hide paused until the next GUI restart. Hold 0 to resume.") if paused else _("OSD auto-hide enabled.")
+			Toast.instance.showToast(text, Toast.TYPE_INFO, 3)
+
+	eAVControl.getInstance().osdAutoHidePauseChanged.get().append(osdAutoHidePauseChanged)
 	config.osd.alpha_teletext = ConfigSelectionInteger(default=255, first=0, last=255, step=1, wrap=False)
 	config.osd.alpha_webbrowser = ConfigSelectionInteger(default=255, first=0, last=255, step=1, wrap=False)
 	config.osd.threeDmode = ConfigSelection(default="auto", choices=[
