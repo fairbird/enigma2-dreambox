@@ -2897,12 +2897,12 @@ class InfoBarTimeshift:
 				"seekdef:6": (boundFunction(self.seekdef, 6), _("Seek")),
 				"seekdef:7": (boundFunction(self.seekdef, 7), _("Seek")),
 				"seekdef:9": (boundFunction(self.seekdef, 9), _("Seek")),
-			}, prio = 0)
+			}, prio=0)
 		self["TimeshiftActivateActions"] = ActionMap(["InfobarTimeshiftActivateActions"],
 			{
 				"timeshiftActivateEnd": self.activateTimeshiftEnd,  # something like "rewind key"
 				"timeshiftActivateEndAndPause": self.activateTimeshiftEndAndPause  # something like "pause key"
-			}, prio = -1)  # priority over record
+			}, prio=-1)  # priority over record
 
 		self["TimeshiftActivateActions"].setEnabled(False)
 		self.ts_rewind_timer = eTimer()
@@ -3937,7 +3937,7 @@ class InfoBarSubserviceSelection:
 		self["SubserviceSelectionAction"] = HelpableActionMap(self, ["InfobarSubserviceSelectionActions"],
 			{
 				"subserviceSelection": (self.subserviceSelection, _("Subservice list...")),
-			}, prio = 0, description = _("Subservice Actions"))
+			}, prio=0, description=_("Subservice Actions"))
 
 		self["SubserviceQuickzapAction"] = HelpableActionMap(self, ["InfobarSubserviceQuickzapActions"],
 			{
@@ -4480,7 +4480,7 @@ class InfoBarCueSheetSupport:
 				"jumpPreviousMark": (self.jumpPreviousMark, _("Jump to previous marked position")),
 				"jumpNextMark": (self.jumpNextMark, _("Jump to next marked position")),
 				"toggleMark": (self.toggleMark, _("Toggle a cut mark at the current position"))
-			}, prio = 1)
+			}, prio=1)
 
 		self.cut_list = []
 		self.is_closing = False
