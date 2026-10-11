@@ -46,6 +46,7 @@ private:
 	friend class eDVBPESReader;
 	friend class eDVBAudio;
 	friend class eDVBVideo;
+	friend class eDVBVideoSwDemux;
 	friend class eDVBPCR;
 	friend class eDVBTText;
 	friend class eDVBTSRecorder;
