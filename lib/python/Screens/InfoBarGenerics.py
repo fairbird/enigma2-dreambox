@@ -485,6 +485,7 @@ class InfoBarShowHide(InfoBarScreenSaver):
 		self.onShowHideNotifiers = []
 
 		self.actualSecondInfoBarScreen = self.InfoBarAdds = None
+
 		class SecondInfoBarEPG(SecondInfoBar):
 			def __init__(self, session, skinName):
 				SecondInfoBar.__init__(self, session, skinName)
