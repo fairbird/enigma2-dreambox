@@ -280,9 +280,9 @@ class Session:
 		self.isStandby = False  # Set by Screens.Standby.
 		from Components.FrontPanelLed import frontPanelLed
 		from Tools.Notifications import notificationCenter
-		ormTimer = enigma.eTimer()  # ORM, started by enigma2.sh, learns that the main loop runs.
-		ormTimer.callback.append(lambda: enigma.eProfileNotify("ready"))
-		ormTimer.start(0, True)
+		self.ormTimer = enigma.eTimer()  # ORM, started by enigma2.sh, learns that the main loop runs.
+		self.ormTimer.callback.append(lambda: enigma.eProfileNotify("ready"))
+		self.ormTimer.start(0, True)
 		frontPanelLed.init(self)
 		self.allDialogs = []
 		notificationCenter.setup(self)

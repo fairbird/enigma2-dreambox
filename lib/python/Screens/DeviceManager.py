@@ -1143,15 +1143,16 @@ class DeviceManagerMountPoints(Setup):
 			mounts = getProcMountsNew()
 			mediaMounts = [f"{x[0]}:{x[1]}" for x in mounts if x[1].startswith("/media/")]
 			removeMounts = []
-			for removeMount in [x for x in mediaMounts if x not in self.deviceMounts]:
+			for removeMount in [x for x in mediaMounts if x not in deviceMounts]:
 				mountPoint = removeMount.split(":")[1]
 				removeMounts.append(mountPoint)
 			if removeMounts:
-				self.console.ePopen([self.UMOUNT, self.UMOUNT] + removeMounts)
-				self.console.ePopen([self.MOUNT, self.MOUNT, "-a"])
+				console.ePopen([umountCommand, umountCommand] + removeMounts)
+				console.ePopen([mountCommand, mountCommand, "-a"])
 			cleanMediaDirs()
 			harddiskmanager.refreshMountPoints()
-			self.close(needReboot)
+			if getattr(self, "session", None) is not None:
+				self.close(needReboot)
 		mountPoints = []
 		for index, device in enumerate(self.devices):
 			if self.mountPoints[index].value:
@@ -1208,6 +1209,9 @@ class DeviceManagerMountPoints(Setup):
 			if saveKnownDevices:
 				fileWriteLines("/etc/udev/known_devices", knownDevices, source=MODULE_NAME)
 			fileWriteLines("/etc/fstab", newFstab, source=MODULE_NAME)
+			# The wizard may destroy this screen before mount completes.
+			deviceMounts = tuple(self.deviceMounts)
+			console, mountCommand, umountCommand = self.console, self.MOUNT, self.UMOUNT
 			self.console.ePopen([self.MOUNT, self.MOUNT, "-a"], keySaveCallback)
 		else:
 			self.close(False)
