@@ -1682,10 +1682,10 @@ class ChannelSelectionBase(Screen):
 		def rightHelp():
 			return _("Move to next marker") if self.servicelist.isVertical() else _("Move to the next item")
 		Screen.__init__(self, session)
-		self["key_red"] = Button(_("All"))
-		self["key_green"] = Button(_("Satellites"))
-		self["key_yellow"] = Button(_("Provider"))
-		self["key_blue"] = Button(_("Favourites"))
+		self["key_red"] = StaticText(_("All"))
+		self["key_green"] = StaticText(_("Satellites"))
+		self["key_yellow"] = StaticText(_("Provider"))
+		self["key_blue"] = StaticText(_("Favourites"))
 
 		self["list"] = ServiceListLegacy(self) if config.channelSelection.screenStyle.value == "" or config.channelSelection.widgetStyle.value == "" else ServiceList(self)
 		self.servicelist = self["list"]
@@ -1710,7 +1710,7 @@ class ChannelSelectionBase(Screen):
 		self.movemode = False
 		self.showSatDetails = False
 
-		self["channelSelectBaseActions"] = HelpableNumberActionMap(self, ["ColorActions", "NumberActions", "InputAsciiActions"],
+		self["channelSelectBaseActions"] = HelpableNumberActionMap(self, ["ColorActions", "NumberActions", "InputAsciiActions", "ChannelSelectBaseActions"],
 			{
 				"red": (self.showAllServices, _("Show all available services")),
 				"green": (boundFunction(self.showSatellites, changeMode=True), _("Show list of transponders")),

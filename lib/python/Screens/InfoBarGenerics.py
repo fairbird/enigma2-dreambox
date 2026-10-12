@@ -7,6 +7,7 @@ from Components.Input import Input
 from Components.Label import Label
 from Components.MovieList import AUDIO_EXTENSIONS, MOVIE_EXTENSIONS, DVD_EXTENSIONS
 from Components.Pixmap import MovingPixmap
+from Components.ScrollLabel import ScrollLabel
 from Components.PluginComponent import plugins
 from Components.ServiceEventTracker import ServiceEventTracker
 from Components.Sources.ServiceEvent import ServiceEvent
@@ -460,8 +461,9 @@ class InfoBarShowHide(InfoBarScreenSaver):
 			}, 1)  # lower prio to make it possible to override ok and cancel..
 
 		self.__event_tracker = ServiceEventTracker(screen=self, eventmap={
-				iPlayableService.evStart: self.serviceStarted,
-			})
+			iPlayableService.evStart: self.serviceStarted,
+			iPlayableService.evUpdatedEventInfo: self.updateEPGDescription,
+		})
 
 		InfoBarScreenSaver.__init__(self)
 		self.__state = self.STATE_SHOWN
@@ -483,18 +485,43 @@ class InfoBarShowHide(InfoBarScreenSaver):
 		self.onShowHideNotifiers = []
 
 		self.actualSecondInfoBarScreen = self.InfoBarAdds = None
+		class SecondInfoBarEPG(SecondInfoBar):
+			def __init__(self, session, skinName):
+				SecondInfoBar.__init__(self, session, skinName)
+				self["RdsDecoder"] = RdsDecoder(self.session.nav)
+				self["epg_description"] = ScrollLabel()
+				self["FullDescription"] = ScrollLabel()
+				self["channel"] = Label()
+				self["key_red"] = StaticText()
+				self["key_green"] = StaticText()
+				self["key_yellow"] = StaticText()
+				self["key_blue"] = StaticText()
+				self["SecondInfoBar"] = HelpableActionMap(self, ["2ndInfobarActions"], {
+					"pageUp": (self.pageUp, _("Switch EPG Page Up")),
+					"pageDown": (self.pageDown, _("Switch EPG Page Down")),
+					"prevPage": (self.pageUp, _("Switch EPG Page Up")),
+					"nextPage": (self.pageDown, _("Switch EPG Page Down")),
+				}, prio=-1, description=_("2nd InfoBar Actions"))
+
+			def pageUp(self):
+				self["epg_description"].pageUp()
+				self["FullDescription"].pageUp()
+
+			def pageDown(self):
+				self["epg_description"].pageDown()
+				self["FullDescription"].pageDown()
 		if isStandardInfoBar(self):
-			self.secondInfoBarScreen = self.session.instantiateDialog(SecondInfoBar, "SecondInfoBar")
+			self.secondInfoBarScreen = self.session.instantiateDialog(SecondInfoBarEPG, "SecondInfoBar")
 			self.secondInfoBarScreen.show()
 			self.secondInfoBarScreen.onShow.append(self.__SecondInfobarOnShow)
 			self.secondInfoBarScreen.onHide.append(self.__SecondInfobarOnHide)
-			self.secondInfoBarScreenSimple = self.session.instantiateDialog(SecondInfoBar, "SecondInfoBarSimple")
+			self.secondInfoBarScreenSimple = self.session.instantiateDialog(SecondInfoBarEPG, "SecondInfoBarSimple")
 			self.secondInfoBarScreenSimple.show()
 			self.secondInfoBarScreenSimple.onShow.append(self.__SecondInfobarOnShow)
 			self.secondInfoBarScreenSimple.onHide.append(self.__SecondInfobarOnHide)
 			self.actualSecondInfoBarScreen = config.usage.show_simple_second_infobar.value and self.secondInfoBarScreenSimple.skinAttributes and self.secondInfoBarScreenSimple or self.secondInfoBarScreen
 			if findSkinScreen("InfoBarAdds"):
-				self.InfoBarAdds = self.session.instantiateDialog(SecondInfoBar, "InfoBarAdds")
+				self.InfoBarAdds = self.session.instantiateDialog(SecondInfoBarEPG, "InfoBarAdds")
 				self.InfoBarAdds.show()
 
 		self.InfobarPluginScreens = [self.session.instantiateDialog(plugin) for plugin in plugins.getPlugins(where=PluginDescriptor.WHERE_INFOBAR_SCREEN)]
@@ -640,6 +667,39 @@ class InfoBarShowHide(InfoBarScreenSaver):
 			if config.usage.show_infobar_on_zap.value:
 				self.doShow()
 		self.showHideVBI()
+
+	def updateEPGDescription(self):
+		screen = getattr(self, "actualSecondInfoBarScreen", None)
+		if screen is None:
+			return
+
+		service = self.session.nav.getCurrentService()
+		info = service and service.info()
+		event = info and info.getEvent(0)
+
+		if not event:
+			ref = self.session.nav.getCurrentlyPlayingServiceOrGroup()
+			event = ref and ref.valid() and eEPGCache.getInstance().lookupEventTime(ref, -1)
+
+		if not event:
+			screen["channel"].setText("")
+			screen["epg_description"].setText("")
+			screen["FullDescription"].setText("")
+			return
+
+		name = event.getEventName() or ""
+		description = event.getShortDescription() or ""
+		extended = event.getExtendedDescription() or ""
+
+		screen["channel"].setText(name)
+
+		if description and extended and description != extended:
+			text = description + "\n" + extended
+		else:
+			text = description or extended
+
+		screen["epg_description"].setText(text)
+		screen["FullDescription"].setText(extended or description)
 
 	def startHideTimer(self):
 		if self.__state == self.STATE_SHOWN and not self.__locked:
