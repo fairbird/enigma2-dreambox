@@ -32,6 +32,7 @@ from Screens.Dish import Dish
 from Screens.EventView import EventViewEPGSelect, EventViewSimple
 from Screens.InputBox import InputBox
 from Screens.MessageBox import MessageBox
+from Screens.ParentalControlSetup import ProtectedScreen, runWithScreenProtection, runWithScreenProtectionScopes
 from Screens.MinuteInput import MinuteInput
 from Screens.TimerSelection import TimerSelection
 from Screens.PictureInPicture import PictureInPicture
@@ -1614,7 +1615,7 @@ class InfoBarEPG:
 				self.session.open(EPGSelection, ref)
 
 	def runPlugin(self, plugin):
-		plugin(session=self.session, servicelist=self.servicelist)
+		return runWithScreenProtection(self.session, ("plugin_browser", "extensions_menu"), boundFunction(plugin, session=self.session, servicelist=self.servicelist))
 
 	def showEventInfoPlugins(self):
 		pluginlist = self.getEPGPluginList()
@@ -3274,7 +3275,9 @@ class InfoBarTimeshift:
 			self.ts_current_event_timer.startLongTimer(duration)
 
 
-class ExtensionsList(ChoiceBox):
+class ExtensionsList(ChoiceBox, ProtectedScreen):
+	protectionSections = ("extensions_menu", "plugin_browser")
+
 	def __init__(self, session, extensions):
 		colorKeys = {
 			"red": 1,
@@ -3309,6 +3312,7 @@ class ExtensionsList(ChoiceBox):
 
 		reorderConfig = "extensionOrder" if config.usage.sortExtensionslist.value == "user" else ""
 		ChoiceBox.__init__(self, session, title=_("Extensions"), list=extensionList, keys=extensionKeys, reorderConfig=reorderConfig, skin_name="ExtensionsList")
+		ProtectedScreen.__init__(self)
 
 
 class InfoBarExtensions:
@@ -3385,11 +3389,14 @@ class InfoBarExtensions:
 					self.updateExtension(y[0], y[1])
 
 	def showExtensionSelection(self):
-		self.session.openWithCallback(self.extensionCallback, ExtensionsList, self.list)
+		authorizedSections = set()
+		dialog = self.session.openWithCallback(self.extensionCallback, ExtensionsList, self.list)
+		# ChoiceBox is destroyed before its selection callback runs.
+		dialog.onClose.append(lambda: authorizedSections.update(dialog.screenProtectionScopes))
 
 	def extensionCallback(self, answer):
 		if answer is not None:
-			answer[1][1]()
+			runWithScreenProtectionScopes(self.session, authorizedSections, answer[1][1])
 
 	def openOScamInfo(self):
 		from Screens.OScamInfo import OscamInfoMenu
@@ -3413,6 +3420,9 @@ class InfoBarPlugins:  # Depends on InfoBarExtensions.
 		return name
 
 	def runPlugin(self, plugin):  # Used in AudioSelection.py
+		return runWithScreenProtection(self.session, ("plugin_browser", "extensions_menu"), boundFunction(self.runPluginProtected, plugin))
+
+	def runPluginProtected(self, plugin):
 		if isinstance(self, InfoBarChannelSelection):
 			plugin(session=self.session, servicelist=self.servicelist)
 		else:

@@ -1623,6 +1623,19 @@ class ChannelSelectionEdit:
 			mutableDst.flushChanges()
 			if mutableSrc is not None:
 				mutableSrc.flushChanges()
+				restored = False
+				for service in self.channelsToMove:
+					if service.flags & eServiceReference.isDirectory:
+						path = service.getPath()
+						start = path.find('FROM BOUQUET "')
+						if start != -1:
+							name = path[start + 14:].split('"')[0]
+							filename = "/etc/enigma2/" + name
+							if not os.path.exists(filename) and os.path.exists(filename + ".del"):
+								os.rename(filename + ".del", filename)
+								restored = True
+				if restored:
+					eDVBDB.getInstance().reloadBouquets()
 			self.servicelist.resetRoot()
 		if self.moveBouquetSelector is not None:
 			self.moveBouquetSelector.close(True)

@@ -11,7 +11,6 @@ from Components.config import ConfigYesNo, config, ConfigSubsection
 from Components.Sources.StaticText import StaticText
 from Components.ConfigList import ConfigListScreen
 from Screens.MessageBox import MessageBox
-from Screens.ParentalControlSetup import ProtectedScreen
 from Tools.Directories import SCOPE_CONFIG, SCOPE_SKIN, resolveFilename
 
 config.FactoryReset = ConfigSubsection()
@@ -27,10 +26,11 @@ config.FactoryReset.resetTimers = ConfigYesNo(default=True)
 config.FactoryReset.resetOthers = ConfigYesNo(default=True)
 
 
-class FactoryReset(ConfigListScreen, Screen, ProtectedScreen):
+class FactoryReset(ConfigListScreen, Screen):
+	protectionSections = ("configuration", "manufacturer_reset")
+
 	def __init__(self, session):
 		Screen.__init__(self, session)
-		ProtectedScreen.__init__(self)
 		self.skinName = ["ParentalControlSetup", "Setup"]
 		self.title = _("Factory Reset")
 		self.onChangedEntry = []
@@ -50,9 +50,6 @@ class FactoryReset(ConfigListScreen, Screen, ProtectedScreen):
 
 	def layoutFinished(self):
 		self.setTitle(self.title)
-
-	def isProtected(self):
-		return config.ParentalControl.configured.value and config.ParentalControl.setuppinactive.value and config.ParentalControl.config_sections.manufacturer_reset.value
 
 	def createSetup(self):
 		self.bouquets = []

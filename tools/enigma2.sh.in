@@ -18,9 +18,24 @@ if [ -x /usr/sbin/smallbox-wizard ]; then
 	done
 fi
 
+#check for /etc/enigma2 folder
+if [ ! -d /etc/enigma2 ] ; then
+	mkdir -p /etc/enigma2
+fi
+
 if [ -d /home/root ]; then
 	export HOME=/home/root
 	cd
+fi
+
+#Workaround for aspect ratio issue
+if [ -e /proc/stb/video/avshutdown ]; then
+	echo "down" > /proc/stb/video/avshutdown && echo "up" > /proc/stb/video/avshutdown
+fi
+
+# LC_ALL available?
+if [ -z $LC_ALL ]; then
+	export LC_ALL=en_GB.utf8
 fi
 
 # any debuglevel passed?
@@ -29,6 +44,24 @@ if [ -z $ENIGMA_DEBUG_LVL ]; then
 else
 	DEBUG_LVL=$ENIGMA_DEBUG_LVL
 fi
+
+#check for sundtek tuner helper lib
+if [ -e /opt/lib/libmediaclient.so ]; then
+	LIBS="/opt/lib/libmediaclient.so @libdir@/libopen.so.0.0.0"
+elif [ ! -e /dev/amremote ]; then
+	LIBS="@libdir@/libopen.so.0.0.0"
+fi
+
+if [ -f /proc/stb/fp/nec_ir ]; then
+	/sbin/insmod /lib/modules/4.9/extra/lcd/lcd.ko
+	echo 1 > /proc/stb/fp/nec_ir
+	[ -f /sys/class/remote/amremote/protocol ] && echo 2 > /sys/class/remote/amremote/protocol
+fi
+
+# hook to execute scripts always before enigma2 start
+#if [ -e @libdir@/libpassthrough.so ]; then
+#	LIBS="$LIBS @libdir@/libpassthrough.so"
+#fi
 
 if [ ! -e /etc/enigma2/settings ]; then
 	touch /etc/enigma2/settings
@@ -43,41 +76,6 @@ elif [ "$(grep -i config.crash.debugLevel=5 /etc/enigma2/settings)" != "" ]; the
 elif [ "$(grep -i config.crash.enabledebug=true /etc/enigma2/settings)" != "" ]; then
 	ENIGMA_DEBUG=1
 	DEBUG_LVL=4
-fi
-
-# LC_ALL available?
-if [ -z $LC_ALL ]; then
-	export LC_ALL=en_GB.utf8
-fi
-
-LIBS=@libdir@/libopen.so.0.0.0
-
-PLATFORMCHECK=`sed -En 's|^platform=(.+)$|\1|p' /usr/lib/enigma.info`
-
-if [ "${PLATFORMCHECK}" == "meson64" ]; then
-	echo "1" > /sys/class/graphics/fb0/osd_clear
-	echo "1" > /sys/class/graphics/fb1/osd_clear
-	FIRSTRUN=`sed -En 's|^config\.misc\.firstrun=(.+)$|\1|p' /etc/enigma2/settings | tr [A-Z] [a-z]`
-	if [ "$FIRSTRUN" == "true" ]; then
-		echo "1080p50hz" > /sys/class/display/mode
-	fi
-fi
-
-if [ -f /proc/stb/fp/led_color ]; then
-	echo "00ffffff" > /proc/stb/fp/led_color
-elif [ -f /proc/stb/fp/led_brightness ]; then
-	echo "000000ff" > /proc/stb/fp/led_brightness
-fi
-
-if [ -f /proc/stb/fp/nec_ir ]; then
-	/sbin/insmod /lib/modules/4.9/extra/lcd/lcd.ko
-	echo "1" > /proc/stb/fp/nec_ir
-	[ -f /sys/class/remote/amremote/protocol ] && echo "2" > /sys/class/remote/amremote/protocol
-fi
-
-# hook to execute scripts always before enigma2 start
-if [ -x /usr/bin/enigma2_pre_start.sh ]; then
-	/usr/bin/enigma2_pre_start.sh
 fi
 
 # Show backdrop on enigma2 start.
@@ -176,7 +174,7 @@ if [ -x $ORM ]; then
 	if [ -e @sysconfdir@/enigma2/.orm-once ]; then
 		# Once instead of enigma2, e.g. for later calls via enigma2 menu
 		rm -f @sysconfdir@/enigma2/.orm-once
-		enigma2bin="$ORM --manual"
+		enigma2bin=$ORM
 	else
 		[ -e $ORM_RESULT ] && mv -f $ORM_RESULT $ORM_RESULT.last
 		ormpid=$($ORM --watch $ORM_RESULT 2>/dev/null)
@@ -210,11 +208,7 @@ wait ${enigma2pid}
 #  2 - reboot
 #  3 - restart enigma in normal mode
 #  4 - front processor upgrade
-#  5 - install new settings
-#  6 - restart enigma in debug mode
-#  7 - manufacturer reset
 # 16 - recovery mode
-# 42 - restart for unattended update
 # 43 - restart for network restore
 # 44 - restart for autobackup restore
 #
@@ -231,46 +225,45 @@ if [ -n "$ormpid" ]; then
 	fi
 fi
 
+function check_busybox_update {
+	if [ -e /etc/enigma2/.busybox_update_required ]; then
+		rm /etc/enigma2/.busybox_update_required
+		opkg install busybox --force-reinstall
+	fi
+}
+
 case $ret in
 	1)
-		if [ -f /proc/stb/fp/led_color ]; then
-			echo "00ffffff" > /proc/stb/fp/led_color
-		elif [ -f /proc/stb/fp/led_brightness ]; then
-			echo "00000008" > /proc/stb/fp/led_brightness
-		fi
+		check_busybox_update
+		touch /etc/enigma2/.deep
 		/sbin/halt
 		;;
 	2)
+		check_busybox_update
+		if [ -f /proc/stb/fp/force_restart ]; then
+			echo 1 > /proc/stb/fp/force_restart
+		fi
+		[[ -e /etc/enigma2/.deep ]] && rm /etc/enigma2/.deep
 		/sbin/reboot
 		;;
 	3)
-		DEBUG_LVL="3"
 		rm -fR /home/root/.cache/gstreamer-1.0
 		rm -f /tmp/.listen.camd.socket.ignore
 		;;
 	4)
+		check_busybox_update
 		/sbin/rmmod lcd
 		/usr/sbin/fpupgrade --upgrade 2>&1 | tee /home/root/fpupgrade.log
 		sleep 1;
 		/sbin/rmmod fp
 		/sbin/modprobe fp
+		[[ -e /etc/enigma2/.deep ]] && rm /etc/enigma2/.deep
 		/sbin/reboot
-		;;
-	5)
-		if ! grep -q config.misc.RestartUI /etc/enigma2/settings; then
-			echo "config.misc.RestartUI=true" >>/etc/enigma2/settings
-		fi
-		;;
-	6)
-		DEBUG_LVL="4"
-		;;
-	7)
-		rm -R /etc/enigma2
 		;;
 	15)
 		rm -fR /home/root/.cache/gstreamer-1.0
 		rm -f /tmp/.listen.camd.socket.ignore
-            dd if=/dev/zero of=/dev/fb0 bs=1M count=16 2>/dev/null
+            	dd if=/dev/zero of=/dev/fb0 bs=1M count=16 2>/dev/null
 		env -i \
 		HOME=/home/root \
 		USER=root \
@@ -282,6 +275,26 @@ case $ret in
 		/usr/bin/kodi --standalone  >/tmp/kodi-standalone.log 2>&1
 		ret=$?
 		echo "kodi exit code: $ret" >>/tmp/kodi-standalone.log
+		;;
+	16)
+		if [ -e /proc/stb/info/model ]; then
+			stbcheck=`cat /proc/stb/info/model`
+			if [[ $stbcheck == "one" || $stbcheck == "two" ]]; then
+				/usr/sbin/to-the-rescue
+			fi
+		fi
+
+		if [ -e /dev/block/by-name/flag ]; then
+			echo -n "0" > /dev/block/by-name/flag
+		elif [ -e /dev/block/by-name/bootoptions ]; then
+			mkdir -p /tmp/bootoptions
+			mount /dev/block/by-name/bootoptions /tmp/bootoptions
+			cp -f /tmp/bootoptions/STARTUP_RECOVERY /tmp/bootoptions/STARTUP_ONCE
+		else
+			echo "rescue" > /proc/stb/fp/boot_mode
+		fi
+		[[ -e /etc/enigma2/.deep ]] && rm /etc/enigma2/.deep
+		/sbin/reboot
 		;;
 	17)
 		rm -fR /home/root/.cache/gstreamer-1.0
@@ -310,59 +323,15 @@ case $ret in
 		echo "RetroGaming standalone exit code: $ret" \
 			>>/tmp/retrogaming-standalone.log
 		;;
-	16)
-		stbcheck=`cat /proc/stb/info/model`
-		if [[ $stbcheck == "one" || $stbcheck == "two" ]]; then
-			/usr/sbin/to-the-rescue
-		fi
-		if [ -e /dev/block/by-name/flag ]; then
-			echo -n "0" > /dev/block/by-name/flag
-		elif [ -e /dev/block/by-name/bootoptions ]; then
-			mkdir -p /tmp/bootoptions
-			mount /dev/block/by-name/bootoptions /tmp/bootoptions
-			cp -f /tmp/bootoptions/STARTUP_RECOVERY /tmp/bootoptions/STARTUP_ONCE
-		else
-			echo "rescue" > /proc/stb/fp/boot_mode
-		fi
-		[[ -e /etc/enigma2/.deep ]] && rm /etc/enigma2/.deep
-		/sbin/reboot
-		;;
-	42)
-		df -P | grep -v "tmpfs " | awk '{print $6}' | tail -n +3 > /tmp/upgrade_mountpoints.txt
-		while read line; do
-			if [  -f $line/var/lib/opkg/status ]; then
-			DESTS=$DESTS" --add-dest "$line":"$line
-		fi
-		done < /tmp/upgrade_mountpoints.txt
-		# bind the console (when available)
-		[ -f /sys/class/vtconsole/vtcon1/bind ] && echo 1 > /sys/class/vtconsole/vtcon1/bind
-		prevupd=0
-		currupd=999
-		opkg update 2>&1 | tee /home/root/opkgupgrade.log
-		# check if we need to upgrade busybox first
-		if [ "$(opkg list-upgradable busybox)" != "" ]; then
-			opkg update busybox 2>&1 | tee -a /home/root/opkgupgrade.log
-		fi
-		# update all other packages
-		while [ $currupd -gt 0 -a $currupd -ne $prevupd ]; do
-			opkg upgrade $DESTS 2>&1 | tee -a /home/root/opkgupgrade.log
-			prevupd=$currupd
-			currupd=`opkg list-upgradable | wc -l`
-			echo "===> $currupd PACKAGE(S) REMAINING" >> /home/root/opkgupgrade.log
-		done
-		/sbin/reboot
-		;;
 	43)
-		# restore only network from autobackup
-		[ -f /sys/class/vtconsole/vtcon1/bind ] && echo 1 > /sys/class/vtconsole/vtcon1/bind
-		/etc/init.d/settings-restore.sh network
-		break
+		init 1
 		;;
 	44)
 		# restore autobackup
 		[ -f /sys/class/vtconsole/vtcon1/bind ] && echo 1 > /sys/class/vtconsole/vtcon1/bind
 		/etc/init.d/settings-restore.sh
 		[ -f /etc/init.d/softcam ] && /etc/init.d/softcam restart
+		[[ -e /etc/enigma2/.deep ]] && rm /etc/enigma2/.deep
 		break
 		;;
 	*)

@@ -2,6 +2,7 @@
 from Screens.Screen import Screen
 from Screens.MessageBox import MessageBox
 from Screens.Console import Console
+from Screens.ParentalControlSetup import ProtectedScreen
 from Components.ActionMap import ActionMap, NumberActionMap
 from Components.Pixmap import Pixmap
 from Components.Label import Label
@@ -10,10 +11,12 @@ from Components.MenuList import MenuList
 from Components.config import config, configfile, ConfigSubsection, ConfigText, ConfigLocations
 from Components.ConfigList import ConfigList, ConfigListScreen
 from Components.FileList import MultiFileSelectList
+from Components.Harddisk import harddiskmanager
 from enigma import eEnv, eEPGCache
 from Tools.Directories import *
 from os import path, makedirs, listdir, stat, rename, remove
 from datetime import date
+
 
 config.plugins.configurationbackup = ConfigSubsection()
 config.plugins.configurationbackup.backuplocation = ConfigText(default='/media/hdd/', visible_width=50, fixed_size=False)
@@ -30,6 +33,23 @@ def getBackupPath():
 
 def getBackupFilename():
 	return "enigma2settingsbackup.tar.gz"
+
+
+def checkConfigBackup():
+	backupfile = getBackupFilename()
+	mountpoints = [x.mountpoint for x in harddiskmanager.getMountedPartitions(onlyhotplug=False) if x.mountpoint != "/"]
+	print(f"[BackupRestore] checkConfigBackup: mountpoints found = {mountpoints}")
+	for mountpoint in mountpoints:
+		fullbackupfilename = path.join(mountpoint, "backup", backupfile)
+		print(f"[BackupRestore] checkConfigBackup: checking {fullbackupfilename}")
+		if path.exists(fullbackupfilename):
+			print(f"[BackupRestore] checkConfigBackup: FOUND {fullbackupfilename}")
+			config.plugins.configurationbackup.backuplocation.setValue(mountpoint)
+			config.plugins.configurationbackup.backuplocation.save()
+			config.plugins.configurationbackup.save()
+			return fullbackupfilename
+	print("[BackupRestore] checkConfigBackup: no backup found")
+	return None
 
 
 class BackupScreen(ConfigListScreen, Screen):
@@ -176,7 +196,9 @@ class BackupSelection(Screen):
 			self.filelist.descent()
 
 
-class RestoreMenu(Screen):
+class RestoreMenu(Screen, ProtectedScreen):
+	protectionSections = ("configuration", "flash_restore")
+
 	skin = """
 		<screen name="RestoreMenu" position="center,center" size="560,400" title="Restore backups" >
 			<ePixmap pixmap="buttons/red.png" position="0,0" size="140,40" alphaTest="on" />
@@ -190,6 +212,7 @@ class RestoreMenu(Screen):
 
 	def __init__(self, session):
 		Screen.__init__(self, session)
+		ProtectedScreen.__init__(self)
 		self.setTitle(_("Restore backups"))
 
 		self["key_red"] = StaticText(_("Cancel"))
@@ -280,7 +303,9 @@ class RestoreMenu(Screen):
 		self["summary_description"].text = cur
 
 
-class RestoreScreen(ConfigListScreen, Screen):
+class RestoreScreen(ConfigListScreen, Screen, ProtectedScreen):
+	protectionSections = ("configuration", "flash_restore")
+
 	skin = """
 		<screen position="135,144" size="350,310" title="Restore is running..." >
 		<widget name="config" position="10,10" size="330,250" transparent="1" scrollbarMode="showOnDemand" />
@@ -288,6 +313,7 @@ class RestoreScreen(ConfigListScreen, Screen):
 
 	def __init__(self, session, runRestore=False):
 		Screen.__init__(self, session)
+		ProtectedScreen.__init__(self)
 		self.setTitle(_("Restoring..."))
 		self.runRestore = runRestore
 		self["actions"] = ActionMap(["WizardActions", "DirectionActions"],
@@ -303,7 +329,7 @@ class RestoreScreen(ConfigListScreen, Screen):
 		self.list = []
 		ConfigListScreen.__init__(self, self.list)
 		if self.runRestore:
-			self.onShown.append(self.doRestore)
+			self.callLater(self.protectedCallback(self.doRestore))
 
 	def doRestore(self):
 		if path.exists("/proc/stb/vmpeg/0/dst_width"):
