@@ -7,4 +7,4 @@ install_PYTHON = \
 	LoadPixmap.py Profile.py HardwareInfo.py Transponder.py ASCIItranslit.py Log.py LogConfig.py \
 	Downloader.py Trashcan.py GetEcmInfo.py Alternatives.py TextBoundary.py ScanBouquetRepair.py \
 	camcontrol.py CountryCodes.py MultiBoot.py FallbackTimer.py Hex2strColor.py HybridService.py \
-	Geolocation.py CopyFiles.py Conversions.py ServiceReference.py ServiceAction.py Migration.py
+	Geolocation.py CopyFiles.py Conversions.py ServiceReference.py ServiceAction.py Migration.py DAB.py
