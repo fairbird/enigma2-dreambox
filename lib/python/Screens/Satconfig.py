@@ -13,6 +13,7 @@ from Components.config import config, ConfigNothing, ConfigYesNo, configfile, Co
 from Components.Sources.List import List
 from Components.Sources.StaticText import StaticText
 from Screens.MessageBox import MessageBox
+from Screens.ParentalControlSetup import ProtectedScreen
 from Screens.ChoiceBox import ChoiceBox
 from Screens.ServiceStopScreen import ServiceStopScreen
 from Screens.AutoDiseqc import AutoDiseqc
@@ -806,10 +807,12 @@ class NimSetup(Setup, ServiceStopScreen):
 		return cc
 
 
-class NimSelection(Screen):
+class NimSelection(Screen, ProtectedScreen):
+	protectionSections = ("configuration",)
+
 	def __init__(self, session):
 		Screen.__init__(self, session)
-
+		ProtectedScreen.__init__(self)
 		self["key_info"] = StaticText(_("INFO"))
 
 		self.list = [None] * nimmanager.getSlotCount()

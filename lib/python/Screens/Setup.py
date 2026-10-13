@@ -13,6 +13,7 @@ from Components.SystemInfo import BoxInfo, getBoxDisplayName
 from Components.Sources.StaticText import StaticText
 from Screens.HelpMenu import HelpableScreen
 from Screens.Screen import Screen, ScreenSummary
+from Screens.ScreenProtection import ProtectedScreen
 from Tools.Directories import SCOPE_PLUGINS, SCOPE_SKIN, fileReadXML, resolveFilename
 
 MODULE_NAME = __name__.split(".")[-1]
@@ -21,9 +22,12 @@ domSetups = {}
 setupModTimes = {}
 
 
-class Setup(ConfigListScreen, Screen, HelpableScreen):
+class Setup(ConfigListScreen, Screen, ProtectedScreen, HelpableScreen):
+	protectionSections = ("configuration",)
+
 	def __init__(self, session, setup=None, plugin=None, PluginLanguageDomain=None, yellow_button=None, blue_button=None, menu_button=None):
 		Screen.__init__(self, session)
+		ProtectedScreen.__init__(self)
 		HelpableScreen.__init__(self)
 		self.setup = setup
 		self.plugin = plugin

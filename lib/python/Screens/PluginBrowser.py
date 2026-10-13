@@ -180,6 +180,8 @@ class PluginBrowserSummary(ScreenSummary):
 
 
 class PluginBrowser(Screen, ProtectedScreen):
+	protectionSections = ("plugin_browser",)
+
 	def __init__(self, session):
 		Screen.__init__(self, session)
 		self.setTitle(_("Plugin browser"))
@@ -236,13 +238,13 @@ class PluginBrowser(Screen, ProtectedScreen):
 		self.nextNumberTimer = eTimer()
 		self.nextNumberTimer.callback.append(self.okbuttonClick)
 
-		self.onFirstExecBegin.append(self.checkWarnings)
 		self.onShown.append(self.updateList)
 		self.onChangedEntry = []
 		self["list"].onSelectionChanged.append(self.selectionChanged)
 		self.onLayoutFinish.append(self.saveListsize)
 		if config.pluginfilter.userfeed.value != "https://" and not fileExists("/etc/opkg/user-feed.conf"):
-			self.createFeedConfig()
+			self.protectedCallback(self.createFeedConfig)()
+		self.callLater(self.protectedCallback(self.checkWarnings))
 		self.onClose.append(self.doClose)
 
 	def doClose(self):
@@ -250,9 +252,6 @@ class PluginBrowser(Screen, ProtectedScreen):
 			Processing.instance.hideProgress()
 			self.internetCheckThread.callback.get().clear()
 			self.internetCheckThread = None
-
-	def isProtected(self):
-		return config.ParentalControl.setuppinactive.value and (not config.ParentalControl.config_sections.main_menu.value or hasattr(self.session, 'infobar') and self.session.infobar is None) and config.ParentalControl.config_sections.plugin_browser.value
 
 	def saveListsize(self):
 		listsize = self["list"].instance.size()
@@ -501,10 +500,12 @@ class PluginBrowser(Screen, ProtectedScreen):
 				self.session.openWithCallback(self.PackageActionClosed, PluginManager)
 
 
-class PluginBrowserNew(Screen):
+class PluginBrowserNew(Screen, ProtectedScreen):
+	protectionSections = ("plugin_browser",)
 
 	def __init__(self, session):
 		Screen.__init__(self, session)
+		ProtectedScreen.__init__(self)
 		self.mainlist = []
 		self.plugins_pos = []
 		self.plugins = []
@@ -627,14 +628,15 @@ class PluginBrowserNew(Screen):
 			"9": self.keyNumberGlobal,
 			"0": self.keyNumberGlobal
 		})
-		self.onFirstExecBegin.append(self.checkWarnings)
+
 		self.onLayoutFinish.append(self.setIcons)
 		self.onLayoutFinish.append(self.activeBox)
 		self.onLayoutFinish.append(self.saveListsize)
 		self.onChangedEntry = []
 		self.setTitle(_("Plugin browser"))
 		if config.pluginfilter.userfeed.value != "https://" and not fileExists("/etc/opkg/user-feed.conf"):
-			self.createFeedConfig()
+			self.protectedCallback(self.createFeedConfig)()
+		self.callLater(self.protectedCallback(self.checkWarnings))
 		self.number = 0
 		self.nextNumberTimer = eTimer()
 		self.nextNumberTimer.callback.append(self.okbuttonClick)
@@ -688,9 +690,6 @@ class PluginBrowserNew(Screen):
 		listsize = self["list"].instance.size()
 		self.listWidth = listsize.width()
 		self.listHeight = listsize.height()
-
-	def isProtected(self):
-		return config.ParentalControl.setuppinactive.value and (not config.ParentalControl.config_sections.main_menu.value or hasattr(self.session, "infobar") and self.session.infobar is None) and config.ParentalControl.config_sections.plugin_browser.value
 
 	def buildSkin(self):
 		if isUHD():
@@ -1331,7 +1330,9 @@ class PluginBrowserNew(Screen):
 		return PluginBrowserSummary
 
 
-class PackageAction(Screen, NumericalTextInput):
+class PackageAction(Screen, NumericalTextInput, ProtectedScreen):
+	protectionSections = ("configuration", "packages", "plugin_browser")
+
 	skin = """
 	<screen name="PackageAction" title="Plugin Browser Action" position="center,center" size="900,585" resolution="1280,720">
 		<widget source="plugins" render="Listbox" position="0,0" size="e,500" scrollbarMode="showOnDemand">
@@ -1419,6 +1420,7 @@ class PackageAction(Screen, NumericalTextInput):
 
 	def __init__(self, session, mode=MODE_REMOVE):
 		Screen.__init__(self, session, enableHelp=True)
+		ProtectedScreen.__init__(self)
 		NumericalTextInput.__init__(self, handleTimeout=False, mode="SearchUpper")
 		self.skinName = ["PackageAction", "PluginAction"]
 		self.modeData = self.MANAGE_OPTIONS.get(mode, self.MANAGE_OPTIONS[self.MODE_MANAGE])
@@ -1557,7 +1559,14 @@ class PackageAction(Screen, NumericalTextInput):
 		# for count, exclude in enumerate(displayExclude, start=1):
 		# 	print(f"[PluginBrowser] DEBUG: Plugin exclude filter {count} is '{exclude}'.")
 		# print("[PluginBrowser] DEBUG: Exclude filter is '%s'." % (r"(%s)$" % "|".join(displayExclude) if displayExclude else r"^$"))
-		self.onLayoutFinish.append(self.layoutFinished)
+		self.onLayoutFinish.append(self.protectedCallback(self.layoutFinished))
+		self.onClose.append(self.doClose)
+
+	def doClose(self):
+		self.quickSelectTimer.stop()
+		self.opkgComponent.removeCallback(self.fetchOpkgDataCallback)
+		if self.internetCheckThread:
+			self.internetCheckThread = None
 
 	def layoutFinished(self):
 		self["plugins"].enableAutoNavigation(False)
