@@ -272,7 +272,7 @@ class Menu(Screen, ProtectedScreen):
 		self.nextNumberTimer = eTimer()
 		self.nextNumberTimer.callback.append(self.okbuttonClick)
 		if len(self.menuList) == 1:  # Does this menu have only one item, if so just run that item.
-			self.onExecBegin.append(self.singleItemMenu)
+			self.onFirstExecBegin.append(self.singleItemMenu)
 		self.onLayoutFinish.append(self.layoutFinished)
 
 	def createMenuList(self, showNumericHelp=False):
