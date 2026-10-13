@@ -280,9 +280,6 @@ class Session:
 		self.isStandby = False  # Set by Screens.Standby.
 		from Components.FrontPanelLed import frontPanelLed
 		from Tools.Notifications import notificationCenter
-		self.ormTimer = enigma.eTimer()  # ORM, started by enigma2.sh, learns that the main loop runs.
-		self.ormTimer.callback.append(lambda: enigma.eProfileNotify("ready"))
-		self.ormTimer.start(0, True)
 		frontPanelLed.init(self)
 		self.allDialogs = []
 		notificationCenter.setup(self)
@@ -660,12 +657,16 @@ def runScreenTest():
 
 	enigma.eProfileWrite("RunReactor")
 	enigma.eProfileDone()
+
+	from Components.FrontPanelLed import frontPanelLed
+
+	ormTimer = enigma.eTimer()  # ORM, started by enigma2.sh, learns that the main loop runs.
+	ormTimer.callback.append(lambda: enigma.eProfileNotify("ready"))
+	ormTimer.start(0, True)
 	runReactor()
-	if MODEL in ("dreamone", "dreamtwo"):
-		from Components.FrontPanelLed import FrontPanelLed
-		session.shutdown = True
-		FrontPanelLed.shutdown()
-		print("[StartEnigma] Normal shutdown.")
+	session.shutdown = True
+	frontPanelLed.shutdown()
+	print("[StartEnigma] Normal shutdown.")
 
 	from time import time, strftime, localtime
 	from Tools.StbHardware import setFPWakeuptime, setRTCtime
