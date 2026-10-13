@@ -52,11 +52,6 @@ elif [ ! -e /dev/amremote ]; then
 	LIBS="@libdir@/libopen.so.0.0.0"
 fi
 
-#check for specific pagecache helper lib
-if [ -e @libdir@/libpagecache.so ]; then
-	LIBS="$LIBS @libdir@/libpagecache.so"
-fi
-
 if [ -f /proc/stb/fp/nec_ir ]; then
 	/sbin/insmod /lib/modules/4.9/extra/lcd/lcd.ko
 	echo 1 > /proc/stb/fp/nec_ir
@@ -67,7 +62,6 @@ fi
 #if [ -e @libdir@/libpassthrough.so ]; then
 #	LIBS="$LIBS @libdir@/libpassthrough.so"
 #fi
-
 
 if [ ! -e /etc/enigma2/settings ]; then
 	touch /etc/enigma2/settings
