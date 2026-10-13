@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from os import access, R_OK
 from os.path import exists
-from enigma import getDesktop
+from enigma import eAVControl, getDesktop
 
 from Components.ActionMap import ActionMap, HelpableActionMap
 from Components.AVSwitch import iAVSwitch
@@ -81,6 +81,12 @@ def InitOSDCalibration():
 			fileWriteLine("/sys/class/graphics/fb0/osd_plane_alpha", hex(configElement.value), source=MODULE_NAME)
 	config.osd.alpha.addNotifier(setOSDPlaneAlpha)
 
+	def setAlpha(configElement):
+		value = configElement.value
+		print(f"[OSDCalibration] Setting OSD alpha to {value}.")
+		config.av.osd_alpha.setValue(value)
+		eAVControl.getInstance().setOSDAlpha(value)
+
 	def set3DMode(configElement):
 		if BoxInfo.getItem("OSD3DCalibration"):
 			value = configElement.value
@@ -103,10 +109,25 @@ def InitOSDCalibration():
 	config.osd.threeDmode.addNotifier(set3DMode)
 
 	def set3DZnorm(configElement):
-		if BoxInfo.getItem("OSD3DCalibration"):
-			print(f"[OSDCalibration] Setting 3D depth: {str(configElement.value)}")
-			fileWriteLine("/proc/stb/fb/znorm", str(int(configElement.value)), source=MODULE_NAME)
-	config.osd.threeDznorm.addNotifier(set3DZnorm)
+		value = configElement.value
+		print(f"[OSDCalibration] Setting 3D depth to {value}.")
+		fileWriteLine("/proc/stb/fb/znorm", str(value), source=MODULE_NAME)
+
+	BoxInfo.setItem("CanChangeOsdPosition", access("/proc/stb/fb/dst_left", W_OK))
+	BoxInfo.setItem("CanChangeOsdPositionAML", access("/sys/class/graphics/fb0/free_scale", W_OK))  # Is this the same as BoxInfo.getItem("AmlogicFamily")?
+	BoxInfo.setItem("CanChangeOsdAlpha", eAVControl.getInstance().hasOSDAlpha())
+	BoxInfo.setItem("OSDCalibration", BoxInfo.getItem("CanChangeOsdPosition") or BoxInfo.getItem("CanChangeOsdPositionAML") or BoxInfo.getItem("CanChangeOsdAlpha"))
+	BoxInfo.setItem("OSD3DCalibration", access("/proc/stb/fb/3dmode", W_OK))
+	print(f"[OSDCalibration] Setting OSD position to (X={config.osd.dst_left.value}, Y={config.osd.dst_top.value}) and size to (W={config.osd.dst_width.value}, H={config.osd.dst_height.value}).")
+	config.osd.dst_left.addNotifier(setLeft)
+	config.osd.dst_top.addNotifier(setTop)
+	config.osd.dst_width.addNotifier(setWidth)
+	config.osd.dst_height.addNotifier(setHeight)
+	if BoxInfo.getItem("CanChangeOsdAlpha"):
+		config.osd.alpha.addNotifier(setAlpha)
+	if BoxInfo.getItem("OSD3DCalibration"):
+		config.osd.threeDmode.addNotifier(set3DMode)
+		config.osd.threeDznorm.addNotifier(set3DZnorm)
 
 
 class OSDCalibration(ConfigListScreen, Screen):
