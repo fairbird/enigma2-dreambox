@@ -1,6 +1,7 @@
 #include <unistd.h>
 #include <fstream>
 #include <lib/gdi/grc.h>
+#include <lib/gdi/glcddc.h>
 #include <lib/gdi/font.h>
 #include <lib/base/init.h>
 #include <lib/base/init_num.h>
@@ -241,9 +242,14 @@ void *gRC::thread()
 				else
 					timeout.tv_sec += 2;
 
+				ePtr<gLCDDC> lcd_dc;
+				const bool lcd_fading = !gLCDDC::getInstance(lcd_dc) && lcd_dc->fadeActive();
 #ifdef HAVE_EGL
 				const bool egl_animating = gEGLDC::getInstance() && gEGLDC::getInstance()->isInitialized() && gEGLDC::getInstance()->animActive();
-				if (egl_animating)
+#else
+				const bool egl_animating = false;
+#endif
+				if (egl_animating || lcd_fading)
 				{
 					clock_gettime(CLOCK_REALTIME, &timeout);
 					timeout.tv_nsec += 4 * 1000 * 1000;
@@ -253,7 +259,6 @@ void *gRC::thread()
 						timeout.tv_sec++;
 					}
 				}
-#endif
 
 				int idle = 1;
 
@@ -859,7 +864,7 @@ void gPainter::sendHide(ePoint point, eSize size)
 	o.parm.setShowHideInfo->anim_id = g_window_animation_id;
 	m_rc->submit(o);
 }
-void gPainter::beginFade(ePoint point, eSize size)
+void gPainter::beginFade(ePoint point, eSize size, int ms)
 {
 	if (m_dc->islocked())
 		return;
@@ -869,7 +874,7 @@ void gPainter::beginFade(ePoint point, eSize size)
 	o.parm.setShowHideInfo = new gOpcode::para::psetShowHideInfo;
 	o.parm.setShowHideInfo->point = point;
 	o.parm.setShowHideInfo->size = size;
-	o.parm.setShowHideInfo->anim_id = 0;
+	o.parm.setShowHideInfo->anim_id = ms;
 	m_rc->submit(o);
 }
 

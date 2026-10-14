@@ -412,7 +412,7 @@ public:
 	void sendHide(ePoint point, eSize size);
 	void beginLayer();
 	void endLayer();
-	void beginFade(ePoint point, eSize size);
+	void beginFade(ePoint point, eSize size, int ms = 0);
 #ifdef USE_LIBVUGLES2
 	void sendShowItem(long dir, ePoint point, eSize size);
 	void setFlush(bool val);

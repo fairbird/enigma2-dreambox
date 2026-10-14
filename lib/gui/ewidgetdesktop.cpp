@@ -696,13 +696,13 @@ void eWidgetDesktop::setWidgetAnimationDuration(int ms)
 
 void eWidgetDesktop::startFade(const eRect &area)
 {
-	if (!m_widget_anim || m_style_id != 0 || m_comp_mode != cmImmediate || !m_mainloop)
+	if (!m_widget_anim || m_comp_mode != cmImmediate || !m_mainloop)
 		return;
 	if (area.width() <= 0 || area.height() <= 0)
 		return;
 	{
 		gPainter painter(m_screen.m_dc);
-		painter.beginFade(ePoint(area.x(), area.y()), area.size());
+		painter.beginFade(ePoint(area.x(), area.y()), area.size(), m_widget_anim_ms);
 	}
 	const int64_t end = fadeNowMs() + m_widget_anim_ms + 80;
 	bool found = false;
