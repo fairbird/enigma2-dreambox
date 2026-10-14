@@ -6,5 +6,9 @@ if HAVE_LIBDDVD
 SUBDIRS += DVDPlayer
 endif
 
+if DREAMNEXTGEN
+SUBDIRS += QuadPip
+endif
+
 install_PYTHON =	\
 	__init__.py
