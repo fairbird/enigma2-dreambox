@@ -5228,6 +5228,8 @@ class InfoBarHandleBsod:
 					crashText += _("Warning: This is the last crash before an automatic restart is performed.\n")
 					crashText += _("Should the crash counter be reset to prevent a restart?")
 					self.bsodLastWarning = True
+				if self.session.dialog_stack and not self.session.in_exec:
+					return
 				try:
 					self.session.openWithCallback(bsodTimeoutCallback, MessageBox, crashText, type=MessageBox.TYPE_YESNO if self.bsodLastWarning else MessageBox.TYPE_ERROR, default=False, close_on_any_key=not self.bsodLastWarning, typeIcon=MessageBox.TYPE_ERROR)
 					self.bsodIsShown = True
