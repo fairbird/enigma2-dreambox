@@ -1814,6 +1814,26 @@ void gEGLDC::applyResolution(int xres, int yres, int bpp)
 
 	glFinish();
 
+	if (xres != m_surface_width || yres != m_surface_height)
+	{
+		// Program the real framebuffer mode like gFBDC::setResolution() does, so the
+		// hardware scaler stretches it to the screen and external apps (Chromium
+		// based plugins) that draw into the framebuffer see the size they asked for.
+		destroyFBO();
+		if (recreateEGLSurfaces(xres, yres))
+		{
+			m_surface_width = xres;
+			m_surface_height = yres;
+		}
+		else
+		{
+			eDebug("[EGLDC] mode change to %dx%d failed, restoring %dx%d", xres, yres, m_surface_width, m_surface_height);
+			recreateEGLSurfaces(m_surface_width, m_surface_height);
+			xres = m_surface_width;
+			yres = m_surface_height;
+		}
+	}
+
 	m_width = xres;
 	m_height = yres;
 
