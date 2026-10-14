@@ -3323,6 +3323,7 @@ class InfoBarExtensions:
 		self.list = []
 		self.addExtension((lambda: _("Softcam Setup"), self.openSoftcamSetup, lambda: config.misc.softcam_setup.extension_menu.value and BoxInfo.getItem("HasSoftcamInstalled")), "1")
 		self.addExtension((lambda: _("Manually import from fallback tuner"), self.importChannels, lambda: config.usage.remote_fallback_extension_menu.value and config.usage.remote_fallback_import.value))
+		self.addExtension((lambda: _("Manual resolution"), self.extManualResolution, lambda: config.av.manual_resolution_extmenu.value and getattr(config.av, "videoport", None) is not None and config.av.videoport.value != "Scart"))
 		self["InstantExtensionsActions"] = HelpableActionMap(self, ["InfobarExtensions"], {
 				"extensions": (self.showExtensionSelection, _("Show extensions...")),
 		}, prio=1, description=_("Extension Actions"))  # Lower priority.
@@ -3359,6 +3360,10 @@ class InfoBarExtensions:
 		from Components.ImportChannels import ImportChannels
 		ImportChannels()
 
+	def extManualResolution(self):
+		from Plugins.SystemPlugins.Videomode.plugin import manualResolution
+		manualResolution(self.session)
+
 	def addExtension(self, extension, key=None, type=EXTENSION_SINGLE):
 		self.list.append((type, extension, key))
 
@@ -3389,14 +3394,14 @@ class InfoBarExtensions:
 					self.updateExtension(y[0], y[1])
 
 	def showExtensionSelection(self):
-		authorizedSections = set()
+		self.authorizedSections = set()
 		dialog = self.session.openWithCallback(self.extensionCallback, ExtensionsList, self.list)
 		# ChoiceBox is destroyed before its selection callback runs.
-		dialog.onClose.append(lambda: authorizedSections.update(dialog.screenProtectionScopes))
+		dialog.onClose.append(lambda: self.authorizedSections.update(dialog.screenProtectionScopes))
 
 	def extensionCallback(self, answer):
 		if answer is not None:
-			runWithScreenProtectionScopes(self.session, authorizedSections, answer[1][1])
+			runWithScreenProtectionScopes(self.session, self.authorizedSections, answer[1][1])
 
 	def openOScamInfo(self):
 		from Screens.OScamInfo import OscamInfoMenu

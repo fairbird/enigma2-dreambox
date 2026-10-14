@@ -115,6 +115,7 @@ def InitAVSwitch():
 	config.av.passthrough_fix_short = ConfigSelection(choices=delayChoices, default=100)
 
 	config.av.osd_alpha = ConfigSlider(default=255, increment=5, limits=(20, 255))  # Make Openpli compatible with some plugins who still use config.av.osd_alpha.
+	config.av.manual_resolution_extmenu = ConfigYesNo(default=False)
 
 	# when YUV, Scart or S-Video is not support by HW, don't let the user select it
 	if BoxInfo.getItem("HasYPbPr"):
@@ -301,8 +302,14 @@ def InitAVSwitch():
 			("bt709", "BT.709")
 		])
 		config.av.hdmicolorimetry.addNotifier(setHDMIColorimetry)
+		config.av.hdmicolorimetry_hdr = ConfigSelection(default="auto", choices=[
+			("auto", _("Auto")),
+			("bt2020ncl", "BT.2020 NCL"),
+			("bt2020cl", "BT.2020 CL")
+		])
 	else:
 		config.av.hdmicolorimetry = ConfigNothing()
+		config.av.hdmicolorimetry_hdr = ConfigNothing()
 
 	colorDepth = fileReadLine("/proc/stb/video/hdmi_colordepth", default=None, source=MODULE_NAME)
 	colorDepth = colorDepth.split() if colorDepth else False
@@ -320,6 +327,27 @@ def InitAVSwitch():
 		config.av.hdmicolordepth.addNotifier(setColorDepth)
 	else:
 		config.av.hdmicolordepth = ConfigNothing()
+
+	deinterlace = fileReadLine("/proc/stb/vmpeg/deinterlace", default=None, source=MODULE_NAME)
+	BoxInfo.setItem("havedeinterlace", deinterlace is not None)
+	if deinterlace is not None:
+		def setDeinterlace(configElement):
+			fileWriteLine("/proc/stb/vmpeg/deinterlace", configElement.value, source=MODULE_NAME)
+
+		deinterlaceLabels = {
+			"off": _("Off"),
+			"auto": _("Auto"),
+			"on": _("On"),
+			"bob": "Bob"
+		}
+		deinterlaceChoices = fileReadLine("/proc/stb/vmpeg/deinterlace_choices", default=None, source=MODULE_NAME)
+		deinterlaceChoices = deinterlaceChoices.split() if deinterlaceChoices else list(deinterlaceLabels)
+		config.av.deinterlace = ConfigSelection(default="auto" if "auto" in deinterlaceChoices else deinterlaceChoices[0], choices=[
+			(value, deinterlaceLabels.get(value, value)) for value in deinterlaceChoices
+		])
+		config.av.deinterlace.addNotifier(setDeinterlace)
+	else:
+		config.av.deinterlace = ConfigNothing()
 
 	AMLHDRSupport = exists("/sys/class/amhdmitx/amhdmitx0/config")
 	BoxInfo.setItem("haveamlhdrsupport", AMLHDRSupport)
@@ -406,8 +434,10 @@ def InitAVSwitch():
 			(value, hdrTypeLabels.get(value, value.upper())) for value in hdrTypeChoices
 		])
 		config.av.hdmihdrtype.addNotifier(setHDRType)
+		config.av.hdmihdrtype_switch = ConfigYesNo(default=False)
 	else:
 		config.av.hdmihdrtype = ConfigNothing()
+		config.av.hdmihdrtype_switch = ConfigNothing()
 	hdrOsd = fileReadLine("/proc/stb/video/hdmi_hdr_osd", default=None, source=MODULE_NAME)
 	BoxInfo.setItem("havehdmihdrosd", bool(hdrOsd))
 	if hdrOsd:

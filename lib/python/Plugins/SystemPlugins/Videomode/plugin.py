@@ -1,16 +1,62 @@
 # -*- coding: utf-8 -*-
-from enigma import eAVControl
+from enigma import eAVControl, iPlayableService, iServiceInformation
 from Screens.Screen import Screen
 from Plugins.Plugin import PluginDescriptor
 from Components.SystemInfo import BoxInfo
 from Components.ConfigList import ConfigListScreen
 from Components.config import config, ConfigBoolean, ConfigNothing
 from Components.Label import Label
+from Components.Pixmap import Pixmap
+from Components.Sources.Boolean import Boolean
 from Components.Sources.StaticText import StaticText
-from Tools.Directories import isPluginInstalled
+from Components.ServiceEventTracker import ServiceEventTracker
+from Tools.Directories import fileReadLine, fileWriteLine, isPluginInstalled
 from Plugins.SystemPlugins.Videomode.VideoHardware import video_hw
 
 config.misc.videowizardenabled = ConfigBoolean(default=True)
+
+
+videoModeHDRController = None
+
+
+class VideoModeHDRController(Screen):
+	def __init__(self, session):
+		Screen.__init__(self, session)
+		self.__event_tracker = ServiceEventTracker(screen=self, eventmap={
+			iPlayableService.evStart: self.evStart,
+			iPlayableService.evVideoGammaChanged: self.gammaChanged
+		})
+
+	def evStart(self):
+		self.gammaChanged(reset=True)
+
+	def gammaChanged(self, reset=False):
+		if not BoxInfo.getItem("havehdmihdrtype") or not config.av.hdmihdrtype_switch.value or config.av.hdmihdrtype.value != "auto":
+			return
+
+		gamma = -1
+		if not reset:
+			service = self.session.nav.getCurrentService()
+			info = service and service.info()
+			if info:
+				gamma = info.getInfo(iServiceInformation.sGamma)
+
+		hdrType = {2: "hdr10", 3: "hlg"}.get(gamma, "auto")
+		if hdrType in config.av.hdmihdrtype.choices:
+			self.writeVideoSetting("/proc/stb/video/hdmi_hdrtype", hdrType)
+			if BoxInfo.getItem("havecolorimetry") and config.av.hdmicolorimetry.value == "auto":
+				self.writeVideoSetting("/proc/stb/video/hdmi_colorimetry", "auto" if hdrType == "auto" else config.av.hdmicolorimetry_hdr.value)
+
+	def writeVideoSetting(self, path, value):
+		if fileReadLine(path, default="", source="VideoMode") != value:
+			fileWriteLine(path, value, source="VideoMode")
+			print("[VideoMode] Set '%s' to '%s'." % (path, value))
+
+
+def videoModeSessionStart(session, **kwargs):
+	global videoModeHDRController
+	if videoModeHDRController is None and BoxInfo.getItem("havehdmihdrtype"):
+		videoModeHDRController = VideoModeHDRController(session)
 
 
 class VideoSetup(ConfigListScreen, Screen):
@@ -20,6 +66,10 @@ class VideoSetup(ConfigListScreen, Screen):
 		# for the skin: first try VideoSetup, then Setup, this allows individual skinning
 		self.skinName = ["VideoSetup", "Setup"]
 		self.setTitle(_("Video Settings"))
+		self["HelpWindow"] = Pixmap()
+		self["HelpWindow"].hide()
+		self["VKeyIcon"] = Boolean(False)
+		self["footnote"] = Label("")
 		self.hw = hw
 		self.onChangedEntry = []
 
@@ -43,8 +93,12 @@ class VideoSetup(ConfigListScreen, Screen):
 		self["key_red"] = StaticText(_("Cancel"))
 		self["key_green"] = StaticText(_("OK"))
 		self["description"] = Label("")
+		self["footnote"] = Label("")
+		self["footnote"].hide()
+		self["config"].onSelectionChanged.append(self.selectionChanged)
 
 		self.createSetup()
+		self.selectionChanged()
 		self.grabLastGoodMode()
 
 	def startHotplug(self):
@@ -52,6 +106,12 @@ class VideoSetup(ConfigListScreen, Screen):
 
 	def stopHotplug(self):
 		self.hw.on_hotplug.remove(self.createSetup)
+
+	def selectionChanged(self):
+		current = self["config"].getCurrent()
+		description = current[2] if current and len(current) > 2 else ""
+		self["description"].setText(description)
+		self["footnote"].setText(description)
 
 	def createSetup(self):
 		level = config.usage.setup_level.index
@@ -107,6 +167,10 @@ class VideoSetup(ConfigListScreen, Screen):
 			self.list.append((_("HDMI Colorimetry"), config.av.hdmicolorimetry, _("This option allows you to configure the Colorimetry for HDR.")))
 		if BoxInfo.getItem("havehdmihdrtype"):
 			self.list.append((_("HDMI HDR Type"), config.av.hdmihdrtype, _("This option allows you to configure the HDR type.")))
+			if config.av.hdmihdrtype.value == "auto":
+				self.list.append((_("Switch HDR type by content"), config.av.hdmihdrtype_switch, _("Switch between SDR, HDR10 and HLG according to the current video content.")))
+				if config.av.hdmihdrtype_switch.value and BoxInfo.getItem("havecolorimetry") and config.av.hdmicolorimetry.value == "auto":
+					self.list.append((_("Colorimetry for HDR content"), config.av.hdmicolorimetry_hdr, _("Select the HDMI colorimetry used while HDR content is shown.")))
 		if BoxInfo.getItem("havehdmihdrosd"):
 			self.list.append((_("HDR OSD adjustment"), config.av.hdmihdrosd, _("This option adjusts SDR graphics and OSD colors while the HDMI output is in HDR mode.")))
 		if BoxInfo.getItem("HasHDMIpreemphasis"):
@@ -121,6 +185,11 @@ class VideoSetup(ConfigListScreen, Screen):
 			self.list.append((_("Amlogic HDR10 Support"), config.av.amlhdr10_support, _("This option allows you to force the HDR10 modes for UHD")))
 		if BoxInfo.getItem("havesyncmode"):
 			self.list.append((_("Video sync mode"), config.av.sync_mode, _("This option allows you to use video sync mode.")))
+
+		if level >= 1 and BoxInfo.getItem("havedeinterlace"):
+			self.list.append((_("Deinterlacer mode"), config.av.deinterlace, _("Select the de-interlacing mode of the video decoder.")))
+		if config.av.videoport.value != "Scart":
+			self.list.append((_("Show 'Manual resolution' in extensions menu"), config.av.manual_resolution_extmenu, _("Add an entry to the extensions menu to change the video mode for the current video.")))
 
 		self["config"].list = self.list
 		self["config"].l.setList(self.list)
@@ -158,6 +227,36 @@ class VideoSetup(ConfigListScreen, Screen):
 			self.session.openWithCallback(self.confirm, MessageBox, _("Is this video mode ok?"), MessageBox.TYPE_YESNO, timeout=20, default=False)
 		else:
 			self.keySave()
+
+
+def manualResolution(session):
+	from Screens.ChoiceBox import ChoiceBox
+	from Screens.MessageBox import MessageBox
+
+	avControl = eAVControl.getInstance()
+	oldMode = avControl.getVideoMode("")
+	if not oldMode:
+		return
+
+	modes = [(x, x) for x in video_hw.readAvailableModes() if x not in ("auto", "pal", "ntsc") and not x.startswith("3d")]
+	if not modes:
+		return
+
+	pol = "p" if avControl.getProgressive() else "i"
+	rate = (avControl.getFrameRate(0) + 500) // 1000 * (2 if pol == "i" else 1)
+	text = _("Video content: %ix%i%s %iHz") % (avControl.getResolutionX(0), avControl.getResolutionY(0), pol, rate)
+	selection = next((index for index, x in enumerate(modes) if x[1] == oldMode), 0)
+
+	def manualResolutionCallback(choice):
+		if choice and choice[1] != oldMode:
+			video_hw.setVideoModeDirect(choice[1])
+			session.openWithCallback(confirmCallback, MessageBox, _("Is this video mode ok?"), MessageBox.TYPE_YESNO, timeout=10, default=False)
+
+	def confirmCallback(answer):
+		if not answer:
+			video_hw.setVideoModeDirect(oldMode)
+
+	session.openWithCallback(manualResolutionCallback, ChoiceBox, title=text, list=modes, selection=selection, windowTitle=_("Manual resolution"))
 
 
 class VideomodeHotplug:
@@ -233,6 +332,7 @@ def VideoWizard(*args, **kwargs):
 def Plugins(**kwargs):
 	list = [
 #		PluginDescriptor(where = [PluginDescriptor.WHERE_SESSIONSTART, PluginDescriptor.WHERE_AUTOSTART], fnc = autostart),
+		PluginDescriptor(where=PluginDescriptor.WHERE_SESSIONSTART, fnc=videoModeSessionStart),
 		PluginDescriptor(name=_("Video setup"), description=_("Advanced video setup"), where=PluginDescriptor.WHERE_MENU, needsRestart=False, fnc=startSetup)
 	]
 	if config.misc.videowizardenabled.value:
