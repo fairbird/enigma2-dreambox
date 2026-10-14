@@ -79,7 +79,7 @@ PyObject *getBatteryLow()
 };
 
 %pythoncode %{
-# DreamOS exposes eManagedInputDevicePtr. The OpenATV backend returns
+# DreamOS exposes eManagedInputDevicePtr. The OpenPLI backend returns
 # eManagedInputDevice instances directly, so keep the DreamOS type name as
 # a compatibility alias for plugin isinstance() checks.
 eManagedInputDevicePtr = eManagedInputDevice
