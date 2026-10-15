@@ -653,7 +653,8 @@ def runScreenTest():
 	enigma.eProfileWrite("InitTrashcan")
 	from Tools.Trashcan import initTrashcan
 	initTrashcan(session)
-
+	enigma.eProfileWrite("VideoModeAutoStart")
+	from Screens.VideoMode import autostart
 	enigma.eProfileWrite("RunReactor")
 	enigma.eProfileDone()
 
@@ -725,13 +726,14 @@ enigma.eProfileWrite("InputDevice")
 import Components.InputDevice
 Components.InputDevice.InitInputDevices()
 
+enigma.eProfileWrite("InitAVSwitch")
+from Components.AVSwitch import InitAVSwitch, InitiVideomodeHotplug
+InitAVSwitch()
+InitiVideomodeHotplug()
+print("[TEST] After InitAVSwitch:", hasattr(config.osd, "dst_left"))
 enigma.eProfileWrite("SetupDevices")
 import Components.SetupDevices
 Components.SetupDevices.InitSetupDevices()
-
-enigma.eProfileWrite("AVSwitch")
-import Components.AVSwitch
-Components.AVSwitch.InitAVSwitch()
 
 enigma.eProfileWrite("HdmiRecord")
 import Components.HdmiRecord
@@ -744,7 +746,7 @@ Components.RecordingConfig.InitRecordingConfig()
 enigma.eProfileWrite("UsageConfig")
 import Components.UsageConfig
 Components.UsageConfig.InitUsageConfig()
-
+print("[TEST] After InitUsageConfig:", hasattr(config.osd, "dst_left"))
 enigma.eProfileWrite("Timezones")
 import Components.Timezones
 Components.Timezones.InitTimeZones()
