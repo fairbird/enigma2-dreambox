@@ -5,7 +5,7 @@ from glob import glob
 from hashlib import md5
 from locale import format_string
 from os import R_OK, access, listdir, readlink, stat
-from os.path import exists as fileAccess, isdir, isfile, join
+from os.path import exists, isfile, islink, join
 from re import findall
 from platform import libc_ver
 from re import search
@@ -13,7 +13,7 @@ from sys import version as pyversion
 from time import localtime, strftime
 
 from enigma import eAVControl, Misc_Options, eDVBCIInterfaces, eDVBResourceManager, eGetEnigmaDebugLvl, eDVBCSAEngine
-from Tools.Directories import SCOPE_PLUGINS, SCOPE_LIBDIR, SCOPE_SKIN, fileCheck, fileReadLine, fileReadLines, resolveFilename, fileExists, fileHas, fileReadLine, pathExists
+from Tools.Directories import SCOPE_PLUGINS, SCOPE_LIBDIR, SCOPE_SKIN, fileCheck, fileReadLine, fileReadLines, resolveFilename, fileExists, fileHas, fileReadLine, pathExists, isPluginInstalled
 from Tools.MultiBoot import MultiBoot
 
 
@@ -463,15 +463,6 @@ def hasInitCam():
 	return result
 
 
-
-def updateSysSoftCam():
-	BoxInfo.setMutableItem("ShowOscamInfo", getSysSoftcam() in ("oscam", "ncam"))
-	BoxInfo.setMutableItem("ShowCCCamInfo", getSysSoftcam() in ("cccam",))
-	BoxInfo.setMutableItem("HasSoftcamEmu", hasSoftcamEmu())
-	BoxInfo.setMutableItem("Softcams", getSoftcams())
-	BoxInfo.setMutableItem("CurrentSoftcam", getCurrentSoftcam())
-
-
 def getBoxName():
 	box = MACHINEBUILD
 	machinename = DISPLAYMODEL.lower()
@@ -522,7 +513,8 @@ BoxInfo.setItem("RCImage", getRCFile("png"))
 BoxInfo.setItem("RCMapping", getRCFile("xml"))
 
 BoxInfo.setItem("RemoteEnable", MACHINEBUILD in ("dm800",))
-BoxInfo.setItem("RemoteRepeat", 400)
+repeat = 400
+BoxInfo.setItem("RemoteRepeat", repeat)
 BoxInfo.setItem("RemoteDelay", 200 if repeat == 400 else 700)
 
 BoxInfo.setItem("HDMI-PreEmphasis", fileExists("/proc/stb/hdmi/preemphasis"))
@@ -535,7 +527,6 @@ BoxInfo.setItem("HasChkrootMultiboot", (MultiBoot.isFat32("/dev/block/by-name/ot
 BoxInfo.setItem("canchkroot", (BoxInfo.getItem("hasUBIMB") or fileExists("/dev/block/by-name/others")) and not BoxInfo.getItem("HasChkrootMultiboot") and not fileExists("/etc/.disableChkroot"))
 BoxInfo.setItem("HasSDmmc", MultiBoot.canMultiBoot() and "sd" in MultiBoot.getBootSlots().get("2", "") and "mmcblk" in MTDROOTFS)
 BoxInfo.setItem("HasSDswap", MODEL in ("h9", "i55plus") and pathExists("/dev/mmcblk0p1"))
-BoxInfo.setItem("HasSoftcamInstalled", hassoftcaminstalled())
 BoxInfo.setItem("OledDisplay", fileExists("/dev/dbox/oled0") or MACHINEBUILD in ("osminiplus",))
 BoxInfo.setItem("NumVideoDecoders", getNumVideoDecoders())
 BoxInfo.setItem("PIPAvailable", BoxInfo.getItem("NumVideoDecoders") > 1)
@@ -589,7 +580,6 @@ BoxInfo.setItem("VFD_scroll_repeats", not MODEL.startswith("et8500") and fileChe
 BoxInfo.setItem("VFD_scroll_delay", not MODEL.startswith("et8500") and fileCheck("/proc/stb/lcd/scroll_delay"))
 BoxInfo.setItem("VFD_initial_scroll_delay", not MODEL.startswith("et8500") and fileCheck("/proc/stb/lcd/initial_scroll_delay"))
 BoxInfo.setItem("VFD_final_scroll_delay", not MODEL.startswith("et8500") and fileCheck("/proc/stb/lcd/final_scroll_delay"))
-BoxInfo.setItem("HAVEINITCARDSERVER", hasInitCardServer())
 BoxInfo.setItem("HaveTouchSensor", MACHINEBUILD in ("dm520", "dm525", "dm900", "dm920"))
 BoxInfo.setItem("LcdLiveTVPiP", fileCheck("/proc/stb/lcd/live_decoder"))
 BoxInfo.setItem("LcdLiveTV", fileCheck("/proc/stb/fb/sd_detach") or fileCheck("/proc/stb/lcd/live_enable"))
@@ -713,5 +703,3 @@ BoxInfo.setItem("CanDescrambleInStandby", any(x in fileReadLine("/proc/stb/tsmux
 BoxInfo.setItem("CanOfflineDecode", MODEL in ("hd51", "h7", "h17", "et10000", "et8000", "hd2400", "vs1500", "8100s"))
 
 BoxInfo.setItem("servicehisilicon", BoxInfo.getItem("mediaservice") == "servicehisilicon" and isPluginInstalled("ServiceHisilicon"))
-
-updateSysSoftCam()
