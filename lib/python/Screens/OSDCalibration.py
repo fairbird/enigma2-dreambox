@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from os import W_OK, access
 from os.path import exists
 
@@ -87,7 +88,7 @@ class OSDCalibration(Setup):
 			fontSize = 30
 			iconButtonWidth = 120
 			itemHeight = 37
-			menuFontSize = 35
+			menuFontSize = 52
 			spacer = 38
 			spacing = 15
 			textHeight = 150

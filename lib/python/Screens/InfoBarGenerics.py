@@ -75,7 +75,7 @@ from pickle import load as pickle_load, dump as pickle_dump
 
 from RecordTimer import RecordTimerEntry, RecordTimer, findSafeRecordPath
 
-from Components.AVSwitch import iAVSwitch
+from Components.AVSwitch import avSwitch
 
 # hack alert!
 from Screens.Menu import Menu, MenuHorizontal, findMenu, menuDom
@@ -3361,7 +3361,7 @@ class InfoBarExtensions:
 		ImportChannels()
 
 	def extManualResolution(self):
-		from Plugins.SystemPlugins.Videomode.plugin import manualResolution
+		from Screens.VideoMode import manualResolution
 		manualResolution(self.session)
 
 	def addExtension(self, extension, key=None, type=EXTENSION_SINGLE):
@@ -4309,9 +4309,8 @@ class InfoBarAspectSelection:
 		else:
 			aspectSwitchList = []
 			if config.av.aspectswitch.enabled.value:
-				from Plugins.SystemPlugins.Videomode.VideoHardware import video_hw
 				for aspect in range(5):
-					aspectSwitchList.append((video_hw.ASPECT_SWITCH_MSG[aspect], str(aspect + 100)))
+					aspectSwitchList.append((avSwitch.ASPECT_SWITCH_MSG[aspect], str(aspect + 100)))
 				aspectSwitchList.append(("--", ""))
 			aspectList = [
 				(_("Resolution"), "resolution"),
@@ -4319,14 +4318,14 @@ class InfoBarAspectSelection:
 			] + aspectSwitchList + [
 				(_("4:3 Letterbox"), "0"),
 				(_("4:3 PanScan"), "1"),
-				(_("16:9"), "2"),
+				("16:9", "2"),
 				(_("16:9 Always"), "3"),
 				(_("16:10 Letterbox"), "4"),
 				(_("16:10 PanScan"), "5"),
 				(_("16:9 Letterbox"), "6")
 			]
 		keys = ["green", "", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
-		aspect = iAVSwitch.getAspectRatioSetting()
+		aspect = avSwitch.getAspectRatioSetting()
 		selection = 0
 		for item in range(len(aspectList)):
 			if aspectList[item][1] == aspect:
@@ -4342,7 +4341,7 @@ class InfoBarAspectSelection:
 				elif aspect[1] == "resolution":
 					self.ExGreen_toggleGreen()
 				else:
-					iAVSwitch.setAspectRatio(int(aspect[1]))
+					avSwitch.setAspectRatio(int(aspect[1]))
 					self.ExGreen_doHide()
 		else:
 			self.ExGreen_doHide()
@@ -4359,12 +4358,11 @@ class InfoBarResolutionSelection:
 		xRes = avControl.getResolutionX(0)
 		resList = []
 		resList.append((_("Exit"), "exit"))
-		resList.append((_("Auto(not available)"), "auto"))
+		resList.append((_("Auto (not available)"), "auto"))
 		resList.append((_("Video") + ": %dx%d@%gHz" % (xRes, yRes, fps), ""))
 		resList.append(("--", ""))
 		# Do we need a new sorting with this way here or should we disable some choices?
-		from Plugins.SystemPlugins.Videomode.VideoHardware import video_hw
-		videoModes = video_hw.readPreferredModes(readOnly=True)
+		videoModes = avSwitch.readPreferredModes(readOnly=True)
 		videoModes = [x.replace("pal ", "").replace("ntsc ", "") for x in videoModes]  # Do we need this?
 		for videoMode in videoModes:
 			video = videoMode
@@ -4389,8 +4387,7 @@ class InfoBarResolutionSelection:
 				if videoMode[1] == "exit" or videoMode[1] == "" or videoMode[1] == "auto":
 					self.ExGreen_toggleGreen()
 				if videoMode[1] != "auto":
-					from Plugins.SystemPlugins.Videomode.VideoHardware import video_hw
-					video_hw.setVideoModeDirect(videoMode[1])
+					avSwitch.setVideoModeDirect(videoMode[1])
 					self.ExGreen_doHide()
 		else:
 			self.ExGreen_doHide()

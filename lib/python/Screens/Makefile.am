@@ -10,11 +10,11 @@ install_PYTHON = \
 	Dish.py DABScan.py LocaleSelection.py WizardStart.py PiPSetup.py \
 	PluginBrowser.py MinuteInput.py Scart.py PVRState.py ScreenProtection.py \
 	Console.py InputBox.py ChoiceBox.py SimpleSummary.py Processing.py \
-	TimerSelection.py Timeshift.py PictureInPicture.py Picon.py TimeDateInput.py \
+	TimerSelection.py Timeshift.py PictureInPicture.py Picon.py TimeDateInput.py VideoMode.py \
 	SubtitleDisplay.py SubservicesQuickzap.py ParentalControlSetup.py NumericalTextInputHelpDialog.py \
 	SleepTimerEdit.py Opkg.py RdsDisplay.py Globals.py RestartNetwork.py RTLSDRSetup.py \
 	SessionGlobals.py LocationBox.py WizardLanguage.py TaskList.py TaskView.py Rc.py VirtualKeyBoard.py \
 	TextBox.py FactoryReset.py Recording.py UnhandledKey.py ServiceStopScreen.py SwapManager.py \
 	InputDeviceSetup.py DVD.py SoftwareUpdate.py AutoDiseqc.py WizardInstall.py ScreenSaver.py \
-	Hotkey.py StreamingClientsInfo.py SoftcamSetup.py FlashManager.py SetupFallbacktuner.py \
+	Hotkey.py StreamingClientsInfo.py SoftcamSetup.py FlashManager.py SetupFallbacktuner.py WizardVideo.py \
 	SkinSelector.py LogManager.py OScamInfo.py Time.py CronTimer.py OSDCalibration.py Toast.py HDMICEC.py

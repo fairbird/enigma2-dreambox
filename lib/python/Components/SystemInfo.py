@@ -5,7 +5,7 @@ from glob import glob
 from hashlib import md5
 from locale import format_string
 from os import R_OK, access, listdir, readlink, stat
-from os.path import exists as fileAccess, isdir, isfile, join
+from os.path import exists, isfile, islink, join
 from re import findall
 from platform import libc_ver
 from re import search
@@ -13,7 +13,7 @@ from sys import version as pyversion
 from time import localtime, strftime
 
 from enigma import eAVControl, Misc_Options, eDVBCIInterfaces, eDVBResourceManager, eGetEnigmaDebugLvl, eDVBCSAEngine
-from Tools.Directories import SCOPE_PLUGINS, SCOPE_LIBDIR, SCOPE_SKIN, fileCheck, fileReadLine, fileReadLines, resolveFilename, fileExists, fileHas, fileReadLine, pathExists
+from Tools.Directories import SCOPE_PLUGINS, SCOPE_LIBDIR, SCOPE_SKIN, fileCheck, fileReadLine, fileReadLines, resolveFilename, fileExists, fileHas, fileReadLine, pathExists, isPluginInstalled
 from Tools.MultiBoot import MultiBoot
 
 
@@ -54,9 +54,8 @@ class BoxInformation:  # To maintain data integrity class variables should not b
 			print("[SystemInfo] Enigma information file data loaded into BoxInfo.")
 		else:
 			print("[SystemInfo] ERROR: Enigma information file is not available!  The system is unlikely to boot or operate correctly.")
-		filename = isfile(resolveFilename(SCOPE_LIBDIR, "enigma.conf"))
-		if filename:
-			lines = fileReadLines(join(resolveFilename(SCOPE_LIBDIR), "enigma.conf"), source=MODULE_NAME)
+		lines = fileReadLines(join(resolveFilename(SCOPE_LIBDIR), "enigma.conf"), source=MODULE_NAME)
+		if lines:
 			print("[SystemInfo] Enigma config override file available and data loaded into BoxInfo.")
 			self.boxInfo["overrideactive"] = True
 			for line in lines:
@@ -121,7 +120,6 @@ class BoxInformation:  # To maintain data integrity class variables should not b
 			del self.boxInfo[item]
 			return True
 		return False
-
 
 # Hardware related functions
 
@@ -400,7 +398,7 @@ def getBoxDisplayName():  # This function returns a tuple like ("BRANDNAME", "BO
 
 def getDemodVersion():
 	version = None
-	if fileExists("/proc/stb/info/nim_firmware_version"):
+	if exists("/proc/stb/info/nim_firmware_version"):
 		version = fileReadLine("/proc/stb/info/nim_firmware_version")
 	return version and version.strip()
 
@@ -465,6 +463,21 @@ def hasInitCam():
 	return result
 
 
+<< << << < HEAD
+
+
+def updateSysSoftCam():
+	BoxInfo.setMutableItem("ShowOscamInfo", getSysSoftcam() in ("oscam", "ncam"))
+	BoxInfo.setMutableItem("ShowCCCamInfo", getSysSoftcam() in ("cccam",))
+	BoxInfo.setMutableItem("HasSoftcamEmu", hasSoftcamEmu())
+	BoxInfo.setMutableItem("Softcams", getSoftcams())
+	BoxInfo.setMutableItem("CurrentSoftcam", getCurrentSoftcam())
+
+
+== == == =
+>>>>>> > ff4d434a2([SystemInfo] Fix)
+
+
 def getBoxName():
 	box = MACHINEBUILD
 	machinename = DISPLAYMODEL.lower()
@@ -499,12 +512,27 @@ def getBoxName():
 	return box
 
 
+def getWakeOnLANType(fileName):
+	value = ""
+	if fileName:
+		value = fileReadLine(fileName)
+	onOff = ("off", "on")
+	return onOff if value in onOff else ("disable", "enable")
+
+
 BoxInfo.setItem("DebugLevel", eGetEnigmaDebugLvl())
 BoxInfo.setItem("InDebugMode", eGetEnigmaDebugLvl() >= 4)
 
 BoxInfo.setItem("BoxName", getBoxName())
 BoxInfo.setItem("RCImage", getRCFile("png"))
 BoxInfo.setItem("RCMapping", getRCFile("xml"))
+
+BoxInfo.setItem("RemoteEnable", MACHINEBUILD in ("dm800",))
+repeat = 400
+BoxInfo.setItem("RemoteRepeat", repeat)
+BoxInfo.setItem("RemoteDelay", 200 if repeat == 400 else 700)
+
+BoxInfo.setItem("HDMI-PreEmphasis", fileExists("/proc/stb/hdmi/preemphasis"))
 
 BoxInfo.setItem("canMultiBoot", MultiBoot.getBootSlots())
 BoxInfo.setItem("HasNewNativeMultiboot", fileExists("/.newMB"))
@@ -513,12 +541,14 @@ BoxInfo.setItem("cankexec", BoxInfo.getItem("kexecmb") and fileExists("/usr/bin/
 BoxInfo.setItem("HasChkrootMultiboot", (MultiBoot.isFat32("/dev/block/by-name/others") or fileExists("/dev/block/by-name/startup")) and MODEL not in ("dreamone", "dreamtwo"))
 BoxInfo.setItem("canchkroot", (BoxInfo.getItem("hasUBIMB") or fileExists("/dev/block/by-name/others")) and not BoxInfo.getItem("HasChkrootMultiboot") and not fileExists("/etc/.disableChkroot"))
 BoxInfo.setItem("HasSDmmc", MultiBoot.canMultiBoot() and "sd" in MultiBoot.getBootSlots().get("2", "") and "mmcblk" in MTDROOTFS)
-BoxInfo.setItem("HasSoftcamInstalled", hassoftcaminstalled())
+BoxInfo.setItem("HasSDswap", MODEL in ("h9", "i55plus") and pathExists("/dev/mmcblk0p1"))
+BoxInfo.setItem("OledDisplay", fileExists("/dev/dbox/oled0") or MACHINEBUILD in ("osminiplus",))
 BoxInfo.setItem("NumVideoDecoders", getNumVideoDecoders())
 BoxInfo.setItem("PIPAvailable", BoxInfo.getItem("NumVideoDecoders") > 1)
 BoxInfo.setItem("CanMeasureFrontendInputPower", eDVBResourceManager.getInstance().canMeasureFrontendInputPower())
 BoxInfo.setItem("12V_Output", Misc_Options.getInstance().detected_12V_output())
 BoxInfo.setItem("ZapMode", fileCheck("/proc/stb/video/zapmode") or fileCheck("/proc/stb/video/zapping_mode"))
+BoxInfo.setItem("MiniTV", fileCheck("/proc/stb/fb/sd_detach") or fileCheck("/proc/stb/lcd/live_enable"))
 BoxInfo.setItem("NumFrontpanelLEDs", countFrontpanelLEDs())
 BoxInfo.setItem("FrontpanelDisplay", fileExists("/dev/dbox/oled0") or fileExists("/dev/dbox/lcd0"))
 BoxInfo.setItem("LCDsymbol_circle_recording", fileCheck("/proc/stb/lcd/symbol_circle") or MODEL in ("hd51", "vs1500") and fileCheck("/proc/stb/lcd/symbol_recording"))
@@ -527,6 +557,7 @@ BoxInfo.setItem("LCDshow_symbols", (MODEL.startswith("et9") or MODEL in ("hd51",
 BoxInfo.setItem("LCDsymbol_hdd", MODEL in ("hd51", "vs1500") and fileCheck("/proc/stb/lcd/symbol_hdd"))
 BoxInfo.setItem("FrontpanelDisplayGrayscale", fileExists("/dev/dbox/oled0"))
 BoxInfo.setItem("CanUse3DModeChoices", fileExists("/proc/stb/fb/3dmode_choices") and True or False)
+BoxInfo.setItem("CIPlusHelper", exists("/usr/bin/ciplushelper"))
 BoxInfo.setItem("DeepstandbySupport", MODEL != "dm800")
 BoxInfo.setItem("OLDE2API", MODEL in ("dm800"))
 BoxInfo.setItem("Fan", fileCheck("/proc/stb/fp/fan"))
@@ -534,12 +565,19 @@ BoxInfo.setItem("FanPWM", BoxInfo.getItem("Fan") and fileCheck("/proc/stb/fp/fan
 BoxInfo.setItem("PowerLED", fileCheck("/proc/stb/power/powerled") or MODEL in ("gbue4k", "gbquad4k") and fileCheck("/proc/stb/fp/led1_pattern"))
 BoxInfo.setItem("StandbyLED", fileCheck("/proc/stb/power/standbyled") or MODEL in ("gbue4k", "gbquad4k") and fileCheck("/proc/stb/fp/led0_pattern"))
 BoxInfo.setItem("SuspendLED", fileCheck("/proc/stb/power/suspendled") or fileCheck("/proc/stb/fp/enable_led"))
+BoxInfo.setItem("ForceLNBPowerChanged", fileCheck("/proc/stb/frontend/fbc/force_lnbon"))
+BoxInfo.setItem("ForceToneBurstChanged", fileCheck("/proc/stb/frontend/fbc/force_toneburst"))
+BoxInfo.setItem("GBWOL", fileExists("/usr/bin/gigablue_wol"))
+BoxInfo.setItem("grautec", fileExists("/tmp/usbtft"))
+BoxInfo.setItem("GraphicLCD", MACHINEBUILD in ("vuultimo", "xpeedlx3", "et10000", "mutant2400", "quadbox2400", "sezammarvel", "atemionemesis", "mbultra", "beyonwizt4", "osmio4kplus"))
 BoxInfo.setItem("Display", BoxInfo.getItem("FrontpanelDisplay") or BoxInfo.getItem("StandbyLED") or MODEL in ("dreamone", "dreamtwo"))
 BoxInfo.setItem("LEDControl", MODEL not in ("dreamone", "dreamtwo"))
 BoxInfo.setItem("LEDColorControl", fileExists("/proc/stb/fp/led_color"))
+BoxInfo.setItem("LEDButtons", MACHINEBUILD == "vuultimo")
 BoxInfo.setItem("LedPowerColor", fileCheck("/proc/stb/fp/ledpowercolor"))
 BoxInfo.setItem("LedStandbyColor", fileCheck("/proc/stb/fp/ledstandbycolor"))
 BoxInfo.setItem("LedSuspendColor", fileCheck("/proc/stb/fp/ledsuspendledcolor"))
+BoxInfo.setItem("MiddleFlash", BoxInfo.getItem("middleflash") and not BoxInfo.getItem("smallflash"))
 BoxInfo.setItem("Power4x7On", fileCheck("/proc/stb/fp/power4x7on"))
 BoxInfo.setItem("Power4x7Standby", fileCheck("/proc/stb/fp/power4x7standby"))
 BoxInfo.setItem("Power4x7Suspend", fileCheck("/proc/stb/fp/power4x7suspend"))
@@ -550,21 +588,33 @@ BoxInfo.setItem("VideoDestinationConfigurable", fileExists("/proc/stb/vmpeg/0/ds
 BoxInfo.setItem("hasPIPVisibleProc", fileCheck("/proc/stb/vmpeg/1/visible"))
 BoxInfo.setItem("MaxPIPSize", MODEL in ("hd51", "h7", "vs1500", "e4hd") and (360, 288) or (540, 432))
 BoxInfo.setItem("HasGPT", MODEL in ("dreamone", "dreamtwo") and pathExists("/dev/mmcblk0p7"))
+BoxInfo.setItem("StandbyPowerLed", fileExists("/proc/stb/power/standbyled"))
+BoxInfo.setItem("SuspendPowerLed", fileExists("/proc/stb/power/suspendled"))
+BoxInfo.setItem("USETunersetup", BoxInfo.getItem("ForceLNBPowerChanged") or BoxInfo.getItem("ForceToneBurstChanged"))
 BoxInfo.setItem("VFD_scroll_repeats", not MODEL.startswith("et8500") and fileCheck("/proc/stb/lcd/scroll_repeats"))
 BoxInfo.setItem("VFD_scroll_delay", not MODEL.startswith("et8500") and fileCheck("/proc/stb/lcd/scroll_delay"))
 BoxInfo.setItem("VFD_initial_scroll_delay", not MODEL.startswith("et8500") and fileCheck("/proc/stb/lcd/initial_scroll_delay"))
 BoxInfo.setItem("VFD_final_scroll_delay", not MODEL.startswith("et8500") and fileCheck("/proc/stb/lcd/final_scroll_delay"))
+BoxInfo.setItem("HaveTouchSensor", MACHINEBUILD in ("dm520", "dm525", "dm900", "dm920"))
+BoxInfo.setItem("LcdLiveTVPiP", fileCheck("/proc/stb/lcd/live_decoder"))
 BoxInfo.setItem("LcdLiveTV", fileCheck("/proc/stb/fb/sd_detach") or fileCheck("/proc/stb/lcd/live_enable"))
 BoxInfo.setItem("LcdLiveTVMode", fileCheck("/proc/stb/lcd/mode"))
 BoxInfo.setItem("LcdLiveDecoder", fileCheck("/proc/stb/lcd/live_decoder"))
 BoxInfo.setItem("LCDMiniTV", fileExists("/proc/stb/lcd/mode"))
 BoxInfo.setItem("LCDSKIN", fileExists("/usr/share/enigma2/display"))
+BoxInfo.setItem("LCDSKIN", fileExists("/usr/share/enigma2/display"))
+BoxInfo.setItem("LCDSKINSetup", fileExists("/usr/share/enigma2/display") and DISPLAYTYPE not in ("7segment",))
+BoxInfo.setItem("LCDMiniTV", fileExists("/proc/stb/lcd/mode"))
+BoxInfo.setItem("LCDMiniTVPiP", BoxInfo.getItem("LCDMiniTV"))
 BoxInfo.setItem("ConfigDisplay", BoxInfo.getItem("FrontpanelDisplay"))
 BoxInfo.setItem("DefaultDisplayBrightness", MACHINEBUILD in ("dm900", "dm920", "dreamone", "dreamtwo") and 8 or 5)
+BoxInfo.setItem("DNSCrypt", fileExists("/usr/bin/dnscrypt-proxy"))
+BoxInfo.setItem("FBLCDDisplay", fileCheck("/proc/stb/fb/sd_detach"))
 BoxInfo.setItem("3DMode", fileCheck("/proc/stb/fb/3dmode") or fileCheck("/proc/stb/fb/primary/3d"))
 BoxInfo.setItem("3DZNorm", fileCheck("/proc/stb/fb/znorm") or fileCheck("/proc/stb/fb/primary/zoffset"))
 BoxInfo.setItem("HasQuadpip", fileCheck("/proc/stb/video/decodermode"))
 BoxInfo.setItem("Blindscan_t2_available", fileCheck("/proc/stb/info/vumodel") and MODEL.startswith("vu"))
+BoxInfo.setItem("Blindscan", isPluginInstalled("Blindscan"))
 BoxInfo.setItem("RcTypeChangable", not (MODEL in ("gbquad4k", "gbue4k", "et8500") or MODEL.startswith("et7")) and pathExists("/proc/stb/ir/rc/type"))
 BoxInfo.setItem("HasFullHDSkinSupport", MODEL not in ("et4000", "et5000", "sh1", "hd500c", "hd1100", "xp1000", "lc"))
 BoxInfo.setItem("HasMMC", "root" in cmdline and cmdline["root"].startswith("/dev/mmcblk"))
@@ -580,6 +630,8 @@ BoxInfo.setItem("HasScaler_sharpness", pathExists("/proc/stb/vmpeg/0/pep_scaler_
 BoxInfo.setItem("HasHDMIin", BoxInfo.getItem("hdmifhdin") or BoxInfo.getItem("hdmihdin"))
 BoxInfo.setItem("HasHDMIinFHD", MODEL in ("dm900", "dm920", "dreamone", "dreamtwo"))
 BoxInfo.setItem("HasHDMIinPiP", BoxInfo.getItem("HasHDMIin") and BRAND != "dreambox")
+BoxInfo.setItem("HaveCISSL", fileCheck("/etc/ssl/certs/customer.pem") and fileCheck("/etc/ssl/certs/device.pem"))
+BoxInfo.setItem("HaveID", fileCheck("/etc/.id"))
 BoxInfo.setItem("HAVEINITCAM", hasInitCam())
 BoxInfo.setItem("HasSoftCSA", eDVBCSAEngine.isAvailable())
 BoxInfo.setItem("DreamBoxDVI", MODEL in ("dm8000", "dm800"))
@@ -591,7 +643,9 @@ BoxInfo.setItem("HasSVideo", MODEL in ("dm8000"))
 BoxInfo.setItem("ArchIsARM64", ARCHITECTURE == "aarch64" or "64" in ARCHITECTURE)
 BoxInfo.setItem("ArchIsARM", ARCHITECTURE.startswith(("arm", "cortex")))
 BoxInfo.setItem("RecoveryMode", fileCheck("/proc/stb/fp/boot_mode") or MODEL in ("dreamone", "dreamtwo"))
-BoxInfo.setItem("AmlogicFamily", SOC_FAMILY.startswith(("aml", "meson")) or fileExists("/proc/device-tree/amlogic-dt-id") or fileExists("/usr/bin/amlhalt") or fileExists("/sys/module/amports"))
+BoxInfo.setItem("Satfinder", isPluginInstalled("Satfinder"))
+BoxInfo.setItem("SmallFlash", BoxInfo.getItem("smallflash"))
+BoxInfo.setItem("AmlogicFamily", SOC_FAMILY.startswith(("aml", "meson")) or exists("/proc/device-tree/amlogic-dt-id") or exists("/usr/bin/amlhalt") or exists("/sys/module/amports"))
 BoxInfo.setItem("HasComposite", MODEL not in ("i55", "gbquad4k", "gbue4k", "hd1500", "osnino", "osninoplus", "purehd", "purehdse", "revo4k", "vusolo4k", "vuzero4k", "vuduo4k", "vuduo4kse", "vuuno4k", "vuuno4kse", "vuultimo4k"))
 BoxInfo.setItem("hasXcoreVFD", MODEL in ("osmega", "spycat4k", "spycat4kmini", "spycat4kcombo") and fileCheck("/sys/module/brcmstb_%s/parameters/pt6302_cgram" % MODEL))
 BoxInfo.setItem("HasOfflineDecoding", MODEL not in ("osmini", "osminiplus", "et7000mini", "et11000", "mbmicro", "mbtwinplus", "mbmicrov2", "et7000", "et8500"))
@@ -623,18 +677,14 @@ BoxInfo.setItem("FrontpanelLEDBlinkControl", fileExists("/proc/stb/fp/led_blink"
 BoxInfo.setItem("FrontpanelLEDBrightnessControl", fileExists("/proc/stb/fp/led_brightness"))
 BoxInfo.setItem("FrontpanelLEDColorControl", fileExists("/proc/stb/fp/led_color"))
 BoxInfo.setItem("FrontpanelLEDFadeControl", fileExists("/proc/stb/fp/led_fade"))
+BoxInfo.setItem("DisplaySetup", MODEL not in ("dreamone",))
 BoxInfo.setItem("DM9X0", MODEL in ("dm900", "dm920"))
 
-# Network services.
-BoxInfo.setItem("inadyn", fileExists("/etc/init.d/inadyn-mt"))
-BoxInfo.setItem("minidlna", fileExists("/etc/init.d/minidlna"))
-BoxInfo.setItem("ushare", fileExists("/etc/init.d/ushare"))
-BoxInfo.setItem("nfsserver", fileExists("/etc/init.d/nfsserver"))
-BoxInfo.setItem("samba", fileExists("/etc/init.d/samba"))
-BoxInfo.setItem("zerotier", fileExists("/etc/init.d/zerotier"))
-
-# AI
-BoxInfo.setItem("AISubs", fileExists("/etc/init.d/aisocket"))
+# Dont't sort.
+BoxInfo.setItem("ConfigDisplay", BoxInfo.getItem("FrontpanelDisplay") and DISPLAYTYPE not in ("7segment",))
+BoxInfo.setItem("dFlash", exists("/usr/lib/enigma2/python/Plugins/Extensions/dFlash"))
+BoxInfo.setItem("dBackup", not BoxInfo.getItem("dFlash") and exists("/usr/lib/enigma2/python/Plugins/Extensions/dBackup"))
+BoxInfo.setItem("ImageBackup", not BoxInfo.getItem("dFlash") and not BoxInfo.getItem("dBackup"))
 
 # Vu+ EAC3Fix
 BoxInfo.setItem("VuEAC3Fix", MODEL in ("vuultimo4k", "vuduo4kse"))
@@ -651,3 +701,20 @@ BoxInfo.setItem("CommonInterfaceCIDelay", fileCheck("/proc/stb/tsmux/rmx_delay")
 for ciSlot in range(BoxInfo.getItem("CommonInterface")):
 	BoxInfo.setItem(f"CI{ciSlot}SupportsHighBitrates", fileCheck(f"/proc/stb/tsmux/ci{ciSlot}_tsclk"))
 	BoxInfo.setItem(f"CI{ciSlot}RelevantPidsRoutingSupport", fileCheck(f"/proc/stb/tsmux/ci{ciSlot}_relevant_pids_routing"))
+
+# Network services.
+BoxInfo.setItem("inadyn", fileExists("/etc/init.d/inadyn-mt"))
+BoxInfo.setItem("minidlna", fileExists("/etc/init.d/minidlna"))
+BoxInfo.setItem("ushare", fileExists("/etc/init.d/ushare"))
+BoxInfo.setItem("nfsserver", fileExists("/etc/init.d/nfsserver"))
+BoxInfo.setItem("samba", fileExists("/etc/init.d/samba"))
+BoxInfo.setItem("zerotier", fileExists("/etc/init.d/zerotier"))
+
+# AI
+BoxInfo.setItem("AISubs", fileExists("/etc/init.d/aisocket"))
+
+BoxInfo.setItem("CanDescrambleInStandby", any(x in fileReadLine("/proc/stb/tsmux/ci0_input_choices", default="", source=MODULE_NAME) for x in ("PVR", "DVR0")))
+
+BoxInfo.setItem("CanOfflineDecode", MODEL in ("hd51", "h7", "h17", "et10000", "et8000", "hd2400", "vs1500", "8100s"))
+
+BoxInfo.setItem("servicehisilicon", BoxInfo.getItem("mediaservice") == "servicehisilicon" and isPluginInstalled("ServiceHisilicon"))

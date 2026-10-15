@@ -7,6 +7,8 @@ from Screens.Wizard import wizardManager, Wizard
 from Screens.HelpMenu import Rc
 from Screens.Standby import TryQuitMainloop, QUIT_RESTART
 from Screens.NetworkSetup import NetworkAdapterSetup, NetworkWiFiAddFlow
+from Screens.WizardVideo import WizardVideo
+from Components.AVSwitch import avSwitch
 from Components.SystemInfo import BoxInfo
 try:
 	from Plugins.SystemPlugins.OSDPositionSetup.overscanwizard import OverscanWizard
@@ -29,6 +31,7 @@ import os
 import glob
 
 config.misc.firstrun = ConfigBoolean(default=True)
+config.misc.videowizardenabled = ConfigBoolean(default=True)
 config.misc.wizardLanguageEnabled = ConfigBoolean(default=True)
 config.misc.do_overscanwizard = ConfigBoolean(default=OverscanWizard and config.skin.primary_skin.value == "PLi-FullNightHD/skin.xml")
 
@@ -402,12 +405,69 @@ class WizardLanguage(Wizard, Rc):
 		Rc.__init__(self)
 		self.skinName = ["WizardLanguage", "WizardStart", "StartWizard"]
 		self.oldLanguage = config.osd.language.value
+		self.mode = "720p"
+		self.modeList = [(mode[0], mode[0]) for mode in avSwitch.getModeList("HDMI")]
 		self["wizard"] = Pixmap()
 		self["HelpWindow"] = Pixmap()
 		self["HelpWindow"].hide()
 		self.setTitle(_("Start Wizard"))
+		self.resolutionTimer = eTimer()
+		self.resolutionTimer.callback.append(self.resolutionTimeout)
+		preferred = ["720p"]  # Only offer 720p - some TVs report broken EDID info, so auto-detection isn't reliable.
+		available = avSwitch.readAvailableModes()
+		preferred = list(set(preferred) & set(available))
+
+		if preferred:
+			if "2160p50" in preferred:
+				self.mode = "2160p"
+			elif "2160p30" in preferred:
+				self.mode = "2160p30"
+			elif "1080p" in preferred:
+				self.mode = "1080p"
+
+		self.setMode()
+
+		if not preferred:
+			ports = [port for port in avSwitch.getPortList() if avSwitch.isPortUsed(port)]
+			if len(ports) > 1:
+				self.resolutionTimer.start(20000)
+				print("[WizardLanguage] DEBUG start resolutionTimer")
+
+	def setMode(self):
+		print(f"[WizardLanguage] DEBUG setMode {self.mode}")
+		if self.mode in ("720p", "1080p") and not BoxInfo.getItem("AmlogicFamily"):
+			rate = "multi"
+		else:
+			rate = self.getVideoRate()
+		avSwitch.setMode(port="HDMI", mode=self.mode, rate=rate)
+
+	def getVideoRate(self):
+		def sortKey(name):
+			return {
+				"multi": 1,
+				"auto": 2
+			}.get(name[0], 3)
+
+		rates = []
+		for modes in avSwitch.getModeList("HDMI"):
+			if modes[0] == self.mode:
+				for rate in modes[1]:
+					if rate == "auto" and not BoxInfo.getItem("have24hz"):
+						continue
+					rates.append((rate, rate))
+		rates.sort(key=sortKey)
+		return rates[0][0]
+
+	def resolutionTimeout(self):
+		if self.mode == "720p":
+			self.mode = "576i"
+		if self.mode == "576i":
+			self.mode = "480i"
+			self.resolutionTimer.stop()
+		self.setMode()
 
 	def saveWizardChanges(self):
+		self.resolutionTimer.stop()
 		config.misc.wizardLanguageEnabled.value = 0
 		config.misc.wizardLanguageEnabled.save()
 		configfile.save()
@@ -423,6 +483,7 @@ if not os.path.isfile("/etc/installed"):
 # See RestoreSettings in StartEnigma.py (around line 528) for how these wizards get run.
 if config.misc.firstrun.value:
 	wizardManager.registerWizard(WizardLanguage, config.misc.wizardLanguageEnabled.value, priority=0)
+wizardManager.registerWizard(WizardVideo, config.misc.videowizardenabled.value, priority=1)
 wizardManager.registerWizard(IncorrectBoxInfoWizard, not BoxInfo.getItem("checksum"), priority=0)
 wizardManager.registerWizard(AutoInstallWizard, os.path.isfile("/etc/.doAutoinstall"), priority=0)
 wizardManager.registerWizard(AutoRestoreWizard, config.misc.wizardLanguageEnabled.value and config.misc.firstrun.value and checkForAvailableAutoBackup(), priority=0)

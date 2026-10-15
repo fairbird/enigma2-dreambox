@@ -1,6 +1,66 @@
 <setupxml>
-	<setup key="Video_setup" title="Video Settings">
-		<!-- this is just a placeholder, the Videomode plugin implements this submenu -->
+	<setup key="Video" title="Video Settings">
+		<!-- VideoSetup in Screens/VideoMode.py prepends the dynamic items. -->
+		<item level="0" text="HDMI color space" description="Select the color space to be used with the HDMI attached TV/monitor." requires="havecolorspace">config.av.hdmicolorspace</item>
+		<item level="0" text="HDMI colorimetry" description="Select the colorimetry to be used with the HDMI attached HDR capable TV/monitor." requires="havecolorimetry">config.av.hdmicolorimetry</item>
+		<item level="0" text="HDMI color depth" description="Select the color depth to be used with the HDMI attached UHD capable TV/monitor." requires="havehdmicolordepth">config.av.hdmicolordepth</item>
+		<if requires="havehdmihdrtype">
+			<item level="0" text="HDMI HDR Type" description="Select the HDR mode to be used for the HDMI attached UHD capable TV/monitor.">config.av.hdmihdrtype</item>
+			<if conditional="config.av.hdmihdrtype.value == 'auto'">
+				<item level="1" text="Switch HDR type by content" description="When enabled, switch the HDMI HDR type (HDR10, HLG or SDR) to match the HDR information of the current video." indent="1">config.av.hdmihdrtype_switch</item>
+				<item level="1" text="Colorimetry for HDR content" description="Select the HDMI colorimetry to be used while HDR content is shown. This option is only used if 'HDMI colorimetry' is set to 'Auto'." requires="havecolorimetry;config.av.hdmihdrtype_switch" conditional="config.av.hdmicolorimetry.value == 'auto'" indent="1">config.av.hdmicolorimetry_hdr</item>
+			</if>
+		</if>
+		<item level="0" text="HDR OSD adjustment" description="This option adjusts SDR graphics and OSD colors while the HDMI output is in HDR mode." requires="havehdmihdrosd">config.av.hdmihdrosd</item>
+		<item level="0" text="Bypass HDMI EDID check" description="When enabled, bypass HDMI EDID checking." requires="Canedidchecking">config.av.bypass_edid_checking</item>
+		<item level="0" text="Hardware video mode" description="Select the video mode capability of the hardware chip. Picture in Picture (PiP) and 12-bit HDR output cannot be used at the same time, so choose whether to enable PiP or 12-bit HDR output." requires="haveboxmode">config.av.boxmode</item>
+		<if requires="HDRSupport">
+			<item level="0" text="%s support" description="Select the %s mode to be used with the HDMI connected HDR capable TV/monitor." data="HLG">config.av.hlg_support</item>
+			<item level="0" text="%s support" description="Select the %s mode to be used with the HDMI connected HDR capable TV/monitor." data="HDR10">config.av.hdr10_support</item>
+			<item level="0" text="Allow %s-bit" description="When enabled, allow the use of %s-bit color mode." data="10">config.av.allow_10bit</item>
+			<item level="0" text="Allow %s-bit" description="When enabled, allow the use of %s-bit color mode." data="12">config.av.allow_12bit</item>
+		</if>
+		<item level="0" text="Sync mode" description="Select how to handle the synchronization of the signal after a service change." requires="havesyncmode">config.av.sync_mode</item>
+		<item level="1" text="Deinterlacer mode" description="Select the deinterlacing mode to be used by the video decoder. 'Auto' lets the driver decide." requires="havedeinterlace">config.av.deinterlace</item>
+		<item level="1" text="Add 'Manual resolution' to Extensions" description="When enabled, an entry of 'Manual resolution' is added to the Extensions menu to allow a quick change of the video mode for the current video." conditional="config.av.videoport.value != 'Scart'">config.av.manual_resolution_extmenu</item>
+		<if requires="haveamlhdrsupport">
+			<item level="0" text="%s support" description="Select the %s mode to be used with the HDMI connected HDR capable TV/monitor." data="HLG">config.av.amlhlg_support</item>
+			<item level="0" text="%s support" description="Select the %s mode to be used with the HDMI connected HDR capable TV/monitor." data="HDR10">config.av.amlhdr10_support</item>
+		</if>
+	</setup>
+	<setup key="Audio" title="Audio Settings" level="1" showOpenWebif="yes">
+		<item level="1" text="Volume Control" />
+		<item level="1" text="Volume steps" description="Select the size of the volume step when the VOLUME buttons are pressed." indent="1">config.volumeControl.pressStep</item>
+		<item level="1" text="Long press volume steps" description="Select the size of the volume steps when the VOLUME buttons are held down." indent="1">config.volumeControl.longStep</item>
+		<item level="1" text="Volume/Mute display timer" description="Select how long, in seconds, that the volume and mute displays are shown before they automatically hide." indent="1">config.volumeControl.hideTimer</item>
+		<item level="1" text="Audio Formats And Output" />
+		<item level="1" text="PCM Multichannel" description="Select whether multichannel audio tracks should be output as PCM." requires="CanPcmMultichannel" indent="1">config.av.pcm_multichannel</item>
+		<if requires="CanDownmixAC3" indent="1">
+			<item level="1" text="AC3 downmix" description="Select whether AC3 audio tracks should be downmixed to stereo.">config.av.downmix_ac3</item>
+		</if>
+		<item level="1" text="AC3 plus transcoding" description="Select whether AC3 Plus audio tracks should be transcoded to AC3." requires="CanAC3plusTranscode" indent="1">config.av.transcodeac3plus</item>
+		<item level="1" text="AC4" description="Select whether AC4 (Dolby Atmos) audio tracks should be passed through to the AVR, downmixed to stereo, or auto-routed based on HDMI sink capability." requires="CanAC4" indent="1">config.av.ac4</item>
+		<item level="1" text="DTS downmix" description="Select whether DTS channel audio tracks should be downmixed to stereo." requires="CanDownmixDTS" indent="1">config.av.downmix_dts</item>
+		<item level="1" text="DTS/DTS-HD HR/DTS-HD MA/DTS:X" description="Select whether DTS channel audio tracks should be downmixed or transcoded." requires="CanDTSHD" indent="1">config.av.dtshd</item>
+		<item level="1" text="Dolby TrueHD" description="Select whether Dolby TrueHD audio tracks should be passed through or decoded." requires="CanTrueHD" indent="1">config.av.truehd</item>
+		<item level="1" text="WMA Pro" description="Select whether WMA Pro channel audio tracks should be downmixed or transcoded." requires="CanWMAPRO" indent="1">config.av.wmapro</item>
+		<item level="1" text="AAC downmix" description="Select whether multichannel audio tracks should be downmixed to stereo." requires="CanDownmixAAC" indent="1">config.av.downmix_aac</item>
+		<item level="1" text="AAC plus downmix" description="Select whether multichannel audio tracks should be downmixed to stereo." requires="CanDownmixAACPlus" indent="1">config.av.downmix_aacplus</item>
+		<item level="1" text="AAC transcoding" description="Select whether AAC audio tracks should be transcoded." requires="CanAACTranscode" indent="1">config.av.transcodeaac</item>
+		<item level="1" text="Audio Source" description="Select whether multichannel audio tracks should be converted to PCM or SPDIF." requires="Canaudiosource" indent="1">config.av.audio_source</item>
+		<item level="1" text="Audio Synchronization" />
+		<item level="1" text="General AC3 delay" description="This option selects the general audio delay of Dolby Digital sound tracks." indent="1">config.av.generalAC3delay</item>
+		<item level="1" text="General PCM delay" description="This option selects the general audio delay of stereo sound tracks." indent="1">config.av.generalPCMdelay</item>
+		<item level="1" text="Sound Enhancements" />
+		<item level="1" text="3D Surround" description="This option allows you to enable 3D Surround Sound." requires="Can3DSurround" indent="1">config.av.surround_3d</item>
+		<item level="1" text="3D Surround Speaker Position" description="This option allows you to change the virtual loudspeaker position." requires="Can3DSpeaker" conditional="config.av.surround_3d.value != 'none'" indent="1">config.av.surround_3d_speaker</item>
+		<item level="1" text="Audio Auto Volume Level" description="This option allows you to set the Auto Volume Level output." requires="CanAutoVolume" indent="1">config.av.autovolume</item>
+		<item level="1" text="Bluetooth Audio" />
+		<item level="1" text="Enable BT audio" description="This option allows you to switch Audio to Bluetooth speakers." requires="CanBTAudio" indent="1">config.av.btaudio</item>
+		<item level="1" text="General BT audio delay" description="This option configures the audio delay value for Bluetooth speakers." requires="CanBTAudioDelay" indent="1">config.av.btaudiodelay</item>
+	</setup>
+	<setup key="audio_setup" title="Audio Settings">
+		<!-- This is just a placeholder, the Videomode plugin implements this sub menu. -->
 	</setup>
 	<setup key="VolumeAdjust" title="Volume Adjust Settings">
 		<item level="0" text="Volume adjustment mode" description="Select 'Disabled' to disable all automated volume adjustments. Select 'Defined volume offsets' to assign a specified offset to the service's volume level. Select 'Last used/set volume' to remember the volume level last used for each service.">config.volumeAdjust.adjustMode</item>
@@ -11,39 +71,6 @@
 		<if conditional="config.volumeAdjust.adjustMode.value != 0">
 			<item level="0" text="Auto show volume level" description="Select 'Yes' to show the volume level on any automated changes of volume level.">config.volumeAdjust.showVolumeBar</item>
 		</if>
-	</setup>
-	<setup key="Audio_setup" title="Audio Settings">
-		<item level="1" text="Volume steps" description="Select the size of the volume step when the VOLUME buttons are pressed.">config.volumeControl.pressStep</item>
-		<item level="1" text="Long press volume steps" description="Select the size of the volume steps when the VOLUME buttons are held down.">config.volumeControl.longStep</item>
-		<item level="1" text="Volume/Mute display timer" description="Select how long, in seconds, that the volume and mute displays are shown before they automatically hide.">config.volumeControl.hideTimer</item>
-		<item level="1" text="PCM Multichannel" description="Select whether multichannel audio tracks should be output as PCM." requires="CanPcmMultichannel">config.av.pcm_multichannel</item>
-		<if requires="CanDownmixAC3">
-			<item level="1" text="AC3 downmix" description="Select whether multichannel audio tracks should be output as PCM.">config.av.downmix_ac3</item>
-			<if requires="VuEAC3Fix" conditional="not config.av.downmix_ac3.value">
-				<item level="1" text="Passthrough audio handling delay AC3" description="Used to specify delay when switching between services and AC3 passthrough is enabled.">config.av.passthrough_fix_short</item>
-				<item level="1" text="Passthrough audio handling delay AC3+" description="Used to specify delay when switching between services and AC3+/Atmos passthrough is enabled.">config.av.passthrough_fix_long</item>
-			</if>
-		</if>
-		<item level="1" text="AC3 plus transcoding" description="Select whether AC3 Plus audio tracks should be transcoded to AC3." requires="CanAC3plusTranscode">config.av.transcodeac3plus</item>
-		<item level="1" text="AC4" description="Select whether AC4 (Dolby Atmos) audio tracks should be passed through to the AVR, downmixed to stereo, or auto-routed based on HDMI sink capability." requires="CanAC4">config.av.ac4</item>
-		<item level="1" text="DTS downmix" description="Select whether DTS channel audio tracks should be downmixed to stereo." requires="CanDownmixDTS">config.av.downmix_dts</item>
-		<item level="1" text="Dolby TrueHD" description="Select whether Dolby TrueHD audio tracks should be passed through or decoded." requires="CanTrueHD">config.av.truehd</item>
-		<item level="1" text="DTS/DTS-HD HR/DTS-HD MA/DTS:X" description="Select whether DTS channel audio tracks should be downmixed or transcoded." requires="CanDTSHD">config.av.dtshd</item>
-		<item level="1" text="WMA Pro" description="Select whether WMA Pro channel audio tracks should be downmixed or transcoded." requires="CanWMAPRO">config.av.wmapro</item>
-		<item level="1" text="AAC downmix" description="Select whether multichannel audio tracks should be downmixed to stereo." requires="CanDownmixAAC">config.av.downmix_aac</item>
-		<item level="1" text="AAC plus downmix" description="Select whether multichannel audio tracks should be downmixed to stereo." requires="CanDownmixAACPlus">config.av.downmix_aacplus</item>
-		<item level="1" text="Audio Source" description="Select whether multichannel audio tracks should be converted to PCM or SPDIF." requires="Canaudiosource">config.av.audio_source</item>
-		<item level="1" text="AAC transcoding" description="Select whether AAC audio tracks should be transcoded." requires="CanAACTranscode">config.av.transcodeaac</item>
-		<item level="1" text="General AC3 delay" description="This option selects configures the general audio delay of Dolby Digital sound tracks.">config.av.generalAC3delay</item>
-		<item level="1" text="General PCM delay" description="This option selects configures the general audio delay of stereo sound tracks.">config.av.generalPCMdelay</item>
-		<item level="1" text="Audio Auto Volume Level" description="This option allows you to set the Auto Volume Level output." requires="CanAutoVolume">config.av.autovolume</item>
-		<item level="1" text="Audio Auto Volume Level" description="This option allows you to set the Auto Volume Level output." requires="HasAutoVolumeLevel">config.av.autovolumelevel</item>
-		<item level="1" text="3D Surround" description="This option allows you to enable 3D Surround Sound." requires="Can3DSurround">config.av.surround_3d</item>
-		<item level="1" text="3D Surround Speaker Position" description="This option allows you to change the virtual loudspeaker position." requires="Can3DSpeaker" conditional="config.av.surround_3d.value != 'none'">config.av.surround_3d_speaker</item>
-		<item level="1" text="3D surround softlimiter" description="This option allows you to enable 3D surround softlimiter." requires="Has3DSurroundSoftLimiter" conditional="config.av.surround_3d_speaker.value != 'none'">config.av.surround_softlimiter_3d</item>
-		<item level="1" text="General audio delay" description="This option configures the general audio delay." requires="CanAudioDelay">config.av.audiodelay</item>
-		<item level="1" text="Enable BT audio" description="This option allows you to switch Audio to Bluetooth speakers." requires="CanBTAudio">config.av.btaudio</item>
-		<item level="1" text="General BT audio delay" description="This option configures the audio delay value for Bluetooth speakers." requires="CanBTAudioDelay">config.av.btaudiodelay</item>
 	</setup>
 	<setup key="Checkupdate" title="Check update Settings">
 		<item level="1" text="check for firmware updates every" description="Choose the time to check for update avilable every...">config.updatecheck.check_update_notifier</item>
