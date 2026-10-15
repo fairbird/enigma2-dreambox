@@ -473,7 +473,7 @@ def updateSysSoftCam():
 
 
 =======
->>>>>>> ff4d434a2 ([SystemInfo] Fix)
+>>>>>>> ff4d434a2([SystemInfo] Fix)
 def getBoxName():
 	box = MACHINEBUILD
 	machinename = DISPLAYMODEL.lower()
