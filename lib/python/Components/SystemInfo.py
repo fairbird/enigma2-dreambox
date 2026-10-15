@@ -464,6 +464,8 @@ def hasInitCam():
 
 
 << << << < HEAD
+
+
 def updateSysSoftCam():
 	BoxInfo.setMutableItem("ShowOscamInfo", getSysSoftcam() in ("oscam", "ncam"))
 	BoxInfo.setMutableItem("ShowCCCamInfo", getSysSoftcam() in ("cccam",))
@@ -474,6 +476,8 @@ def updateSysSoftCam():
 
 == == == =
 >>>>>> > ff4d434a2([SystemInfo] Fix)
+
+
 def getBoxName():
 	box = MACHINEBUILD
 	machinename = DISPLAYMODEL.lower()
