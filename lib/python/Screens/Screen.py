@@ -333,10 +333,11 @@ class Screen(dict):
 		self.createGUIScreen(self.instance, self.desktop)
 
 	def createGUIScreen(self, parent, desktop, updateonly=False):
+		stacked = []
+
 		def addToStack(widget):
 			if hasattr(widget, "stackIndex") and widget.stackIndex != -1:
-				stack = self.stacks[widget.stackIndex]
-				stack.instance.addChild(widget.instance)
+				stacked.append(widget)
 		for widget in self.stacks:
 			widget.instance = widget.widget(parent, widget.layout)
 			applyAllAttributes(widget.instance, desktop, widget.skinAttributes, self.scale)
@@ -370,6 +371,8 @@ class Screen(dict):
 				# w.instance.thisown = 0
 			applyAllAttributes(widget.instance, desktop, widget.skinAttributes, self.scale)
 			addToStack(widget)
+		for widget in sorted(stacked, key=lambda x: getattr(x, "stackOrder", 0)):  # Add in skin order, the stack layout depends on it.
+			self.stacks[widget.stackIndex].instance.addChild(widget.instance)
 		if self.screenImage:
 			if self.screenImageGlyph:
 				self["Image"].setText(self.screenImage)
