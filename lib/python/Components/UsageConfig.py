@@ -1394,6 +1394,11 @@ def InitUsageConfig():
 		(1, _("Read/Write"))
 	])
 
+	choicelist = []
+	for i in range(1, 7):
+		choicelist.append(("%d" % i, "%d" % i))
+	config.misc.longkey_threshold = ConfigSelection(default="4", choices=choicelist)
+
 	config.seek = ConfigSubsection()
 	config.seek.baractivation = ConfigSelection(default="leftright", choices=[
 		("leftright", _("Long Left/Right")),

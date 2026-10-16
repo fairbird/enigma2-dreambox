@@ -67,6 +67,7 @@ void keyEvent(const eRCKey &key)
 {
 	static eRCKey last(0, 0, 0);
 	static int num_repeat;
+	int repeat = eConfigManager::getConfigIntValue("config.misc.longkey_threshold", 4);
 
 	ePtr<eActionMap> ptr;
 	eActionMap::getInstance(ptr);
@@ -79,7 +80,7 @@ void keyEvent(const eRCKey &key)
 		last = key;
 	}
 
-	if (num_repeat == 4)
+	if (num_repeat == repeat)
 	{
 		ptr->keyPressed(key.producer->getIdentifier(), key.code, eRCKey::flagLong);
 		num_repeat++;
