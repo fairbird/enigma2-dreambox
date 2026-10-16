@@ -1,5 +1,6 @@
 #include <sstream>
 #include <fcntl.h>
+#include <string.h>
 #include <sys/ioctl.h>
 
 #include <ios>
@@ -1495,6 +1496,8 @@ void eDVBCISlot::data(int what)
 	if (what & eSocketNotifier::Read) {
 		uint8_t data[4096];
 		int r;
+		/* some CI drivers memcpy into the buffer; a copy-on-write page oopses there */
+		memset(data, 0, sizeof(data));
 		r = ::read(fd, data, 4096);
 		if(r > 0) {
 			int i;
