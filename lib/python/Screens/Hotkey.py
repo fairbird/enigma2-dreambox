@@ -74,6 +74,7 @@ class hotkey:
 		("Up", "cross_up", ""),
 		("Down", "cross_down", ""),
 		("Ok", "ok", ""),
+		("Ok" + " " + _("long"), "ok_long", ""),
 		("Channel up", "channelup", ""),
 		("Channel down", "channeldown", ""),
 		("Page up", "pageUp", ""),
