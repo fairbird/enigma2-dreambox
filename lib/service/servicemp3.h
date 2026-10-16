@@ -349,6 +349,11 @@ private:
 	int m_initialAudioStream = -1;
 	bool m_initialAudioSelection = true;
 	int m_audio_switch_deferred = -1;
+	/* retries a deferred switch, the pipeline may not reach PAUSED->PLAYING again */
+	ePtr<eTimer> m_audio_switch_timer;
+	int m_audio_switch_retries = 0;
+	bool m_audio_switch_retrying = false;
+	void retryAudioSwitch();
 	void applyAudioSelection();
 	int m_currentSubtitleStream;
 	int m_cachedSubtitleStream;
