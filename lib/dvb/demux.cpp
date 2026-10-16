@@ -6,6 +6,7 @@
 #include <signal.h>
 #include <sys/sysinfo.h>
 #include <sys/mman.h>
+#include <sys/stat.h>
 #include <atomic>
 #include <linux/dvb/dmx.h>
 #include <lib/base/eerror.h>
@@ -431,6 +432,7 @@ eDVBRecordFileThread::eDVBRecordFileThread(int packetsize, int bufferCount, int 
 		/*buffer*/ (unsigned char*) ::mmap(NULL, (buffersize > 0) ? (buffersize * bufferCount) : (bufferCount * packetsize * 1024), PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, /*ignored*/-1, 0),
 		/*buffersize*/ (buffersize > 0) ? buffersize : (packetsize * 1024), packetsize),
 	 m_ts_parser(packetsize),
+	 m_packet_size(packetsize),
 	 m_current_offset(0),
 	 m_fd_dest(-1),
 	 m_sync_mode(sync_mode),
@@ -484,7 +486,38 @@ int eDVBRecordFileThread::getFirstPTS(pts_t &pts)
 	return m_ts_parser.getFirstPTS(pts);
 }
 
+// Transient resource shortage: drop the chunk instead of aborting the thread.
+static bool isTransientAioError(int err)
+{
+	return err == ENOMEM || err == EAGAIN;
+}
+
+void eDVBRecordFileThread::AsyncIO::countShortWrite(int* short_write_count)
+{
+	if (short_write_count && !short_written)
+		++(*short_write_count);
+	short_written = true;
+}
+
 int eDVBRecordFileThread::AsyncIO::wait(const volatile int* stop_flag, int* short_write_count)
+{
+	int ret = 0;
+	int saved_errno = 0;
+	for (auto& part : parts)
+	{
+		int r = waitPart(part, stop_flag, short_write_count);
+		if (r < 0 && ret == 0)
+		{
+			ret = r;
+			saved_errno = errno;
+		}
+	}
+	if (ret < 0)
+		errno = saved_errno;
+	return ret;
+}
+
+int eDVBRecordFileThread::AsyncIO::waitPart(struct aiocb& aio, const volatile int* stop_flag, int* short_write_count)
 {
 	if (aio.aio_buf == nullptr) // No request outstanding
 		return 0;
@@ -550,6 +583,12 @@ int eDVBRecordFileThread::AsyncIO::wait(const volatile int* stop_flag, int* shor
 		int r = aio_return(&aio);
 		if (r < 0)
 		{
+			if (isTransientAioError(err))
+			{
+				eWarning("[eDVBRecordFileThread] aio failed (error=%d): %s - dropping %zu bytes", err, strerror(err), aio.aio_nbytes);
+				aio.aio_buf = NULL;
+				return 0;
+			}
 			// aio_return() does not set errno, the error is in aio_error()
 			if (err > 0)
 				errno = err;
@@ -561,8 +600,7 @@ int eDVBRecordFileThread::AsyncIO::wait(const volatile int* stop_flag, int* shor
 		// Handle short write - retry remaining bytes
 		if ((size_t)r != aio.aio_nbytes)
 		{
-			if (short_write_count)
-				++(*short_write_count);
+			countShortWrite(short_write_count);
 			eDebug("[eDVBRecordFileThread] wait: short write %d of %zu bytes -> retry", r, aio.aio_nbytes);
 			aio.aio_nbytes -= r;
 			aio.aio_offset += r;
@@ -587,10 +625,24 @@ int eDVBRecordFileThread::AsyncIO::cancel(int fd)
 	if (r <= 0)
 		return r; // Either no need to cancel, or error return
 	eDebug("[eDVBRecordFileThread] cancelling");
-	return aio_cancel(fd, &aio);
+	// The worst result of all parts: error, not cancelled, cancelled, all done
+	int ret = AIO_ALLDONE;
+	for (auto& aio : parts)
+	{
+		if (aio.aio_buf == NULL)
+			continue;
+		int res = aio_cancel(fd, &aio);
+		if (res < 0)
+			ret = -1;
+		else if (ret >= 0 && res == AIO_NOTCANCELED)
+			ret = AIO_NOTCANCELED;
+		else if (ret == AIO_ALLDONE && res == AIO_CANCELED)
+			ret = AIO_CANCELED;
+	}
+	return ret;
 }
 
-int eDVBRecordFileThread::AsyncIO::poll(int* short_write_count)
+int eDVBRecordFileThread::AsyncIO::pollPart(struct aiocb& aio, int* short_write_count)
 {
 	if (aio.aio_buf == NULL)
 		return 0;
@@ -604,8 +656,7 @@ int eDVBRecordFileThread::AsyncIO::poll(int* short_write_count)
 
 	if (r >= 0 && (size_t)r != aio.aio_nbytes)
 	{ // short write
-		if (short_write_count)
-			++(*short_write_count);
+		countShortWrite(short_write_count);
 #ifdef GLIBC_64BIT_TIME_FLAGS
 		eDebug("[eDVBRecordFileThread] short write: %d of bytes %d written -> retry", r, aio.aio_nbytes);
 #else
@@ -629,6 +680,11 @@ int eDVBRecordFileThread::AsyncIO::poll(int* short_write_count)
 			 * The operation itself completed - treat as done. */
 			return 0;
 		}
+		if (isTransientAioError(err))
+		{
+			eWarning("[eDVBRecordFileThread] aio failed (error=%d): %s - dropping %zu bytes", err, strerror(err), aio.aio_nbytes);
+			return 0;
+		}
 		eDebug("[eDVBRecordFileThread] poll: aio failed (error=%d): %s", err, strerror(err));
 		// aio_return() does not set errno, callers check it
 		errno = err;
@@ -637,14 +693,72 @@ int eDVBRecordFileThread::AsyncIO::poll(int* short_write_count)
 	return 0;
 }
 
-int eDVBRecordFileThread::AsyncIO::start(int fd, off_t offset, size_t nbytes, void* buffer)
+int eDVBRecordFileThread::AsyncIO::poll(int* short_write_count)
 {
-	memset(&aio, 0, sizeof(aiocb)); // Documentation says "zero it before call".
-	aio.aio_fildes = fd;
-	aio.aio_nbytes = nbytes;
-	aio.aio_offset = offset;   // Offset can be omitted with O_APPEND
-	aio.aio_buf = buffer;
-	return aio_write(&aio);
+	int ret = 0;
+	for (auto& aio : parts)
+	{
+		int r = pollPart(aio, short_write_count);
+		if (r < 0)
+			return r;
+		if (r > 0)
+			ret = 1;
+	}
+	return ret;
+}
+
+int eDVBRecordFileThread::AsyncIO::start(int fd, off_t offset, size_t nbytes, unsigned char* data, size_t chunk)
+{
+	for (const auto& aio : parts)
+	{
+		if (aio.aio_buf != NULL)
+		{
+			errno = EBUSY;
+			return -1;
+		}
+	}
+	size_t count = (chunk && nbytes > chunk) ? (nbytes + chunk - 1) / chunk : 1;
+	parts.resize(count);
+	short_written = false;
+	size_t done = 0;
+	for (size_t i = 0; i < count; ++i)
+	{
+		struct aiocb& aio = parts[i];
+		size_t len = (count > 1 && nbytes - done > chunk) ? chunk : nbytes - done;
+		memset(&aio, 0, sizeof(struct aiocb)); // Documentation says "zero it before call".
+		aio.aio_fildes = fd;
+		aio.aio_nbytes = len;
+		aio.aio_offset = offset + done;   // Offset can be omitted with O_APPEND
+		aio.aio_buf = data + done;
+		if (aio_write(&aio) < 0)
+		{
+			// Not queued, nothing to wait for; earlier parts stay queued
+			for (size_t j = i; j < count; ++j)
+				parts[j].aio_buf = NULL;
+			if (i == 0)
+				return -1;
+			if (isTransientAioError(errno))
+				eWarning("[eDVBRecordFileThread] aio_write failed: %m - dropping %zu bytes", nbytes - done);
+			else
+				eWarning("[eDVBRecordFileThread] aio_write failed: %m - %zu bytes not written", nbytes - done);
+			return 0;
+		}
+		done += len;
+	}
+	return 0;
+}
+
+void eDVBRecordFileThread::updateWriteChunk()
+{
+	struct stat st = {};
+	bool dvr = m_serviceDescrambler && m_fd_dest >= 0 && fstat(m_fd_dest, &st) == 0 && S_ISCHR(st.st_mode);
+	size_t chunk = dvr ? (MAX_DVR_WRITE / m_packet_size) * m_packet_size : 0;
+	if (chunk != m_write_chunk.load())
+	{
+		m_write_chunk.store(chunk);
+		if (chunk)
+			eDebug("[eDVBRecordFileThread] writing descrambled data to the DVR in parts of %zu bytes", chunk);
+	}
 }
 
 // AIO write mode detection: locked after verification for entire session.
@@ -681,10 +795,17 @@ int eDVBRecordFileThread::asyncWrite(int len)
 	gettimeofday(&starttime, NULL);
 #endif
 
-	int r = m_current_buffer->start(m_fd_dest, m_current_offset, len, m_buffer);
+	int r = m_current_buffer->start(m_fd_dest, m_current_offset, len, m_buffer, m_write_chunk.load());
 	if (r < 0)
 	{
+		if (isTransientAioError(errno))
+		{
+			eWarning("[eDVBRecordFileThread] aio_write failed: %m - dropping %d bytes", len);
+			return len;
+		}
+		int error = errno;
 		eWarning("[eDVBRecordFileThread] aio_write failed: %m");
+		errno = error;
 		return r;
 	}
 	m_current_offset += len;
@@ -778,10 +899,14 @@ int eDVBRecordFileThread::writeData(int len)
 			m_ts_parser.parseData(m_current_offset, m_buffer, len);
 		}
 
+		const size_t chunk = m_write_chunk.load();
 		int written = 0;
 		while (written < len)
 		{
-			ssize_t w = ::write(m_fd_dest, m_buffer + written, len - written);
+			size_t count = len - written;
+			if (chunk && count > chunk)
+				count = chunk;
+			ssize_t w = ::write(m_fd_dest, m_buffer + written, count);
 			if (w > 0)
 			{
 				written += w;
@@ -822,6 +947,9 @@ int eDVBRecordFileThread::writeData(int len)
 			{
 				// Next slot still has pending AIO - DVR is busy
 				// Discard data instead of blocking in wait()
+				++m_busy_discard_count;
+				if (m_busy_discard_count <= 20 || m_busy_discard_count % 100 == 0)
+					eWarning("[eDVBRecordFileThread] DVR busy - discarded %d bytes (#%u)", len, m_busy_discard_count);
 				return len;
 			}
 		}
