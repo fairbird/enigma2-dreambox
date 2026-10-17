@@ -1,5 +1,12 @@
 # -*- coding: utf-8 -*-
+import os
+import math
+from fnmatch import fnmatchcase
+from skin import parseColor
+from time import time
+from fnmatch import fnmatchcase
 from re import compile
+from shutil import rmtree
 from os import makedirs, symlink, unlink
 from os.path import exists, join, islink
 from Screens.Screen import Screen
@@ -30,15 +37,11 @@ from Screens.Console import Console
 from Screens.Setup import Setup
 from Screens.Toast import Toast
 from Screens.Standby import TryQuitMainloop
+from Screens.VirtualKeyBoard import VirtualKeyBoard
 from Plugins.Plugin import PluginDescriptor
 from Tools.Directories import fileExists, fileReadLines, fileAccess, fileWriteLine, fileWriteLines, resolveFilename, SCOPE_PLUGINS, SCOPE_CURRENT_SKIN, SCOPE_GUISKIN
 from Tools.LoadPixmap import LoadPixmap
 from Tools.NumericalTextInput import NumericalTextInput
-
-from skin import parseColor
-from time import time
-import os
-import math
 
 language.addCallback(plugins.reloadPlugins)
 
@@ -473,6 +476,8 @@ class PluginBrowser(Screen, ProtectedScreen):
 		Processing.instance.hideProgress()
 		self["actions"].setEnabled(True)
 		self["PluginDownloadActions"].setEnabled(True)
+		self["key_green"].setText(_("Download plugins"))
+		self["key_yellow"].setText(_("Update plugins"))
 		if result == 0:
 			self.internetCheckedTime = time()
 			self.session.openWithCallback(self.PackageActionClosed, PackageAction, mode)
@@ -1300,6 +1305,8 @@ class PluginBrowserNew(Screen, ProtectedScreen):
 		Processing.instance.hideProgress()
 		self["actions"].setEnabled(True)
 		self["PluginDownloadActions"].setEnabled(True)
+		self["key_green"].setText(_("Download plugins"))
+		self["key_yellow"].setText(_("Update plugins"))
 		if result == 0:
 			self.internetCheckedTime = time()
 			self.session.openWithCallback(self.PackageActionClosed, PackageAction, mode)
@@ -1363,6 +1370,9 @@ class PackageAction(Screen, NumericalTextInput, ProtectedScreen):
 		<widget source="key_yellow" render="Label" position="380,e-40" size="180,40" backgroundColor="key_yellow" conditional="key_yellow" font="Regular;20" foregroundColor="key_text" halign="center" valign="center">
 			<convert type="ConditionalShowHide" />
 		</widget>
+		<widget source="key_blue" render="Label" position="570,e-40" size="180,40" backgroundColor="key_blue" conditional="key_blue" font="Regular;20" foregroundColor="key_text" halign="center" valign="center">
+			<convert type="ConditionalShowHide" />
+		</widget>
 		<widget source="key_help" render="Label" position="e-90,e-40" size="90,40" backgroundColor="key_back" conditional="key_help" font="Regular;20" foregroundColor="key_text" halign="center" valign="center">
 			<convert type="ConditionalShowHide" />
 		</widget>
@@ -1382,6 +1392,16 @@ class PackageAction(Screen, NumericalTextInput, ProtectedScreen):
 		4: "MODE_PACKAGE",
 		5: "MODE_SOFTCAM"
 	}
+	INTERNET_ERROR_TEXTS = {  # 1=DNS error, 2=Other network error, 3=No link, 4=No active adapter.
+		1: "Feed server DNS error!",
+		2: "Feed server access error!",
+		3: "Network adapter not connected to a network!",
+		4: "No network adapters enabled/available!"
+	}
+
+	@staticmethod
+	def getInternetErrorText(result):  # Always English, for logging. Wrap with _() for display.
+		return PackageAction.INTERNET_ERROR_TEXTS.get(result, "No Internet connection available!")
 
 	MANAGE_OPTIONS = {
 		MODE_MANAGE: (MODE_MANAGE, _("Plugin"), _("Plugins"), _("plugin"), _("plugins"), ENIGMA_PREFIX, PLUGIN_CATEGORIES),
@@ -1431,15 +1451,26 @@ class PackageAction(Screen, NumericalTextInput, ProtectedScreen):
 			self.MODE_UPDATE: _("Update Plugins"),
 			self.MODE_MANAGE: _("Manage %s") % self.modeData[self.DATA_UPPER_PLURAL]
 		}.get(self.mode, _("Unknown")))
+		self.browserTitle = self.getTitle()
+		self.searchText = ""
+		self.searchAll = False
+		self.searchPackages = None
+		self.searchLoading = False
+		self.searchFailed = False
+		self.searchSelection = None
+		self.searchCollapsed = set()
 		self["plugins"] = List([])
 		self["plugins"].onSelectionChanged.append(self.selectionChanged)
 		self["quickselect"] = Label()
 		self["quickselect"].hide()
 		text = _("Getting plugin information. Please wait...") if self.mode == self.MODE_REMOVE else _("Downloading plugin information. Please wait...")
+		self.descriptionText = text
 		self["description"] = Label(text)
 		self["key_red"] = StaticText(_("Close"))
 		self["key_green"] = StaticText()
 		self["key_yellow"] = StaticText()
+		self["key_blue"] = StaticText(_("Search"))
+		self["key_menu"] = StaticText(_("MENU"))
 		description = {
 			self.MODE_REMOVE: _("Plugin Browser Remove Actions"),
 			self.MODE_INSTALL: _("Plugin Browser Install Actions"),
@@ -1472,6 +1503,11 @@ class PackageAction(Screen, NumericalTextInput, ProtectedScreen):
 			"yellow": (self.keyShowLog, _("Show the last opkg command's output"))
 		}, prio=0, description=description)
 		self["logAction"].setEnabled(False)
+		self["searchActions"] = HelpableActionMap(self, ["ColorActions", "MenuActions", "ShowVirtualKeyboardActions"], {
+			"blue": (self.keySearch, _("Search packages by name or description")),
+			"menu": (self.keySearch, _("Search packages by name or description")),
+			"showVirtualKeyboard": (self.keySearch, _("Search packages by name or description"))
+		}, prio=0, description=description)
 		self["navigationActions"] = HelpableActionMap(self, ["NavigationActions", "PreviousNextActions"], {
 			"top": (self["plugins"].goTop, _("Move to the first item on the first screen")),
 			"pageUp": (self["plugins"].goPageUp, _("Move up a screen")),
@@ -1498,9 +1534,9 @@ class PackageAction(Screen, NumericalTextInput, ProtectedScreen):
 			"0": (self.keyNumberGlobal, smsMsg)
 		}, prio=0, description=_("QuickSelect Actions"))
 		self["quickSelectActions"].setEnabled(False)
-		self.expandableIcon = LoadPixmap(resolveFilename(SCOPE_GUISKIN, "icons/expandable.png"))
-		self.expandedIcon = LoadPixmap(resolveFilename(SCOPE_GUISKIN, "icons/expanded.png"))
-		self.verticalIcon = LoadPixmap(resolveFilename(SCOPE_GUISKIN, "icons/vertical.png"))
+		self.expandableIcon = LoadPixmap(resolveFilename(SCOPE_GUISKIN, "icons/plugin_expandable.png"))
+		self.expandedIcon = LoadPixmap(resolveFilename(SCOPE_GUISKIN, "icons/plugin_expanded.png"))
+		self.verticalIcon = LoadPixmap(resolveFilename(SCOPE_GUISKIN, "icons/plugin_vertical.png"))
 		self.installableIcon = LoadPixmap(resolveFilename(SCOPE_GUISKIN, "icons/installable.png"))
 		self.installIcon = LoadPixmap(resolveFilename(SCOPE_GUISKIN, "icons/install.png"))
 		self.installedIcon = LoadPixmap(resolveFilename(SCOPE_GUISKIN, "icons/installed.png"))
@@ -1526,6 +1562,7 @@ class PackageAction(Screen, NumericalTextInput, ProtectedScreen):
 		self.currentBootLogo = None
 		self.currentSettings = None
 		self.logData = ""
+		self.internetCheckThread = None
 		self.opkgComponent = OpkgComponent()
 		self.opkgComponent.addCallback(self.fetchOpkgDataCallback)
 		opkgFilterArguments = [self.modeData[self.DATA_FILTER] % "*"]
@@ -1583,41 +1620,47 @@ class PackageAction(Screen, NumericalTextInput, ProtectedScreen):
 				self.internetCheckThread.callback.get().append(self.internetCheckCallback)
 				self.internetCheckThread.startThread(FEED_SERVER, INTERNET_TIMEOUT, True)
 
-	def internetCheckCallback(self, result):
-		self.internetCheckThread = None
+	def internetCheckCallback(self, result):  # 0=Site reachable, 1=DNS error, 2=Other network error, 3=No link, 4=No active adapter.
 		if result == 0:
 			self.opkgComponent.runCommand(self.opkgComponent.CMD_REFRESH_INFO, self.opkgFilterArguments)
 		else:
-			text = {
-				1: _("Feed server DNS error!"),
-				2: _("Feed server access error!"),
-				3: _("Network adapter not connected to a network!"),
-				4: _("No network adapters enabled/available!")
-			}.get(result, _("No Internet connection available!"))
-			self["description"].setText(text)
+			text = self.getInternetErrorText(result)
+			self["description"].setText(_(text))
 			print(f"[PluginBrowser] PackageAction Error: {text}")
 			self.setWaiting(None)
 
 	def selectionChanged(self):
 		label = ""
+		self.quickSelectCategory = ""
 		current = self["plugins"].getCurrent()
 		if current:
 			category = current[self.PLUGIN_CATEGORY]
-			if not isinstance(category, str) or self.selectedRemoveItems or self.selectedInstallItems or self.selectedUpdateItems:
+			if not isinstance(category, str):
 				label = {
 					self.MODE_REMOVE: _("Remove Plugins") if len(self.selectedRemoveItems) > 1 else _("Remove Plugin"),
 					self.MODE_INSTALL: _("Install Plugins") if len(self.selectedInstallItems) > 1 else _("Install Plugin"),
 					self.MODE_UPDATE: _("Update Plugins") if len(self.selectedUpdateItems) > 1 else _("Update Plugin"),
 					self.MODE_MANAGE: (_("Remove %s") if current[self.PLUGIN_INSTALLED] else _("Install %s")) % self.modeData[self.DATA_UPPER_PLURAL]
 				}.get(self.mode, _("Unknown"))
-			self.quickSelectCategory = current[self.PLUGIN_DISPLAY_CATEGORY] if category is None or category in self.expanded else ""  # Allows QuickSelect to start searching the current category from the category heading. QuickSelect disabled on closed categories.
-			self["quickSelectActions"].setEnabled(self.quickSelectCategory != "")
+			expanded = category not in self.searchCollapsed if self.searchText else category in self.expanded
+			self.quickSelectCategory = current[self.PLUGIN_DISPLAY_CATEGORY] if category is None or expanded else ""  # QuickSelect also works in expanded search results.
+		# Marked packages remain selected even if a search hides them.
+		if self.selectedRemoveItems:
+			label = _("Remove Plugins")
+		elif self.selectedInstallItems:
+			label = _("Install Plugins")
+		elif self.selectedUpdateItems:
+			label = _("Update Plugins")
+		self["quickSelectActions"].setEnabled(bool(self.quickSelectCategory) and not self.processing)
 		self["key_green"].setText(label)
-		self["performAction"].setEnabled(label != "")
+		self["performAction"].setEnabled(bool(label) and not self.processing)
 		for callback in self.onChangedEntry:
 			callback()
 
 	def keyCancel(self):
+		if self.searchText and not self.processing:
+			self.keySearchCallback("")
+			return
 		if self.processing:
 			self.opkgComponent.stop()
 			self.setWaiting(None)
@@ -1632,12 +1675,65 @@ class PackageAction(Screen, NumericalTextInput, ProtectedScreen):
 			pluginComponent.readPluginList(resolveFilename(SCOPE_PLUGINS))
 		self.close()
 
+	def keySearch(self):
+		if not self.processing:
+			self.quickSelectTimeout(force=True)
+			self["quickselect"].hide()
+			choices = [(_("Search in the current view"), False), (_("Search all packages"), True)]
+			if self.searchText:
+				choices.append((_("Clear search"), None))
+			self.session.openWithCallback(self.keySearchScopeCallback, ChoiceBox, windowTitle=_("Search"), list=choices, selection=int(self.searchAll))
+
+	def keySearchScopeCallback(self, choice):
+		if choice and not self.processing:
+			if choice[1] is None:
+				self.keySearchCallback("")
+			else:
+				self.session.openWithCallback(lambda text: self.keySearchCallback(text, choice[1]), VirtualKeyBoard, title=choice[0], text=self.searchText)
+
+	def keySearchCallback(self, text, searchAll=None):
+		if text is None or self.processing:
+			return
+		text = text.strip()
+		if searchAll is not None:
+			self.searchAll = searchAll
+		if text and not self.searchText:
+			self.searchSelection = self["plugins"].getCurrent()
+		self.searchText = text
+		self.searchCollapsed.clear()
+		if text and self.searchAll and self.searchPackages is None:
+			# Read the complete local opkg index once, including categories hidden by the browser filters.
+			self.searchLoading = True
+			self.searchFailed = False
+			self.setWaiting(_("Getting plugin information. Please wait..."))
+			command = {
+				self.MODE_REMOVE: self.opkgComponent.CMD_LIST_INSTALLED,
+				self.MODE_INSTALL: self.opkgComponent.CMD_LIST_INSTALLABLE,
+				self.MODE_UPDATE: self.opkgComponent.CMD_LIST_UPDATES,
+				self.MODE_MANAGE: self.opkgComponent.CMD_INFO
+			}[self.mode]
+			self.opkgComponent.runCommand(command, {"arguments": ["*"]})
+		else:
+			self.displayPluginList(self.pluginList, False)
+			self["plugins"].setCurrentIndex(0)
+			if not text and self.searchSelection:
+				for index, item in enumerate(self["plugins"].getList()):
+					if item[:2] == self.searchSelection[:2]:
+						self["plugins"].setCurrentIndex(index)
+						break
+			self.selectionChanged()
+
 	def keySelect(self):
 		current = self["plugins"].getCurrent()
 		if current:
 			category = current[self.PLUGIN_CATEGORY]
 			if isinstance(category, str):  # Entry is a category.
-				if category in self.expanded:
+				if self.searchText:
+					if category in self.searchCollapsed:
+						self.searchCollapsed.remove(category)
+					else:
+						self.searchCollapsed.add(category)
+				elif category in self.expanded:
 					self.expanded.remove(category)
 				else:
 					self.expanded.append(category)
@@ -1679,12 +1775,6 @@ class PackageAction(Screen, NumericalTextInput, ProtectedScreen):
 						else:
 							self.selectedUpdateItems.append(package)
 			self.displayPluginList(self.pluginList, False)
-			removeText = ngettext("%d package marked for remove.", "%d packages marked for remove.", len(self.selectedRemoveItems)) % len(self.selectedRemoveItems) if self.selectedRemoveItems else ""
-			installText = ngettext("%d package marked for install.", "%d packages marked for install.", len(self.selectedInstallItems)) % len(self.selectedInstallItems) if self.selectedInstallItems else ""
-			updateText = ngettext("%d package marked for update.", "%d packages marked for update.", len(self.selectedUpdateItems)) % len(self.selectedUpdateItems) if self.selectedUpdateItems else ""
-			markedText = installText or removeText or updateText
-			markedText = f"\n{markedText}" if markedText else ""
-			self["description"].setText(f"{self.descriptionText}{markedText}")
 
 	def keyGreen(self):
 		def confirmSelection(prompt, items, default):
@@ -1694,7 +1784,7 @@ class PackageAction(Screen, NumericalTextInput, ProtectedScreen):
 			else:
 				items = "'\n    '".join(items)
 				items = f"'{items}'"
-			self.session.openWithCallback(keyGreenCallback, MessageBox, text=f"{prompt}\n    {items}", default=default, title=self.getTitle())
+			self.session.openWithCallback(keyGreenCallback, MessageBox, text=f"{prompt}\n    {items}", default=default, windowTitle=self.getTitle())
 
 		def keyGreenCallback(answer):
 			if answer:
@@ -1783,7 +1873,7 @@ class PackageAction(Screen, NumericalTextInput, ProtectedScreen):
 				self.selectedUpdateItems = [package]
 				text = f"{_('Do you want to update:')}\n    '{package}'"
 				default = False
-			self.session.openWithCallback(keyGreenCallback, MessageBox, text=text, default=default, title=self.getTitle())
+			self.session.openWithCallback(keyGreenCallback, MessageBox, text=text, default=default, windowTitle=self.getTitle())
 
 	def keyShowLog(self):
 		self.session.open(PackageActionLog, self.logData)
@@ -1807,6 +1897,8 @@ class PackageAction(Screen, NumericalTextInput, ProtectedScreen):
 				current = self["plugins"].getCurrent()
 
 	def fetchOpkgDataCallback(self, event, eventData):
+		if self.searchLoading and event in (self.opkgComponent.EVENT_ERROR, self.opkgComponent.EVENT_OPKG_IN_USE, self.opkgComponent.EVENT_COMMAND_ERROR, self.opkgComponent.EVENT_SYNTAX_ERROR):
+			self.searchFailed = True
 		match event:
 			case self.opkgComponent.EVENT_LIST_INSTALLED_DONE | self.opkgComponent.EVENT_LIST_INSTALLABLE_DONE | self.opkgComponent.EVENT_LIST_UPDATES_DONE | self.opkgComponent.EVENT_INFO_DONE:
 				# print(f"[PluginBrowser] PackageAction DEBUG: '{self.opkgComponent.getCommandText(self.opkgComponent.command)}' returned event '{self.opkgComponent.getEventText(event)}' with {len(eventData)} parameters.")
@@ -1857,9 +1949,15 @@ class PackageAction(Screen, NumericalTextInput, ProtectedScreen):
 			case self.opkgComponent.EVENT_DONE:
 				# print(f"[PluginBrowser] PackageAction: Opkg command '{self.opkgComponent.getCommandText(eventData)}' completed.")
 				if hasattr(self, "nextCommand"):
-					self.opkgComponent.runCommand(self.nextCommand, self.opkgFilterArguments)
+					arguments = {"arguments": ["*"]} if self.searchPackages is not None else self.opkgFilterArguments
+					self.opkgComponent.runCommand(self.nextCommand, arguments)
 					del self.nextCommand
 				else:
+					if self.searchLoading:  # No list callback was delivered, e.g. opkg was locked. Allow retrying the search.
+						self.searchLoading = False
+						self.searchText = ""
+						self.displayPluginList(self.pluginList, False)
+						self.session.open(MessageBox, _("Unable to load package information!"), type=MessageBox.TYPE_ERROR)
 					self.setWaiting(None)
 					haveLogs = self.logData != ""
 					self["logAction"].setEnabled(haveLogs)
@@ -1875,51 +1973,54 @@ class PackageAction(Screen, NumericalTextInput, ProtectedScreen):
 	# 	"Description",  "Installed-Size",  "Installed-Time",  "Tags".  The keys "Installed" and "Update" are added by Opkg.py.
 	# Only "Package" is guaranteed to be always be present.
 	#
+	def getPackageInfo(self, package):
+		packageFile = package["Package"]
+		if packageFile.startswith("enigma2-plugin-"):
+			parts = packageFile.split("-", 3)
+			packageCategory = parts[2]
+			packageName = parts[3] if len(parts) > 3 else packageFile
+		elif packageFile.startswith("kodi-addon-"):
+			packageCategory = "kodiaddons"
+			packageName = packageFile[11:]
+		elif packageFile.startswith("kernel-module-"):
+			packageCategory = "kernel"
+			packageName = packageFile[14:].replace(self.kernelVersion, "")
+		else:
+			packageCategory = package.get("Section", "")
+			packageCategory = PACKAGE_CATEGORY_MAPPINGS.get(packageCategory, packageCategory)
+			packageName = packageFile
+		if packageCategory not in PLUGIN_CATEGORIES and packageCategory not in PACKAGE_CATEGORIES:
+			packageCategory = ""
+		return (packageFile, packageCategory, packageName, package.get("Description", ""), package.get("Version", ""), package.get("Installed", False), "Update" in package)
+
 	def processListCallback(self, packages):
+		if self.searchLoading and self.searchFailed:
+			return  # Keep the normal list and allow another search after a failed index read.
 		allCount = 0
 		installCount = 0
 		updateCount = 0
 		pluginList = []
-		for package in packages:
-			packageFile = package["Package"]
+		packageList = [self.getPackageInfo(package) for package in packages]
+		if self.searchLoading or self.searchPackages is not None:
+			self.searchPackages = packageList
+			self.searchLoading = False
+		for data in packageList:
+			packageFile = data[self.INFO_PACKAGE]
+			# The full search index must not change the normal browser's package/category filters.
+			if not any(fnmatchcase(packageFile, pattern) for pattern in self.opkgFilterArguments["arguments"]):
+				continue
+			if self.modeData[self.DATA_MODE] != self.MODE_PACKAGE and not packageFile.startswith(("enigma2-plugin-", "kodi-addon-", "kernel-module-")):
+				continue
 			if (self.displayFilter is None or self.displayFilter.search(packageFile)) and self.displayExclude.search(packageFile) is None:
 				allCount += 1
-				parts = packageFile.split("-")
-				count = len(parts)
-				if count > 2:
-					if parts[0] == "enigma2" and parts[1] == "plugin":
-						packageCategory = parts[2]
-						packageName = "-".join(parts[3:])
-					elif parts[0] == "kodi" and parts[1] == "addon":
-						packageCategory = "kodiaddons"
-						packageName = "-".join(parts[2:])
-					elif parts[0] == "kernel" and parts[1] == "module":
-						packageCategory = "kernel"
-						packageName = ("-".join(parts[2:])).replace(self.kernelVersion, "")
-				else:
-					if self.modeData[self.DATA_MODE] == self.MODE_PACKAGE:
-						packageCategory = package.get("Section", "")
-						packageCategory = PACKAGE_CATEGORY_MAPPINGS.get(packageCategory, packageCategory)
-						packageName = packageFile
-					else:
-						print(f"[PluginBrowser] PackageAction Error: Plugin package '{packageFile}' has no name!")
-						continue
-				if packageCategory not in PLUGIN_CATEGORIES and packageCategory not in PACKAGE_CATEGORIES:
-					packageCategory = ""
-				# print(f"[PluginBrowser] PackageAction DEBUG: Package='{packageFile}', Name='{packageName}', Category='{packageCategory}'.")
-				packageDescription = package["Description"] if "Description" in package else ""
-				packageVersion = package["Version"] if "Version" in package else ""
-				packageInstalled = package["Installed"] if "Installed" in package else False
-				packageUpdate = "Update" in package
-				if packageInstalled:
+				if data[self.INFO_INSTALLED]:
 					installCount += 1
-				if packageUpdate:
+				if data[self.INFO_UPGRADE]:
 					updateCount += 1
-				data = (packageFile, packageCategory, packageName, packageDescription, packageVersion, packageInstalled, packageUpdate)
 				pluginList.append(data)
 		print(f"[PluginBrowser] PackageAction Packages: {len(packages)} returned from opkg, {allCount} matched, {installCount} installed, {updateCount} have updates.")
 		installedText = ngettext("%d package installed.", "%d packages installed.", installCount) % installCount
-		updateText = ngettext("%d package has an update", "%d packages have updates.", updateCount) % updateCount
+		updateText = ngettext("%d package has an update.", "%d packages have updates.", updateCount) % updateCount
 		match self.mode:
 			case self.MODE_REMOVE:
 				self.descriptionText = installedText
@@ -1929,11 +2030,30 @@ class PackageAction(Screen, NumericalTextInput, ProtectedScreen):
 				self.descriptionText = updateText
 			case _:
 				self.descriptionText = f"{ngettext('%d package found.', '%d packages found.', allCount) % allCount} {installedText} {updateText}"
-		self["description"].setText(self.descriptionText)
-		self.displayPluginList(pluginList, True)
 		self.pluginList = pluginList
+		self.displayPluginList(pluginList, True)
 
 	def displayPluginList(self, pluginList, initialLoad):
+		current = self["plugins"].getCurrent()
+		if self.searchText:
+			pattern = self.searchText.casefold()
+			if self.searchAll:
+				pluginList = self.searchPackages or []
+			pluginList = [info for info in pluginList if any(pattern in (info[field] or "").casefold() for field in (self.INFO_PACKAGE, self.INFO_NAME, self.INFO_DESCRIPTION))]
+			searchTitle = _("All packages") if self.searchAll else self.browserTitle
+			self.setTitle(f"{searchTitle} - {self.searchText}")
+			description = ngettext("%d package found.", "%d packages found.", len(pluginList)) % len(pluginList) if pluginList else _("No packages found.")
+		else:
+			self.setTitle(self.browserTitle)
+			description = self.descriptionText
+		self["key_blue"].setText(_("Change search") if self.searchText else _("Search"))
+		self["key_red"].setText(_("Clear search") if self.searchText else _("Close"))
+		removeText = ngettext("%d package marked for remove.", "%d packages marked for remove.", len(self.selectedRemoveItems)) % len(self.selectedRemoveItems) if self.selectedRemoveItems else ""
+		installText = ngettext("%d package marked for install.", "%d packages marked for install.", len(self.selectedInstallItems)) % len(self.selectedInstallItems) if self.selectedInstallItems else ""
+		updateText = ngettext("%d package marked for update.", "%d packages marked for update.", len(self.selectedUpdateItems)) % len(self.selectedUpdateItems) if self.selectedUpdateItems else ""
+		markedText = installText or removeText or updateText
+		self["description"].setText(f"{description}\n{markedText}" if markedText else description)
+		categoryNames = PLUGIN_CATEGORIES | PACKAGE_CATEGORIES | self.modeData[self.DATA_CATEGORIES]
 		categories = {}
 		for info in pluginList:
 			category = info[self.INFO_CATEGORY]
@@ -1942,9 +2062,9 @@ class PackageAction(Screen, NumericalTextInput, ProtectedScreen):
 			else:
 				categories[category] = [info]
 		# categoryList = sorted(categories.keys())  # This sorts the categories by their key.
-		categoryList = [y[1] for y in sorted([(self.modeData[self.DATA_CATEGORIES].get(x, _("Unknown Packages")), x) for x in categories.keys()])]  # This sorts the categories by their label.
+		categoryList = [y[1] for y in sorted([(categoryNames.get(x, _("Unknown Packages")), x) for x in categories.keys()])]  # This sorts the categories by their label.
 		count = len(categoryList)
-		if initialLoad:
+		if initialLoad and not self.searchText:
 			autoExpand = 1
 			match autoExpand:  # config.pluginBrowser.autoExpand.value
 				case 1:
@@ -1957,8 +2077,10 @@ class PackageAction(Screen, NumericalTextInput, ProtectedScreen):
 						self.expanded.append(category)
 		plugins = []
 		for category in categoryList:
-			if category in self.expanded:
-				plugins.append((category, category, self.modeData[self.DATA_CATEGORIES].get(category, category), None, None, None, self.expandedIcon, None, self.modeData[self.DATA_CATEGORIES].get(category, category), None, None, None))
+			categoryName = categoryNames.get(category, category)
+			expanded = category not in self.searchCollapsed if self.searchText else category in self.expanded
+			if expanded:
+				plugins.append((category, category, categoryName, None, None, None, self.expandedIcon, None, categoryName, None, None, None))
 				for info in sorted(categories[category], key=lambda x: x[self.INFO_PACKAGE]):
 					installed = info[self.INFO_INSTALLED]
 					icon = self.installedIcon if installed else self.installableIcon
@@ -1978,10 +2100,16 @@ class PackageAction(Screen, NumericalTextInput, ProtectedScreen):
 						if part.startswith("git"):
 							parts.remove(part)
 					version = "+".join(parts)
-					plugins.append((info[self.INFO_PACKAGE], None, None, info[self.INFO_NAME], info[self.INFO_DESCRIPTION], version, self.verticalIcon, icon, self.modeData[self.DATA_CATEGORIES].get(category, category), info[self.INFO_INSTALLED], info[self.INFO_UPGRADE], f"{info[self.INFO_NAME]} ({version})"))
+					plugins.append((info[self.INFO_PACKAGE], None, None, info[self.INFO_NAME], info[self.INFO_DESCRIPTION], version, self.verticalIcon, icon, categoryName, info[self.INFO_INSTALLED], info[self.INFO_UPGRADE], f"{info[self.INFO_NAME]} ({version})"))
 			else:
-				plugins.append((category, category, self.modeData[self.DATA_CATEGORIES].get(category, category), None, None, None, self.expandableIcon, None, self.modeData[self.DATA_CATEGORIES].get(category, category), None, None, None))
+				plugins.append((category, category, categoryName, None, None, None, self.expandableIcon, None, categoryName, None, None, None))
 		self["plugins"].setList(plugins)
+		if current:
+			for index, item in enumerate(plugins):
+				if item[:2] == current[:2]:
+					self["plugins"].setCurrentIndex(index)
+					break
+		self.selectionChanged()
 
 	def setWaiting(self, text):
 		if text:
@@ -1991,6 +2119,7 @@ class PackageAction(Screen, NumericalTextInput, ProtectedScreen):
 			self["logAction"].setEnabled(False)
 			self["navigationActions"].setEnabled(False)
 			self["quickSelectActions"].setEnabled(False)
+			self["searchActions"].setEnabled(False)
 			self.processing = True
 			Processing.instance.setDescription(text)
 			Processing.instance.showProgress(endless=True)
@@ -2002,6 +2131,8 @@ class PackageAction(Screen, NumericalTextInput, ProtectedScreen):
 			self["logAction"].setEnabled(self.actionMaps[2])
 			self["navigationActions"].setEnabled(self.actionMaps[3])
 			self["quickSelectActions"].setEnabled(self.actionMaps[4])
+			self["searchActions"].setEnabled(True)
+			self.selectionChanged()
 
 	def keyNumberGlobal(self, digit):
 		self.quickSelectTimer.stop()
