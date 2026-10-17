@@ -303,7 +303,7 @@ class MMIDialog(Screen):
 		self.timer.stop()
 		if self.is_pin_list > -1 and self.is_pin_list < 4:
 			self.is_pin_list += 1
-		self.keyConfigEntry(KActionKeys.RIGHT)
+		self.keyConfigEntry(ActionKeys.RIGHT)
 
 	def updateList(self, list):
 		List = self["entries"]
@@ -545,10 +545,10 @@ class CiSelection(Screen):
 			pass
 
 	def keyLeft(self):
-		self.keyConfigEntry(KEY_LEFT)
+		self.keyConfigEntry(ActionKeys.LEFT)
 
 	def keyRight(self):
-		self.keyConfigEntry(KEY_RIGHT)
+		self.keyConfigEntry(ActionKeys.RIGHT)
 
 	def appendEntries(self, slot, state):
 		self.state[slot] = state
