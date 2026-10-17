@@ -2,15 +2,15 @@
 from Components.Harddisk import harddiskmanager
 from Components.International import international
 from Components.Console import Console
-from Components.config import ConfigSubsection, ConfigDirectory, ConfigYesNo, config, ConfigSelection, ConfigText, ConfigNumber, ConfigSet, ConfigLocations, ConfigSelectionNumber, ConfigSelectionInteger, ConfigClock, ConfigSlider, ConfigEnableDisable, ConfigSubDict, ConfigDictionarySet, ConfigInteger, ConfigIP, ConfigPassword, ConfigSequence, NoSave, ConfigBoolean, configfile
+from Components.config import ConfigSubsection, ConfigDirectory, ConfigYesNo, config, ConfigSelection, ConfigText, ConfigNumber, ConfigSet, ConfigLocations, ConfigSelectionNumber, ConfigSelectionInteger, ConfigClock, ConfigSlider, ConfigEnableDisable, ConfigSubDict, ConfigDictionarySet, ConfigIP, ConfigInteger, ConfigPassword, ConfigSequence, NoSave, ConfigBoolean, configfile
 from Tools.Directories import SCOPE_HDD, SCOPE_TIMESHIFT, defaultRecordingLocation, fileContains, resolveFilename, fileHas, fileReadXML, fileWriteLine, fileWriteLines, SCOPE_SKIN
-from enigma import eAVControl, setTunerTypePriorityOrder, setPreferredTuner, setSpinnerOnOff, setEnableTtCachingOnOff, eActionMap, eEnv, eDVBDB, Misc_Options, eBackgroundFileEraser, eServiceEvent, eSubtitleSettings, eSettings, eDVBLocalTimeHandler, eEPGCache
+from enigma import eAVControl, setTunerTypePriorityOrder, setPreferredTuner, setSpinnerOnOff, setEnableTtCachingOnOff, eActionMap, eEnv, eDVBDB, Misc_Options, eBackgroundFileEraser, eServiceEvent, eSettings, eSubtitleSettings, eDVBLocalTimeHandler, eEPGCache
 from Components.About import GetIPsFromNetworkInterfaces
 from Components.NimManager import nimmanager
 from Components.Renderer.FrontpanelLed import ledPatterns, PATTERN_ON, PATTERN_OFF, PATTERN_BLINK
 from Components.ServiceList import refreshServiceList
 from Components.SystemInfo import BoxInfo
-from skin import getcomponentTemplateNames, parameters, domScreens
+from skin import domScreens, getcomponentTemplateNames, parameters
 from os import makedirs, unlink
 from os.path import exists, isfile, join as pathjoin, normpath
 import os
@@ -1891,14 +1891,16 @@ def InitUsageConfig():
 	config.autolanguage.audio_epglanguage_alternative.addNotifier(setEpgLanguageAlternative)
 	config.autolanguage.audio_epglanguage_alternative.addNotifier(epglanguage)
 
-	def getselectedlanguages(range):
-		return [eval("config.autolanguage.audio_autoselect%x.value" % x) for x in range]
+	def updateLanguageChoices(selections, choices):
+		for index, selection in enumerate(selections):
+			# Read the current values after each update: setChoices can change a selection.
+			selectedValues = {x.value for x in selections if x is not selection}
+			allowNone = index == len(selections) - 1 or not selections[index + 1].value
+			selection.setChoices([x for x in choices if x[0] and x[0] not in selectedValues or not x[0] and allowNone])
 
 	def autolanguage(configElement):
-		config.autolanguage.audio_autoselect1.setChoices([x for x in languageChoiceList if x[0] and x[0] not in getselectedlanguages((2, 3, 4)) or not x[0] and not config.autolanguage.audio_autoselect2.value])
-		config.autolanguage.audio_autoselect2.setChoices([x for x in languageChoiceList if x[0] and x[0] not in getselectedlanguages((1, 3, 4)) or not x[0] and not config.autolanguage.audio_autoselect3.value])
-		config.autolanguage.audio_autoselect3.setChoices([x for x in languageChoiceList if x[0] and x[0] not in getselectedlanguages((1, 2, 4)) or not x[0] and not config.autolanguage.audio_autoselect4.value])
-		config.autolanguage.audio_autoselect4.setChoices([x for x in languageChoiceList if x[0] and x[0] not in getselectedlanguages((1, 2, 3)) or not x[0]])
+		selections = (config.autolanguage.audio_autoselect1, config.autolanguage.audio_autoselect2, config.autolanguage.audio_autoselect3, config.autolanguage.audio_autoselect4)
+		updateLanguageChoices(selections, languageChoiceList)
 		eSettings.setAudioLanguages(config.autolanguage.audio_autoselect1.value, config.autolanguage.audio_autoselect2.value, config.autolanguage.audio_autoselect3.value, config.autolanguage.audio_autoselect4.value)
 
 	config.autolanguage.audio_autoselect1 = ConfigSelection(default="", choices=languageChoiceList)
@@ -1928,17 +1930,12 @@ def InitUsageConfig():
 	config.autolanguage.audio_usecache = ConfigYesNo(default=True)
 	config.autolanguage.audio_usecache.addNotifier(setAudioUseCache)
 
-	def getselectedsublanguages(range):
-		return [eval("config.autolanguage.subtitle_autoselect%x.value" % x) for x in range]
-
 	def autolanguagesub(configElement):
-		config.autolanguage.subtitle_autoselect1.setChoices([x for x in subtitleChoiceList if x[0] and x[0] not in getselectedsublanguages((2, 3, 4)) or not x[0] and not config.autolanguage.subtitle_autoselect2.value])
-		config.autolanguage.subtitle_autoselect2.setChoices([x for x in subtitleChoiceList if x[0] and x[0] not in getselectedsublanguages((1, 3, 4)) or not x[0] and not config.autolanguage.subtitle_autoselect3.value])
-		config.autolanguage.subtitle_autoselect3.setChoices([x for x in subtitleChoiceList if x[0] and x[0] not in getselectedsublanguages((1, 2, 4)) or not x[0] and not config.autolanguage.subtitle_autoselect4.value])
-		config.autolanguage.subtitle_autoselect4.setChoices([x for x in subtitleChoiceList if x[0] and x[0] not in getselectedsublanguages((1, 2, 3)) or not x[0]])
+		selections = (config.autolanguage.subtitle_autoselect1, config.autolanguage.subtitle_autoselect2, config.autolanguage.subtitle_autoselect3, config.autolanguage.subtitle_autoselect4)
+		updateLanguageChoices(selections, subtitleChoiceList)
 		choiceList = [(0, _("None"))]
 		for y in list(range(1, 15 if config.autolanguage.subtitle_autoselect4.value else (7 if config.autolanguage.subtitle_autoselect3.value else (4 if config.autolanguage.subtitle_autoselect2.value else (2 if config.autolanguage.subtitle_autoselect1.value else 0))))):
-			choiceList.append((y, ", ".join([eval("config.autolanguage.subtitle_autoselect%x.getText()" % x) for x in (y & 1, y & 2, y & 4 and 3, y & 8 and 4) if x])))
+			choiceList.append((y, ", ".join([selections[x - 1].getText() for x in (y & 1, y & 2, y & 4 and 3, y & 8 and 4) if x])))
 		if config.autolanguage.subtitle_autoselect3.value:
 			choiceList.append((y + 1, _("All")))
 		config.autolanguage.equal_languages.setChoices(default=0, choices=choiceList)
