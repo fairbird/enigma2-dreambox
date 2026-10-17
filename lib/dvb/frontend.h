@@ -147,6 +147,7 @@ public:
 	virtual ~eDVBFrontend();
 
 	int readInputpower();
+	int getCurrentType(){return m_type;}
 	RESULT getFrontendType(int &type);
 	RESULT tune(const iDVBFrontendParameters &where, bool blindscan = false);
 	RESULT prepare_sat(const eDVBFrontendParametersSatellite &, unsigned int timeout);
