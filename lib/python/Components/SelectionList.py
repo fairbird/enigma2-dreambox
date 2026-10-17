@@ -9,13 +9,22 @@ from Tools.LoadPixmap import LoadPixmap
 icons = None
 
 
+def loadIcons():
+	global icons
+	icons = [
+		LoadPixmap(path=resolveFilename(SCOPE_GUISKIN, "icons/lock_on.png")),
+		LoadPixmap(path=resolveFilename(SCOPE_GUISKIN, "icons/lock_off.png"))
+	]
+
+
 def SelectionEntryComponent(description, value, index, selected, selectionListDescr=parameters.get("SelectionListDescr", (45, 0, 650, 30))):
 	dx, dy, dw, dh = selectionListDescr
 	res = [
 		(description, value, index, selected),
 		(eListboxPythonMultiContent.TYPE_TEXT, dx, dy, dw, dh, 0, RT_HALIGN_LEFT | RT_VALIGN_CENTER, description)
 	]
-	global icons
+	if icons is None:  # entries can be built before the first SelectionList exists
+		loadIcons()
 	icon = icons[0] if selected else icons[1]
 # 	Do we really we need SelectionListLockOff
 #	ix, iy, iw, ih = parameters.get("SelectionListLock" if selected else "SelectionListLockOff", (0, 2, 25, 24))
@@ -31,11 +40,7 @@ class SelectionList(MenuList):
 		self.l.setFont(0, gFont(font[0], font[1]))
 		self.l.setItemHeight(font[2])
 		self.selectionListDescr = parameters.get("SelectionListDescr", (45, 3, 650, 30))
-		global icons
-		icons = [
-			LoadPixmap(path=resolveFilename(SCOPE_GUISKIN, "icons/lock_on.png")),
-			LoadPixmap(path=resolveFilename(SCOPE_GUISKIN, "icons/lock_off.png"))
-		]
+		loadIcons()
 
 	def addSelection(self, description, value, index, selected=True):
 		self.list.append(SelectionEntryComponent(description, value, index, selected, self.selectionListDescr))
