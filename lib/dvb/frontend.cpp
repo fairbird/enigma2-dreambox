@@ -2,6 +2,7 @@
 #include <linux/version.h>
 #include <lib/dvb/dvb.h>
 #include <lib/dvb/frontendparms.h>
+#include <lib/dvb/warmstart.h>
 #include <lib/base/cfile.h>
 #include <lib/base/eerror.h>
 #include <lib/base/estring.h>
@@ -2904,6 +2905,7 @@ RESULT eDVBFrontend::setVoltage(int voltage)
 	switch (voltage)
 	{
 		case voltageOff:
+			eDVBWarmStart::voltageOff(*this);
 			m_data[CSW]=m_data[UCSW]=m_data[TONEBURST]=-1; // reset diseqc
 			vlt = SEC_VOLTAGE_OFF;
 			active_antenna_power = 0;

@@ -2,6 +2,7 @@
 #include <lib/dvb/sec.h>
 #include <lib/dvb/rotor_calc.h>
 #include <lib/dvb/dvbtime.h>
+#include <lib/dvb/warmstart.h>
 
 #include <set>
 
@@ -24,6 +25,26 @@ int eDVBSatelliteEquipmentControl::m_params[MAX_PARAMS];
    defaults are set in python lib/python/Components/NimManager.py
    in InitSecParams function via setParam call
 */
+
+int slot_id_to_fe_id(int slot_id)
+{
+	int fe_id=-1;
+	while (slot_id) {
+		fe_id++;
+		slot_id >>=1;
+	}
+	return fe_id;
+}
+
+#define EXT_ROTOR_CMD "/home/root/rotor_%d"
+
+bool has_external_rotor(int fe_id) {
+	char cmd[32];
+	sprintf(cmd, EXT_ROTOR_CMD, fe_id);
+	bool retval = ::access(cmd, X_OK) == 0;
+	eDebug("has_external_rotor %s %s", cmd, retval ? "yes" : "no");
+	return retval;
+}
 
 void eDVBSatelliteEquipmentControl::setParam(int param, int value)
 {
@@ -427,6 +448,22 @@ RESULT eDVBSatelliteEquipmentControl::prepare(iDVBFrontend &frontend, const eDVB
 			sec_fe->getData(eDVBFrontend::TONEBURST, lastToneburst);
 			sec_fe->getData(eDVBFrontend::ROTOR_CMD, lastRotorCmd);
 			sec_fe->getData(eDVBFrontend::ROTOR_POS, curRotorPos);
+			//with simulate we don't want to move the dish and spam the log with useless messages
+			bool useExternalRotorCmd = !simulate && has_external_rotor(slot_id_to_fe_id(slot_id));
+
+			if (!simulate)
+			{
+				int bootTime = std::max(m_params[DELAY_AFTER_ENABLE_VOLTAGE_BEFORE_SWITCH_CMDS], lnb_param.BootUpTime);
+				eDVBFrontend &physicalFrontend = *static_cast<eDVBFrontend *>(sec_fe);
+				eDVBWarmStart::prepare(*static_cast<eDVBFrontend *>(&frontend), physicalFrontend,
+					is_unicable && lnb_param.BootUpTime > 0 && sec_fe == &frontend && (m_not_linked_slot_mask & slot_id)
+					&& diseqc_mode != eDVBSatelliteDiseqcParameters::V1_2 && !useExternalRotorCmd
+					&& satposDependPtr == -1 && lnb_param.m_advanced_satposdepends == -1,
+					VOLTAGE(13), bootTime);
+				int remaining = eDVBWarmStart::remaining(physicalFrontend, bootTime);
+				if (remaining)
+					sec_sequence.push_back(eSecCommand(eSecCommand::SLEEP, remaining));
+			}
 
 			if (lastcsw == lastucsw && lastToneburst == lastucsw && lastucsw == -1)
 				needDiSEqCReset = true;
