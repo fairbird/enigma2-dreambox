@@ -265,16 +265,13 @@ class Session:
 		self.nav = navigation
 		self.delay_timer = enigma.eTimer()
 		self.delay_timer.callback.append(self.processDelay)
-
+		self.pendingCallbacks = []
 		self.current_dialog = None
-
 		self.dialog_stack = []
 		self.summary_stack = []
 		self.onShutdown = []
 		self.summary = None
-
 		self.in_exec = False
-
 		self.screen = SessionGlobals(self)
 		self.isStandby = False  # Set by Screens.Standby.
 		from Components.FrontPanelLed import frontPanelLed
@@ -305,6 +302,10 @@ class Session:
 
 		self.popCurrent()
 		if callback is not None:
+			self.pendingCallbacks.append((callback, retVal))
+		# A dialog that closed itself on exec begin leaves the session out of exec until its own processDelay.
+		while self.pendingCallbacks and (self.in_exec or self.current_dialog is None):
+			callback, retVal = self.pendingCallbacks.pop(0)
 			callback(*retval)
 
 	def execBegin(self, first=True, do_show=True):
