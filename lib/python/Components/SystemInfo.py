@@ -13,6 +13,7 @@ from sys import version as pyversion
 from time import localtime, strftime
 
 from enigma import eAVControl, Misc_Options, eDVBCIInterfaces, eDVBResourceManager, eGetEnigmaDebugLvl, eDVBCSAEngine
+
 from Tools.Directories import SCOPE_PLUGINS, SCOPE_LIBDIR, SCOPE_SKIN, fileCheck, fileReadLine, fileReadLines, resolveFilename, fileExists, fileHas, fileReadLine, pathExists, isPluginInstalled
 from Tools.MultiBoot import MultiBoot
 
@@ -555,6 +556,13 @@ BoxInfo.setItem("ForceLNBPowerChanged", fileCheck("/proc/stb/frontend/fbc/force_
 BoxInfo.setItem("ForceToneBurstChanged", fileCheck("/proc/stb/frontend/fbc/force_toneburst"))
 BoxInfo.setItem("GBWOL", fileExists("/usr/bin/gigablue_wol"))
 BoxInfo.setItem("grautec", fileExists("/tmp/usbtft"))
+try:
+	# The driver reports hexadecimal bpp. Legacy colorlcd128 branding also
+	# includes monochrome OLEDs, so the build flag alone is not sufficient.
+	colorFrontpanel = int(fileReadLine("/proc/stb/lcd/bpp", default="0"), 16) > 8
+except ValueError:
+	colorFrontpanel = False
+BoxInfo.setItem("ColorFrontpanelDisplay", bool(BoxInfo.getItem("FrontpanelDisplay") and DISPLAYTYPE not in ("7segment", "textlcd") and (colorFrontpanel or BoxInfo.getItem("grautec") or DISPLAYTYPE in ("colorlcd220", "colorlcd240", "colorlcd390", "colorlcd400", "colorlcd480", "colorlcd720", "colorlcd800"))))
 BoxInfo.setItem("GraphicLCD", MACHINEBUILD in ("vuultimo", "xpeedlx3", "et10000", "mutant2400", "quadbox2400", "sezammarvel", "atemionemesis", "mbultra", "beyonwizt4", "osmio4kplus"))
 BoxInfo.setItem("Display", BoxInfo.getItem("FrontpanelDisplay") or BoxInfo.getItem("StandbyLED") or MODEL in ("dreamone", "dreamtwo"))
 BoxInfo.setItem("LEDControl", MODEL not in ("dreamone", "dreamtwo"))
