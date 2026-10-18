@@ -44,10 +44,10 @@ class TimerEditList(Screen):
 		self.key_yellow_choice = self.EMPTY
 		self.key_blue_choice = self.EMPTY
 
-		self["key_red"] = StaticText("")
+		self["key_red"] = StaticText()
 		self["key_green"] = StaticText(_("Add"))
-		self["key_yellow"] = StaticText("")
-		self["key_blue"] = StaticText("")
+		self["key_yellow"] = StaticText()
+		self["key_blue"] = StaticText()
 		self["key_info"] = StaticText(_("INFO"))
 
 		self["description"] = Label("")
@@ -431,9 +431,9 @@ class TimerSanityConflict(Screen):
 		self["timerlist"] = TimerList(self.list)
 
 		self["key_red"] = StaticText(_("Cancel"))
-		self["key_green"] = StaticText("")
-		self["key_yellow"] = StaticText("")
-		self["key_blue"] = StaticText("")
+		self["key_green"] = StaticText()
+		self["key_yellow"] = StaticText()
+		self["key_blue"] = StaticText()
 
 		self["actions"] = ActionMap(["OkCancelActions", "DirectionActions", "ShortcutActions", "TimerEditActions", "MenuActions"],
 			{

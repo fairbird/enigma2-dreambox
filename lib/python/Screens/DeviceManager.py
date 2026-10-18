@@ -1248,9 +1248,9 @@ class DevicesPanelSummary(Screen):
 	def __init__(self, session, parent):
 		Screen.__init__(self, session, parent=parent)
 		self.skinName = "SetupSummary"
-		self["SetupTitle"] = StaticText("")
-		self["SetupEntry"] = StaticText("")
-		self["SetupValue"] = StaticText("")
+		self["SetupTitle"] = StaticText()
+		self["SetupEntry"] = StaticText()
+		self["SetupValue"] = StaticText()
 		self.onShow.append(self.addWatcher)
 		self.onHide.append(self.removeWatcher)
 

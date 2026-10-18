@@ -248,11 +248,11 @@ class SetupSummary(ScreenSummary):
 
 	def __init__(self, session, parent):
 		ScreenSummary.__init__(self, session, parent=parent)
-		self["entry"] = StaticText("")  # DEBUG: Proposed for new summary screens.
-		self["value"] = StaticText("")  # DEBUG: Proposed for new summary screens.
+		self["entry"] = StaticText()  # DEBUG: Proposed for new summary screens.
+		self["value"] = StaticText()  # DEBUG: Proposed for new summary screens.
 		self["SetupTitle"] = StaticText(parent.getTitle())
-		self["SetupEntry"] = StaticText("")
-		self["SetupValue"] = StaticText("")
+		self["SetupEntry"] = StaticText()
+		self["SetupValue"] = StaticText()
 		if self.addWatcher not in self.onShow:
 			self.onShow.append(self.addWatcher)
 		if self.removeWatcher not in self.onHide:

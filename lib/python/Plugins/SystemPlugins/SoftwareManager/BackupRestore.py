@@ -218,7 +218,7 @@ class RestoreMenu(Screen, ProtectedScreen):
 		self["key_red"] = StaticText(_("Cancel"))
 		self["key_green"] = StaticText(_("Restore"))
 		self["key_yellow"] = StaticText(_("Delete"))
-		self["summary_description"] = StaticText("")
+		self["summary_description"] = StaticText()
 
 		self.sel = []
 		self.val = []

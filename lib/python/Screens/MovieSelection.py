@@ -328,7 +328,7 @@ class MovieBrowserConfiguration(Setup):
 class MovieContextMenuSummary(Screen):
 	def __init__(self, session, parent):
 		Screen.__init__(self, session, parent=parent)
-		self["selected"] = StaticText("")
+		self["selected"] = StaticText()
 		self.onShow.append(self.__onShow)
 		self.onHide.append(self.__onHide)
 
@@ -461,7 +461,7 @@ class MovieSelectionSummary(Screen):
 	# this when the info is not selected
 	def __init__(self, session, parent):
 		Screen.__init__(self, session, parent=parent)
-		self["name"] = StaticText("")
+		self["name"] = StaticText()
 		self.onShow.append(self.__onShow)
 		self.onHide.append(self.__onHide)
 
@@ -564,10 +564,10 @@ class MovieSelection(Screen, HelpableScreen, SelectionEventInfo, InfoBarBase, Pr
 		# Need list for init
 		SelectionEventInfo.__init__(self)
 
-		self["key_red"] = StaticText("")
-		self["key_green"] = StaticText("")
-		self["key_yellow"] = StaticText("")
-		self["key_blue"] = StaticText("")
+		self["key_red"] = StaticText()
+		self["key_green"] = StaticText()
+		self["key_yellow"] = StaticText()
+		self["key_blue"] = StaticText()
 		self["key_menu"] = StaticText(_("MENU"))
 		self["key_info"] = StaticText(_("INFO"))
 		self["movie_off"] = MultiPixmap()

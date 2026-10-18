@@ -47,7 +47,7 @@ class AudioSelection(ConfigListScreen, Screen):
 		self["key_left"] = Pixmap()
 		self["key_right"] = Pixmap()
 		self["switchdescription"] = Label(_("Switch between Audio-, Subtitlepage"))
-		self["summary_description"] = StaticText("")
+		self["summary_description"] = StaticText()
 
 		self.protectContextMenu = True
 
