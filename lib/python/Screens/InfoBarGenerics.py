@@ -1715,6 +1715,7 @@ class InfoBarRdsDecoder:
 		self.rds_display = self.session.instantiateDialog(RdsInfoDisplay)
 		self.rds_display.setAnimationMode(0)
 		self.dab_slide_display.reserveRadioTextArea(self.rds_display)
+		self.rds_display.onLayoutFinish.append(self.dab_slide_display.reserveRadioTextArea)
 		self.rass_interactive = None
 
 		self.__event_tracker = ServiceEventTracker(screen=self, eventmap={
@@ -1729,7 +1730,7 @@ class InfoBarRdsDecoder:
 
 		self["RdsActions"].setEnabled(False)
 
-		self.onLayoutFinish.append(self.rds_display.show)
+		self.onLayoutFinish.append(self.rds_display.updateVisibility)
 		self.rds_display.onRassInteractivePossibilityChanged.append(self.RassInteractivePossibilityChanged)
 
 	def RassInteractivePossibilityChanged(self, state):
@@ -1757,7 +1758,7 @@ class InfoBarRdsDecoder:
 		if self.rass_interactive is not None:
 			self.rass_interactive = None
 			self.RassSlidePicChanged()
-		self.rds_display.show()
+		self.rds_display.updateVisibility()
 
 
 class SeekBar(Screen):
@@ -4757,8 +4758,8 @@ class InfoBarSummary(Screen):
 	def __init__(self, session, parent):
 		Screen.__init__(self, session, parent=parent)
 		self.radioSummary = None
-		if session.summaryDesktop is not None and BoxInfo.getItem("FrontpanelDisplay"):
-			self.radioSummary = session.doInstantiateDialog(RdsInfoDisplaySummary, (self,), {}, session.summaryDesktop)
+		if session.summary_desktop is not None and BoxInfo.getItem("FrontpanelDisplay"):
+			self.radioSummary = session.doInstantiateDialog(RdsInfoDisplaySummary, (self,), {}, session.summary_desktop)
 			# Follow the normal summary lifecycle, not the TV infobar's hide timer.
 			# RDS updates must never show over menus, movie playback or standby.
 			self.onShow.append(self.radioSummary.updateDisplay)
