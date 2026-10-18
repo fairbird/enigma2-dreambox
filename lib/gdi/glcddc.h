@@ -28,6 +28,8 @@ class gLCDDC: public gDC
 	void fadeBlend(int a);
 	void fadeEnd();
 public:
+	gLCDDC();
+	~gLCDDC();
 	bool fadeActive() const { return m_fading; }
 	void fadeTick();
 	void setUpdate(int update);
