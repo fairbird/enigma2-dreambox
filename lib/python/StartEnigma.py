@@ -290,23 +290,20 @@ class Session:
 
 	def processDelay(self):
 		callback = self.current_dialog.callback
-
-		retval = self.current_dialog.returnValue
-
+		retVal = self.current_dialog.returnValue
 		if self.current_dialog.isTmp:
 			self.current_dialog.doClose()
 #			dump(self.current_dialog)
 			del self.current_dialog
 		else:
 			del self.current_dialog.callback
-
 		self.popCurrent()
 		if callback is not None:
 			self.pendingCallbacks.append((callback, retVal))
 		# A dialog that closed itself on exec begin leaves the session out of exec until its own processDelay.
 		while self.pendingCallbacks and (self.in_exec or self.current_dialog is None):
 			callback, retVal = self.pendingCallbacks.pop(0)
-			callback(*retval)
+			callback(*retVal)
 
 	def execBegin(self, first=True, do_show=True):
 		assert not self.in_exec
@@ -416,7 +413,7 @@ class Session:
 		self.execBegin()
 		return dlg
 
-	def close(self, screen, *retval):
+	def close(self, screen, *retVal):
 		if not self.in_exec:
 			print("[StartEnigma] Close after exec!")
 			return
@@ -430,7 +427,7 @@ class Session:
 		# the onExec, which opens the dialog again, closing the loop.
 		assert screen == self.current_dialog
 
-		self.current_dialog.returnValue = retval
+		self.current_dialog.returnValue = retVal
 		self.delay_timer.start(0, 1)
 		self.execEnd()
 
