@@ -4757,8 +4757,8 @@ class InfoBarSummary(Screen):
 	def __init__(self, session, parent):
 		Screen.__init__(self, session, parent=parent)
 		self.radioSummary = None
-		if session.summaryDesktop is not None and BoxInfo.getItem("FrontpanelDisplay"):
-			self.radioSummary = session.doInstantiateDialog(RdsInfoDisplaySummary, (self,), {}, session.summaryDesktop)
+		if session.summary_desktop is not None and BoxInfo.getItem("FrontpanelDisplay"):
+			self.radioSummary = session.doInstantiateDialog(RdsInfoDisplaySummary, (self,), {}, session.summary_desktop)
 			# Follow the normal summary lifecycle, not the TV infobar's hide timer.
 			# RDS updates must never show over menus, movie playback or standby.
 			self.onShow.append(self.radioSummary.updateDisplay)
