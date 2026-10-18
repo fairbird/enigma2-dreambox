@@ -14,6 +14,17 @@ if eAVControl.getInstance().hasVideoAxis():
 	config.plugins.OSDPositionSetup.dst_width = ConfigSelectionNumber(default=limits[2], stepwidth=1, min=limits[2] - 255, max=limits[2] + 255, wraparound=False)
 	config.plugins.OSDPositionSetup.dst_top = ConfigSelectionNumber(default=limits[1], stepwidth=1, min=limits[1] - 255, max=limits[1] + 255, wraparound=False)
 	config.plugins.OSDPositionSetup.dst_height = ConfigSelectionNumber(default=limits[3], stepwidth=1, min=limits[3] - 255, max=limits[3] + 255, wraparound=False)
+	# Values saved for another output mode (e.g. the old 720x576 reset of the overscan wizard during the Start Wizard)
+	# are outside the range of the current mode and shrink the OSD: drop them, the full axis of the mode is used.
+	for element in (config.plugins.OSDPositionSetup.dst_left, config.plugins.OSDPositionSetup.dst_width, config.plugins.OSDPositionSetup.dst_top, config.plugins.OSDPositionSetup.dst_height):
+		try:
+			saved = None if element.saved_value is None else int(element.saved_value)
+		except ValueError:
+			saved = element.first - 1
+		if saved is not None and not element.first <= saved <= element.last:
+			print("[OSDPositionSetup] Drop saved value %s outside %d..%d." % (element.saved_value, element.first, element.last))
+			element.value = element.default
+			element.save()
 else:
 	config.plugins.OSDPositionSetup.dst_left = ConfigSelectionNumber(default=0, stepwidth=1, min=0, max=720, wraparound=False)
 	config.plugins.OSDPositionSetup.dst_width = ConfigSelectionNumber(default=720, stepwidth=1, min=0, max=720, wraparound=False)

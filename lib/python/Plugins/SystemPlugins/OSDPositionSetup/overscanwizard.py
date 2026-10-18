@@ -169,10 +169,8 @@ class OverscanWizard(ConfigListScreen, Screen):
 					config.plugins.OSDPositionSetup.dst_top.value = self.dst_top.value
 					config.plugins.OSDPositionSetup.dst_height.value = self.dst_bottom.value - self.dst_top.value
 				else:
-					config.plugins.OSDPositionSetup.dst_left.value = 0
-					config.plugins.OSDPositionSetup.dst_width.value = 720
-					config.plugins.OSDPositionSetup.dst_top.value = 0
-					config.plugins.OSDPositionSetup.dst_height.value = 576
+					for element in (config.plugins.OSDPositionSetup.dst_left, config.plugins.OSDPositionSetup.dst_width, config.plugins.OSDPositionSetup.dst_top, config.plugins.OSDPositionSetup.dst_height):
+						element.value = element.default  # full screen of the current mode (video axis) or 0/720/0/576
 				config.misc.do_overscanwizard.value = False
 				config.misc.do_overscanwizard.save()
 				config.plugins.OSDPositionSetup.save()
