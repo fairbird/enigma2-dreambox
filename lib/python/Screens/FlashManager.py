@@ -37,6 +37,14 @@ FEED_JSON_URL = 1
 USER_AGENT = {"User-Agent": USER_AGENTS.CHROME}
 
 
+class FlashSelectionMessageBox(MessageBox):
+	def createActionMap(self, prio):
+		super().createActionMap(prio)
+		# Flash selections return a slot or action, never a boolean confirmation.
+		self["actions"].removeAction(self, "MsgBoxActions", "selectOk")
+		self["actions"].addAction(self, "MsgBoxActions", "selectOk", (self.select, _("Return the current selection response")))
+
+
 MEDIAFIRE_FOLDERS = {
 	"BlackHole": {"dm920": "cdmen9tqtpwxk", "dm520": "gkhsdcxiikosk", "dm7080": "5cmni3i0rch9e"},
 	"OpenTSimage": {"dm920": "sbrjw60if73re", "dm520": "gnxuy5xl3vmjo", "dm7080": "tb1x6tmtglyw4"},
@@ -476,7 +484,7 @@ class FlashManager(Screen, ProtectedScreen):
 			distributionList.append((distribution, distribution))
 			if distribution == self.imageFeed:
 				default = index
-		self.session.openWithCallback(self.keyDistributionCallback, MessageBox, _("Please select a distribution from which you would like to flash an image:"), list=distributionList, default=default, title=_("Flash Manager - Distributions"))
+		self.session.openWithCallback(self.keyDistributionCallback, FlashSelectionMessageBox, _("Please select a distribution from which you would like to flash an image:"), list=distributionList, default=default, title=_("Flash Manager - Distributions"))
 
 	def keyDistributionCallback(self, distribution):
 		if distribution:
@@ -620,7 +628,7 @@ class FlashImage(Screen, ProtectedScreen):
 				default = index
 			choices.append((slotMsg % (slotCode, slotType, imageDictionary[slotCode]["imagename"], current), (slotCode, True)))
 		choices.append((_("No, don't flash this image"), False))
-		self.session.openWithCallback(self.checkMedia, MessageBox, _("Do you want to flash the image '%s'?") % self.imageName, list=choices, default=default, title=self.getTitle())
+		self.session.openWithCallback(self.checkMedia, FlashSelectionMessageBox, _("Do you want to flash the image '%s'?") % self.imageName, list=choices, default=default, title=self.getTitle())
 
 	def checkMedia(self, choice):
 		if choice:
@@ -729,7 +737,7 @@ class FlashImage(Screen, ProtectedScreen):
 					(_("Do not flash image"), "abort")
 				]
 				default = 0
-			self.session.openWithCallback(self.postFlashActionCallback, MessageBox, text, list=choices, default=default, title=self.getTitle())
+			self.session.openWithCallback(self.postFlashActionCallback, FlashSelectionMessageBox, text, list=choices, default=default, title=self.getTitle())
 		else:
 			self.keyCancel()
 
