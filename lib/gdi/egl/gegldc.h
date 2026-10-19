@@ -61,6 +61,8 @@ private:
 	int m_height;
 	int m_surface_width;
 	int m_surface_height;
+	int m_native_width;
+	int m_native_height;
 	GLuint m_fbo;
 	GLuint m_fbo_texture;
 	int m_fbo_width;

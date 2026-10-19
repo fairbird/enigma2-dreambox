@@ -1611,6 +1611,8 @@ gEGLDC::gEGLDC(INativeWindowProvider* window_provider, int width, int height) : 
 	m_height = height;
 	m_surface_width = width;
 	m_surface_height = height;
+	m_native_width = width;
+	m_native_height = height;
 	m_gles_version = 0;
 	m_egl_display = EGL_NO_DISPLAY;
 	for (int i = 0; i < MAX_EGL_SURFACES; ++i)
@@ -1814,23 +1816,24 @@ void gEGLDC::applyResolution(int xres, int yres, int bpp)
 
 	glFinish();
 
-	if (xres != m_surface_width || yres != m_surface_height)
+	// Sizes the hardware can scan out get the real framebuffer mode (the hardware
+	// scaler stretches it); bigger ones (WQHD skins) stay on the native mode and are
+	// scaled down by the FBO blit in flip().
+	const bool fits = xres <= m_native_width && yres <= m_native_height;
+	const int target_w = fits ? xres : m_native_width;
+	const int target_h = fits ? yres : m_native_height;
+	if (target_w != m_surface_width || target_h != m_surface_height)
 	{
-		// Program the real framebuffer mode like gFBDC::setResolution() does, so the
-		// hardware scaler stretches it to the screen and external apps (Chromium
-		// based plugins) that draw into the framebuffer see the size they asked for.
 		destroyFBO();
-		if (recreateEGLSurfaces(xres, yres))
+		if (recreateEGLSurfaces(target_w, target_h))
 		{
-			m_surface_width = xres;
-			m_surface_height = yres;
+			m_surface_width = target_w;
+			m_surface_height = target_h;
 		}
 		else
 		{
-			eDebug("[EGLDC] mode change to %dx%d failed, restoring %dx%d", xres, yres, m_surface_width, m_surface_height);
+			eDebug("[EGLDC] mode change to %dx%d failed, restoring %dx%d", target_w, target_h, m_surface_width, m_surface_height);
 			recreateEGLSurfaces(m_surface_width, m_surface_height);
-			xres = m_surface_width;
-			yres = m_surface_height;
 		}
 	}
 
