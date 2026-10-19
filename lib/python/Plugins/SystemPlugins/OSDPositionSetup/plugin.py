@@ -32,6 +32,25 @@ else:
 	config.plugins.OSDPositionSetup.dst_height = ConfigSelectionNumber(default=576, stepwidth=1, min=0, max=576, wraparound=False)
 
 
+def updateAxisLimits():
+	"""Video-axis boxes: the values are window_axis pixels of the output mode, but the mode often changes after this
+	module was imported (the Start Wizard boots in 720p and switches to 1080p before the overscan wizard ends). Follow
+	the mode that is set now, as AVSwitch.setMode() does for config.osd: new ranges and defaults, and values the user
+	never changed move to the full axis of the new mode."""
+	if not eAVControl.getInstance().hasVideoAxis():
+		return
+	mode = getattr(avSwitch, "current_mode", None)
+	axis = eAVControl.getInstance().getVideoAxis(mode) if mode else avSwitch.getWindowsAxis()
+	limits = [int(x) for x in axis.split()]
+	for element, base in ((config.plugins.OSDPositionSetup.dst_left, limits[0]), (config.plugins.OSDPositionSetup.dst_top, limits[1]), (config.plugins.OSDPositionSetup.dst_width, limits[2]), (config.plugins.OSDPositionSetup.dst_height, limits[3])):
+		if element.default == base:
+			continue
+		custom = element.saved_value is not None
+		element.setChoices(default=base, first=base - 255, last=base + 255)
+		if not custom:
+			element.value = base
+
+
 def setPosition(dst_left, dst_width, dst_top, dst_height):
 	if dst_left + dst_width > 720:
 		dst_width = 720 - dst_left
@@ -52,6 +71,7 @@ def setPosition(dst_left, dst_width, dst_top, dst_height):
 
 def setConfiguredPosition():
 	if BoxInfo.getItem("AmlogicFamily"):
+		updateAxisLimits()
 		try:
 			print("[OSDPositionSetup] Write to /sys/class/graphics/fb0/window_axis")
 			open("/sys/class/graphics/fb0/window_axis", "w").write('%s %s %s %s' % (config.plugins.OSDPositionSetup.dst_left.value, config.plugins.OSDPositionSetup.dst_top.value, config.plugins.OSDPositionSetup.dst_width.value, config.plugins.OSDPositionSetup.dst_height.value))
