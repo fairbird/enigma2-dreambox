@@ -826,6 +826,7 @@ def parseScale(value):
 		"width": BT_SCALE | BT_VALIGN_CENTER,  # Adjust the width to the target, the height can be too big or too small.
 		"height": BT_SCALE | BT_HALIGN_CENTER,  # Adjust height to target, width can be too big or too small.
 		"stretch": BT_SCALE,  # Adjust height and width to the target, aspect may break.
+		"streach": BT_SCALE,  # Common misspelling of "stretch" found in some DreamOS-derived.
 		"fill": BT_SCALE | BT_HALIGN_CENTER | BT_VALIGN_CENTER  # Scaled so large that the target is completely filled, may be too wide OR too high, "width" or "height" is only automatically selected depending on which side is "too small".
 	}
 	return parseOptions(options, "scale", value, 0)

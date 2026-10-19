@@ -610,6 +610,7 @@ class InformationDistribution(InformationBase):
 			576: "PAL",
 			720: "HD",
 			1080: "FHD",
+			1440: "WQHD",
 			2160: "4K",
 			4320: "8K",
 			8640: "16K"
