@@ -241,11 +241,11 @@ class FlashExpander(Setup):
 					config.flashExpander.location.save()
 					Setup.keySave(self)
 				else:
-					self.session.open(MessageBox, _("Error: mount not successful!"), MessageBox.TYPE_ERROR)
+					self.session.open(MessageBox, _("Error: mount not successful!"), MessageBox.TYPE_ERROR, windowTitle=self.getTitle())
 
 			self.messageBox.close(retVal == 0)
 			if retVal:
-				self.session.open(MessageBox, _("Error: The copy was unsuccessful!"), MessageBox.TYPE_ERROR)
+				self.session.open(MessageBox, _("Error: The copy was unsuccessful!"), MessageBox.TYPE_ERROR, windowTitle=self.getTitle())
 				self.updateStatus()
 			else:
 				self.fstabUpdate(True)
@@ -274,7 +274,7 @@ class FlashExpander(Setup):
 			def deleteMessageCallback(output, retVal, extraArgs):
 				self.messageBox.close(retVal == 0)
 				if retVal:
-					self.session.open(MessageBox, _("Error: The delete was unsuccessful!"), MessageBox.TYPE_ERROR)
+					self.session.open(MessageBox, _("Error: The delete was unsuccessful!"), MessageBox.TYPE_ERROR, windowTitle=self.getTitle())
 				self.updateStatus()
 
 			if answer:
