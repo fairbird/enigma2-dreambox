@@ -228,7 +228,7 @@ class FlashExpander(Setup):
 			else:
 				message = _("Please select the device where the flash expander '/usr' directory should created.")
 
-			self.session.openWithCallback(self.keySelectCallback, MessageBox, text=message, list=choiceList)
+			self.session.openWithCallback(self.keySelectCallback, MessageBox, text=message, list=choiceList, windowTitle=self.getTitle())
 
 		self.readDevices(readDevicesCallback)
 
@@ -293,9 +293,9 @@ class FlashExpander(Setup):
 			usrDirectory = join(self.mountData[0], EXPANDER_MOUNT)
 			if exists(usrDirectory):
 				if self.active:
-					self.session.openWithCallback(deactivateCallback, MessageBox, "%s\n\n%s" % (usrDirectory, _("Do you want to deactivate this flash expander?")), MessageBox.TYPE_YESNO, default=False)
+					self.session.openWithCallback(deactivateCallback, MessageBox, "%s\n\n%s" % (usrDirectory, _("Do you want to deactivate this flash expander?")), MessageBox.TYPE_YESNO, default=False, windowTitle=self.getTitle())
 				else:
-					self.session.openWithCallback(deleteCallback, MessageBox, "%s\n\n%s" % (usrDirectory, _("Do you want to delete this flash expander directory?")), MessageBox.TYPE_YESNO, default=False)
+					self.session.openWithCallback(deleteCallback, MessageBox, "%s\n\n%s" % (usrDirectory, _("Do you want to delete this flash expander directory?")), MessageBox.TYPE_YESNO, default=False, windowTitle=self.getTitle())
 			else:
 				copyFlashdata()
 		else:
@@ -328,7 +328,7 @@ class FlashExpander(Setup):
 			fstabnew.append(f"/{EXPANDER_MOUNT}/{EXPANDER_MOUNT} {EXPANDER_DIRECTORY} none  bind 0 0")
 		fstabnew.append("")
 		fileWriteLines("/etc/fstab", "\n".join(fstabnew), source=MODULE_NAME)
-		print("[FlashExpander] fstabUpdate DEBUG: Ending fstab:\n%s" % "\n".join(fstab))
+		print("[FlashExpander] fstabUpdate DEBUG: Ending fstab:\n%s" % "\n".join(fstabnew))
 
 	def readDevices(self, callback=None):
 		black = BoxInfo.getItem("mtdblack")
