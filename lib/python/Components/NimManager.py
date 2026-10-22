@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 from os import access, path, F_OK
+from os.path import join
 
 from Components.SystemInfo import BoxInfo, MODEL, getChipSetString
 from Tools.BoundFunction import boundFunction
-from Tools.Directories import fileReadXML
+from Tools.Directories import fileReadLine, fileReadXML
 
 from Components.config import config, ConfigSubsection, ConfigSelection, ConfigFloat, ConfigSatlist, ConfigYesNo, ConfigInteger, ConfigSubList, ConfigNothing, ConfigSubDict, ConfigOnOff, ConfigDateTime, ConfigText
 
@@ -194,6 +195,8 @@ class SecConfigure:
 			if slot.type is not None:
 				used_nim_slots.append((slot.slot, slot.description, slot.config.configMode.value != "nothing" and True or False, slot.isCompatible("DVB-S2"), slot.frontend_id is None and -1 or slot.frontend_id))
 		eDVBResourceManager.getInstance().setFrontendSlotInformations(used_nim_slots)
+		if hasattr(eDVBResourceManager.getInstance(), "setFrontendInputGroups"):
+			eDVBResourceManager.getInstance().setFrontendInputGroups([(x.slot, x.sharedSatInput, x.sharedCTInput) for x in nim_slots if x.frontend_id is not None])
 
 		for slot in nim_slots:
 			x = slot.slot
@@ -590,6 +593,9 @@ class NIM:
 		self.__is_empty = is_empty
 		self.is_fbc = is_fbc or (0, 0, 0)
 		self.input_name = input_name
+		self.sharedSatInput = -1
+		self.sharedCTInput = -1
+		self.inputGroupSlots = ()
 
 		self.compatible = {
 			None: (None,),
@@ -687,6 +693,13 @@ class NIM:
 
 	def internallyConnectableTo(self):
 		return self.internally_connectable
+
+	def getInputDescription(self):
+		if self.sharedSatInput >= 0:
+			return _("Two tuners share one SAT input and one C/T input. Reception types switch automatically. Use compatible SAT settings and separate Unicable User Bands. Cable and terrestrial reception cannot run together.")
+		if self.sharedCTInput >= 0:
+			return _("Two tuners, two SAT sockets, one shared C/T socket. Two frequencies of the same reception type can run together. Cable and terrestrial cannot run together.")
+		return ""
 
 	def setInternalLink(self):
 		if self.internally_connectable is not None:
@@ -1013,16 +1026,19 @@ class NimManager:
 				entry["i2c"] = None
 			if "has_outputs" not in entry:
 				entry["has_outputs"] = entry["name"] in BoxInfo.getItem("HasPhysicalLoopthrough")  # "Has_Outputs: yes" not in /proc/bus/nim_sockets NIM, but the physical loopthrough exist
-			entry["internally_connectable"] = None
-			if "frontend_device" in entry:  # check if internally connectable
-				if path.exists("/proc/stb/frontend/%d/rf_switch" % entry["frontend_device"]) and (not id or entries[id]["name"] == entries[id - 1]["name"]):
-					if '7356' in getChipSetString():
-						if not id:
+			if "frontend_device" in entry:
+				if "internally_connectable" not in entry:
+					previousFrontend = entry["frontend_device"] - 1
+					entry["internally_connectable"] = None
+					if path.exists(join("/proc/stb/frontend", str(entry["frontend_device"]), "rf_switch")):
+						if '7356' in getChipSetString() and not id:
 							entry["internally_connectable"] = 1
-					elif id:
-						entry["internally_connectable"] = entry["frontend_device"] - 1
+						elif BoxInfo.getItem("machinebuild") == "vusolo2":
+							entry["internally_connectable"] = previousFrontend
+						elif id:
+							entry["internally_connectable"] = next((x for x in entries if entries[x].get("frontend_device") == previousFrontend), None)
 			else:
-				entry["frontend_device"] = None
+				entry["frontend_device"] = entry["internally_connectable"] = None
 			if "multi_type" not in entry:
 				entry["multi_type"] = {}
 			if "input_name" not in entry:
@@ -1043,6 +1059,37 @@ class NimManager:
 					fbc_tuner += 1
 
 			self.nim_slots.append(NIM(slot=id, description=entry["name"], sattype=entry["type"], has_outputs=entry["has_outputs"], internally_connectable=entry["internally_connectable"], multi_type=entry["multi_type"], frontend_id=entry["frontend_device"], i2c=entry["i2c"], is_empty=entry["isempty"], input_name=entry.get("input_name", None), supports_blind_scan=entry["supports_blind_scan"], is_fbc=entry["fbc"], number_of_slots=self.number_of_slots))
+
+		self.configureInputGroups()
+
+	def configureInputGroups(self):
+		machine = BoxInfo.getItem("machinebuild")
+		groups = {}
+		for slot in self.nim_slots:
+			slot.sharedSatInput = slot.sharedCTInput = -1
+			slot.inputGroupSlots = ()
+			if slot.frontend_id is None or slot.isFBCTuner() or not all(slot.canBeCompatible(x) for x in ("DVB-S", "DVB-C", "DVB-T")):
+				continue
+			fixedCombo = machine in ("dreamone", "dreamtwo") and slot.description == "Si2169D"
+			plugInTriple = machine in ("dm900", "dm920", "dm820", "dm7080") and slot.description == "Si2169C"
+			name = slot.input_name or ""
+			if not (fixedCombo or plugInTriple) or len(name) != 2 or name[1] not in "12":
+				continue
+			groups.setdefault((name[0], slot.description, slot.i2c), []).append(slot)
+		for slots in groups.values():
+			slots.sort(key=lambda x: x.input_name)
+			if len(slots) != 2 or slots[0].input_name[1] != "1" or slots[1].input_name[1] != "2" or slots[1].frontend_id != slots[0].frontend_id + 1:
+				continue
+			sharedSat = slots[0].description == "Si2169D"
+			inputChoices = [fileReadLine(join("/proc/stb/frontend", str(x.frontend_id), "input_choices"), default="").split() for x in slots]
+			if all(inputChoices):
+				sharedSat = inputChoices[0] == inputChoices[1] and len(inputChoices[0]) == 1
+			for slot in slots:
+				slot.sharedSatInput = slots[0].slot if sharedSat else -1
+				slot.sharedCTInput = slots[0].slot
+				slot.inputGroupSlots = tuple(x.slot for x in slots)
+			print("[NimManager] Triple tuner %s: slots %s, %s SAT inputs, one shared C/T input." % (
+				slots[0].input_name[0], slots[0].inputGroupSlots, "one shared" if sharedSat else "two separate"))
 
 	def hasNimType(self, chktype):
 		return any(slot.canBeCompatible(chktype) for slot in self.nim_slots)

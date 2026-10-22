@@ -133,8 +133,11 @@ class NimSetup(Setup, ServiceStopScreen):
 			self.cableCountriesEntry = None
 
 		if self.nim.isMultiType():
-			self.multiType = (_("Tuner type"), self.nimConfig.multiType, _("This is a multitype tuner. Available options depend on the hardware."))
+			inputDescription = self.nim.getInputDescription()
+			self.multiType = (_("Tuner type"), self.nimConfig.multiType, inputDescription or _("This is a multitype tuner. Available options depend on the hardware."))
 			self.list.append(self.multiType)
+			if inputDescription:
+				self.list.append(getConfigListEntry(_("Shared SAT and C/T inputs") if self.nim.sharedSatInput >= 0 else _("2 tuners: 2 SAT sockets, 1 C/T socket")))
 			if self.nimConfig.multiType.value == "nothing":
 				self.nimConfig.configMode.value = "nothing"
 			elif self.nim.isCompatible("DVB-S"):
@@ -1012,6 +1015,8 @@ class NimSelection(Screen, ProtectedScreen):
 				elif x.multi_type:
 					enabledTuners = "/".join([y[1].replace("DVB-", "") for y in sorted([({"DVB-S": 1, "DVB-C": 2, "DVB-T": 3, "ATSC": 4}[y[:5]], y) for y in x.getTunerTypesEnabled()])] if nimConfig.configMode.value != "nothing" else [])
 					text = ("%s: %s\n%s" % (_("Modes") if "/" in enabledTuners else _("Mode"), enabledTuners if enabledTuners == 'ATSC' else "DVB-%s" % enabledTuners, text)) if enabledTuners else _("Disabled")
+					if x.sharedCTInput >= 0:
+						text += "\n" + (_("Shared SAT and C/T inputs") if x.sharedSatInput >= 0 else _("2 tuners: 2 SAT sockets, 1 C/T socket"))
 				if x.isCompatible("DVB-T") and ("DVB-T" in (text + x.friendly_full_description) or "/T" in (text + x.friendly_full_description)) and _("Disabled") not in text and hasattr(nimConfig, "terrestrial_5V") and nimConfig.terrestrial_5V.value:
 					text += _(" (+5 volt terrestrial)")
 				self.list.append((slotid, x.friendly_full_description, text or nimConfig.configMode.value, x))

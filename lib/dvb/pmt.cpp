@@ -1131,6 +1131,8 @@ void eDVBServicePMTHandler::allocatePVRChannel()
 
 void eDVBServicePMTHandler::SDTScanEvent(int event)
 {
+	if (!m_dvb_scan)
+		return;
 	switch (event)
 	{
 		case eDVBScan::evtFinish:
@@ -1307,6 +1309,7 @@ int eDVBServicePMTHandler::tuneExt(eServiceReferenceDVB &ref, ePtr<iTsSource> &s
 
 void eDVBServicePMTHandler::free()
 {
+	m_scan_event_connection = 0;
 	m_dvb_scan = 0;
 
 	if (m_ca_servicePtr)
