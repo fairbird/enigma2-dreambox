@@ -11,7 +11,6 @@ from Tools.GetEcmInfo import GetEcmInfo, getCaidData
 from Tools.Transponder import ConvertToHumanReadable
 
 
-
 class PliExtraInfo(Converter, Poll):
 	satelliteNames = {
 		30: "Rascom/Eutelsat 3E",
