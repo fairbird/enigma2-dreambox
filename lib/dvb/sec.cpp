@@ -118,7 +118,7 @@ int eDVBSatelliteEquipmentControl::canTune(const eDVBFrontendParametersSatellite
 	while (!linked_in_use && linked_next_ptr != -1)
 	{
 		eDVBRegisteredFrontend *linked_fe = (eDVBRegisteredFrontend*) linked_next_ptr;
-		if ((linked_fe->m_inuse && (requestedFrontend->getSharedCTInput() < 0 || linked_fe->m_frontend->getTuneType() == feSatellite)) || (direct_connected && ((eDVBFrontend*)fe)->is_FBCTuner() && tunerLinkedInUse(((eDVBFrontend*)fe)->getSlotID())))
+		if ((linked_fe->m_inuse && (requestedFrontend->getSharedCTInput() < 0 || linked_fe->m_frontend->getTuneType() == iDVBFrontend::feSatellite)) || (direct_connected && ((eDVBFrontend*)fe)->is_FBCTuner() && tunerLinkedInUse(((eDVBFrontend*)fe)->getSlotID())))
 			linked_in_use = true;
 		linked_fe->m_frontend->getData(eDVBFrontend::LINKED_NEXT_PTR, (long&)linked_next_ptr);
 	}
