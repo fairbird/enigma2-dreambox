@@ -974,10 +974,11 @@ int eDVBServicePMTHandler::getProgramInfo(program &program)
 			eDVBService::cacheID cTag = audioMapList[m].cacheTag;
 			if (cached_apid[cTag] != -1)
 			{
-				audioStream s;
+				audioStream s = {};
 				s.type = audioMapList[m].streamType;
 				s.pid = cached_apid[cTag];
 				s.rdsPid = -1;
+				s.component_tag = -1;
 				program.audioStreams.push_back(s);
 				++cnt;
 			}
