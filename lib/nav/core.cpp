@@ -39,7 +39,6 @@ void eNavigation::recordEvent(iRecordableService* service, int event)
 RESULT eNavigation::playService(const eServiceReference &service)
 {
 	RESULT res = -1;
-
 	ePtr<iPlayableService> nextDAB;
 	if (eServiceDAB::prepareRTLSDRZap(m_runningService, service, nextDAB))
 	{
@@ -51,14 +50,10 @@ RESULT eNavigation::playService(const eServiceReference &service)
 	}
 	else
 	{
-#if defined(HAVE_FCC)
-		if (!m_fccmgr || m_fccmgr->tryFCCService(service, m_runningService) == -1)
-		{
-			stopService();
-			ASSERT(m_servicehandler);
-			res = m_servicehandler->play(service, m_runningService);
-#endif
-		}
+		stopService();
+		ASSERT(m_servicehandler);
+		res = m_servicehandler->play(service, m_runningService);
+	}
 
 	m_runningServiceRef = service;
 	if (m_decoder == 0)
