@@ -1,28 +1,26 @@
-# -*- coding: utf-8 -*-
-from __future__ import print_function
-from Plugins.Plugin import PluginDescriptor
-from Screens.Setup import Setup
-from Screens.InfoBar import InfoBar
-from Components.config import config, ConfigSubsection, ConfigYesNo, ConfigSelection
+from glob import glob
+from os import W_OK, access
+
+from enigma import eFCCServiceManager, eServiceReference, eTimer, iPlayableService, iRecordableService
+
+from Components.config import ConfigSelection, ConfigSubsection, ConfigYesNo, config
 from Components.ServiceEventTracker import ServiceEventTracker
 from Components.SystemInfo import BoxInfo
-from enigma import iPlayableService, eTimer, eServiceReference, iRecordableService
-import os
-import glob
-from enigma import eFCCServiceManager
+from Plugins.Plugin import PluginDescriptor
+from Screens.InfoBar import InfoBar
 from Screens.InfoBarGenerics import streamrelay
+from Screens.Setup import Setup
 
-g_max_fcc = len(glob.glob('/dev/fcc?'))
-g_default_fcc = (g_max_fcc) > 5 and 5 or g_max_fcc
+max_fcc = len(glob('/dev/fcc?'))
+default_fcc = (max_fcc) > 5 and 5 or max_fcc
 
 config.plugins.fccsetup = ConfigSubsection()
 config.plugins.fccsetup.activate = ConfigYesNo(default=False)
-config.plugins.fccsetup.maxfcc = ConfigSelection(default=str(g_default_fcc), choices=list((str(n), str(n)) for n in range(2, g_max_fcc + 1)))
+config.plugins.fccsetup.maxfcc = ConfigSelection(default=default_fcc, choices=[(n, str(n)) for n in range(2, max_fcc + 1)])
 config.plugins.fccsetup.zapupdown = ConfigYesNo(default=True)
 config.plugins.fccsetup.history = ConfigYesNo(default=False)
 config.plugins.fccsetup.priority = ConfigSelection(default="zapupdown", choices={"zapupdown": _("Zap Up/Down"), "historynextback": _("History Prev/Next")})
 config.plugins.fccsetup.disableforrec = ConfigYesNo(default=True)
-config.plugins.fccsetup.extensions = ConfigYesNo(default=False)
 
 FccInstance = None
 
@@ -32,38 +30,26 @@ def FCCChanged():
 		FccInstance.FCCSetupChanged()
 
 
-def checkSupportFCC():
-	return bool(g_max_fcc)
-
-
 class FCCSupport:
 	def __init__(self, session):
 		self.session = session
-
 		self.fccmgr = eFCCServiceManager.getInstance()
-
 		self.fccList = []
-
+		self.eventList = []
 		self.createListTimer = eTimer()
 		self.createListTimer.callback.append(self.FCCCreateList)
-
 		self.getSrefTimer = eTimer()
 		self.getSrefTimer.callback.append(self.FCCGetCurSref)
-
-		self.eventList = []
 		self.fccEventTimer = eTimer()
 		self.fccEventTimer.callback.append(self.FCCApplyEvent)
-
 		self.fccForceStartTimer = eTimer()
 		self.fccForceStartTimer.callback.append(self.FCCForceStart)
-
 		self.fccResetTimer = eTimer()
 		self.fccResetTimer.callback.append(self.FCCResetTimerForREC)
-
 		self.activating = False
-
-		self.fccSetupActivate = checkSupportFCC() and config.plugins.fccsetup.activate.value
-		self.maxFCC = int(config.plugins.fccsetup.maxfcc.value)
+		self.hasfcc = max_fcc > 0
+		self.fccSetupActivate = self.hasfcc and config.plugins.fccsetup.activate.value
+		self.maxFCC = config.plugins.fccsetup.maxfcc.value
 		self.zapdownEnable = config.plugins.fccsetup.zapupdown.value
 		self.historyEnable = config.plugins.fccsetup.history.value
 		self.priority = config.plugins.fccsetup.priority.value
@@ -84,12 +70,13 @@ class FCCSupport:
 		self.onClose = []
 		self.changeEventTracker()
 		BoxInfo.setMutableItem("FCCactive", self.fccSetupActivate)
+
 #		from Screens.PictureInPicture import on_pip_start_stop
 #		on_pip_start_stop.append(self.FCCForceStopforPIP)
 
 	def setProcFCC(self, value):
 		procPath = "/proc/stb/frontend/fbc/fcc"
-		if os.access(procPath, os.W_OK):
+		if access(procPath, W_OK):
 			open(procPath, 'w').write(value and "enable" or "disable")
 		else:
 			print("[FCCSupport] write fail! : ", procPath)
@@ -141,14 +128,14 @@ class FCCSupport:
 	def FCCSetupChanged(self):
 		fcc_changed = False
 
-		newFccSetupActivate = checkSupportFCC() and config.plugins.fccsetup.activate.value
+		newFccSetupActivate = self.hasfcc and config.plugins.fccsetup.activate.value
 		if self.fccSetupActivate != newFccSetupActivate:
 			self.fccSetupActivate = newFccSetupActivate
 			self.setProcFCC(self.fccSetupActivate)
 			fcc_changed = True
 
-		if int(config.plugins.fccsetup.maxfcc.value) != self.maxFCC:
-			self.maxFCC = int(config.plugins.fccsetup.maxfcc.value)
+		if config.plugins.fccsetup.maxfcc.value != self.maxFCC:
+			self.maxFCC = config.plugins.fccsetup.maxfcc.value
 			fcc_changed = True
 
 		if self.zapdownEnable != config.plugins.fccsetup.zapupdown.value:
@@ -176,6 +163,7 @@ class FCCSupport:
 		if fcc_changed:
 			self.fccmgr.setFCCEnable(int(self.fccSetupActivate))
 			BoxInfo.setMutableItem("FCCactive", self.fccSetupActivate)
+
 			curPlaying = self.session.nav.getCurrentlyPlayingServiceReference()
 			if curPlaying:
 				self.session.nav.stopService()
@@ -183,7 +171,7 @@ class FCCSupport:
 
 	# get current recording state
 	def getRecordings(self):
-		self.recordings = bool(self.session.nav.getRecordings())
+		self.recordings = self.session.nav.getAnyRecordingsCount() > 0
 
 	def addRecordEventCallback(self, enable=True):
 		if enable:
@@ -417,7 +405,6 @@ class FCCSupport:
 		self.getSrefTimer.stop()
 		self.activating = False
 		self.fccList = []
-
 		self.fccEventTimer.stop()
 		self.fccmgr.stopFCCService()
 		self.eventList = []
@@ -454,51 +441,53 @@ class FCCSupport:
 
 class FCCSetup(Setup):
 	def __init__(self, session):
-		Setup.__init__(self, session, None)
-		self.title = _("Fast Channel Change Setup")
+		Setup.__init__(self, session, "fcc", plugin="SystemPlugins/FastChannelChange")
 
-	def createSetup(self):
-		self.list = []
-		self.list.append((_("FCC enabled"), config.plugins.fccsetup.activate))
-		if config.plugins.fccsetup.activate.value:
-			self.list.append((_("Max channels"), config.plugins.fccsetup.maxfcc))
-			self.list.append((_("Zap Up/Down"), config.plugins.fccsetup.zapupdown))
-			self.list.append((_("History Prev/Next"), config.plugins.fccsetup.history))
-			if config.plugins.fccsetup.zapupdown.value and config.plugins.fccsetup.history.value:
-				self.list.append((_("priority"), config.plugins.fccsetup.priority))
-			self.list.append((_("Disable FCC during recordings"), config.plugins.fccsetup.disableforrec))
-		self.list.append((_("Show in extensions menu"), config.plugins.fccsetup.extensions))
-		self["config"].list = self.list
-
-	def entryChanged(self):
-		currentItem = self.getCurrentItem()
-		if currentItem in (config.plugins.fccsetup.zapupdown, config.plugins.fccsetup.history, config.plugins.fccsetup.activate):
+	def changedEntry(self):
+		if self.getCurrentItem() in (config.plugins.fccsetup.zapupdown, config.plugins.fccsetup.history):
 			if not (config.plugins.fccsetup.zapupdown.value or config.plugins.fccsetup.history.value):
-				if currentItem == config.plugins.fccsetup.history:
+				if self.getCurrentItem() == config.plugins.fccsetup.history:
 					config.plugins.fccsetup.zapupdown.value = True
 				else:
 					config.plugins.fccsetup.history.value = True
-			elif config.plugins.fccsetup.zapupdown.value and config.plugins.fccsetup.history.value:
-				if int(config.plugins.fccsetup.maxfcc.value) < 5:
-					if g_max_fcc < 5:
-						config.plugins.fccsetup.maxfcc.value = str(g_max_fcc)
-					else:
-						config.plugins.fccsetup.maxfcc.value = str(5)
-			self.createSetup()
+			elif (config.plugins.fccsetup.zapupdown.value and config.plugins.fccsetup.history.value):
+				if config.plugins.fccsetup.maxfcc.value < 5:
+					config.plugins.fccsetup.maxfcc.value = max_fcc if max_fcc < 5 else 5
+		Setup.changedEntry(self)
 
 	def keySave(self):
-		FCCChanged()
 		Setup.keySave(self)
+		FCCChanged()
 
 
-def addExtentions(session, **kwargs):
-	session.open(FCCSetup)
+def ToggleUpdate():
+	if config.plugins.fccsetup.activate.value:
+		config.plugins.fccsetup.activate.value = False
+	else:
+		config.plugins.fccsetup.activate.value = True
+	config.plugins.fccsetup.activate.save()
+	FCCChanged()
 
 
 def FCCSupportInit(reason, **kwargs):
 	if "session" in kwargs:
 		global FccInstance
 		FccInstance = FCCSupport(kwargs["session"])
+
+
+def showFCCExtentionMenu():
+	currentScreenName = None
+	if FccInstance:
+		currentScreenName = FccInstance.session.current_dialog.__class__.__name__
+	return (currentScreenName == "InfoBar")
+
+
+def getExtensionName():
+	return _("Disable Fast Channel Change") if config.plugins.fccsetup.activate.value else _("Enable Fast Channel Change")
+
+
+def addExtentions(infobarExtensions):
+	infobarExtensions.addExtension((getExtensionName, ToggleUpdate, showFCCExtentionMenu), None)
 
 
 def FCCStart(session, **kwargs):
@@ -515,24 +504,22 @@ def main(menuid, **kwargs):
 def Plugins(**kwargs):
 	list = []
 
-	if g_max_fcc:
+	if max_fcc > 0:
 		list.append(
 			PluginDescriptor(name="FCCSupport",
 			description="Fast Channel Change support",
 			where=[PluginDescriptor.WHERE_SESSIONSTART],
 			fnc=FCCSupportInit))
 
-		if config.plugins.fccsetup.extensions.value:
-			list.append(
-				PluginDescriptor(name="Fast Channel Change",
-				description="Fast Channel Change Setup",
-				where=[PluginDescriptor.WHERE_EXTENSIONSMENU],
-				fnc=addExtentions,
-				needsRestart=True))
+		list.append(
+			PluginDescriptor(name="FCCExtensionMenu",
+			description="Fast Channel Change menu",
+			where=[PluginDescriptor.WHERE_EXTENSIONSINGLE],
+			fnc=addExtentions))
 
 		list.append(
-			PluginDescriptor(name=_("FCCSetup"),
-			description=_("Fast Channel Change setup"),
+			PluginDescriptor(name="FCCSetup",
+			description=_("Fast Channel Change Setup"),
 			where=[PluginDescriptor.WHERE_MENU],
 			needsRestart=False,
 			fnc=main))

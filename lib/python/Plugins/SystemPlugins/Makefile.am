@@ -24,5 +24,9 @@ if DM920
 SUBDIRS += FSBLUpdater
 endif
 
+if HAVE_FCC
+SUBDIRS += FastChannelChange
+endif
+
 install_PYTHON =	\
 	__init__.py
