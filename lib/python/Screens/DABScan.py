@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from os.path import basename, exists
 from re import fullmatch, sub
 from time import monotonic
