@@ -4,7 +4,7 @@ from Components.International import international
 from Components.Console import Console
 from Components.config import ConfigSubsection, ConfigDirectory, ConfigYesNo, config, ConfigSelection, ConfigText, ConfigNumber, ConfigSet, ConfigLocations, ConfigSelectionNumber, ConfigSelectionInteger, ConfigClock, ConfigSlider, ConfigEnableDisable, ConfigSubDict, ConfigDictionarySet, ConfigIP, ConfigInteger, ConfigPassword, ConfigSequence, NoSave, ConfigBoolean, configfile
 from Tools.Directories import SCOPE_HDD, SCOPE_TIMESHIFT, defaultRecordingLocation, fileContains, resolveFilename, fileHas, fileReadXML, fileWriteLine, fileWriteLines, SCOPE_SKIN
-from enigma import eAVControl, setTunerTypePriorityOrder, setPreferredTuner, setSpinnerOnOff, setEnableTtCachingOnOff, eActionMap, eEnv, eDVBDB, Misc_Options, eBackgroundFileEraser, eServiceEvent, eSettings, eSubtitleSettings, eDVBLocalTimeHandler, eEPGCache
+from enigma import eAVControl, setTunerTypePriorityOrder, setPreferredTuner, setSpinnerColor, setSpinnerOnOff, setEnableTtCachingOnOff, eActionMap, eEnv, eDVBDB, Misc_Options, eBackgroundFileEraser, eServiceEvent, eSettings, eSubtitleSettings, eDVBLocalTimeHandler, eEPGCache
 from Components.About import GetIPsFromNetworkInterfaces
 from Components.NimManager import nimmanager
 from Components.Renderer.FrontpanelLed import ledPatterns, PATTERN_ON, PATTERN_OFF, PATTERN_BLINK
@@ -1260,6 +1260,11 @@ def InitUsageConfig():
 	config.misc.usegstplaybin3 = ConfigYesNo(default=False)
 
 	config.misc.spinnerPosition = ConfigSequence(default=[50, 50], limits=[(0, 1260), (0, 700)], seperator=",")
+	config.misc.spinnerColor = ConfigSelection(default="2b7fd9", choices=[("2b7fd9", _("Blue")), ("ffffff", _("White")), ("00c080", _("Green")), ("ffbf00", _("Yellow")), ("ff8000", _("Orange")), ("e04040", _("Red"))])
+
+	def spinnerColorChanged(configElement):
+		setSpinnerColor(int(configElement.value, 16))
+	config.misc.spinnerColor.addNotifier(spinnerColorChanged)
 
 	config.misc.toastFade = ConfigSelection(default=10, choices=[
 		(0, _("Disabled")),
