@@ -46,8 +46,8 @@ class FlashSelectionMessageBox(MessageBox):
 
 
 MEDIAFIRE_FOLDERS = {
-	"BlackHole": {"dm920": "cdmen9tqtpwxk", "dm520": "gkhsdcxiikosk", "dm7080": "5cmni3i0rch9e"},
-	"OpenTSimage": {"dm920": "sbrjw60if73re", "dm520": "gnxuy5xl3vmjo", "dm7080": "tb1x6tmtglyw4"},
+	"BlackHole": {"dm920": "cdmen9tqtpwxk", "dm520": "gkhsdcxiikosk", "dm7080": "5cmni3i0rch9e", "dreamtwo": "yx295tx6vgp8c"},
+	"OpenTSimage": {"dm920": "sbrjw60if73re", "dm520": "gnxuy5xl3vmjo", "dm7080": "tb1x6tmtglyw4", "dreamtwo": "wik2i04d3e5zu"},
 	"OpenPli": "5mqob16bb176n"
 }
 
