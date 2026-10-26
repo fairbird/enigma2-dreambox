@@ -1384,14 +1384,11 @@ class InfoBarSimpleEventView:
 		if epglist:
 			self.session.open(EventViewSimple, epglist[0], ServiceReference(ref), self.eventViewCallback)
 
-	def eventViewCallback(self, setEvent, setService, val):  # used for now/next displaying
-		epglist = self.epglist
-		if len(epglist) > 1:
-			tmp = epglist[0]
-			epglist[0] = epglist[1]
-			epglist[1] = tmp
-			setEvent(epglist[0])
-
+	def eventViewCallback(self, setEvent, setService, val):
+		event = self.eventView and self.eventView.getAdjacentEvent(val, self.epglist)
+		if event:
+			self.is_now_next = False  # Keep live EPG updates from resetting the selected event.
+			setEvent(event)
 
 class SimpleServicelist:
 	def __init__(self, services):
@@ -1696,13 +1693,11 @@ class InfoBarEPG:
 			print("no epg for the service avail.. so we show multiepg instead of eventinfo")
 			self.openMultiServiceEPG(False)
 
-	def eventViewCallback(self, setEvent, setService, val):  # used for now/next displaying
-		epglist = self.epglist
-		if len(epglist) > 1:
-			tmp = epglist[0]
-			epglist[0] = epglist[1]
-			epglist[1] = tmp
-			setEvent(epglist[0])
+	def eventViewCallback(self, setEvent, setService, val):
+		event = self.eventView and self.eventView.getAdjacentEvent(val, self.epglist)
+		if event:
+			self.is_now_next = False  # Keep live EPG updates from resetting the selected event.
+			setEvent(event)
 
 
 class InfoBarRdsDecoder:
