@@ -1390,6 +1390,7 @@ class InfoBarSimpleEventView:
 			self.is_now_next = False  # Keep live EPG updates from resetting the selected event.
 			setEvent(event)
 
+
 class SimpleServicelist:
 	def __init__(self, services):
 		self.setServices(services)
