@@ -3525,6 +3525,10 @@ class InfoBarPiP:
 	def showPiP(self):
 		self.lastPiPServiceTimeoutTimer.stop()
 		slist = self.servicelist
+		if not slist:  # MoviePlayer without a channel list.
+			# Prevent circular import.
+			from Screens.InfoBar import InfoBar
+			slist = InfoBar.instance and InfoBar.instance.servicelist
 		if self.session.pipshown:
 			if slist and slist.dopipzap:
 				self.togglePipzap()
@@ -3547,17 +3551,17 @@ class InfoBarPiP:
 				self.session.pip.setAnimationMode(0)
 				self.session.pip.show()
 				if isStandardInfoBar(self):
-					newservice = self.lastPiPService or self.session.nav.getCurrentlyPlayingServiceReference() or self.servicelist.getCurrentSelection()
+					newservice = self.lastPiPService or self.session.nav.getCurrentlyPlayingServiceReference() or slist.getCurrentSelection()
 				else:
-					newservice = self.lastPiPService or self.servicelist.getCurrentSelection()
+					newservice = self.lastPiPService or slist.getCurrentSelection()
 				if self.session.pip.playService(newservice):
 					self.session.pipshown = True
-					self.session.pip.servicePath = self.servicelist.getCurrentServicePath()
+					self.session.pip.servicePath = slist.getCurrentServicePath()
 				else:
-					newservice = self.session.nav.getCurrentlyPlayingServiceReference() or self.servicelist.servicelist.getCurrent()
+					newservice = self.session.nav.getCurrentlyPlayingServiceReference() or slist.servicelist.getCurrent()
 					if self.session.pip.playService(newservice):
 						self.session.pipshown = True
-						self.session.pip.servicePath = self.servicelist.getCurrentServicePath()
+						self.session.pip.servicePath = slist.getCurrentServicePath()
 					else:
 						self.lastPiPService = None
 						self.session.pipshown = False
