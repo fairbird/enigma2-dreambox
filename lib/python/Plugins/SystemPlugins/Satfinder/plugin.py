@@ -58,8 +58,11 @@ class Satfinder(ScanSetup):
 
 		self.initcomplete = True
 		self.session.postScanService = self.session.nav.getCurrentlyPlayingServiceOrGroup()
-		self.onClose.append(self.__onClose)
-		self.onShow.append(self.prepareFrontend)
+		if self.scan_nims.value:
+			self.onClose.append(self.__onClose)
+			self.onShow.append(self.prepareFrontend)
+		else:
+			self["key_green"].setText("")
 
 	def openFrontend(self):
 		res_mgr = eDVBResourceManager.getInstance()
@@ -300,6 +303,8 @@ class Satfinder(ScanSetup):
 		if self.frontendData and 'orbital_position' in self.frontendData:
 			self.orbital_position = self.frontendData['orbital_position']
 		ScanSetup.createConfig(self, self.frontendData)
+		if not self.scan_nims.value:
+			return
 
 		# The following are updated in self.newConfig(). Do not add here.
 		# self.scan_sat.system, self.tuning_type, self.scan_input_as, self.scan_ats.system, self.DVB_type, self.scan_ter.system, self.satfinder_scan_nims, self.tuning_sat
@@ -577,7 +582,17 @@ def SatfinderMain(session, close=None, **kwargs):
 	nims = nimmanager.nim_slots
 	nimList = []
 	for n in nims:
-		if not any([n.isCompatible(x) for x in ("DVB-S", "DVB-T", "DVB-C", "ATSC")]):
+		if not any(
+			n.canBeCompatible(tuner_type) and (
+				getattr(n.config, config_mode).value if n.isCombined() else n.config_mode != "nothing"
+			)
+			for tuner_type, config_mode in (
+				("DVB-S", "configModeDVBS"),
+				("DVB-C", "configModeDVBC"),
+				("DVB-T", "configModeDVBT"),
+				("ATSC", "configModeATSC"),
+			)
+		):
 			continue
 		if n.config_mode in ("loopthrough", "satposdepends", "nothing"):
 			continue
