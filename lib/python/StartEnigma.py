@@ -655,6 +655,7 @@ def runScreenTest():
 	initTrashcan(session)
 	enigma.eProfileWrite("VideoModeAutoStart")
 	from Screens.VideoMode import autostart
+	autostart(session)
 	enigma.eProfileWrite("RunReactor")
 	enigma.eProfileDone()
 
