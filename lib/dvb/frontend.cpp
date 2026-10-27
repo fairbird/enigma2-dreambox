@@ -2923,6 +2923,12 @@ RESULT eDVBFrontend::setVoltage(int voltage)
 			eDVBWarmStart::voltageOff(*this);
 			if (sharedCTInput < 0 || m_type == feSatellite)
 				inputData(CSW) = inputData(UCSW) = inputData(TONEBURST) = -1; // reset diseqc
+			else if (sharedSatData && !sharedInputInUse(feSatellite))
+			{
+				// The demodulator also switches off the LNB supply of the shared SAT input.
+				(*sharedSatData)[CUR_VOLTAGE] = voltageOff;
+				(*sharedSatData)[CSW] = (*sharedSatData)[UCSW] = (*sharedSatData)[TONEBURST] = -1;
+			}
 			vlt = SEC_VOLTAGE_OFF;
 			active_antenna_power = 0;
 			break;
