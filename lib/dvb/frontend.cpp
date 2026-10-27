@@ -884,8 +884,9 @@ int eDVBFrontend::closeFrontend(bool force, bool no_delayed)
 				inputData(ROTOR_CMD) = -1;
 		}
 
-		if (sharedInputInUse(m_type))
+	if (sharedInputInUse(m_type) || (m_type != feSatellite && sharedInputInUse(feSatellite)))
 		{
+		// A C/T demodulator can also cut power to the shared SAT input after a zap.
 			if (!m_simulate && m_sn)
 				m_sn->stop();
 			m_state = stateIdle;
