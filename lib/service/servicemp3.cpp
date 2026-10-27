@@ -2559,7 +2559,7 @@ RESULT eServiceMP3::isCurrentlySeekable() {
 		return 0;
 #ifdef DREAMNEXTGEN
 	/* 4: winds at every speed and backwards itself, InfoBarSeek needs no jumps; with jumps on, it jumps from 8x and backwards */
-	if (m_state == stRunning && m_prerolled)
+	if (m_state == stRunning)
 		return canWind() ? (eConfigManager::getConfigBoolValue("config.seek.withjumps", true) ? 3 : 7) : 0;
 #endif
 
