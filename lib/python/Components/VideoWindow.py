@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
+from enigma import eSize, eVideoWidget
+
 from Components.GUIComponent import GUIComponent
-from enigma import eVideoWidget, eSize
 
 
 class VideoWindow(GUIComponent):

@@ -9,7 +9,7 @@ install_PYTHON = \
 	InfoBarGenerics.py HelpMenu.py Wizard.py __init__.py UserManual.py \
 	Dish.py DABScan.py LocaleSelection.py WizardStart.py PiPSetup.py \
 	PluginBrowser.py MinuteInput.py Scart.py PVRState.py ScreenProtection.py \
-	Console.py InputBox.py ChoiceBox.py SimpleSummary.py Processing.py \
+	Console.py InputBox.py ChoiceBox.py SimpleSummary.py Processing.py QuadPiP.py \
 	TimerSelection.py Timeshift.py PictureInPicture.py Picon.py TimeDateInput.py VideoMode.py \
 	SubtitleDisplay.py SubservicesQuickzap.py ParentalControlSetup.py NumericalTextInputHelpDialog.py \
 	SleepTimerEdit.py Opkg.py RdsDisplay.py Globals.py RestartNetwork.py RTLSDRSetup.py \
