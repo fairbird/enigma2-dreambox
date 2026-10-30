@@ -833,7 +833,7 @@ class FlashImage(Screen, ProtectedScreen):
 				self["info"].setText(self.imageName)
 				self["summary_header"].setText(self["header"].getText())
 				downloadURL = resolveMediafireLink(self.source)
-				self.downloader = downloadWithProgress(downloadURL.replace(" ", "%20"), self.zippedImage)
+				self.downloader = DownloadWithProgress(downloadURL.replace(" ", "%20"), self.zippedImage)
 				self.downloader.addProgress(self.downloadProgress)
 				self.downloader.addEnd(self.downloadEnd)
 				self.downloader.addError(self.downloadError)
