@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
+from weakref import ref as weakrefRef
+
 from Screens.Screen import Screen
 from Screens.Dish import Dishpip
 from enigma import ePoint, eSize, eRect, eServiceCenter, getBestPlayableServiceReference, eServiceReference, eTimer
+from Components.ParentalControl import parentalControl
 from Components.SystemInfo import BoxInfo
 from Components.VideoWindow import VideoWindow
 from Components.Sources.StreamService import StreamServiceList
@@ -61,6 +64,7 @@ class PictureInPicture(Screen):
 		self.pipActive = session.instantiateDialog(PictureInPictureZapping)
 		self.dishpipActive = session.instantiateDialog(Dishpip)
 		self.currentService = None
+		self.parentalControlService = None
 		self.currentServiceReference = None
 		self.noSkinReload = True
 		self.isCurrentStreamRelay = None
@@ -184,11 +188,22 @@ class PictureInPicture(Screen):
 	def getModeName(self):
 		return self.choicelist[config.av.pip_mode.index][1]
 
-	def playService(self, service):
+	def playService(self, service, checkParentalControl=True):
+		pipReference = weakrefRef(self)  # A pending PIN must not keep a closed PiP and its decoder alive.
+
+		def playAfterPin(ref, forceRestart=False):
+			pip = pipReference()
+			if pip is not None and getattr(pip.session, "pip", None) is pip and pip.parentalControlService == ref:
+				pip.playService(ref, checkParentalControl=False)
+
+		self.parentalControlService = service
 		if service is None:
 			self.session.nav.pnav.clearPiPService()
 			return 0
-		from Screens.InfoBarGenerics import streamrelay
+		if checkParentalControl and not parentalControl.isServicePlayable(service, playAfterPin):
+			return 0
+		self.parentalControlService = None
+		from Screens.InfoBarGenerics import streamrelay  # Avoid the circular import through InfoBarPiP.
 		orig_ref = self.resolveAlternatePipService(service)
 		ref = streamrelay.streamrelayChecker(self.resolveAlternatePipService(service))[0]
 		if ref:
