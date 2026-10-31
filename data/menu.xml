@@ -179,7 +179,7 @@ self.session.openWithCallback(msgClosed, EpgDeleteMsg)
 				<item key="manage_plugins" level="0" text="Manage extensions" description="Manage extensions or plugins for your receiver" weight="10"><screen module="PluginBrowser" screen="PackageAction">3</screen></item>
 				<item key="software_update" level="0" text="Software Update" description="Online update of your %s %s software." weight="11"><screen module="SoftwareUpdate" screen="SoftwareUpdate" /></item>
 				<item key="flash_online" level="0" text="Flash Online" description="Download and flash images on your %s %s." weight="13"><screen module="FlashManager" screen="FlashManager" /></item>
-				<item key="backup_image" level="0" text="Image Backup" description="Backup your running %s %s image to HDD or USB." weight="14" requires="ImageBackup"><screen module="ImageBackup" screen="ImageBackup" /></item>
+				<item key="backup_image" level="0" text="Image Backup" description="Backup your running %s %s image to HDD or USB." weight="14" requires="ImageBackup"><plugin system="SoftwareManager" screen="ImageBackup" /></item>
 				<item key="multiboot" level="0" text="MultiBoot Manager" description="Maintain your multi boot device." weight="15" requires="canMultiBoot"><screen module="MultiBootManager" screen="MultiBootManager" /></item>
 				<item key="backup_system" level="0" text="Backup System Settings" description="Backup your %s %s settings." weight="16"><plugin system="SoftwareManager" screen="BackupHelper">1</plugin></item>
 				<item key="restore_system" level="0" text="Restore System Settings" description="Restore your %s %s settings." weight="17"><plugin system="SoftwareManager" screen="BackupHelper">2</plugin></item>
