@@ -226,9 +226,11 @@ class ChannelContextMenu(Screen):
 			# skip all normal/plugin menu building entirely while in multi-select mode,
 			# so no plugin (e.g. WHERE_CHANNEL_CONTEXT_MENU entries) can inject itself here
 			self.removeFunction = self.removeCurrentService
-			append_when_current_valid(current, menu, (_("Move selection to bouquet"), self.moveChannelsToBouquetSelected), level=0, key="9")
+			if self.inBouquet:
+				append_when_current_valid(current, menu, (_("Move selection to bouquet"), self.moveChannelsToBouquetSelected), level=0, key="9")
 			append_when_current_valid(current, menu, (_("Copy selection to bouquet"), self.copyChannelsToBouquetSelected), level=0, key="0")
-			append_when_current_valid(current, menu, (_("Remove selection from bouquet"), self.removeEntry), level=0, key="8")
+			removeLabel = _("Remove selection from bouquet") if self.inBouquet else _("Remove selected services")
+			append_when_current_valid(current, menu, (removeLabel, self.removeEntry), level=0, key="8")
 			append_when_current_valid(current, menu, (_("Cancel selection"), self.cancelChannelMoveSelect), level=0, key="7")
 			self["menu"] = ChoiceList(menu)
 			# some plugins (e.g. TMBD) monkey-patch this whole __init__ and insert their
@@ -312,6 +314,8 @@ class ChannelContextMenu(Screen):
 							append_when_current_valid(current, menu, (_("Play in main window"), self.playMain), level=0, key="red")
 						else:
 							append_when_current_valid(current, menu, (_("Play as Picture in Picture"), self.showServiceInPiP), level=0, key="blue")
+					if not self.inBouquet and not csel.isSubservices():
+						append_when_current_valid(current, menu, (_("Enable multi selection"), self.startChannelMoveSelect), level=0, key="9")
 					append_when_current_valid(current, menu, (_("Find currently playing service"), self.findCurrentlyPlayed), level=0, key="3")
 				else:
 					if 'FROM SATELLITES' in current_root.getPath() and current and _("Services") in eServiceCenter.getInstance().info(current).getName(current):
@@ -1479,6 +1483,12 @@ class ChannelSelectionEdit:
 						mutableList.removeService(ref)
 				mutableList.flushChanges()
 				self.servicelist.resetRoot()
+			else:
+				db = eDVBDB.getInstance()
+				for ref in refs:
+					if ref.valid():
+						db.removeService(ref)
+				refreshServiceList()
 			self.cancelChannelMoveSelect()
 			return
 		ref = self.servicelist.getCurrent()
@@ -1604,7 +1614,7 @@ class ChannelSelectionEdit:
 		if not self.channelsToMove:
 			self.cancelChannelMoveSelect()
 			return
-		self.channelMoveIsCopy = not doMove
+		self.channelMoveIsCopy = not doMove or self.getMutableList() is None
 		srcBouquet = self.getRoot()
 		bouquets = [b for b in self.collectBouquetFolders(self.bouquet_root) if not (srcBouquet and b[1].toString() == srcBouquet.toString())]
 		if bouquets:
