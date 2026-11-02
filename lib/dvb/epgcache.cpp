@@ -169,15 +169,15 @@ eventData::eventData(const eit_event_struct* e, int size, int _type, int tsidoni
 					bool isCyrillic = (table == 5) ? true : false;
 
 					int eventNameLen = descr[5];
-					int textLen = descr[6 + eventNameLen];
+					int eventTextLen = descr[6 + eventNameLen];
 
 					//convert our strings to UTF8
 					std::string eventNameUTF8 = convertDVBUTF8((const unsigned char*)&descr[6], eventNameLen, table, tsidonid);
-					std::string eventText((const char*)&descr[7 + eventNameLen], textLen);
+					std::string eventText((const char*)&descr[7 + eventNameLen], eventTextLen);
 
 					if (!isCyrillic)
 					{
-						eventText = convertDVBUTF8((const unsigned char*)&descr[7 + eventNameLen], textLen, table, tsidonid);
+						eventText = convertDVBUTF8((const unsigned char*)&descr[7 + eventNameLen], eventTextLen, table, tsidonid);
 						//hack to fix split titles
 						undoAbbreviation(eventNameUTF8, eventText);
 						removePrefixesFromEventName(eventNameUTF8, eventText);
@@ -422,7 +422,7 @@ static pthread_mutex_t cache_lock =
 DEFINE_REF(eEPGCache)
 
 eEPGCache::eEPGCache()
-	:messages(this,1, "eEPGCache"), m_running(false), m_enabledEpgSources(0), cleanTimer(eTimer::create(this)), m_timeQueryRef(nullptr)
+	:messages(this,1,"eEPGCache"), m_running(false), m_enabledEpgSources(0), cleanTimer(eTimer::create(this)), m_timeQueryRef(nullptr)
 {
 	eDebug("[eEPGCache] Initialized EPGCache (wait for setCacheFile call now)");
 
@@ -2649,30 +2649,30 @@ PyObject *eEPGCache::search(ePyObject arg)
 							it != eventData::descriptors.end(); ++it)
 						{
 							uint8_t *data = it->second.data;
-							ssize_t textlen = 0;
+							ssize_t eventTextLen = 0;
 							const char *textptr = NULL;
 							if ( data[0] == SHORT_EVENT_DESCRIPTOR && querytype > 0 && querytype < 5 )
 							{
 								textptr = (const char*)&data[6];
-								textlen = data[5];
+								eventTextLen = data[5];
 								if (data[6] < 0x20)
 								{
 									/* custom encoding */
-									text = convertDVBUTF8((unsigned char*)textptr, textlen, 0x40, 0);
+									text = convertDVBUTF8((unsigned char*)textptr, eventTextLen, 0x40, 0);
 									textptr = text.data();
-									textlen = text.length();
+									eventTextLen = text.length();
 								}
 							}
 							else if ( data[0] == EXTENDED_EVENT_DESCRIPTOR && querytype == 5 )
 							{
 								textptr = (const char*)&data[8];
-								textlen = data[7];
+								eventTextLen = data[7];
 								if (data[8] < 0x20)
 								{
 									/* custom encoding */
-									text = convertDVBUTF8((unsigned char*)textptr, textlen, 0x40, 0);
+									text = convertDVBUTF8((unsigned char*)textptr, eventTextLen, 0x40, 0);
 									textptr = text.data();
-									textlen = text.length();
+									eventTextLen = text.length();
 								}
 							}
 							else if ( data[0] == CONTENT_IDENTIFIER_DESCRIPTOR && querytype == 6 )
@@ -2694,48 +2694,48 @@ PyObject *eEPGCache::search(ePyObject arg)
 								}
 							}
 							/* if we have a descriptor, the argument may not be bigger */
-							if (textlen > 0 && strlen <= textlen )
+							if (eventTextLen > 0 && strlen <= eventTextLen )
 							{
 								if (querytype == 1)
 								{
 									/* require exact text match */
-									if (textlen != strlen)
+									if (eventTextLen != strlen)
 										continue;
 								}
 								else if (querytype == 3)
 								{
 									/* Do a "startswith" match by pretending the text isn't that long */
-									textlen = strlen;
+									eventTextLen = strlen;
 								}
 								else if (querytype == 4)
 								{
 									/* Offset to adjust the pointer based on the text length difference */
-									textptr = textptr + textlen - strlen;
-									textlen = strlen;
+									textptr = textptr + eventTextLen - strlen;
+									eventTextLen = strlen;
 								}
 								if (casetype)
 								{
-									while (textlen >= strlen)
+									while (eventTextLen >= strlen)
 									{
 										if (!strncasecmp(textptr, str, strlen))
 										{
 											descr.push_back(it->first);
 											break;
 										}
-										textlen--;
+										eventTextLen--;
 										textptr++;
 									}
 								}
 								else
 								{
-									while (textlen >= strlen)
+									while (eventTextLen >= strlen)
 									{
 										if (!memcmp(textptr, str, strlen))
 										{
 											descr.push_back(it->first);
 											break;
 										}
-										textlen--;
+										eventTextLen--;
 										textptr++;
 									}
 								}
