@@ -1021,7 +1021,7 @@ void eEPGCache::load()
 		int cnt=0;
 		unsigned int magic=0;
 		unlink(EPGDAT_IN_FLASH);/* Don't keep it around when in flash */
-		ret = fread( &magic, sizeof(int), 1, f);
+		ret = fread(&magic, sizeof(int), 1, f);
 		if (magic != 0x98765432)
 		{
 			eDebug("[eEPGCache] epg file has incorrect byte order.. do not  read it");
@@ -1029,7 +1029,7 @@ void eEPGCache::load()
 			return;
 		}
 		char text1[13];
-		ret = fread( text1, 13, 1, f);
+		ret = fread(text1, 13, 1, f);
 		if ( !memcmp( text1, "ENIGMA_EPG_V8", 13) )
 		{
 			singleLock s(cache_lock);
@@ -1037,29 +1037,29 @@ void eEPGCache::load()
 			{
 				clearCompleteEPGCache();
 			}
-			ret = fread( &size, sizeof(int), 1, f);
+			ret = fread(&size, sizeof(int), 1, f);
 			eventDB.rehash(size); /* Reserve buckets in advance */
 			while(size--)
 			{
 				uniqueEPGKey key;
 				int size=0;
-				ret = fread( &key, sizeof(uniqueEPGKey), 1, f);
-				ret = fread( &size, sizeof(int), 1, f);
+				ret = fread(&key, sizeof(uniqueEPGKey), 1, f);
+				ret = fread(&size, sizeof(int), 1, f);
 				EventCacheItem& item = eventDB[key]; /* Constructs new entry */
 				while(size--)
 				{
 					uint8_t len=0;
 					uint16_t type=0;
 					eventData *event=0;
-					ret = fread( &type, sizeof(uint16_t), 1, f);
-					ret = fread( &len, sizeof(uint8_t), 1, f);
+					ret = fread(&type, sizeof(uint16_t), 1, f);
+					ret = fread(&len, sizeof(uint8_t), 1, f);
 					event = new eventData(0, len, type);
 					event->n_crc = (len-10) / sizeof(uint32_t);
-					ret = fread( event->rawEITdata, 10, 1, f);
+					ret = fread(event->rawEITdata, 10, 1, f);
 					if (event->n_crc)
 					{
 						event->crc_list = new uint32_t[event->n_crc];
-						ret = fread( event->crc_list, sizeof(uint32_t), event->n_crc, f);
+						ret = fread(event->crc_list, sizeof(uint32_t), event->n_crc, f);
 					}
 					eventData::CacheSize += sizeof(eventData) + event->n_crc * sizeof(uint32_t);
 					item.byEvent[event->getEventID()] = event;
@@ -1071,31 +1071,31 @@ void eEPGCache::load()
 			eDebug("[eEPGCache] %d events read from %s", cnt, EPGDAT);
 #ifdef ENABLE_PRIVATE_EPG
 			char text2[11];
-			ret = fread( text2, 11, 1, f);
+			ret = fread(text2, 11, 1, f);
 			if ( !memcmp( text2, "PRIVATE_EPG", 11) )
 			{
 				size=0;
-				ret = fread( &size, sizeof(int), 1, f);
+				ret = fread(&size, sizeof(int), 1, f);
 				while(size--)
 				{
 					int size=0;
 					uniqueEPGKey key;
-					ret = fread( &key, sizeof(uniqueEPGKey), 1, f);
+					ret = fread(&key, sizeof(uniqueEPGKey), 1, f);
 					eventMap &evMap = eventDB[key].byEvent;
-					ret = fread( &size, sizeof(int), 1, f);
+					ret = fread(&size, sizeof(int), 1, f);
 					while(size--)
 					{
 						int size;
 						int content_id;
-						ret = fread( &content_id, sizeof(int), 1, f);
-						ret = fread( &size, sizeof(int), 1, f);
+						ret = fread(&content_id, sizeof(int), 1, f);
+						ret = fread(&size, sizeof(int), 1, f);
 						while(size--)
 						{
 							time_t time1, time2;
 							uint16_t event_id;
-							ret = fread( &time1, sizeof(time_t), 1, f);
-							ret = fread( &time2, sizeof(time_t), 1, f);
-							ret = fread( &event_id, sizeof(uint16_t), 1, f);
+							ret = fread(&time1, sizeof(time_t), 1, f);
+							ret = fread(&time2, sizeof(time_t), 1, f);
+							ret = fread(&event_id, sizeof(uint16_t), 1, f);
 							content_time_tables[key][content_id][time1]=std::pair<time_t, uint16_t>(time2, event_id);
 							eventMap::iterator it =
 								evMap.find(event_id);
@@ -3200,7 +3200,7 @@ void eEPGCache::crossepgImportEPGv21(std::string dbroot)
 	}
 
 	/* read headers */
-	fread (tmp, 13, 1, headers);
+	ret = fread(tmp, 13, 1, headers);
 	if (memcmp (tmp, "_xEPG_HEADERS", 13) != 0)
 	{
 		eDebug("[EPGC] crossepg db invalid magic");
@@ -3210,7 +3210,7 @@ void eEPGCache::crossepgImportEPGv21(std::string dbroot)
 		return;
 	}
 
-	fread (&revision, sizeof (unsigned char), 1, headers);
+	ret = fread(&revision, sizeof (unsigned char), 1, headers);
 	if (revision != 0x07)
 	{
 		eDebug("[EPGC] crossepg db invalid revision");
@@ -3221,7 +3221,7 @@ void eEPGCache::crossepgImportEPGv21(std::string dbroot)
 	}
 
 	/* read aliases */
-	fread (tmp, 13, 1, aliases);
+	ret = fread(tmp, 13, 1, aliases);
 	if (memcmp (tmp, "_xEPG_ALIASES", 13) != 0)
 	{
 	eDebug("[EPGC] crossepg aliases db invalid magic");
@@ -3230,7 +3230,7 @@ void eEPGCache::crossepgImportEPGv21(std::string dbroot)
 		fclose(aliases);
 		return;
 	}
-	fread (&revision, sizeof (unsigned char), 1, aliases);
+	ret = fread(&revision, sizeof (unsigned char), 1, aliases);
 	if (revision != 0x07)
 	{
 		eDebug("[EPGC] crossepg aliases db invalid revision");
@@ -3240,7 +3240,7 @@ void eEPGCache::crossepgImportEPGv21(std::string dbroot)
 		return;
 	}
 
-	fread(&aliases_groups_count, sizeof (int), 1, aliases);
+	ret = fread(&aliases_groups_count, sizeof (int), 1, aliases);
 	epgdb_aliases_t all_aliases[aliases_groups_count];
 	for (int i=0; i<aliases_groups_count; i++)
 	{
@@ -3248,17 +3248,17 @@ void eEPGCache::crossepgImportEPGv21(std::string dbroot)
 		unsigned char aliases_count;
 		epgdb_channel_t channel;
 
-		fread(&channel, sizeof (epgdb_channel_t), 1, aliases);
+		ret = fread(&channel, sizeof (epgdb_channel_t), 1, aliases);
 		all_aliases[i].nid[0] = channel.nid;
 		all_aliases[i].tsid[0] = channel.tsid;
 		all_aliases[i].sid[0] = channel.sid;
 
-		fread(&aliases_count, sizeof (unsigned char), 1, aliases);
+		ret = fread(&aliases_count, sizeof (unsigned char), 1, aliases);
 
 		for (j=0; j<aliases_count; j++)
 		{
 			epgdb_channel_t alias;
-			fread(&alias, sizeof (epgdb_channel_t), 1, aliases);
+			ret = fread(&alias, sizeof (epgdb_channel_t), 1, aliases);
 
 			if (j < 63) // one lost from the channel
 			{
@@ -3279,21 +3279,21 @@ void eEPGCache::crossepgImportEPGv21(std::string dbroot)
 
 	/* import data */
 	fseek(headers, sizeof(time_t)*2, SEEK_CUR);
-	fread (&channels_count, sizeof (int), 1, headers);
+	ret = fread(&channels_count, sizeof (int), 1, headers);
 
 	for (int i=0; i<channels_count; i++)
 	{
 		int titles_count;
 		epgdb_channel_t channel;
 
-		fread(&channel, sizeof(epgdb_channel_t), 1, headers);
-		fread(&titles_count, sizeof (int), 1, headers);
+		ret = fread(&channel, sizeof(epgdb_channel_t), 1, headers);
+		ret = fread(&titles_count, sizeof (int), 1, headers);
 		for (int j=0; j<titles_count; j++)
 		{
 			epgdb_title_t title;
 			__u8 data[EIT_LENGTH];
 
-			fread(&title, sizeof(epgdb_title_t), 1, headers);
+			ret = fread(&title, sizeof(epgdb_title_t), 1, headers);
 
 			eit_t *data_eit = (eit_t*)data;
 			data_eit->table_id = 0x50;
@@ -3347,7 +3347,7 @@ void eEPGCache::crossepgImportEPGv21(std::string dbroot)
 				data_tmp++;
 			}
 			fseek(descriptors, title.description_seek, SEEK_SET);
-			fread(data_tmp, title.description_length, 1, descriptors);
+			ret = fread(data_tmp, title.description_length, 1, descriptors);
 			data_tmp += title.description_length;
 			*data_tmp = 0;
 			++data_tmp;
@@ -3358,9 +3358,9 @@ void eEPGCache::crossepgImportEPGv21(std::string dbroot)
 			data_tmp[3] = 0;
 			data_tmp += 4;
 
-			fread(data_tmp, title.description_length, 1, descriptors);
+			ret = fread(data_tmp, title.description_length, 1, descriptors);
 
-			int current_loop_length = data_tmp - (__u8*)data_eit_short_event;
+			int current_loop_length = data_tmp - (uint8_t*)data_eit_short_event;
 			static const int overhead_per_descriptor = 9;
 			static const int MAX_LEN = 256 - overhead_per_descriptor;
 
@@ -3369,7 +3369,7 @@ void eEPGCache::crossepgImportEPGv21(std::string dbroot)
 
 			char *ldescription = new char[title.long_description_length];
 			fseek(descriptors, title.long_description_seek, SEEK_SET);
-			fread(ldescription, title.long_description_length, 1, descriptors);
+			ret = fread(ldescription, title.long_description_length, 1, descriptors);
 
 			int last_descriptor_number = (title.long_description_length + MAX_LEN-1) / MAX_LEN - 1;
 			int remaining_text_length = title.long_description_length - last_descriptor_number * MAX_LEN;
