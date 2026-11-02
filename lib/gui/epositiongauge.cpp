@@ -246,10 +246,6 @@ int ePositionGauge::event(int event, void *data, void *data2)
 		eWidget::event(event, data, data2);
 		updatePosition();
 		return 0;
-	case evtChangedSize:
-		eWidget::event(event, data, data2);
-		updatePosition();
-		return 0;
 	default:
 		return eWidget::event(event, data, data2);
 	}
