@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 from time import localtime
-from Components.PerServiceDisplay import PerServiceDisplay, PerServiceBase
+
+from enigma import ePositionGauge, eTimer, iPlayableService
+
 from Components.GUIComponent import GUIComponent
-from enigma import eTimer, iPlayableService, ePositionGauge
+from Components.PerServiceDisplay import PerServiceBase, PerServiceDisplay
 
 
 class ServicePosition(PerServiceDisplay):
@@ -21,7 +23,6 @@ class ServicePosition(PerServiceDisplay):
 		self.updateTimer.callback.append(self.update)
 		self.type = type
 		self.relative_base = 0
-#		self.setType(type)
 
 	def newService(self):
 		self.setType(self.type)
@@ -111,14 +112,14 @@ class ServicePositionGauge(PerServiceBase, GUIComponent):
 		service = self.navcore.getCurrentService()
 		seek = service and service.seek()
 		if seek is None:
-			return (0, 0)
+			return 0, 0
 
 		lVal = seek.getLength()
 		pos = seek.getPlayPosition()
 
 		if lVal[0] or pos[0]:
-			return (0, 0)
-		return (lVal[1], pos[1])
+			return 0, 0
+		return lVal[1], pos[1]
 
 	def poll(self):
 		data = self.get()
