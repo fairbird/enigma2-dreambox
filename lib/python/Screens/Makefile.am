@@ -6,7 +6,7 @@ install_PYTHON = \
 	MovieSelection.py Setup.py Information.py HarddiskSetup.py FixedMenu.py FlashExpander.py \
 	Satconfig.py ScanSetup.py NetworkSetup.py Ci.py TimerEntry.py Volume.py VolumeControl.py \
 	EpgSelection.py EventView.py Standby.py ServiceInfo.py NetworkServices.py NetworkMounts.py \
-	InfoBarGenerics.py HelpMenu.py Wizard.py __init__.py UserManual.py \
+	InfoBarGenerics.py HelpMenu.py Wizard.py __init__.py UserManual.py DateTime.py \
 	Dish.py DABScan.py LocaleSelection.py WizardStart.py PiPSetup.py \
 	PluginBrowser.py MinuteInput.py Scart.py PVRState.py ScreenProtection.py \
 	Console.py InputBox.py ChoiceBox.py SimpleSummary.py Processing.py QuadPiP.py \
@@ -17,4 +17,4 @@ install_PYTHON = \
 	TextBox.py FactoryReset.py Recording.py UnhandledKey.py ServiceStopScreen.py SwapManager.py \
 	InputDeviceSetup.py DVD.py SoftwareUpdate.py AutoDiseqc.py WizardInstall.py ScreenSaver.py \
 	Hotkey.py StreamingClientsInfo.py SoftcamSetup.py FlashManager.py SetupFallbacktuner.py WizardVideo.py \
-	SkinSelector.py LogManager.py OScamInfo.py Time.py CronTimer.py OSDCalibration.py Toast.py HDMICEC.py
+	SkinSelector.py LogManager.py OScamInfo.py CronTimer.py OSDCalibration.py Toast.py HDMICEC.py

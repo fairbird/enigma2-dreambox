@@ -16,6 +16,7 @@ from Components.About import about
 from Components.ActionMap import HelpableActionMap
 from Components.config import config
 from Components.Console import Console
+from Components.DateTimes import dateTimes
 from Components.Harddisk import harddiskmanager
 from Components.InputDevice import remoteControl
 from Components.Label import Label
@@ -359,12 +360,14 @@ class InformationCommit(InformationBase):
 				info = []
 				for data in log:
 					if git == API_GITHUB:
-						date = datetime.strptime(data["commit"]["committer"]["date"], "%Y-%m-%dT%H:%M:%SZ").strftime(f"{config.usage.date.daylong.value} {config.usage.time.long.value}")
+						commitTime = datetime.strptime(data["commit"]["committer"]["date"], "%Y-%m-%dT%H:%M:%SZ").timetuple()
+						date = f"{dateTimes.getDateShortDayShortMonth(commitTime)} {dateTimes.getTime(commitTime)}"
 						author = data["commit"]["author"]["name"]
 						# committer = data["commit"]["committer"]["name"]
 						message = [x.rstrip() for x in data["commit"]["message"].split("\n")]
 					elif git == API_GITLAB:
-						date = datetime.strptime(data['committed_date'], '%Y-%m-%dT%H:%M:%S.000%z').strftime(f"{config.usage.date.daylong.value} {config.usage.time.long.value}")
+						commitTime = datetime.strptime(data['committed_date'], '%Y-%m-%dT%H:%M:%S.000%z').timetuple()
+						date = f"{dateTimes.getDateShortDayShortMonth(commitTime)} {dateTimes.getTime(commitTime)}"
 						author = data['author_name']
 						message = [x.rstrip() for x in data["title"].split("\n")]
 					if info:

@@ -488,15 +488,6 @@
 		<item level="0" text="User Feed URL" description="Enter your personal feed URL to allow you to select packages from your personal feed.">config.pluginfilter.userfeed</item>
 		<item level="0" text="Use alternate GitHub DNS" description="Select 'Yes' to use alternate GitHub feed IP addresses. This can be helpful if you use a VPN and the normal feeds can't be accessed via the published DNS names.">config.usage.alternateGitHubDNS</item>
 	</setup>
-	<setup key="Time" title="Time Setup">
-		<item level="0" text="Time zone area" description="Select your time zone area or region.\n\nOr Press YELLOW to set the time zone via geolocation.">config.timezone.area</item>
-		<item level="0" text="Time zone" description="Select the time zone within the area or region.">config.timezone.val</item>		
-		<item level="0" text="Sync time using" description="Synchronize system time using transponder or Internet.">config.misc.SyncTimeUsing</item>
-		<item level="0" text="NTP server" conditional="config.misc.SyncTimeUsing.value == '1'" description="Configure your NTP server.">config.misc.NTPserver</item>
-		<item level="0" text="Sync NTP every (minutes)" conditional="config.misc.SyncTimeUsing.value == '1'" description="Setup network time synchronization interval.">config.misc.useNTPminutes</item>
-		<item level="0" text="Date style" description="Choose the display formatting style for dates. 'D' / 'DD' is the date and 'M' / 'MM' is the month in digits.  ('DD' and 'MM' have leading zeros for single digit values.) The screen display will be based on your choice but can be influenced by the skin." requires="config.usage.date.enabled">config.usage.date.dayfull</item>
-		<item level="0" text="Time style" description="Choose the display formatting style for times. 'H' / 'HH' is the hour for a 24 hour clock, 'h' / 'hh' is the hour for a 12 hour clock, 'mm' is the minutes and 'ss' is the seconds.  ('HH' and 'hh' have leading zeros for single digit values.) The screen display will be based on your choice but can be influenced by the skin." requires="config.usage.time.enabled">config.usage.time.long</item>
-	</setup>
 	<setup key="DNS" title="DNS Settings">
 		<item level="0" text="Hostname" description="Enter the network hostname to be used to identify this receiver.">self.hostname</item>
 		<item level="0" text="Domain name" description="Enter the network domain name suffix to be added to the hostname above. This helps the DNS resolver find other network devices on the network.">config.usage.dnsSuffix</item>
@@ -552,6 +543,42 @@
 	<setup key="ChkrootSlotManager" title="Slot Manager">
 		<item level="0" text="Target location" description="Choose the target device for the slots.">self.ChkrootSlotManagerLocation</item>
 		<item level="0" text="Slot count" description="Choose the amount of additional slots." conditional="self.ChkrootSlotManagerLocation.value">self.ChkrootSlotManagerSlots</item>
+	</setup>
+	<setup key="DateTime" title="Date and Time Settings" showOpenWebif="yes">
+		<item level="0" text="Time zone area" description="Select your time zone area or region.">config.timezone.area</item>
+		<item level="0" text="Time zone" description="Select the time zone within the area or region.">config.timezone.val</item>
+		<item level="0" text="Sync time using" description="Synchronize system time using transponder or Internet.">config.misc.SyncTimeUsing</item>
+		<if conditional="config.misc.SyncTimeUsing.value == '1'">
+			<item level="0" text="NTP server" description="Configure your NTP server.">config.misc.NTPserver</item>
+			<item level="0" text="Sync NTP every" description="Setup network time synchronization interval.">config.misc.useNTPminutes</item>
+		</if>
+		<if requires="config.usage.date.enabled">
+			<item level="0" text="Date Format" />
+			<item level="0" text="Date style" description="Select the style for displaying dates." indent="1">config.usage.date.layout</item>
+			<item level="0" text="Day display style" description="Select the display style for day of the week. The screen display will be based on your choice but can be influenced by the skin." indent="1">config.usage.date.dayFormat</item>
+			<item level="0" text="Day separator" description="Select the separator between the day and the date elements." indent="1" conditional="config.usage.date.dayFormat.value">config.usage.date.daySeparator</item>
+			<if conditional="config.usage.date.layout.value == '%A+%d=%m#%Y'">
+				<item level="0" text="Date display style" description="Select the display style for dates. The screen display will be based on your choices but can be influenced by the skin." indent="1">config.usage.date.dateFormat</item>
+			<else />
+				<item level="0" text="Month display style" description="Select the display style for months. The screen display will be based on your choices but can be influenced by the skin." indent="1">config.usage.date.monthFormat</item>
+			</if>
+			<item level="0" text="First separator" description="Select the separator between the first two date elements." indent="1">config.usage.date.firstSeparator</item>
+			<if conditional="config.usage.date.layout.value == '%A+%d=%m#%Y'">
+				<item level="0" text="Month display style" description="Select the display style for months. The screen display will be based on your choices but can be influenced by the skin." indent="1">config.usage.date.monthFormat</item>
+			<else />
+				<item level="0" text="Date display style" description="Select the display style for dates. The screen display will be based on your choices but can be influenced by the skin." indent="1">config.usage.date.dateFormat</item>
+			</if>
+			<item level="0" text="Second separator" description="Select the separator between the second two date elements." indent="1">config.usage.date.secondSeparator</item>
+			<item level="0" text="Suffix character" description="Select the suffix character to be appended to the date string. This is used for some locales." indent="1">config.usage.date.suffix</item>
+			<item level="0" text="Time separator" description="Select the separator between the date and the time elements." indent="1">config.usage.date.timeSeparator</item>
+		</if>
+		<if requires="config.usage.time.enabled">
+			<item level="0" text="Time Format" />
+			<item level="0" text="Hour display style" description="Select the display style for hours/times." indent="1">config.usage.time.hourFormat</item>
+			<item level="0" text="Meridiem (AM/PM) display" description="Select the AM/PM indication for a 12 hour clock. This is ignored for a 24 hour clock." indent="1" requires="config.usage.time.meridiemActive">config.usage.time.meridiemFormat</item>
+			<item level="0" text="Display seconds" description="When enabled, seconds will be shown in time displays. The seconds display will be based on your selection but will be influenced by code and space requirements and the skin." indent="1">config.usage.time.secondsFormat</item>
+			<item level="0" text="Time separator" description="Select the separator between the time elements." indent="1">config.usage.time.separator</item>
+		</if>
 	</setup>
 	<setup key="GPTSlotManager" title="Slot Manager">
 		<item level="0" text="Target location" description="Choose the target device for the slots.">self.GPTSlotManagerLocation</item>
@@ -828,8 +855,6 @@
 	</setup>
 	<setup key="FrontDisplay" title="Display Setup" requires="FrontpanelDisplay">
 		<item level="0" text="Use separate picon pack for front panel display" description="Use piconlcd directory for picons on color LCD">config.lcd.picon_pack</item>
-		<item level="0" text="Date style" description="Choose the front panel display formatting style for dates. 'D' / 'DD' is the date and 'M' / 'MM' is the month in digits.  ('DD' and 'MM' have leading zeros for single digit values.) The screen display will be based on your choice but can be influenced by the skin." requires="config.usage.date.enabled_display">config.usage.date.display</item>
-		<item level="0" text="Time style" description="Choose the front panel display formatting style for times. 'H' / 'HH' is the hour for a 24 hour clock, 'h' / 'hh' is the hour for a 12 hour clock, 'mm' is the minutes.  ('HH' and 'hh' have leading zeros for single digit values.) The front panel display will be based on your choice but can be influenced any applicable skin." requires="config.usage.time.enabled_display">config.usage.time.display</item>
 		<item level="1" requires="ConfigDisplay" text="Show Time Remaining/Elapsed" description="This option allows you choose how to display remaining time, or elapsed time, or both.">config.usage.swap_time_remaining_on_vfd</item>
 		<item level="1" requires="ConfigDisplay" text="Show Transponder Remaining/Elapsed as" description="This option allows you choose how to display the remaining/elapsed time for live TV.">config.usage.swap_time_display_on_vfd</item>
 		<item level="1" requires="ConfigDisplay" text="Show Media playback Remaining/Elapsed as" description="This option allows you to choose how to display the remaining/elapsed time for Media playback.">config.usage.swap_media_time_display_on_vfd</item>

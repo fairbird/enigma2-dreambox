@@ -83,7 +83,7 @@
 				<menu key="gui" level="0" text="GUI Settings" description="This menu contains GUI settings.">
 					<item key="locale_setup" level="0" text="Locale / Language Settings" description="This options for language setup."><screen module="LocaleSelection"/></item>
 					<!-- Menu / Setup / Time -->
-					<item key="time_setup" level="0" text="Time" description="This options for time setup." weight="50"><screen module="Time" screen="Time" /></item>
+					<item key="datetime_setup" level="0" text="Date and Time Settings" description="This options for time setup." weight="50"><screen module="DateTime" screen="DateTime" /></item>
 					<item key="user_interface" level="0" text="User Interface" description="This options for user interface setup." ><setup setupKey="UserInterface"/></item>
 					<item key="usage_setup" level="0" text="Customize" description="This options for usage setup."><setup setupKey="Usage"/></item>
 					<item key="picon_setup" level="0" text="Picon Settings" weight="26" description="This options for Picon Settings."><screen module="Picon" screen="PiconSettings" /></item>

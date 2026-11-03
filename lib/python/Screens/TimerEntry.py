@@ -10,6 +10,7 @@ from Components.Sources.StaticText import StaticText
 from Components.Button import Button
 from Components.Pixmap import Pixmap
 from Components.Label import Label
+from Components.DateTimes import dateTimes
 from Components.NimManager import nimmanager
 from Components.SystemInfo import BoxInfo
 from Components.UsageConfig import defaultMoviePath
@@ -603,7 +604,7 @@ class TimerLog(Screen):
 		self.updateText()
 
 	def fillLogList(self):
-		self.list = [(str(strftime(config.usage.date.daylong.value + " " + config.usage.time.short.value, localtime(x[0])) + " - " + x[2]), x) for x in self.log_entries]
+		self.list = [(str(strftime(dateTimes.dateTimeShortDayShortMonthNoSeconds, localtime(x[0])) + " - " + x[2]), x) for x in self.log_entries]
 
 	def clearLog(self):
 		self.log_entries = []
