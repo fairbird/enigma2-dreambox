@@ -1,8 +1,8 @@
 <wizard>
-	<step id="inputselection" nextstep="modesdetection" timeout="10" timeoutaction="selectnext">
+	<step id="inputselection" nextstep="modedefault" timeout="10" timeoutaction="selectnext">
 		<condition>
 self.portCount = len(self.listPorts())
-self.condition = self.portCount > 1
+self.condition = True
 if self.portCount == 1:
 	self.selection = "HDMI"
 	self.portSelectionMoved()
@@ -16,7 +16,7 @@ self.selectKey("OK")
 		</code>
 	</step>
 
-	<step id="modesdetection" >
+	<!--step id="modesdetection" >
 		<condition>
 self.condition = (self.port == "DVI" or self.port == "HDMI")
 		</condition>
@@ -31,7 +31,7 @@ self.clearSelectedKeys()
 self.selectKey("UP")
 self.selectKey("DOWN")
 		</code>
-	</step>
+	</step-->
 
 	<step id="modedefault" timeoutstep="modeselection" timeout="1" timeoutaction="changestep">
 		<condition>
