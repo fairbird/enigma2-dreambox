@@ -370,7 +370,7 @@ void eFilePushThread::pause()
 		return;
 	}
 	/* Set thread into a paused state by setting m_stop to 2 and wait
-	* for the thread to acknowledge. */
+	 * for the thread to acknowledge. */
 	eSingleLocker lock(m_run_mutex);
 	m_stop = 2;
 	sendSignal(SIGUSR1);
@@ -431,13 +431,13 @@ void eFilePushThread::filterRecordData(const unsigned char *data, int len)
 }
 
 eFilePushThreadRecorder::eFilePushThreadRecorder(unsigned char *buffer, size_t buffersize, int packetSize) : m_fd_source(-1),
-												m_buffersize(buffersize),
-												m_buffer(buffer),
-												m_overflow_count(0),
-												m_buffer_fill(0),
-												m_stop(1),
-												m_packetSize(packetSize),
-												m_messagepump(eApp, 0, "eFilePushThreadRecorder")
+																							 m_buffersize(buffersize),
+																							 m_buffer(buffer),
+																							 m_overflow_count(0),
+																							 m_buffer_fill(0),
+																							 m_stop(1),
+																							 m_packetSize(packetSize),
+																							 m_messagepump(eApp, 0, "eFilePushThreadRecorder")
 {
 	m_protocol = m_stream_id = m_session_id = m_packet_no = 0;
 	CONNECT(m_messagepump.recv_msg, eFilePushThreadRecorder::recvEvent);
@@ -469,13 +469,19 @@ int eFilePushThreadRecorder::writeBuffer()
 	size_t length = m_buffer_fill;
 	unsigned char tail[192];
 	size_t remainder = 0;
-	if (m_serviceFilter.active())
+	// Retain an incomplete TS packet across reads, including buffer rotation
+	// by asynchronous writes. A packet split over two writes reaches the
+	// recording, the stream and the descrambler as a sync loss, so pass on
+	// whole packets only and prepend the stub to the next buffer.
+	if (m_packetSize > 0 && static_cast<size_t>(m_packetSize) <= sizeof(tail))
 	{
-		// Retain an incomplete TS packet across reads, including buffer rotation
-		// by asynchronous writes. Never feed the same bytes to the filter twice.
 		remainder = length % m_packetSize;
 		length -= remainder;
 		memcpy(tail, m_buffer + length, remainder);
+	}
+	if (m_serviceFilter.active())
+	{
+		// Never feed the same bytes to the filter twice.
 		m_serviceFilter.process(m_buffer + m_filteredBytes, length - m_filteredBytes, m_packetSize);
 		m_filteredBytes = length;
 	}
@@ -558,7 +564,7 @@ int eFilePushThreadRecorder::read_ts(int fd, unsigned char *buf, int size)
 int eFilePushThreadRecorder::read_dmx(int fd, void *m_buffer, int size)
 {
 	unsigned char *buf;
-	int pos = 0, bytes = 0;
+	int it = 0, pos = 0, bytes = 0;
 	int max_pack = 42;
 	int i, left;
 	static int cnt;
@@ -587,6 +593,7 @@ int eFilePushThreadRecorder::read_dmx(int fd, void *m_buffer, int size)
 				eDebug("incomplete packet read from %d with size %d", fd, bytes);
 
 			m_packet_no++;
+			it++;
 			for (i = 0; i < bytes; i += 188)
 			{
 				b = buf + 16 + i;
@@ -694,8 +701,9 @@ void eFilePushThreadRecorder::thread()
 				int w = writeBuffer();
 				if (w < 0)
 				{
+					int error = errno;
 					eDebug("[eFilePushThreadRecorder] WRITE ERROR on timeout flush: %m");
-					sendEvent(evtWriteError);
+					_setWriteError(error);
 					break;
 				}
 			}
@@ -730,8 +738,9 @@ void eFilePushThreadRecorder::thread()
 					int w = writeBuffer();
 					if (w < 0)
 					{
+						int error = errno;
 						eDebug("[eFilePushThreadRecorder] WRITE ERROR on EAGAIN flush: %m");
-						sendEvent(evtWriteError);
+						_setWriteError(error);
 						break;
 					}
 				}
@@ -767,8 +776,9 @@ void eFilePushThreadRecorder::thread()
 #endif
 			if (w < 0)
 			{
+				int error = errno;
 				eDebug("[eFilePushThreadRecorder] WRITE ERROR, aborting thread: %m");
-				sendEvent(evtWriteError);
+				_setWriteError(error);
 				break;
 			}
 			if (w == 0)
@@ -781,9 +791,12 @@ void eFilePushThreadRecorder::thread()
 	}
 
 	/* Flush remaining data. */
-	if (m_buffer_fill > 0)
+	if (m_buffer_fill > 0 && !_writeError)
 	{
-		writeBuffer();
+		// A write of 0 is only an error while a whole packet is still waiting:
+		// the stub left over from packet alignment cannot be written at all.
+		if (int result = writeBuffer(); result < 0 || (result == 0 && m_buffer_fill >= static_cast<size_t>(m_packetSize)))
+			_setWriteError(result < 0 ? errno : EIO);
 		m_buffer_fill = 0;
 	}
 
@@ -795,6 +808,7 @@ void eFilePushThreadRecorder::thread()
 void eFilePushThreadRecorder::start(int fd)
 {
 	m_fd_source = fd;
+	_writeError = 0;
 	m_stop = 0;
 	run();
 }
@@ -821,6 +835,15 @@ void eFilePushThreadRecorder::stop()
 void eFilePushThreadRecorder::sendEvent(int evt)
 {
 	m_messagepump.send(evt);
+}
+
+void eFilePushThreadRecorder::_setWriteError(int error)
+{
+	if (!_writeError)
+	{
+		_writeError = error ? error : EIO;
+		sendEvent(evtWriteError);
+	}
 }
 
 void eFilePushThreadRecorder::recvEvent(const int &evt)
