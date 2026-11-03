@@ -124,12 +124,12 @@ protected:
 		std::vector<struct aiocb> parts;
 		unsigned char* buffer = nullptr;
 		bool short_written = false; // a part had a short write (counted once per buffer)
-		int wait(const volatile int* stop_flag = nullptr, int* short_write_count = nullptr);
+		int wait(const std::atomic<int>* stop_flag = nullptr, int* short_write_count = nullptr);
 		int start(int fd, off_t offset, size_t nbytes, unsigned char* data, size_t chunk = 0);
 		int poll(int* short_write_count = nullptr); // returns 1 if busy, 0 if ready, <0 on error return
 		int cancel(int fd); // returns <0 on error, 0 cancelled, >0 bytes written?
 	private:
-		int waitPart(struct aiocb& aio, const volatile int* stop_flag, int* short_write_count);
+		int waitPart(struct aiocb& aio, const std::atomic<int>* stop_flag, int* short_write_count);
 		int pollPart(struct aiocb& aio, int* short_write_count);
 		void countShortWrite(int* short_write_count);
 	};

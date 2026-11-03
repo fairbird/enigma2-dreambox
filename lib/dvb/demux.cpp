@@ -499,7 +499,7 @@ void eDVBRecordFileThread::AsyncIO::countShortWrite(int* short_write_count)
 	short_written = true;
 }
 
-int eDVBRecordFileThread::AsyncIO::wait(const volatile int* stop_flag, int* short_write_count)
+int eDVBRecordFileThread::AsyncIO::wait(const std::atomic<int>* stop_flag, int* short_write_count)
 {
 	int ret = 0;
 	int saved_errno = 0;
@@ -517,7 +517,7 @@ int eDVBRecordFileThread::AsyncIO::wait(const volatile int* stop_flag, int* shor
 	return ret;
 }
 
-int eDVBRecordFileThread::AsyncIO::waitPart(struct aiocb& aio, const volatile int* stop_flag, int* short_write_count)
+int eDVBRecordFileThread::AsyncIO::waitPart(struct aiocb& aio, const std::atomic<int>* stop_flag, int* short_write_count)
 {
 	if (aio.aio_buf == nullptr) // No request outstanding
 		return 0;
@@ -544,7 +544,7 @@ int eDVBRecordFileThread::AsyncIO::waitPart(struct aiocb& aio, const volatile in
 						timeout_count, MAX_TIMEOUTS);
 
 					// Check if we should stop
-					if (stop_flag && *stop_flag)
+					if (stop_flag && stop_flag->load())
 					{
 						eDebug("[eDVBRecordFileThread] stop requested, cancelling AIO");
 						aio_cancel(aio.aio_fildes, &aio);
@@ -565,7 +565,7 @@ int eDVBRecordFileThread::AsyncIO::waitPart(struct aiocb& aio, const volatile in
 				if (errno == EINTR)
 				{
 					// Check if we should stop after signal
-					if (stop_flag && *stop_flag)
+					if (stop_flag && stop_flag->load())
 					{
 						eDebug("[eDVBRecordFileThread] stop requested after EINTR");
 						aio_cancel(aio.aio_fildes, &aio);
