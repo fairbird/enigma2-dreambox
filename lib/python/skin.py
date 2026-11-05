@@ -224,7 +224,7 @@ def loadSkin(filename, scope=SCOPE_SKINS, desktop=getDesktop(GUI_SKIN_ID), scree
 
 
 def reloadSkins():
-	from Screens.InfoBar import InfoBar # Don't move it keep it here
+	from Screens.InfoBar import InfoBar  # Don't move it keep it here
 	if InfoBar.instance:
 		InfoBar.instance.session.closePluginBrowser()
 	for styleID in windowStyles:  # Reset window styles so a new skin without its own <windowstyle> doesn't inherit the previous skin's fonts/colors.
