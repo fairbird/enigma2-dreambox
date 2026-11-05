@@ -5260,7 +5260,6 @@ RESULT eServiceMP3::enableSubtitles(iSubtitleUser* user, struct SubtitleTrack& t
 		m_cc_enabled = true;
 		m_cc_sync_timer->start(100, true);
 		if (m_is_dash_pipeline) {
-			m_subtitle_switch_deferred = false;
 			return 0;
 		}
 	}
