@@ -365,6 +365,10 @@ private:
 	   with an older generation are still in the pump queue and must not reach a
 	   parser. Written on the main thread, read on the gstreamer thread. */
 	std::atomic<int> m_subtitle_generation{0};
+	/* current-text switch requested while the pipeline was not settled in PLAYING;
+	   applied on the next PAUSED->PLAYING transition */
+	bool m_subtitle_switch_deferred = false;
+	void applySubtitleStreamSwitch();
 	int selectAudioStream(int i, bool skipAudioFix = false, bool remember = true);
 	GstElement* getAudioChannelSink();
 	std::vector<audioStream> m_audioStreams;

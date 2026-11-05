@@ -169,6 +169,15 @@ static bool pipelineSettledInPlaying(GstElement* pipeline)
 	return state == GST_STATE_PLAYING && pending == GST_STATE_VOID_PENDING;
 }
 
+/* Runs on a GStreamer pool thread, see eServiceMP3::applySubtitleStreamSwitch().
+   user_data is the text-selector sink pad; it holds one ref, released via the
+   GDestroyNotify passed to gst_element_call_async(). */
+static void forceSelectorCommit(GstElement*, gpointer user_data)
+{
+	GstPad* pad = GST_PAD(user_data);
+	gst_pad_send_event(pad, gst_event_new_custom(GST_EVENT_CUSTOM_DOWNSTREAM_OOB,
+					gst_structure_new_empty("eServiceMP3-force-selector-commit")));
+}
 
 static GstElement* createDashPlaybackPipeline(const std::string& uri, const std::string& useragent)
 {
@@ -3682,6 +3691,11 @@ void eServiceMP3::gstBusCall(GstMessage* msg) {
 				} break;
 				case GST_STATE_CHANGE_PAUSED_TO_PLAYING: {
 					m_paused = false;
+					if (m_subtitle_switch_deferred && pipelineSettledInPlaying(m_gst_playbin)) {
+						m_subtitle_switch_deferred = false;
+						m_subtitle_generation++;
+						applySubtitleStreamSwitch();
+					}
 					applyAudioSelection();
 #ifdef PASSTHROUGH_FIX
 					m_clear_buffers = false;
@@ -4448,8 +4462,8 @@ void eServiceMP3::gstPoll(ePtr<GstMessageContainer> const& msg) {
 			if (buffer) {
 				/* queued before the last stream switch: the buffer still holds data of
 				   the previous track and would be fed to the parser of the new one */
-				if (msg->getGeneration() != m_subtitle_generation) {
-					eDebug("[eServiceMP3] dropping stale subtitle buffer (gen %d, current %d)",
+				if (m_subtitle_switch_deferred || msg->getGeneration() != m_subtitle_generation) {
+					eDebug("[eServiceMP3] dropping deferred or stale subtitle buffer (gen %d, current %d)",
 						   msg->getGeneration(), m_subtitle_generation.load());
 					break;
 				}
@@ -5260,15 +5274,45 @@ RESULT eServiceMP3::enableSubtitles(iSubtitleUser* user, struct SubtitleTrack& t
 		m_cc_enabled = true;
 		m_cc_sync_timer->start(100, true);
 		if (m_is_dash_pipeline) {
+					m_subtitle_switch_deferred = false;
 			return 0;
 		}
 	}
-	g_object_set(m_gst_playbin, "current-text", m_currentSubtitleStream, NULL);
-
-	eDebug("[eServiceMP3] switched to subtitle stream %i (generation %d)", m_currentSubtitleStream,
-		   m_subtitle_generation.load());
-
+	/* The forced selector commit in applySubtitleStreamSwitch() cannot complete
+	   while a streaming thread sits blocked in the text sink, which it does until
+	   the pipeline is back in PLAYING (pause, buffering, re-preroll after a seek).
+	   Defer the whole switch then, not just the commit: a pending active pad left
+	   behind would deadlock the next flushing seek. */
+	if (pipelineSettledInPlaying(m_gst_playbin)) {
+		m_subtitle_switch_deferred = false;
+		applySubtitleStreamSwitch();
+	} else {
+		m_subtitle_switch_deferred = true;
+	}
 	return 0;
+}
+
+void eServiceMP3::applySubtitleStreamSwitch() {
+	// Video CC has a synthetic track id, not a playbin text-pad index.
+	const int textStream = m_cc_enabled && m_cc_from_video ? -1 : m_currentSubtitleStream;
+	g_object_set(m_gst_playbin, "current-text", textStream, NULL);
+
+	/* Work around a playbin/input-selector timing bug in GStreamer >= 1.28:
+	   the pending active pad is committed lazily by the next event or buffer.
+	   Force that commit with a harmless custom event. Send it from a GStreamer
+	   pool thread because the subtitle sink may be waiting for its clock time. */
+	GstPad* textPad = NULL;
+	if (textStream >= 0 && g_signal_lookup("get-text-pad", G_OBJECT_TYPE(m_gst_playbin)))
+		g_signal_emit_by_name(m_gst_playbin, "get-text-pad", textStream, &textPad);
+	if (textPad) {
+		GstElement* selector = gst_pad_get_parent_element(textPad);
+		if (selector) {
+			gst_element_call_async(selector, forceSelectorCommit, textPad, (GDestroyNotify)gst_object_unref);
+			gst_object_unref(selector);
+		} else {
+			gst_object_unref(textPad);
+		}
+	}
 }
 
 /**
@@ -5288,6 +5332,7 @@ RESULT eServiceMP3::disableSubtitles() {
 		m_cc_video.hide();
 	}
 	m_subtitle_generation++;
+	m_subtitle_switch_deferred = false;
 	m_currentSubtitleStream = -1;
 	m_pgs_subtitle_parser->reset();
 	m_cachedSubtitleStream = m_currentSubtitleStream;
