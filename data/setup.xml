@@ -189,6 +189,10 @@
 		<item text="AutoRefresh" description="Enable autorefresh templates." requires="CanRefreshTemplates">config.skin.autorefresh</item>
 	</setup>
 	<setup key="skinsetup" title="Skin Settings">
+		<item text="Fallback Font" description="Choose the fallback font.">config.skin.FallbackFont</item>
+		<item text="Channel Selection Screen" description="Select the screen layout, from the options provided by the skin, to be used for the ChannelSelection screen." conditional="len(config.channelSelection.screenStyle.choices) > 1" restart="gui">config.channelSelection.screenStyle</item>
+		<item text="Channel Selection List" description="Select the layout of the information in the services list, from the options provided by the skin, displayed within the ChannelSelection screen." conditional="config.channelSelection.screenStyle.value" restart="gui">config.channelSelection.widgetStyle</item>
+		<item text="AutoRefresh" description="Enable autorefresh templates." requires="CanRefreshTemplates">config.skin.autorefresh</item>
 		<item level="1" text="Fast Skin Reload" description="Reload the skin without restarting the GUI when switching skins.">config.usage.fastSkinReload</item>
 	</setup>
 	<setup key="UserInterface" title="User interface">
