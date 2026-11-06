@@ -44,6 +44,7 @@ class Screen(dict):
 		self.onShown = []
 		self.onShow = []
 		self.onHide = []
+		self.activeComponents = []
 		self.execing = False
 		self.shown = True
 		# DEBUG: Variable alreadyShown used in CutListEditor/ui.py and StartKodi/plugin.py...
