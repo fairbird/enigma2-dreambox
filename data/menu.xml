@@ -87,7 +87,10 @@
 					<item key="user_interface" level="0" text="User Interface" description="This options for user interface setup." ><setup setupKey="UserInterface"/></item>
 					<item key="usage_setup" level="0" text="Customize" description="This options for usage setup."><setup setupKey="Usage"/></item>
 					<item key="picon_setup" level="0" text="Picon Settings" weight="26" description="This options for Picon Settings."><screen module="Picon" screen="PiconSettings" /></item>
-					<item key="primary_skin_selector" level="0" text="Skin" description="This options for primary skin selector setup."><screen module="SkinSelector" screen="SkinSelector"/></item>
+					<menu key="skin_setup" level="0" text="Skin Setup" description="This options for skin setup.">
+						<item key="primary_skin_selector" level="0" text="Skin Selector" description="This options for primary skin selector setup."><screen module="SkinSelector" screen="SkinSelector"/></item>
+						<item key="skin_setup" level="1" text="Skin Settings" description="This options for Skin Settings."><setup setupKey="skinsetup" /></item>
+					</menu>
 					<menu key="lcd" level="0" text="Front Panel Display" description="This menu contains front panel display settings.">
 						<item key="display_skin_selector" level="0" text="Skin Setup" description="This options for display skin selector setup setup." weight="5" requires="Display"><screen module="SkinSelector" screen="LcdSkinSelector" /></item>
 						<item key="lcd_setup" level="1" text="LCD Setup" description="This options for lcd setup." weight="10" requires="Display"><setup setupKey="FrontDisplay" /></item>
