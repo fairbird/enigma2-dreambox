@@ -110,4 +110,48 @@ You may combine all 3 types of animations, but only one of each kind for one typ
 		<position val="2.0" animateX="" interpolate="decelerate" factor="1.5"/>
 		<position_hide val="-1.0" animateX="" interpolate="accelerate" factor="1.5"/>
 	</animation>
+	<animation key="fade_in_out" title="Fade in / fade out" duration="250" interpolate="linear">
+		<alpha val="0.0" interpolate="decelerate" factor="1.5"/>
+		<alpha_hide val="0.0" interpolate="accelerate" factor="1.5"/>
+	</animation>
+	<animation key="modern_adaptive" title="Modern adaptive" duration="280" interpolate="linear">
+		<alpha val="0.0" interpolate="decelerate" factor="1.5"/>
+		<alpha_hide val="0.0" interpolate="accelerate" factor="1.5"/>
+		<position val="0.04" animateY="" interpolate="decelerate" factor="2.0"/>
+		<position_hide val="0.04" animateY="" interpolate="accelerate" factor="1.5"/>
+	</animation>
+	<animation key="dialog_pop" title="Dialog pop" duration="240" interpolate="linear">
+		<alpha val="0.0" interpolate="decelerate" factor="1.5"/>
+		<alpha_hide val="0.0" interpolate="accelerate" factor="1.5"/>
+		<size val="240,140" centered="" interpolate="overshoot" tension="1.2"/>
+		<size_hide val="240,140" centered="" interpolate="accelerate" factor="1.5"/>
+	</animation>
+	<animation key="toast_slide" title="Toast slide" duration="260" interpolate="linear">
+		<alpha val="0.0" interpolate="decelerate" factor="1.5"/>
+		<alpha_hide val="0.0" interpolate="accelerate" factor="1.5"/>
+		<position val="-0.1" animateY="" interpolate="decelerate" factor="2.0"/>
+		<position_hide val="-0.1" animateY="" interpolate="accelerate" factor="1.5"/>
+	</animation>
+	<animation key="side_sheet" title="Side sheet" duration="260" interpolate="linear">
+		<alpha val="0.3" interpolate="decelerate" factor="1.5"/>
+		<alpha_hide val="0.3" interpolate="accelerate" factor="1.5"/>
+		<position val="0.35" animateX="" interpolate="decelerate" factor="2.0"/>
+		<position_hide val="0.35" animateX="" interpolate="accelerate" factor="1.5"/>
+	</animation>
+	<animation key="zoom_fade" title="Zoom and fade" duration="250" interpolate="linear">
+		<alpha val="0.0" interpolate="decelerate" factor="1.5"/>
+		<alpha_hide val="0.0" interpolate="accelerate" factor="1.5"/>
+		<size val="0,0" centered="" interpolate="decelerate" factor="1.5"/>
+		<size_hide val="0,0" centered="" interpolate="accelerate" factor="1.5"/>
+	</animation>
+	<animation key="infobar_slide" title="Slide in from bottom / out to bottom" duration="250" internal="">
+		<position val="0.25" animateY="" interpolate="decelerate" factor="2.0"/>
+		<position_hide val="0.25" animateY="" interpolate="accelerate" factor="1.5"/>
+	</animation>
+	<animation key="infobar_slide_fade" title="Slide from bottom with fade" duration="250" internal="">
+		<alpha val="0.0" interpolate="decelerate" factor="1.5"/>
+		<alpha_hide val="0.0" interpolate="accelerate" factor="1.5"/>
+		<position val="0.12" animateY="" interpolate="decelerate" factor="2.0"/>
+		<position_hide val="0.12" animateY="" interpolate="accelerate" factor="1.5"/>
+	</animation>
 </animations>
