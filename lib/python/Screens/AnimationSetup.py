@@ -35,7 +35,7 @@ class AnimationSetup(ConfigListScreen, Screen):
 			<widget name="key_yellow" position="676,10" size="320,50" zPosition="1" font="Regular;26" halign="center" valign="center" backgroundColor="#a08500" foregroundColor="#ffffff" shadowColor="black" shadowOffset="-2,-2" />
 			<widget name="key_blue" position="1009,10" size="320,50" zPosition="1" font="Regular;26" halign="center" valign="center" backgroundColor="#18188b" foregroundColor="#ffffff" shadowColor="black" shadowOffset="-2,-2" />
 			<eLabel position="10,72" size="1340,1" backgroundColor="grey" />
-			<widget name="config" position="10,80" size="1340,770" font="Regular;30" itemHeight="48" enableWrapAround="1" scrollbarMode="showOnDemand" />
+			<widget name="config" position="10,80" size="1340,770" font="Regular;30" valueFont="Regular;30" itemHeight="48" enableWrapAround="1" scrollbarMode="showOnDemand" />
 			<eLabel position="10,860" size="1340,1" backgroundColor="grey" />
 			<widget name="description" position="10,868" size="1340,90" font="Regular;26" halign="center" valign="center" />
 		</screen>"""
@@ -46,7 +46,7 @@ class AnimationSetup(ConfigListScreen, Screen):
 			<widget name="key_yellow" position="1352,20" size="640,100" zPosition="1" font="Regular;52" halign="center" valign="center" backgroundColor="#a08500" foregroundColor="#ffffff" shadowColor="black" shadowOffset="-2,-2" />
 			<widget name="key_blue" position="2018,20" size="640,100" zPosition="1" font="Regular;52" halign="center" valign="center" backgroundColor="#18188b" foregroundColor="#ffffff" shadowColor="black" shadowOffset="-2,-2" />
 			<eLabel position="20,144" size="2680,2" backgroundColor="grey" />
-			<widget name="config" position="20,160" size="2680,1540" font="Regular;60" itemHeight="96" enableWrapAround="1" scrollbarMode="showOnDemand" />
+			<widget name="config" position="20,160" size="2680,1540" font="Regular;60" valueFont="Regular;60" itemHeight="96" enableWrapAround="1" scrollbarMode="showOnDemand" />
 			<eLabel position="20,1720" size="2680,2" backgroundColor="grey" />
 			<widget name="description" position="20,1736" size="2680,180" font="Regular;52" halign="center" valign="center" />
 		</screen>"""
