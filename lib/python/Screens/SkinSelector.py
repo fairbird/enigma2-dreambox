@@ -4,12 +4,13 @@ import re
 
 from enigma import ePicLoad, getDesktop
 from os import listdir
-from os.path import dirname, exists, isdir, join
+from os.path import dirname, exists, isdir, isfile, join
 
 from skin import DEFAULT_SKIN, DEFAULT_DISPLAY_SKIN, EMERGENCY_NAME, EMERGENCY_SKIN, currentDisplaySkin, currentPrimarySkin, domScreens
 from Components.ActionMap import HelpableNumberActionMap
 from Components.config import config, configfile
 from Components.PluginComponent import plugins
+from Components.SystemInfo import BoxInfo
 from Components.Pixmap import Pixmap
 from Components.Sources.List import List
 from Components.Sources.StaticText import StaticText
@@ -113,6 +114,12 @@ class SkinSelector(Screen):
 			previewPath = join(self.rootDir, dir)
 			for skinFile in self.xmlList:
 				skin = join(dir, skinFile)
+				if skinFile == "skin.xml":
+					if dir == "Umbra":
+						if not BoxInfo.getItem("fhdskin"):
+							skin = join(dir, "HD", "skin.xml")
+						elif self.current.startswith(join(dir, "")) and isfile(join(self.rootDir, self.current)):
+							skin = self.current
 				skinPath = join(self.rootDir, skin)
 				if exists(skinPath):
 					parseDone = fileReadXML(skinPath)
