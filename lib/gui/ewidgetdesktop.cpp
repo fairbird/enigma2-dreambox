@@ -6,6 +6,10 @@
 
 extern void dumpRegion(const gRegion &region);
 
+#ifdef HAVE_EGL
+extern "C" void egl_release_surface_texture(unsigned int gl_texture_id, const void *surface);
+#endif
+
 void eWidgetDesktop::addRootWidget(eWidget *root)
 {
 	ASSERT(!root->m_desktop);
@@ -373,6 +377,16 @@ void eWidgetDesktop::paintModalIm(eWidget *widget)
 
 	ePtr<gPixmap> pm;
 	comp->m_dc->getPixmap(pm);
+#ifdef HAVE_EGL
+	/* this buffer is redrawn by the CPU on every update, but the EGL texture cache keeps the
+	   first upload forever; drop it so the blit below uploads the new content. */
+	if (pm && pm->surface && pm->surface->gl_texture_id)
+	{
+		unsigned int texture_id = pm->surface->gl_texture_id;
+		pm->surface->gl_texture_id = 0;
+		egl_release_surface_texture(texture_id, pm->surface);
+	}
+#endif
 	gPainter painter(m_screen.m_dc);
 	painter.resetClip(dirty);
 	painter.blit(pm, comp->m_position, eRect(), gPixmap::blitAlphaBlend);
