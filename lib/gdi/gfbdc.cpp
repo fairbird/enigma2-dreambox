@@ -445,7 +445,7 @@ void gFBDC::setResolution(int xres, int yres, int bpp)
 	m_requested_x = xres;
 	m_requested_y = yres;
 
-	/* The OSD hardware tops out at 1920x1080. Bigger skins (WQHD, 4K) are
+	/* The OSD hardware tops out at 1920x1080.  Bigger skins (WQHD, 4K) are
 	 * drawn into an off-screen logical surface and scaled down on flush. */
 	const int logical_xres = xres;
 	const int logical_yres = yres;
@@ -562,6 +562,7 @@ void gFBDC::setResolution(int xres, int yres, int bpp)
 		if (bpp == 32 && gAccel::getInstance() && gAccel::getInstance()->accelAlloc(&m_logical_surface) == 0)
 		{
 #if defined(DREAMNEXTGEN)
+			/* the GE2D allocator may leave the surface to the CPU: use a plain buffer then */
 			if (!m_logical_surface.data)
 			{
 				m_logical_surface.data = new (std::nothrow) unsigned char[(size_t)m_logical_surface.stride * m_logical_surface.y];
@@ -603,8 +604,7 @@ void gFBDC::setResolution(int xres, int yres, int bpp)
 		m_pixmap = new gPixmap(&m_logical_surface);
 	else
 		m_pixmap = new gPixmap(&surface);
-
-	invalidateNativeSpinner();
+		invalidateNativeSpinner();
 
 #ifdef CONFIG_ION
 	if (grc)

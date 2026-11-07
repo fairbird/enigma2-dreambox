@@ -485,7 +485,6 @@ public:
 	virtual void disableSpinner();
 	virtual void incrementSpinner();
 	virtual void setSpinner(eRect pos, ePtr<gPixmap> *pic, int len);
-
 	void setNativeSpinner(ePoint position, unsigned int color);
 	void setSpinnerColor(unsigned int color) { m_spinnerColor.store(color, std::memory_order_relaxed); }
 	int spinnerInterval() const { return m_nativeSpinner ? 33 : 100; }
