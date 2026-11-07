@@ -619,6 +619,7 @@ private:
 	int m_smooth_dur = 0;
 	ePtr<eTimer> m_smooth_timer;
 	void smoothTick();
+	void smoothStop();
 	void smoothStart(int oldSel, int newSel);
 	float smoothRows();
 

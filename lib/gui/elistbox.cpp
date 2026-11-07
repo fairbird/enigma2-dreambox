@@ -99,6 +99,13 @@ void eListbox::smoothStart(int oldSel, int newSel)
 	m_smooth_timer->start(16, false);
 }
 
+void eListbox::smoothStop()
+{
+	m_smooth_active = false;
+	if (m_smooth_timer)
+		m_smooth_timer->stop();
+}
+
 void eListbox::smoothTick()
 {
 	if (!m_smooth_active || smoothNowMs() - m_smooth_start_ms >= m_smooth_dur)
@@ -1969,18 +1976,12 @@ void eListbox::moveSelection(int dir)
 	}
 	else
 	{
-		if (m_top != oldTop)
-		{
-			invalidate();
-		}
-		else if (m_selected != oldSel)
-		{
-			if (defaultSmoothMs > 0 && m_orientation == orVertical && !m_lock_first_row && dir != justCheck && std::abs(m_selected - oldSel) == 1)
-			{
-				smoothStart(oldSel, m_selected);
+				smoothStop();
 				invalidate();
 				return;
 			}
+			/* repaint the whole list: partial invalidation of the old/new row can leave a stale highlight on the GPU path */
+			invalidate();
 			gRegion inv = eRect(getItemPostion(m_selected), eSize((m_style.m_selection_width), (m_style.m_selection_height)));
 			inv |= eRect(getItemPostion(oldSel), eSize((m_style.m_selection_width), (m_style.m_selection_height)));
 			invalidate(inv);
