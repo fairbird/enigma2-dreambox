@@ -2305,7 +2305,7 @@ except Exception as e:
 		<widget name="list" position="0,0" size="560,533" itemHeight="30" foregroundColorEvent="darkgrey" foregroundColorEventSelected="menu-title-frgrnd" foregroundColor="window-fg" backgroundColor="window-bg" transparent="0" enableWrapAround="1"/>
 		<panel name="ButtonBarAuto1Panel"/>
 	</screen>
-	<screen name="SkinSelector" position="center,center" size="560,450">
+	<screen name="SkinSelector_backup" position="center,center" size="560,450">
 		<widget name="Preview" position="117,0" size="280,210" alphatest="on" zPosition="0"/>
 		<widget name="preview" position="117,0" size="280,210" alphatest="on" zPosition="0"/> # For ViX
 		<widget name="SkinList" position="15,220" size="495,240" itemHeight="30" foregroundColor="window-fg" backgroundColor="window-bg" transparent="0" scrollbarMode="showOnDemand" enableWrapAround="1"/>
