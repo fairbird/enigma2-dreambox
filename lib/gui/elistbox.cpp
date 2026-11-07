@@ -1976,15 +1976,28 @@ void eListbox::moveSelection(int dir)
 	}
 	else
 	{
+		if (m_top != oldTop)
+		{
+			smoothStop();
+			invalidate();
+		}
+		else if (m_selected != oldSel)
+		{
+			if (defaultSmoothMs > 0 && m_orientation == orVertical && !m_lock_first_row && dir != justCheck && std::abs(m_selected - oldSel) == 1)
+			{
+				smoothStart(oldSel, m_selected);
+				invalidate();
+				return;
+			}
+			if (m_smooth_active)
+			{
+				/* a slide is still in flight: its bar sits on a row that is neither the old nor the new one */
 				smoothStop();
 				invalidate();
 				return;
 			}
 			/* repaint the whole list: partial invalidation of the old/new row can leave a stale highlight on the GPU path */
 			invalidate();
-			gRegion inv = eRect(getItemPostion(m_selected), eSize((m_style.m_selection_width), (m_style.m_selection_height)));
-			inv |= eRect(getItemPostion(oldSel), eSize((m_style.m_selection_width), (m_style.m_selection_height)));
-			invalidate(inv);
 		}
 	}
 }
