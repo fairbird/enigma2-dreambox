@@ -220,6 +220,9 @@ class Screen(dict):
 	image = property(getImage, setImage)
 
 	def setTitle(self, title, showPath=True):
+		if isinstance(title, str) and not title.isascii():
+			# Titles may include filesystem names with undecodable bytes.
+			title = title.encode("UTF-8", errors="replace").decode("UTF-8")
 		try:  # This protects against calls to setTitle() before being fully initialised like self.session is accessed *before* being defined.
 			self.screenPath = ""
 			if self.session.dialog_stack:

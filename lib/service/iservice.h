@@ -15,6 +15,8 @@ class eServiceEvent;
 class eServiceReference
 {
 public:
+	typedef std::string PathString;
+	typedef std::string DisplayName;
 	enum
 	{
 		idServiceIsScrambled  = 0x0100,				//  256  Added to normal id to indicate scrambling
@@ -70,7 +72,7 @@ public:
 	bool isStreamRelay = false;
 #endif
 	std::string getPath() const { return path; }
-	void setPath( const std::string &n ) { path=n; }
+	void setPath(const PathString &n) { path=n; }
 	void setAlternativeUrl( const std::string &n, bool isSR = false ) { alternativeurl=n; isStreamRelay=isSR; }
 	void setSubUri( const std::string &n ) { suburi=n; }
 	bool getIsStreamRelay() const { return isStreamRelay; }
@@ -111,7 +113,7 @@ public:
 #endif
 	std::string getName() const { return name; }
 	std::string getProvider() const { return prov; }
-	void setName( const std::string &s ) { name=s; }
+	void setName(const std::string &s) { name=s; }
 	void setProvider( const std::string &s ) { prov=s; }
 	int getChannelNum() const { return number; }
 	void setChannelNum(const int n) { number = n; }
@@ -175,7 +177,7 @@ public:
 		number = 0;
 	}
 
-	eServiceReference(int type, int flags, const std::string &path)
+	eServiceReference(int type, int flags, const PathString &path)
 		: type(type), flags(flags), path(path)
 	{
 		memset(data, 0, sizeof(data));
@@ -184,7 +186,7 @@ public:
 #ifdef SWIG
 	eServiceReference(const eServiceReference &ref);
 #endif
-	eServiceReference(const std::string &string);
+	eServiceReference(const PathString &string);
 	std::string toString() const;
 	std::string toCompareString() const;
 	std::string toReferenceString() const;
