@@ -479,16 +479,6 @@ public:
 	}
 	gRGB getRGB(gColor col);
 	virtual eSize size() { return m_pixmap->size(); }
-	virtual int islocked() const { return 0; }
-
-	virtual void enableSpinner();
-	virtual void disableSpinner();
-	virtual void incrementSpinner();
-	virtual void setSpinner(eRect pos, ePtr<gPixmap> *pic, int len);
-	void setNativeSpinner(ePoint position, unsigned int color);
-	void setSpinnerColor(unsigned int color) { m_spinnerColor.store(color, std::memory_order_relaxed); }
-	int spinnerInterval() const { return m_nativeSpinner ? 33 : 100; }
-	void invalidateNativeSpinner() { m_nativeSpinnerVisible = false; m_nativeSpinnerScreen = eSize(); }
 
 	// A hardware-accelerated backend (see gEGLDC) can override this to
 	// intercept a glyph's raw FreeType coverage bitmap - before
@@ -510,6 +500,17 @@ public:
 	// gEGLDC::compositeTextOverlay()) know that pass is still needed for
 	// this draw.
 	virtual void onGlyphCpuDrawn() {}
+
+	virtual int islocked() const { return 0; }
+
+	virtual void enableSpinner();
+	virtual void disableSpinner();
+	virtual void incrementSpinner();
+	virtual void setSpinner(eRect pos, ePtr<gPixmap> *pic, int len);
+	void setNativeSpinner(ePoint position, unsigned int color);
+	void setSpinnerColor(unsigned int color) { m_spinnerColor.store(color, std::memory_order_relaxed); }
+	int spinnerInterval() const { return m_nativeSpinner ? 33 : 100; }
+	void invalidateNativeSpinner() { m_nativeSpinnerVisible = false; m_nativeSpinnerScreen = eSize(); }
 };
 
 #endif
