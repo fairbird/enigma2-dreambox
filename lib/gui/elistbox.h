@@ -411,6 +411,9 @@ public:
 		defaultScrollBarMode = mode;
 	}
 
+	/* smooth selection: duration in ms of the sliding highlight between two rows (0 = off) */
+	static void setSmoothSelection(int ms) { defaultSmoothMs = ms < 0 ? 0 : ms; }
+
 	static void setDefaultPadding(const eRect &padding) { defaultPadding = padding; }
 
 	static void setDefaultScrollbarRadius(int radius, uint8_t radiusEdges)
@@ -558,8 +561,6 @@ private:
 	int effectiveMaxRows() const { return (m_lock_first_row && m_orientation == orVertical && m_max_rows > 1) ? m_max_rows - 1 : m_max_rows; }
 	int setScrollbarPosition();
 	void setItemCornerRadiusInternal(uint8_t index, int radius, uint8_t edges);
-	/* smooth selection: duration in ms of the sliding highlight between two rows (0 = off) */
-	static void setSmoothSelection(int ms) { defaultSmoothMs = ms < 0 ? 0 : ms; }
 
 	void setItemGradientInternal(uint8_t index, const gRGB &startcolor, const gRGB &midcolor, const gRGB &endcolor, uint8_t direction, bool alphablend);
 
