@@ -802,13 +802,29 @@ int eListbox::event(int event, void *data, void *data2)
 		m_content->cursorSaveLine(line);
 		m_content->cursorRestore();
 
-		/* sliding highlight: the selected row is drawn last, shifted towards the previous row */
+		/* sliding focus bar: all rows stay in place and are drawn unselected; only the bar moves.
+		   The selected look of the rows is drawn clipped to the bar rectangle on top. */
 		if (smoothPainted)
 		{
 			int pitch = m_itemheight + m_spacing.y();
 			int dy = (int)(smoothRows() * (float)pitch);
-			if (m_content->cursorGet() == m_selected)
-				m_content->paint(painter, *style, ePoint(smoothPos.x(), smoothPos.y() + dy), 1);
+			eRect barRect(smoothPos.x(), smoothPos.y() + dy, m_style.m_selection_width, m_style.m_selection_height);
+			int origin = m_content->cursorGet();
+			int rowsVisible = m_max_rows;
+			for (int r = m_selected - 3; r <= m_selected + 3; ++r)
+			{
+				if (r < m_top || r >= m_top + rowsVisible || r < 0 || r >= m_content->size())
+					continue;
+				ePoint rowPos(smoothPos.x(), smoothPos.y() + (r - m_selected) * pitch);
+				eRect part = eRect(rowPos, eSize(m_style.m_selection_width, m_style.m_selection_height)) & barRect;
+				if (part.empty())
+					continue;
+				m_content->cursorSet(r);
+				painter.clip(part);
+				m_content->paint(painter, *style, rowPos, 1);
+				painter.clippop();
+			}
+			m_content->cursorSet(origin);
 		}
 
 		// draw selected item last for horizontal/grid orientations
