@@ -20,11 +20,17 @@ class Label(VariableText, Renderer):
 			print("SKINERROR: render label has no source")
 
 	def changed(self, what):
+		source = self.source
 		if what[0] == self.CHANGED_CLEAR:
 			self.text = ""
-		elif self.source:
-			if hasattr(self.source, "text"):
-				self.text = self.source.text
+		elif source:
+			try:
+				text = source.text
+			except AttributeError:
+				pass
+			else:
+				if source is self.source:  # Ignore updates from a disconnected or replaced source.
+					self.text = text
 		else:
 			self.text = "<No Source>"
 			print("SKINERROR: render label has no source")
