@@ -6,6 +6,10 @@ try:
 	from enigma import registerAnimation_spec
 except ImportError:  # enigma2 binary built without per-window animations
 	registerAnimation_spec = None
+try:
+	from enigma import setListboxSmoothSelection
+except ImportError:  # enigma2 binary built without smooth list selection
+	setListboxSmoothSelection = None
 from Components.config import config, ConfigOnOff, ConfigSelection, ConfigSelectionNumber, ConfigText, ConfigYesNo
 from Tools.Directories import fileExists, resolveFilename, SCOPE_SKIN
 from Tools.HardwareInfo import HardwareInfo
@@ -95,7 +99,13 @@ class WindowAnimationManager:
 			self.ids[spec] = registerAnimation_spec(spec)
 		return self.ids[spec]
 
+	def applySmoothSelection(self):
+		if setListboxSmoothSelection is not None:
+			enabled = config.osd.animation_smooth_list.value
+			setListboxSmoothSelection(int(150 * 15 / max(5, int(config.osd.animation_speed.value))) if enabled else 0)
+
 	def setDefault(self, key):
+		self.applySmoothSelection()
 		self.default = key
 		setAnimation_spec(self.scaledSpec(key) if config.osd.window_animation.value else "")
 
@@ -174,6 +184,7 @@ class ScreenAnimations:
 	def loadDefault(self):
 		from Screens.Screen import Screen
 		Screen.animationHook = eWindowAnimationManager.applyScreen
+		eWindowAnimationManager.applySmoothSelection()
 		eWindowAnimationManager.setAnimationSet(WindowAnimationSet(eWindowAnimationManager.KEY_DISABLED, _("Disable Animations"), False, ""))
 		path = resolveFilename(SCOPE_SKIN, "animations.xml")
 		if fileExists(path):

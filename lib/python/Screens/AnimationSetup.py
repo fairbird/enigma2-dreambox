@@ -75,7 +75,7 @@ class AnimationSetup(ConfigListScreen, Screen):
 		entries = [
 			getConfigListEntry(_("Window animation"), self.styleConfig, _("Select the default OSD window animation.")),
 			getConfigListEntry(_("Animation speed"), config.osd.animation_speed, _("Higher is faster. 15 is the standard speed.")),
-			getConfigListEntry(_("Smooth list selection"), config.osd.animation_smooth_list, _("Move the list selection smoothly between entries.") + note),
+			getConfigListEntry(_("Smooth list selection"), config.osd.animation_smooth_list, _("Move the list selection smoothly between entries.")),
 			getConfigListEntry(_("Fade changed widget content"), config.osd.widget_animation, _("Cross-fade changing texts and pictures.")),
 		]
 		if self.hasDisplay():
