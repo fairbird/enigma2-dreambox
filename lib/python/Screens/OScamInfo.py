@@ -4,7 +4,7 @@ from datetime import datetime, timezone, timedelta
 from json import loads
 from os.path import exists
 from re import compile
-from twisted.internet.reactor import callInThread
+from twisted.internet.reactor import callFromThread, callInThread
 from ssl import create_default_context, _create_unverified_context as SkipCertificateVerification
 from urllib.parse import unquote
 from urllib.request import build_opener, HTTPDigestAuthHandler, HTTPHandler, HTTPSHandler, HTTPPasswordMgrWithDefaultRealm, Request
@@ -14,16 +14,15 @@ from xml.etree.ElementTree import XML, ParseError
 from ipaddress import ip_address
 from socket import getaddrinfo, gaierror, gethostname
 
-# ENIGMA IMPORTS
 from enigma import eTimer
 from skin import parameters
+from Components.About import GetIPsFromNetworkInterfaces
 from Components.ActionMap import HelpableActionMap
 from Components.config import config
 from Components.ScrollLabel import ScrollLabel
+from Components.SystemInfo import BoxInfo
 from Components.Sources.List import List
 from Components.Sources.StaticText import StaticText
-from Components.About import GetIPsFromNetworkInterfaces
-from Components.SystemInfo import BoxInfo
 from Components.Pixmap import Pixmap
 from Screens.MessageBox import MessageBox
 from Screens.Screen import Screen
@@ -325,6 +324,7 @@ class OSCamInfo(Screen, OSCamGlobals):
 		self.isLocal = False
 		self._isLocalKey = None
 		self._fetchInProgress = False
+		self.actionsClosed = False
 		self["logo"] = Pixmap()
 		self["buildinfos"] = StaticText()
 		self["extrainfos"] = StaticText()
@@ -359,6 +359,7 @@ class OSCamInfo(Screen, OSCamGlobals):
 		self.loop.callback.append(self._triggerDataUpdate)
 		self.actionRefreshTimer = eTimer()
 		self.actionRefreshTimer.callback.append(self._triggerDataUpdate)
+		self.onClose.append(self.closeActions)
 		self.onLayoutFinish.append(self.onLayoutFinished)
 		self.bgColors = parameters.get("OSCamInfoBGcolors", (0x10fcfce1, 0x10f1f6e6, 0x10e2e0ef))
 
@@ -585,6 +586,9 @@ class OSCamInfo(Screen, OSCamGlobals):
 		self.session.openWithCallback(self.keyCallback, OSCamInfoLog)
 
 	def _afterAction(self, action, exitCode=None):
+		# Screen.doClose clears instance attributes before a pending action may finish.
+		if getattr(self, "actionsClosed", True):
+			return
 		if exitCode:
 			messages = {
 				"start": _("Starting %s failed (exit code %s)"),
@@ -604,10 +608,20 @@ class OSCamInfo(Screen, OSCamGlobals):
 	def _remoteAction(self, action):
 		def doAction():
 			webifok, api, url, signstatus, result = self.openWebIF(part=action)
-			if not webifok:
-				self._showActionError(result)
-			self._afterAction(action)
+			callFromThread(self.remoteActionFinished, action, webifok, result)
 		callInThread(doAction)
+
+	def remoteActionFinished(self, action, webifok, result):
+		if getattr(self, "actionsClosed", True):
+			return
+		if not webifok:
+			self._showActionError(result)
+		self._afterAction(action)
+
+	def closeActions(self):
+		self.actionsClosed = True
+		self.loop.stop()
+		self.actionRefreshTimer.stop()
 
 	def msgboxCB(self, action, answer):
 		if answer:
