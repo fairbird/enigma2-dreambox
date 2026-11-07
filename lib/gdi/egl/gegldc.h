@@ -339,6 +339,9 @@ public:
 	static int s_anim_counter;
 	static std::vector<AnimSpec> s_anim_history;
 	static void setAnimationSpec(const char *spec);
+	static bool parseAnimationSpec(const char *spec, AnimSpec &s);
+	static int registerAnimationSpec(const char *spec);
+	static std::vector<AnimSpec> s_anim_profiles;
 
 	void flip();
 	bool animActive() const { return m_anim_running || m_anim_clean_pending || !m_fades.empty(); }

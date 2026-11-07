@@ -31,6 +31,7 @@
 #include <lib/gdi/font.h>
 #include <lib/gui/ebutton.h>
 #include <lib/gui/elabel.h>
+#include <lib/gui/elistbox.h>
 #include <lib/gui/elistboxcontent.h>
 #include <lib/gui/ewidget.h>
 #include <lib/gui/ewidgetdesktop.h>
@@ -584,6 +585,20 @@ void setAnimation_current_listbox(int a) {}
 #endif
 #endif
 #endif
+
+int registerAnimation_spec(const char *spec)
+{
+#ifdef HAVE_EGL
+	return gEGLDC::registerAnimationSpec(spec);
+#else
+	return 0;
+#endif
+}
+
+void setListboxSmoothSelection(int ms)
+{
+	eListbox::setSmoothSelection(ms);
+}
 
 void setAnimation_spec(const char *spec)
 {

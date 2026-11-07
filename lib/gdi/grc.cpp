@@ -837,7 +837,7 @@ void gPainter::endLayer()
 	m_rc->submit(o);
 }
 
-void gPainter::sendShow(ePoint point, eSize size)
+void gPainter::sendShow(ePoint point, eSize size, int anim_id)
 {
 	if (m_dc->islocked())
 		return;
@@ -847,11 +847,11 @@ void gPainter::sendShow(ePoint point, eSize size)
 	o.parm.setShowHideInfo = new gOpcode::para::psetShowHideInfo;
 	o.parm.setShowHideInfo->point = point;
 	o.parm.setShowHideInfo->size = size;
-	o.parm.setShowHideInfo->anim_id = g_window_animation_id;
+	o.parm.setShowHideInfo->anim_id = anim_id > 0 ? anim_id : g_window_animation_id;
 	m_rc->submit(o);
 }
 
-void gPainter::sendHide(ePoint point, eSize size)
+void gPainter::sendHide(ePoint point, eSize size, int anim_id)
 {
 	if (m_dc->islocked())
 		return;
@@ -861,7 +861,7 @@ void gPainter::sendHide(ePoint point, eSize size)
 	o.parm.setShowHideInfo = new gOpcode::para::psetShowHideInfo;
 	o.parm.setShowHideInfo->point = point;
 	o.parm.setShowHideInfo->size = size;
-	o.parm.setShowHideInfo->anim_id = g_window_animation_id;
+	o.parm.setShowHideInfo->anim_id = anim_id > 0 ? anim_id : g_window_animation_id;
 	m_rc->submit(o);
 }
 void gPainter::beginFade(ePoint point, eSize size, int ms)

@@ -408,8 +408,8 @@ public:
 	void setCompositing(gCompositingData *comp);
 
 	void flush();
-	void sendShow(ePoint point, eSize size);
-	void sendHide(ePoint point, eSize size);
+	void sendShow(ePoint point, eSize size, int anim_id = 0);
+	void sendHide(ePoint point, eSize size, int anim_id = 0);
 	void beginLayer();
 	void endLayer();
 	void beginFade(ePoint point, eSize size, int ms = 0);

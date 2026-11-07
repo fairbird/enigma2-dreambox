@@ -77,8 +77,8 @@ public:
 
 	void resize(eSize size);
 	eSize size() const { return m_screen.m_screen_size; }
-	void sendShow(ePoint point, eSize size);
-	void sendHide(ePoint point, eSize size);
+	void sendShow(ePoint point, eSize size, int anim_id = 0);
+	void sendHide(ePoint point, eSize size, int anim_id = 0);
 	void captureLayer(eWidget *widget);
 	void setWidgetAnimationsEnabled(bool enabled);
 	void setWidgetAnimationDuration(int ms);

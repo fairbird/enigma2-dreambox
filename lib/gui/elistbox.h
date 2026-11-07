@@ -4,6 +4,7 @@
 #include <lib/gui/ewidget.h>
 #include <lib/gui/elabel.h>
 #include <connection.h>
+#include <lib/base/ebase.h>
 #include <vector>
 
 class eListbox;
@@ -557,6 +558,9 @@ private:
 	int effectiveMaxRows() const { return (m_lock_first_row && m_orientation == orVertical && m_max_rows > 1) ? m_max_rows - 1 : m_max_rows; }
 	int setScrollbarPosition();
 	void setItemCornerRadiusInternal(uint8_t index, int radius, uint8_t edges);
+	/* smooth selection: duration in ms of the sliding highlight between two rows (0 = off) */
+	static void setSmoothSelection(int ms) { defaultSmoothMs = ms < 0 ? 0 : ms; }
+
 	void setItemGradientInternal(uint8_t index, const gRGB &startcolor, const gRGB &midcolor, const gRGB &endcolor, uint8_t direction, bool alphablend);
 
 	static int defaultScrollBarWidth;
@@ -565,6 +569,7 @@ private:
 	static uint8_t defaultScrollBarScroll;
 	static uint8_t defaultScrollBarMode;
 	static bool defaultWrapAround;
+	static int defaultSmoothMs;
 	static eRect defaultPadding;
 	static int defaultItemRadius[4];
 	static uint8_t defaultItemRadiusEdges[4];
@@ -605,6 +610,16 @@ private:
 	int m_last_selectable_item = -1;
 	int m_scrollbar_calcsize;
 	bool m_lock_first_row = false;
+
+	/* smooth selection animation state */
+	bool m_smooth_active = false;
+	int m_smooth_from = 0, m_smooth_to = 0;
+	long long m_smooth_start_ms = 0;
+	int m_smooth_dur = 0;
+	ePtr<eTimer> m_smooth_timer;
+	void smoothTick();
+	void smoothStart(int oldSel, int newSel);
+	float smoothRows();
 
 	ePoint m_spacing;
 	ePoint m_defined_spacing;

@@ -34,6 +34,7 @@ For more details about the CC BY-NC-SA 4.0 License, please visit:
 https://creativecommons.org/licenses/by-nc-sa/4.0/
 */
 
+#include <chrono>
 #include <lib/gui/elistbox.h>
 #include <lib/gui/elistboxcontent.h>
 #include <lib/gui/eslider.h>
@@ -54,6 +55,60 @@ uint8_t eListbox::defaultScrollBarScroll = eListbox::DefaultScrollBarScroll;
 uint8_t eListbox::defaultScrollBarMode = eListbox::DefaultScrollBarMode;
 uint8_t eListbox::defaultScrollbarRadiusEdges = 0;
 bool eListbox::defaultWrapAround = eListbox::DefaultWrapAround;
+int eListbox::defaultSmoothMs = 0;
+
+static long long smoothNowMs()
+{
+	return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now().time_since_epoch()).count();
+}
+
+/* current vertical offset of the sliding highlight in rows, relative to its target row */
+float eListbox::smoothRows()
+{
+	if (!m_smooth_active || m_smooth_dur <= 0)
+		return 0.0f;
+	float t = (float)(smoothNowMs() - m_smooth_start_ms) / (float)m_smooth_dur;
+	if (t >= 1.0f)
+		return 0.0f;
+	if (t < 0.0f)
+		t = 0.0f;
+	float inv = 1.0f - t;
+	float ease = 1.0f - inv * inv * inv;
+	return (float)(m_smooth_from - m_smooth_to) * (1.0f - ease);
+}
+
+void eListbox::smoothStart(int oldSel, int newSel)
+{
+	/* continue from the current visual position when a previous slide is still running */
+	float carry = 0.0f;
+	if (m_smooth_active)
+		carry = smoothRows() + (float)(m_smooth_to - newSel);
+	else
+		carry = (float)(oldSel - newSel);
+	if (!m_smooth_timer)
+	{
+		m_smooth_timer = eTimer::create(eApp);
+		CONNECT(m_smooth_timer->timeout, eListbox::smoothTick);
+	}
+	/* store the start as a virtual source row so smoothRows() reproduces the carry offset */
+	m_smooth_from = newSel + (int)(carry >= 0 ? carry + 0.5f : carry - 0.5f);
+	m_smooth_to = newSel;
+	m_smooth_start_ms = smoothNowMs();
+	m_smooth_dur = defaultSmoothMs;
+	m_smooth_active = true;
+	m_smooth_timer->start(16, false);
+}
+
+void eListbox::smoothTick()
+{
+	if (!m_smooth_active || smoothNowMs() - m_smooth_start_ms >= m_smooth_dur)
+	{
+		m_smooth_active = false;
+		if (m_smooth_timer)
+			m_smooth_timer->stop();
+	}
+	invalidate();
+}
 int eListbox::defaultHorizontalAlignment = -1;
 int eListbox::defaultVerticalAlignment = -1;
 
@@ -657,6 +712,8 @@ int eListbox::event(int event, void *data, void *data2)
 		}
 
 		int line = 0;
+		ePoint smoothPos(0, 0);
+		bool smoothPainted = false;
 		int m_max_items = m_orientation == orGrid ? m_max_columns * m_max_rows : m_orientation == orHorizontal ? m_max_columns
 																											   : m_max_rows;
 		bool lockRow = m_lock_first_row && m_orientation == orVertical && m_content->size() > 0;
@@ -699,9 +756,17 @@ int eListbox::event(int event, void *data, void *data2)
 			}
 
 			bool sel = (m_selected == m_content->cursorGet() && m_content->size() && m_selection_enabled);
+			bool smoothSel = false;
 
 			if (sel)
 				line = m_orientation == orGrid ? (i / m_max_columns) : i;
+
+			if (sel && m_smooth_active && m_orientation == orVertical && !m_lock_first_row)
+			{
+				smoothSel = true;
+				smoothPos = ePoint(posx + xOffset, posy + yOffset);
+				sel = false;
+			}
 
 			entryRect = eRect(posx + xOffset, posy + yOffset, m_style.m_selection_width, m_style.m_selection_height);
 			gRegion entry_clip_rect = paint_region & entryRect;
@@ -715,7 +780,11 @@ int eListbox::event(int event, void *data, void *data2)
 						m_content->paint(painter, *style, ePoint(posx + xOffset, posy + yOffset), 0);
 				}
 				else if (m_orientation == orVertical)
+				{
 					m_content->paint(painter, *style, ePoint(posx + xOffset, posy + yOffset), sel);
+					if (smoothSel)
+						smoothPainted = true;
+				}
 #ifdef USE_LIBVUGLES2
 				if (sel && m_orientation == orVertical)
 				{
@@ -732,6 +801,15 @@ int eListbox::event(int event, void *data, void *data2)
 
 		m_content->cursorSaveLine(line);
 		m_content->cursorRestore();
+
+		/* sliding highlight: the selected row is drawn last, shifted towards the previous row */
+		if (smoothPainted)
+		{
+			int pitch = m_itemheight + m_spacing.y();
+			int dy = (int)(smoothRows() * (float)pitch);
+			if (m_content->cursorGet() == m_selected)
+				m_content->paint(painter, *style, ePoint(smoothPos.x(), smoothPos.y() + dy), 1);
+		}
 
 		// draw selected item last for horizontal/grid orientations
 		if (m_selected == m_content->cursorGet() && m_content->size() && m_selection_enabled && m_orientation != orVertical)
@@ -1881,6 +1959,12 @@ void eListbox::moveSelection(int dir)
 		}
 		else if (m_selected != oldSel)
 		{
+			if (defaultSmoothMs > 0 && m_orientation == orVertical && !m_lock_first_row && dir != justCheck && std::abs(m_selected - oldSel) == 1)
+			{
+				smoothStart(oldSel, m_selected);
+				invalidate();
+				return;
+			}
 			gRegion inv = eRect(getItemPostion(m_selected), eSize((m_style.m_selection_width), (m_style.m_selection_height)));
 			inv |= eRect(getItemPostion(oldSel), eSize((m_style.m_selection_width), (m_style.m_selection_height)));
 			invalidate(inv);

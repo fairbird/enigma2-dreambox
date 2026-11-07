@@ -1482,6 +1482,12 @@ void gEGLDC::exec(const gOpcode* opcode) {
 						break;
 					}
 				}
+				for (size_t i = 0; i < s_anim_profiles.size(); ++i) {
+					if (s_anim_profiles[i].id == spec_id) {
+						spec = s_anim_profiles[i];
+						break;
+					}
+				}
 			}
 			// a window shown in the same frame replaces a pending hide, so the new
 			// window animates in over the old one instead of the old one animating
@@ -1551,9 +1557,9 @@ std::mutex gEGLDC::s_anim_mutex;
 gEGLDC::AnimSpec gEGLDC::s_anim_spec;
 int gEGLDC::s_anim_counter = 0;
 std::vector<gEGLDC::AnimSpec> gEGLDC::s_anim_history;
+std::vector<gEGLDC::AnimSpec> gEGLDC::s_anim_profiles;
 
-void gEGLDC::setAnimationSpec(const char *spec) {
-	AnimSpec s;
+bool gEGLDC::parseAnimationSpec(const char *spec, AnimSpec &s) {
 	if (spec && *spec) {
 		std::istringstream in(spec);
 		float duration = 0.0f;
@@ -1565,6 +1571,24 @@ void gEGLDC::setAnimationSpec(const char *spec) {
 			s.valid = true;
 		}
 	}
+	return s.valid;
+}
+
+// Registers a spec that a single window can select (eWindow::setAnimationId). The
+// returned id stays valid; it is not pushed out by changes of the global animation.
+int gEGLDC::registerAnimationSpec(const char *spec) {
+	AnimSpec s;
+	if (!parseAnimationSpec(spec, s))
+		return 0;
+	std::lock_guard<std::mutex> lock(s_anim_mutex);
+	s.id = ++s_anim_counter;
+	s_anim_profiles.push_back(s);
+	return s.id;
+}
+
+void gEGLDC::setAnimationSpec(const char *spec) {
+	AnimSpec s;
+	parseAnimationSpec(spec, s);
 	{
 		std::lock_guard<std::mutex> lock(s_anim_mutex);
 		s.id = ++s_anim_counter;
