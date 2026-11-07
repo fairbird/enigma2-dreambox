@@ -28,11 +28,11 @@
 #include <lib/gdi/compositing.h>
 #include <lib/gdi/spinner.h>
 
+class eTextPara;
+
 extern int g_window_animation_current;
 extern int g_window_animation_id;
 extern int g_widget_fade_ms;
-
-class eTextPara;
 
 class gDC;
 struct gOpcode
@@ -486,6 +486,11 @@ public:
 	virtual void incrementSpinner();
 	virtual void setSpinner(eRect pos, ePtr<gPixmap> *pic, int len);
 
+	void setNativeSpinner(ePoint position, unsigned int color);
+	void setSpinnerColor(unsigned int color) { m_spinnerColor.store(color, std::memory_order_relaxed); }
+	int spinnerInterval() const { return m_nativeSpinner ? 33 : 100; }
+	void invalidateNativeSpinner() { m_nativeSpinnerVisible = false; m_nativeSpinnerScreen = eSize(); }
+
 	// A hardware-accelerated backend (see gEGLDC) can override this to
 	// intercept a glyph's raw FreeType coverage bitmap - before
 	// eTextPara::blit() (font.cpp) applies any color/background blending -
@@ -498,10 +503,6 @@ public:
 	// reusable identity to cache against. Return true to skip the existing
 	// CPU compositing loop entirely for this glyph.
 	virtual bool renderGlyph(const ePoint &pos, const uint8_t *data, int width, int height, int pitch, const gRGB &color, uint64_t glyph_key) { return false; }
-	void setNativeSpinner(ePoint position, unsigned int color);
-	void setSpinnerColor(unsigned int color) { m_spinnerColor.store(color, std::memory_order_relaxed); }
-	int spinnerInterval() const { return m_nativeSpinner ? 33 : 100; }
-	void invalidateNativeSpinner() { m_nativeSpinnerVisible = false; m_nativeSpinnerScreen = eSize(); }
 
 	// Called by eTextPara::blit() immediately before it falls back to
 	// writing glyph pixels directly into m_pixmap's CPU buffer (renderGlyph()
