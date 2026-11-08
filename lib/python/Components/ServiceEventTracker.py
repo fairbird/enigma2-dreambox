@@ -94,6 +94,11 @@ class ServiceEventTracker:
 #		print "ServiceEventTracker set active '" + str(infobar) + "'"
 
 	@staticmethod
+	def getActiveInfoBar():
+		set = ServiceEventTracker
+		return set.InfoBarStack[set.InfoBarStackSize - 1] if set.InfoBarStackSize else None
+
+	@staticmethod
 	def popActiveInfoBar():
 		set = ServiceEventTracker
 		stack = set.InfoBarStack
