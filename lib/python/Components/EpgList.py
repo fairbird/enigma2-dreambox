@@ -126,11 +126,6 @@ class EPGList(GUIComponent):
 		self.onSelChanged.remove(func)
 
 	def selectionChanged(self):
-		# In graphic mode the highlight is drawn by buildEntry() for the row matching
-		# CurrentBouquetService, so keep it in sync with the cursor and redraw.
-		if self.graphic and self.instance is not None and self.l.getCurrentSelection():
-			self.CurrentBouquetService = self.getCurrentBouquetService()
-			self.l.invalidate()
 		for x in self.onSelChanged:
 			if x is not None:
 				x()
@@ -144,7 +139,7 @@ class EPGList(GUIComponent):
 
 	def postWidgetCreate(self, instance):
 		instance.setWrapAround(True)
-		instance.selectionChanged.get().remove(self.selectionChanged)
+		instance.selectionChanged.get().append(self.selectionChanged)
 		instance.setContent(self.l)
 
 	def preWidgetRemove(self, instance):
