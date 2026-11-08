@@ -778,19 +778,11 @@ def InitUsageConfig():
 		config.usage.lcd_show_symbols.addNotifier(lcdShowSymbols)
 
 	if BoxInfo.getItem("WakeOnLAN"):
-		f = open(BoxInfo.getItem("WakeOnLAN"), "r")
-		status = f.read().strip()
-		f.close()
-
 		def wakeOnLANChanged(configElement):
-			if status in ("enable", "disable"):
-				with open(BoxInfo.getItem("WakeOnLAN"), "w") as fd:
-					fd.write(configElement.value and "enable" or "disable")
-			else:
-				with open(BoxInfo.getItem("WakeOnLAN"), "w") as fd:
-					fd.write(configElement.value and "on" or "off")
-		config.usage.wakeOnLAN = ConfigYesNo(default=False)
-		config.usage.wakeOnLAN.addNotifier(wakeOnLANChanged)
+			fileWriteLine(BoxInfo.getItem("WakeOnLAN"), BoxInfo.getItem("WakeOnLANType")[configElement.value], source=MODULE_NAME)
+
+		config.network.wol = ConfigYesNo(default=False)
+		config.network.wol.addNotifier(wakeOnLANChanged)
 
 	if BoxInfo.getItem("hasXcoreVFD"):
 		def set12to8characterVFD(configElement):
