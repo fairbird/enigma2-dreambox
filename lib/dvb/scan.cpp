@@ -1322,11 +1322,11 @@ void eDVBScan::channelDone()
 
 		if (!(m_flags & scanOnlyFree) || !m_pmt_in_progress->second.scrambled) {
 			SCAN_eDebug("[eDVBScan] add not scrambled!");
-			m_new_servicerefs.push_back(ref);
 			std::pair<std::map<eServiceReferenceDVB, ePtr<eDVBService> >::iterator, bool> i =
 				m_new_services.insert(std::pair<eServiceReferenceDVB, ePtr<eDVBService> >(ref, service));
 			if (i.second)
 			{
+				m_new_servicerefs.push_back(ref);
 				m_last_service = i.first;
 				m_event(evtNewService);
 			}

@@ -132,12 +132,31 @@ class ServiceScan(Screen):
 				print(f"[ServiceScan] Starting service scan run {self.run + 1} of {len(self.scanList)}.")
 			self["pass"].setText(f"{_("Pass")} {self.run + 1}/{len(self.scanList)}: {_("Tuner")} {chr(ord("A") + frontendID)}")
 
+	@staticmethod
+	def getServiceKey(serviceRef):
+		ref = eServiceReference(serviceRef)
+		if ref.type == eServiceReference.idDVB and not ref.getPath():
+			return tuple(ref.getUnsignedData(index) for index in range(1, 8))
+		return ref.toCompareString()
+
 	def newService(self):
-		self.foundServices += 1
 		serviceName = self.scan.getLastServiceName()
 		serviceRef = self.scan.getLastServiceRef()
 		if self.bouquetRepair is not None:
 			self.bouquetRepair.addScannedService(serviceRef)
+
+		serviceKey = self.getServiceKey(serviceRef)
+		for index, (_oldName, oldRef) in enumerate(self.serviceList):
+			if self.getServiceKey(oldRef) == serviceKey:
+				self.serviceList[index] = (serviceName, serviceRef)
+				self["servicelist"].setList(self.serviceList)
+				self["servicelist"].goBottom()
+				print(f"[ServiceScan] Updated service '{serviceName}' with service reference '{serviceRef}'.")
+				for callback in self.onServiceChanged:
+					callback(serviceName)
+				return
+
+		self.foundServices += 1
 		self.serviceList.append((serviceName, serviceRef))
 		self["servicelist"].setList(self.serviceList)
 		self["servicelist"].goBottom()
