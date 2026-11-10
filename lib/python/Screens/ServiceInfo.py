@@ -3,6 +3,7 @@ from Components.MenuList import MenuList
 from Screens.Screen import Screen
 from Components.ActionMap import ActionMap
 from Components.Label import Label
+from Components.SystemInfo import VideoCodec
 from ServiceReference import ServiceReference
 from enigma import eListboxPythonMultiContent, gFont, iServiceInformation, eServiceCenter, eDVBFrontendParametersSatellite, RT_HALIGN_LEFT, RT_VALIGN_CENTER
 from Tools.Transponder import ConvertToHumanReadable
@@ -142,8 +143,7 @@ class ServiceInfo(Screen):
 				refstr = _("N/A")
 			resolution = "-"
 			if self.info:
-				from Components.Converter.PliExtraInfo import codec_data
-				videocodec = codec_data.get(self.info.getInfo(iServiceInformation.sVideoType), "N/A")
+				videocodec = VideoCodec.getName(self.info.getInfo(iServiceInformation.sVideoType), "N/A")
 				width = self.info.getInfo(iServiceInformation.sVideoWidth)
 				height = self.info.getInfo(iServiceInformation.sVideoHeight)
 				if width > 0 and height > 0:
