@@ -14,7 +14,7 @@ from Components.config import config, ConfigOnOff, ConfigSelection, ConfigSelect
 from Tools.Directories import fileExists, resolveFilename, SCOPE_SKIN
 from Tools.HardwareInfo import HardwareInfo
 
-config.osd.window_animation = ConfigOnOff(default=True)
+config.osd.window_animation = ConfigOnOff(default=False)
 config.osd.window_animation_default = ConfigText(default="simple_fade")
 config.osd.widget_animation = ConfigSelection(default="off", choices=[("off", _("No")), ("on", _("Yes"))])
 config.osd.widget_animation_display = ConfigSelection(default="off", choices=[("off", _("No")), ("on", _("Yes"))])
