@@ -24,6 +24,7 @@ class Screen(dict):
 	NO_SUSPEND = False  # Deprecated feature needed for plugins
 	SUSPEND_STOPS = True  # Deprecated feature needed for plugins
 	SUSPEND_PAUSES = True  # Deprecated feature needed for plugins
+	animationHook = None
 
 	ALLOW_SUSPEND = True
 	globalScreen = None
@@ -150,6 +151,8 @@ class Screen(dict):
 		if not (self.shown and self.alreadyShown) and self.instance:
 			self.shown = True
 			self.alreadyShown = True
+			if Screen.animationHook:
+				Screen.animationHook(self)
 			self.instance.show()
 			for method in self.onShow:
 				method()

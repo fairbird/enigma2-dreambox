@@ -80,6 +80,7 @@
 						<item key="autolanguage_setup" level="1" text="Auto Language Settings" description="This options for auto language setup."><setup setupKey="AutoLanguage" /></item>
 					</menu>
 				</menu>
+				<item key="animation_setup" text="OSD Animations Settings" description="This options for window animation setup." level="0" weight="45"><screen module="AnimationSetup" screen="AnimationSetup" /></item>
 				<menu key="gui" level="0" text="GUI Settings" description="This menu contains GUI settings.">
 					<item key="locale_setup" level="0" text="Locale / Language Settings" description="This options for language setup."><screen module="LocaleSelection"/></item>
 					<!-- Menu / Setup / Time -->

@@ -7,6 +7,7 @@ eWidget::eWidget(eWidget* parent) : m_animation(this), m_parent(parent ? parent-
 	m_gradient_set = false;
 	m_gradient_direction = 0;
 	m_vis = 0;
+	m_layer_capture = false;
 	m_layer = 0;
 	m_desktop = 0;
 	m_z_position = 0;
@@ -134,6 +135,23 @@ void eWidget::invalidate(const gRegion &region)
 	}
 }
 
+void eWidget::fadeContent()
+{
+	if (!(m_vis & wVisShow) || m_visible_with_childs.empty())
+		return;
+	eWidget *root = this;
+	ePoint abspos = position();
+	while (root && !root->m_desktop)
+	{
+		root = root->m_parent;
+		if (!root)
+			return;
+		abspos += root->position();
+	}
+	if (root && root->m_desktop)
+		root->m_desktop->startFade(eRect(abspos, size()));
+}
+
 void eWidget::show()
 {
 	if (m_vis & wVisShow)
@@ -216,7 +234,10 @@ void eWidget::hide()
 			   so the whole screen must be redrawn once it's gone. */
 			root->m_desktop->invalidate(gRegion(eRect(ePoint(0, 0), root->m_desktop->size())));
 		else
+		{
+			root->m_desktop->addEraseRegion(abs);
 			root->m_desktop->invalidate(abs);
+		}
 	}
 	if (m_stack)
 		m_stack->invalidateChilds();
@@ -422,12 +443,26 @@ int eWidget::event(int event, void *data, void *data2)
 					}
 					else
 					{
+						// Under GLES (see gEGLDC::executeRectangle()'s
+						// comment), each of these two draws needs its own
+						// blend formula picked from the color it's actually
+						// filling with, not a single widget-wide flag: an
+						// opaque border/fill (the common case) must use the
+						// "over" formula so its AA corner fringe doesn't leak
+						// to the video plane, while a deliberately
+						// translucent fill (e.g. a Pig-style video window's
+						// near-transparent backgroundColor) must keep using
+						// the "hole" formula so it still actually reveals
+						// video, not just tint over it. Other backends are
+						// unaffected either way - they never had a
+						// use-formula distinction here.
+						gRGB innerColor = m_have_background_color ? m_background_color : gRGB(0, 0, 0);
 						painter.setBackgroundColor(m_border_color);
-						painter.drawRectangle(eRect(ePoint(0, 0), size()));
+						painter.drawRectangle(eRect(ePoint(0, 0), size()), painter.usingGLES() && m_border_color.a == 0);
 						if (r)
 							painter.setRadius(r, m_cornerRadiusEdges);
-						painter.setBackgroundColor(m_have_background_color ? m_background_color : gRGB(0, 0, 0));
-						painter.drawRectangle(eRect(m_border_width, m_border_width, size().width() - m_border_width * 2, size().height() - m_border_width * 2));
+						painter.setBackgroundColor(innerColor);
+						painter.drawRectangle(eRect(m_border_width, m_border_width, size().width() - m_border_width * 2, size().height() - m_border_width * 2), painter.usingGLES() && innerColor.a == 0);
 					}
 
 					drawborder = false;

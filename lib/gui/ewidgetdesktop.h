@@ -3,6 +3,8 @@
 
 #include <lib/gdi/grc.h>
 #include <lib/base/eptrlist.h>
+#include <vector>
+#include <stdint.h>
 
 class eWidget;
 class eMainloop;
@@ -50,6 +52,7 @@ public:
 	void paintLayer(eWidget *widget, int layer);
 	void paintModalIm(eWidget *widget);
 	void paint();
+	void addEraseRegion(const gRegion &region) { m_erase_region |= region; }
 	void setDC(gDC *dc);
 
 	void setBackgroundColor(gRGB col);
@@ -74,8 +77,12 @@ public:
 
 	void resize(eSize size);
 	eSize size() const { return m_screen.m_screen_size; }
-	void sendShow(ePoint point, eSize size);
-	void sendHide(ePoint point, eSize size);
+	void sendShow(ePoint point, eSize size, int anim_id = 0);
+	void sendHide(ePoint point, eSize size, int anim_id = 0);
+	void captureLayer(eWidget *widget);
+	void setWidgetAnimationsEnabled(bool enabled);
+	void setWidgetAnimationDuration(int ms);
+	void startFade(const eRect &area);
 	eRect bounds() const; // returns area inside margins
 	eRect margins() const { return m_margins; }
 	void setMargins(const eRect& value) { m_margins = value; }
@@ -91,6 +98,7 @@ private:
 	int m_require_redraw;
 
 	eWidgetDesktopCompBuffer m_screen;
+	gRegion m_erase_region;
 
 	void createBufferForWidget(eWidget *widget, int layer, const eRect *bboxOverride = 0);
 	void removeBufferForWidget(eWidget *widget, int layer);
@@ -102,6 +110,17 @@ private:
 
 	int m_style_id;
 	eRect m_margins;
+
+	struct FadeEntry
+	{
+		eRect rect;
+		int64_t end_ms;
+	};
+	bool m_widget_anim;
+	int m_widget_anim_ms;
+	std::vector<FadeEntry> m_fades;
+	ePtr<eTimer> m_fade_timer;
+	void fadeTick();
 };
 
 #endif

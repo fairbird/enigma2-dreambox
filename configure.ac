@@ -11,6 +11,7 @@ AC_SYS_LARGEFILE
 
 AC_PROG_CC
 AC_PROG_CXX
+PKG_PROG_PKG_CONFIG
 m4_ifdef([LT_INIT], [LT_INIT], [AC_PROG_LIBTOOL])
 AC_CONFIG_MACRO_DIR([m4])
 AC_OPENMP()
@@ -208,6 +209,17 @@ AS_IF([test "$BOXTYPE" == "dm500hd"],[AC_DEFINE(HWDM500HD, 1,[dm500hd])])
 AS_IF([test "$BOXTYPE" == "dm800sev2"],[AC_DEFINE(HWDM800SEV2, 1,[dm800sev2])])
 AS_IF([test "$BOXTYPE" == "dm500hdv2"],[AC_DEFINE(HWDM500HDV2, 1,[dm500hdv2])])
 
+AC_ARG_WITH(osdanimation,
+	AS_HELP_STRING([--with-osdanimation], [use osd animation, yes or no]),
+	[[withosdanimation=$withval]],
+	[[withosdanimation=no]]
+)
+if test x"$withosdanimation" != xno ; then
+
+	AC_DEFINE(HAVE_OSDANIMATION, 1,[Define if driver supports animation of osd])
+fi
+AM_CONDITIONAL(HAVE_OSDANIMATION, test x"$withosdanimation" != xno)
+
 if test `echo "$BOXTYPE" | cut -b 1-2` == "dm" -o `echo "$BOXTYPE" | cut -b 1-5` == "dream"; then
 	AC_DEFINE(DREAMBOX, 1, [Dreambox hardware])
 	AC_DEFINE(KEY_PLAY_ACTUALLY_IS_KEY_PLAYPAUSE, 1,[define when rc sends a KEY_PLAY event for its KEY_PLAYPAUSE key])
@@ -324,6 +336,88 @@ if test "$with_libxine" = "yes"; then
 	AC_DEFINE([WITH_XINE],[1],[Define to 1 if you have libxine])
 fi
 AM_CONDITIONAL(HAVE_LIBXINE, test "$with_libxine" = "yes")
+
+AC_ARG_WITH([egl],
+  AS_HELP_STRING([--with-egl], [enable EGL/GLES2/GLES3 backend, yes/no/auto]),
+  [],
+  [with_egl=no])
+
+# Unlike most --with-* switches here, EGL is not something a box gets by
+# default: with_egl defaults to "no", so a box only gets probed for EGL/GLES
+# when whatever's driving this build (e.g. the recipe's EXTRA_OECONF, keyed
+# off the distro-level ENABLE_E2EGL var) explicitly passes --with-egl.
+# Boxes whose SDK merely happens to carry EGL/GLESv2/GLES3 pkg-config
+# metadata without a working backend (this has bitten vuduo4kse, vusolo4k
+# and vuultimo4k in the past, with link failures such as "undefined
+# reference to glBindVertexArray") simply never pass --with-egl and are
+# never probed at all - with_egl stays "no" and PKG_CHECK_MODULES below
+# never runs.
+have_egl=no
+have_gles2=no
+have_gles3=no
+
+AS_IF([test "x$with_egl" != "xno"], [
+  PKG_CHECK_MODULES([EGL], [egl], [have_egl=yes], [have_egl=no])
+  PKG_CHECK_MODULES([GLES2], [glesv2], [have_gles2=yes], [have_gles2=no])
+])
+
+AS_IF([test "x$have_gles2" = "xyes"], [
+  saved_CPPFLAGS="$CPPFLAGS"
+  CPPFLAGS="$CPPFLAGS $GLES2_CFLAGS"
+  AC_CHECK_HEADERS([GLES3/gl3.h], [have_gles3=yes], [have_gles3=no])
+  CPPFLAGS="$saved_CPPFLAGS"
+])
+
+AS_IF([test "x$with_egl" = "xyes"], [
+  AS_IF([test "x$have_egl" != "xyes" -o "x$have_gles2" != "xyes"], [
+    AC_MSG_ERROR([--with-egl was given, but egl and/or glesv2 were not found])
+  ])
+])
+
+# Baseline requirement is EGL + GLESv2 - this alone decides use_egl.
+AS_IF([test "x$have_egl" = "xyes" -a "x$have_gles2" = "xyes"], [
+  AC_DEFINE([HAVE_EGL], [1], [Define if EGL/GLES2 support is available])
+  use_egl=yes
+], [
+  use_egl=no
+])
+
+# GLES3 is a strictly optional upgrade on top of that baseline - it must
+# only ever ADD the extra define, never downgrade use_egl back to no when
+# GLES3/gl3.h isn't available (a very common case: many SDKs ship EGL +
+# GLESv2 without GLES3 headers at all). Getting this wrong silently drops
+# the whole EGL backend for anyone without GLES3, with no error - it just
+# falls back to gfbdc/sdl as if --with-egl had never been requested.
+AS_IF([test "x$use_egl" = "xyes" -a "x$have_gles3" = "xyes"], [
+  AC_DEFINE([HAVE_GLES3], [1], [Define if GLES3 support is available])
+])
+
+AM_CONDITIONAL([HAVE_EGL], [test "x$use_egl" = "xyes"])
+
+AC_SUBST([EGL_CFLAGS])
+AC_SUBST([EGL_LIBS])
+AC_SUBST([GLES2_CFLAGS])
+AC_SUBST([GLES2_LIBS])
+
+# Dreambox's VC5/BEGL EGL stack (libvc5dream/libv3ddriver) only implements the
+# EGL_EXT_platform_base *pixmap* path (see lib/gdi/egl/platform/dreambox) - it
+# is unrelated to, and independent of, the FORCE_ALPHABLENDING_ACCELERATION
+# workaround below (that one is about the older 2D/bcm blit accelerator being
+# unreliable on these boxes, not about this GPU path).
+AM_CONDITIONAL(HAVE_DREAMBOX_EGL, test "x$use_egl" = "xyes" -a \( "$BOXTYPE" == "dm7080" -o "$BOXTYPE" == "dm820" -o "$BOXTYPE" == "dm900" -o "$BOXTYPE" == "dm920" \))
+if test "x$use_egl" = "xyes" -a \( "$BOXTYPE" == "dm7080" -o "$BOXTYPE" == "dm820" -o "$BOXTYPE" == "dm900" -o "$BOXTYPE" == "dm920" \); then
+	AC_DEFINE(HAVE_DREAMBOX_EGL, 1, [Dreambox VC5/BEGL EGL pixmap backend available])
+fi
+
+AC_ARG_WITH(gles,
+	AS_HELP_STRING([--with-gles],[enable OpenGL ES 2.0 hardware acceleration, yes or no]),
+	[with_gles=$withval],[with_gles=no])
+if test "$with_gles" = "yes"; then
+	PKG_CHECK_MODULES(GLES, egl glesv2)
+	AC_DEFINE([HAVE_GLES],[1],[Define to 1 if you have GLES support])
+	BASE_LIBS="$BASE_LIBS $GLES_LIBS"
+fi
+AM_CONDITIONAL(HAVE_GLES, test "$with_gles" = "yes")
 
 AC_ARG_WITH(debug,
 	AS_HELP_STRING([--without-debug],[disable debugging code]),
@@ -485,6 +579,15 @@ if test x"$with_accelerationaccumulation" = xyes ; then
 	AC_DEFINE(SUPPORT_ACCUMULATED_ACCELERATION_OPERATIONS, 1,[Accumulate blit/fill acceleration operations])
 fi
 
+AC_ARG_WITH(libvugles2,
+	AS_HELP_STRING([--with-libvugles2],[use libvugles2, yes or no]),
+	[with_libvugles2=$withval],[with_libvugles2=no])
+if test "$with_libvugles2" = "yes"; then
+	PKG_CHECK_MODULES(LIBVUGLES2, [libvugles2])
+	GLES_CFLAGS="-DUSE_LIBVUGLES2"
+fi
+AM_CONDITIONAL(HAVE_LIBVUGLES2, test "$with_libvugles2" = "yes")
+
 AC_ARG_WITH(olde2api,
 	AS_HELP_STRING([--with-olde2api],[use olde2api, yes or no]),
 	[with_olde2api=$withval],[with_olde2api=no])
@@ -512,7 +615,7 @@ CFLAGS="$CFLAGS -Wall"
 CXXFLAGS="$CXXFLAGS -Wall -Wno-psabi \
 	-Wformat=2 -Wformat-overflow=2 -Wformat-nonliteral -Wformat-security \
 	-Wimplicit-fallthrough=5 -Wdangling-else -Wno-error=stringop-truncation -Wno-error=maybe-uninitialized -Wno-error=array-bounds= \
-	$BASE_CFLAGS $ENIGMA2_CFLAGS $PTHREAD_CFLAGS $OPENMP_CFLAGS $GLES_CFLAGS $ALSA_CFLAGS $AMCODEC_CFLAGS $FFMPEG_CFLAGS $AMADEC_CFLAGS $DVBCSA_CFLAGS"
+	$BASE_CFLAGS $ENIGMA2_CFLAGS $PTHREAD_CFLAGS $OPENMP_CFLAGS $GLES_CFLAGS $EGL_CFLAGS $GLES2_CFLAGS $ALSA_CFLAGS $AMCODEC_CFLAGS $FFMPEG_CFLAGS $AMADEC_CFLAGS $DVBCSA_CFLAGS"
 
 AX_SWIG_PYTHON_OPT="$AX_SWIG_PYTHON_OPT -DSWIG_PYTHON_LEGACY_BOOL"
 

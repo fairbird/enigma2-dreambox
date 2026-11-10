@@ -2,6 +2,7 @@
 #include <fstream>
 #include <algorithm>
 #include <lib/gdi/grc.h>
+#include <lib/gdi/glcddc.h>
 #include <lib/gdi/font.h>
 #include <lib/base/init.h>
 #include <lib/base/init_num.h>
@@ -11,6 +12,10 @@
 
 #ifdef GFX_DEBUG_DRAWRECT
 #include "../base/benchmark.h"
+#endif
+
+#ifdef HAVE_EGL
+#include <lib/gdi/egl/gegldc.h>
 #endif
 
 #ifndef SYNC_PAINT
@@ -31,7 +36,8 @@ gRC::gRC() : rp(0), wp(0)
 	m_notify_pump(eApp, 1, "gRC")
 #endif
 	,
-	m_spinner_enabled(0), m_spinneronoff(1), m_prev_idle_count(0) // NOSONAR
+	m_spinner_enabled(0), m_spinneronoff(1), m_prev_idle_count(0),
+	m_flush_issued(0), m_flush_completed(0) // NOSONAR
 {
 	ASSERT(!instance);
 	instance = this;
@@ -101,22 +107,39 @@ void gRC::submit(const gOpcode &o)
 #else
 			thread();
 #endif
-			// eDebug("[gRC] Render buffer full.");
-			// fflush(stdout);
-			usleep(1000); // wait 1 msec
+			usleep(1000);
 			continue;
 		}
-		int free = rp - wp;
-		if (free <= 0)
-			free += MAXSIZE;
-		queue[wp++] = o;
+
+		gOpcode queued = o;
+		unsigned int flush_id = 0;
+
+		if (queued.opcode == gOpcode::flush)
+		{
+			flush_id = ++m_flush_issued;
+			queued.flush_id = flush_id;
+		}
+
+		queue[wp++] = queued;
 		if (wp == MAXSIZE)
 			wp = 0;
-		if (o.opcode == gOpcode::flush || o.opcode == gOpcode::shutdown || o.opcode == gOpcode::notify)
+
 #ifndef SYNC_PAINT
+		if (queued.opcode == gOpcode::flush || queued.opcode == gOpcode::shutdown || queued.opcode == gOpcode::notify || queued.opcode == gOpcode::setResolution)
 			pthread_cond_signal(&cond); // wakeup gdi thread
 		pthread_mutex_unlock(&mutex);
+
+#ifdef HAVE_EGL
+		if (queued.opcode == gOpcode::flush && queued.dc == gEGLDC::getInstance() && flush_id)
+		{
+			pthread_mutex_lock(&mutex);
+			while (m_flush_completed < flush_id)
+				pthread_cond_wait(&cond, &mutex);
+			pthread_mutex_unlock(&mutex);
+		}
+#endif
 #else
+		if (queued.opcode == gOpcode::flush || queued.opcode == gOpcode::shutdown || queued.opcode == gOpcode::notify || queued.opcode == gOpcode::setResolution)
 			thread(); // paint
 #endif
 		break;
@@ -126,6 +149,24 @@ void gRC::submit(const gOpcode &o)
 void *gRC::thread()
 {
 	int need_notify = 0;
+#ifdef USE_LIBVUGLES2
+	if (gles_open())
+	{
+		gles_state_open();
+		gles_viewport(720, 576, 720 * 4);
+	}
+#endif
+#ifdef HAVE_EGL
+	// EGL contexts are bound per-thread via eglMakeCurrent(); this is the
+	// thread that actually executes every render opcode (o.dc->exec(&o)
+	// below), so the context must be made current here, not on the
+	// eInit/main thread that constructs gEGLDC (see egl_init.cpp).
+	if (gEGLDC::getInstance() && !gEGLDC::getInstance()->isInitialized())
+	{
+		if (!gEGLDC::getInstance()->initEGL())
+			eDebug("[gRC] gEGLDC::initEGL() failed on render thread.");
+	}
+#endif
 #ifndef SYNC_PAINT
 	while (1)
 	{
@@ -162,6 +203,16 @@ void *gRC::thread()
 				// o.dc is a gDC* filled with grabref... so we must release it here
 				o.dc->Release();
 			}
+#ifndef SYNC_PAINT
+			if (o.opcode == gOpcode::flush && o.flush_id)
+			{
+				pthread_mutex_lock(&mutex);
+				if (o.flush_id > m_flush_completed)
+					m_flush_completed = o.flush_id;
+				pthread_cond_broadcast(&cond);
+				pthread_mutex_unlock(&mutex);
+			}
+#endif
 		}
 		else
 		{
@@ -192,9 +243,37 @@ void *gRC::thread()
 				else
 					timeout.tv_sec += 2;
 
+				ePtr<gLCDDC> lcd_dc;
+				const bool lcd_fading = !gLCDDC::getInstance(lcd_dc) && lcd_dc->fadeActive();
+#ifdef HAVE_EGL
+				const bool egl_animating = gEGLDC::getInstance() && gEGLDC::getInstance()->isInitialized() && gEGLDC::getInstance()->animActive();
+#else
+				const bool egl_animating = false;
+#endif
+				if (egl_animating || lcd_fading)
+				{
+					clock_gettime(CLOCK_REALTIME, &timeout);
+					timeout.tv_nsec += 4 * 1000 * 1000;
+					if (timeout.tv_nsec >= 1000 * 1000 * 1000)
+					{
+						timeout.tv_nsec -= 1000 * 1000 * 1000;
+						timeout.tv_sec++;
+					}
+				}
+
 				int idle = 1;
 
-				if (pthread_cond_timedwait(&cond, &mutex, &timeout) == ETIMEDOUT)
+				const int wait_result = pthread_cond_timedwait(&cond, &mutex, &timeout);
+#ifdef HAVE_EGL
+				if (wait_result == ETIMEDOUT && egl_animating && rp == wp)
+				{
+					pthread_mutex_unlock(&mutex);
+					gEGLDC::getInstance()->animTick();
+					pthread_mutex_lock(&mutex);
+					continue;
+				}
+#endif
+				if (wait_result == ETIMEDOUT)
 				{
 					if (eApp && !eApp->isIdle())
 					{
@@ -223,6 +302,27 @@ void *gRC::thread()
 #endif
 		}
 	}
+#ifdef USE_LIBVUGLES2
+	gles_state_close();
+	gles_close();
+#endif
+#ifdef HAVE_EGL
+	// Mirror the initEGL() call at the top of this function: EGL contexts
+	// are per-thread, and this is the thread the context was made current
+	// on, so it must also be torn down here, before this thread exits -
+	// not later from gEGLDC's destructor, which normally runs on a
+	// different thread (eInit's teardown, on the main thread) well after
+	// this thread has already terminated. gRC's own AutoInit priority
+	// (eAutoInitNumbers::graphic) is higher than gEGLDCAutoInit's
+	// (graphic-1), so LIFO close order tears gRC down - joining this
+	// thread - before gEGLDCAutoInit::closeNow() ever runs; by then there
+	// is no longer any thread left where eglMakeCurrent()/eglDestroyContext()
+	// etc. would be valid to call, which is what crashed the closed-source
+	// EGL driver on shutdown (segfault right after "gEGLDC" in the eInit
+	// teardown log, immediately following Ctrl+C).
+	if (gEGLDC::getInstance() && gEGLDC::getInstance()->isInitialized())
+		gEGLDC::getInstance()->cleanupEGL();
+#endif
 #ifndef SYNC_PAINT
 	pthread_exit(0);
 #endif
@@ -524,6 +624,18 @@ void gPainter::drawRectangle(const eRect &area, bool useNew) {
 	m_rc->submit(o);
 }
 
+bool gPainter::usingGLES() const {
+#ifdef HAVE_EGL
+	// Same instance/init check as gRC::thread()'s own gEGLDC use above -
+	// getInstance() is a plain static accessor (not virtual), so this has no
+	// effect on gDC/gMainDC's vtable layout, unlike a would-be gDC::isGLES()
+	// virtual reachable from every backend's header.
+	return gEGLDC::getInstance() && gEGLDC::getInstance()->isInitialized();
+#else
+	return false;
+#endif
+}
+
 void gPainter::setPalette(gRGB *colors, int start, int len)
 {
 	if (m_dc->islocked())
@@ -708,7 +820,31 @@ void gPainter::end()
 		return;
 }
 
-void gPainter::sendShow(ePoint point, eSize size)
+int g_window_animation_current = 0;
+int g_window_animation_id = 0;
+int g_widget_fade_ms = 0;
+
+void gPainter::beginLayer()
+{
+	if (m_dc->islocked())
+		return;
+	gOpcode o;
+	o.opcode = gOpcode::beginLayer;
+	o.dc = m_dc.grabRef();
+	m_rc->submit(o);
+}
+
+void gPainter::endLayer()
+{
+	if (m_dc->islocked())
+		return;
+	gOpcode o;
+	o.opcode = gOpcode::endLayer;
+	o.dc = m_dc.grabRef();
+	m_rc->submit(o);
+}
+
+void gPainter::sendShow(ePoint point, eSize size, int anim_id)
 {
 	if (m_dc->islocked())
 		return;
@@ -718,10 +854,11 @@ void gPainter::sendShow(ePoint point, eSize size)
 	o.parm.setShowHideInfo = new gOpcode::para::psetShowHideInfo;
 	o.parm.setShowHideInfo->point = point;
 	o.parm.setShowHideInfo->size = size;
+	o.parm.setShowHideInfo->anim_id = anim_id > 0 ? anim_id : g_window_animation_id;
 	m_rc->submit(o);
 }
 
-void gPainter::sendHide(ePoint point, eSize size)
+void gPainter::sendHide(ePoint point, eSize size, int anim_id)
 {
 	if (m_dc->islocked())
 		return;
@@ -731,8 +868,60 @@ void gPainter::sendHide(ePoint point, eSize size)
 	o.parm.setShowHideInfo = new gOpcode::para::psetShowHideInfo;
 	o.parm.setShowHideInfo->point = point;
 	o.parm.setShowHideInfo->size = size;
+	o.parm.setShowHideInfo->anim_id = anim_id > 0 ? anim_id : g_window_animation_id;
 	m_rc->submit(o);
 }
+void gPainter::beginFade(ePoint point, eSize size, int ms)
+{
+	if (m_dc->islocked())
+		return;
+	gOpcode o;
+	o.opcode = gOpcode::beginFade;
+	o.dc = m_dc.grabRef();
+	o.parm.setShowHideInfo = new gOpcode::para::psetShowHideInfo;
+	o.parm.setShowHideInfo->point = point;
+	o.parm.setShowHideInfo->size = size;
+	o.parm.setShowHideInfo->anim_id = ms;
+	m_rc->submit(o);
+}
+
+#ifdef USE_LIBVUGLES2
+void gPainter::sendShowItem(long dir, ePoint point, eSize size)
+{
+	if (m_dc->islocked())
+		return;
+	gOpcode o;
+	o.opcode = gOpcode::sendShowItem;
+	o.dc = m_dc.grabRef();
+	o.parm.setShowItemInfo = new gOpcode::para::psetShowItemInfo;
+	o.parm.setShowItemInfo->dir = dir;
+	o.parm.setShowItemInfo->point = point;
+	o.parm.setShowItemInfo->size = size;
+	m_rc->submit(o);
+}
+void gPainter::setFlush(bool val)
+{
+	if (m_dc->islocked())
+		return;
+	gOpcode o;
+	o.opcode = gOpcode::setFlush;
+	o.dc = m_dc.grabRef();
+	o.parm.setFlush = new gOpcode::para::psetFlush;
+	o.parm.setFlush->enable = val;
+	m_rc->submit(o);
+}
+void gPainter::setView(eSize size)
+{
+	if (m_dc->islocked())
+		return;
+	gOpcode o;
+	o.opcode = gOpcode::setView;
+	o.dc = m_dc.grabRef();
+	o.parm.setViewInfo = new gOpcode::para::psetViewInfo;
+	o.parm.setViewInfo->size = size;
+	m_rc->submit(o);
+}
+#endif
 
 gDC::gDC()
 {
@@ -886,6 +1075,10 @@ void gDC::exec(const gOpcode *o)
 		break;
 	case gOpcode::setGradient:
 		m_gradient_colors = o->parm.gradient->colors;
+		// eDebug("[gDC] setGradient orientation=%d colors=%d",
+		//	o->parm.gradient->orientation,
+		//	(int)o->parm.gradient->colors.size());
+
 		m_gradient_orientation = o->parm.gradient->orientation;
 		m_gradient_alphablend = o->parm.gradient->alphablend;
 		m_gradient_fullSize = o->parm.gradient->fullSize;
@@ -1228,6 +1421,21 @@ void gDC::exec(const gOpcode *o)
 		break;
 	case gOpcode::sendHide:
 		break;
+	case gOpcode::beginLayer:
+		break;
+	case gOpcode::endLayer:
+		break;
+	case gOpcode::beginFade:
+		delete o->parm.setShowHideInfo;
+		break;
+#ifdef USE_LIBVUGLES2
+	case gOpcode::sendShowItem:
+		break;
+	case gOpcode::setFlush:
+		break;
+	case gOpcode::setView:
+		break;
+#endif
 	case gOpcode::enableSpinner:
 		enableSpinner();
 		break;

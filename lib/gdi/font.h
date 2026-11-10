@@ -188,6 +188,12 @@ public:
 
 	void blit(gDC &dc, const ePoint &offset, const gRGB &background, const gRGB &foreground, bool border = false, bool marked = false);
 
+	// Needed by gEGLDC::exec()'s gOpcode::renderPara handling (gegldc.cpp) to
+	// know which screen region to composite after blit() has run - area is
+	// otherwise private, unlike gOpcode::renderText's own area field which
+	// callers can read directly off the opcode.
+	const eRect &getArea() const { return area; }
+
 	enum
 	{
 		dirLeft,
@@ -226,6 +232,18 @@ public:
 		ASSERT(num >= 0);
 		ASSERT(num < (int)glyphs.size());
 		return glyphs[num].bbox;
+	}
+
+	// Needed by gEGLDC::exec()'s gOpcode::renderPara handling (gegldc.cpp) to
+	// check, before blit() runs, whether any glyph carries GS_INVERT (a
+	// marked/selected character - see eListboxPythonConfigContent::paint()'s
+	// "mtext" handling) - flags is otherwise private, same reasoning as
+	// getGlyphBBox() above.
+	int getGlyphFlags(int num) const
+	{
+		ASSERT(num >= 0);
+		ASSERT(num < (int)glyphs.size());
+		return glyphs[num].flags;
 	}
 
 	void setGlyphFlag(int g, int f)

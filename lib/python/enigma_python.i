@@ -664,8 +664,18 @@ extern const char *getEnigmaVersionString();
 extern int getImageFingerprint();
 extern const char *getBoxType();
 extern const char *getGStreamerVersionString();
+extern const char *getEGLVersionString();
+extern const char *getGLESVersionString();
 extern void dump_malloc_stats(void);
+#ifndef HAVE_OSDANIMATION
+extern void setAnimation_current(int a);
+extern void setAnimation_speed(int speed);
+extern void setAnimation_current_listbox(int a);
+#endif
 extern void pauseInit(void);
+extern void setAnimation_spec(const char *spec);
+extern int registerAnimation_spec(const char *spec);
+extern void setListboxSmoothSelection(int ms);
 extern void resumeInit(void);
 extern int checkInternetAccess(const char* host, int timeout = 3);
 extern int getE2Flags();
@@ -684,8 +694,18 @@ extern const char *getEnigmaVersionString();
 extern int getImageFingerprint();
 extern const char *getBoxType();
 extern const char *getGStreamerVersionString();
+extern const char *getEGLVersionString();
+extern const char *getGLESVersionString();
 extern void dump_malloc_stats(void);
+#ifndef HAVE_OSDANIMATION
+extern void setAnimation_current(int a);
+extern void setAnimation_speed(int speed);
+extern void setAnimation_current_listbox(int a);
+#endif
 extern void pauseInit(void);
+extern void setAnimation_spec(const char *spec);
+extern int registerAnimation_spec(const char *spec);
+extern void setListboxSmoothSelection(int ms);
 extern void resumeInit(void);
 extern int checkInternetAccess(const char* host, int timeout = 3);
 extern int getE2Flags();

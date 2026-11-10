@@ -2,8 +2,13 @@
 #include <lib/gui/ewidget.h>
 #include <lib/base/ebase.h>
 #include <lib/gdi/grc.h>
+#include <chrono>
 
 extern void dumpRegion(const gRegion &region);
+
+#ifdef HAVE_EGL
+extern "C" void egl_release_surface_texture(unsigned int gl_texture_id, const void *surface);
+#endif
 
 void eWidgetDesktop::addRootWidget(eWidget *root)
 {
@@ -66,7 +71,7 @@ void eWidgetDesktop::calcWidgetClipRegion(eWidget *widget, gRegion &parent_visib
 		widget->m_visible_region.moveBy(widget->position());
 		widget->m_visible_region &= parent_visible; // in parent space!
 
-		if (!widget->isTransparent() && !widget->isModal() && (!widget->m_gradient_alphablend || parent) && (widget->m_cornerRadius == 0 || parent) && (!widget->m_alphaBlend || parent))
+		if (!widget->isTransparent() && !widget->isModal() && !widget->m_needs_backdrop && (!widget->m_gradient_alphablend || parent) && (widget->m_cornerRadius == 0 || parent) && (!widget->m_alphaBlend || parent))
 				/* remove everything this widget will contain from parent's visible list, unless widget is transparent. */
 			parent_visible -= widget->m_visible_region; // will remove child regions too!
 
@@ -372,6 +377,16 @@ void eWidgetDesktop::paintModalIm(eWidget *widget)
 
 	ePtr<gPixmap> pm;
 	comp->m_dc->getPixmap(pm);
+#ifdef HAVE_EGL
+	/* this buffer is redrawn by the CPU on every update, but the EGL texture cache keeps the
+	   first upload forever; drop it so the blit below uploads the new content. */
+	if (pm && pm->surface && pm->surface->gl_texture_id)
+	{
+		unsigned int texture_id = pm->surface->gl_texture_id;
+		pm->surface->gl_texture_id = 0;
+		egl_release_surface_texture(texture_id, pm->surface);
+	}
+#endif
 	gPainter painter(m_screen.m_dc);
 	painter.resetClip(dirty);
 	painter.blit(pm, comp->m_position, eRect(), gPixmap::blitAlphaBlend);
@@ -388,7 +403,17 @@ void eWidgetDesktop::paint()
 			   composite over the windows below them. for regular
 			   (mutually disjoint) windows the order doesn't matter. */
 		gRegion dirty = m_screen.m_dirty_region;
+		gRegion erase = m_erase_region & dirty;
+		m_erase_region = gRegion();
+		erase -= m_screen.m_background_region;
 		paintBackground(&m_screen);
+		if (!erase.empty())
+		{
+			gPainter clearPainter(m_screen.m_dc);
+			clearPainter.resetClip(erase);
+			clearPainter.setBackgroundColor(m_screen.m_background_color);
+			clearPainter.clear();
+		}
 		m_screen.m_dirty_region = dirty;
 
 		ePtrList<eWidget>::iterator i(m_root.end());
@@ -415,6 +440,15 @@ void eWidgetDesktop::paint()
 		}
 
 		m_screen.m_dirty_region = gRegion();
+
+		for (ePtrList<eWidget>::iterator c(m_root.begin()); c != m_root.end(); ++c)
+		{
+			if (c->m_layer_capture)
+			{
+				c->m_layer_capture = false;
+				captureLayer(c);
+			}
+		}
 
 		gPainter painter(m_screen.m_dc);
 		painter.flush();
@@ -514,7 +548,9 @@ eWidgetDesktop::eWidgetDesktop(eSize size):
 	m_mainloop(0),
 	m_require_redraw(0),
 	m_style_id(0),
-	m_margins(0,0,0,0)
+	m_margins(0,0,0,0),
+	m_widget_anim(false),
+	m_widget_anim_ms(400)
 {
 	m_screen.m_dirty_region = gRegion(eRect(ePoint(0, 0), size));
 	m_screen.m_screen_size = size;
@@ -626,24 +662,121 @@ void eWidgetDesktop::resize(eSize size)
 	m_screen.m_dirty_region = gRegion(eRect(ePoint(0, 0), size));
 	m_screen.m_screen_size = size;
 
+#ifdef USE_LIBVUGLES2
+	gPainter painter(m_screen.m_dc);
+	painter.setView(size);
+#endif
 }
 
-void eWidgetDesktop::sendShow(ePoint point, eSize size)
+void eWidgetDesktop::captureLayer(eWidget *widget)
+{
+	if (m_comp_mode != cmImmediate || m_style_id != 0)
+		return;
+	if (!(widget->m_vis & eWidget::wVisShow) || widget->m_visible_with_childs.empty())
+		return;
+
+	gRegion region = gRegion(eRect(widget->position(), widget->size()));
+	gPainter painter(m_screen.m_dc);
+	painter.beginLayer();
+	widget->doPaint(painter, region, 0);
+	painter.endLayer();
+}
+
+static int64_t fadeNowMs()
+{
+	return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now().time_since_epoch()).count();
+}
+
+void eWidgetDesktop::setWidgetAnimationsEnabled(bool enabled)
+{
+	m_widget_anim = enabled;
+	if (!enabled)
+	{
+		m_fades.clear();
+		if (m_fade_timer)
+			m_fade_timer->stop();
+	}
+}
+
+void eWidgetDesktop::setWidgetAnimationDuration(int ms)
+{
+	if (ms < 50)
+		ms = 50;
+	if (ms > 1000)
+		ms = 1000;
+	m_widget_anim_ms = ms;
+	g_widget_fade_ms = ms;
+}
+
+void eWidgetDesktop::startFade(const eRect &area)
+{
+	if (!m_widget_anim || m_comp_mode != cmImmediate || !m_mainloop)
+		return;
+	if (area.width() <= 0 || area.height() <= 0)
+		return;
+	{
+		gPainter painter(m_screen.m_dc);
+		painter.beginFade(ePoint(area.x(), area.y()), area.size(), m_widget_anim_ms);
+	}
+	const int64_t end = fadeNowMs() + m_widget_anim_ms + 80;
+	bool found = false;
+	for (size_t i = 0; i < m_fades.size(); ++i)
+	{
+		const eRect &r = m_fades[i].rect;
+		if (r.x() == area.x() && r.y() == area.y() && r.width() == area.width() && r.height() == area.height())
+		{
+			m_fades[i].end_ms = end;
+			found = true;
+		}
+	}
+	if (!found)
+	{
+		if (m_fades.size() >= 8)
+			return;
+		FadeEntry entry;
+		entry.rect = area;
+		entry.end_ms = end;
+		m_fades.push_back(entry);
+	}
+	if (!m_fade_timer)
+	{
+		m_fade_timer = eTimer::create(m_mainloop);
+		CONNECT(m_fade_timer->timeout, eWidgetDesktop::fadeTick);
+	}
+	if (!m_fade_timer->isActive())
+		m_fade_timer->start(33, false);
+}
+
+void eWidgetDesktop::fadeTick()
+{
+	const int64_t now = fadeNowMs();
+	for (size_t i = 0; i < m_fades.size();)
+	{
+		if (now >= m_fades[i].end_ms)
+			m_fades.erase(m_fades.begin() + i);
+		else
+			++i;
+	}
+	if (m_fades.empty() && m_fade_timer)
+		m_fade_timer->stop();
+}
+
+void eWidgetDesktop::sendShow(ePoint point, eSize size, int anim_id)
 {
 	if(m_style_id!=0)
 		return;
 
 	gPainter painter(m_screen.m_dc);
-	painter.sendShow(point, size);
+	painter.sendShow(point, size, anim_id);
 }
 
-void eWidgetDesktop::sendHide(ePoint point, eSize size)
+void eWidgetDesktop::sendHide(ePoint point, eSize size, int anim_id)
 {
 	if(m_style_id!=0)
 		return;
 
 	gPainter painter(m_screen.m_dc);
-	painter.sendHide(point, size);
+	painter.sendHide(point, size, anim_id);
 }
 
 eRect eWidgetDesktop::bounds() const

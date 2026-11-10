@@ -22,12 +22,17 @@
 #include <lib/base/modelinformation.h>
 #include <lib/base/nconfig.h>
 #include <lib/gdi/gmaindc.h>
+#ifdef HAVE_EGL
+#include <lib/gdi/egl/gegldc.h>
+#include <lib/gdi/egl/gles_version.h>
+#endif
 #include <lib/gdi/glcddc.h>
 #include <lib/gdi/grc.h>
 #include <lib/gdi/epng.h>
 #include <lib/gdi/font.h>
 #include <lib/gui/ebutton.h>
 #include <lib/gui/elabel.h>
+#include <lib/gui/elistbox.h>
 #include <lib/gui/elistboxcontent.h>
 #include <lib/gui/ewidget.h>
 #include <lib/gui/ewidgetdesktop.h>
@@ -407,6 +412,25 @@ const char *getBoxType()
 	return BOXTYPE;
 }
 
+// Driver-reported EGL / GLES version strings; empty when not running on the EGL backend.
+const char *getEGLVersionString()
+{
+#ifdef HAVE_EGL
+	return gles::eglVersionString.c_str();
+#else
+	return "";
+#endif
+}
+
+const char *getGLESVersionString()
+{
+#ifdef HAVE_EGL
+	return gles::glesVersionString.c_str();
+#else
+	return "";
+#endif
+}
+
 const char *getGStreamerVersionString()
 {
 	return gst_version_string();
@@ -474,5 +498,56 @@ void dump_malloc_stats(void)
 #endif
 #else
 	eDebug("MALLOC: info not exposed");
+#endif
+}
+
+#ifdef USE_LIBVUGLES2
+#include <vuplus_gles.h>
+void setAnimation_current(int a)
+{
+	gles_set_animation_func(a);
+}
+
+void setAnimation_speed(int speed)
+{
+	gles_set_animation_speed(speed);
+}
+
+void setAnimation_current_listbox(int a)
+{
+	gles_set_animation_listbox_func(a);
+}
+#else
+#ifndef HAVE_OSDANIMATION
+#ifdef HAVE_EGL
+void setAnimation_current(int a) { gEGLDC::s_anim_current = a; g_window_animation_current = a; }
+void setAnimation_speed(int speed) { gEGLDC::s_anim_speed = speed; }
+void setAnimation_current_listbox(int a) { gEGLDC::s_anim_listbox = a; }
+#else
+void setAnimation_current(int a) {}
+void setAnimation_speed(int speed) {}
+void setAnimation_current_listbox(int a) {}
+#endif
+#endif
+#endif
+
+int registerAnimation_spec(const char *spec)
+{
+#ifdef HAVE_EGL
+	return gEGLDC::registerAnimationSpec(spec);
+#else
+	return 0;
+#endif
+}
+
+void setListboxSmoothSelection(int ms)
+{
+	eListbox::setSmoothSelection(ms);
+}
+
+void setAnimation_spec(const char *spec)
+{
+#ifdef HAVE_EGL
+	gEGLDC::setAnimationSpec(spec);
 #endif
 }

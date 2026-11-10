@@ -1,0 +1,371 @@
+#pragma once
+#include <atomic>
+#include <mutex>
+#include <chrono>
+#include <vector>
+#include <EGL/egl.h>
+#ifdef HAVE_GLES3
+#include <GLES3/gl3.h>
+#else
+#include <GLES2/gl2.h>
+#include <GLES2/gl2ext.h>
+#endif
+#include <lib/gdi/egl/gtexture_manager.h>
+#include <lib/gdi/egl/inative_window_provider.h>
+#include <lib/gdi/egl/shader/gadvanced_shader.h>
+#include <lib/gdi/egl/shader/gshader.h>
+#include <lib/gdi/egl/shader/gtext_shader.h>
+#include <lib/gdi/egl/shader/gtexture_shader.h>
+#include <lib/gdi/gfont_atlas.h>
+#include <lib/gdi/gmaindc.h>
+
+class gEGLDCAutoInit;
+
+class gEGLDC : public gMainDC {
+private:
+	struct AnimProp {
+		int on = 0;
+		float a = 0.0f, b = 0.0f;
+		int ax = 1, ay = 1;
+		int centered = 0;
+		int type = -1;
+		float factor = 1.0f;
+	};
+
+	struct AnimSpec {
+		bool valid = false;
+		int id = 0;
+		float duration = 0.25f;
+		int base_type = 0;
+		float base_factor = 1.0f;
+		AnimProp p[6]; // alpha show/hide, position show/hide, size show/hide
+	};
+
+	INativeWindowProvider* m_window_provider;
+	EGLDisplay m_egl_display;
+	EGLConfig m_egl_config;
+	EGLContext m_egl_context;
+
+	// One EGLSurface per framebuffer page for a pixmap-surface provider (see
+	// tryInitEGL()/flip()) so rendering can ping-pong between pages instead
+	// of always targeting the one currently being scanned out - just [0] for
+	// a window-surface provider (real double buffering there is free via
+	// eglSwapBuffers()). MAX_EGL_SURFACES bounds this to fbClass's own
+	// practical maximum (triple buffering - see fb.cpp).
+	static const int MAX_EGL_SURFACES = 3;
+	EGLSurface m_egl_surfaces[MAX_EGL_SURFACES];
+	int m_page_count; // 1 unless a multi-page pixmap-surface provider
+	int m_render_page; // index into m_egl_surfaces currently bound for rendering
+
+	int m_width;
+	int m_height;
+	int m_surface_width;
+	int m_surface_height;
+	int m_native_width;
+	int m_native_height;
+	GLuint m_fbo;
+	GLuint m_fbo_texture;
+	int m_fbo_width;
+	int m_fbo_height;
+	bool createFBO(int w, int h);
+	void destroyFBO();
+	void captureBackgroundIntoPixmap(const eRect& rect);
+	int m_gles_version; // 2 or 3
+
+	gShader m_basic_shader;
+	gAdvancedShader m_advanced_shader;
+	gTextureShader m_texture_shader;
+	gTextShader m_text_shader;
+
+	gFontAtlas m_font_atlas;
+	gTextureManager m_texture_manager;
+
+	std::vector<float> m_text_batch_buffer;
+	const size_t MAX_BATCH_GLYPHS = 1024;
+
+	// The clip flushTextBatch() must scissor this batch's glyphs against -
+	// captured once, when the batch starts (see renderGlyph()), NOT read
+	// live from m_current_clip at flush time, because the batch is drawn
+	// later than it's filled: by then m_current_clip may already be a
+	// different widget's clip entirely, or (see exec()'s renderText/
+	// renderPara handling) have been restored from the narrowed value it
+	// was temporarily set to for this specific text draw back to the
+	// wider one active around it. Mirrors m_blit_batch_clip below for the
+	// identical reason on the blit-batching side.
+	//
+	// That narrowing is the actual fix this exists for: eTextPara::blit()'s
+	// CPU path (font.cpp) always additionally intersects the active clip
+	// with the renderText/renderPara opcode's own declared area ("clip &=
+	// eRect(area...)") before drawing, which is what stops long text
+	// exactly at its own column's edge - the GPU glyph path
+	// (renderGlyph()) had no way to replicate that (it never receives
+	// `area` at all), so text rendered via the atlas was only ever
+	// clipped to the surrounding widget/row's clip, letting it overflow
+	// past its own column into whatever's drawn next (observed: EPG title
+	// text overflowing into the signal-strength meter column).
+	gRegion m_text_batch_clip;
+
+	// Batches consecutive gOpcode::blit calls that share the same texture,
+	// blend requirement, and a single clip rect into one draw call instead
+	// of one glDrawArrays per blit - targets sequences like
+	// eWindowStyleSkinned::drawBorder()'s tiled border blits (many small
+	// blits of the same tile pixmap in a row) and repeated same-icon
+	// blits, without needing a shared texture atlas. Flushed the instant
+	// anything that would change per-draw state appears (different
+	// texture/blend/clip, rounding, or any other opcode type at all - see
+	// flushBlitBatch()'s call sites), so this never reorders draws
+	// relative to other opcodes and is visually identical to drawing them
+	// one at a time.
+	std::vector<float> m_blit_batch_buffer;
+	GLuint m_blit_batch_tex_id = 0;
+	bool m_blit_batch_blend = false;
+	bool m_blit_batch_true_alpha = false;
+	bool m_blit_batch_filter_linear = true;
+	eRect m_blit_batch_clip;
+	bool m_blit_batch_active = false;
+
+	// Selects which of two different alpha-channel blend formulas the next
+	// blended draw uses - see the call sites (executeBlit/flushBlitBatch,
+	// executeRectangle, flushTextBatch, compositeTextOverlay, and
+	// executeClear's overlay recomposite) and this function's own definition
+	// in gegldc.cpp for the full reasoning. In short: this render target's
+	// alpha channel is read by the display's hardware compositor to decide
+	// how much of the video plane shows through the OSD, and the two kinds
+	// of blended content this backend draws need different alpha semantics
+	// there - trueAlphaBlend=true (text, blitAlphaBlend/blitAlphaTest
+	// images, a rectangle drawn with genuine alphaBlend) accumulates alpha
+	// normally so it stays opaque (blocking video, as it should) when
+	// layered over already-opaque content; trueAlphaBlend=false (a
+	// near-transparent rounded/bordered background like a video window's
+	// own "Pig" skin element, which isn't really semi-transparent UI so
+	// much as a punched-through hole with decoration) makes the draw's own
+	// alpha the absolute, unaccumulated result, since such a widget is
+	// deliberately layered over whatever opaque parent/screen background
+	// eWidgetDesktop::calcWidgetClipRegion() (lib/gui/ewidgetdesktop.cpp)
+	// still paints underneath it and needs to defeat that, not blend with it.
+	void setAlphaBlendMode(bool trueAlphaBlend);
+
+	void flushBlitBatch();
+
+	// Union of every area compositeTextOverlay() has painted into that
+	// hasn't since been erased by executeClear() - lets executeClear() skip
+	// its (CPU memset + texture upload + extra draw call) stale-text erase
+	// entirely for the common case of a background clear that never had any
+	// text composited over it, instead of paying that cost on every single
+	// clear opcode once any text exists anywhere on screen.
+	gRegion m_text_overlay_region;
+
+	// Set by onGlyphCpuDrawn() whenever eTextPara::blit() (font.cpp) actually
+	// wrote glyph pixels into m_pixmap's CPU buffer during the current
+	// renderText/renderPara opcode - i.e. renderGlyph() declined a glyph (not
+	// initialized) or blit() never offered one at all (border/pre-rendered
+	// "image" glyphs). Reset before each blit() call in exec() and checked
+	// afterward so compositeTextOverlay() only runs, and only re-uploads
+	// m_pixmap's (possibly stale, untouched-this-draw) content, when the CPU
+	// path actually ran - otherwise a glyph fully handled by renderGlyph()
+	// (drawn straight to the GPU via the atlas/batch below, never touching
+	// m_pixmap) would have compositeTextOverlay() paint whatever unrelated
+	// old content happens to still sit in m_pixmap's buffer at that screen
+	// position on top of it.
+	bool m_cpu_overlay_dirty;
+
+	bool recreateEGLSurfaces(int xres, int yres);
+	void applyResolution(int xres, int yres, int bpp);
+
+	bool tryInitEGL(int version);
+
+	// Copies page `from`'s content into page `to` entirely through the GL
+	// pipeline (eglMakeCurrent with asymmetric draw/read surfaces, then
+	// glBlitFramebuffer) instead of the INativeWindowProvider's CPU memcpy
+	// fallback (see flip()) - see the comment at its call site for why this
+	// exists: this GPU's tile-based deferred renderer appears to track a
+	// surface's content by what it last wrote through the GL pipeline, not
+	// by re-reading the surface's backing memory, so a CPU memcpy into that
+	// memory can be partially invisible to it. Requires GLES3
+	// (glBlitFramebuffer); returns false (no-op) on GLES2 or if
+	// eglMakeCurrent fails, in which case the caller should fall back to
+	// the CPU path. On success this leaves EGL's current surfaces as
+	// draw=`to`, read=`from` (asymmetric, needed for the blit itself) - the
+	// caller must restore the normal draw=read=`to` current state
+	// afterward regardless of whether this returns true or false.
+	bool gpuCopyPageContent(int from, int to);
+
+
+	// window show/hide animation (see animRun())
+	GLuint m_anim_tex_before = 0;
+	GLuint m_anim_tex_after = 0;
+	GLuint m_anim_tex_layer = 0;
+	GLuint m_anim_fbo_layer = 0;
+	bool m_anim_layer_valid = false;
+	bool m_anim_in_layer = false;
+	bool m_anim_pending = false;
+	bool m_anim_show = true;
+	eRect m_anim_rect;
+	eRect m_anim_region;
+	AnimSpec m_anim_active;
+	bool animCapture(GLuint &tex, const eRect &r);
+	void animBeginLayer();
+	void animEndLayer();
+	void animState(const AnimSpec &s, bool show, const eRect &r, float t, float &alpha, float &x, float &y, float &w, float &h) const;
+	eRect animRegion(const AnimSpec &s, const eRect &r) const;
+	void animDrawFrame(float alpha, float x, float y, float w, float h, GLuint bg, GLuint layer, const eRect &region, const eRect &r);
+	void animRun();
+	void animOverlay();
+	void overlayScissor(const eRect &rect);
+	bool animCaptureBlit(GLuint &tex, GLuint &fbo, const eRect &r);
+	void animAbort();
+	GLuint m_anim_fbo_before = 0;
+	bool m_anim_clean_pending = false;
+	bool m_frame_open = false;
+	std::chrono::steady_clock::time_point m_last_op;
+	bool m_anim_running = false;
+	std::chrono::steady_clock::time_point m_anim_t0;
+	GLuint m_anim_run_bg = 0;
+	GLuint m_anim_run_layer = 0;
+
+	// widget cross-fade (see fadeBegin()/fadeDraw())
+	struct FadeItem {
+		eRect rect;
+		GLuint tex = 0;
+		std::chrono::steady_clock::time_point start;
+		float duration = 0.4f;
+	};
+	std::vector<FadeItem> m_fades;
+	void fadeBegin(const eRect &area, float seconds);
+	void fadeDraw();
+	void fadeClear();
+
+	// dedicated opcode handlers
+	void executeFill(const gOpcode* op);
+	void executeFillRegion(const gOpcode* op);
+	void executeRectangle(const gOpcode* op);
+	void executeLine(const gOpcode* op);
+	void executeBlit(const gOpcode* op);
+	void executeClear(const gOpcode* op);
+	void flushTextBatch();
+	void setGlScissor(const eRect& rect);
+
+	// Shared by gOpcode::renderText and gOpcode::renderPara for whatever
+	// glyphs renderGlyph() below didn't handle (border/pre-rendered "image"
+	// glyphs, or EGL not initialized - see m_cpu_overlay_dirty): once the
+	// software eTextPara::blit() path (called via gDC::exec()) has written
+	// those glyphs into m_pixmap's CPU buffer, upload the affected area as a
+	// texture and composite it onto the real GPU surface - m_pixmap has no
+	// GPU hook of its own, so without this nothing drawn into it ever
+	// reaches the display.
+	//
+	// trueAlphaBlend (default true) is forwarded to setAlphaBlendMode() -
+	// real content (glyphs, the spinner icon itself) needs the accumulating
+	// mode so it stacks correctly over whatever's already opaque. Erasing
+	// content back to a transparent hole (disableSpinner()) needs false:
+	// with true, alpha-blending m_pixmap's now-fully-transparent restored
+	// pixels onto a destination that still holds the last opaque spinner
+	// frame is a no-op (accumulating alpha never decreases), leaving that
+	// frame permanently stuck on screen even after the icon stops animating.
+	void compositeTextOverlay(eRect area, bool trueAlphaBlend = true);
+
+	// Resets m_pixmap's CPU buffer to fully transparent (raw alpha byte 0,
+	// not enigma's inverted gRGB convention - see the call site's comment)
+	// across `area` before a border-text renderText draw runs its CPU
+	// rasterization - eTextPara::blit() (font.cpp) only writes pixels where
+	// it actually draws glyph cells, leaving anything else in that area
+	// (padding between/around characters, or simply whatever this shared,
+	// screen-sized staging buffer held there from an earlier, unrelated
+	// draw at the same screen coordinates - it's never reset between
+	// frames otherwise) as stale/untouched bytes that compositeTextOverlay()
+	// then uploads and composites right along with the real glyph pixels.
+	void clearOverlayArea(const eRect& area);
+
+	bool renderGlyph(const ePoint& pos, const uint8_t* data, int width, int height, int pitch, const gRGB& color, uint64_t glyph_key) override;
+	void onGlyphCpuDrawn() override { m_cpu_overlay_dirty = true; }
+
+	// gDC::enableSpinner()/disableSpinner()/incrementSpinner() (grc.cpp) draw
+	// the busy spinner with plain gPixmap::blit() calls straight into
+	// m_pixmap's CPU buffer - entirely outside the gOpcode queue, so
+	// gEGLDC::exec() never sees them. That's fine for a backend where
+	// m_pixmap *is* the displayed framebuffer, but here m_pixmap is only a
+	// CPU-side staging buffer for text (see compositeTextOverlay()'s
+	// comment) - without composing m_spinner_pos to the real GPU surface
+	// after each of these, the spinner is drawn but never actually reaches
+	// the screen.
+	void enableSpinner() override;
+	void disableSpinner() override;
+	void incrementSpinner() override;
+
+	static gEGLDC* s_instance;
+
+public:
+	// initEGL() performs eglMakeCurrent() and must be called from gRC's own
+	// render thread (see gRC::thread() in grc.cpp), NOT from the thread that
+	// constructs gEGLDC (eInit/gEGLDCAutoInit) - EGL contexts are per-thread,
+	// and gRC::thread() is the only thread that ever issues GL draw calls.
+	static gEGLDC* getInstance() { return s_instance; }
+
+	bool initEGL();
+
+	// Tears down the EGL context/surfaces/display. Like initEGL(), this
+	// must run on gRC's own render thread and NOT on whatever thread ends
+	// up destructing this object (eInit's teardown, driven by ~eMain() on
+	// the main thread - see the destructor's own comment) - eglMakeCurrent()/
+	// eglDestroyContext() etc. are meaningless (and observed to crash inside
+	// the closed-source driver) once called against a context that isn't
+	// current on, or was never made current on, the calling thread. gRC's
+	// AutoInit priority (eAutoInitNumbers::graphic, see grc.cpp) is HIGHER
+	// than gEGLDCAutoInit's (graphic-1), so gRC's own teardown - which joins
+	// and ends the render thread - runs BEFORE gEGLDCAutoInit::closeNow()
+	// even starts (LIFO close order: higher priority number inits later,
+	// closes first). By the time the destructor below would otherwise call
+	// this, the render thread is already gone - there is no longer any
+	// thread left where these calls would be valid. So gRC::thread()
+	// (grc.cpp) calls this itself, still running on the render thread,
+	// right before it exits on gOpcode::shutdown. Safe to call again
+	// afterward (from the destructor, as a fallback for any window
+	// provider/configuration where that ordering assumption doesn't hold) -
+	// it's a no-op once m_egl_display is already EGL_NO_DISPLAY.
+	void cleanupEGL();
+
+	gEGLDC(INativeWindowProvider* window_provider = nullptr, int width = 1280, int height = 720);
+	virtual ~gEGLDC();
+
+	virtual void setResolution(int xres, int yres, int bpp = 32) override;
+	virtual void exec(const gOpcode* opcode);
+
+	static std::atomic<int> s_anim_current;
+	static std::atomic<int> s_anim_speed;
+	static std::atomic<int> s_anim_listbox;
+
+	static std::mutex s_anim_mutex;
+	static AnimSpec s_anim_spec;
+	static int s_anim_counter;
+	static std::vector<AnimSpec> s_anim_history;
+	static void setAnimationSpec(const char *spec);
+	static bool parseAnimationSpec(const char *spec, AnimSpec &s);
+	static int registerAnimationSpec(const char *spec);
+	static std::vector<AnimSpec> s_anim_profiles;
+
+	void flip();
+	bool animActive() const { return m_anim_running || m_anim_clean_pending || !m_fades.empty(); }
+	void animTick();
+	bool isInitialized() const { return m_egl_context != EGL_NO_CONTEXT; }
+	int getGLESVersion() const { return m_gles_version; }
+
+
+	// gDC::islocked() defaults to 0 (unlocked) and gMainDC never overrides
+	// it either - gFBDC is the only other gMainDC subclass, and it forwards
+	// to its own fbClass* (see gfbdc.h). Without this override, every
+	// gPainter call (fill/blit/renderText/flush/flip/...) skips its
+	// `if (m_dc->islocked()) return;` guard (grc.cpp) unconditionally on
+	// this backend, so fbClass::lock()/unlock() - already called by
+	// ImageManager.py bracketing ofgwrite's Mode 2 (non-active-slot, e2
+	// stays running) flash - had no effect here: enigma2 kept drawing and
+	// flipping/presenting pages throughout the flash, racing ofgwrite's own
+	// direct framebuffer writes for the same physical memory. That race is
+	// the progress-screen flicker/corruption seen after gEGLDC's earlier
+	// fix restored real triple-buffered presentPixmap() rotation (see
+	// project memory) - before that fix a leftover forceSingleBuffer flag
+	// meant DM900 never exercised multi-page presentation, so the race was
+	// latent. Forwarding to the same fbClass singleton DreamboxWindowProvider
+	// already uses (see its init()) makes gEGLDC honor the same lock every
+	// other backend does, with no ofgwrite or Python-side change needed.
+	int islocked() const override;
+};

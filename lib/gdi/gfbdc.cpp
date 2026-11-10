@@ -53,9 +53,11 @@ gFBDC::gFBDC()
 	fb->getMode(xres, yres, bpp);
 
 	/* we can only use one of these three modes: */
-	if (!((xres == 720 && yres == 576)
-		|| (xres == 1280 && yres == 720)
-		|| (xres == 1920 && yres == 1080)))
+	if (!((xres == 720 && yres == 576) ||
+		(xres == 1280 && yres == 720) ||
+		(xres == 1920 && yres == 1080) ||
+		(xres == 2560 && yres == 1440) ||
+		(xres == 3840 && yres == 2160)))
 	{
 		/* fallback to a decent default */
 		xres = 720;
@@ -224,7 +226,15 @@ void gFBDC::exec(const gOpcode *o)
 		break;
 	}
 	case gOpcode::flush:
+#ifdef USE_LIBVUGLES2
+		if (gles_is_animation())
+			gles_do_animation();
+		else
+			fb->blit();
+		gles_flush();
+#else
 		fb->blit();
+#endif
 #if defined(CONFIG_ION)
 		if (m_scaled_output && m_logical_surface.data_phys && surface.data_phys)
 		{
@@ -345,6 +355,10 @@ void gFBDC::exec(const gOpcode *o)
 #ifdef HAVE_OSDANIMATION
 		CFile::writeIntHex("/proc/stb/fb/animation_mode", 0x01);
 #endif
+#ifdef USE_LIBVUGLES2
+		gles_set_buffer((unsigned int *)surface.data);
+		gles_set_animation(1, o->parm.setShowHideInfo->point.x(), o->parm.setShowHideInfo->point.y(), o->parm.setShowHideInfo->size.width(), o->parm.setShowHideInfo->size.height());
+#endif
 		delete o->parm.setShowHideInfo;
 		break;
 	}
@@ -353,9 +367,34 @@ void gFBDC::exec(const gOpcode *o)
 #ifdef HAVE_OSDANIMATION
 		CFile::writeIntHex("/proc/stb/fb/animation_mode", 0x10);
 #endif
+#ifdef USE_LIBVUGLES2
+		gles_set_buffer((unsigned int *)surface.data);
+		gles_set_animation(0, o->parm.setShowHideInfo->point.x(), o->parm.setShowHideInfo->point.y(), o->parm.setShowHideInfo->size.width(), o->parm.setShowHideInfo->size.height());
+#endif
 		delete o->parm.setShowHideInfo;
 		break;
 	}
+#ifdef USE_LIBVUGLES2
+	case gOpcode::sendShowItem:
+	{
+		gles_set_buffer((unsigned int *)surface.data);
+		gles_set_animation_listbox(o->parm.setShowItemInfo->dir, o->parm.setShowItemInfo->point.x(), o->parm.setShowItemInfo->point.y(), o->parm.setShowItemInfo->size.width(), o->parm.setShowItemInfo->size.height());
+		delete o->parm.setShowItemInfo;
+		break;
+	}
+	case gOpcode::setFlush:
+	{
+		gles_set_flush(o->parm.setFlush->enable);
+		delete o->parm.setFlush;
+		break;
+	}
+	case gOpcode::setView:
+	{
+		gles_viewport(o->parm.setViewInfo->size.width(), o->parm.setViewInfo->size.height(), fb->Stride());
+		delete o->parm.setViewInfo;
+		break;
+	}
+#endif
 	default:
 		gDC::exec(o);
 		break;
@@ -419,6 +458,7 @@ void gFBDC::setResolution(int xres, int yres, int bpp)
 #endif
 
 	fb->SetMode(xres, yres, bpp);
+	fb->getMode(xres, yres, bpp);
 
 	unsigned char *base_addr = fb->lfb;
 	unsigned long base_phys = fb->getPhysAddr();
@@ -430,8 +470,8 @@ void gFBDC::setResolution(int xres, int yres, int bpp)
 	surface.stride = fb->Stride();
 	surface.data = base_addr;
 
-	for (int y=0; y<yres; y++) // make whole screen transparent
-		memset(fb->lfb+ y * xres * 4, 0x00, xres * 4);
+	for (int y=0; y<yres; y++)
+		memset(fb->lfb + y * xres * 4, 0x00, xres * 4);
 
 	surface.data_phys = base_phys;
 
@@ -445,7 +485,6 @@ void gFBDC::setResolution(int xres, int yres, int bpp)
 	{
 		surface_back = surface;
 		fb_size += fb_page_size;
-		// the hardware starts on the first page; draw to the next one first
 		surface_back.data = base_addr;
 		surface_back.data_phys = base_phys;
 
@@ -484,26 +523,25 @@ void gFBDC::setResolution(int xres, int yres, int bpp)
 		surface_back.data_phys = 0;
 	}
 
-        surface_third.data = 0;
-        surface_third.data_phys = 0;
+	surface_third.data = 0;
+	surface_third.data_phys = 0;
 #endif
 
 	eDebug("[gFBDC] resolution: %d x %d x %d (stride: %d) pages: %d", surface.x, surface.y, surface.bpp, fb->Stride(), fb->getNumPages());
 
 #ifndef CONFIG_ION
-	/* accel is already set in fb.cpp */
-	eDebug("[gFBDC] %dkB available for acceleration surfaces.", (fb->Available() - fb_size)/1024);
+	eDebug("[gFBDC] %dkB available for acceleration surfaces.", (fb->Available() - fb_size) / 1024);
 	if (gAccel::getInstance())
 		gAccel::getInstance()->setAccelMemorySpace(fb->lfb + fb_size, surface.data_phys + fb_size, fb->Available() - fb_size);
 #endif
 #ifdef HAVE_HISILICON_ACCEL
-	dinobot_accel_register(&surface,&surface_back);
+	dinobot_accel_register(&surface, &surface_back);
 #endif
 	if (!surface.clut.data)
 	{
 		surface.clut.colors = 256;
 		surface.clut.data = new gRGB[surface.clut.colors];
-		memset(static_cast<void*>(surface.clut.data), 0, sizeof(*surface.clut.data)*surface.clut.colors);
+		memset(static_cast<void*>(surface.clut.data), 0, sizeof(*surface.clut.data) * surface.clut.colors);
 	}
 
 	surface_back.clut = surface.clut;
@@ -554,7 +592,7 @@ void gFBDC::setResolution(int xres, int yres, int bpp)
 #endif
 
 #if defined(CONFIG_HISILICON_FB)
-	if(islocked()==0)
+	if (islocked() == 0)
 	{
 		gUnmanagedSurface s(surface);
 		surface = surface_back;

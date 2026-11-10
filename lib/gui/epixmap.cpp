@@ -85,14 +85,16 @@ void ePixmap::setPixmapScale(int flags)
 
 void ePixmap::setPixmap(gPixmap *pixmap)
 {
-    m_animTimer->stop();
+	fadeContent();
+	m_animTimer->stop();
 	m_pixmap = pixmap;
 	event(evtChangedPixmap);
 }
 
 void ePixmap::setPixmap(ePtr<gPixmap> &pixmap)
 {
-    m_animTimer->stop();
+	fadeContent();
+	m_animTimer->stop();
 	m_pixmap = pixmap;
 	event(evtChangedPixmap);
 }
