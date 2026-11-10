@@ -107,6 +107,7 @@ def eglStr():
 		return f"EGL {egl}"
 	return ""
 
+
 def glesStr():
 	gles = getGLESVersionString()
 	if gles:
