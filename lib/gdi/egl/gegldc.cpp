@@ -9,6 +9,9 @@
 #include <lib/base/init_num.h>
 #include <lib/gdi/egl/gegldc.h>
 #include <lib/gdi/egl/gles_version.h>
+#ifdef DREAMNEXTGEN
+#include <lib/gdi/egl/platform/amlogic/amlogic_window_provider.h>
+#endif
 #include <lib/gdi/fb.h>
 #include <lib/gdi/font.h>
 
