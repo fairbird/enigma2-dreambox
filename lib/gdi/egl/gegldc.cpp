@@ -18,6 +18,9 @@
 #ifndef GL_BGRA_EXT
 #define GL_BGRA_EXT 0x80E1
 #endif
+#ifndef EGL_EXT_platform_base
+typedef EGLSurface (EGLAPIENTRYP PFNEGLCREATEPLATFORMPIXMAPSURFACEEXTPROC)(EGLDisplay dpy, EGLConfig config, void *native_pixmap, const EGLint *attrib_list);
+#endif
 
 // Initialization is now managed by gEGLDCAutoInit in egl_init.cpp
 // to support runtime fallback to FBDC/SDLDC.
@@ -2394,6 +2397,7 @@ void gEGLDC::fadeDraw() {
 
 void gEGLDC::flip() {
 	if (isInitialized() && m_egl_display != EGL_NO_DISPLAY && m_egl_surfaces[m_render_page] != EGL_NO_SURFACE) {
+#ifdef HAVE_GLES3
 		if (m_fbo) {
 			glBindFramebuffer(GL_READ_FRAMEBUFFER, m_fbo);
 			glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
@@ -2405,6 +2409,7 @@ void gEGLDC::flip() {
 			animOverlay();
 			m_anim_clean_pending = false;
 		}
+#endif
 		// eglSwapBuffers() is only defined for window surfaces; a pixmap-surface
 		// platform (Dreambox) presents via the provider instead - see
 		// presentPixmap(). m_render_page is the page this frame was just
