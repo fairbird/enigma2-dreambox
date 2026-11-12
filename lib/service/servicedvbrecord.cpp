@@ -19,9 +19,12 @@ DEFINE_REF(eDVBServiceRecord);
 eDVBServiceRecord::eDVBServiceRecord(const eServiceReferenceDVB &ref, bool isstreamclient): m_ref(ref)
 {
 	m_eitRetryTimer = eTimer::create(eApp);
+	m_programInfoRetryTimer = eTimer::create(eApp);
 	CONNECT(m_service_handler.serviceEvent, eDVBServiceRecord::serviceEvent);
 	CONNECT(m_event_handler.m_eit_changed, eDVBServiceRecord::gotNewEvent);
 	CONNECT(m_eitRetryTimer->timeout, eDVBServiceRecord::retrySaveEit);
+	CONNECT(m_programInfoRetryTimer->timeout, eDVBServiceRecord::retryProgramInfo);
+	m_programInfoRetries = 0;
 	m_state = stateIdle;
 	m_want_record = 0;
 	m_record_ecm = false;
@@ -78,6 +81,13 @@ void eDVBServiceRecord::serviceEvent(int event)
 	}
 	case eDVBServicePMTHandler::eventNewProgramInfo:
 	{
+		if (m_service_handler.isPmtReady())
+		{
+			m_programInfoRetryTimer->stop();
+			if (m_programInfoRetries)
+				eDebug("[eDVBServiceRecord] programme information recovered for %s after %u retries", m_ref.toString().c_str(), m_programInfoRetries);
+			m_programInfoRetries = 0;
+		}
 		if (m_state == stateIdle)
 			doPrepare();
 		else if (m_want_record) /* doRecord can be called from Prepared and Recording state */
@@ -85,6 +95,16 @@ void eDVBServiceRecord::serviceEvent(int event)
 		m_event((iRecordableService*)this, evNewProgramInfo);
 		break;
 	}
+	case eDVBServicePMTHandler::eventNoPAT:
+	case eDVBServicePMTHandler::eventNoPATEntry:
+	case eDVBServicePMTHandler::eventNoPMT:
+		if (m_state == statePrepared && !m_simulate && !m_streaming && m_ref.path.empty()
+			&& !m_service_handler.isPmtReady() && !m_programInfoRetryTimer->isActive())
+		{
+			eWarning("[eDVBServiceRecord] programme information unavailable for %s (event %d)", m_ref.toString().c_str(), event);
+			m_programInfoRetryTimer->start(1000, true);
+		}
+		break;
 	case eDVBServicePMTHandler::eventMisconfiguration:
 		m_error = errMisconfiguration;
 		m_event((iRecordableService*)this, evTuneFailed);
@@ -217,6 +237,9 @@ RESULT eDVBServiceRecord::start(bool simulate)
 
 RESULT eDVBServiceRecord::stop()
 {
+	int result = 0;
+	m_programInfoRetryTimer->stop();
+	m_want_record = 0;
 	m_eitRetryTimer->stop();
 
 	if (!m_simulate)
@@ -245,15 +268,17 @@ RESULT eDVBServiceRecord::stop()
 		m_use_software_descramble = false;
 	}
 
+	// Close files opened while waiting for programme information.
+	if (m_target_fd >= 0)
+	{
+		if (::close(m_target_fd) < 0)
+			result = -1;
+		m_target_fd = -1;
+	}
+
 	// Recording already stopped above
 	if (m_state == stateRecording)
 	{
-		if (m_target_fd >= 0)
-		{
-			::close(m_target_fd);
-			m_target_fd = -1;
-		}
-
 		// .sc may be unreadable after a write error, mmap access would crash
 		if (!m_write_error)
 			saveCutlist();
@@ -266,8 +291,12 @@ RESULT eDVBServiceRecord::stop()
 		m_record = 0;
 		m_state = stateIdle;
 	}
+	m_service_handler.free();
+	m_tuned = 0;
 	m_event((iRecordableService*)this, evRecordStopped);
-	return 0;
+	if (result)
+		m_event((iRecordableService*)this, evRecordWriteError);
+	return result;
 }
 
 int eDVBServiceRecord::doPrepare()
@@ -275,6 +304,7 @@ int eDVBServiceRecord::doPrepare()
 		/* allocate a ts recorder if we don't already have one. */
 	if (m_state == stateIdle)
 	{
+		m_programInfoRetries = 0;
 		eDVBServicePMTHandler::serviceType servicetype;
 
 		if(tryFallbackTuner(/*REF*/m_ref, /*REF*/m_is_stream_client, m_is_pvr, m_simulate))
@@ -397,6 +427,27 @@ int eDVBServiceRecord::setupSoftwareDescrambler(eDVBServicePMTHandler::program& 
 
 	m_use_software_descramble = true;
 	return 0;
+}
+
+void eDVBServiceRecord::retryProgramInfo()
+{
+	if (m_state != statePrepared || m_simulate || m_streaming || !m_ref.path.empty() || m_service_handler.isPmtReady())
+		return;
+
+	if (m_programInfoRetries < 2)
+	{
+		++m_programInfoRetries;
+		eWarning("[eDVBServiceRecord] retrying programme information for %s (%u/2)", m_ref.toString().c_str(), m_programInfoRetries);
+		if (m_service_handler.retryProgramInfo())
+			m_programInfoRetryTimer->start(1000, true);
+		return;
+	}
+
+	ePtr<eDVBServiceRecord> self = this;
+	eWarning("[eDVBServiceRecord] recording failed: programme information unavailable for %s", m_ref.toString().c_str());
+	m_error = errNoProgramInfo;
+	stop();
+	m_event((iRecordableService*)this, evRecordFailed);
 }
 
 int eDVBServiceRecord::doRecord()

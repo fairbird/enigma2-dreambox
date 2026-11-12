@@ -79,6 +79,9 @@ private:
 
 	int doPrepare();
 	int doRecord();
+	void retryProgramInfo();
+	ePtr<eTimer> m_programInfoRetryTimer;
+	unsigned int m_programInfoRetries;
 
 			/* events */
 	void serviceEvent(int event);

@@ -1085,6 +1085,7 @@ public:
 		errTuneFailed=-255,
 		errMisconfiguration = -256,
 		errNoResources = -257,
+		errNoProgramInfo = -259,
 	};
 };
 

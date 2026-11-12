@@ -135,10 +135,11 @@ void eDVBServicePMTHandler::channelStateChanged(iDVBChannel *channel)
 
 			if (!m_service || m_service->usePMT())
 			{
-				if (m_pmt_pid == -1)
-					m_PAT.begin(eApp, eDVBPATSpec(), m_demux);
-				else
-					m_PMT.begin(eApp, eDVBPMTSpec(m_pmt_pid, m_reference.getServiceID().get()), m_demux);
+				int result = m_pmt_pid == -1
+					? m_PAT.begin(eApp, eDVBPATSpec(), m_demux)
+					: m_PMT.begin(eApp, eDVBPMTSpec(m_pmt_pid, m_reference.getServiceID().get()), m_demux);
+				if (result && !sendServiceEvent(m_pmt_pid == -1 ? eventNoPAT : eventNoPMT))
+					return;
 			}
 
 			serviceEvent(eventTuned);
@@ -192,6 +193,21 @@ void eDVBServicePMTHandler::registerCAService()
 	else
 		demuxes[1] = demuxes[0];
 	eDVBCAHandler::getInstance()->registerService(m_reference, adapterid, demuxes, (int)m_service_type, m_ca_servicePtr);
+}
+
+int eDVBServicePMTHandler::retryProgramInfo()
+{
+	if (!m_demux || m_pmt_ready)
+		return -1;
+
+	// Reopen only this handler's section readers, without retuning the shared channel.
+	m_no_pat_entry_delay->stop();
+	m_PMT.stop();
+	m_PAT.stop();
+	m_have_cached_program = false;
+	if (m_pmt_pid != -1)
+		return m_PMT.begin(eApp, eDVBPMTSpec(m_pmt_pid, m_reference.getServiceID().get()), m_demux);
+	return m_PAT.begin(eApp, eDVBPATSpec(), m_demux);
 }
 
 void eDVBServicePMTHandler::PMTready(int error)
@@ -326,7 +342,8 @@ void eDVBServicePMTHandler::PATready(int)
 			if(eDVBServicePMTHandler::m_debug)
 				eDebug("[eDVBServicePMTHandler] use pmtpid %04x for service_id %04x", pmtpid, m_reference.getServiceID().get());
 			m_no_pat_entry_delay->stop();
-			m_PMT.begin(eApp, eDVBPMTSpec(pmtpid, m_reference.getServiceID().get()), m_demux);
+			if (m_PMT.begin(eApp, eDVBPMTSpec(pmtpid, m_reference.getServiceID().get()), m_demux))
+				serviceEvent(eventNoPMT);
 		}
 	} else
 		serviceEvent(eventNoPAT);
@@ -1322,6 +1339,9 @@ int eDVBServicePMTHandler::tuneExt(eServiceReferenceDVB &ref, ePtr<iTsSource> &s
 void eDVBServicePMTHandler::free()
 {
 	++m_free_count;
+	m_no_pat_entry_delay->stop();
+	m_channelStateChanged_connection = 0;
+	m_channelEvent_connection = 0;
 	m_scan_event_connection = 0;
 	m_dvb_scan = 0;
 
@@ -1366,6 +1386,8 @@ void eDVBServicePMTHandler::free()
 	m_sr_channel = 0;
 	m_pvr_channel = 0;
 	m_demux = 0;
+	m_pmt_ready = false;
+	m_have_cached_program = false;
 }
 
 void eDVBServicePMTHandler::addCaHandler()

@@ -177,6 +177,7 @@ class RecordTimerEntry(timer.TimerEntry):
 		self.disabled = disabled
 		self.timer = None
 		self.__record_service = None
+		self.failed = False
 		self.rec_ref = None
 		self.start_prepare = 0
 		self.justplay = justplay
@@ -584,7 +585,7 @@ class RecordTimerEntry(timer.TimerEntry):
 		elif next_state == self.StateEnded:
 			old_end = self.end
 			self.ts_dialog = None
-			if self.setAutoincreaseEnd():
+			if not self.failed and self.setAutoincreaseEnd():
 				self.log(12, "autoincrease recording %d minute(s)" % int((self.end - old_end) / 60))
 				self.state -= 1
 				return True
@@ -775,7 +776,7 @@ class RecordTimerEntry(timer.TimerEntry):
 
 	def gotRecordEvent(self, record, event):
 		# TODO: this is not working (never true), please fix. (comparing two swig wrapped ePtrs)
-		if record is None or self.__record_service.__deref__() != record.__deref__():
+		if record is None or self.__record_service is None or self.__record_service.__deref__() != record.__deref__():
 			return
 		#self.log(16, "record event %d" % event)
 		if event == iRecordableService.evRecordWriteError:
@@ -787,6 +788,17 @@ class RecordTimerEntry(timer.TimerEntry):
 			# ok, the recording has been stopped. we need to properly note
 			# that in our state, with also keeping the possibility to re-try.
 			# TODO: this has to be done.
+		elif event == iRecordableService.evRecordFailed and record.getError() == iRecordableService.errNoProgramInfo:
+			NavigationInstance.instance.stopRecordService(self.record_service)
+			self.record_service = None
+			self.failed = True
+			self.end = int(time()) + 5
+			self.state = self.StateRunning
+			self.backoff = 0
+			self.log(16, "Recording stopped: no programme information after repeated attempts.")
+			AddPopup(text=_("Recording failed because the channel's programme information could not be received.\n%s") % self.name, type=MessageBox.TYPE_ERROR, timeout=20, id="RecordingProgramInfo")
+			NavigationInstance.instance.RecordTimer.timer_list.sort()
+			NavigationInstance.instance.RecordTimer.calcNextActivation()
 		elif event == iRecordableService.evStart:
 			text = _("A recording has started:\n%s") % self.name
 			notify = config.usage.show_message_when_recording_starts.value and not Screens.Standby.inStandby and self.InfoBarInstance and self.InfoBarInstance.execing
@@ -910,7 +922,8 @@ class RecordTimer(timer.Timer):
 		else:
 			# yes. Process repeated, and re-add.
 			if w.repeated:
-				w.processRepeated()
+				w.processRepeated(findNextEvent=w.failed)
+				w.failed = False
 				w.state = RecordTimerEntry.StateWaiting
 				w.first_try_prepare = True
 				self.addTimerEntry(w)
