@@ -171,10 +171,35 @@ class AnimationSetup(ConfigListScreen, Screen):
 		elif item in (config.osd.animation_infobar, config.osd.animation_mediainfobar, config.osd.animation_infobar_duration):
 			self.session.open(PreviewInfobar, "mediainfobar" if item is config.osd.animation_mediainfobar else "infobar")
 		else:
-			self.session.openWithCallback(self.previewDone, MessageBox, _("Animation preview"), MessageBox.TYPE_INFO, timeout=3)
+			original = Screen.animationHook
+			dialogRow = item is config.osd.animation_dialog
+
+			def previewHook(screen):
+				if screen is self:
+					screen.instance.setAnimationId(-1)
+				elif dialogRow:
+					original(screen)
+				else:
+					screen.instance.setAnimationId(0)
+
+			from enigma import eTimer
+			self.previewHook = original
+			self.instance.setAnimationId(-1)
+			Screen.animationHook = previewHook
+			self.hide()
+			self.previewTimer = eTimer()
+			self.previewTimer.callback.append(self.openPreview)
+			self.previewTimer.start(150, True)
+
+	def openPreview(self):
+		self.shown = True
+		self.session.openWithCallback(self.previewDone, MessageBox, _("Animation preview"), MessageBox.TYPE_INFO, timeout=3)
 
 	def previewDone(self, *args):
-		pass
+		if getattr(self, "previewHook", None):
+			Screen.animationHook = self.previewHook
+			self.previewHook = None
+			eWindowAnimationManager.applyScreen(self)
 
 
 class PreviewToast(Screen):

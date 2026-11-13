@@ -132,6 +132,7 @@ class WindowAnimationManager:
 	MEDIA_NAMES = ("MoviePlayer", "EMCMediaCenter", "MediaPlayer")
 	DIALOG_NAMES = ("MessageBox", "Processing", "ToastScreen")
 	POPUP_NAMES = ("ChoiceBox", "ContextMenu", "HelpMenu", "InputBox", "PiPSetup")
+	MENU_NAMES = ("Menu", "Setup", "ConfigListScreen")
 
 	def isInfoBarScreen(self, screen):
 		return self.classify(screen) in ("infobar", "mediainfobar")
@@ -148,6 +149,8 @@ class WindowAnimationManager:
 			return "dialog"
 		if any(name in self.POPUP_NAMES for name in names):
 			return "popup"
+		if any(name in self.MENU_NAMES for name in names):
+			return None
 		try:
 			size = screen.instance.size()
 			desktop = screen.instance.getDesktop() if hasattr(screen.instance, "getDesktop") else getDesktop(0)
