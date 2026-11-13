@@ -45,7 +45,7 @@ class fontRenderClass
 		std::string filename, face;
 		int scale; // 100 is 1:1
 		int renderflags;
-		b_font_t *shapingFont = nullptr;
+		hb_font_t *shapingFont = nullptr;
 		~fontListEntry();
 	};
 
