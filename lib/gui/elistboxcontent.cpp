@@ -419,7 +419,7 @@ void eListboxPythonStringContent::paint(gPainter &painter, eWindowStyle &style, 
 			// is actually in play here (not for a plain gradient fill,
 			// which this same call also handles) and only under GLES -
 			// other backends keep their original unconditional behavior.
-			painter.drawRectangle(itemRect, radius && painter.usingGLES());
+			painter.drawRectangle(itemRect);
 		}
 		else
 			painter.clear();
