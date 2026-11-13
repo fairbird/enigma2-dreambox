@@ -36,6 +36,7 @@ public:
 	RESULT saveTimeshiftFile() override; // no-op: nothing on disk
 	void serviceEventTimeshift(int event) override;
 
+	RESULT seekTimeshiftDelay(int milliseconds) override;
 	RESULT timeshift(ePtr<iTimeshiftService>& ptr) override { ptr = this; return 0; }
 
 protected:

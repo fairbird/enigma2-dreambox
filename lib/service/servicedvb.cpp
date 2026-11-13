@@ -3839,7 +3839,12 @@ RESULT eDVBServicePlay::stopTimeshift(bool swToLive)
 
 	// NOW switch to live (SoftDecoder can safely allocate resources)
 	if (swToLive)
+	{
 		switchToLive();
+		// A full stop may remove this directory asynchronously. A new session
+		// must use its own directory instead of reusing the pending cleanup path.
+		m_timeshift_directory.clear();
+	}
 	if (m_timeshift_fd >= 0)
 	{
 		close(m_timeshift_fd);
