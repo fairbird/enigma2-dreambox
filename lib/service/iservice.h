@@ -308,9 +308,6 @@ public:
 
 	virtual int setInfo(const eServiceReference &ref, int w, int v);
 	virtual int setInfoString(const eServiceReference &ref, int w, const char *v);
-	// Optional, bounded RAM-buffer repositioning for external-audio synchronization.
-	// Does not enable general seeking or change ordinary timeshift recovery.
-	virtual RESULT seekTimeshiftDelay(int /*milliseconds*/) { return -1; }
 };
 SWIG_TEMPLATE_TYPEDEF(ePtr<iStaticServiceInformation>, iStaticServiceInformationPtr);
 
@@ -706,6 +703,9 @@ public:
 			/* this essentially seeks to the relative end of the timeshift buffer */
 	virtual RESULT activateTimeshift()=0;
 	virtual RESULT saveTimeshiftFile()=0;
+	// Optional, bounded RAM-buffer repositioning for external-audio synchronization.
+	// Does not enable general seeking or change ordinary timeshift recovery.
+	virtual RESULT seekTimeshiftDelay(int /*milliseconds*/) { return -1; }
 	virtual std::string getTimeshiftFilename()=0;
 	virtual void switchToLive()=0;
 };
