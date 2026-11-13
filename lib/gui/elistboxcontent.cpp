@@ -478,7 +478,7 @@ void eListboxPythonStringContent::paint(gPainter &painter, eWindowStyle &style, 
 			if (radius)
 				painter.setRadius(radius, edges);
 			// See the matching comment above.
-			painter.drawRectangle(itemRect, radius && painter.usingGLES());
+			painter.drawRectangle(itemRect);
 		}
 
 		if (!item || item == Py_None)
@@ -1007,7 +1007,7 @@ void eListboxPythonConfigContent::paint(gPainter &painter, eWindowStyle &style, 
 			if (radius)
 				painter.setRadius(radius, edges);
 			// See eListboxPythonStringContent::paint()'s matching comment.
-			painter.drawRectangle(itemRect, radius && painter.usingGLES());
+			painter.drawRectangle(itemRect);
 		}
 		else
 			painter.clear();
@@ -1055,7 +1055,7 @@ void eListboxPythonConfigContent::paint(gPainter &painter, eWindowStyle &style, 
 			if (radius)
 				painter.setRadius(radius, edges);
 			// See eListboxPythonStringContent::paint()'s matching comment.
-			painter.drawRectangle(itemRect, radius && painter.usingGLES());
+			painter.drawRectangle(itemRect);
 		}
 		int alphablendflag = (alphablendtext) ? gPainter::RT_BLEND : 0;
 
@@ -1876,7 +1876,7 @@ void eListboxPythonMultiContent::paint(gPainter &painter, eWindowStyle &style, c
 			// the path most listboxes (e.g. a plain skinned menu list) hit,
 			// as opposed to the per-item TYPE_TEXT cornerRadius tuple
 			// handled further down in this function.
-			painter.drawRectangle(itemRect, radius && painter.usingGLES());
+			painter.drawRectangle(itemRect);
 		}
 		else
 			clearRegion(painter, style, local_style, ePyObject(), ePyObject(), ePyObject(), ePyObject(), selected, marked, itemregion, sel_clip, offs, itemRect.size(), cursorValid, true, orientation, even);
