@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from enigma import getDesktop
+from enigma import getDesktop, eTimer
 from Components.ActionMap import ActionMap
 from Components.ConfigList import ConfigListScreen
 from Components.Label import Label
@@ -182,24 +182,47 @@ class AnimationSetup(ConfigListScreen, Screen):
 				else:
 					screen.instance.setAnimationId(0)
 
-			from enigma import eTimer
 			self.previewHook = original
 			self.instance.setAnimationId(-1)
 			Screen.animationHook = previewHook
-			self.hide()
-			self.previewTimer = eTimer()
-			self.previewTimer.callback.append(self.openPreview)
-			self.previewTimer.start(150, True)
-
-	def openPreview(self):
-		self.shown = True
-		self.session.openWithCallback(self.previewDone, MessageBox, _("Animation preview"), MessageBox.TYPE_INFO, timeout=3)
+			self.hide = lambda: None
+			self.session.openWithCallback(self.previewDone, PreviewMessage)
 
 	def previewDone(self, *args):
+		self.__dict__.pop("hide", None)
 		if getattr(self, "previewHook", None):
 			Screen.animationHook = self.previewHook
 			self.previewHook = None
 			eWindowAnimationManager.applyScreen(self)
+
+
+class PreviewMessage(Screen):
+	skin = """
+		<screen name="PreviewMessage" position="center,center" size="900,340" zPosition="1000" flags="wfNoBorder" transparent="1" resolution="1920,1080">
+			<eLabel position="0,0" size="900,340" zPosition="-1" backgroundColor="#0D1B26" cornerRadius="28" borderWidth="3" borderColor="#5E90A0" />
+			<widget name="text" position="40,40" size="820,100" zPosition="1" font="Regular;48" halign="center" valign="center" foregroundColor="#FFFFFF" transparent="1" />			<widget name="text" position="40,40" size="820,100" font="Regular;48" halign="center" valign="center" foregroundColor="#FFFFFF" transparent="1" />
+			<eLabel position="120,160" size="660,2" backgroundColor="#5E90A0" />
+			<widget name="hint" position="40,180" size="820,120" zPosition="1" font="Regular;32" halign="center" valign="center" foregroundColor="#9FB6C3" transparent="1" />
+		</screen>"""
+
+	def __init__(self, session):
+		Screen.__init__(self, session)
+		self["text"] = Label(_("Animation preview"))
+		self["hint"] = Label()
+		self.left = 3
+		self["actions"] = ActionMap(["OkCancelActions"], {"ok": self.close, "cancel": self.close}, -1)
+		self.timer = eTimer()
+		self.timer.callback.append(self.tick)
+		self.tick()
+		self.timer.start(1000)
+
+	def tick(self):
+		if self.left <= 0:
+			self.timer.stop()
+			self.close()
+			return
+		self["hint"].setText(_("Closing in %d s") % self.left)
+		self.left -= 1
 
 
 class PreviewToast(Screen):
