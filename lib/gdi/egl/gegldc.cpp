@@ -366,7 +366,7 @@ void gEGLDC::setAlphaBlendMode(bool trueAlphaBlend) {
 	if (trueAlphaBlend)
 		glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 	else
-		glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ZERO);
+		glBlendFuncSeparate(GL_ONE, GL_ZERO, GL_ONE, GL_ZERO);
 }
 
 void gEGLDC::executeFill(const gOpcode* op) {
