@@ -1141,7 +1141,18 @@ void gEGLDC::captureBackgroundIntoPixmap(const eRect& rect) {
 	for (int row = 0; row < h; ++row) {
 		const uint8_t* src_row = pixels.data() + (size_t)(h - 1 - row) * row_bytes;
 		uint8_t* dst_row = dst_base + (size_t)(top + row) * dst_stride + (size_t)left * 4U;
+#ifdef DREAMNEXTGEN
+		// the render target holds true RGBA here, m_pixmap is BGRA in memory
+		// and is uploaded through the R/B texture swizzle
+		for (size_t i = 0; i < row_bytes; i += 4) {
+			dst_row[i] = src_row[i + 2];
+			dst_row[i + 1] = src_row[i + 1];
+			dst_row[i + 2] = src_row[i];
+			dst_row[i + 3] = src_row[i + 3];
+		}
+#else
 		memcpy(dst_row, src_row, row_bytes);
+#endif
 	}
 }
 
