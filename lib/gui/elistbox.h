@@ -179,7 +179,8 @@ public:
 	enum
 	{
 		byPage,
-		byLine
+		byLine,
+		byCenter
 	};
 
 	enum
