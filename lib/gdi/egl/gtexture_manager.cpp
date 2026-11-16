@@ -130,6 +130,10 @@ GLuint gTextureManager::createTextureFromPixmap(gPixmap* pixmap) {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
 	if (surface->bpp == 32) {
+#ifdef DREAMNEXTGEN
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_R, GL_BLUE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_RED);
+#endif
 		// This render target's fragment-shader output ends up read back by
 		// the display in the opposite R/B order from what GL writes (see
 		// gshader.cpp's fragment shader for the ground-truth test that
@@ -184,6 +188,10 @@ GLuint gTextureManager::createTextureFromPixmap(gPixmap* pixmap) {
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, packed.data());
 		}
 	} else if (surface->bpp == 8 && surface->clut.data) {
+#ifdef DREAMNEXTGEN
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_R, GL_BLUE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_RED);
+#endif
 		// 8-bit paletted image (often used for picons/skins).
 		// gles 3.0 does not support indexed color textures natively anymore,
 		// so we expand it to 32-bit rgba on the cpu before uploading.

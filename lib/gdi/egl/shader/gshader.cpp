@@ -27,7 +27,11 @@ static const char* fragment_shader_es3 = R"(#version 300 es
         // draws - which get an equivalent correction via GL_TEXTURE_SWIZZLE
         // in gtexture_manager.cpp - come out correct). Solid-color draws
         // have no texture/swizzle stage to piggyback on, so swap here.
+#ifdef DREAMNEXTGEN
+        frag_color = u_color;
+#else
         frag_color = u_color.bgra;
+#endif
     }
 )";
 #endif
@@ -49,7 +53,11 @@ static const char* fragment_shader_es2 = R"(#version 100
     uniform vec4 u_color;
     void main() {
         // See the GLES3 fragment shader above for why this swap is here.
+#ifdef DREAMNEXTGEN
+        gl_FragColor = u_color;
+#else
         gl_FragColor = u_color.bgra;
+#endif
     }
 )";
 

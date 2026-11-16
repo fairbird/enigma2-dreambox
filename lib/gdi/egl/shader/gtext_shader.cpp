@@ -42,7 +42,11 @@ static const char *fragment_shader_es3 = R"(#version 300 es
         // color.r/g/b (semantically correct, not pre-swapped), so this
         // shader needs the same explicit swap gshader.cpp/gadvanced_shader.cpp
         // do on their own solid-color output.
+#ifdef DREAMNEXTGEN
+        frag_color = vec4(v_color.r, v_color.g, v_color.b, v_color.a * mask);
+#else
         frag_color = vec4(v_color.b, v_color.g, v_color.r, v_color.a * mask);
+#endif
     }
 )";
 #endif
@@ -80,7 +84,11 @@ static const char *fragment_shader_es2 = R"(#version 100
         // In GL_LUMINANCE textures the single channel is replicated into r/g/b
         float mask = texture2D(u_texture, v_uv).r;
         // See the GLES3 fragment shader above for why this swap is needed here.
+#ifdef DREAMNEXTGEN
+        gl_FragColor = vec4(v_color.r, v_color.g, v_color.b, v_color.a * mask);
+#else
         gl_FragColor = vec4(v_color.b, v_color.g, v_color.r, v_color.a * mask);
+#endif
     }
 )";
 

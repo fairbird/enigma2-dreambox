@@ -124,7 +124,11 @@ static const char* fragment_shader_es3 = R"(#version 300 es
         // same render-target-vs-scanout channel-order mismatch applies to
         // every solid-color/gradient draw with no texture to compensate via
         // GL_TEXTURE_SWIZZLE.
+#ifdef DREAMNEXTGEN
+        frag_color = final_color;
+#else
         frag_color = final_color.bgra;
+#endif
     }
 )";
 #endif
@@ -243,7 +247,11 @@ static const char* fragment_shader_es2 = R"(#version 100
         final_color.a *= coverage;
 
         // See gshader.cpp's fragment shader for why this swap is here.
+#ifdef DREAMNEXTGEN
+        gl_FragColor = final_color;
+#else
         gl_FragColor = final_color.bgra;
+#endif
     }
 )";
 
