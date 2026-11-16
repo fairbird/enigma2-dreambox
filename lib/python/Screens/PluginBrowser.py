@@ -182,11 +182,12 @@ class PluginBrowserSummary(ScreenSummary):
 		self["value"].setText(description)
 
 
-class PluginBrowser(Screen, ProtectedScreen):
+class PluginBrowser(Screen, NumericalTextInput, ProtectedScreen):
 	protectionSections = ("plugin_browser",)
 
 	def __init__(self, session):
 		Screen.__init__(self, session)
+		NumericalTextInput.__init__(self, handleTimeout=False, mode="SearchUpper")
 		self.setTitle(_("Plugin browser"))
 		ProtectedScreen.__init__(self)
 
@@ -194,11 +195,16 @@ class PluginBrowser(Screen, ProtectedScreen):
 		self.internetCheckedTime = None
 		self.internetCheckThread = None
 
-		self["key_red"] = self["red"] = Label(_("Remove plugins"))
-		self["key_green"] = self["green"] = Label(_("Download plugins"))
-		self["key_yellow"] = self["yellow"] = Label(_("Update plugins"))
+		self["key_red"] = self["red"] = StaticText(_("Remove plugins"))
+		self["key_green"] = self["green"] = StaticText(_("Download plugins"))
+		self["key_yellow"] = self["yellow"] = StaticText(_("Update plugins"))
+		self["key_blue"] = self["blue"] = StaticText()
 		self["key_menu"] = StaticText(_("MENU"))
+		self["quickselect"] = Label()
+		self["quickselect"].hide()
+		self["description"] = Label()
 		self.list = []
+		self["pluginList"] = List([])
 		self["list"] = PluginList(self.list)
 
 		self["actions"] = ActionMap(["WizardActions", "MenuActions"],
@@ -241,9 +247,12 @@ class PluginBrowser(Screen, ProtectedScreen):
 		self.nextNumberTimer = eTimer()
 		self.nextNumberTimer.callback.append(self.okbuttonClick)
 
-		self.onShown.append(self.updateList)
 		self.onChangedEntry = []
+		self["pluginList"].onSelectionChanged.append(self.selectionChanged)
 		self["list"].onSelectionChanged.append(self.selectionChanged)
+		self.listWidth = 1280
+		self.listHeight = 720
+		self.updateList()
 		self.onLayoutFinish.append(self.saveListsize)
 		if config.pluginfilter.userfeed.value != "https://" and not fileExists("/etc/opkg/user-feed.conf"):
 			self.protectedCallback(self.createFeedConfig)()
@@ -257,15 +266,21 @@ class PluginBrowser(Screen, ProtectedScreen):
 			self.internetCheckThread = None
 
 	def saveListsize(self):
-		listsize = self["list"].instance.size()
-		self.listWidth = listsize.width()
-		self.listHeight = listsize.height()
+		self.listWidth = 1280
+		self.listHeight = 720
+		if self["list"].instance:
+			listsize = self["list"].instance.size()
+			self.listWidth = listsize.width()
+			self.listHeight = listsize.height()
+		self.updateList()
 
 	def createSummary(self):
 		return PluginBrowserSummary
 
 	def selectionChanged(self):
-		item = self["list"].getCurrent()
+		item = self["pluginList"].getCurrent()
+		if not item:
+			item = self["list"].getCurrent()
 		if item:
 			p = item[0]
 			name = p.name
@@ -317,8 +332,10 @@ class PluginBrowser(Screen, ProtectedScreen):
 		self.run()
 
 	def run(self):
-		plugin = self["list"].l.getCurrentSelection()[0]
-		plugin(session=self.session)
+		current = self["pluginList"].getCurrent()
+		if current:
+			plugin = current[0]
+			plugin(session=self.session)
 		self.help = False
 
 	def setDefaultList(self, answer):
@@ -342,7 +359,7 @@ class PluginBrowser(Screen, ProtectedScreen):
 				self.resetNumberKey()
 
 	def okbuttonClick(self):
-		self["list"].moveToIndex(self.number - 1)
+		self["pluginList"].setCurrentIndex(self.number - 1)
 		self.resetNumberKey()
 		self.run()
 
@@ -358,22 +375,12 @@ class PluginBrowser(Screen, ProtectedScreen):
 
 	def move(self, direction):
 		if len(self.list) > 1:
-			currentIndex = self["list"].getSelectionIndex()
+			currentIndex = self["pluginList"].getSelectedIndex()
 			swapIndex = (currentIndex + direction) % len(self.list)
-			if currentIndex == 0 and swapIndex != 1:
-				self.list = self.list[1:] + [self.list[0]]
-			elif swapIndex == 0 and currentIndex != 1:
-				self.list = [self.list[-1]] + self.list[:-1]
-			else:
-				self.list[currentIndex], self.list[swapIndex] = self.list[swapIndex], self.list[currentIndex]
-			self["list"].l.setList(self.list)
-			if direction == 1:
-				self["list"].down()
-			else:
-				self["list"].up()
-			plugin_order = []
-			for x in self.list:
-				plugin_order.append(x[0].path[24:])
+			self.list[currentIndex], self.list[swapIndex] = self.list[swapIndex], self.list[currentIndex]
+			self["pluginList"].setList(self.list)
+			self["pluginList"].setCurrentIndex(swapIndex)
+			plugin_order = [x[0].path[24:] for x in self.list]
 			config.misc.pluginbrowser.plugin_order.value = ",".join(plugin_order)
 			config.misc.pluginbrowser.plugin_order.save()
 
@@ -381,17 +388,29 @@ class PluginBrowser(Screen, ProtectedScreen):
 		self.list = []
 		pluginlist = plugins.getPlugins(PluginDescriptor.WHERE_PLUGINMENU)[:]
 		for x in config.misc.pluginbrowser.plugin_order.value.split(","):
-			plugin = list(plugin for plugin in pluginlist if plugin.path[24:] == x)
+			plugin = [p for p in pluginlist if p.path[24:] == x]
 			if plugin:
-				self.list.append(PluginEntryComponent(plugin[0], self.listWidth))
+				self.list.append(plugin[0])
 				pluginlist.remove(plugin[0])
-		self.list = self.list + [PluginEntryComponent(plugin, self.listWidth) for plugin in pluginlist]
-		if config.misc.menu_show_numbers.value or showHelp:
-			for x in enumerate(self.list):
-				tmp = list(x[1][1])
-				tmp[7] = "%s %s" % (x[0] + 1, tmp[7])
-				x[1][1] = tuple(tmp)
-		self["list"].l.setList(self.list)
+		self.list.extend(pluginlist)
+		defaultIcon = LoadPixmap(resolveFilename(SCOPE_GUISKIN, "icons/plugin.png"))
+		listEntries = []
+		for idx, plugin in enumerate(self.list, start=1):
+			name = plugin.name
+			if config.misc.menu_show_numbers.value or showHelp:
+				name = "%d %s" % (idx, name)
+			listEntries.append((plugin, name, plugin.description, plugin.icon or defaultIcon))
+		self["pluginList"].setList(listEntries)
+		try:
+			pluginEntries = [PluginEntryComponent(plugin, self.listWidth) for plugin in self.list]
+			if config.misc.menu_show_numbers.value or showHelp:
+				for x in enumerate(pluginEntries):
+					tmp = list(x[1][1])
+					tmp[7] = "%s %s" % (x[0] + 1, tmp[7])
+					x[1][1] = tuple(tmp)
+			self["list"].l.setList(pluginEntries)
+		except Exception as e:
+			print(f"[PluginBrowser] PluginList widget error: {e}")
 
 	def showHelp(self):
 		if config.misc.menu_show_numbers.value:
