@@ -614,9 +614,9 @@ class PluginBrowserNew(Screen, ProtectedScreen):
 		self["list"] = PluginList(self.list)
 		self["pages"] = Label()
 		self["plugin_description"] = Label()
-		self["key_red"] = self["red"] = Label(_("Remove plugins"))
-		self["key_green"] = self["green"] = Label(_("Download plugins"))
-		self["key_yellow"] = self["yellow"] = Label(_("Update plugins"))
+		self["key_red"] = self["red"] = StaticText(_("Remove plugins"))
+		self["key_green"] = self["green"] = StaticText(_("Download plugins"))
+		self["key_yellow"] = self["yellow"] = StaticText(_("Update plugins"))
 
 		self["actions"] = ActionMap(["WizardActions", "MenuActions"],
 		{
