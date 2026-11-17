@@ -41,7 +41,7 @@ from Screens.Toast import Toast
 from Screens.Standby import TryQuitMainloop
 from Screens.VirtualKeyBoard import VirtualKeyBoard
 from Plugins.Plugin import PluginDescriptor
-from Tools.Directories import fileExists, fileWriteLine, resolveFilename, SCOPE_PLUGINS, SCOPE_CURRENT_SKIN, SCOPE_GUISKIN
+from Tools.Directories import fileExists, fileReadLines, fileWriteLine, resolveFilename, SCOPE_PLUGINS, SCOPE_CURRENT_SKIN, SCOPE_GUISKIN
 from Tools.LoadPixmap import LoadPixmap
 from Tools.NumericalTextInput import NumericalTextInput
 
