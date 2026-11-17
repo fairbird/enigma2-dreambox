@@ -1,5 +1,169 @@
 #include <lib/gui/ewidget.h>
 #include <lib/gui/ewidgetdesktop.h>
+#include <algorithm>
+#include <time.h>
+
+namespace {
+bool contentAnimationsEnabled = false;
+bool displayContentAnimationsEnabled = false;
+int contentAnimationDuration = 400;
+
+unsigned long long contentNowMs() {
+	timespec now = {};
+	clock_gettime(CLOCK_MONOTONIC, &now);
+	return static_cast<unsigned long long>(now.tv_sec) * 1000 + now.tv_nsec / 1000000;
+}
+}
+
+void eWidget::setContentAnimationDefaults(bool enabled, int durationMs, int budgetMiB, bool display)
+{
+	contentAnimationsEnabled = enabled;
+	displayContentAnimationsEnabled = display;
+	contentAnimationDuration = std::max(50, std::min(1000, durationMs));
+	gContentTransition::limitBytes = static_cast<unsigned long long>(std::max(8, std::min(128, budgetMiB))) * 1024 * 1024;
+}
+
+bool eWidget::supportsContentAnimations() const
+{
+	const eWidget* root = this;
+	while (root && !root->m_desktop) root = root->m_parent;
+	return root && root->m_desktop->supportsContentAnimations();
+}
+
+void eWidget::setDefaultAnimationEnabled(bool enabled)
+{
+	contentEligible = enabled;
+	if (!enabled) abortContentChange();
+}
+
+void eWidget::setContentAnimation(int durationMs)
+{
+	contentDuration = durationMs < 0 ? -1 : std::min(2500, durationMs);
+	if (!contentDuration) abortContentChange();
+}
+
+unsigned long long eWidget::contentAnimationBytes()
+{
+	// Two RGBA snapshots plus their possible GPU uploads. Imported storage
+	// uses less; this conservative reservation also covers other platforms.
+	return static_cast<unsigned long long>(std::max(0, size().width())) * std::max(0, size().height()) * 16;
+}
+
+ePtr<gPixmap> eWidget::captureAnimationContent()
+{
+	ePtr<gPixmap> image = new gPixmap(size(), 32, gPixmap::accelAlways);
+	if (!image->surface || !image->surface->data) return nullptr;
+	image->surface->transparent = true;
+	ePtr<gDC> dc = new gDC(image);
+	gPainter painter(dc);
+	gRegion clip(eRect(ePoint(), size()));
+	painter.resetClip(clip);
+	painter.setBackgroundColor(gRGB(0xff000000));
+	painter.clear();
+	contentCapturing = true;
+	try {
+		event(evtPaint, &clip, &painter);
+	} catch (...) {
+		contentCapturing = false;
+		throw;
+	}
+	contentCapturing = false;
+	return image;
+}
+
+bool eWidget::beginContentChange()
+{
+	if (contentTransition) {
+		cancelContentTransition(); // Rapid updates settle directly; no snapshot chain.
+		return false;
+	}
+	const eWidget* root = this;
+	for (const eWidget* ancestor = this; ancestor; ancestor = ancestor->m_parent)
+		if (!ancestor->contentAllowed) return false;
+	while (root && !root->m_desktop) root = root->m_parent;
+	if (!contentEligible || !contentDuration || !root || !isVisible() || !supportsContentAnimations() || !m_childs.empty() ||
+		size().width() <= 0 || size().height() <= 0 || size().width() > 4096 || size().height() > 4096)
+		return false;
+	const bool enabled = root->m_desktop->getStyleID() ? displayContentAnimationsEnabled : contentAnimationsEnabled;
+	if (contentDuration < 0 && !enabled) return false;
+	contentTransition = gContentTransition::reserve(contentAnimationBytes());
+	if (!contentTransition) return false;
+	contentTransition->blitFlags = contentBlitFlags();
+	contentTransition->radius = contentCornerRadius();
+	contentTransition->edges = getCornerRadiusEdges();
+	try {
+		contentTransition->before = captureAnimationContent();
+		contentTransition->beforePremultiplied = contentIsPremultiplied();
+	} catch (const std::bad_alloc&) {
+		contentTransition.reset();
+	}
+	if (!contentTransition || !contentTransition->before) {
+		contentTransition.reset();
+		return false;
+	}
+	return true;
+}
+
+void eWidget::endContentChange()
+{
+	if (!contentTransition) return;
+	const unsigned long long required = contentAnimationBytes();
+	if (required > contentTransition->bytes) {
+		auto extra = gContentTransition::reserve(required - contentTransition->bytes);
+		if (!extra) { cancelContentTransition(); return; }
+		contentTransition->bytes += extra->bytes;
+		extra->bytes = 0;
+	}
+	try {
+		contentTransition->after = captureAnimationContent();
+		contentTransition->afterPremultiplied = contentIsPremultiplied();
+	} catch (const std::bad_alloc&) {
+		contentTransition.reset();
+	}
+	if (!contentTransition || !contentTransition->after) {
+		cancelContentTransition();
+		return;
+	}
+	contentWasTransparent = isTransparent();
+	contentVisibilityChanged = true;
+	setTransparent(1); // Repaint the parent beneath partially visible content.
+	contentStarted = contentNowMs();
+	contentRunningDuration = contentDuration > 0 ? contentDuration : contentAnimationDuration;
+	if (!contentTimer) {
+		contentTimer = eTimer::create(eApp);
+		CONNECT(contentTimer->timeout, eWidget::contentTick);
+	}
+	contentTimer->start(16, false);
+	invalidate();
+}
+
+float eWidget::contentProgress() const
+{
+	return contentRunningDuration ? std::min(1.0f, float(contentNowMs() - contentStarted) / contentRunningDuration) : 1.0f;
+}
+
+void eWidget::cancelContentTransition()
+{
+	if (contentTimer) contentTimer->stop();
+	contentTransition.reset();
+	if (contentVisibilityChanged) {
+		contentVisibilityChanged = false;
+		setTransparent(contentWasTransparent);
+	}
+}
+
+void eWidget::abortContentChange()
+{
+	if (!contentTransition) return;
+	cancelContentTransition();
+	invalidate();
+}
+
+void eWidget::contentTick()
+{
+	if (!isVisible() || contentProgress() >= 1.0f) cancelContentTransition();
+	invalidate();
+}
 
 extern void dumpRegion(const gRegion &region);
 
@@ -7,7 +171,6 @@ eWidget::eWidget(eWidget* parent) : m_animation(this), m_parent(parent ? parent-
 	m_gradient_set = false;
 	m_gradient_direction = 0;
 	m_vis = 0;
-	m_layer_capture = false;
 	m_layer = 0;
 	m_desktop = 0;
 	m_z_position = 0;
@@ -56,6 +219,7 @@ void eWidget::move(ePoint pos)
 
 void eWidget::resize(eSize size)
 {
+	cancelContentTransition();
 	/* same strategy as with move: we first check if
 	the size changed at all, and if it did, we
 	invalidate both the old and new area.
@@ -133,23 +297,6 @@ void eWidget::invalidate(const gRegion &region)
 	{
 		root->m_desktop->invalidate(res, this, target_layer);
 	}
-}
-
-void eWidget::fadeContent()
-{
-	if (!(m_vis & wVisShow) || m_visible_with_childs.empty())
-		return;
-	eWidget *root = this;
-	ePoint abspos = position();
-	while (root && !root->m_desktop)
-	{
-		root = root->m_parent;
-		if (!root)
-			return;
-		abspos += root->position();
-	}
-	if (root && root->m_desktop)
-		root->m_desktop->startFade(eRect(abspos, size()));
 }
 
 void eWidget::show()
@@ -234,10 +381,7 @@ void eWidget::hide()
 			   so the whole screen must be redrawn once it's gone. */
 			root->m_desktop->invalidate(gRegion(eRect(ePoint(0, 0), root->m_desktop->size())));
 		else
-		{
-			root->m_desktop->addEraseRegion(abs);
 			root->m_desktop->invalidate(abs);
-		}
 	}
 	if (m_stack)
 		m_stack->invalidateChilds();
@@ -324,6 +468,7 @@ void eWidget::mayKillFocus()
 
 eWidget::~eWidget()
 {
+	cancelContentTransition();
 	if (m_stack)
 	{
 		m_stack->forgetStackChild(this);
@@ -373,7 +518,15 @@ void eWidget::doPaint(gPainter &painter, const gRegion &r, int layer)
 		if (!region.empty())
 		{
 			painter.resetClip(region);
-			event(evtPaint, &region, &painter);
+			if (contentTransition && contentTransition->after && painter.getDC()->supportsContentAnimations()) {
+				if (contentPaintBackground()) {
+					if (!contentWasTransparent) m_vis &= ~wVisTransparent;
+					eWidget::event(evtPaint, &region, &painter);
+					m_vis |= wVisTransparent;
+				}
+				painter.blitTransition(contentTransition, eRect(ePoint(), size()), contentProgress());
+			} else
+				event(evtPaint, &region, &painter);
 		}
 	}
 
@@ -416,6 +569,7 @@ int eWidget::event(int event, void *data, void *data2)
 	{
 	case evtPaint:
 	{
+		if (contentCapturing) return 0; // Capture this widget's content, not its background.
 		gPainter &painter = *(gPainter *)data2;
 		// eDebug("[eWidget] evtPaint");
 		// dumpRegion(*(gRegion*)data);
@@ -445,26 +599,12 @@ int eWidget::event(int event, void *data, void *data2)
 					}
 					else
 					{
-						// Under GLES (see gEGLDC::executeRectangle()'s
-						// comment), each of these two draws needs its own
-						// blend formula picked from the color it's actually
-						// filling with, not a single widget-wide flag: an
-						// opaque border/fill (the common case) must use the
-						// "over" formula so its AA corner fringe doesn't leak
-						// to the video plane, while a deliberately
-						// translucent fill (e.g. a Pig-style video window's
-						// near-transparent backgroundColor) must keep using
-						// the "hole" formula so it still actually reveals
-						// video, not just tint over it. Other backends are
-						// unaffected either way - they never had a
-						// use-formula distinction here.
-						gRGB innerColor = m_have_background_color ? m_background_color : gRGB(0, 0, 0);
 						painter.setBackgroundColor(m_border_color);
-						painter.drawRectangle(eRect(ePoint(0, 0), size()), painter.usingGLES() && m_border_color.a == 0);
+						painter.drawRectangle(eRect(ePoint(0, 0), size()));
 						if (r)
 							painter.setRadius(r, m_cornerRadiusEdges);
-						painter.setBackgroundColor(innerColor);
-						painter.drawRectangle(eRect(m_border_width, m_border_width, size().width() - m_border_width * 2, size().height() - m_border_width * 2), painter.usingGLES() && innerColor.a == 0);
+						painter.setBackgroundColor(m_have_background_color ? m_background_color : gRGB(0, 0, 0));
+						painter.drawRectangle(eRect(m_border_width, m_border_width, size().width() - m_border_width * 2, size().height() - m_border_width * 2));
 					}
 
 					drawborder = false;
