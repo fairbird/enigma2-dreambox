@@ -1,3 +1,4 @@
+#include <dlfcn.h>
 #include <algorithm>
 #include <chrono>
 #include <cmath>
@@ -14,6 +15,15 @@
 #endif
 #include <lib/gdi/fb.h>
 #include <lib/gdi/font.h>
+
+// The Dreambox V3D driver (dm820, dm7080) exports eglCreatePlatformPixmapSurfaceEXT as a symbol but
+// does not return it from eglGetProcAddress(): look the exported symbol up directly in that case
+static PFNEGLCREATEPLATFORMPIXMAPSURFACEEXTPROC getCreatePlatformPixmapSurface() {
+	PFNEGLCREATEPLATFORMPIXMAPSURFACEEXTPROC fn = (PFNEGLCREATEPLATFORMPIXMAPSURFACEEXTPROC)eglGetProcAddress("eglCreatePlatformPixmapSurfaceEXT");
+	if (!fn)
+		fn = (PFNEGLCREATEPLATFORMPIXMAPSURFACEEXTPROC)dlsym(RTLD_DEFAULT, "eglCreatePlatformPixmapSurfaceEXT");
+	return fn;
+}
 
 #ifndef EGL_OPENGL_ES3_BIT_KHR
 #define EGL_OPENGL_ES3_BIT_KHR 0x00000040
@@ -87,8 +97,7 @@ bool gEGLDC::tryInitEGL(int version) {
 		m_egl_surfaces[i] = EGL_NO_SURFACE;
 
 	if (pixmap_mode) {
-		PFNEGLCREATEPLATFORMPIXMAPSURFACEEXTPROC eglCreatePlatformPixmapSurfaceEXT =
-			(PFNEGLCREATEPLATFORMPIXMAPSURFACEEXTPROC)eglGetProcAddress("eglCreatePlatformPixmapSurfaceEXT");
+		PFNEGLCREATEPLATFORMPIXMAPSURFACEEXTPROC eglCreatePlatformPixmapSurfaceEXT = getCreatePlatformPixmapSurface();
 		if (!eglCreatePlatformPixmapSurfaceEXT) {
 			eDebug("[gEGLDC] eglCreatePlatformPixmapSurfaceEXT not available.");
 			eglDestroyContext(m_egl_display, m_egl_context);
@@ -1791,8 +1800,7 @@ bool gEGLDC::recreateEGLSurfaces(int xres, int yres)
 
 	if (pixmap_mode)
 	{
-		PFNEGLCREATEPLATFORMPIXMAPSURFACEEXTPROC eglCreatePlatformPixmapSurfaceEXT =
-			(PFNEGLCREATEPLATFORMPIXMAPSURFACEEXTPROC)eglGetProcAddress("eglCreatePlatformPixmapSurfaceEXT");
+		PFNEGLCREATEPLATFORMPIXMAPSURFACEEXTPROC eglCreatePlatformPixmapSurfaceEXT = getCreatePlatformPixmapSurface();
 
 		if (!eglCreatePlatformPixmapSurfaceEXT)
 		{
