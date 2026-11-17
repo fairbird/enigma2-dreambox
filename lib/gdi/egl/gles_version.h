@@ -1,6 +1,9 @@
 #pragma once
 
 #include <locale.h>
+#include <cstring>
+#include <string>
+
 
 // gles_version.h
 // Runtime GLES version singleton.
