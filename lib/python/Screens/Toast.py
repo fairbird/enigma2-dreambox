@@ -4,6 +4,7 @@ from enigma import ePoint, eSize, eTimer, gRGB
 from skin import parseColor, parseInteger
 from Components.config import config
 from Components.Label import Label
+from Components.SystemInfo import BoxInfo
 from Screens.Screen import Screen
 
 
@@ -138,7 +139,7 @@ class ToastScreen(Screen):
 		self["background"].instance.resize(eSize(width, height))
 		self["text"].instance.resize(eSize(textWidth, textHeight))
 		self.hideTimer.start((timeout if timeout else self.defaultTimeout) * 1000)
-		if config.misc.toastFade.value:
+		if config.misc.toastFade.value and not BoxInfo.getItem("e2egl", False):
 			self.alpha = 0xFF
 			self.fadeIn = True
 			self.fadeTimer.start(self.fadeSpeed)
@@ -161,7 +162,7 @@ class ToastScreen(Screen):
 
 	def hideToast(self):
 		self.hideTimer.stop()
-		if config.misc.toastFade.value:
+		if config.misc.toastFade.value and not BoxInfo.getItem("e2egl", False):
 			self.fadeIn = False
 			self.fadeTimer.start(self.fadeSpeed)
 		else:

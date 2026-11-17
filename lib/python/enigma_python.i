@@ -629,6 +629,37 @@ PyObject *getDeviceDB()
 }
 %}
 
+
+PyObject *getGraphicsInfo();
+%{
+PyObject *getGraphicsInfo()
+{
+	ePyObject result = PyDict_New();
+	ePtr<gMainDC> dc;
+
+	if (gMainDC::getInstance(dc) < 0 || !dc)
+		return result;
+
+	PutToDict(result, "backend", dc->getGraphicsBackend().c_str());
+	PutToDict(result, "window_provider", dc->getGraphicsWindowProvider().c_str());
+	PutToDict(result, "accelerator", dc->getGraphicsAccelerator().c_str());
+	PutToDict(result, "buffering", dc->getGraphicsBuffering().c_str());
+	PutToDict(result, "buffer_pages", dc->getGraphicsBufferPages());
+	PutToDict(result, "logical_width", dc->getGraphicsLogicalWidth());
+	PutToDict(result, "logical_height", dc->getGraphicsLogicalHeight());
+	PutToDict(result, "surface_width", dc->getGraphicsSurfaceWidth());
+	PutToDict(result, "surface_height", dc->getGraphicsSurfaceHeight());
+	PutToDict(result, "egl_major", dc->getGraphicsEGLMajor());
+	PutToDict(result, "egl_minor", dc->getGraphicsEGLMinor());
+	PutToDict(result, "gles_version", dc->getGraphicsGLESVersion());
+	PutToDict(result, "preserved_swap", dc->getGraphicsPreservedSwap() ? 1 : 0);
+	PutToDict(result, "suspended", dc->isGraphicsSuspended() ? 1 : 0);
+	PutToDict(result, "hardware_accelerated", dc->getGraphicsHardwareAccelerated() ? 1 : 0);
+	PutToDict(result, "animations_supported", dc->getGraphicsAnimationsSupported() ? 1 : 0);
+	return result;
+}
+%}
+
 void eProfileDone();
 %{
 void eProfileDone()
@@ -674,7 +705,12 @@ extern const char *getEGLVersionString();
 extern const char *getGLESVersionString();
 extern void dump_malloc_stats(void);
 extern void pauseInit(void);
-extern void setAnimation_spec(const char *spec);
+extern void setAnimation_current(int a);
+extern void setAnimation_speed(int speed);
+extern void setAnimation_toast_speed(int speed);
+extern void setAnimation_current_listbox(int a);
+extern void setAnimation_profiles(int enabled, int dialog, int popup, int toast);
+extern bool supportsEGLAnimations(void);
 extern int registerAnimation_spec(const char *spec);
 extern void setListboxSmoothSelection(int ms);
 extern void resumeInit(void);
@@ -699,7 +735,12 @@ extern const char *getEGLVersionString();
 extern const char *getGLESVersionString();
 extern void dump_malloc_stats(void);
 extern void pauseInit(void);
-extern void setAnimation_spec(const char *spec);
+extern void setAnimation_current(int a);
+extern void setAnimation_speed(int speed);
+extern void setAnimation_toast_speed(int speed);
+extern void setAnimation_current_listbox(int a);
+extern void setAnimation_profiles(int enabled, int dialog, int popup, int toast);
+extern bool supportsEGLAnimations(void);
 extern int registerAnimation_spec(const char *spec);
 extern void setListboxSmoothSelection(int ms);
 extern void resumeInit(void);

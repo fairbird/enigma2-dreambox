@@ -42,6 +42,7 @@ class Pig(Renderer):
 			self.instance.resize(self.Size)
 		if self.Position:
 			self.instance.move(self.Position)
+		self.instance.updateVideoPosition()
 
 	def onShow(self):
 		if self.instance:

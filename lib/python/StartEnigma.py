@@ -837,6 +837,10 @@ enigma.eProfileWrite("InitOSDCalibration")
 from Screens.OSDCalibration import InitOSDCalibration
 InitOSDCalibration()
 
+enigma.eProfileWrite("InitAnimationSetup")
+from Screens.AnimationSetup import InitAnimationSetup
+InitAnimationSetup()
+
 enigma.eProfileWrite("Init:PowerOffTimer")
 from Components.PowerOffTimer import powerOffTimer
 

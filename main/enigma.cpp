@@ -616,10 +616,3 @@ void setListboxSmoothSelection(int ms)
 {
 	eListbox::setSmoothSelection(ms);
 }
-
-void setAnimation_spec(const char *spec)
-{
-#ifdef HAVE_EGL
-	gEGLDC::setAnimationSpec(spec);
-#endif
-}

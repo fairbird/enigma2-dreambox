@@ -12,7 +12,7 @@ from re import fullmatch, search
 from sys import version as pyversion
 from time import localtime, strftime
 
-from enigma import eAVControl, Misc_Options, eDVBCIInterfaces, eDVBResourceManager, eGetEnigmaDebugLvl, eDVBCSAEngine
+from enigma import eAVControl, Misc_Options, eDVBCIInterfaces, eDVBResourceManager, eGetEnigmaDebugLvl, eDVBCSAEngine, getGraphicsInfo
 
 from Tools.Directories import SCOPE_PLUGINS, SCOPE_LIBDIR, SCOPE_SKIN, fileCheck, fileReadLine, fileReadLines, resolveFilename, fileExists, fileHas, fileReadLine, pathExists, isPluginInstalled
 from Tools.MultiBoot import MultiBoot
@@ -537,6 +537,7 @@ class VideoCodec:  # Stream type to codec name mapping.
 BoxInfo.setItem("DebugLevel", eGetEnigmaDebugLvl())
 BoxInfo.setItem("InDebugMode", eGetEnigmaDebugLvl() >= 4)
 BoxInfo.setItem("KernelVersion", getKernelVersion())
+BoxInfo.setMutableItem("e2egl", getGraphicsInfo().get("backend", "") == "e2egl")
 
 BoxInfo.setItem("BoxName", getBoxName())
 BoxInfo.setItem("RCImage", getRCFile("png"))
