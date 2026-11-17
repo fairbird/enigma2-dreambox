@@ -16,15 +16,6 @@
 #include <lib/gdi/fb.h>
 #include <lib/gdi/font.h>
 
-// The Dreambox V3D driver (dm820, dm7080) exports eglCreatePlatformPixmapSurfaceEXT as a symbol but
-// does not return it from eglGetProcAddress(): look the exported symbol up directly in that case
-static PFNEGLCREATEPLATFORMPIXMAPSURFACEEXTPROC getCreatePlatformPixmapSurface() {
-	PFNEGLCREATEPLATFORMPIXMAPSURFACEEXTPROC fn = (PFNEGLCREATEPLATFORMPIXMAPSURFACEEXTPROC)eglGetProcAddress("eglCreatePlatformPixmapSurfaceEXT");
-	if (!fn)
-		fn = (PFNEGLCREATEPLATFORMPIXMAPSURFACEEXTPROC)dlsym(RTLD_DEFAULT, "eglCreatePlatformPixmapSurfaceEXT");
-	return fn;
-}
-
 #ifndef EGL_OPENGL_ES3_BIT_KHR
 #define EGL_OPENGL_ES3_BIT_KHR 0x00000040
 #endif
@@ -34,6 +25,15 @@ static PFNEGLCREATEPLATFORMPIXMAPSURFACEEXTPROC getCreatePlatformPixmapSurface()
 #ifndef EGL_EXT_platform_base
 typedef EGLSurface (EGLAPIENTRYP PFNEGLCREATEPLATFORMPIXMAPSURFACEEXTPROC)(EGLDisplay dpy, EGLConfig config, void *native_pixmap, const EGLint *attrib_list);
 #endif
+
+// The Dreambox V3D driver (dm820, dm7080) exports eglCreatePlatformPixmapSurfaceEXT as a symbol but
+// does not return it from eglGetProcAddress(): look the exported symbol up directly in that case
+static PFNEGLCREATEPLATFORMPIXMAPSURFACEEXTPROC getCreatePlatformPixmapSurface() {
+	PFNEGLCREATEPLATFORMPIXMAPSURFACEEXTPROC fn = (PFNEGLCREATEPLATFORMPIXMAPSURFACEEXTPROC)eglGetProcAddress("eglCreatePlatformPixmapSurfaceEXT");
+	if (!fn)
+		fn = (PFNEGLCREATEPLATFORMPIXMAPSURFACEEXTPROC)dlsym(RTLD_DEFAULT, "eglCreatePlatformPixmapSurfaceEXT");
+	return fn;
+}
 
 // Initialization is now managed by gEGLDCAutoInit in egl_init.cpp
 // to support runtime fallback to FBDC/SDLDC.
