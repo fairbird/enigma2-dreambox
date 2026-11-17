@@ -41,7 +41,7 @@ from Screens.Toast import Toast
 from Screens.Standby import TryQuitMainloop
 from Screens.VirtualKeyBoard import VirtualKeyBoard
 from Plugins.Plugin import PluginDescriptor
-from Tools.Directories import fileExists, fileReadLines, fileWriteLine, fileWriteLines, resolveFilename, SCOPE_PLUGINS, SCOPE_CURRENT_SKIN, SCOPE_GUISKIN
+from Tools.Directories import fileExists, fileWriteLine, resolveFilename, SCOPE_PLUGINS, SCOPE_CURRENT_SKIN, SCOPE_GUISKIN
 from Tools.LoadPixmap import LoadPixmap
 from Tools.NumericalTextInput import NumericalTextInput
 
@@ -2429,7 +2429,6 @@ class PluginBrowserSetup(Setup):
 			print(f"[PluginBrowser] Unable to change picon storage: {failure.value}")
 			self.session.open(MessageBox, _("Unable to change the picon storage location: %s") % failure.value, type=MessageBox.TYPE_ERROR)
 
-		self.swapGitHubDNS()
 		location = config.usage.piconInstallLocation.value
 		if location != "/" or config.usage.piconInstallLocation.isChanged():
 			self.suspendAllActionMaps()
@@ -2439,14 +2438,6 @@ class PluginBrowserSetup(Setup):
 			operation.addCallbacks(saveFinished, saveFailed)
 		else:
 			Setup.keySave(self)
-
-	def swapGitHubDNS(self):
-		if config.usage.alternateGitHubDNS.isChanged():
-			lines = fileReadLines("/etc/hosts", source=MODULE_NAME)
-			lines = [line for line in lines if "raw.githubusercontent.com" not in line]
-			if config.usage.alternateGitHubDNS.value:
-				lines += ["%s raw.githubusercontent.com" % ip for ip in ("185.199.108.133", "185.199.109.133", "185.199.110.133", "185.199.111.133", "2606:50c0:8000::154", "2606:50c0:8001::154", "2606:50c0:8002::154", "2606:50c0:8003::154")]
-			fileWriteLines("/etc/hosts", lines, source=MODULE_NAME)
 
 
 if config.misc.plugin_style.value == "grid1" or config.misc.plugin_style.value == "grid2" or config.misc.plugin_style.value == "grid3" or config.misc.plugin_style.value == "grid4" or config.misc.plugin_style.value == "grid5" or config.misc.plugin_style.value == "grid6":

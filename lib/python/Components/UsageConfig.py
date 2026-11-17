@@ -620,8 +620,6 @@ def InitUsageConfig():
 
 	config.usage.show_timer_conflict_warning = ConfigYesNo(default=True)
 
-	config.usage.alternateGitHubDNS = ConfigYesNo(default=False)
-
 	preferredTunerChoicesUpdate()
 
 	config.misc.disable_background_scan = ConfigYesNo(default=False)
