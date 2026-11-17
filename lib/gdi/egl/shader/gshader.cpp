@@ -17,6 +17,11 @@ static const char* vertex_shader_es3 = R"(#version 300 es
 )";
 
 static const char* fragment_shader_es3 = R"(#version 300 es
+)"
+#ifdef DREAMNEXTGEN
+	"#define DREAMNEXTGEN 1\n"
+#endif
+	R"(
     precision mediump float;
     uniform vec4 u_color;
     out vec4 frag_color;
@@ -49,6 +54,11 @@ static const char* vertex_shader_es2 = R"(#version 100
 )";
 
 static const char* fragment_shader_es2 = R"(#version 100
+)"
+#ifdef DREAMNEXTGEN
+	"#define DREAMNEXTGEN 1\n"
+#endif
+	R"(
     precision mediump float;
     uniform vec4 u_color;
     void main() {
