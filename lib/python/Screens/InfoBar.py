@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
-from enigma import eServiceReference, eProfileWrite
 from os.path import splitext
 from glob import glob
 import os
+
+from enigma import eServiceReference, eProfileWrite
+
+from skin import EMERGENCY_SKIN, findSkinScreen
 
 # workaround for required config entry dependencies.
 import Screens.MovieSelection
@@ -121,8 +124,7 @@ class InfoBar(InfoBarBase, InfoBarShowHide,
 		if config.usage.e1like_radio_mode.value:
 			self.showRadioChannelList(True)
 		else:
-			self.rds_display.hide()  # in InfoBarRdsDecoder
-			from Screens.ChannelSelection import ChannelSelectionRadio
+			from Screens.ChannelSelection import ChannelSelectionRadio  # Avoid a circular import during InfoBar initialization.
 			self.session.openWithCallback(self.ChannelSelectionRadioClosed, ChannelSelectionRadio, self)
 
 	def toggleTvRadio(self):
@@ -134,7 +136,6 @@ class InfoBar(InfoBarBase, InfoBarShowHide,
 			self.showRadio()
 
 	def ChannelSelectionRadioClosed(self, *arg):
-		self.rds_display.show()  # in InfoBarRdsDecoder
 		self.servicelist.correctChannelNumber()
 
 	def showMovies(self, defaultRef=None):
