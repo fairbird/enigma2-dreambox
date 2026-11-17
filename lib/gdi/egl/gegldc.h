@@ -1,8 +1,5 @@
 #pragma once
-#include <atomic>
-#include <mutex>
-#include <chrono>
-#include <vector>
+
 #include <EGL/egl.h>
 #ifdef HAVE_GLES3
 #include <GLES3/gl3.h>
@@ -18,59 +15,55 @@
 #include <lib/gdi/egl/shader/gtexture_shader.h>
 #include <lib/gdi/gfont_atlas.h>
 #include <lib/gdi/gmaindc.h>
+#ifdef DREAMNEXTGEN
+#include <lib/gdi/egl/platform/amlogic/amlogic_fb_output.h>
+#endif
+#include <atomic>
+#include <functional>
+#include <mutex>
+#include <pthread.h>
+#include <vector>
 
 class gEGLDCAutoInit;
+class fbClass;
 
 class gEGLDC : public gMainDC {
 private:
-	struct AnimProp {
-		int on = 0;
-		float a = 0.0f, b = 0.0f;
-		int ax = 1, ay = 1;
-		int centered = 0;
-		int type = -1;
-		float factor = 1.0f;
-	};
-
-	struct AnimSpec {
-		bool valid = false;
-		int id = 0;
-		float duration = 0.25f;
-		int base_type = 0;
-		float base_factor = 1.0f;
-		AnimProp p[6]; // alpha show/hide, position show/hide, size show/hide
-	};
-
 	INativeWindowProvider* m_window_provider;
+	fbClass* m_fb;
 	EGLDisplay m_egl_display;
 	EGLConfig m_egl_config;
+	EGLSurface m_egl_surface;
 	EGLContext m_egl_context;
-
-	// One EGLSurface per framebuffer page for a pixmap-surface provider (see
-	// tryInitEGL()/flip()) so rendering can ping-pong between pages instead
-	// of always targeting the one currently being scanned out - just [0] for
-	// a window-surface provider (real double buffering there is free via
-	// eglSwapBuffers()). MAX_EGL_SURFACES bounds this to fbClass's own
-	// practical maximum (triple buffering - see fb.cpp).
-	static const int MAX_EGL_SURFACES = 3;
-	EGLSurface m_egl_surfaces[MAX_EGL_SURFACES];
-	int m_page_count; // 1 unless a multi-page pixmap-surface provider
-	int m_render_page; // index into m_egl_surfaces currently bound for rendering
 
 	int m_width;
 	int m_height;
 	int m_surface_width;
 	int m_surface_height;
-	int m_native_width;
-	int m_native_height;
-	GLuint m_fbo;
-	GLuint m_fbo_texture;
-	int m_fbo_width;
-	int m_fbo_height;
-	bool createFBO(int w, int h);
-	void destroyFBO();
-	void captureBackgroundIntoPixmap(const eRect& rect);
+	int m_osd_left;
+	int m_osd_top;
+	int m_osd_width;
+	int m_osd_height;
+	int m_egl_major;
+	int m_egl_minor;
 	int m_gles_version; // 2 or 3
+	GLint m_max_texture_size;
+	int m_flip_count;
+	bool m_preserved_swap;
+	bool m_native_window_ready;
+	bool m_video_mode_surface_active;
+	bool m_graphics_suspended;
+	bool m_egl_client_released;
+	bool m_surface_lost;
+	unsigned long long m_surface_retry_us;
+	std::recursive_mutex m_egl_mutex;
+	// The context stays bound to the gRC render thread; other threads hand GL work to it.
+	std::atomic<bool> m_render_thread_known{false};
+	pthread_t m_render_thread;
+#ifdef DREAMNEXTGEN
+	// No EGL window surface: the scene is copied into the framebuffer pages.
+	AmlogicFramebufferOutput m_fb_output;
+#endif
 
 	gShader m_basic_shader;
 	gAdvancedShader m_advanced_shader;
@@ -79,293 +72,365 @@ private:
 
 	gFontAtlas m_font_atlas;
 	gTextureManager m_texture_manager;
+	unsigned int m_textRenderErrorCount = 0;
+	bool m_fontAtlasRetrySmaller = false;
+
+	struct PendingWindowAnimation {
+		bool active;
+		bool show;
+		eRect rect;
+		int style = 0;
+		int durationMs = 0;
+		bool explicitStyle = false;
+		gAnimationToken completion;
+		PendingWindowAnimation() : active(false), show(true), rect(eRect()) {}
+	};
+
+	PendingWindowAnimation m_pending_window_animation;
+	struct PendingListboxAnimation {
+		bool active;
+		eRect from;
+		eRect to;
+		gRGB background_color;
+		std::vector<gRGB> gradient_colors;
+		uint8_t gradient_orientation;
+		bool gradient_alpha_blend;
+		int radius;
+		uint8_t radius_edges;
+		ePtr<gPixmap> selection_pixmap;
+		PendingListboxAnimation() : active(false), from(eRect()), to(eRect()), background_color(gRGB()),
+			gradient_orientation(0), gradient_alpha_blend(false), radius(0), radius_edges(0) {}
+	};
+
+	PendingListboxAnimation m_pending_listbox_animation;
+	struct EventAnimation {
+		bool listbox = false;
+		bool compact = false;
+		bool scene = false;
+		bool show = true;
+		GLuint oldFrame = 0;
+		GLuint newFrame = 0;
+		eRect source;
+		PendingListboxAnimation selection;
+		unsigned long long started = 0;
+		int durationMs = 0;
+		int style = 0;
+		int frames = 0;
+		gAnimationToken completion;
+	} m_event_animation;
+	std::atomic<unsigned long long> m_animation_deadline{0};
+	bool startEventAnimation(GLuint oldFrame, GLuint newFrame, bool scene, const eRect& source, bool show, int durationMs, const PendingListboxAnimation* selection = nullptr, int style = 0, bool compact = false, gAnimationToken completion = {});
+	void finishEventAnimation(bool present);
+	GLuint m_compactOld = 0;
+	GLuint m_compactNew = 0;
+	bool captureCompactTexture(GLuint& texture, const eRect& source);
+	void deleteCompactTextures();
+	void drawCompactTexture(GLuint texture, const eRect& dest, float alpha, bool blend);
+	GLuint m_last_frame_texture;
+	GLuint m_animation_frame_texture;
+	GLuint m_scene_frame_texture;
+	GLuint m_scene_framebuffer;
+	GLuint m_scene_spare_frame_texture;
+	GLuint m_scene_spare_framebuffer;
+	GLuint m_scene_animation_old_texture;
+	bool m_last_frame_valid;
+	bool m_last_frame_presented = false;
+	bool m_frame_restore_pending;
+	bool m_frame_texture_surface;
+	bool m_frame_texture_scene_scaled;
+	int m_frame_texture_width;
+	int m_frame_texture_height;
+	int m_scene_frame_width;
+	int m_scene_frame_height;
+	bool m_scene_frame_valid;
+	bool m_scene_spare_frame_valid;
+	bool m_scene_animation_old_valid;
+	bool m_scene_framebuffer_unavailable;
+	bool m_spinner_background_valid;
+	int m_spinner_background_width;
+	int m_spinner_background_height;
+	bool m_spinner_background_clear;
+	bool m_spinner_clear_pending;
+	int m_capture_socket_fd;
+	pthread_t m_capture_thread;
+	bool m_capture_thread_started;
+	std::atomic<bool> m_capture_thread_stop;
+
+	struct FrameStats {
+		unsigned int fill_ops = 0;
+		unsigned int fill_rects = 0;
+		unsigned int solid_batches = 0;
+		unsigned int solid_vertices = 0;
+		unsigned int clear_ops = 0;
+		unsigned int clear_rects = 0;
+		unsigned int rect_ops = 0;
+		unsigned int rect_rects = 0;
+		unsigned int gradient_ops = 0;
+		unsigned int rounded_ops = 0;
+		unsigned int line_ops = 0;
+		unsigned int line_rects = 0;
+		unsigned int blit_ops = 0;
+		unsigned int blit_rects = 0;
+		unsigned int glyphs = 0;
+		unsigned int text_ops = 0;
+		unsigned int text_batches = 0;
+		unsigned int text_draw_rects = 0;
+		unsigned int text_flush_fill = 0;
+		unsigned int text_flush_rect = 0;
+		unsigned int text_flush_line = 0;
+		unsigned int text_flush_blit = 0;
+		unsigned int text_flush_clear = 0;
+		unsigned int text_flush_state = 0;
+		unsigned int text_flush_atlas = 0;
+		unsigned int text_flush_limit = 0;
+		unsigned int text_overlap_checks = 0;
+		unsigned int text_overlap_rect_tests = 0;
+		unsigned int font_uploads = 0;
+		unsigned int frame_captures = 0;
+		unsigned int frame_restores = 0;
+		unsigned int frame_copy_draws = 0;
+		unsigned int texture_uploads = 0;
+#ifdef ENABLE_GLES_TESTLAB
+		unsigned int ionUploads = 0;
+		unsigned long long ionAvoidedBytes = 0;
+#endif
+		unsigned int texture_dmabuf_uploads = 0;
+		unsigned int nativeImportFailures = 0;
+		unsigned int nativeWrites = 0;
+		unsigned int contentBlits = 0;
+		unsigned int nativeSyncFailures = 0;
+		unsigned long long cpuUploadBytes = 0;
+		unsigned long long importedBytes = 0;
+		unsigned long long nativeWaitUs = 0;
+		unsigned long long nativeSyncUs = 0;
+		unsigned long long nativeBytes = 0;
+		unsigned int texture_32_direct_uploads = 0;
+		unsigned int texture16Uploads = 0;
+		unsigned int texture_32_converted_uploads = 0;
+		unsigned int texture_8_clut_uploads = 0;
+		unsigned int texture_8_luma_uploads = 0;
+		unsigned int texture_content_cache_hits = 0;
+		unsigned int texture_content_cache_misses = 0;
+		unsigned long long fill_pixels = 0;
+		unsigned long long clear_pixels = 0;
+		unsigned long long rect_pixels = 0;
+		unsigned long long blit_pixels = 0;
+		unsigned long long font_upload_pixels = 0;
+		unsigned long long frame_copy_pixels = 0;
+		unsigned long long texture_upload_pixels = 0;
+		unsigned long long texture_upload_bytes = 0;
+		unsigned long long frame_start_us = 0;
+		unsigned long long draw_us = 0;
+		unsigned long long swap_us = 0;
+		unsigned long long capture_us = 0;
+		unsigned long long restore_us = 0;
+		unsigned long long fill_us = 0;
+		unsigned long long rect_us = 0;
+		unsigned long long clear_us = 0;
+		unsigned long long line_us = 0;
+		unsigned long long blit_us = 0;
+		unsigned long long text_build_us = 0;
+		unsigned long long text_us = 0;
+		unsigned long long state_us = 0;
+		unsigned long long overlap_us = 0;
+		unsigned long long texture_gc_us = 0;
+		unsigned long long copy_us = 0;
+	};
+	FrameStats m_frame_stats;
+	unsigned int m_frame_stats_index;
 
 	std::vector<float> m_text_batch_buffer;
-	const size_t MAX_BATCH_GLYPHS = 1024;
+	std::vector<eRect> m_text_batch_rects;
+	eRect m_text_batch_bounds;
+	bool m_text_batch_bounds_valid;
+	std::vector<float> m_fill_batch_buffer;
+	eRect m_fill_batch_bounds;
+	gRGB m_fill_batch_color;
+	bool m_fill_batch_blend;
+	bool m_fill_batch_valid;
+	const size_t MAX_BATCH_GLYPHS = 4096;
 
-	// The clip flushTextBatch() must scissor this batch's glyphs against -
-	// captured once, when the batch starts (see renderGlyph()), NOT read
-	// live from m_current_clip at flush time, because the batch is drawn
-	// later than it's filled: by then m_current_clip may already be a
-	// different widget's clip entirely, or (see exec()'s renderText/
-	// renderPara handling) have been restored from the narrowed value it
-	// was temporarily set to for this specific text draw back to the
-	// wider one active around it. Mirrors m_blit_batch_clip below for the
-	// identical reason on the blit-batching side.
-	//
-	// That narrowing is the actual fix this exists for: eTextPara::blit()'s
-	// CPU path (font.cpp) always additionally intersects the active clip
-	// with the renderText/renderPara opcode's own declared area ("clip &=
-	// eRect(area...)") before drawing, which is what stops long text
-	// exactly at its own column's edge - the GPU glyph path
-	// (renderGlyph()) had no way to replicate that (it never receives
-	// `area` at all), so text rendered via the atlas was only ever
-	// clipped to the surrounding widget/row's clip, letting it overflow
-	// past its own column into whatever's drawn next (observed: EPG title
-	// text overflowing into the signal-strength meter column).
-	gRegion m_text_batch_clip;
-
-	// Batches consecutive gOpcode::blit calls that share the same texture,
-	// blend requirement, and a single clip rect into one draw call instead
-	// of one glDrawArrays per blit - targets sequences like
-	// eWindowStyleSkinned::drawBorder()'s tiled border blits (many small
-	// blits of the same tile pixmap in a row) and repeated same-icon
-	// blits, without needing a shared texture atlas. Flushed the instant
-	// anything that would change per-draw state appears (different
-	// texture/blend/clip, rounding, or any other opcode type at all - see
-	// flushBlitBatch()'s call sites), so this never reorders draws
-	// relative to other opcodes and is visually identical to drawing them
-	// one at a time.
-	std::vector<float> m_blit_batch_buffer;
-	GLuint m_blit_batch_tex_id = 0;
-	bool m_blit_batch_blend = false;
-	bool m_blit_batch_true_alpha = false;
-	bool m_blit_batch_filter_linear = true;
-	eRect m_blit_batch_clip;
-	bool m_blit_batch_active = false;
-
-	// Selects which of two different alpha-channel blend formulas the next
-	// blended draw uses - see the call sites (executeBlit/flushBlitBatch,
-	// executeRectangle, flushTextBatch, compositeTextOverlay, and
-	// executeClear's overlay recomposite) and this function's own definition
-	// in gegldc.cpp for the full reasoning. In short: this render target's
-	// alpha channel is read by the display's hardware compositor to decide
-	// how much of the video plane shows through the OSD, and the two kinds
-	// of blended content this backend draws need different alpha semantics
-	// there - trueAlphaBlend=true (text, blitAlphaBlend/blitAlphaTest
-	// images, a rectangle drawn with genuine alphaBlend) accumulates alpha
-	// normally so it stays opaque (blocking video, as it should) when
-	// layered over already-opaque content; trueAlphaBlend=false (a
-	// near-transparent rounded/bordered background like a video window's
-	// own "Pig" skin element, which isn't really semi-transparent UI so
-	// much as a punched-through hole with decoration) makes the draw's own
-	// alpha the absolute, unaccumulated result, since such a widget is
-	// deliberately layered over whatever opaque parent/screen background
-	// eWidgetDesktop::calcWidgetClipRegion() (lib/gui/ewidgetdesktop.cpp)
-	// still paints underneath it and needs to defeat that, not blend with it.
-	void setAlphaBlendMode(bool trueAlphaBlend);
-
-	void flushBlitBatch();
-
-	// Union of every area compositeTextOverlay() has painted into that
-	// hasn't since been erased by executeClear() - lets executeClear() skip
-	// its (CPU memset + texture upload + extra draw call) stale-text erase
-	// entirely for the common case of a background clear that never had any
-	// text composited over it, instead of paying that cost on every single
-	// clear opcode once any text exists anywhere on screen.
-	gRegion m_text_overlay_region;
-
-	// Set by onGlyphCpuDrawn() whenever eTextPara::blit() (font.cpp) actually
-	// wrote glyph pixels into m_pixmap's CPU buffer during the current
-	// renderText/renderPara opcode - i.e. renderGlyph() declined a glyph (not
-	// initialized) or blit() never offered one at all (border/pre-rendered
-	// "image" glyphs). Reset before each blit() call in exec() and checked
-	// afterward so compositeTextOverlay() only runs, and only re-uploads
-	// m_pixmap's (possibly stale, untouched-this-draw) content, when the CPU
-	// path actually ran - otherwise a glyph fully handled by renderGlyph()
-	// (drawn straight to the GPU via the atlas/batch below, never touching
-	// m_pixmap) would have compositeTextOverlay() paint whatever unrelated
-	// old content happens to still sit in m_pixmap's buffer at that screen
-	// position on top of it.
-	bool m_cpu_overlay_dirty;
-
-	bool recreateEGLSurfaces(int xres, int yres);
-	void applyResolution(int xres, int yres, int bpp);
+	enum TextFlushReason {
+		textFlushFill,
+		textFlushRectangle,
+		textFlushLine,
+		textFlushBlit,
+		textFlushClear,
+		textFlushState,
+		textFlushAtlas,
+		textFlushLimit
+	};
 
 	bool tryInitEGL(int version);
-
-	// Copies page `from`'s content into page `to` entirely through the GL
-	// pipeline (eglMakeCurrent with asymmetric draw/read surfaces, then
-	// glBlitFramebuffer) instead of the INativeWindowProvider's CPU memcpy
-	// fallback (see flip()) - see the comment at its call site for why this
-	// exists: this GPU's tile-based deferred renderer appears to track a
-	// surface's content by what it last wrote through the GL pipeline, not
-	// by re-reading the surface's backing memory, so a CPU memcpy into that
-	// memory can be partially invisible to it. Requires GLES3
-	// (glBlitFramebuffer); returns false (no-op) on GLES2 or if
-	// eglMakeCurrent fails, in which case the caller should fall back to
-	// the CPU path. On success this leaves EGL's current surfaces as
-	// draw=`to`, read=`from` (asymmetric, needed for the blit itself) - the
-	// caller must restore the normal draw=read=`to` current state
-	// afterward regardless of whether this returns true or false.
-	bool gpuCopyPageContent(int from, int to);
-
-
-	// window show/hide animation (see animRun())
-	GLuint m_anim_tex_before = 0;
-	GLuint m_anim_tex_after = 0;
-	GLuint m_anim_tex_layer = 0;
-	GLuint m_anim_fbo_layer = 0;
-	bool m_anim_layer_valid = false;
-	bool m_anim_in_layer = false;
-	bool m_anim_pending = false;
-	bool m_anim_show = true;
-	eRect m_anim_rect;
-	eRect m_anim_region;
-	AnimSpec m_anim_active;
-	bool animCapture(GLuint &tex, const eRect &r);
-	void animBeginLayer();
-	void animEndLayer();
-	void animState(const AnimSpec &s, bool show, const eRect &r, float t, float &alpha, float &x, float &y, float &w, float &h) const;
-	eRect animRegion(const AnimSpec &s, const eRect &r) const;
-	void animDrawFrame(float alpha, float x, float y, float w, float h, GLuint bg, GLuint layer, const eRect &region, const eRect &r);
-	void animRun();
-	void animOverlay();
-	void overlayScissor(const eRect &rect);
-	bool animCaptureBlit(GLuint &tex, GLuint &fbo, const eRect &r);
-	void animAbort();
-	GLuint m_anim_fbo_before = 0;
-	bool m_anim_clean_pending = false;
-	bool m_frame_open = false;
-	std::chrono::steady_clock::time_point m_last_op;
-	bool m_anim_running = false;
-	std::chrono::steady_clock::time_point m_anim_t0;
-	GLuint m_anim_run_bg = 0;
-	GLuint m_anim_run_layer = 0;
-
-	// widget cross-fade (see fadeBegin()/fadeDraw())
-	struct FadeItem {
-		eRect rect;
-		GLuint tex = 0;
-		std::chrono::steady_clock::time_point start;
-		float duration = 0.4f;
-	};
-	std::vector<FadeItem> m_fades;
-	void fadeBegin(const eRect &area, float seconds);
-	void fadeDraw();
-	void fadeClear();
+	bool makeCurrent();
+	bool releaseCurrent();
+	void unbindContext();
+	bool onRenderThread() const;
+	bool runOnRenderThread(const std::function<void()>& function);
+	void applySwapBehavior();
+	void primeEGLSurface(bool preserve_scene = false);
+#ifdef DREAMNEXTGEN
+	bool createFramebufferOutput();
+#endif
+	void cleanupEGL();
+	// Frees the surface and GL objects; releaseClient also terminates the EGL display and context.
+	bool releaseGraphics(bool releaseClient);
 
 	// dedicated opcode handlers
 	void executeFill(const gOpcode* op);
 	void executeFillRegion(const gOpcode* op);
 	void executeRectangle(const gOpcode* op);
+	void drawRoundedSolidRect(const gRegion& clip, const eRect& area, int radius, int edges, const gRGB& color, bool replaceCoverage);
 	void executeLine(const gOpcode* op);
 	void executeBlit(const gOpcode* op);
+	void executeDrawGlyph(const gOpcode* op);
 	void executeClear(const gOpcode* op);
+	void drawRegion(const gRegion& region, const gRGB& color, bool blend = false, bool count_stats = true);
+	void flushFillBatch();
+	void flushFillBatchIfOverlaps(const eRect& area);
+	void flushFillBatchIfOverlaps(const gRegion& region);
+	bool fillBatchIntersects(const eRect& area) const;
+	bool fillBatchIntersects(const gRegion& region) const;
+	void drawPixmap(gPixmap* pixmap, const eRect& pos, int flags);
+	bool readFramebufferRegion(const eRect& pos, gPixmap* pixmap);
+	bool readOSDToBGRA(std::vector<unsigned char>& pixels, int& width, int& height);
+	bool writeCaptureFrame(int client_fd);
+	void startCaptureServer();
+	void stopCaptureServer();
+	static void* captureServerThreadEntry(void* arg);
+	void captureServerThread();
+	bool ensureFrameTexture(GLuint& texture);
+	bool copyCurrentFrameToTexture(GLuint& texture);
+	void deleteFrameTextures();
+	bool sceneFramebufferWanted() const;
+	bool sceneFramebufferActive() const;
+	bool sceneFramebufferUsesSurfaceScale() const;
+	int sceneFramebufferWidth() const;
+	int sceneFramebufferHeight() const;
+	eRect logicalToSceneRect(const eRect& rect) const;
+	bool currentFramebufferIsScene() const;
+	bool ensureSceneFramebufferObject(GLuint& texture, GLuint& framebuffer, bool& valid, int width, int height, const char* label);
+	bool ensureSceneFramebuffer();
+	bool ensureSpareSceneFramebuffer();
+	void deleteSceneFramebuffer();
+	void markSurfaceLost();
+	bool bindSceneFramebuffer();
+	void bindWindowFramebuffer();
+	void bindAnimationFramebuffer();
+	bool presentAnimationFrame();
+	eRect osdDestinationLogical() const;
+	eRect osdDestinationSurface() const;
+	eRect logicalToSurfaceRect(const eRect& rect) const;
+	void applyWindowViewport();
+	void clearSceneFramebuffer();
+	bool presentSceneFramebuffer();
+	bool beginSceneFramebufferAnimation();
+	void finishSceneFramebufferAnimation();
+	bool swapWindowFramebuffer();
+	void captureCurrentFrameAsLast();
+	void capturePresentedFrame();
+	void restoreFrameIfNeeded();
+	void executeWindowAnimationOpcode(const gOpcode* op, bool show);
+	bool runPendingWindowAnimation();
+	void executeListboxAnimationOpcode(const gOpcode* op);
+	bool runPendingListboxAnimation();
+	void drawListboxSelection(const eRect& area, const PendingListboxAnimation& animation);
+	void copiedTextureSize(GLuint texture, int& width, int& height) const;
+	void drawCopiedFrameTexture(GLuint texture, const eRect& dest, const eRect& source, float alpha, bool blend);
+	eRect animatedWindowDestRect(const eRect& source, float visible_progress, bool show, int animation, float* alpha = 0) const;
+	eRect stripedWindowDamageRect(const eRect& source) const;
+	void drawAnimatedWindowTexture(GLuint texture, const eRect& source, float visible_progress, bool show, int animation);
+	void drawStripedWindowTexture(GLuint texture, const eRect& source, float visible_progress);
+	eRect clampToScreen(const eRect& rect) const;
+	eRect currentSpinnerRect() const;
+	gPixmap* currentSpinnerBackground() const;
+	void clearSpinnerRect(const eRect& rect);
+	bool clearSpinnerBackgroundPixmap(gPixmap* background);
+	bool captureSpinnerBackground();
+	void updateNativeSpinnerGeometry();
+	void drawNativeSpinnerFrame(const eRect& rect);
+	void invalidateSpinnerBackground(bool clear_pending = false);
+	void resetRectangleState();
+	void resetBlitState();
 	void flushTextBatch();
+	GLuint prepareFontAtlasTexture();
+	void recoverFontAtlas();
+	void logTextRenderFailure(const char* stage, GLenum error, const eRect& area = eRect());
+	void flushTextBatchForReason(TextFlushReason reason);
+	void flushTextBatchIfOverlaps(const eRect& area, TextFlushReason reason);
+	void flushTextBatchIfOverlaps(const gRegion& region, TextFlushReason reason);
+	void addTextBatchRect(const eRect& rect);
+	void noteTextFlushReason(TextFlushReason reason);
+	bool textBatchIntersects(const eRect& area);
+	bool textBatchIntersects(const gRegion& region);
+	eRect lineDrawBounds(const gOpcode::para::pline* op) const;
+	eRect blitDrawBounds(const gOpcode::para::pblit* op) const;
 	void setGlScissor(const eRect& rect);
+	void setTextureFiltering(GLuint texture, bool linear);
+	bool currentFramebufferUsesSurface() const;
+	int surfaceWidth() const;
+	int surfaceHeight() const;
+	bool updateVideoModeSurfaceSize(const char* reason);
+	int scaleSurfaceFloorX(int value) const;
+	int scaleSurfaceCeilX(int value) const;
+	int scaleSurfaceFloorY(int value) const;
+	int scaleSurfaceCeilY(int value) const;
+	void resetFrameStats(unsigned long long now_us = 0);
+	void addTextureUploadStats();
+	void logAndResetFrameStats();
 
-	// Shared by gOpcode::renderText and gOpcode::renderPara for whatever
-	// glyphs renderGlyph() below didn't handle (border/pre-rendered "image"
-	// glyphs, or EGL not initialized - see m_cpu_overlay_dirty): once the
-	// software eTextPara::blit() path (called via gDC::exec()) has written
-	// those glyphs into m_pixmap's CPU buffer, upload the affected area as a
-	// texture and composite it onto the real GPU surface - m_pixmap has no
-	// GPU hook of its own, so without this nothing drawn into it ever
-	// reaches the display.
-	//
-	// trueAlphaBlend (default true) is forwarded to setAlphaBlendMode() -
-	// real content (glyphs, the spinner icon itself) needs the accumulating
-	// mode so it stacks correctly over whatever's already opaque. Erasing
-	// content back to a transparent hole (disableSpinner()) needs false:
-	// with true, alpha-blending m_pixmap's now-fully-transparent restored
-	// pixels onto a destination that still holds the last opaque spinner
-	// frame is a no-op (accumulating alpha never decreases), leaving that
-	// frame permanently stuck on screen even after the icon stops animating.
-	void compositeTextOverlay(eRect area, bool trueAlphaBlend = true);
-
-	// Resets m_pixmap's CPU buffer to fully transparent (raw alpha byte 0,
-	// not enigma's inverted gRGB convention - see the call site's comment)
-	// across `area` before a border-text renderText draw runs its CPU
-	// rasterization - eTextPara::blit() (font.cpp) only writes pixels where
-	// it actually draws glyph cells, leaving anything else in that area
-	// (padding between/around characters, or simply whatever this shared,
-	// screen-sized staging buffer held there from an earlier, unrelated
-	// draw at the same screen coordinates - it's never reset between
-	// frames otherwise) as stale/untouched bytes that compositeTextOverlay()
-	// then uploads and composites right along with the real glyph pixels.
-	void clearOverlayArea(const eRect& area);
-
-	bool renderGlyph(const ePoint& pos, const uint8_t* data, int width, int height, int pitch, const gRGB& color, uint64_t glyph_key) override;
-	void onGlyphCpuDrawn() override { m_cpu_overlay_dirty = true; }
-
-	// gDC::enableSpinner()/disableSpinner()/incrementSpinner() (grc.cpp) draw
-	// the busy spinner with plain gPixmap::blit() calls straight into
-	// m_pixmap's CPU buffer - entirely outside the gOpcode queue, so
-	// gEGLDC::exec() never sees them. That's fine for a backend where
-	// m_pixmap *is* the displayed framebuffer, but here m_pixmap is only a
-	// CPU-side staging buffer for text (see compositeTextOverlay()'s
-	// comment) - without composing m_spinner_pos to the real GPU surface
-	// after each of these, the spinner is drawn but never actually reaches
-	// the screen.
+	bool isHardwareAccelerated() const override { return true; }
+	bool supportsShowHideAnimations() const override { return true; }
+	bool supportsContentAnimations() const override { return true; }
+	bool supportsListboxAnimations() const override;
+	void fillTextBackground(const gRegion& clip) override;
+	void renderGlyph(const ePoint& pos, gPixmap* glyph_mask, const gRGB& color) override;
 	void enableSpinner() override;
 	void disableSpinner() override;
 	void incrementSpinner() override;
 
-	static gEGLDC* s_instance;
-
 public:
-	// initEGL() performs eglMakeCurrent() and must be called from gRC's own
-	// render thread (see gRC::thread() in grc.cpp), NOT from the thread that
-	// constructs gEGLDC (eInit/gEGLDCAutoInit) - EGL contexts are per-thread,
-	// and gRC::thread() is the only thread that ever issues GL draw calls.
-	static gEGLDC* getInstance() { return s_instance; }
-
+	bool runSurfaceOperation(const std::function<bool(gTextureManager&)>& operation);
 	bool initEGL();
-
-	// Tears down the EGL context/surfaces/display. Like initEGL(), this
-	// must run on gRC's own render thread and NOT on whatever thread ends
-	// up destructing this object (eInit's teardown, driven by ~eMain() on
-	// the main thread - see the destructor's own comment) - eglMakeCurrent()/
-	// eglDestroyContext() etc. are meaningless (and observed to crash inside
-	// the closed-source driver) once called against a context that isn't
-	// current on, or was never made current on, the calling thread. gRC's
-	// AutoInit priority (eAutoInitNumbers::graphic, see grc.cpp) is HIGHER
-	// than gEGLDCAutoInit's (graphic-1), so gRC's own teardown - which joins
-	// and ends the render thread - runs BEFORE gEGLDCAutoInit::closeNow()
-	// even starts (LIFO close order: higher priority number inits later,
-	// closes first). By the time the destructor below would otherwise call
-	// this, the render thread is already gone - there is no longer any
-	// thread left where these calls would be valid. So gRC::thread()
-	// (grc.cpp) calls this itself, still running on the render thread,
-	// right before it exits on gOpcode::shutdown. Safe to call again
-	// afterward (from the destructor, as a fallback for any window
-	// provider/configuration where that ordering assumption doesn't hold) -
-	// it's a no-op once m_egl_display is already EGL_NO_DISPLAY.
-	void cleanupEGL();
-
+#ifdef HAVE_VUPLUS_MIPSEL_EGL
+	void setNativeWindowVisible(bool visible) override;
+#endif
 	gEGLDC(INativeWindowProvider* window_provider = nullptr, int width = 1280, int height = 720);
 	virtual ~gEGLDC();
 
 	virtual void setResolution(int xres, int yres, int bpp = 32) override;
+	virtual void refresh() override;
 	virtual void exec(const gOpcode* opcode);
-
-	static std::atomic<int> s_anim_current;
-	static std::atomic<int> s_anim_speed;
-	static std::atomic<int> s_anim_listbox;
-
-	static std::mutex s_anim_mutex;
-	static AnimSpec s_anim_spec;
-	static int s_anim_counter;
-	static std::vector<AnimSpec> s_anim_history;
-	static void setAnimationSpec(const char *spec);
-	static bool parseAnimationSpec(const char *spec, AnimSpec &s);
-	static int registerAnimationSpec(const char *spec);
-	static std::vector<AnimSpec> s_anim_profiles;
+	int islocked() const override;
+	unsigned long long animationFrameDeadlineUs() const override { return m_animation_deadline.load(); }
+	void renderAnimationFrame() override;
+	std::string getGraphicsBackend() const override { return "e2egl"; }
+	std::string getGraphicsWindowProvider() const override;
+	std::string getGraphicsAccelerator() const override;
+	std::string getGraphicsBuffering() const override;
+	int getGraphicsBufferPages() const override;
+	int getGraphicsLogicalWidth() const override { return m_width; }
+	int getGraphicsLogicalHeight() const override { return m_height; }
+	int getGraphicsSurfaceWidth() const override { return surfaceWidth(); }
+	int getGraphicsSurfaceHeight() const override { return surfaceHeight(); }
+	int getGraphicsEGLMajor() const override { return m_egl_major; }
+	int getGraphicsEGLMinor() const override { return m_egl_minor; }
+	int getGraphicsGLESVersion() const override { return m_gles_version; }
+	bool getGraphicsPreservedSwap() const override;
+	bool suspendGraphics() override;
+	bool resumeGraphics() override;
+	bool isGraphicsSuspended() const override { return m_graphics_suspended; }
+	std::string getOSDAxis() const override;
+	bool hasOSDPosition() const override { return true; }
+	bool setOSDPosition(int left, int top, int width, int height) override;
 
 	void flip();
-	bool animActive() const { return m_anim_running || m_anim_clean_pending || !m_fades.empty(); }
-	void animTick();
 	bool isInitialized() const { return m_egl_context != EGL_NO_CONTEXT; }
 	int getGLESVersion() const { return m_gles_version; }
-
-
-	// gDC::islocked() defaults to 0 (unlocked) and gMainDC never overrides
-	// it either - gFBDC is the only other gMainDC subclass, and it forwards
-	// to its own fbClass* (see gfbdc.h). Without this override, every
-	// gPainter call (fill/blit/renderText/flush/flip/...) skips its
-	// `if (m_dc->islocked()) return;` guard (grc.cpp) unconditionally on
-	// this backend, so fbClass::lock()/unlock() - already called by
-	// ImageManager.py bracketing ofgwrite's Mode 2 (non-active-slot, e2
-	// stays running) flash - had no effect here: enigma2 kept drawing and
-	// flipping/presenting pages throughout the flash, racing ofgwrite's own
-	// direct framebuffer writes for the same physical memory. That race is
-	// the progress-screen flicker/corruption seen after gEGLDC's earlier
-	// fix restored real triple-buffered presentPixmap() rotation (see
-	// project memory) - before that fix a leftover forceSingleBuffer flag
-	// meant DM900 never exercised multi-page presentation, so the race was
-	// latent. Forwarding to the same fbClass singleton DreamboxWindowProvider
-	// already uses (see its init()) makes gEGLDC honor the same lock every
-	// other backend does, with no ofgwrite or Python-side change needed.
-	int islocked() const override;
 };
+
+void gEGLDCSetAnimationCurrent(int animation);
+void gEGLDCSetAnimationSpeed(int speed);
+void gEGLDCSetToastAnimationSpeed(int speed);
+void gEGLDCSetAnimationListbox(int animation);
+void gEGLDCSetAnimationProfiles(int enabled, int dialog, int popup, int toast);

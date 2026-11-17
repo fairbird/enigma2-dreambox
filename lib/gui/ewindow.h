@@ -34,6 +34,7 @@ public:
 	void setAnimationMode(int mode);
 	/* 0 = the global animation, -1 = no animation for this window, >0 = id from registerAnimation_spec() */
 	void setAnimationId(int id) { m_animation_id = id; }
+	void setAnimationStyle(int style, int durationMs = 0);
 	int getAnimationId() const { return m_animation_id; }
 protected:
 	enum eWindowEvents
@@ -49,6 +50,9 @@ private:
 	bool m_osdAutoHideActive = false;
 	eWidgetDesktop *m_desktop;
 	int m_animation_mode;
+	int m_animationStyle = -1;
+	int m_animationDurationMs = 0;
+	eRect animationRect() const;
 	int m_animation_id = 0;
 	static int m_has_animation_mode;
 };

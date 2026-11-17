@@ -1,6 +1,7 @@
 #include <lib/base/eerror.h>
 #include <lib/gdi/egl/gles_version.h>
 #include <lib/gdi/egl/shader/gadvanced_shader.h>
+#include <algorithm>
 
 // ---------------------------------------------------------------------------
 // GLES 3.0 shader sources
@@ -17,118 +18,109 @@ static const char* vertex_shader_es3 = R"(#version 300 es
 )";
 
 static const char* fragment_shader_es3 = R"(#version 300 es
+    #ifdef GL_FRAGMENT_PRECISION_HIGH
+    precision highp float;
+    #else
     precision mediump float;
-
+    #endif
+    
     in vec2 v_pos;
     out vec4 frag_color;
-
+    
     uniform vec4 u_rect_size;
     uniform float u_radius;
     uniform int u_edges;
     uniform vec4 u_solid_color;
     uniform float u_border_width;
     uniform vec4 u_border_color;
-
+    uniform int u_coverage_pass;
+    
     uniform int u_num_stops;
     uniform vec4 u_gradient_colors[16];
     uniform float u_gradient_stops[16];
     uniform int u_gradient_orientation;
+    uniform float u_gradient_extent;
     uniform int u_alphablend;
-    uniform float u_gradient_full_size;
 
-    float udRoundBox(vec2 p, vec2 b, float r) {
-        vec2 d = abs(p) - b + vec2(r);
-        return min(max(d.x, d.y), 0.0) + length(max(d, 0.0)) - r;
+    float cornerCoverage(float r, vec2 d) {
+        if (r <= 0.0)
+            return 1.0;
+        float dist = length(d) - r;
+        return clamp(0.5 - dist, 0.0, 1.0);
+    }
+
+    float roundedCoverage(vec2 local, vec2 size, float inset) {
+        float w = size.x;
+        float h = size.y;
+        if (w <= 0.0 || h <= 0.0 || local.x < 0.0 || local.y < 0.0 || local.x >= w || local.y >= h)
+            return 0.0;
+        float r = max(0.0, min(u_radius, min(u_rect_size.z, u_rect_size.w) * 0.5) - inset);
+        float c = 1.0;
+        if ((u_edges & 1) != 0 && local.x < r && local.y < r)
+            c = cornerCoverage(r, vec2(r - local.x, r - local.y));
+        else if ((u_edges & 2) != 0 && local.x > w - r && local.y < r)
+            c = cornerCoverage(r, vec2(local.x - (w - r), r - local.y));
+        else if ((u_edges & 4) != 0 && local.x < r && local.y > h - r)
+            c = cornerCoverage(r, vec2(r - local.x, local.y - (h - r)));
+        else if ((u_edges & 8) != 0 && local.x > w - r && local.y > h - r)
+            c = cornerCoverage(r, vec2(local.x - (w - r), local.y - (h - r)));
+        return c;
     }
 
     void main() {
         float coverage = 1.0;
-        vec2 half_size = u_rect_size.zw * 0.5;
-        vec2 center = vec2(u_rect_size.x, u_rect_size.y) + half_size;
-        vec2 p = v_pos - center;
-        float r = u_radius;
-
         if (u_radius > 0.0) {
-            if (p.x < 0.0 && p.y < 0.0 && (u_edges & 1) == 0) r = 0.0;
-            if (p.x > 0.0 && p.y < 0.0 && (u_edges & 2) == 0) r = 0.0;
-            if (p.x < 0.0 && p.y > 0.0 && (u_edges & 4) == 0) r = 0.0;
-            if (p.x > 0.0 && p.y > 0.0 && (u_edges & 8) == 0) r = 0.0;
-
-            float dist = udRoundBox(p, half_size, r);
-            // Analytic coverage ramp over ~1px instead of a hard discard at
-            // dist>0.5 - the same technique Ganesh's round-rect ops use for
-            // GPU antialiasing (see GrOvalOpFactory): udRoundBox's signed
-            // distance is how many pixels outside the shape this fragment
-            // is, so fading coverage to 0 across that last pixel replaces a
-            // jagged binary edge with a soft one at the same per-pixel cost.
-            if (dist > 0.0) discard;
-            coverage = 1.0;
+            coverage = roundedCoverage(v_pos - u_rect_size.xy, u_rect_size.zw, 0.0);
+            if (coverage <= 0.0)
+                discard;
         }
-
+        
         vec4 final_color = u_solid_color;
-
+        
         if (u_num_stops > 0) {
             float t = 0.0;
-            if (u_gradient_orientation == 2) {
-                float gradient_size = u_gradient_full_size > 0.0 ? u_gradient_full_size : u_rect_size.z;
-                t = (v_pos.x - u_rect_size.x) / max(gradient_size - 1.0, 1.0);
+            float extent = u_gradient_extent > 0.0 ? u_gradient_extent : ((u_gradient_orientation == 1) ? u_rect_size.w : u_rect_size.z);
+            if (u_gradient_orientation == 1) {
+                t = (v_pos.y - u_rect_size.y) / extent;
             } else {
-                float gradient_size = u_gradient_full_size > 0.0 ? u_gradient_full_size : u_rect_size.w;
-                t = (v_pos.y - u_rect_size.y) / max(gradient_size - 1.0, 1.0);
+                t = (v_pos.x - u_rect_size.x) / extent;
             }
-
+            t = clamp(t, 0.0, 1.0);
+            
             vec4 grad_color = u_gradient_colors[0];
             for (int i = 0; i < 15; i++) {
                 if (i >= u_num_stops - 1) break;
                 if (t >= u_gradient_stops[i] && t <= u_gradient_stops[i+1]) {
                     float range = u_gradient_stops[i+1] - u_gradient_stops[i];
                     float f = (t - u_gradient_stops[i]) / range;
+                    f = smoothstep(0.0, 1.0, f);
                     grad_color = mix(u_gradient_colors[i], u_gradient_colors[i+1], f);
                     break;
                 }
             }
-
-            // GLSL ES 1.00 (Appendix A) only allows constant-index-expressions
-            // for uniform arrays in a fragment shader - u_num_stops - 1 is a
-            // runtime uniform, which GLES drivers may reject. Find the last stop
-            // with a loop index instead, which is a constant-index-expression.
-            for (int i = 0; i < 16; i++) {
-                if (i == u_num_stops - 1 && t > u_gradient_stops[i]) {
-                    grad_color = u_gradient_colors[i];
-                }
+            
+            if (t > u_gradient_stops[u_num_stops - 1]) {
+                grad_color = u_gradient_colors[u_num_stops - 1];
             }
-
-            if (u_alphablend == 1) {
-                final_color.rgb = mix(final_color.rgb, grad_color.rgb, grad_color.a);
-            } else {
-                final_color = grad_color;
-            }
+            
+            final_color = grad_color;
         }
-
+        
         if (u_border_width > 0.0) {
-            // Second, inset SDF for the fill/border split: a fragment inside
-            // the shrunk-by-border_width rounded box is fill, one between it
-            // and the outer edge (already established by `coverage` above)
-            // is border - same analytic-ramp antialiasing as the outer edge,
-            // just against this inner boundary instead.
-            float inner_r = max(r - u_border_width, 0.0);
-            vec2 inner_half = max(half_size - vec2(u_border_width), vec2(0.0));
-            float inner_dist = udRoundBox(p, inner_half, inner_r);
-            float inner_coverage = clamp(0.5 - inner_dist, 0.0, 1.0);
-            final_color = mix(u_border_color, final_color, inner_coverage);
+            float inner = min(coverage, roundedCoverage(v_pos - u_rect_size.xy - vec2(u_border_width),
+                u_rect_size.zw - vec2(2.0 * u_border_width), u_border_width));
+            float fill_alpha = final_color.a * inner;
+            float border_alpha = u_border_color.a * (coverage - inner);
+            float alpha = fill_alpha + border_alpha;
+            vec3 rgb = alpha > 0.0 ? (final_color.rgb * fill_alpha + u_border_color.rgb * border_alpha) / alpha : vec3(0.0);
+            frag_color = vec4(rgb, alpha);
+        } else {
+            frag_color = vec4(final_color.rgb, final_color.a * coverage);
         }
-
-        final_color.a *= coverage;
-
-        // See gshader.cpp's fragment shader for why this swap is here -
-        // same render-target-vs-scanout channel-order mismatch applies to
-        // every solid-color/gradient draw with no texture to compensate via
-        // GL_TEXTURE_SWIZZLE.
-#ifdef DREAMNEXTGEN
-        frag_color = final_color;
-#else
-        frag_color = final_color.bgra;
-#endif
+        if (u_coverage_pass == 1)
+            frag_color = vec4(0.0, 0.0, 0.0, coverage);
+        else if (u_coverage_pass == 2)
+            frag_color.rgb *= coverage;
     }
 )";
 #endif
@@ -149,10 +141,14 @@ static const char* vertex_shader_es2 = R"(#version 100
 )";
 
 static const char* fragment_shader_es2 = R"(#version 100
+    #ifdef GL_FRAGMENT_PRECISION_HIGH
+    precision highp float;
+    #else
     precision mediump float;
-
+    #endif
+    
     varying vec2 v_pos;
-
+    
     uniform vec4 u_rect_size;
     uniform float u_radius;
     // Per-corner radii replaces bitmask (GLSL ES 1.00 has no bitwise ops on int uniforms)
@@ -163,122 +159,194 @@ static const char* fragment_shader_es2 = R"(#version 100
     uniform vec4 u_solid_color;
     uniform float u_border_width;
     uniform vec4 u_border_color;
-
+    uniform int u_coverage_pass;
+    
     uniform int u_num_stops;
     uniform vec4 u_gradient_colors[16];
     uniform float u_gradient_stops[16];
     uniform int u_gradient_orientation;
+    uniform float u_gradient_extent;
     uniform int u_alphablend;
-    uniform float u_gradient_full_size;
 
-    float udRoundBox(vec2 p, vec2 b, float r) {
-        vec2 d = abs(p) - b + vec2(r);
-        return min(max(d.x, d.y), 0.0) + length(max(d, 0.0)) - r;
+    float cornerCoverage(float r, vec2 d) {
+        if (r <= 0.0)
+            return 1.0;
+        float dist = length(d) - r;
+        return clamp(0.5 - dist, 0.0, 1.0);
+    }
+
+    float roundedCoverage(vec2 local, vec2 size, float inset) {
+        float w = size.x;
+        float h = size.y;
+        if (w <= 0.0 || h <= 0.0 || local.x < 0.0 || local.y < 0.0 || local.x >= w || local.y >= h)
+            return 0.0;
+        float max_r = min(u_rect_size.z, u_rect_size.w) * 0.5;
+        float r_tl = max(0.0, min(u_r_tl, max_r) - inset);
+        float r_tr = max(0.0, min(u_r_tr, max_r) - inset);
+        float r_bl = max(0.0, min(u_r_bl, max_r) - inset);
+        float r_br = max(0.0, min(u_r_br, max_r) - inset);
+        float c = 1.0;
+        if (local.x < r_tl && local.y < r_tl)
+            c = cornerCoverage(r_tl, vec2(r_tl - local.x, r_tl - local.y));
+        else if (local.x > w - r_tr && local.y < r_tr)
+            c = cornerCoverage(r_tr, vec2(local.x - (w - r_tr), r_tr - local.y));
+        else if (local.x < r_bl && local.y > h - r_bl)
+            c = cornerCoverage(r_bl, vec2(r_bl - local.x, local.y - (h - r_bl)));
+        else if (local.x > w - r_br && local.y > h - r_br)
+            c = cornerCoverage(r_br, vec2(local.x - (w - r_br), local.y - (h - r_br)));
+        return c;
+    }
+
+    vec4 mixGradientSegment(float t, float lo, float hi, vec4 a, vec4 b) {
+        float f = clamp((t - lo) / (hi - lo), 0.0, 1.0);
+        return mix(a, b, smoothstep(0.0, 1.0, f));
+    }
+
+    vec4 gradientColor(float t) {
+        vec4 grad_color = u_gradient_colors[0];
+        float denom = max(float(u_num_stops) - 1.0, 1.0);
+
+        if (u_num_stops > 1) {
+            float lo = 0.0 / denom;
+            float hi = 1.0 / denom;
+            if (t >= lo && t <= hi) grad_color = mixGradientSegment(t, lo, hi, u_gradient_colors[0], u_gradient_colors[1]);
+        }
+        if (u_num_stops > 2) {
+            float lo = 1.0 / denom;
+            float hi = 2.0 / denom;
+            if (t >= lo && t <= hi) grad_color = mixGradientSegment(t, lo, hi, u_gradient_colors[1], u_gradient_colors[2]);
+        }
+        if (u_num_stops > 3) {
+            float lo = 2.0 / denom;
+            float hi = 3.0 / denom;
+            if (t >= lo && t <= hi) grad_color = mixGradientSegment(t, lo, hi, u_gradient_colors[2], u_gradient_colors[3]);
+        }
+        if (u_num_stops > 4) {
+            float lo = 3.0 / denom;
+            float hi = 4.0 / denom;
+            if (t >= lo && t <= hi) grad_color = mixGradientSegment(t, lo, hi, u_gradient_colors[3], u_gradient_colors[4]);
+        }
+        if (u_num_stops > 5) {
+            float lo = 4.0 / denom;
+            float hi = 5.0 / denom;
+            if (t >= lo && t <= hi) grad_color = mixGradientSegment(t, lo, hi, u_gradient_colors[4], u_gradient_colors[5]);
+        }
+        if (u_num_stops > 6) {
+            float lo = 5.0 / denom;
+            float hi = 6.0 / denom;
+            if (t >= lo && t <= hi) grad_color = mixGradientSegment(t, lo, hi, u_gradient_colors[5], u_gradient_colors[6]);
+        }
+        if (u_num_stops > 7) {
+            float lo = 6.0 / denom;
+            float hi = 7.0 / denom;
+            if (t >= lo && t <= hi) grad_color = mixGradientSegment(t, lo, hi, u_gradient_colors[6], u_gradient_colors[7]);
+        }
+        if (u_num_stops > 8) {
+            float lo = 7.0 / denom;
+            float hi = 8.0 / denom;
+            if (t >= lo && t <= hi) grad_color = mixGradientSegment(t, lo, hi, u_gradient_colors[7], u_gradient_colors[8]);
+        }
+        if (u_num_stops > 9) {
+            float lo = 8.0 / denom;
+            float hi = 9.0 / denom;
+            if (t >= lo && t <= hi) grad_color = mixGradientSegment(t, lo, hi, u_gradient_colors[8], u_gradient_colors[9]);
+        }
+        if (u_num_stops > 10) {
+            float lo = 9.0 / denom;
+            float hi = 10.0 / denom;
+            if (t >= lo && t <= hi) grad_color = mixGradientSegment(t, lo, hi, u_gradient_colors[9], u_gradient_colors[10]);
+        }
+        if (u_num_stops > 11) {
+            float lo = 10.0 / denom;
+            float hi = 11.0 / denom;
+            if (t >= lo && t <= hi) grad_color = mixGradientSegment(t, lo, hi, u_gradient_colors[10], u_gradient_colors[11]);
+        }
+        if (u_num_stops > 12) {
+            float lo = 11.0 / denom;
+            float hi = 12.0 / denom;
+            if (t >= lo && t <= hi) grad_color = mixGradientSegment(t, lo, hi, u_gradient_colors[11], u_gradient_colors[12]);
+        }
+        if (u_num_stops > 13) {
+            float lo = 12.0 / denom;
+            float hi = 13.0 / denom;
+            if (t >= lo && t <= hi) grad_color = mixGradientSegment(t, lo, hi, u_gradient_colors[12], u_gradient_colors[13]);
+        }
+        if (u_num_stops > 14) {
+            float lo = 13.0 / denom;
+            float hi = 14.0 / denom;
+            if (t >= lo && t <= hi) grad_color = mixGradientSegment(t, lo, hi, u_gradient_colors[13], u_gradient_colors[14]);
+        }
+        if (u_num_stops > 15) {
+            float lo = 14.0 / denom;
+            float hi = 15.0 / denom;
+            if (t >= lo && t <= hi) grad_color = mixGradientSegment(t, lo, hi, u_gradient_colors[14], u_gradient_colors[15]);
+        }
+
+        return grad_color;
     }
 
     void main() {
         float coverage = 1.0;
-        vec2 half_size = u_rect_size.zw * 0.5;
-        vec2 center = vec2(u_rect_size.x, u_rect_size.y) + half_size;
-        vec2 p = v_pos - center;
-        float r = u_radius;
-
         if (u_radius > 0.0) {
-            if (p.x < 0.0 && p.y < 0.0) r = u_r_tl;
-            if (p.x > 0.0 && p.y < 0.0) r = u_r_tr;
-            if (p.x < 0.0 && p.y > 0.0) r = u_r_bl;
-            if (p.x > 0.0 && p.y > 0.0) r = u_r_br;
-
-            float dist = udRoundBox(p, half_size, r);
-            // See the ES3 fragment shader above for why this is a coverage
-            // ramp instead of a hard discard.
-            if (dist > 0.0) discard;
-            coverage = 1.0;
+            coverage = roundedCoverage(v_pos - u_rect_size.xy, u_rect_size.zw, 0.0);
+            if (coverage <= 0.0)
+                discard;
         }
-
+        
         vec4 final_color = u_solid_color;
-
+        
         if (u_num_stops > 0) {
             float t = 0.0;
-            if (u_gradient_orientation == 2) {
-                t = (v_pos.x - u_rect_size.x) / u_rect_size.z;
+            float extent = u_gradient_extent > 0.0 ? u_gradient_extent : ((u_gradient_orientation == 1) ? u_rect_size.w : u_rect_size.z);
+            if (u_gradient_orientation == 1) {
+                t = (v_pos.y - u_rect_size.y) / extent;
             } else {
-                t = (v_pos.y - u_rect_size.y) / u_rect_size.w;
+                t = (v_pos.x - u_rect_size.x) / extent;
             }
-
-            vec4 grad_color = u_gradient_colors[0];
-            for (int i = 0; i < 15; i++) {
-                if (i >= u_num_stops - 1) break;
-                if (t >= u_gradient_stops[i] && t <= u_gradient_stops[i+1]) {
-                    float range = u_gradient_stops[i+1] - u_gradient_stops[i];
-                    float f = (t - u_gradient_stops[i]) / range;
-                    grad_color = mix(u_gradient_colors[i], u_gradient_colors[i+1], f);
-                    break;
-                }
-            }
-
-            // GLSL ES 1.00 (Appendix A) only allows constant-index-expressions
-            // for uniform arrays in a fragment shader - u_num_stops - 1 is a
-            // runtime uniform, which GLES drivers may reject. Find the last stop
-            // with a loop index instead, which is a constant-index-expression.
-            for (int i = 0; i < 16; i++) {
-                if (i == u_num_stops - 1 && t > u_gradient_stops[i]) {
-                    grad_color = u_gradient_colors[i];
-                }
-            }
-
-            if (u_alphablend == 1) {
-                final_color.rgb = mix(final_color.rgb, grad_color.rgb, grad_color.a);
-            } else {
-                final_color = grad_color;
-            }
+            t = clamp(t, 0.0, 1.0);
+            
+            final_color = gradientColor(t);
         }
-
+        
         if (u_border_width > 0.0) {
-            // See the ES3 fragment shader above for the inner-SDF fill/border
-            // split this mirrors.
-            float inner_r = max(r - u_border_width, 0.0);
-            vec2 inner_half = max(half_size - vec2(u_border_width), vec2(0.0));
-            float inner_dist = udRoundBox(p, inner_half, inner_r);
-            float inner_coverage = clamp(0.5 - inner_dist, 0.0, 1.0);
-            final_color = mix(u_border_color, final_color, inner_coverage);
+            float inner = min(coverage, roundedCoverage(v_pos - u_rect_size.xy - vec2(u_border_width),
+                u_rect_size.zw - vec2(2.0 * u_border_width), u_border_width));
+            float fill_alpha = final_color.a * inner;
+            float border_alpha = u_border_color.a * (coverage - inner);
+            float alpha = fill_alpha + border_alpha;
+            vec3 rgb = alpha > 0.0 ? (final_color.rgb * fill_alpha + u_border_color.rgb * border_alpha) / alpha : vec3(0.0);
+            gl_FragColor = vec4(rgb, alpha);
+        } else {
+            gl_FragColor = vec4(final_color.rgb, final_color.a * coverage);
         }
-
-        final_color.a *= coverage;
-
-        // See gshader.cpp's fragment shader for why this swap is here.
-#ifdef DREAMNEXTGEN
-        gl_FragColor = final_color;
-#else
-        gl_FragColor = final_color.bgra;
-#endif
+        if (u_coverage_pass == 1)
+            gl_FragColor = vec4(0.0, 0.0, 0.0, coverage);
+        else if (u_coverage_pass == 2)
+            gl_FragColor.rgb *= coverage;
     }
 )";
 
 // ---------------------------------------------------------------------------
 
-#if defined(HAVE_GLES3)
-gAdvancedShader::gAdvancedShader() : m_program_id(0), m_vao(0), m_vbo(0) {}
-#else
 gAdvancedShader::gAdvancedShader() : m_program_id(0), m_vbo(0) {}
-#endif
 
-gAdvancedShader::~gAdvancedShader() {
-	destroy();
+gAdvancedShader::~gAdvancedShader() = default;
+
+void gAdvancedShader::release(bool contextCurrent) {
+	if (contextCurrent && m_vbo)
+		glDeleteBuffers(1, &m_vbo);
+	if (contextCurrent && m_program_id)
+		glDeleteProgram(m_program_id);
+	m_vbo = 0;
+	m_program_id = 0;
 }
 
-void gAdvancedShader::destroy() {
-#if defined(HAVE_GLES3)
-	if (gles::isGLES3() && m_vao)
-		glDeleteVertexArrays(1, &m_vao);
-	m_vao = 0;
-#endif
-	if (m_vbo)
-		glDeleteBuffers(1, &m_vbo);
-	m_vbo = 0;
-	if (m_program_id)
-		glDeleteProgram(m_program_id);
-	m_program_id = 0;
+static int channelDistance(unsigned char a, unsigned char b) {
+	return a > b ? a - b : b - a;
+}
+
+static bool nearlySameGradientStop(const gRGB& a, const gRGB& b) {
+	return a.a == b.a && channelDistance(a.r, b.r) <= 1 && channelDistance(a.g, b.g) <= 1 && channelDistance(a.b, b.b) <= 1;
 }
 
 GLuint gAdvancedShader::compileShader(GLenum type, const char* source) {
@@ -298,6 +366,9 @@ GLuint gAdvancedShader::compileShader(GLenum type, const char* source) {
 }
 
 bool gAdvancedShader::init() {
+	gles::ShaderLocale shaderLocale;
+	if (!shaderLocale.valid())
+		return false;
 #if defined(HAVE_GLES3)
 	const char* vs_src = gles::isGLES3() ? vertex_shader_es3 : vertex_shader_es2;
 	const char* fs_src = gles::isGLES3() ? fragment_shader_es3 : fragment_shader_es2;
@@ -330,14 +401,15 @@ bool gAdvancedShader::init() {
 	m_radius_location = glGetUniformLocation(m_program_id, "u_radius");
 	m_edges_location = glGetUniformLocation(m_program_id, "u_edges");
 	m_solid_color_location = glGetUniformLocation(m_program_id, "u_solid_color");
+	m_alphablend_location = glGetUniformLocation(m_program_id, "u_alphablend");
 	m_border_width_location = glGetUniformLocation(m_program_id, "u_border_width");
 	m_border_color_location = glGetUniformLocation(m_program_id, "u_border_color");
-	m_alphablend_location = glGetUniformLocation(m_program_id, "u_alphablend");
+	m_coveragePassLocation = glGetUniformLocation(m_program_id, "u_coverage_pass");
 	m_gradient_colors_location = glGetUniformLocation(m_program_id, "u_gradient_colors");
 	m_gradient_stops_location = glGetUniformLocation(m_program_id, "u_gradient_stops");
 	m_num_stops_location = glGetUniformLocation(m_program_id, "u_num_stops");
 	m_gradient_orientation_location = glGetUniformLocation(m_program_id, "u_gradient_orientation");
-	m_gradient_full_size_location = glGetUniformLocation(m_program_id, "u_gradient_full_size");
+	m_gradient_extent_location = glGetUniformLocation(m_program_id, "u_gradient_extent");
 
 	// ES2-only per-corner radius locations
 	if (!gles::isGLES3()) {
@@ -347,13 +419,6 @@ bool gAdvancedShader::init() {
 		m_edges_br_location = glGetUniformLocation(m_program_id, "u_r_br");
 	}
 
-#if defined(HAVE_GLES3)
-	if (gles::isGLES3()) {
-		glGenVertexArrays(1, &m_vao);
-		glBindVertexArray(m_vao);
-	}
-#endif
-
 	glGenBuffers(1, &m_vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 6 * 2, nullptr, GL_DYNAMIC_DRAW);
@@ -361,10 +426,6 @@ bool gAdvancedShader::init() {
 	glEnableVertexAttribArray(0);
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
-#if defined(HAVE_GLES3)
-	if (gles::isGLES3())
-		glBindVertexArray(0);
-#endif
 
 	return true;
 }
@@ -374,27 +435,13 @@ void gAdvancedShader::bind() {
 }
 
 void gAdvancedShader::bindVAO() {
-#if defined(HAVE_GLES3)
-	if (gles::isGLES3()) {
-		glBindVertexArray(m_vao);
-	} else
-#endif
-	{
-		glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
-		glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
-		glEnableVertexAttribArray(0);
-	}
+	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
 }
 
 void gAdvancedShader::unbindVAO() {
-#if defined(HAVE_GLES3)
-	if (gles::isGLES3()) {
-		glBindVertexArray(0);
-	} else
-#endif
-	{
-		glDisableVertexAttribArray(0);
-	}
+	glDisableVertexAttribArray(0);
 }
 
 void gAdvancedShader::setResolution(float width, float height) {
@@ -403,14 +450,21 @@ void gAdvancedShader::setResolution(float width, float height) {
 	glUniformMatrix4fv(m_projection_location, 1, GL_FALSE, ortho);
 }
 
-void gAdvancedShader::drawAdvancedRect(float x, float y, float width, float height, int radius, uint8_t edges, const std::vector<gRGB>& gradient_colors, uint8_t orientation, bool alphablend, float alpha,
-									   const gRGB& solid_color, int border_width, const gRGB& border_color, int gradient_full_size) {
+void gAdvancedShader::setFramebufferResolution(float width, float height) {
 	bind();
+	float ortho[16] = {2.0f / width, 0.0f, 0.0f, 0.0f, 0.0f, 2.0f / height, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f, 0.0f, -1.0f, -1.0f, 0.0f, 1.0f};
+	glUniformMatrix4fv(m_projection_location, 1, GL_FALSE, ortho);
+}
+
+void gAdvancedShader::drawAdvancedRect(float x, float y, float width, float height, int radius, uint8_t edges, const std::vector<gRGB>& gradient_colors, uint8_t orientation, bool alphablend,
+									   int gradient_full_size, float alpha, const gRGB& solid_color, int border_width, const gRGB& border_color, bool replaceCoverage) {
+	bind();
+	(void)alpha;
 
 	glUniform4f(m_rect_size_location, x, y, width, height);
 	glUniform1f(m_radius_location, (float)radius);
 	glUniform4f(m_solid_color_location, solid_color.r / 255.0f, solid_color.g / 255.0f, solid_color.b / 255.0f, 1.0f - (solid_color.a / 255.0f));
-	glUniform1f(m_border_width_location, (float)border_width);
+	glUniform1f(m_border_width_location, std::max(0.0f, std::min((float)border_width, std::min(width, height) * 0.5f)));
 	glUniform4f(m_border_color_location, border_color.r / 255.0f, border_color.g / 255.0f, border_color.b / 255.0f, 1.0f - (border_color.a / 255.0f));
 
 	if (gles::isGLES3()) {
@@ -426,34 +480,58 @@ void gAdvancedShader::drawAdvancedRect(float x, float y, float width, float heig
 	}
 
 	if (gradient_colors.size() > 0) {
-		glUniform1i(m_num_stops_location, gradient_colors.size());
+		int stops_count = gradient_colors.size() > 16 ? 16 : gradient_colors.size();
+		const bool collapse_tail_stop = stops_count > 2 && nearlySameGradientStop(gradient_colors[1], gradient_colors[2]);
+		if (collapse_tail_stop)
+			stops_count = 2;
+		glUniform1i(m_num_stops_location, stops_count);
 		glUniform1i(m_gradient_orientation_location, orientation);
 		glUniform1i(m_alphablend_location, alphablend ? 1 : 0);
-		glUniform1f(m_gradient_full_size_location, (float)gradient_full_size);
+		const float default_extent = orientation == 1 ? height : width;
+		const float gradient_extent = gradient_full_size > 0 ? std::max((float)gradient_full_size, default_extent) : default_extent;
+		glUniform1f(m_gradient_extent_location, gradient_extent);
 
 		float colors[16 * 4];
 		float stops[16];
-		int stops_count = gradient_colors.size() > 16 ? 16 : gradient_colors.size();
 
 		for (int i = 0; i < stops_count; i++) {
-			colors[i * 4 + 0] = gradient_colors[i].r / 255.0f;
-			colors[i * 4 + 1] = gradient_colors[i].g / 255.0f;
-			colors[i * 4 + 2] = gradient_colors[i].b / 255.0f;
-			colors[i * 4 + 3] = alphablend ? alpha : (1.0f - (gradient_colors[i].a / 255.0f));
-			stops[i] = (float)i / (float)(stops_count - 1);
+			const gRGB& color = collapse_tail_stop && i == 1 ? gradient_colors[2] : gradient_colors[i];
+			colors[i * 4 + 0] = color.r / 255.0f;
+			colors[i * 4 + 1] = color.g / 255.0f;
+			colors[i * 4 + 2] = color.b / 255.0f;
+			colors[i * 4 + 3] = 1.0f - (color.a / 255.0f);
+			stops[i] = stops_count > 1 ? (float)i / (float)(stops_count - 1) : 0.0f;
 		}
 
 		glUniform4fv(m_gradient_colors_location, stops_count, colors);
 		glUniform1fv(m_gradient_stops_location, stops_count, stops);
 	} else {
 		glUniform1i(m_num_stops_location, 0);
+		glUniform1f(m_gradient_extent_location, 0.0f);
 	}
 
 	float vertices[6][2] = {{x, y}, {x, y + height}, {x + width, y}, {x + width, y}, {x, y + height}, {x + width, y + height}};
 
 	bindVAO();
 	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
-	gles::uploadDynamicVBO(sizeof(vertices), vertices);
-	glDrawArrays(GL_TRIANGLES, 0, 6);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
+	if (replaceCoverage) {
+		// Legacy rounded fills replace RGBA, interpolating with the destination
+		// only at the antialiased edge. Source-over would make stacked panels opaque.
+		// Two passes implement dst * (1 - coverage) + src * coverage without readback.
+		glEnable(GL_BLEND);
+		glBlendEquationSeparate(GL_FUNC_ADD, GL_FUNC_ADD);
+		glBlendFunc(GL_ZERO, GL_ONE_MINUS_SRC_ALPHA);
+		glUniform1i(m_coveragePassLocation, 1);
+		glDrawArrays(GL_TRIANGLES, 0, 6);
+		glBlendFunc(GL_ONE, GL_ONE);
+		glUniform1i(m_coveragePassLocation, 2);
+		glDrawArrays(GL_TRIANGLES, 0, 6);
+		glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+		glDisable(GL_BLEND);
+	} else {
+		glUniform1i(m_coveragePassLocation, 0);
+		glDrawArrays(GL_TRIANGLES, 0, 6);
+	}
 	unbindVAO();
 }

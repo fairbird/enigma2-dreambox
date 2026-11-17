@@ -761,22 +761,22 @@ void eWidgetDesktop::fadeTick()
 		m_fade_timer->stop();
 }
 
-void eWidgetDesktop::sendShow(ePoint point, eSize size, int anim_id)
+void eWidgetDesktop::sendShow(ePoint point, eSize size, int animation, int durationMs)
 {
 	if(m_style_id!=0)
 		return;
 
 	gPainter painter(m_screen.m_dc);
-	painter.sendShow(point, size, anim_id);
+	painter.sendShow(point, size, animation, durationMs);
 }
 
-void eWidgetDesktop::sendHide(ePoint point, eSize size, int anim_id)
+void eWidgetDesktop::sendHide(ePoint point, eSize size, int animation, int durationMs)
 {
 	if(m_style_id!=0)
 		return;
 
 	gPainter painter(m_screen.m_dc);
-	painter.sendHide(point, size, anim_id);
+	painter.sendHide(point, size, animation, durationMs);
 }
 
 eRect eWidgetDesktop::bounds() const

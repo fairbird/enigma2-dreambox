@@ -2,35 +2,10 @@
 
 Radius / Rectangle Feature of gPixmap
 
-Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License
-
 Copyright (c) 2023-2025 jbleyel, zKhadiri
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-1. Non-Commercial Use: You may not use the Software or any derivative works
-   for commercial purposes without obtaining explicit permission from the
-   copyright holder.
-2. Share Alike: If you distribute or publicly perform the Software or any
-   derivative works, you must do so under the same license terms, and you
-   must make the source code of any derivative works available to the
-   public.
-3. Attribution: You must give appropriate credit to the original author(s)
-   of the Software by including a prominent notice in your derivative works.
-THE SOFTWARE IS PROVIDED "AS IS," WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE, AND NONINFRINGEMENT. IN NO EVENT SHALL
-THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES, OR
-OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT, OR OTHERWISE,
-ARISING FROM, OUT OF, OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
-OTHER DEALINGS IN THE SOFTWARE.
-
-For more details about the CC BY-NC-SA 4.0 License, please visit:
-https://creativecommons.org/licenses/by-nc-sa/4.0/
+This code may be used commercially. Attribution must be given to the original author.
+Licensed under GPLv2.
 */
 
 
@@ -42,23 +17,10 @@ https://creativecommons.org/licenses/by-nc-sa/4.0/
 #include <lib/gdi/accel.h>
 #include <lib/gdi/drawing.h>
 #include <byteswap.h>
+#include <sys/time.h>
 
 #ifndef BYTE_ORDER
 #error "no BYTE_ORDER defined!"
-#endif
-
-#ifdef HAVE_EGL
-// Defined in lib/gdi/egl/gtexture_manager.cpp - queues a GLES texture name
-// for deletion on gRC's render thread (glDeleteTextures() needs a current
-// EGL context, which only that thread has). gSurface's destructor below is
-// the one place that reliably runs exactly when a surface (and whatever
-// texture gTextureManager may have cached for it - see gUnmanagedSurface's
-// gl_texture_id) is no longer needed by anything, regardless of which
-// specific code path let its last reference go.
-// gSurface::~gSurface() can run outside the EGL render thread, so it only
-// records ownership-aware release here; actual GL deletion remains queued for
-// the thread that owns the current EGL context.
-extern "C" void egl_release_surface_texture(unsigned int gl_texture_id, const void* surface);
 #endif
 
 /* surface acceleration threshold: do not attempt to accelerate surfaces smaller than the threshold (measured in bytes) */
@@ -190,7 +152,12 @@ void gLookup::build(int _size, const gPalette &pal, const gRGB &start, const gRG
 gUnmanagedSurface::gUnmanagedSurface():
 	x(0), y(0), bpp(0), bypp(0), stride(0),
 	data(0),
-	data_phys(0)
+	data_phys(0),
+	gl_texture_id(0),
+	gl_framebuffer_id(0),
+	gl_context_generation(0),
+	gl_content_valid(false),
+	cpu_content_valid(true)
 {
 }
 
@@ -199,7 +166,12 @@ gUnmanagedSurface::gUnmanagedSurface(int width, int height, int _bpp):
 	y(height),
 	bpp(_bpp),
 	data(0),
-	data_phys(0)
+	data_phys(0),
+	gl_texture_id(0),
+	gl_framebuffer_id(0),
+	gl_context_generation(0),
+	gl_content_valid(false),
+	cpu_content_valid(true)
 {
 	switch (_bpp)
 	{
@@ -240,6 +212,308 @@ static inline void added_pixmap(int size) {}
 static inline void removed_pixmap(int size) {}
 #endif
 
+static void invalidate_gl_texture(gUnmanagedSurface *surface, bool release = false)
+{
+	if (!surface)
+		return;
+	if (surface->nativeImported && !release) {
+		// The CPU edits the imported allocation; keep its EGLImage and FBO.
+		surface->gl_content_valid = false;
+		surface->cpu_content_valid = true;
+		return;
+	}
+
+	if (surface->gl_framebuffer_id)
+	{
+		extern void egl_queue_framebuffer_deletion(unsigned int fb_id, unsigned int context_generation) __attribute__((weak));
+		if (egl_queue_framebuffer_deletion)
+			egl_queue_framebuffer_deletion(surface->gl_framebuffer_id, surface->gl_context_generation);
+		surface->gl_framebuffer_id = 0;
+	}
+
+	if (surface->gl_texture_id)
+	{
+		extern void egl_queue_texture_deletion(unsigned int tx_id, unsigned int context_generation) __attribute__((weak));
+		if (egl_queue_texture_deletion)
+			egl_queue_texture_deletion(surface->gl_texture_id, surface->gl_context_generation);
+		surface->gl_texture_id = 0;
+	}
+
+	surface->gl_content_valid = false;
+	surface->cpu_content_valid = true;
+	surface->gl_native_shared = false;
+	surface->nativeImported = false;
+}
+
+static bool sync_gl_texture_to_cpu(gUnmanagedSurface *surface)
+{
+	if (surface && surface->nativeAccessFailed)
+		return false;
+	if (!surface || (surface->cpu_content_valid && !surface->nativeGPUAccessPending))
+		return true;
+
+	extern bool egl_sync_surface_to_cpu(gUnmanagedSurface *surface) __attribute__((weak));
+	if (egl_sync_surface_to_cpu && egl_sync_surface_to_cpu(surface))
+		return true;
+
+	eWarning("[gPixmap] unable to sync GLES pixmap content back to CPU for %dx%dx%d", surface->x, surface->y, surface->bpp);
+	return false;
+}
+
+static bool prepare_cpu_write(gUnmanagedSurface *surface)
+{
+	if (!sync_gl_texture_to_cpu(surface))
+		return false;
+	invalidate_gl_texture(surface);
+	return true;
+}
+
+static bool prepare_cpu_read(gUnmanagedSurface *surface)
+{
+	return sync_gl_texture_to_cpu(surface);
+}
+
+static bool e2egl_gpixmap_gles_enabled(const gUnmanagedSurface *surface)
+{
+	if (!surface || surface->nativeAccessFailed || !surface->data_phys || surface->bpp != 32 || surface->x <= 0 || surface->stride / 4 < surface->x)
+		return false;
+	static int enabled = -1;
+	if (enabled < 0)
+	{
+		// The former weak hooks were unresolved. Activate the repaired bridge only
+		// for the explicitly enabled native target experiment, with CPU fallback.
+		const char *env = getenv(
+#ifdef DREAMNEXTGEN
+			"E2EGL_AML_NATIVE_TARGET"
+#else
+			"E2EGL_DREAMBCM_ION_TARGET"
+#endif
+		);
+		enabled = env && *env == '1';
+	}
+	return enabled;
+}
+
+static bool try_gles_fill(gUnmanagedSurface *surface, const eRect &area, uint32_t color)
+{
+	if (!e2egl_gpixmap_gles_enabled(surface) || area.empty())
+		return false;
+
+	extern bool egl_gpixmap_fill(gUnmanagedSurface *surface, int x, int y, int w, int h, uint32_t color) __attribute__((weak));
+	return egl_gpixmap_fill && egl_gpixmap_fill(surface, area.x(), area.y(), area.width(), area.height(), color);
+}
+
+static void e2egl_trace_gpixmap_summary();
+
+static bool e2egl_trace_gpixmap_enabled()
+{
+	static int enabled = -1;
+	if (enabled < 0)
+	{
+		const char *env = getenv("E2EGL_TRACE_GPIXMAP");
+		enabled = env && *env && *env != '0' && *env != 'n' && *env != 'N' && *env != 'f' && *env != 'F' && *env != 'o' && *env != 'O';
+		if (enabled)
+			atexit(e2egl_trace_gpixmap_summary);
+	}
+	return enabled;
+}
+
+static int e2egl_trace_gpixmap_limit()
+{
+	static int limit = -1;
+	if (limit < 0)
+	{
+		const char *env = getenv("E2EGL_TRACE_GPIXMAP_LIMIT");
+		limit = env && *env ? atoi(env) : 256;
+		if (limit < 0)
+			limit = 0;
+	}
+	return limit;
+}
+
+struct e2egl_gpixmap_trace_counter
+{
+	const char *op;
+	unsigned int count;
+	unsigned long long bytes;
+	unsigned long long time_us;
+	unsigned long long max_us;
+};
+
+static e2egl_gpixmap_trace_counter e2egl_trace_gpixmap_counters[] =
+{
+	{ "fill-indexed-cpu", 0, 0, 0, 0 },
+	{ "fill-16-cpu", 0, 0, 0, 0 },
+	{ "fill-32-cpu", 0, 0, 0, 0 },
+	{ "fill-32-gles", 0, 0, 0, 0 },
+	{ "fill-ge2d", 0, 0, 0, 0 },
+	{ "fill-rgb-16-cpu", 0, 0, 0, 0 },
+	{ "fill-rgb-32-cpu", 0, 0, 0, 0 },
+	{ "fill-rgb-32-gles", 0, 0, 0, 0 },
+	{ "fill-rgb-ge2d", 0, 0, 0, 0 },
+	{ "drawRectangle-solid-cpu", 0, 0, 0, 0 },
+	{ "drawRectangle-solid-gles", 0, 0, 0, 0 },
+	{ "drawRectangle-gradient-cpu", 0, 0, 0, 0 },
+	{ "drawRectangle-gradient-gles", 0, 0, 0, 0 },
+	{ "drawRectangle-rounded-gles", 0, 0, 0, 0 },
+	{ "drawRectangle-new-cpu", 0, 0, 0, 0 },
+	{ "drawRectangle-new-gles", 0, 0, 0, 0 },
+	{ "blit-cpu", 0, 0, 0, 0 },
+	{ "blit-scale-cpu", 0, 0, 0, 0 },
+	{ "blit-rounded-cpu", 0, 0, 0, 0 },
+	{ "blit-rounded-scale-cpu", 0, 0, 0, 0 },
+	{ "blit-rounded-gles", 0, 0, 0, 0 },
+	{ "blit-rounded-scale-gles", 0, 0, 0, 0 },
+	{ "blit-ge2d", 0, 0, 0, 0 },
+	{ "blit-scale-ge2d", 0, 0, 0, 0 },
+	{ "mergePalette-cpu", 0, 0, 0, 0 },
+	{ "line-cpu", 0, 0, 0, 0 },
+	{ "line-gles", 0, 0, 0, 0 },
+	{ 0, 0, 0, 0, 0 }
+};
+
+static void e2egl_trace_gpixmap_count(const char *op, int bytes)
+{
+	for (e2egl_gpixmap_trace_counter *counter = e2egl_trace_gpixmap_counters; counter->op; ++counter)
+	{
+		if (!strcmp(counter->op, op))
+		{
+			++counter->count;
+			if (bytes > 0)
+				counter->bytes += bytes;
+			return;
+		}
+	}
+}
+
+static void e2egl_trace_gpixmap_summary()
+{
+	bool has_data = false;
+	for (e2egl_gpixmap_trace_counter *counter = e2egl_trace_gpixmap_counters; counter->op; ++counter)
+	{
+		if (counter->count)
+		{
+			has_data = true;
+			break;
+		}
+	}
+	if (!has_data)
+		return;
+
+	eDebug("[e2egl:gPixmap] summary begin");
+	for (e2egl_gpixmap_trace_counter *counter = e2egl_trace_gpixmap_counters; counter->op; ++counter)
+	{
+		if (counter->count)
+		{
+			const unsigned long long avg_us = counter->time_us ? counter->time_us / counter->count : 0;
+			const unsigned long long kib_s = counter->time_us ? ((counter->bytes * 1000000ULL) / counter->time_us) / 1024ULL : 0;
+			eDebug("[e2egl:gPixmap] summary op=%s count=%u bytes=%llu time_us=%llu avg_us=%llu max_us=%llu kib_s=%llu",
+				counter->op, counter->count, counter->bytes, counter->time_us, avg_us, counter->max_us, kib_s);
+		}
+	}
+	eDebug("[e2egl:gPixmap] summary end");
+}
+
+static unsigned long long e2egl_trace_gpixmap_now_us()
+{
+	struct timeval tv;
+	gettimeofday(&tv, 0);
+	return static_cast<unsigned long long>(tv.tv_sec) * 1000000ULL + tv.tv_usec;
+}
+
+static void e2egl_trace_gpixmap_record_time(const char *op, unsigned long long elapsed_us)
+{
+	for (e2egl_gpixmap_trace_counter *counter = e2egl_trace_gpixmap_counters; counter->op; ++counter)
+	{
+		if (!strcmp(counter->op, op))
+		{
+			counter->time_us += elapsed_us;
+			if (elapsed_us > counter->max_us)
+				counter->max_us = elapsed_us;
+			break;
+		}
+	}
+
+	static unsigned int timed_count = 0;
+	++timed_count;
+	const int limit = e2egl_trace_gpixmap_limit();
+	if (limit && !(timed_count % limit))
+		e2egl_trace_gpixmap_summary();
+}
+
+class e2egl_gpixmap_trace_scope
+{
+public:
+	e2egl_gpixmap_trace_scope(const char *op):
+		m_op(op),
+		m_start(e2egl_trace_gpixmap_enabled() ? e2egl_trace_gpixmap_now_us() : 0)
+	{
+	}
+
+	~e2egl_gpixmap_trace_scope()
+	{
+		if (m_start)
+			e2egl_trace_gpixmap_record_time(m_op, e2egl_trace_gpixmap_now_us() - m_start);
+	}
+
+private:
+	const char *m_op;
+	unsigned long long m_start;
+};
+
+static unsigned long long e2egl_trace_gpixmap_begin_time()
+{
+	return e2egl_trace_gpixmap_enabled() ? e2egl_trace_gpixmap_now_us() : 0;
+}
+
+static void e2egl_trace_gpixmap_end_time(const char *op, unsigned long long start_us)
+{
+	if (start_us)
+		e2egl_trace_gpixmap_record_time(op, e2egl_trace_gpixmap_now_us() - start_us);
+}
+
+static void e2egl_trace_gpixmap_op(const char *op, const gUnmanagedSurface *dst, const eRect &area, unsigned int rects,
+	const gUnmanagedSurface *src = 0, int flags = 0, int cornerRadius = 0, uint8_t edges = 0, const char *path = "cpu")
+{
+	if (!e2egl_trace_gpixmap_enabled())
+		return;
+
+	const int bytes = dst && area.width() > 0 && area.height() > 0 ? area.width() * area.height() * dst->bypp : 0;
+	e2egl_trace_gpixmap_count(op, bytes);
+
+	static int count = 0;
+	const int limit = e2egl_trace_gpixmap_limit();
+	if (limit && count >= limit)
+	{
+		if (count == limit)
+			eDebug("[e2egl:gPixmap] trace limit reached (%d); set E2EGL_TRACE_GPIXMAP_LIMIT to change it", limit);
+		++count;
+		return;
+	}
+	++count;
+
+	const int dst_x = dst ? dst->x : 0;
+	const int dst_y = dst ? dst->y : 0;
+	const int dst_bpp = dst ? dst->bpp : 0;
+	const int dst_stride = dst ? dst->stride : 0;
+	const int dst_phys = dst ? dst->data_phys : 0;
+	const unsigned int dst_gl_texture = dst ? dst->gl_texture_id : 0;
+	const unsigned int dst_gl_framebuffer = dst ? dst->gl_framebuffer_id : 0;
+	const int dst_gl_valid = dst && dst->gl_content_valid ? 1 : 0;
+	const int dst_cpu_valid = dst && dst->cpu_content_valid ? 1 : 0;
+	const int src_x = src ? src->x : 0;
+	const int src_y = src ? src->y : 0;
+	const int src_bpp = src ? src->bpp : 0;
+	const int src_phys = src ? src->data_phys : 0;
+	const unsigned int src_gl_texture = src ? src->gl_texture_id : 0;
+	const int src_gl_valid = src && src->gl_content_valid ? 1 : 0;
+	const int src_cpu_valid = src && src->cpu_content_valid ? 1 : 0;
+
+	eDebug("[e2egl:gPixmap] %s path=%s dst=%dx%dx%d stride=%d phys=0x%x gltex=%u fbo=%u glvalid=%d cpuvalid=%d src=%dx%dx%d srcphys=0x%x srctex=%u srcglvalid=%d srccpuvalid=%d area=%d,%d %dx%d bytes=%d rects=%u flags=0x%x radius=%d edges=0x%x",
+		op, path, dst_x, dst_y, dst_bpp, dst_stride, dst_phys, dst_gl_texture, dst_gl_framebuffer, dst_gl_valid, dst_cpu_valid, src_x, src_y, src_bpp, src_phys, src_gl_texture, src_gl_valid, src_cpu_valid,
+		area.x(), area.y(), area.width(), area.height(), bytes, rects, flags, cornerRadius, edges);
+}
+
 static bool is_a_candidate_for_accel(const gUnmanagedSurface* surface)
 {
 	if (surface->stride < 48)
@@ -254,6 +528,86 @@ static bool is_a_candidate_for_accel(const gUnmanagedSurface* surface)
 	}
 }
 
+static bool try_gles_draw_solid_rect(gUnmanagedSurface *surface, const gRegion &region, const eRect &area, uint32_t color)
+{
+	if (!e2egl_gpixmap_gles_enabled(surface) || area.empty() || region.rects.empty())
+		return false;
+
+	bool drew = false;
+	for (unsigned int i = 0; i < region.rects.size(); ++i)
+	{
+		eRect draw = area & region.rects[i];
+		if (draw.empty())
+			continue;
+		if (!try_gles_fill(surface, draw, color))
+			return false;
+		drew = true;
+	}
+	return drew;
+}
+
+static bool try_gles_draw_rectangle(gUnmanagedSurface *surface, const gRegion &region, const eRect &area, const gRGB &backgroundColor, const gRGB &borderColor, int borderWidth,
+	const std::vector<gRGB> &gradientColors, uint8_t direction, int radius, uint8_t edges, bool alphablend, int gradientFullSize, bool useNew)
+{
+	if (!e2egl_gpixmap_gles_enabled(surface) || area.empty() || region.rects.empty())
+		return false;
+	if (direction && gradientColors.size() < 2)
+		return false;
+
+	extern bool egl_gpixmap_draw_rectangle(gUnmanagedSurface *surface, const gRegion *region, int x, int y, int w, int h, uint32_t background_color, uint32_t border_color, int border_width,
+		const gRGB *gradient_colors, int gradient_count, uint8_t direction, int radius, uint8_t edges, bool alphablend, int gradient_full_size, bool use_new) __attribute__((weak));
+	if (!egl_gpixmap_draw_rectangle)
+		return false;
+
+	const gRGB *colors = gradientColors.empty() ? 0 : &gradientColors[0];
+	return egl_gpixmap_draw_rectangle(surface, &region, area.x(), area.y(), area.width(), area.height(), backgroundColor.argb(), borderColor.argb(), borderWidth, colors,
+		(int)gradientColors.size(), direction, radius, edges, alphablend, gradientFullSize, useNew);
+}
+
+static bool try_gles_draw_axis_aligned_line(gUnmanagedSurface *surface, const gRegion &clip, ePoint start, ePoint dst, uint32_t color, eRect *line_area)
+{
+	if (!e2egl_gpixmap_gles_enabled(surface) || clip.rects.empty())
+		return false;
+
+	const int xa = start.x();
+	const int ya = start.y();
+	const int xb = dst.x();
+	const int yb = dst.y();
+	if (ya == yb)
+		*line_area = eRect(std::min(xa, xb), ya, abs(xb - xa), 1);
+	else if (xa == xb)
+		*line_area = eRect(xa, std::min(ya, yb), 1, abs(yb - ya));
+	else
+		return false;
+
+	if (line_area->empty())
+		return true;
+
+	bool drew = false;
+	for (unsigned int i = 0; i < clip.rects.size(); ++i)
+	{
+		eRect draw = *line_area & clip.rects[i];
+		if (draw.empty())
+			continue;
+		if (!try_gles_fill(surface, draw, color))
+			return false;
+		drew = true;
+	}
+	return drew;
+}
+
+static bool try_gles_blit(gUnmanagedSurface *dst, gUnmanagedSurface *src, const eRect &pos, const eRect &area, int flag, int cornerRadius, uint8_t edges)
+{
+	if (!e2egl_gpixmap_gles_enabled(dst) || !src || dst == src || src->bpp != 32 || pos.empty() || area.empty())
+		return false;
+	extern bool egl_gpixmap_blit(gUnmanagedSurface *dst, gUnmanagedSurface *src, int dx, int dy, int dw, int dh, int ax, int ay, int aw, int ah, int flags, int radius, uint8_t edges)
+		__attribute__((weak));
+	if (!egl_gpixmap_blit)
+		return false;
+
+	return egl_gpixmap_blit(dst, src, pos.x(), pos.y(), pos.width(), pos.height(), area.x(), area.y(), area.width(), area.height(), flag, cornerRadius, edges);
+}
+
 gSurface::gSurface(int width, int height, int _bpp, int accel):
 	gUnmanagedSurface(width, height, _bpp)
 {
@@ -261,7 +615,7 @@ gSurface::gSurface(int width, int height, int _bpp, int accel):
 		((accel == gPixmap::accelAuto) && (is_a_candidate_for_accel(this))))
 	{
 		if (gAccel::getInstance()->accelAlloc(this) != 0)
-				eDebug("[gSurface] ERROR: accelAlloc failed");
+				eTrace("[gSurface] ERROR: accelAlloc failed");
 	}
 	if (!data)
 	{
@@ -272,32 +626,9 @@ gSurface::gSurface(int width, int height, int _bpp, int accel):
 
 gSurface::~gSurface()
 {
-	// gTextureManager::getTexture() (lib/gdi/egl/gtexture_manager.cpp)
-	// caches a GLES texture name here the first time this surface is
-	// blitted through the EGL backend, to avoid re-uploading it on every
-	// draw - but nothing ever released that texture once this surface
-	// (and its cached name) went away: egl_queue_texture_deletion() was
-	// defined but never called anywhere, an unconditional leak of one GL
-	// texture (and, for an accel-backed surface uploaded via
-	// createTextureFromDmabuf()'s DMA-BUF import path, of the underlying
-	// EGLImageKHR pinning that region of the accel pool / system ION heap
-	// at the driver level) per surface that ever got textured. That
-	// matches "ION exhausts gradually as more and more distinct images get
-	// rendered, independent of scroll speed" exactly: every picon/icon
-	// that's ever been shown once leaks its accel-backed memory forever
-	// instead of returning it when scrolled away and destroyed.
-#ifdef HAVE_EGL
-	// Diagnostic only: gTextureManager's own logs (+texture/-texture) never
-	// show a single deletion across an entire long-running session despite
-	// plenty of surfaces provably going out of scope Python-side - this
-	// traces whether that's because ~gSurface() itself isn't running for
-	// them (something else is still keeping the gPixmap referenced) or
-	// because it runs but gl_texture_id is unexpectedly 0 here.
-	eDebug("[gSurface] dtor surface=%p gl_texture_id=%u %dx%d bpp=%d", this, gl_texture_id, x, y, bpp);
-	if (gl_texture_id)
-		egl_release_surface_texture(gl_texture_id, this);
-#endif
+	invalidate_gl_texture(this, true);
 	gAccel::getInstance()->accelFree(this);
+
 	if (data)
 	{
 		delete [] (unsigned char*)data;
@@ -320,11 +651,19 @@ void gPixmap::fill(const gRegion &region, const gColor &color)
 
 		if (surface->bpp == 8)
 		{
+			if (!prepare_cpu_write(surface))
+				return;
+			e2egl_trace_gpixmap_op("fill-indexed-cpu", surface, area, 1);
+			e2egl_gpixmap_trace_scope trace_scope("fill-indexed-cpu");
 			for (int y = area.top(); y < area.bottom(); y++)
 				memset(((__u8 *)surface->data) + y * surface->stride + area.left(), color.color, area.width());
 		}
 		else if (surface->bpp == 16)
 		{
+			if (!prepare_cpu_write(surface))
+				return;
+			e2egl_trace_gpixmap_op("fill-16-cpu", surface, area, 1);
+			e2egl_gpixmap_trace_scope trace_scope("fill-16-cpu");
 			uint32_t icol;
 
 			if (surface->clut.data && color < surface->clut.colors)
@@ -355,12 +694,27 @@ void gPixmap::fill(const gRegion &region, const gColor &color)
 
 			col ^= 0xFF000000;
 
+			const unsigned long long gles_trace_start = e2egl_trace_gpixmap_begin_time();
+			if (try_gles_fill(surface, area, col))
+			{
+				e2egl_trace_gpixmap_op("fill-32-gles", surface, area, 1, 0, 0, 0, 0, "gles");
+				e2egl_trace_gpixmap_end_time("fill-32-gles", gles_trace_start);
+				continue;
+			}
+
+			if (!prepare_cpu_write(surface))
+				return;
+
 #ifdef GPIXMAP_DEBUG
 			Stopwatch s;
 #endif
 			if (surface->data_phys && ((area.surface() * surface->bypp) > GFX_SURFACE_FILL_ACCELERATION_THRESHOLD))
+			{
+				const unsigned long long trace_start = e2egl_trace_gpixmap_begin_time();
 				if (!gAccel::getInstance()->fill(surface, area, col))
 				{
+					e2egl_trace_gpixmap_op("fill-ge2d", surface, area, 1, 0, 0, 0, 0, "ge2d");
+					e2egl_trace_gpixmap_end_time("fill-ge2d", trace_start);
 #ifdef GPIXMAP_DEBUG
 					s.stop();
 					eDebug("[gPixmap] [BLITBENCH] accel fill %dx%d (%d bytes) took %u us", area.width(), area.height(), area.surface() * surface->bypp, s.elapsed_us());
@@ -372,7 +726,10 @@ void gPixmap::fill(const gRegion &region, const gColor &color)
 					continue;
 #endif
 				}
+			}
 
+			e2egl_trace_gpixmap_op("fill-32-cpu", surface, area, 1);
+			e2egl_gpixmap_trace_scope trace_scope("fill-32-cpu");
 			for (int y = area.top(); y < area.bottom(); y++)
 			{
 				uint32_t *dst = (uint32_t *)(((uint8_t *)surface->data) + y * surface->stride + area.left() * surface->bypp);
@@ -412,12 +769,27 @@ void gPixmap::fill(const gRegion &region, const gRGB &color)
 			col = color.argb();
 			col ^= 0xFF000000;
 
+			const unsigned long long gles_trace_start = e2egl_trace_gpixmap_begin_time();
+			if (try_gles_fill(surface, area, col))
+			{
+				e2egl_trace_gpixmap_op("fill-rgb-32-gles", surface, area, 1, 0, 0, 0, 0, "gles");
+				e2egl_trace_gpixmap_end_time("fill-rgb-32-gles", gles_trace_start);
+				continue;
+			}
+
+			if (!prepare_cpu_write(surface))
+				return;
+
 #ifdef GPIXMAP_DEBUG
 			Stopwatch s;
 #endif
 			if (surface->data_phys && ((area.surface() * surface->bypp) > GFX_SURFACE_FILL_ACCELERATION_THRESHOLD))
+			{
+				const unsigned long long trace_start = e2egl_trace_gpixmap_begin_time();
 				if (!gAccel::getInstance()->fill(surface, area, col))
 				{
+					e2egl_trace_gpixmap_op("fill-rgb-ge2d", surface, area, 1, 0, 0, 0, 0, "ge2d");
+					e2egl_trace_gpixmap_end_time("fill-rgb-ge2d", trace_start);
 #ifdef GPIXMAP_DEBUG
 					s.stop();
 					eDebug("[gPixmap] [BLITBENCH] accel fill %dx%d (%d bytes) took %u us", area.width(), area.height(), area.surface() * surface->bypp, s.elapsed_us());
@@ -429,7 +801,10 @@ void gPixmap::fill(const gRegion &region, const gRGB &color)
 					continue;
 #endif
 				}
+			}
 
+			e2egl_trace_gpixmap_op("fill-rgb-32-cpu", surface, area, 1);
+			e2egl_gpixmap_trace_scope trace_scope("fill-rgb-32-cpu");
 			for (int y = area.top(); y < area.bottom(); y++)
 			{
 				uint32_t *dst = (uint32_t *)(((uint8_t *)surface->data) + y * surface->stride + area.left() * surface->bypp);
@@ -450,6 +825,10 @@ void gPixmap::fill(const gRegion &region, const gRGB &color)
 		}
 		else if (surface->bpp == 16)
 		{
+			if (!prepare_cpu_write(surface))
+				return;
+			e2egl_trace_gpixmap_op("fill-rgb-16-cpu", surface, area, 1);
+			e2egl_gpixmap_trace_scope trace_scope("fill-rgb-16-cpu");
 			uint32_t icol = color.argb();
 #if BYTE_ORDER == LITTLE_ENDIAN
 			uint16_t col = bswap_16(((icol & 0xFF) >> 3) << 11 | ((icol & 0xFF00) >> 10) << 5 | (icol & 0xFF0000) >> 19);
@@ -538,6 +917,9 @@ static void convert_palette(uint32_t *pal, const gPalette &clut)
 #define FIX 0x10000
 
 void gPixmap::drawRectangleNew(const gRegion& region, const eRect& area, const gRGB& borderColor, int borderWidth, int radius, uint8_t edges, const gRGB& fillColor) {
+	if (!prepare_cpu_write(surface))
+		return;
+
 	for (unsigned int i = 0; i < region.rects.size(); ++i) {
 		eRect reg = area;
 		reg &= region.rects[i];
@@ -646,14 +1028,7 @@ void gPixmap::drawRectangleNew(const gRegion& region, const eRect& area, const g
 			drawCorner(area.right() - brr, area.bottom() - brr, brr, false, false);
 
 		// Borders
-			/* every block below intersects its rows/columns with reg (this iteration's
-			   piece of the region), for the same reason as the corner bound check above:
-			   without it, a multi-rect region would re-blend the same pixels once per rect.
-			   Also skip outright when borderA is 0 (fully transparent border) - same
-			   reasoning as the fillA guard above the fill blocks below: a border color
-			   with 0 alpha is a guaranteed no-op, so don't pay for a full per-pixel
-			   alpha_blend() pass around the whole perimeter to draw nothing. */
-		if (borderWidth > 0 && borderA) {
+		if (borderWidth > 0) {
 			// Top Border
 			for (int y = 0; y < borderWidth; ++y) {
 				int py = area.top() + y;
@@ -755,10 +1130,38 @@ void gPixmap::drawRectangleNew(const gRegion& region, const eRect& area, const g
 
 void gPixmap::drawRectangle(const gRegion& region, const eRect& area, const gRGB& backgroundColor, const gRGB& borderColor, int borderWidth, const std::vector<gRGB>& gradientColors, uint8_t direction,
 							int radius, uint8_t edges, bool alphablend, int gradientFullSize, bool useNew) {
+	const char *trace_op = useNew ? "drawRectangle-new-cpu" : (direction ? "drawRectangle-gradient-cpu" : "drawRectangle-solid-cpu");
+
 	if (surface->bpp < 32) {
+		if (!prepare_cpu_write(surface))
+			return;
+		e2egl_trace_gpixmap_op(trace_op, surface, area, region.rects.size(), 0, 0, radius, edges);
+		e2egl_gpixmap_trace_scope trace_scope(trace_op);
 		eWarning("[gPixmap] couldn't rgbfill %d bpp", surface->bpp);
 		return;
 	}
+
+	uint32_t backColor = backgroundColor.argb();
+	backColor ^= 0xFF000000;
+	const unsigned long long gles_trace_start = e2egl_trace_gpixmap_begin_time();
+	if (!useNew && !direction && !radius && !borderWidth && !alphablend && try_gles_draw_solid_rect(surface, region, area, backColor)) {
+		e2egl_trace_gpixmap_op("drawRectangle-solid-gles", surface, area, region.rects.size(), 0, 0, radius, edges, "gles");
+		e2egl_trace_gpixmap_end_time("drawRectangle-solid-gles", gles_trace_start);
+		return;
+	}
+
+	const char *gles_trace_op = useNew ? "drawRectangle-new-gles" : (direction ? "drawRectangle-gradient-gles" : "drawRectangle-rounded-gles");
+	if ((useNew || direction || radius || borderWidth || alphablend) &&
+		try_gles_draw_rectangle(surface, region, area, backgroundColor, borderColor, borderWidth, gradientColors, direction, radius, edges, alphablend, gradientFullSize, useNew)) {
+		e2egl_trace_gpixmap_op(gles_trace_op, surface, area, region.rects.size(), 0, 0, radius, edges, "gles");
+		e2egl_trace_gpixmap_end_time(gles_trace_op, gles_trace_start);
+		return;
+	}
+
+	if (!prepare_cpu_write(surface))
+		return;
+	e2egl_trace_gpixmap_op(trace_op, surface, area, region.rects.size(), 0, 0, radius, edges);
+	e2egl_gpixmap_trace_scope trace_scope(trace_op);
 
 #ifdef GPIXMAP_DEBUG
 	Stopwatch s;
@@ -774,8 +1177,6 @@ void gPixmap::drawRectangle(const gRegion& region, const eRect& area, const gRGB
 	}
 
 	const uint8_t GRADIENT_VERTICAL = 1;
-	uint32_t backColor = backgroundColor.argb();
-	backColor ^= 0xFF000000;
 	uint32_t borderCol = (borderWidth) ? borderColor.argb() : 0;
 	borderCol ^= 0xFF000000;
 	uint32_t* gradientBuf = nullptr;
@@ -2088,6 +2489,16 @@ void gPixmap::blit(const gPixmap& src, const eRect& _pos, const gRegion& clip, i
 
 	//	eDebug("[gPixmap] SCALE %x %x", scale_x, scale_y);
 
+	bool cpu_prepared = false;
+	auto prepare_cpu_blit = [&]() {
+		if (cpu_prepared)
+			return true;
+		if (!prepare_cpu_read(src.surface) || !prepare_cpu_write(surface))
+			return false;
+		cpu_prepared = true;
+		return true;
+	};
+
 	for (unsigned int i = 0; i < clip.rects.size(); ++i) {
 		//		eDebug("[gPixmap] clip rect: %d %d %d %d", clip.rects[i].x(), clip.rects[i].y(), clip.rects[i].width(),
 		// clip.rects[i].height());
@@ -2115,6 +2526,18 @@ void gPixmap::blit(const gPixmap& src, const eRect& _pos, const gRegion& clip, i
 #ifdef GPIXMAP_DEBUG
 			Stopwatch s;
 #endif
+			const unsigned long long gles_trace_start = e2egl_trace_gpixmap_begin_time();
+			if (try_gles_blit(surface, src.surface, pos, area, flag, cornerRadius, edges)) {
+				const char *trace_op = (flag & blitScale) ? "blit-rounded-scale-gles" : "blit-rounded-gles";
+				e2egl_trace_gpixmap_op(trace_op, surface, area, 1, src.surface, flag, cornerRadius, edges, "gles");
+				e2egl_trace_gpixmap_end_time(trace_op, gles_trace_start);
+				continue;
+			}
+			if (!prepare_cpu_blit())
+				return;
+			e2egl_trace_gpixmap_op((flag & blitScale) ? "blit-rounded-scale-cpu" : "blit-rounded-cpu",
+				surface, area, 1, src.surface, flag, cornerRadius, edges);
+			e2egl_gpixmap_trace_scope trace_scope((flag & blitScale) ? "blit-rounded-scale-cpu" : "blit-rounded-cpu");
 			if (src.surface->bpp == 32) {
 				if (flag & blitScale)
 					blitRounded32BitScaled(src, pos, clip.rects[i], cornerRadius, edges, flag);
@@ -2133,6 +2556,9 @@ void gPixmap::blit(const gPixmap& src, const eRect& _pos, const gRegion& clip, i
 #endif
 			continue;
 		}
+
+		if (!prepare_cpu_blit())
+			return;
 
 #ifdef FORCE_NO_ACCELNEVER
 		accel = false;
@@ -2184,12 +2610,22 @@ void gPixmap::blit(const gPixmap& src, const eRect& _pos, const gRegion& clip, i
 #ifdef GPIXMAP_DEBUG
 		Stopwatch s;
 #endif
+
+#ifdef FORCE_NO_ACCELERATION_SCALE
+		if (accel && (flag & blitScale) && (src.size().width() != srcarea.width() || src.size().height() != srcarea.height())) {
+			accel = false;
+		}
+#endif
 		if (accel) {
 			flag &= 7; // remove all flags except the blit flags
 			// eDebug("[gPixmap] accel flag %d / area (%d,%d,%d,%d) / srcarea (%d,%d,%d,%d)", flag, area.left(),
 			// area.top(), area.width(), area.height(), srcarea.left(), srcarea.top(), srcarea.width(),
 			// srcarea.height());
+			const char *trace_op = (flag & blitScale) ? "blit-scale-ge2d" : "blit-ge2d";
+			const unsigned long long trace_start = e2egl_trace_gpixmap_begin_time();
 			if (!gAccel::getInstance()->blit(surface, src.surface, area, srcarea, flag)) {
+				e2egl_trace_gpixmap_op(trace_op, surface, area, 1, src.surface, flag, 0, 0, "ge2d");
+				e2egl_trace_gpixmap_end_time(trace_op, trace_start);
 #ifdef GPIXMAP_DEBUG
 				s.stop();
 				eDebug("[gPixmap] [BLITBENCH] accel blit (%d bytes) took %u us", srcarea.surface() * src.surface->bypp, s.elapsed_us());
@@ -2204,6 +2640,8 @@ void gPixmap::blit(const gPixmap& src, const eRect& _pos, const gRegion& clip, i
 		}
 
 		if (flag & blitScale) {
+			e2egl_trace_gpixmap_op("blit-scale-cpu", surface, area, 1, src.surface, flag);
+			e2egl_gpixmap_trace_scope trace_scope("blit-scale-cpu");
 			if ((surface->bpp == 32) && (src.surface->bpp == 8)) {
 				const uint8_t* srcptr = (uint8_t*)src.surface->data;
 				uint8_t* dstptr = (uint8_t*)surface->data; // !!
@@ -2308,6 +2746,9 @@ void gPixmap::blit(const gPixmap& src, const eRect& _pos, const gRegion& clip, i
 #endif
 			continue;
 		}
+
+		e2egl_trace_gpixmap_op("blit-cpu", surface, area, 1, src.surface, flag);
+		e2egl_gpixmap_trace_scope trace_scope("blit-cpu");
 
 		if ((surface->bpp == 8) && (src.surface->bpp == 8)) {
 			uint8_t* srcptr = (uint8_t*)src.surface->data;
@@ -2543,8 +2984,14 @@ void gPixmap::blit(const gPixmap& src, const eRect& _pos, const gRegion& clip, i
 
 void gPixmap::mergePalette(const gPixmap &target)
 {
+	if (!prepare_cpu_write(surface))
+		return;
+
 	if ((!surface->clut.colors) || (!target.surface->clut.colors))
 		return;
+
+	e2egl_trace_gpixmap_op("mergePalette-cpu", surface, eRect(0, 0, surface->x, surface->y), 1, target.surface);
+	e2egl_gpixmap_trace_scope trace_scope("mergePalette-cpu");
 
 	gColor *lookup = new gColor[surface->clut.colors];
 
@@ -2614,6 +3061,21 @@ void gPixmap::line(const gRegion &clip, ePoint start, ePoint dst, unsigned int c
 	if (clip.rects.empty())
 		return;
 
+	eRect gles_line_area;
+	const unsigned long long gles_trace_start = e2egl_trace_gpixmap_begin_time();
+	if (try_gles_draw_axis_aligned_line(surface, clip, start, dst, color, &gles_line_area))
+	{
+		if (!gles_line_area.empty())
+		{
+			e2egl_trace_gpixmap_op("line-gles", surface, gles_line_area, clip.rects.size(), 0, 0, 0, 0, "gles");
+			e2egl_trace_gpixmap_end_time("line-gles", gles_trace_start);
+		}
+		return;
+	}
+
+	if (!prepare_cpu_write(surface))
+		return;
+
 	uint8_t *srf8 = 0;
 	uint16_t *srf16 = 0;
 	uint32_t *srf32 = 0;
@@ -2636,6 +3098,8 @@ void gPixmap::line(const gRegion &clip, ePoint start, ePoint dst, unsigned int c
 
 	int xa = start.x(), ya = start.y(), xb = dst.x(), yb = dst.y();
 	int dx, dy, x, y, s1, s2, e, temp, swap, i;
+	e2egl_trace_gpixmap_op("line-cpu", surface, eRect(std::min(xa, xb), std::min(ya, yb), abs(xb - xa) + 1, abs(yb - ya) + 1), clip.rects.size());
+	e2egl_gpixmap_trace_scope trace_scope("line-cpu");
 	dy = abs(yb - ya);
 	dx = abs(xb - xa);
 	s1 = sgn(xb - xa);
@@ -2674,7 +3138,7 @@ void gPixmap::line(const gRegion &clip, ePoint start, ePoint dst, unsigned int c
 				lasthit = a = 0;
 			else
 				goto fail;
-		}
+		} 
 		else if (!clip.rects[a].contains(x, y))
 		{
 			do
@@ -2822,6 +3286,21 @@ gPixmap::~gPixmap()
 		on_dispose(this);
 	if (surface)
 		delete (gSurface *)surface;
+}
+
+void gPixmap::ensureCPUContent()
+{
+	prepare_cpu_read(surface);
+}
+
+bool gPixmap::checkCPUContent()
+{
+	return prepare_cpu_read(surface);
+}
+
+bool gPixmap::prepareCPUWrite()
+{
+	return prepare_cpu_write(surface);
 }
 
 static void donot_delete_surface(gPixmap *pixmap)

@@ -4,47 +4,101 @@
 #include <GLES3/gl3.h>
 #else
 #include <GLES2/gl2.h>
-#endif
 #include <GLES2/gl2ext.h>
+#endif
 
 #include <EGL/egl.h>
 #include <EGL/eglext.h>
+#include <lib/gdi/egl/shader/gadvanced_shader.h>
+#include <lib/gdi/egl/shader/gtexture_shader.h>
 #include <lib/gdi/gpixmap.h>
 #include <mutex>
+#include <stdint.h>
 #include <unordered_map>
 #include <vector>
+
+class gRegion;
+
+struct gTextureUploadStats {
+	unsigned int textures = 0;
+#ifdef ENABLE_GLES_TESTLAB
+	unsigned int ionUploads = 0;
+	unsigned long long ionAvoidedBytes = 0;
+#endif
+	unsigned int dmabuf = 0;
+	unsigned int importFailures = 0;
+	unsigned int nativeWrites = 0;
+	unsigned int nativeSyncFailures = 0;
+	unsigned long long importedBytes = 0;
+	unsigned long long cpuUploadBytes = 0;
+	unsigned long long nativeWaitUs = 0;
+	unsigned long long nativeSyncUs = 0;
+	unsigned long long nativeBytes = 0;
+	unsigned int upload32_direct = 0;
+	unsigned int upload32_converted = 0;
+	unsigned int upload16 = 0;
+	unsigned int upload8_clut = 0;
+	unsigned int upload8_luma = 0;
+	unsigned int content_cache_hits = 0;
+	unsigned int content_cache_misses = 0;
+	unsigned long long pixels = 0;
+	unsigned long long bytes = 0;
+};
 
 class gTextureManager {
 private:
 	// thread safe garbage collection for destroyed pixmaps
 	std::vector<GLuint> m_pending_deletions;
+	std::vector<GLuint> m_pending_framebuffer_deletions;
 	std::mutex m_deletion_mutex;
 	EGLDisplay m_egl_display;
 	std::unordered_map<GLuint, EGLImageKHR> m_texture_to_image_map;
-
-	// Diagnostic only (see gTextureManager::createTextureFromPixmap()/
-	// processDeletions()): tracks how many GL textures this manager
-	// currently believes are live, so a genuine unbounded leak (count keeps
-	// climbing) can be told apart from a legitimate-but-too-high working set
-	// (count plateaus, then the next alloc past that plateau fails). Both
-	// the increment (getTexture(), on the render/GL thread) and the
-	// decrement (processDeletions(), same thread) only ever run on the
-	// single EGL context thread, so this doesn't need its own lock.
-	long m_live_texture_count = 0;
-	// Approximate GPU storage tracked for each texture, used only when a
-	// GL_OUT_OF_MEMORY needs to trigger controlled LRU eviction.
-	std::unordered_map<GLuint, size_t> m_texture_bytes;
-	// texture name -> owning surface. This prevents a recycled GL name from
-	// being released by a different surface after an LRU eviction.
-	std::unordered_map<GLuint, gUnmanagedSurface*> m_texture_owner;
-	unsigned int m_frame = 0;
-	bool m_last_upload_oom = false;
-	size_t evictLRU(size_t bytes_wanted);
-	size_t m_live_texture_bytes = 0;
+	struct NativeTarget {
+		int fd = -1;
+		void* mapping = nullptr;
+		size_t length = 0;
+		bool amlogic = false;
+	};
+	std::unordered_map<GLuint, NativeTarget> m_nativeTargets;
+	unsigned int m_nativeTargetCreates = 0;
+	unsigned int m_nativeTargetWrites = 0;
+	gTextureUploadStats m_upload_stats;
+	unsigned int m_dreamBcmIonUploads = 0;
+	unsigned int m_dreamBcmIonFailures = 0;
+	unsigned long long m_dreamBcmIonBytes = 0;
+	struct ContentTextureEntry {
+		GLuint texture_id = 0;
+		unsigned long long bytes = 0;
+		unsigned int last_used = 0;
+	};
+	std::unordered_map<uint64_t, ContentTextureEntry> m_content_texture_cache;
+	unsigned int m_content_texture_use_counter;
+	unsigned long long m_content_texture_bytes;
+	gAdvancedShader m_offscreen_advanced_shader;
+	gTextureShader m_offscreen_texture_shader;
+	bool m_offscreen_advanced_shader_initialized;
+	bool m_offscreen_texture_shader_initialized;
+	unsigned int m_context_generation;
 
 	// unified method to generate and upload the texture based on bpp
-	GLuint createTextureFromPixmap(gPixmap* pixmap);
-	GLuint createTextureFromDmabuf(gPixmap* pixmap);
+	GLuint createTextureFromSurface(gUnmanagedSurface* surface);
+	GLuint getSurfaceTexture(gUnmanagedSurface* surface);
+	GLuint createTextureFromDmabuf(gUnmanagedSurface* surface);
+	GLuint createTextureFromDreamBcmIon(gUnmanagedSurface* surface);
+	GLuint createSharedNativeTarget(gUnmanagedSurface* surface);
+	bool finishSurfaceWrite(gUnmanagedSurface* surface);
+	bool prepareNativeDevice(gUnmanagedSurface* surface);
+	bool waitNativeGPU();
+	void recordUpload(int width, int height, int bytes, bool dmabuf, bool upload32_direct, bool upload32_converted, bool upload8_clut, bool upload8_luma);
+	bool ensureFramebuffer(gUnmanagedSurface* surface, bool preserve_cpu_content);
+	bool canContentCacheSurface(const gUnmanagedSurface* surface) const;
+	uint64_t hashContentTextureSurface(const gUnmanagedSurface* surface) const;
+	GLuint findContentTexture(uint64_t key);
+	GLuint storeContentTexture(uint64_t key, GLuint texture_id, unsigned long long bytes);
+	void trimContentTextureCache();
+	void trimContentTextureCache(size_t max_entries, unsigned long long max_bytes);
+	bool ensureOffscreenAdvancedShader();
+	bool ensureOffscreenTextureShader();
 
 public:
 	gTextureManager();
@@ -56,11 +110,21 @@ public:
 	GLuint getTexture(gPixmap* pixmap);
 
 	// called by enigma2 main thread when a pixmap dies
-	void queueForDeletion(GLuint texture_id);
+	void queueForDeletion(GLuint texture_id, unsigned int context_generation = 0);
+	void queueFramebufferForDeletion(GLuint framebuffer_id, unsigned int context_generation = 0);
 
 	// called by our egl context thread at the start of exec() to free vram
 	void processDeletions();
-	// Called once after presenting a frame; defines the frame boundary for LRU.
-	void nextFrame() { ++m_frame; }
-	void releaseSurfaceTexture(GLuint texture_id, const void* surface);
+	void clearContentTextureCache();
+	void releaseGLResources();
+	void releaseNativeTargets();
+	void resetContextGeneration();
+	void prepareSurface(gUnmanagedSurface* surface);
+
+	void takeUploadStats(gTextureUploadStats& stats);
+	bool fillSurface(gUnmanagedSurface* surface, const eRect& area, uint32_t color);
+	bool drawRectangleSurface(gUnmanagedSurface* surface, const gRegion& region, const eRect& area, const gRGB& background_color, const gRGB& border_color, int border_width,
+		const std::vector<gRGB>& gradient_colors, uint8_t direction, int radius, uint8_t edges, bool alphablend, int gradient_full_size, bool use_new);
+	bool blitSurface(gUnmanagedSurface* dst, gUnmanagedSurface* src, const eRect& dest_rect, const eRect& area, int flags, int radius, uint8_t edges);
+	bool syncSurfaceToCPU(gUnmanagedSurface* surface);
 };

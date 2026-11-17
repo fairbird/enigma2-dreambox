@@ -25,7 +25,6 @@ dist_pkgdata_DATA = \
 	wizardlanguage.xml \
 	dnsservers.xml \
 	unicable.xml \
-	animations.xml \
 	hd-testcard.mvi \
 	picon_default.png \
 	lcd_picon_default.png

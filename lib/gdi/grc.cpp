@@ -200,6 +200,10 @@ void *gRC::thread()
 			else if (o.dc)
 			{
 				o.dc->exec(&o);
+				if (o.dc->animationFrameDeadlineUs())
+					m_animation_dc = o.dc;
+				else if (m_animation_dc == o.dc)
+					m_animation_dc = nullptr;
 				// o.dc is a gDC* filled with grabref... so we must release it here
 				o.dc->Release();
 			}
@@ -224,6 +228,21 @@ void *gRC::thread()
 #ifndef SYNC_PAINT
 			while (rp == wp)
 			{
+				unsigned long long animation_delay_ms = 0;
+				if (m_animation_dc) {
+					const unsigned long long deadline = m_animation_dc->animationFrameDeadlineUs();
+					const unsigned long long now = monotonicMs() * 1000ULL;
+					if (!deadline)
+						m_animation_dc = nullptr;
+					else if (deadline <= now) {
+						// Producers must be able to submit while the GPU presents a frame.
+						pthread_mutex_unlock(&mutex);
+						m_animation_dc->renderAnimationFrame();
+						pthread_mutex_lock(&mutex);
+						continue;
+					} else
+						animation_delay_ms = (deadline - now + 999) / 1000;
+				}
 
 				/* when the main thread is non-idle for a too long time without any display output,
 				   we want to display a spinner. */
@@ -242,6 +261,12 @@ void *gRC::thread()
 				}
 				else
 					timeout.tv_sec += 2;
+				if (animation_delay_ms) {
+					clock_gettime(CLOCK_REALTIME, &timeout);
+					const unsigned long long wait_ns = timeout.tv_nsec + std::min(2000ULL, animation_delay_ms) * 1000000ULL;
+					timeout.tv_sec += wait_ns / 1000000000ULL;
+					timeout.tv_nsec = wait_ns % 1000000000ULL;
+				}
 
 				ePtr<gLCDDC> lcd_dc;
 				const bool lcd_fading = !gLCDDC::getInstance(lcd_dc) && lcd_dc->fadeActive();
@@ -275,6 +300,8 @@ void *gRC::thread()
 #endif
 				if (wait_result == ETIMEDOUT)
 				{
+					if (animation_delay_ms)
+						continue;
 					if (eApp && !eApp->isIdle())
 					{
 						int idle_count = eApp->idleCount();
@@ -324,6 +351,7 @@ void *gRC::thread()
 		gEGLDC::getInstance()->cleanupEGL();
 #endif
 #ifndef SYNC_PAINT
+	m_animation_dc = nullptr;
 	pthread_exit(0);
 #endif
 	return 0;
@@ -844,7 +872,7 @@ void gPainter::endLayer()
 	m_rc->submit(o);
 }
 
-void gPainter::sendShow(ePoint point, eSize size, int anim_id)
+void gPainter::sendShow(ePoint point, eSize size, int animation, int durationMs)
 {
 	if (m_dc->islocked())
 		return;
@@ -854,11 +882,12 @@ void gPainter::sendShow(ePoint point, eSize size, int anim_id)
 	o.parm.setShowHideInfo = new gOpcode::para::psetShowHideInfo;
 	o.parm.setShowHideInfo->point = point;
 	o.parm.setShowHideInfo->size = size;
-	o.parm.setShowHideInfo->anim_id = anim_id > 0 ? anim_id : g_window_animation_id;
+	o.parm.setShowHideInfo->animation = animation;
+	o.parm.setShowHideInfo->durationMs = durationMs;
 	m_rc->submit(o);
 }
 
-void gPainter::sendHide(ePoint point, eSize size, int anim_id)
+void gPainter::sendHide(ePoint point, eSize size, int animation, int durationMs)
 {
 	if (m_dc->islocked())
 		return;
@@ -868,9 +897,11 @@ void gPainter::sendHide(ePoint point, eSize size, int anim_id)
 	o.parm.setShowHideInfo = new gOpcode::para::psetShowHideInfo;
 	o.parm.setShowHideInfo->point = point;
 	o.parm.setShowHideInfo->size = size;
-	o.parm.setShowHideInfo->anim_id = anim_id > 0 ? anim_id : g_window_animation_id;
+	o.parm.setShowHideInfo->animation = animation;
+	o.parm.setShowHideInfo->durationMs = durationMs;
 	m_rc->submit(o);
 }
+
 void gPainter::beginFade(ePoint point, eSize size, int ms)
 {
 	if (m_dc->islocked())

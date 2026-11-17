@@ -219,17 +219,6 @@ AS_IF([test "$BOXTYPE" == "dm500hd"],[AC_DEFINE(HWDM500HD, 1,[dm500hd])])
 AS_IF([test "$BOXTYPE" == "dm800sev2"],[AC_DEFINE(HWDM800SEV2, 1,[dm800sev2])])
 AS_IF([test "$BOXTYPE" == "dm500hdv2"],[AC_DEFINE(HWDM500HDV2, 1,[dm500hdv2])])
 
-AC_ARG_WITH(osdanimation,
-	AS_HELP_STRING([--with-osdanimation], [use osd animation, yes or no]),
-	[[withosdanimation=$withval]],
-	[[withosdanimation=no]]
-)
-if test x"$withosdanimation" != xno ; then
-
-	AC_DEFINE(HAVE_OSDANIMATION, 1,[Define if driver supports animation of osd])
-fi
-AM_CONDITIONAL(HAVE_OSDANIMATION, test x"$withosdanimation" != xno)
-
 if test `echo "$BOXTYPE" | cut -b 1-2` == "dm" -o `echo "$BOXTYPE" | cut -b 1-5` == "dream"; then
 	AC_DEFINE(DREAMBOX, 1, [Dreambox hardware])
 	AC_DEFINE(KEY_PLAY_ACTUALLY_IS_KEY_PLAYPAUSE, 1,[define when rc sends a KEY_PLAY event for its KEY_PLAYPAUSE key])
@@ -347,78 +336,6 @@ if test "$with_libxine" = "yes"; then
 fi
 AM_CONDITIONAL(HAVE_LIBXINE, test "$with_libxine" = "yes")
 
-AC_ARG_WITH([egl],
-  AS_HELP_STRING([--with-egl], [enable EGL/GLES2/GLES3 backend, yes/no/auto]),
-  [],
-  [with_egl=no])
-
-# Unlike most --with-* switches here, EGL is not something a box gets by
-# default: with_egl defaults to "no", so a box only gets probed for EGL/GLES
-# when whatever's driving this build (e.g. the recipe's EXTRA_OECONF, keyed
-# off the distro-level ENABLE_E2EGL var) explicitly passes --with-egl.
-# Boxes whose SDK merely happens to carry EGL/GLESv2/GLES3 pkg-config
-# metadata without a working backend (this has bitten vuduo4kse, vusolo4k
-# and vuultimo4k in the past, with link failures such as "undefined
-# reference to glBindVertexArray") simply never pass --with-egl and are
-# never probed at all - with_egl stays "no" and PKG_CHECK_MODULES below
-# never runs.
-have_egl=no
-have_gles2=no
-have_gles3=no
-
-AS_IF([test "x$with_egl" != "xno"], [
-  PKG_CHECK_MODULES([EGL], [egl], [have_egl=yes], [have_egl=no])
-  PKG_CHECK_MODULES([GLES2], [glesv2], [have_gles2=yes], [have_gles2=no])
-])
-
-AS_IF([test "x$have_gles2" = "xyes"], [
-  saved_CPPFLAGS="$CPPFLAGS"
-  CPPFLAGS="$CPPFLAGS $GLES2_CFLAGS"
-  AC_CHECK_HEADERS([GLES3/gl3.h], [have_gles3=yes], [have_gles3=no])
-  CPPFLAGS="$saved_CPPFLAGS"
-])
-
-AS_IF([test "x$with_egl" = "xyes"], [
-  AS_IF([test "x$have_egl" != "xyes" -o "x$have_gles2" != "xyes"], [
-    AC_MSG_ERROR([--with-egl was given, but egl and/or glesv2 were not found])
-  ])
-])
-
-# Baseline requirement is EGL + GLESv2 - this alone decides use_egl.
-AS_IF([test "x$have_egl" = "xyes" -a "x$have_gles2" = "xyes"], [
-  AC_DEFINE([HAVE_EGL], [1], [Define if EGL/GLES2 support is available])
-  use_egl=yes
-], [
-  use_egl=no
-])
-
-# GLES3 is a strictly optional upgrade on top of that baseline - it must
-# only ever ADD the extra define, never downgrade use_egl back to no when
-# GLES3/gl3.h isn't available (a very common case: many SDKs ship EGL +
-# GLESv2 without GLES3 headers at all). Getting this wrong silently drops
-# the whole EGL backend for anyone without GLES3, with no error - it just
-# falls back to gfbdc/sdl as if --with-egl had never been requested.
-AS_IF([test "x$use_egl" = "xyes" -a "x$have_gles3" = "xyes"], [
-  AC_DEFINE([HAVE_GLES3], [1], [Define if GLES3 support is available])
-])
-
-AM_CONDITIONAL([HAVE_EGL], [test "x$use_egl" = "xyes"])
-
-AC_SUBST([EGL_CFLAGS])
-AC_SUBST([EGL_LIBS])
-AC_SUBST([GLES2_CFLAGS])
-AC_SUBST([GLES2_LIBS])
-
-# Dreambox's VC5/BEGL EGL stack (libvc5dream/libv3ddriver) only implements the
-# EGL_EXT_platform_base *pixmap* path (see lib/gdi/egl/platform/dreambox) - it
-# is unrelated to, and independent of, the FORCE_ALPHABLENDING_ACCELERATION
-# workaround below (that one is about the older 2D/bcm blit accelerator being
-# unreliable on these boxes, not about this GPU path).
-AM_CONDITIONAL(HAVE_DREAMBOX_EGL, test "x$use_egl" = "xyes" -a \( "$BOXTYPE" == "dm7080" -o "$BOXTYPE" == "dm820" -o "$BOXTYPE" == "dm900" -o "$BOXTYPE" == "dm920" \))
-if test "x$use_egl" = "xyes" -a \( "$BOXTYPE" == "dm7080" -o "$BOXTYPE" == "dm820" -o "$BOXTYPE" == "dm900" -o "$BOXTYPE" == "dm920" \); then
-	AC_DEFINE(HAVE_DREAMBOX_EGL, 1, [Dreambox VC5/BEGL EGL pixmap backend available])
-fi
-
 AC_ARG_WITH(gles,
 	AS_HELP_STRING([--with-gles],[enable OpenGL ES 2.0 hardware acceleration, yes or no]),
 	[with_gles=$withval],[with_gles=no])
@@ -520,6 +437,219 @@ fi
 
 FFMPEG_CFLAGS=" "
 
+AC_ARG_WITH([egl],
+  AS_HELP_STRING([--with-egl], [enable EGL/GLES2/GLES3 backend]),
+  [],
+  [with_egl=no])
+
+have_egl=no
+have_gles2=no
+have_gles3=no
+have_nxpl=no
+have_vupl=no
+have_v3dplatform=no
+use_vuplus_egl=no
+use_vuplus_mips_egl=no
+use_nxpl_egl=no
+use_v3dplatform_egl=no
+use_hisilicon_egl=no
+use_dreambcm_egl=no
+NXPL_CFLAGS=""
+NXPL_LIBS=""
+VUPL_CFLAGS=""
+VUPL_LIBS=""
+V3DPLATFORM_CFLAGS=""
+V3DPLATFORM_LIBS=""
+
+is_vuplus_egl_box=no
+case "$BOXTYPE" in
+  vu7376duo|vu7376|vuuno4k|vuuno4kse|vuzero4k)
+    is_vuplus_egl_box=yes
+    ;;
+esac
+
+is_vuplus_mips_egl_box=no
+case "$BOXTYPE" in
+  vuduo2|vusolo2|vusolose)
+    is_vuplus_mips_egl_box=yes
+    ;;
+esac
+
+is_nxpl_egl_box=no
+case "$BOXTYPE" in
+  et10000|et1x000|triplex|hd2400|8100s|gb7252|gb72604|dags72604|hd51|vs1500|h7|h17|sf4008)
+    is_nxpl_egl_box=yes
+    ;;
+esac
+# Only formuler1 of fm7356, not formuler1tc.
+if test "$MACHINEBUILD" == "formuler1"; then
+  is_nxpl_egl_box=yes
+fi
+
+is_v3dplatform_egl_box=no
+case "$BOXTYPE" in
+  ed72604|xc7346)
+    is_v3dplatform_egl_box=yes
+    ;;
+esac
+
+is_dreambcm_egl_box=no
+case "$BOXTYPE" in
+  dm520|dm525|dm7435|dm7252s)
+    is_dreambcm_egl_box=yes
+    ;;
+esac
+
+is_hisilicon_egl_box=no
+case "$BOXTYPE" in
+  u5|u5pvr|u51|u52|u54|u55|u56|u57|u571|u41|u42|u43|u45|u53|u532|u533|ocmv200|sx988|ip8|ustym4kpro|ustym4kottpremium|ustym4ks2ottx|gbmv200|beyonwizv2|viper4k|dagsmv200|og2ott4k|og2s4k|sfx6008|sx88v2|abmv200|multibox|multiboxpro|multiboxse|h8se|h9|h9combo|h9combose|h9se|h10|h11|i55plus|i55se|hd60|hd61|hd66se)
+    is_hisilicon_egl_box=yes
+    ;;
+esac
+
+AS_IF([test "x$with_egl" != "xno"], [
+  PKG_CHECK_MODULES([EGL], [egl], [have_egl=yes], [
+    EGL_CFLAGS=""
+    EGL_LIBS="-lEGL"
+    have_egl=yes
+  ])
+  PKG_CHECK_MODULES([GLES2], [glesv2], [have_gles2=yes], [
+    GLES2_CFLAGS=""
+    GLES2_LIBS="-lGLESv2"
+    have_gles2=yes
+  ])
+  AS_IF([test "x$is_vuplus_egl_box" = "xyes" -o "x$is_nxpl_egl_box" = "xyes"], [
+    PKG_CHECK_MODULES([NXPL], [nxpl], [have_nxpl=yes], [have_nxpl=no])
+  ])
+  AS_IF([test "x$is_vuplus_mips_egl_box" = "xyes"], [
+    PKG_CHECK_MODULES([VUPL], [libvupl nxpl], [have_vupl=yes], [
+      AC_CHECK_HEADERS([eglvuplus.h], [have_vupl_header=yes], [have_vupl_header=no])
+      saved_LIBS="$LIBS"
+      LIBS="$LIBS -lnxpl -ldvb_client -ldvb_base"
+      AC_CHECK_LIB([vupl], [VUGLES_InitPlatformAndDefaultDisplay], [have_vupl_lib=yes], [have_vupl_lib=no])
+      LIBS="$saved_LIBS"
+      AS_IF([test "x$have_vupl_header" = "xyes" -a "x$have_vupl_lib" = "xyes"], [
+        VUPL_CFLAGS=""
+        VUPL_LIBS="-lvupl -lnxpl -ldvb_client -ldvb_base"
+        have_vupl=yes
+      ], [
+        have_vupl=no
+      ])
+    ])
+  ])
+  AS_IF([test "x$is_v3dplatform_egl_box" = "xyes"], [
+    PKG_CHECK_MODULES([V3DPLATFORM], [v3dplatform], [have_v3dplatform=yes], [have_v3dplatform=no])
+  ])
+])
+
+AS_IF([test "x$have_gles2" = "xyes"], [
+  saved_CPPFLAGS="$CPPFLAGS"
+  saved_LIBS="$LIBS"
+  CPPFLAGS="$CPPFLAGS $EGL_CFLAGS $GLES2_CFLAGS"
+  LIBS="$LIBS $GLES2_LIBS $EGL_LIBS $NXPL_LIBS $VUPL_LIBS $V3DPLATFORM_LIBS"
+  AC_CHECK_HEADERS([GLES3/gl3.h], [have_gles3_header=yes], [have_gles3_header=no])
+  # Some SDKs ship GLES3/gl3.h but a GLESv2-only library, verify the GLES3 entry points link.
+  AS_IF([test "x$have_gles3_header" = "xyes"], [
+    AC_MSG_CHECKING([whether libGLESv2 provides GLES3 entry points])
+    AC_LINK_IFELSE([AC_LANG_PROGRAM(
+      [[#include <GLES3/gl3.h>]],
+      [[GLuint vao; glGenVertexArrays(1, &vao); glBindVertexArray(vao);]])],
+      [have_gles3=yes], [have_gles3=no])
+    AC_MSG_RESULT([$have_gles3])
+  ], [have_gles3=no])
+  AC_CHECK_HEADERS([EGL/fbdev_window.h])
+  AC_CHECK_TYPES([fbdev_window],
+    [AC_DEFINE([HAVE_FBDEV_WINDOW_TYPE], [1], [Define if EGL exposes the fbdev_window type])],
+    [],
+    [[#include <EGL/egl.h>]])
+  CPPFLAGS="$saved_CPPFLAGS"
+  LIBS="$saved_LIBS"
+])
+
+AS_IF([test "x$with_egl" = "xyes"], [
+  AS_IF([test "x$have_egl" != "xyes" -o "x$have_gles2" != "xyes"], [
+    AC_MSG_ERROR([--with-egl was given, but egl and/or glesv2 were not found])
+  ])
+  AS_IF([test "x$is_vuplus_egl_box" = "xyes" -a "x$have_nxpl" != "xyes"], [
+    AC_MSG_ERROR([--with-egl on Vu+ requires nxpl])
+  ])
+  AS_IF([test "x$is_vuplus_mips_egl_box" = "xyes" -a "x$have_vupl" != "xyes"], [
+    AC_MSG_ERROR([--with-egl on Vu+ MIPS requires libvupl])
+  ])
+  AS_IF([test "x$is_nxpl_egl_box" = "xyes" -a "x$have_nxpl" != "xyes"], [
+    AC_MSG_ERROR([--with-egl on Broadcom/NXPL requires nxpl])
+  ])
+  AS_IF([test "x$is_v3dplatform_egl_box" = "xyes" -a "x$have_v3dplatform" != "xyes"], [
+    AC_MSG_ERROR([--with-egl on Broadcom/V3D platform requires v3dplatform])
+  ])
+  AS_IF([test "x$is_hisilicon_egl_box" = "xyes"], [
+    AC_DEFINE([HAVE_HISILICON_EGL], [1], [Define if HiSilicon Mali native EGL support is available])
+    use_hisilicon_egl=yes
+  ])
+  AS_IF([test "x$is_dreambcm_egl_box" = "xyes"], [
+    AC_DEFINE([HAVE_DREAMBCM_EGL], [1], [Define if Dreambox Broadcom native EGL support is available])
+    EGL_CFLAGS="$EGL_CFLAGS -DBROADCOM_PLATFORM"
+    GLES2_CFLAGS="$GLES2_CFLAGS -DBROADCOM_PLATFORM"
+    use_dreambcm_egl=yes
+  ])
+])
+
+use_egl=no
+AS_IF([test "x$have_egl" = "xyes" -a "x$have_gles2" = "xyes"], [
+  AC_DEFINE([HAVE_EGL], [1], [Define if EGL/GLES2 support is available])
+  use_egl=yes
+  AS_IF([test "x$is_vuplus_egl_box" = "xyes" -a "x$have_nxpl" = "xyes"], [
+    AC_DEFINE([HAVE_VUPLUS_EGL], [1], [Define if Vu+ NXPL native EGL support is available])
+    use_vuplus_egl=yes
+  ])
+  AS_IF([test "x$is_vuplus_mips_egl_box" = "xyes" -a "x$have_vupl" = "xyes"], [
+    AC_DEFINE([HAVE_VUPLUS_MIPSEL_EGL], [1], [Define if legacy Vu+ MIPS libvupl native EGL support is available])
+    use_vuplus_mips_egl=yes
+  ])
+  AS_IF([test "x$is_nxpl_egl_box" = "xyes" -a "x$have_nxpl" = "xyes"], [
+    AC_DEFINE([HAVE_NXPL_EGL], [1], [Define if Broadcom NXPL native EGL support is available])
+    use_nxpl_egl=yes
+  ])
+  AS_IF([test "x$is_v3dplatform_egl_box" = "xyes" -a "x$have_v3dplatform" = "xyes"], [
+    AC_DEFINE([HAVE_V3DPLATFORM_EGL], [1], [Define if Broadcom V3D platform native EGL support is available])
+    use_v3dplatform_egl=yes
+  ])
+])
+
+AS_IF([test "x$have_egl" = "xyes" -a "x$have_gles3" = "xyes"], [
+  AC_DEFINE([HAVE_GLES3], [1], [Define if GLES3 support is available])
+])
+
+AM_CONDITIONAL([HAVE_EGL], [test "x$use_egl" = "xyes"])
+AM_CONDITIONAL([HAVE_VUPLUS_EGL], [test "x$use_vuplus_egl" = "xyes"])
+AM_CONDITIONAL([HAVE_VUPLUS_MIPSEL_EGL], [test "x$use_vuplus_mips_egl" = "xyes"])
+AM_CONDITIONAL([HAVE_NXPL_EGL], [test "x$use_nxpl_egl" = "xyes"])
+AM_CONDITIONAL([HAVE_V3DPLATFORM_EGL], [test "x$use_v3dplatform_egl" = "xyes"])
+AM_CONDITIONAL([HAVE_HISILICON_EGL], [test "x$use_hisilicon_egl" = "xyes"])
+AM_CONDITIONAL([HAVE_DREAMBCM_EGL], [test "x$use_dreambcm_egl" = "xyes"])
+
+AC_ARG_ENABLE([gles-testlab],
+  AS_HELP_STRING([--enable-gles-testlab], [build the optional GLES visual/performance test plugin (default: no)]),
+  [enable_gles_testlab="$enableval"], [enable_gles_testlab=no])
+AS_CASE([$enable_gles_testlab], [yes|no], [], [AC_MSG_ERROR([--enable-gles-testlab accepts yes or no])])
+AS_IF([test "x$enable_gles_testlab" = "xyes"], [
+  AS_IF([test "x$use_egl" != "xyes"], [AC_MSG_ERROR([--enable-gles-testlab requires --with-egl])])
+  AC_DEFINE([ENABLE_GLES_TESTLAB], [1], [Build the optional GLES renderer test lab])
+  AX_SWIG_PYTHON_OPT="$AX_SWIG_PYTHON_OPT -DENABLE_GLES_TESTLAB"
+])
+AM_CONDITIONAL([ENABLE_GLES_TESTLAB], [test "x$enable_gles_testlab" = "xyes"])
+
+AC_SUBST([EGL_CFLAGS])
+AC_SUBST([EGL_LIBS])
+AC_SUBST([GLES2_CFLAGS])
+AC_SUBST([GLES2_LIBS])
+AC_SUBST([NXPL_CFLAGS])
+AC_SUBST([NXPL_LIBS])
+AC_SUBST([VUPL_CFLAGS])
+AC_SUBST([VUPL_LIBS])
+AC_SUBST([V3DPLATFORM_CFLAGS])
+AC_SUBST([V3DPLATFORM_LIBS])
+
 AM_CONDITIONAL(DREAMNEXTGEN, test "$BOXTYPE" == dreamone -o "$BOXTYPE" == dreamtwo)
 if test "$BOXTYPE" == "dreamone" -o "$BOXTYPE" == "dreamtwo"; then
 	ALSA_CFLAGS="-lasound"
@@ -589,15 +719,6 @@ if test x"$with_accelerationaccumulation" = xyes ; then
 	AC_DEFINE(SUPPORT_ACCUMULATED_ACCELERATION_OPERATIONS, 1,[Accumulate blit/fill acceleration operations])
 fi
 
-AC_ARG_WITH(libvugles2,
-	AS_HELP_STRING([--with-libvugles2],[use libvugles2, yes or no]),
-	[with_libvugles2=$withval],[with_libvugles2=no])
-if test "$with_libvugles2" = "yes"; then
-	PKG_CHECK_MODULES(LIBVUGLES2, [libvugles2])
-	GLES_CFLAGS="-DUSE_LIBVUGLES2"
-fi
-AM_CONDITIONAL(HAVE_LIBVUGLES2, test "$with_libvugles2" = "yes")
-
 AC_ARG_WITH(olde2api,
 	AS_HELP_STRING([--with-olde2api],[use olde2api, yes or no]),
 	[with_olde2api=$withval],[with_olde2api=no])
@@ -625,7 +746,7 @@ CFLAGS="$CFLAGS -Wall"
 CXXFLAGS="$CXXFLAGS -Wall -Wno-psabi \
 	-Wformat=2 -Wformat-overflow=2 -Wformat-nonliteral -Wformat-security \
 	-Wimplicit-fallthrough=5 -Wdangling-else -Wno-error=stringop-truncation -Wno-error=maybe-uninitialized -Wno-error=array-bounds= \
-	$BASE_CFLAGS $ENIGMA2_CFLAGS $PTHREAD_CFLAGS $OPENMP_CFLAGS $GLES_CFLAGS $EGL_CFLAGS $GLES2_CFLAGS $ALSA_CFLAGS $AMCODEC_CFLAGS $FFMPEG_CFLAGS $AMADEC_CFLAGS $DVBCSA_CFLAGS"
+	$BASE_CFLAGS $ENIGMA2_CFLAGS $PTHREAD_CFLAGS $OPENMP_CFLAGS $GLES_CFLAGS $EGL_CFLAGS $GLES2_CFLAGS $NXPL_CFLAGS $VUPL_CFLAGS $V3DPLATFORM_CFLAGS $ALSA_CFLAGS $AMCODEC_CFLAGS $FFMPEG_CFLAGS $AMADEC_CFLAGS $DVBCSA_CFLAGS"
 
 AX_SWIG_PYTHON_OPT="$AX_SWIG_PYTHON_OPT -DSWIG_PYTHON_LEGACY_BOOL"
 
@@ -705,6 +826,7 @@ lib/python/Plugins/Extensions/MediaPlayer/Makefile
 lib/python/Plugins/Extensions/MediaScanner/Makefile
 lib/python/Plugins/Extensions/MediaScanner/meta/Makefile
 lib/python/Plugins/Extensions/PicturePlayer/Makefile
+lib/python/Plugins/Extensions/GlesTestLab/Makefile
 lib/python/Plugins/Extensions/SocketMMI/Makefile
 lib/python/Plugins/Extensions/SocketMMI/meta/Makefile
 lib/python/Plugins/Extensions/SocketMMI/src/Makefile

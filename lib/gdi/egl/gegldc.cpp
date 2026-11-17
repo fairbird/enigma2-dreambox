@@ -1,29 +1,803 @@
-#include <algorithm>
-#include <chrono>
-#include <cmath>
-#include <vector>
-#include <cstring>
-#include <sstream>
 #include <lib/base/eerror.h>
 #include <lib/base/init.h>
 #include <lib/base/init_num.h>
+#include <lib/base/modelinformation.h>
 #include <lib/gdi/egl/gegldc.h>
 #include <lib/gdi/egl/gles_version.h>
+#include <lib/gdi/fb.h>
+#ifdef ENABLE_GLES_TESTLAB
+#include <lib/gdi/grendertest.h>
+#endif
+#include <algorithm>
+#include <cmath>
+#include <fstream>
+#include <iterator>
+#include <errno.h>
+#include <fcntl.h>
+#include <poll.h>
+#include <pthread.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/socket.h>
+#include <sys/time.h>
+#include <sys/un.h>
+#include <time.h>
+#include <unistd.h>
+#include <vector>
 #ifdef DREAMNEXTGEN
+#include <lib/gdi/dreamge2d.h>
 #include <lib/gdi/egl/platform/amlogic/amlogic_window_provider.h>
 #endif
-#include <lib/gdi/fb.h>
-#include <lib/gdi/font.h>
+#ifdef HAVE_VUPLUS_EGL
+#include <lib/gdi/egl/platform/vuplus/vuplus_window_provider.h>
+#endif
+#ifdef HAVE_VUPLUS_MIPSEL_EGL
+#include <lib/gdi/egl/platform/vuplus_mips/vuplus_mips_window_provider.h>
+#endif
+#ifdef HAVE_NXPL_EGL
+#include <lib/gdi/egl/platform/nxpl/nxpl_window_provider.h>
+#endif
+#ifdef HAVE_V3DPLATFORM_EGL
+#include <lib/gdi/egl/platform/v3dplatform/v3dplatform_window_provider.h>
+#endif
+#ifdef HAVE_HISILICON_EGL
+#include <lib/gdi/egl/platform/hisilicon/hisilicon_window_provider.h>
+#endif
+#ifdef HAVE_DREAMBCM_EGL
+#include <lib/gdi/egl/platform/dreambcm/dreambcm_window_provider.h>
+#endif
 
 #ifndef EGL_OPENGL_ES3_BIT_KHR
 #define EGL_OPENGL_ES3_BIT_KHR 0x00000040
 #endif
-#ifndef GL_BGRA_EXT
-#define GL_BGRA_EXT 0x80E1
+#ifndef EGL_SWAP_BEHAVIOR
+#define EGL_SWAP_BEHAVIOR 0x3093
 #endif
-#ifndef EGL_EXT_platform_base
-typedef EGLSurface (EGLAPIENTRYP PFNEGLCREATEPLATFORMPIXMAPSURFACEEXTPROC)(EGLDisplay dpy, EGLConfig config, void *native_pixmap, const EGLint *attrib_list);
+#ifndef EGL_BUFFER_PRESERVED
+#define EGL_BUFFER_PRESERVED 0x3094
 #endif
+#ifndef EGL_BUFFER_DESTROYED
+#define EGL_BUFFER_DESTROYED 0x3095
+#endif
+#ifndef EGL_SWAP_BEHAVIOR_PRESERVED_BIT
+#define EGL_SWAP_BEHAVIOR_PRESERVED_BIT 0x0400
+#endif
+
+static bool hasExtension(const char* extensions, const char* name) {
+	if (!extensions || !name || !*name)
+		return false;
+
+	const char* start = extensions;
+	const size_t name_len = strlen(name);
+	while ((start = strstr(start, name))) {
+		const char before = start == extensions ? ' ' : *(start - 1);
+		const char after = *(start + name_len);
+		if ((before == ' ' || before == '\0') && (after == ' ' || after == '\0'))
+			return true;
+		start += name_len;
+	}
+	return false;
+}
+
+static bool e2eglForceDestroyedSwap() {
+#if defined(HAVE_V3DPLATFORM_EGL) || defined(HAVE_NXPL_EGL) || defined(HAVE_VUPLUS_EGL) || defined(HAVE_VUPLUS_MIPSEL_EGL)
+	return true;
+#else
+	return false;
+#endif
+}
+
+static std::string e2eglReadTextFile(const char* filename) {
+	std::ifstream file(filename);
+	std::string value;
+	if (file.good())
+		std::getline(file, value);
+	return value;
+}
+
+#if defined(HAVE_NXPL_EGL) && defined(E2EGL_NXPL_SYNC_FB_DST)
+static bool e2eglWriteHexProc(const char* filename, int value)
+{
+	int fd = open(filename, O_WRONLY | O_TRUNC);
+	if (fd < 0)
+		return false;
+
+	char buf[32];
+	const int len = snprintf(buf, sizeof(buf), "%08x\n", value);
+	const bool ok = len > 0 && write(fd, buf, len) == len;
+	close(fd);
+	return ok;
+}
+
+static bool e2eglWriteIntProc(const char* filename, int value)
+{
+	int fd = open(filename, O_WRONLY | O_TRUNC);
+	if (fd < 0)
+		return false;
+
+	char buf[32];
+	const int len = snprintf(buf, sizeof(buf), "%d\n", value);
+	const bool ok = len > 0 && write(fd, buf, len) == len;
+	close(fd);
+	return ok;
+}
+
+// The driver expects the fb destination in a 720x576 space, independent of the OSD resolution.
+static void e2eglSyncNxplFramebufferDestination(int left, int top, int width, int height, int logicalWidth, int logicalHeight)
+{
+	if (width < 1 || height < 1 || logicalWidth < 1 || logicalHeight < 1)
+		return;
+
+	static const char* dst_left = "/proc/stb/fb/dst_left";
+	static const char* dst_top = "/proc/stb/fb/dst_top";
+	static const char* dst_width = "/proc/stb/fb/dst_width";
+	static const char* dst_height = "/proc/stb/fb/dst_height";
+	static const char* dst_apply = "/proc/stb/fb/dst_apply";
+	if (access(dst_left, W_OK) || access(dst_top, W_OK) || access(dst_width, W_OK) || access(dst_height, W_OK))
+		return;
+
+	const int dstLeft = left * 720 / logicalWidth;
+	const int dstTop = top * 576 / logicalHeight;
+	const int dstWidth = width * 720 / logicalWidth;
+	const int dstHeight = height * 576 / logicalHeight;
+	const bool ok = e2eglWriteHexProc(dst_left, dstLeft) &&
+	                e2eglWriteHexProc(dst_top, dstTop) &&
+	                e2eglWriteHexProc(dst_width, dstWidth) &&
+	                e2eglWriteHexProc(dst_height, dstHeight);
+	if (ok && !access(dst_apply, W_OK))
+		e2eglWriteIntProc(dst_apply, 1);
+
+	eDebug("[gEGLDC] NXPL framebuffer OSD destination %s logical=%d,%d %dx%d of %dx%d dst=%d,%d %dx%d",
+		ok ? "synced" : "sync failed", left, top, width, height, logicalWidth, logicalHeight, dstLeft, dstTop, dstWidth, dstHeight);
+}
+#endif
+
+#ifdef HAVE_HISILICON_EGL
+static std::string e2eglReadWholeFile(const char* filename) {
+	std::ifstream file(filename);
+	if (!file.good())
+		return std::string();
+	return std::string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+}
+
+static bool e2eglExtractXmlAttribute(const std::string& tag, const char* name, std::string& value) {
+	const std::string key(name);
+	size_t pos = tag.find(key);
+	if (pos != std::string::npos) {
+		const size_t after_key = pos + key.size();
+		size_t eq = tag.find('=', after_key);
+		if (eq == std::string::npos)
+			return false;
+		size_t quote = tag.find_first_of("\"'", eq + 1);
+		if (quote == std::string::npos)
+			return false;
+		const char quote_char = tag[quote];
+		const size_t end = tag.find(quote_char, quote + 1);
+		if (end == std::string::npos)
+			return false;
+		value = tag.substr(quote + 1, end - quote - 1);
+		return true;
+	}
+	return false;
+}
+
+static bool e2eglExtractXmlIntAttribute(const std::string& tag, const char* name, int& value) {
+	std::string text;
+	if (!e2eglExtractXmlAttribute(tag, name, text))
+		return false;
+	value = atoi(text.c_str());
+	return value > 0;
+}
+
+static bool e2eglReadSkinResolution(const std::string& skin_file, int& width, int& height, int& bpp, int level = 0) {
+	const std::string skin = e2eglReadWholeFile(skin_file.c_str());
+	if (skin.empty())
+		return false;
+
+	const size_t resolution_start = skin.find("<resolution");
+	if (resolution_start == std::string::npos) {
+		// Skins like MetrixHD keep the resolution in an included file.
+		if (level >= 3)
+			return false;
+		for (size_t include_start = skin.find("<include"); include_start != std::string::npos; include_start = skin.find("<include", include_start + 1)) {
+			const size_t include_end = skin.find('>', include_start);
+			if (include_end == std::string::npos)
+				break;
+			std::string filename;
+			if (!e2eglExtractXmlAttribute(skin.substr(include_start, include_end - include_start + 1), "filename", filename) || filename.empty())
+				continue;
+			if (filename[0] != '/')
+				filename = skin_file.substr(0, skin_file.rfind('/') + 1) + filename;
+			if (e2eglReadSkinResolution(filename, width, height, bpp, level + 1))
+				return true;
+		}
+		return false;
+	}
+	const size_t resolution_end = skin.find('>', resolution_start);
+	if (resolution_end == std::string::npos)
+		return false;
+
+	const std::string tag = skin.substr(resolution_start, resolution_end - resolution_start + 1);
+	int xres = 0, yres = 0, depth = 32;
+	if (!e2eglExtractXmlIntAttribute(tag, "xres", xres) || !e2eglExtractXmlIntAttribute(tag, "yres", yres))
+		return false;
+	e2eglExtractXmlIntAttribute(tag, "bpp", depth);
+
+	if (!((xres == 720 && yres == 576) || (xres == 1280 && yres == 720) || (xres == 1920 && yres == 1080) || (xres == 2560 && yres == 1440)))
+		return false;
+
+	width = xres;
+	height = yres;
+	bpp = depth > 0 ? depth : 32;
+	return true;
+}
+
+static bool e2eglReadSkinResolutionFromValue(std::string skin, int& width, int& height, int& bpp) {
+	skin.erase(std::remove(skin.begin(), skin.end(), '\r'), skin.end());
+	skin.erase(std::remove(skin.begin(), skin.end(), '\n'), skin.end());
+	if (skin.empty())
+		return false;
+
+	if (skin[0] == '/')
+		return e2eglReadSkinResolution(skin, width, height, bpp);
+
+	return e2eglReadSkinResolution(std::string("/usr/share/enigma2/") + skin, width, height, bpp);
+}
+
+static bool e2eglReadConfiguredSkinResolution(int& width, int& height, int& bpp) {
+	std::ifstream settings("/etc/enigma2/settings");
+	std::string line;
+	while (settings.good() && std::getline(settings, line)) {
+		const char* prefix = "config.skin.primary_skin=";
+		if (line.find(prefix) != 0)
+			continue;
+
+		if (e2eglReadSkinResolutionFromValue(line.substr(strlen(prefix)), width, height, bpp))
+			return true;
+		break;
+	}
+
+	if (e2eglReadSkinResolutionFromValue("MetrixHD/skin.xml", width, height, bpp))
+		return true;
+
+	return e2eglReadSkinResolutionFromValue("skin_default/skin.xml", width, height, bpp);
+}
+#endif
+
+static bool e2eglNeedsLegacyNxplSurface(const std::string& value) {
+	return value == "hd2400" || value == "mutant2400" || value == "quadbox2400" ||
+	       value == "triplex" ||
+	       value == "et10000" ||
+	       value == "formuler1" || value == "formuler1tc" || value == "f1";
+}
+
+static bool e2eglNxplUseVideoModeSurface() {
+#if defined(HAVE_VUPLUS_EGL)
+	return true;
+#elif defined(HAVE_NXPL_EGL)
+	static int use = -1;
+	if (use < 0) {
+		const std::string machine = eModelInformation::getInstance().getValue("machinebuild");
+		const std::string boxtype = e2eglReadTextFile("/proc/stb/info/boxtype");
+		use = e2eglNeedsLegacyNxplSurface(machine) || e2eglNeedsLegacyNxplSurface(boxtype);
+	}
+	return use != 0;
+#else
+	return false;
+#endif
+}
+
+static bool e2eglRequiresNativeWindow()
+{
+#ifdef HAVE_DREAMBCM_EGL
+	return false;
+#else
+	return true;
+#endif
+}
+
+static bool e2eglVideoModeToSize(std::string mode, int& width, int& height) {
+	mode.erase(std::remove(mode.begin(), mode.end(), '\n'), mode.end());
+	mode.erase(std::remove(mode.begin(), mode.end(), '\r'), mode.end());
+	if (mode.find("smpte") == 0) {
+		width = 4096;
+		height = 2160;
+		return true;
+	}
+	if (mode.find("2160") != std::string::npos) {
+		width = 3840;
+		height = 2160;
+		return true;
+	}
+	if (mode.find("1080") != std::string::npos) {
+		width = 1920;
+		height = 1080;
+		return true;
+	}
+	if (mode.find("720") != std::string::npos) {
+		width = 1280;
+		height = 720;
+		return true;
+	}
+	if (mode.find("576") != std::string::npos || mode == "pal" || mode == "pal60") {
+		width = 720;
+		height = 576;
+		return true;
+	}
+	if (mode.find("480") != std::string::npos || mode == "ntsc") {
+		width = 720;
+		height = 480;
+		return true;
+	}
+	return false;
+}
+
+static void e2eglLimitVuplusNativeSurfaceSize(int& width, int& height) {
+#ifdef HAVE_VUPLUS_EGL
+	// Vu+ 4K renders WQHD skins logically, while its NXPL OSD window stays at 1080p.
+	if (width > 1920 || height > 1080) {
+		width = 1920;
+		height = 1080;
+	}
+#else
+	(void)width;
+	(void)height;
+#endif
+}
+
+static const char E2EGL_CAPTURE_SOCKET[] = "/tmp/e2egl-osd.socket";
+static const char E2EGL_CAPTURE_MAGIC[8] = {'E', '2', 'E', 'G', 'L', '0', '1', 0};
+static const uint32_t E2EGL_CAPTURE_FORMAT_BGRA = 1;
+
+struct E2EGLCaptureHeader {
+	char magic[8];
+	uint32_t width;
+	uint32_t height;
+	uint32_t stride;
+	uint32_t format;
+};
+
+static bool e2eglWriteAll(int fd, const void* data, size_t len) {
+	const uint8_t* ptr = static_cast<const uint8_t*>(data);
+	while (len) {
+#ifdef MSG_NOSIGNAL
+		const ssize_t written = send(fd, ptr, len, MSG_NOSIGNAL);
+#else
+		const ssize_t written = send(fd, ptr, len, 0);
+#endif
+		if (written < 0) {
+			if (errno == EINTR)
+				continue;
+			return false;
+		}
+		if (!written)
+			return false;
+		ptr += written;
+		len -= written;
+	}
+	return true;
+}
+
+static int divFloorSigned(long long numerator, int denominator) {
+	if (denominator <= 0)
+		return 0;
+	if (numerator >= 0)
+		return (int)(numerator / denominator);
+	return -(int)((-numerator + denominator - 1) / denominator);
+}
+
+static int divCeilSigned(long long numerator, int denominator) {
+	if (denominator <= 0)
+		return 0;
+	if (numerator >= 0)
+		return (int)((numerator + denominator - 1) / denominator);
+	return -(int)((-numerator) / denominator);
+}
+
+static float colorComponent(unsigned char value) {
+	return value / 255.0f;
+}
+
+static float colorAlpha(const gRGB& color) {
+	return 1.0f - (color.a / 255.0f);
+}
+
+static void appendRectVertices(std::vector<float>& vertices, const eRect& area) {
+	const float x = area.x();
+	const float y = area.y();
+	const float w = area.width();
+	const float h = area.height();
+	vertices.push_back(x);
+	vertices.push_back(y);
+	vertices.push_back(x);
+	vertices.push_back(y + h);
+	vertices.push_back(x + w);
+	vertices.push_back(y);
+	vertices.push_back(x + w);
+	vertices.push_back(y);
+	vertices.push_back(x);
+	vertices.push_back(y + h);
+	vertices.push_back(x + w);
+	vertices.push_back(y + h);
+}
+
+static void appendColoredRectVertices(std::vector<float>& vertices, const eRect& area, const gRGB& color) {
+	const float r = colorComponent(color.r);
+	const float g = colorComponent(color.g);
+	const float b = colorComponent(color.b);
+	const float a = colorAlpha(color);
+	const float x = area.x();
+	const float y = area.y();
+	const float w = area.width();
+	const float h = area.height();
+	const float rect_vertices[12] = {x, y, x, y + h, x + w, y, x + w, y, x, y + h, x + w, y + h};
+
+	for (unsigned int i = 0; i < 6; ++i) {
+		vertices.push_back(rect_vertices[i * 2 + 0]);
+		vertices.push_back(rect_vertices[i * 2 + 1]);
+		vertices.push_back(r);
+		vertices.push_back(g);
+		vertices.push_back(b);
+		vertices.push_back(a);
+	}
+}
+
+static int s_egl_animation_current = 0;
+static int s_egl_animation_speed = 15;
+static bool s_egl_animation_profiles = true;
+static int s_egl_animation_dialog = 18;
+static int s_egl_animation_popup = 16;
+static int s_egl_animation_toast = 17;
+static int s_egl_animation_toast_speed = 10;
+static bool s_egl_animation_listbox = false;
+static const int E2EGL_WINDOW_ANIMATION_MAX = 23;
+
+static int clampInt(int value, int min_value, int max_value) {
+	return std::max(min_value, std::min(max_value, value));
+}
+
+static float clampFloat(float value, float min_value, float max_value) {
+	return std::max(min_value, std::min(max_value, value));
+}
+
+static bool isToastLikeWindow(const eRect& source, int screen_width, int screen_height) {
+	if (source.empty())
+		return false;
+
+	const float screen_w = std::max(1.0f, (float)screen_width);
+	const float screen_h = std::max(1.0f, (float)screen_height);
+	const float width_ratio = (float)source.width() / screen_w;
+	const float height_ratio = (float)source.height() / screen_h;
+	return width_ratio > 0.08f && width_ratio < 0.94f && height_ratio < 0.28f
+		&& (source.top() < (int)(screen_h * 0.24f) || source.bottom() > (int)(screen_h * 0.72f));
+}
+
+static int effectiveWindowAnimationForRect(const eRect& source, int screen_width, int screen_height) {
+	const int base_animation = s_egl_animation_current;
+	if (!s_egl_animation_profiles || (base_animation != 15 && base_animation != 16) || source.empty())
+		return base_animation;
+
+	const float screen_w = std::max(1.0f, (float)screen_width);
+	const float screen_h = std::max(1.0f, (float)screen_height);
+	const float width_ratio = (float)source.width() / screen_w;
+	const float height_ratio = (float)source.height() / screen_h;
+	const bool small_dialog = width_ratio < 0.68f && height_ratio < 0.68f;
+	const bool toast_like = isToastLikeWindow(source, screen_width, screen_height);
+	const bool side_panel = height_ratio > 0.42f && width_ratio < 0.76f
+		&& (source.left() < (int)(screen_w * 0.12f) || source.right() > (int)(screen_w * 0.88f));
+	const bool popup_panel = !toast_like && !small_dialog && width_ratio < 0.82f && height_ratio < 0.74f;
+
+	if (toast_like)
+		return s_egl_animation_toast;
+	if (small_dialog && s_egl_animation_dialog > 0)
+		return s_egl_animation_dialog;
+	if ((side_panel || popup_panel) && s_egl_animation_popup > 0)
+		return s_egl_animation_popup;
+	return base_animation;
+}
+
+static int windowAnimationDurationMs(const eRect& source, int screen_width, int screen_height) {
+	const bool toast_like = isToastLikeWindow(source, screen_width, screen_height);
+	const int speed = toast_like ? s_egl_animation_toast_speed : s_egl_animation_speed;
+#ifdef DREAMNEXTGEN
+	const int duration_factor = 12;
+#else
+	const int duration_factor = 6;
+#endif
+	return toast_like ? clampInt(speed * duration_factor, 60, 240) : clampInt(speed * duration_factor, 80, 420);
+}
+
+static float easeOut(float t) {
+	t = clampFloat(t, 0.0f, 1.0f);
+	const float inv = 1.0f - t;
+	return 1.0f - inv * inv;
+}
+
+static float easeInOut(float t) {
+	t = clampFloat(t, 0.0f, 1.0f);
+	return t * t * (3.0f - 2.0f * t);
+}
+
+static bool opcodeDrawsToSurface(gOpcode::Opcode opcode) {
+	switch (opcode) {
+	case gOpcode::renderText:
+	case gOpcode::renderPara:
+	case gOpcode::fill:
+	case gOpcode::fillRegion:
+	case gOpcode::clear:
+	case gOpcode::blit:
+	case gOpcode::blitTransition:
+	case gOpcode::gradient:
+	case gOpcode::rectangle:
+	case gOpcode::line:
+	case gOpcode::enableSpinner:
+	case gOpcode::disableSpinner:
+	case gOpcode::incrementSpinner:
+		return true;
+	default:
+		return false;
+	}
+}
+
+static bool opcodeCanKeepPendingText(gOpcode::Opcode opcode) {
+	switch (opcode) {
+	case gOpcode::renderText:
+	case gOpcode::renderPara:
+	case gOpcode::setFont:
+	case gOpcode::setBackgroundColor:
+	case gOpcode::setForegroundColor:
+	case gOpcode::setBackgroundColorRGB:
+	case gOpcode::setForegroundColorRGB:
+	case gOpcode::setGradient:
+	case gOpcode::setRadius:
+	case gOpcode::setBorder:
+	case gOpcode::setOffset:
+	case gOpcode::setClip:
+	case gOpcode::addClip:
+	case gOpcode::popClip:
+		return true;
+	default:
+		return false;
+	}
+}
+
+static bool opcodeCanRunWithoutEGLContext(gOpcode::Opcode opcode) {
+	switch (opcode) {
+	case gOpcode::setFont:
+	case gOpcode::setBackgroundColor:
+	case gOpcode::setForegroundColor:
+	case gOpcode::setBackgroundColorRGB:
+	case gOpcode::setForegroundColorRGB:
+	case gOpcode::setGradient:
+	case gOpcode::setRadius:
+	case gOpcode::setBorder:
+	case gOpcode::setOffset:
+	case gOpcode::setClip:
+	case gOpcode::addClip:
+	case gOpcode::popClip:
+		return true;
+	default:
+		return false;
+	}
+}
+
+static bool regionCoversRect(const gRegion& region, const eRect& bounds) {
+	if (region.extends != bounds)
+		return false;
+
+	long long covered = 0;
+	for (unsigned int i = 0; i < region.rects.size(); ++i) {
+		eRect rect = region.rects[i] & bounds;
+		if (!rect.empty())
+			covered += (long long)rect.width() * rect.height();
+	}
+	return covered >= (long long)bounds.width() * bounds.height();
+}
+
+static void logEGLConfig(EGLDisplay display, EGLConfig config, int version) {
+	EGLint red = 0, green = 0, blue = 0, alpha = 0;
+	EGLint depth = 0, stencil = 0, surface = 0, native_visual = 0;
+	EGLint sample_buffers = 0, samples = 0;
+
+	eglGetConfigAttrib(display, config, EGL_RED_SIZE, &red);
+	eglGetConfigAttrib(display, config, EGL_GREEN_SIZE, &green);
+	eglGetConfigAttrib(display, config, EGL_BLUE_SIZE, &blue);
+	eglGetConfigAttrib(display, config, EGL_ALPHA_SIZE, &alpha);
+	eglGetConfigAttrib(display, config, EGL_DEPTH_SIZE, &depth);
+	eglGetConfigAttrib(display, config, EGL_STENCIL_SIZE, &stencil);
+	eglGetConfigAttrib(display, config, EGL_SURFACE_TYPE, &surface);
+	eglGetConfigAttrib(display, config, EGL_NATIVE_VISUAL_ID, &native_visual);
+	eglGetConfigAttrib(display, config, EGL_SAMPLE_BUFFERS, &sample_buffers);
+	eglGetConfigAttrib(display, config, EGL_SAMPLES, &samples);
+
+	eDebug("[gEGLDC] EGL config GLES%d rgba=%d/%d/%d/%d depth=%d stencil=%d surface=0x%x native=0x%x samples=%d/%d",
+		version, red, green, blue, alpha, depth, stencil, surface, native_visual, sample_buffers, samples);
+}
+
+static bool textRectsCanMerge(const eRect& a, const eRect& b) {
+	const int overlap_top = std::max(a.top(), b.top());
+	const int overlap_bottom = std::min(a.bottom(), b.bottom());
+	if (overlap_top >= overlap_bottom)
+		return false;
+
+	const int min_height = std::max(1, std::min(a.height(), b.height()));
+	if ((overlap_bottom - overlap_top) * 2 < min_height)
+		return false;
+
+	int gap = 0;
+	if (a.right() < b.left())
+		gap = b.left() - a.right();
+	else if (b.right() < a.left())
+		gap = a.left() - b.right();
+
+	return gap <= 32;
+}
+
+static unsigned long long e2eglNowUs() {
+	struct timespec ts;
+	clock_gettime(CLOCK_MONOTONIC, &ts);
+	return (unsigned long long)ts.tv_sec * 1000000ULL + (unsigned long long)ts.tv_nsec / 1000ULL;
+}
+
+// Animation progress follows the elapsed time, so the duration does not depend on the output frame rate.
+static float animationProgress(unsigned long long start_us, int duration_ms) {
+	return duration_ms > 0 ? clampFloat((float)(e2eglNowUs() - start_us) / ((float)duration_ms * 1000.0f), 0.0f, 1.0f) : 1.0f;
+}
+
+// Keeps animation frames at least 16 ms apart where presenting does not wait for the display.
+static void waitForNextAnimationFrame(unsigned long long frame_start_us) {
+	const unsigned long long next_us = frame_start_us + 16000ULL;
+	const unsigned long long now_us = e2eglNowUs();
+	if (next_us > now_us)
+		usleep((useconds_t)(next_us - now_us));
+}
+
+class e2eglScopedTimer {
+public:
+	e2eglScopedTimer(unsigned long long& target) : m_target(target), m_start_us(e2eglNowUs()) {}
+	~e2eglScopedTimer() { m_target += e2eglNowUs() - m_start_us; }
+
+private:
+	unsigned long long& m_target;
+	unsigned long long m_start_us;
+};
+
+static bool e2eglTraceGlEnabled() {
+	static int enabled = -1;
+	if (enabled < 0) {
+		const char* env = getenv("E2EGL_TRACE_GL");
+		enabled = (env && *env && strcmp(env, "0")) ? 1 : 0;
+	}
+	return enabled != 0;
+}
+
+static unsigned int e2eglTraceGlLimit() {
+	static int limit = -1;
+	if (limit < 0) {
+		const char* env = getenv("E2EGL_TRACE_GL_LIMIT");
+		limit = env && *env ? atoi(env) : 240;
+	}
+	return limit < 0 ? 0 : (unsigned int)limit;
+}
+
+static unsigned long long e2eglTraceGlSlowUs() {
+	static long long slow_us = -1;
+	if (slow_us < 0) {
+		const char* env = getenv("E2EGL_TRACE_GL_SLOW_US");
+		slow_us = env && *env ? atoll(env) : 0;
+	}
+	return slow_us < 0 ? 0 : (unsigned long long)slow_us;
+}
+
+static bool e2eglTraceOpsEnabled() {
+	static int enabled = -1;
+	if (enabled < 0) {
+		const char* env = getenv("E2EGL_TRACE_OPS");
+		enabled = (env && *env && strcmp(env, "0")) ? 1 : 0;
+	}
+	return enabled != 0;
+}
+
+static bool e2eglAnimationDamageEnabled() {
+	static int enabled = -1;
+	if (enabled < 0) {
+		const char* env = getenv("E2EGL_ANIMATION_DAMAGE");
+		enabled = (!env || !*env || strcmp(env, "0")) ? 1 : 0;
+	}
+	return enabled != 0;
+}
+
+static unsigned long long rectPixels(const eRect& rect) {
+	return rect.empty() ? 0 : (unsigned long long)rect.width() * (unsigned long long)rect.height();
+}
+
+static void logColorOp(const char* op, const eRect& area, const gRGB& color, bool blend) {
+	if (!e2eglTraceOpsEnabled())
+		return;
+
+	eDebug("[e2egl:op] %s area=%d,%d %dx%d color=#%02x%02x%02x inva=%u alpha=%.3f blend=%d",
+		op, area.x(), area.y(), area.width(), area.height(), color.r, color.g, color.b, color.a, colorAlpha(color), blend ? 1 : 0);
+}
+
+static void logBlitOp(const char* op, const eRect& dest, const eRect& src, gPixmap* pixmap, int flags) {
+	if (!e2eglTraceOpsEnabled())
+		return;
+
+	gUnmanagedSurface* surface = pixmap ? pixmap->surface : nullptr;
+	eDebug("[e2egl:op] %s dst=%d,%d %dx%d src=%d,%d %dx%d pix=%dx%dx%d tex=%u flags=0x%x transparent=%d",
+		op, dest.x(), dest.y(), dest.width(), dest.height(), src.x(), src.y(), src.width(), src.height(),
+		surface ? surface->x : 0, surface ? surface->y : 0, surface ? surface->bpp : 0, surface ? surface->gl_texture_id : 0,
+		flags, surface && surface->transparent ? 1 : 0);
+}
+
+void gEGLDCSetAnimationCurrent(int animation) {
+	s_egl_animation_current = clampInt(animation, 0, E2EGL_WINDOW_ANIMATION_MAX);
+	eDebug("[gEGLDC] window animation set to %d", s_egl_animation_current);
+}
+
+void gEGLDCSetAnimationSpeed(int speed) {
+	s_egl_animation_speed = clampInt(speed, 1, 100);
+	eDebug("[gEGLDC] window animation speed set to %d", s_egl_animation_speed);
+}
+
+void gEGLDCSetToastAnimationSpeed(int speed) {
+	s_egl_animation_toast_speed = clampInt(speed, 1, 100);
+	eDebug("[gEGLDC] toast animation speed set to %d", s_egl_animation_toast_speed);
+}
+
+void gEGLDCSetAnimationListbox(int animation) {
+	s_egl_animation_listbox = animation != 0;
+	eDebug("[gEGLDC] smooth list selection %s", s_egl_animation_listbox ? "enabled" : "disabled");
+}
+
+bool gEGLDC::supportsListboxAnimations() const {
+	return s_egl_animation_listbox;
+}
+
+void gEGLDCSetAnimationProfiles(int enabled, int dialog, int popup, int toast) {
+	s_egl_animation_profiles = enabled != 0;
+	s_egl_animation_dialog = clampInt(dialog, 0, E2EGL_WINDOW_ANIMATION_MAX);
+	s_egl_animation_popup = clampInt(popup, 0, E2EGL_WINDOW_ANIMATION_MAX);
+	s_egl_animation_toast = clampInt(toast, 0, E2EGL_WINDOW_ANIMATION_MAX);
+	eDebug("[gEGLDC] window animation profiles %s: dialog=%d popup=%d toast=%d",
+		s_egl_animation_profiles ? "enabled" : "disabled",
+		s_egl_animation_dialog, s_egl_animation_popup, s_egl_animation_toast);
+}
+
+static glyph_key_t hashGlyphMask(gPixmap* glyph_mask) {
+	const gUnmanagedSurface* surface = glyph_mask ? glyph_mask->surface : nullptr;
+	if (!surface || !surface->data)
+		return 0;
+
+	const int width = surface->x;
+	const int height = surface->y;
+	int pitch = surface->stride ? surface->stride : width;
+
+	uint64_t hash = 1469598103934665603ULL;
+	auto mix = [&hash](uint64_t value) {
+		for (int i = 0; i < 8; ++i) {
+			hash ^= (value >> (i * 8)) & 0xff;
+			hash *= 1099511628211ULL;
+		}
+	};
+
+	mix((uint64_t)width);
+	mix((uint64_t)height);
+	mix((uint64_t)(uint32_t)pitch);
+
+	const uint8_t* data = (const uint8_t*)surface->data;
+	for (int row = 0; row < height; ++row) {
+		const uint8_t* src_row = pitch > 0 ? data + (row * pitch) : data + ((height - 1 - row) * -pitch);
+		for (int x = 0; x < width; ++x) {
+			hash ^= src_row[x];
+			hash *= 1099511628211ULL;
+		}
+	}
+
+	return hash;
+}
 
 // Initialization is now managed by gEGLDCAutoInit in egl_init.cpp
 // to support runtime fallback to FBDC/SDLDC.
@@ -34,6 +808,11 @@ typedef EGLSurface (EGLAPIENTRYP PFNEGLCREATEPLATFORMPIXMAPSURFACEEXTPROC)(EGLDi
 // caller can immediately try again with a different version.
 // ---------------------------------------------------------------------------
 bool gEGLDC::tryInitEGL(int version) {
+	if (!m_window_provider || !m_native_window_ready) {
+		eDebug("[gEGLDC] no usable native window provider for GLES%d.", version);
+		return false;
+	}
+
 	// 1. get the native display from our platform provider
 	EGLNativeDisplayType native_display = m_window_provider->getNativeDisplay();
 
@@ -49,22 +828,50 @@ bool gEGLDC::tryInitEGL(int version) {
 		eDebug("[gEGLDC] error: eglInitialize failed.");
 		return false;
 	}
+	m_egl_major = major;
+	m_egl_minor = minor;
 	eDebug("[gEGLDC] EGL version %d.%d initialised", major, minor);
+
+#ifdef HAVE_DREAMBCM_EGL
+	if (auto *provider = dynamic_cast<DreamBcmWindowProvider*>(m_window_provider)) {
+		if (!provider->prepareEGL())
+			return false;
+	}
+#endif
 
 	// 3. choose EGL config for the requested GLES version
 	EGLint renderable_type = (version >= 3) ? EGL_OPENGL_ES3_BIT_KHR : EGL_OPENGL_ES2_BIT;
-	bool pixmap_mode = m_window_provider->usesPixmapSurface();
-	EGLint surface_type_bit = pixmap_mode ? EGL_PIXMAP_BIT : EGL_WINDOW_BIT;
 
+#ifdef DREAMNEXTGEN
+	// The GPU draws into the framebuffer pages, the context only needs a placeholder surface.
 	const EGLint config_attribs[] = {
-		EGL_SURFACE_TYPE, surface_type_bit, EGL_RENDERABLE_TYPE, renderable_type, EGL_RED_SIZE, 8, EGL_GREEN_SIZE, 8, EGL_BLUE_SIZE, 8, EGL_ALPHA_SIZE, 8, EGL_DEPTH_SIZE, 0, EGL_STENCIL_SIZE, 0,
+		EGL_SURFACE_TYPE, EGL_PBUFFER_BIT, EGL_RENDERABLE_TYPE, renderable_type, EGL_RED_SIZE, 8, EGL_GREEN_SIZE, 8, EGL_BLUE_SIZE, 8, EGL_ALPHA_SIZE, 8, EGL_DEPTH_SIZE, 0, EGL_STENCIL_SIZE, 0,
 		EGL_NONE};
 
 	EGLint num_configs = 0;
+	m_preserved_swap = false;
 	if (!eglChooseConfig(m_egl_display, config_attribs, &m_egl_config, 1, &num_configs) || num_configs == 0) {
 		eDebug("[gEGLDC] no suitable EGL config found for GLES%d.", version);
 		return false;
 	}
+#else
+	const EGLint preserved_config_attribs[] = {
+		EGL_SURFACE_TYPE, EGL_WINDOW_BIT | EGL_SWAP_BEHAVIOR_PRESERVED_BIT, EGL_RENDERABLE_TYPE, renderable_type, EGL_RED_SIZE, 8, EGL_GREEN_SIZE, 8, EGL_BLUE_SIZE, 8, EGL_ALPHA_SIZE, 8,
+		EGL_DEPTH_SIZE, 0, EGL_STENCIL_SIZE, 0, EGL_NONE};
+	const EGLint config_attribs[] = {
+		EGL_SURFACE_TYPE, EGL_WINDOW_BIT, EGL_RENDERABLE_TYPE, renderable_type, EGL_RED_SIZE, 8, EGL_GREEN_SIZE, 8, EGL_BLUE_SIZE, 8, EGL_ALPHA_SIZE, 8, EGL_DEPTH_SIZE, 0, EGL_STENCIL_SIZE, 0,
+		EGL_NONE};
+
+	EGLint num_configs = 0;
+	m_preserved_swap = false;
+	if (!e2eglForceDestroyedSwap() && eglChooseConfig(m_egl_display, preserved_config_attribs, &m_egl_config, 1, &num_configs) && num_configs > 0) {
+		m_preserved_swap = true;
+	} else if (!eglChooseConfig(m_egl_display, config_attribs, &m_egl_config, 1, &num_configs) || num_configs == 0) {
+		eDebug("[gEGLDC] no suitable EGL config found for GLES%d.", version);
+		return false;
+	}
+#endif
+	logEGLConfig(m_egl_display, m_egl_config, version);
 
 	// 4. create the context
 	const EGLint context_attribs[] = {EGL_CONTEXT_CLIENT_VERSION, version, EGL_NONE};
@@ -75,127 +882,345 @@ bool gEGLDC::tryInitEGL(int version) {
 		return false;
 	}
 
-	// 5. create the rendering surface(s) - a pixmap surface per available
-	// framebuffer page for platforms that only implement EGL_EXT_platform_base's
-	// pixmap path (e.g. Dreambox's VC5/BEGL stack, where the "pixmap" IS live
-	// display memory - see DreamboxWindowProvider's class comment), so this
-	// can ping-pong rendering between pages instead of always rendering into
-	// (and presenting) the one currently on screen - see flip(). A single
-	// window surface otherwise, which already gets real double-buffering for
-	// free via eglSwapBuffers().
-	for (int i = 0; i < MAX_EGL_SURFACES; ++i)
-		m_egl_surfaces[i] = EGL_NO_SURFACE;
-
-	if (pixmap_mode) {
-		PFNEGLCREATEPLATFORMPIXMAPSURFACEEXTPROC eglCreatePlatformPixmapSurfaceEXT =
-			(PFNEGLCREATEPLATFORMPIXMAPSURFACEEXTPROC)eglGetProcAddress("eglCreatePlatformPixmapSurfaceEXT");
-		if (!eglCreatePlatformPixmapSurfaceEXT) {
-			eDebug("[gEGLDC] eglCreatePlatformPixmapSurfaceEXT not available.");
-			eglDestroyContext(m_egl_display, m_egl_context);
-			m_egl_context = EGL_NO_CONTEXT;
-			return false;
-		}
-
-		m_page_count = std::max(1, std::min(m_window_provider->getPageCount(), MAX_EGL_SURFACES));
-		for (int i = 0; i < m_page_count; ++i) {
-			void* native_pixmap = m_window_provider->getNativePixmap(i);
-			m_egl_surfaces[i] = eglCreatePlatformPixmapSurfaceEXT(m_egl_display, m_egl_config, native_pixmap, nullptr);
-			if (m_egl_surfaces[i] == EGL_NO_SURFACE) {
-				eDebug("[gEGLDC] eglCreatePlatformPixmapSurfaceEXT failed for page %d. EGL error: 0x%x", i, eglGetError());
-				for (int j = 0; j < i; ++j)
-					eglDestroySurface(m_egl_display, m_egl_surfaces[j]);
-				eglDestroyContext(m_egl_display, m_egl_context);
-				m_egl_context = EGL_NO_CONTEXT;
-				return false;
-			}
-		}
-	} else {
-		m_page_count = 1;
-		EGLNativeWindowType native_window = m_window_provider->getNativeWindow();
-		m_egl_surfaces[0] = eglCreateWindowSurface(m_egl_display, m_egl_config, native_window, nullptr);
-		if (m_egl_surfaces[0] == EGL_NO_SURFACE) {
-			eDebug("[gEGLDC] eglCreateWindowSurface failed. EGL error: 0x%x", eglGetError());
-			eglDestroyContext(m_egl_display, m_egl_context);
-			m_egl_context = EGL_NO_CONTEXT;
-			return false;
-		}
-	}
-
-	// 6. make context current against the page the first frame will render
-	// into. Start one page *ahead* of whatever the provider is showing at
-	// startup (page 0 - see DreamboxWindowProvider::init()'s initial
-	// setOffset(0)) so the very first frame never renders into the page
-	// that's simultaneously being scanned out.
-	m_render_page = (m_page_count > 1) ? 1 : 0;
-	if (!eglMakeCurrent(m_egl_display, m_egl_surfaces[m_render_page], m_egl_surfaces[m_render_page], m_egl_context)) {
-		eDebug("[gEGLDC] eglMakeCurrent failed.");
-		for (int i = 0; i < m_page_count; ++i)
-			eglDestroySurface(m_egl_display, m_egl_surfaces[i]);
+#ifdef DREAMNEXTGEN
+	// 5. bind the context to the framebuffer pages
+	if (!createFramebufferOutput()) {
 		eglDestroyContext(m_egl_display, m_egl_context);
 		m_egl_context = EGL_NO_CONTEXT;
 		return false;
 	}
+#else
+	// 5. create the window surface
+	EGLNativeWindowType native_window = m_window_provider->getNativeWindow();
+	if (!native_window && e2eglRequiresNativeWindow()) {
+		eDebug("[gEGLDC] native window is not available for GLES%d.", version);
+		eglDestroyContext(m_egl_display, m_egl_context);
+		m_egl_context = EGL_NO_CONTEXT;
+		return false;
+	}
+	m_egl_surface = eglCreateWindowSurface(m_egl_display, m_egl_config, native_window, nullptr);
+	if (m_egl_surface == EGL_NO_SURFACE) {
+		eDebug("[gEGLDC] eglCreateWindowSurface failed. EGL error: 0x%x", eglGetError());
+		eglDestroyContext(m_egl_display, m_egl_context);
+		m_egl_context = EGL_NO_CONTEXT;
+		return false;
+	}
+	applySwapBehavior();
+
+	// 6. make context current
+	if (!eglMakeCurrent(m_egl_display, m_egl_surface, m_egl_surface, m_egl_context)) {
+		eDebug("[gEGLDC] eglMakeCurrent failed.");
+		eglDestroySurface(m_egl_display, m_egl_surface);
+		eglDestroyContext(m_egl_display, m_egl_context);
+		m_egl_surface = EGL_NO_SURFACE;
+		m_egl_context = EGL_NO_CONTEXT;
+		return false;
+	}
+#endif
 
 	m_gles_version = version;
-	gles::version = m_gles_version;
+	return true;
+}
 
-	{
-		const char* egl_ver = eglQueryString(m_egl_display, EGL_VERSION);
-		const char* gl_ver = (const char*)glGetString(GL_VERSION);
-		gles::eglVersionString = egl_ver ? egl_ver : "";
-		gles::glesVersionString = gl_ver ? gl_ver : "";
-		eDebug("[gEGLDC] EGL_VERSION=%s GL_VERSION=%s", egl_ver ? egl_ver : "(null)", gl_ver ? gl_ver : "(null)");
-	}
-
-	// The framebuffer provider starts displaying page 0, while EGL starts
-	// rendering on page 1. Copy the currently displayed page into the first
-	// render page before the first flip, otherwise page 1 starts empty and
-	// the page rotation can erase the bootlogo.
-	if (m_page_count > 1) {
-		bool seeded = gpuCopyPageContent(0, m_render_page);
-
-		if (!seeded) {
-			if (eglMakeCurrent(m_egl_display, m_egl_surfaces[m_render_page], m_egl_surfaces[m_render_page], m_egl_context)) {
-				m_window_provider->copyPageContent(0, m_render_page);
-				seeded = true;
-			}
-		}
-
-		eDebug("[EGLDC] initial page seed 0 -> %d success=%d", m_render_page, seeded ? 1 : 0);
-
-		if (!eglMakeCurrent(m_egl_display, m_egl_surfaces[m_render_page], m_egl_surfaces[m_render_page], m_egl_context)) {
-			eDebug("[gEGLDC] eglMakeCurrent after initial page seed failed: 0x%x", eglGetError());
+#ifdef DREAMNEXTGEN
+#ifndef HAVE_GLES3
+#error "DreamNextGen framebuffer output needs GLES3 (glBlitFramebuffer)"
+#endif
+bool gEGLDC::createFramebufferOutput() {
+	if (m_egl_surface == EGL_NO_SURFACE) {
+		const EGLint pbuffer_attribs[] = {EGL_WIDTH, 1, EGL_HEIGHT, 1, EGL_NONE};
+		m_egl_surface = eglCreatePbufferSurface(m_egl_display, m_egl_config, pbuffer_attribs);
+		if (m_egl_surface == EGL_NO_SURFACE) {
+			eDebug("[gEGLDC] eglCreatePbufferSurface failed. EGL error: 0x%x", eglGetError());
 			return false;
 		}
 	}
+	if (eglGetCurrentContext() != m_egl_context || eglGetCurrentSurface(EGL_DRAW) != m_egl_surface) {
+		if (!eglMakeCurrent(m_egl_display, m_egl_surface, m_egl_surface, m_egl_context)) {
+			eDebug("[gEGLDC] eglMakeCurrent failed. EGL error: 0x%x", eglGetError());
+			eglDestroySurface(m_egl_display, m_egl_surface);
+			m_egl_surface = EGL_NO_SURFACE;
+			return false;
+		}
+	}
+	if (!m_fb_output.create(m_egl_display, surfaceWidth(), surfaceHeight())) {
+		// Without a surface exec() keeps retrying through refresh().
+		unbindContext();
+		eglDestroySurface(m_egl_display, m_egl_surface);
+		m_egl_surface = EGL_NO_SURFACE;
+		return false;
+	}
+	return true;
+}
+#endif
 
-	// One-time dump of what this driver/hardware actually advertises, as
-	// opposed to what the vendor SDK headers merely *declare* - header
-	// presence (EGL_KHR_partial_update, EGL_KHR_fence_sync, etc. all exist
-	// in eglext.h) says nothing about whether libvc5dream's V3D driver on
-	// this specific box actually implements them. Logged once at startup so
-	// this can be checked against the log rather than guessed at.
-	{
-		const char* egl_ext = eglQueryString(m_egl_display, EGL_EXTENSIONS);
-		const char* gl_ext = (const char*)glGetString(GL_EXTENSIONS);
-		eDebug("[gEGLDC] EGL_EXTENSIONS: %s", egl_ext ? egl_ext : "(null)");
-		eDebug("[gEGLDC] GL_EXTENSIONS: %s", gl_ext ? gl_ext : "(null)");
+bool gEGLDC::makeCurrent() {
+	if (!isInitialized() || m_egl_display == EGL_NO_DISPLAY || m_egl_surface == EGL_NO_SURFACE)
+		return false;
+
+	if (eglGetCurrentContext() == m_egl_context)
+		return true;
+
+	if (!eglMakeCurrent(m_egl_display, m_egl_surface, m_egl_surface, m_egl_context)) {
+		eDebug("[gEGLDC] eglMakeCurrent failed. EGL error: 0x%x", eglGetError());
+		return false;
 	}
 
 	return true;
+}
+
+bool gEGLDC::releaseCurrent() {
+	// The render thread keeps the context for good, only other threads hand it back.
+	if (onRenderThread())
+		return false;
+	if (m_egl_display != EGL_NO_DISPLAY && eglGetCurrentContext() == m_egl_context) {
+		eglMakeCurrent(m_egl_display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
+		return true;
+	}
+	return false;
+}
+
+void gEGLDC::unbindContext() {
+	// EGL keeps a surface alive while it is current, so unbind before destroying it.
+	if (m_egl_display != EGL_NO_DISPLAY && eglGetCurrentContext() == m_egl_context)
+		eglMakeCurrent(m_egl_display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
+}
+
+bool gEGLDC::onRenderThread() const {
+	return m_render_thread_known && pthread_equal(pthread_self(), m_render_thread);
+}
+
+bool gEGLDC::runOnRenderThread(const std::function<void()>& function) {
+	static thread_local bool direct_call = false;
+	if (direct_call || onRenderThread())
+		return false;
+
+	gRC* rc = gRC::getInstance();
+	{
+		std::lock_guard<std::recursive_mutex> egl_lock(m_egl_mutex);
+		if (!rc || !m_render_thread_known) {
+			// No render thread yet (or no more): run here, the lock keeps it from binding the context meanwhile.
+			direct_call = true;
+			function();
+			direct_call = false;
+			return true;
+		}
+	}
+
+	rc->invoke(function, this);
+	return true;
+}
+
+void gEGLDC::applySwapBehavior() {
+	if (m_egl_display == EGL_NO_DISPLAY || m_egl_surface == EGL_NO_SURFACE)
+		return;
+
+	if (e2eglForceDestroyedSwap()) {
+		m_preserved_swap = false;
+		if (!eglSurfaceAttrib(m_egl_display, m_egl_surface, EGL_SWAP_BEHAVIOR, EGL_BUFFER_DESTROYED))
+			eDebug("[gEGLDC] EGL destroyed swap request failed for Broadcom EGL. EGL error: 0x%x", eglGetError());
+		eDebug("[gEGLDC] EGL swap behavior: destroyed (Broadcom preserved swap ignored)");
+		return;
+	}
+
+	if (!eglSurfaceAttrib(m_egl_display, m_egl_surface, EGL_SWAP_BEHAVIOR, EGL_BUFFER_PRESERVED)) {
+		m_preserved_swap = false;
+		eDebug("[gEGLDC] EGL preserved swap unavailable. EGL error: 0x%x", eglGetError());
+		return;
+	}
+
+	EGLint behavior = EGL_BUFFER_DESTROYED;
+	eglQuerySurface(m_egl_display, m_egl_surface, EGL_SWAP_BEHAVIOR, &behavior);
+	m_preserved_swap = behavior == EGL_BUFFER_PRESERVED;
+	eDebug("[gEGLDC] EGL swap behavior: %s", m_preserved_swap ? "preserved" : "destroyed");
+}
+
+bool gEGLDC::runSurfaceOperation(const std::function<bool(gTextureManager&)>& operation)
+{
+#if (defined(DREAMNEXTGEN) || (defined(DREAMBCM_ION_ACCEL) && defined(HAVE_DREAMBCM_EGL))) && defined(HAVE_GLES3)
+	bool result = false;
+	if (runOnRenderThread([&]() { result = runSurfaceOperation(operation); }))
+		return result;
+	std::lock_guard<std::recursive_mutex> lock(m_egl_mutex);
+	if (m_graphics_suspended || !isInitialized() || !makeCurrent() || !gles::isGLES3())
+		return false;
+	flushFillBatch();
+	flushTextBatch();
+	m_texture_manager.processDeletions();
+	GLint readFbo, drawFbo, viewport[4], scissor[4], program, buffer, vao, activeTexture, texture, pack, unpack;
+	GLboolean mask[4];
+	const GLenum capabilities[] = {GL_BLEND, GL_SCISSOR_TEST, GL_DEPTH_TEST, GL_STENCIL_TEST, GL_CULL_FACE, GL_DITHER, GL_RASTERIZER_DISCARD};
+	GLboolean enabled[sizeof(capabilities) / sizeof(capabilities[0])];
+	glGetIntegerv(GL_READ_FRAMEBUFFER_BINDING, &readFbo);
+	glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &drawFbo);
+	glGetIntegerv(GL_VIEWPORT, viewport);
+	glGetIntegerv(GL_SCISSOR_BOX, scissor);
+	glGetIntegerv(GL_CURRENT_PROGRAM, &program);
+	glGetIntegerv(GL_ARRAY_BUFFER_BINDING, &buffer);
+	glGetIntegerv(GL_VERTEX_ARRAY_BINDING, &vao);
+	glGetIntegerv(GL_ACTIVE_TEXTURE, &activeTexture);
+	glGetIntegerv(GL_PACK_ALIGNMENT, &pack);
+	glGetIntegerv(GL_UNPACK_ALIGNMENT, &unpack);
+	glGetBooleanv(GL_COLOR_WRITEMASK, mask);
+	glActiveTexture(GL_TEXTURE0);
+	glGetIntegerv(GL_TEXTURE_BINDING_2D, &texture);
+	for (size_t i = 0; i < sizeof(capabilities) / sizeof(capabilities[0]); ++i) {
+		enabled[i] = glIsEnabled(capabilities[i]);
+		glDisable(capabilities[i]);
+	}
+	glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+	GLuint operationVao = 0;
+	glGenVertexArrays(1, &operationVao);
+	glBindVertexArray(operationVao);
+	result = operation(m_texture_manager);
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, readFbo);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, drawFbo);
+	glViewport(viewport[0], viewport[1], viewport[2], viewport[3]);
+	glScissor(scissor[0], scissor[1], scissor[2], scissor[3]);
+	glColorMask(mask[0], mask[1], mask[2], mask[3]);
+	for (size_t i = 0; i < sizeof(capabilities) / sizeof(capabilities[0]); ++i)
+		if (enabled[i]) glEnable(capabilities[i]); else glDisable(capabilities[i]);
+	glBindVertexArray(vao);
+	glDeleteVertexArrays(1, &operationVao);
+	glBindBuffer(GL_ARRAY_BUFFER, buffer);
+	glUseProgram(program);
+	glBindTexture(GL_TEXTURE_2D, texture);
+	glActiveTexture(activeTexture);
+	glPixelStorei(GL_PACK_ALIGNMENT, pack);
+	glPixelStorei(GL_UNPACK_ALIGNMENT, unpack);
+	return result;
+#else
+	(void)operation;
+	return false;
+#endif
+}
+
+void gEGLDC::primeEGLSurface(bool preserve_scene) {
+#if !defined(HAVE_DREAMBCM_EGL) && !defined(DREAMNEXTGEN)
+	(void)preserve_scene;
+#endif
+#if defined(HAVE_VUPLUS_EGL) || defined(HAVE_VUPLUS_MIPSEL_EGL) || defined(HAVE_NXPL_EGL) || defined(HAVE_V3DPLATFORM_EGL) || defined(HAVE_HISILICON_EGL) || defined(HAVE_DREAMBCM_EGL) || defined(DREAMNEXTGEN)
+	if (m_egl_display == EGL_NO_DISPLAY || m_egl_surface == EGL_NO_SURFACE || m_egl_context == EGL_NO_CONTEXT)
+		return;
+#if defined(HAVE_DREAMBCM_EGL) || defined(DREAMNEXTGEN)
+	const bool scene_preserved = preserve_scene && sceneFramebufferActive() && m_scene_frame_valid;
+#else
+	const bool scene_preserved = false;
+#endif
+
+	bindWindowFramebuffer();
+	glDisable(GL_BLEND);
+	glDisable(GL_SCISSOR_TEST);
+	glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+	glViewport(0, 0, surfaceWidth(), surfaceHeight());
+	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+
+#if defined(HAVE_V3DPLATFORM_EGL)
+	const int swap_count = 3;
+#elif defined(HAVE_VUPLUS_EGL)
+	const int swap_count = 5;
+#elif defined(HAVE_NXPL_EGL)
+	const int swap_count = e2eglNxplUseVideoModeSurface() ? 5 : (m_preserved_swap ? 1 : 3);
+#elif !defined(DREAMNEXTGEN)
+	const int swap_count = m_preserved_swap ? 1 : 3;
+#endif
+#ifdef DREAMNEXTGEN
+	// The pages are drawn directly, so no stale OSD content can become visible after clearing them.
+	m_fb_output.clearPages();
+	const int cleared_swaps = m_fb_output.pages();
+#else
+	int cleared_swaps = 0;
+	for (int i = 0; i < swap_count; ++i) {
+		glClear(GL_COLOR_BUFFER_BIT);
+		if (!eglSwapBuffers(m_egl_display, m_egl_surface)) {
+			eDebug("[gEGLDC] EGL surface prime swap failed. EGL error: 0x%x", eglGetError());
+			break;
+		}
+		++cleared_swaps;
+	}
+#endif
+
+	glClear(GL_COLOR_BUFFER_BIT);
+	glFlush();
+	m_last_frame_valid = false;
+	m_frame_restore_pending = false;
+	invalidateSpinnerBackground(true);
+	if (sceneFramebufferWanted() && ensureSceneFramebuffer() && !scene_preserved)
+		clearSceneFramebuffer();
+	bindWindowFramebuffer();
+#ifdef HAVE_DREAMBCM_EGL
+	eDebug("[gEGLDC] primed EGL surface %dx%d logical=%dx%d with %d clear swap(s), preserved=%d scene_preserved=%d",
+		surfaceWidth(), surfaceHeight(), m_width, m_height, cleared_swaps, m_preserved_swap ? 1 : 0, scene_preserved ? 1 : 0);
+#else
+	eDebug("[gEGLDC] primed EGL surface %dx%d logical=%dx%d with %d clear swap(s), preserved=%d",
+		surfaceWidth(), surfaceHeight(), m_width, m_height, cleared_swaps, m_preserved_swap ? 1 : 0);
+#endif
+#endif
 }
 
 // ---------------------------------------------------------------------------
 // initEGL – cascades from GLES3 down to GLES2, then initialises shaders.
 // ---------------------------------------------------------------------------
 bool gEGLDC::initEGL() {
-	// Try GLES3 first, fall back to GLES2
-	if (!tryInitEGL(3)) {
+	if (!m_window_provider || !m_native_window_ready) {
+		eDebug("[gEGLDC] native window provider unavailable, falling back.");
+		return false;
+	}
+
+	auto tryGLESVersions = [this]() {
+		if (tryInitEGL(3))
+			return true;
 		eDebug("[gEGLDC] GLES3 not available, falling back to GLES2.");
-		if (!tryInitEGL(2)) {
-			eDebug("[gEGLDC] error: neither GLES3 nor GLES2 could be initialised.");
-			return false;
+		return tryInitEGL(2);
+	};
+
+	bool egl_ready = tryGLESVersions();
+
+#ifdef HAVE_VUPLUS_EGL
+	if (!egl_ready && m_video_mode_surface_active) {
+		const int failed_width = surfaceWidth();
+		const int failed_height = surfaceHeight();
+		struct SurfaceSize {
+			int width;
+			int height;
+		};
+		const SurfaceSize fallback_sizes[] = {
+			{1280, 720}
+		};
+
+		m_video_mode_surface_active = false;
+		for (const SurfaceSize& fallback : fallback_sizes) {
+			if (fallback.width > failed_width || fallback.height > failed_height ||
+				(fallback.width == failed_width && fallback.height == failed_height))
+				continue;
+
+			if (m_egl_display != EGL_NO_DISPLAY) {
+				eglTerminate(m_egl_display);
+				m_egl_display = EGL_NO_DISPLAY;
+			}
+			m_surface_width = fallback.width;
+			m_surface_height = fallback.height;
+			eDebug("[gEGLDC] Vu+ native window rejected %dx%d, retrying driver-safe surface %dx%d logical=%dx%d",
+				failed_width, failed_height, fallback.width, fallback.height, m_width, m_height);
+			m_native_window_ready = m_window_provider->init(fallback.width, fallback.height);
+			if (!m_native_window_ready) {
+				eDebug("[gEGLDC] Vu+ native window fallback init failed for %dx%d",
+					fallback.width, fallback.height);
+				continue;
+			}
+			if (tryGLESVersions()) {
+				egl_ready = true;
+				eDebug("[gEGLDC] Vu+ driver-safe EGL surface selected: %dx%d logical=%dx%d",
+					fallback.width, fallback.height, m_width, m_height);
+				break;
+			}
 		}
+	}
+#endif
+
+	if (!egl_ready) {
+		eDebug("[gEGLDC] error: neither GLES3 nor GLES2 could be initialised.");
+		return false;
 	}
 
 	// Publish the detected version so all shaders can query it
@@ -205,39 +1230,20 @@ bool gEGLDC::initEGL() {
 	m_texture_manager.setDisplay(m_egl_display);
 
 	// 7. basic GL state
-	glViewport(0, 0, m_width, m_height);
+	applyWindowViewport();
 	eglSwapInterval(m_egl_display, 1);
+	glGetIntegerv(GL_MAX_TEXTURE_SIZE, &m_max_texture_size);
+	eDebug("[gEGLDC] GL maximum texture size: %d", m_max_texture_size);
 
-	// GL_BLEND and GL_SCISSOR_TEST are left enabled for the lifetime of the
-	// context instead of being toggled on/off around every single opcode -
-	// every draw call in this backend uses this same blend func, and for a
-	// fully opaque source (alpha=1.0, the common case: solid fills,
-	// backgrounds, non-alpha-blended blits) it produces exactly the same
-	// result as blending disabled (src*1 + dst*0 == src), so there's no
-	// correctness difference, only fewer state-change calls per frame.
-	// Scissor is always set to the exact intended draw area immediately
-	// before each draw (see setGlScissor() call sites), so a stale rect
-	// left over from an earlier, unrelated opcode can never clip a draw
-	// incorrectly. The one exception is gpuCopyPageContent()'s
-	// glBlitFramebuffer(), which is also subject to the scissor test and
-	// resets it to the full surface before blitting - see its comment.
-	glEnable(GL_BLEND);
-	// RGB always blends as normal "over" (GL_SRC_ALPHA,
-	// GL_ONE_MINUS_SRC_ALPHA) - what makes a translucent widget visually
-	// look tinted/composited against whatever real content (another
-	// widget, the desktop) is behind it, exactly like gPixmap's own CPU
-	// blendPixel() (gpixmap.cpp) does for the same case. The alpha channel
-	// is different: this render target's own alpha is read by the
-	// display's hardware compositor to decide how much of the video plane
-	// shows through the OSD, and two genuinely different kinds of "blended"
-	// draw need two different formulas there - see setAlphaBlendMode()
-	// (called at every blend-enabling call site) for which and why. Default
-	// to the "true" alphaBlend formula here since it's what the overwhelming
-	// majority of blended draws (text, alphaBlend/alphaTest images) need;
-	// callers that need the other one set it explicitly right before their
-	// own draw.
-	setAlphaBlendMode(true);
-	glEnable(GL_SCISSOR_TEST);
+	const char* egl_extensions = eglQueryString(m_egl_display, EGL_EXTENSIONS);
+	const char* gl_extensions = (const char*)glGetString(GL_EXTENSIONS);
+#if defined(DREAMNEXTGEN) || defined(HAVE_VUPLUS_EGL) || defined(HAVE_VUPLUS_MIPSEL_EGL) || defined(HAVE_NXPL_EGL) || defined(HAVE_V3DPLATFORM_EGL) || defined(HAVE_HISILICON_EGL) || defined(HAVE_DREAMBCM_EGL)
+	const bool bgra_upload = false;
+#else
+	const bool bgra_upload = hasExtension(gl_extensions, "GL_EXT_texture_format_BGRA8888");
+#endif
+	eDebug("[gEGLDC] dmabuf import: %s, EGL image target: %s, BGRA upload: %s", hasExtension(egl_extensions, "EGL_EXT_image_dma_buf_import") ? "yes" : "no",
+		   hasExtension(gl_extensions, "GL_OES_EGL_image") ? "yes" : "no", bgra_upload ? "yes" : "no");
 
 	// 8. initialise shaders and resources
 	if (!m_basic_shader.init()) {
@@ -266,223 +1272,296 @@ bool gEGLDC::initEGL() {
 	m_advanced_shader.setResolution((float)m_width, (float)m_height);
 	m_texture_shader.setResolution((float)m_width, (float)m_height);
 	m_text_shader.setResolution((float)m_width, (float)m_height);
+	primeEGLSurface();
 
-	createFBO(m_width, m_height);
 	eDebug("[gEGLDC] GLES%d successfully initialised (%dx%d)", m_gles_version, m_width, m_height);
+	releaseCurrent();
+	startCaptureServer();
 	return true;
 }
 
-bool gEGLDC::createFBO(int w, int h) {
-	if (m_fbo != 0 && m_fbo_width == w && m_fbo_height == h)
-		return true;
-	destroyFBO();
-	glGenFramebuffers(1, &m_fbo);
-	glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
-	glGenTextures(1, &m_fbo_texture);
-	glBindTexture(GL_TEXTURE_2D, m_fbo_texture);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_fbo_texture, 0);
-	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-		eDebug("[gEGLDC] FBO incomplete");
-		destroyFBO();
+int gEGLDC::surfaceWidth() const {
+	return m_surface_width > 0 ? m_surface_width : m_width;
+}
+
+int gEGLDC::surfaceHeight() const {
+	return m_surface_height > 0 ? m_surface_height : m_height;
+}
+
+bool gEGLDC::updateVideoModeSurfaceSize(const char* reason) {
+#if defined(HAVE_VUPLUS_EGL)
+	if (!m_video_mode_surface_active)
 		return false;
-	}
-	glClearColor(0, 0, 0, 0);
-	glClear(GL_COLOR_BUFFER_BIT);
-	m_fbo_width = w;
-	m_fbo_height = h;
-	eDebug("[gEGLDC] FBO created %dx%d", w, h);
+#elif defined(HAVE_NXPL_EGL)
+	if (!e2eglNxplUseVideoModeSurface())
+		return false;
+#else
+	return false;
+#endif
+
+	const std::string mode = e2eglReadTextFile("/proc/stb/video/videomode");
+	int width = 0;
+	int height = 0;
+	if (!e2eglVideoModeToSize(mode, width, height))
+		return false;
+	e2eglLimitVuplusNativeSurfaceSize(width, height);
+
+	if (width == m_surface_width && height == m_surface_height)
+		return false;
+
+	eDebug("[gEGLDC] Broadcom video surface %s: mode='%s' %dx%d -> %dx%d logical=%dx%d",
+		reason ? reason : "update", mode.c_str(), m_surface_width, m_surface_height, width, height, m_width, m_height);
+	m_surface_width = width;
+	m_surface_height = height;
 	return true;
 }
 
-void gEGLDC::destroyFBO() {
-	if (m_anim_tex_before) { glDeleteTextures(1, &m_anim_tex_before); m_anim_tex_before = 0; }
-	if (m_anim_fbo_before) { glDeleteFramebuffers(1, &m_anim_fbo_before); m_anim_fbo_before = 0; }
-	fadeClear();
-	if (m_anim_tex_after) { glDeleteTextures(1, &m_anim_tex_after); m_anim_tex_after = 0; }
-	m_anim_pending = false;
-	m_anim_running = false;
-	m_anim_clean_pending = false;
-	m_anim_layer_valid = false;
-	m_anim_in_layer = false;
-	if (m_anim_fbo_layer) { glDeleteFramebuffers(1, &m_anim_fbo_layer); m_anim_fbo_layer = 0; }
-	if (m_anim_tex_layer) { glDeleteTextures(1, &m_anim_tex_layer); m_anim_tex_layer = 0; }
-	if (m_fbo_texture) { glDeleteTextures(1, &m_fbo_texture); m_fbo_texture = 0; }
-	if (m_fbo) { glDeleteFramebuffers(1, &m_fbo); m_fbo = 0; }
-	m_fbo_width = 0;
-	m_fbo_height = 0;
+int gEGLDC::scaleSurfaceFloorX(int value) const {
+	if (surfaceWidth() == m_width || m_width <= 0)
+		return value;
+	return divFloorSigned((long long)value * surfaceWidth(), m_width);
+}
+
+int gEGLDC::scaleSurfaceCeilX(int value) const {
+	if (surfaceWidth() == m_width || m_width <= 0)
+		return value;
+	return divCeilSigned((long long)value * surfaceWidth(), m_width);
+}
+
+int gEGLDC::scaleSurfaceFloorY(int value) const {
+	if (surfaceHeight() == m_height || m_height <= 0)
+		return value;
+	return divFloorSigned((long long)value * surfaceHeight(), m_height);
+}
+
+int gEGLDC::scaleSurfaceCeilY(int value) const {
+	if (surfaceHeight() == m_height || m_height <= 0)
+		return value;
+	return divCeilSigned((long long)value * surfaceHeight(), m_height);
+}
+
+bool gEGLDC::currentFramebufferUsesSurface() const {
+	if (currentFramebufferIsScene())
+		return sceneFramebufferUsesSurfaceScale();
+
+	const bool osd_fullscreen = m_osd_left == 0 && m_osd_top == 0 && m_osd_width == m_width && m_osd_height == m_height;
+	if (surfaceWidth() == m_width && surfaceHeight() == m_height && osd_fullscreen)
+		return false;
+	if (!sceneFramebufferActive())
+		return true;
+
+	GLint framebuffer = 0;
+	glGetIntegerv(GL_FRAMEBUFFER_BINDING, &framebuffer);
+	return framebuffer == 0;
 }
 
 void gEGLDC::setGlScissor(const eRect& rect) {
-	if (m_fbo) {
-		int sx = rect.x();
-		int sy = m_fbo_height - (rect.y() + rect.height());
-		glScissor(sx, sy, rect.width(), rect.height());
-	} else {
-		float x_scale = (float)m_surface_width / (float)m_width;
-		float y_scale = (float)m_surface_height / (float)m_height;
-		int sx = (int)(rect.x() * x_scale);
-		int sy = m_surface_height - (int)((rect.y() + rect.height()) * y_scale);
-		int sw = (int)(rect.width() * x_scale);
-		int sh = (int)(rect.height() * y_scale);
-		glScissor(sx, sy, sw, sh);
-	}
-}
-
-void gEGLDC::setAlphaBlendMode(bool trueAlphaBlend) {
-	// RGB factors are identical either way - see the call sites' comments
-	// and initEGL()'s for the full picture. Only the alpha factors differ:
-	//
-	// trueAlphaBlend: standard Porter-Duff "over" (dst factor
-	// GL_ONE_MINUS_SRC_ALPHA) - out.a = src.a + dst.a*(1-src.a). Stacks
-	// correctly (an opaque destination stays opaque; two translucent
-	// layers compound) and matches gPixmap's own CPU blendPixel() alpha
-	// math. This is what text glyphs, blitAlphaBlend/blitAlphaTest images,
-	// and a rectangle drawn with genuine alphaBlend need: they're real
-	// translucent *content*, and should still fully block the video plane
-	// wherever they sit over already-opaque UI, exactly as they visually
-	// appear to (tinted, not see-through-to-video).
-	//
-	// !trueAlphaBlend: dst factor GL_ZERO - out.a = src.a, unconditionally
-	// overwriting whatever alpha was already in the framebuffer. This is
-	// for draws that aren't really translucent *content* so much as a
-	// deliberately-near-transparent hole with decoration - a video
-	// widget's own rounded/bordered background (e.g. a "Pig" skin element
-	// with backgroundColor close to fully transparent). eWidgetDesktop
-	// still paints whatever opaque parent/screen background sits behind
-	// such a widget first (see calcWidgetClipRegion(), which keeps a
-	// rounded/alphaBlend widget's backdrop visible/painted specifically so
-	// normal translucent widgets CAN blend against it) - accumulating
-	// "over" that already-opaque destination can never read back as
-	// anything but opaque, no matter how transparent the widget's own
-	// color is, which defeats the whole point of a near-transparent video
-	// window background. Ignoring the destination entirely instead makes
-	// this draw's own alpha the absolute truth for video-plane visibility
-	// at the pixels it touches.
-	if (trueAlphaBlend)
-		glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-	else
-		glBlendFuncSeparate(GL_ONE, GL_ZERO, GL_ONE, GL_ZERO);
-}
-
-void gEGLDC::executeFill(const gOpcode* op) {
-	// A pending blit or text batch (see executeBlit()/renderGlyph()) hasn't
-	// been drawn yet - flush both first so this fill lands in the correct
-	// z-order relative to them, instead of ending up underneath content that
-	// was actually submitted before it.
-	flushBlitBatch();
-	flushTextBatch();
-
-	float r = m_foreground_color_rgb.r / 255.0f;
-	float g = m_foreground_color_rgb.g / 255.0f;
-	float b = m_foreground_color_rgb.b / 255.0f;
-	float a = 1.0f - (m_foreground_color_rgb.a / 255.0f);
-
-	eRect area = op->parm.fill->area;
-	area.moveBy(m_current_offset);
-	gRegion clip = m_current_clip & area;
-
-	// The CPU/software renderer's gPixmap::fill() is a raw pixel overwrite
-	// that never honors alpha (see its "*dst++ = col" loop in gpixmap.cpp) -
-	// a plain fill/rectangle/clear opcode is expected to flatly overwrite
-	// regardless of the color's alpha, matching that. Blend is left enabled
-	// by default (see initEGL()) for the paths that always genuinely need
-	// it (gradients, blits, text), so it must be explicitly turned off here
-	// or a widget with a non-fully-opaque background color would start
-	// alpha-blending with whatever stale content is already on screen
-	// instead of overwriting it.
-	glDisable(GL_BLEND);
-	for (unsigned int i = 0; i < clip.rects.size(); ++i) {
-		eRect r_area = clip.rects[i];
-		setGlScissor(r_area);
-		m_basic_shader.drawRect(r_area.x(), r_area.y(), r_area.width(), r_area.height(), r, g, b, a);
-	}
-	glEnable(GL_BLEND);
-}
-
-void gEGLDC::executeFillRegion(const gOpcode* op) {
-	// See executeFill() above for why pending blit/text batches must flush first.
-	flushBlitBatch();
-	flushTextBatch();
-
-	float r = m_foreground_color_rgb.r / 255.0f;
-	float g = m_foreground_color_rgb.g / 255.0f;
-	float b = m_foreground_color_rgb.b / 255.0f;
-	float a = 1.0f - (m_foreground_color_rgb.a / 255.0f);
-
-	gRegion region = op->parm.fillRegion->region;
-	region.moveBy(m_current_offset);
-	gRegion clip = m_current_clip & region;
-
-	// See executeFill() above for why blend must be forced off here.
-	glDisable(GL_BLEND);
-	for (unsigned int i = 0; i < clip.rects.size(); ++i) {
-		eRect r_area = clip.rects[i];
-		setGlScissor(r_area);
-		m_basic_shader.drawRect(r_area.x(), r_area.y(), r_area.width(), r_area.height(), r, g, b, a);
-	}
-	glEnable(GL_BLEND);
-}
-
-void gEGLDC::executeRectangle(const gOpcode* op) {
-	// gDC::exec()'s own gOpcode::rectangle handling (grc.cpp) always resets
-	// m_border_width/m_radius/m_radius_edges/the gradient state after every
-	// rectangle draw so it never leaks into the next one - this backend
-	// intercepts gOpcode::rectangle entirely (see exec()'s switch below) and
-	// never calls through to gDC::exec() for it, so it must repeat that same
-	// reset itself, on every return path (including the empty-clip one
-	// below, which grc.cpp's equivalent also reaches unconditionally since
-	// the reset there runs after gPixmap::drawRectangle() regardless of
-	// whether that call's region ended up empty).
-	if (m_current_clip.rects.empty()) {
-		m_border_width = 0;
-		m_radius = 0;
-		m_radius_edges = 0;
-		m_gradient_orientation = 0;
-		m_gradient_fullSize = 0;
-		m_gradient_alphablend = false;
-		m_gradient_colors.clear();
+	if (currentFramebufferIsScene()) {
+		const eRect scene_rect = logicalToSceneRect(rect);
+		glScissor(scene_rect.x(), m_scene_frame_height - scene_rect.bottom(), scene_rect.width(), scene_rect.height());
 		return;
 	}
 
-	// See executeFill() above for why pending blit/text batches must flush first.
-	flushBlitBatch();
-	flushTextBatch();
-
-	if (m_radius > 0 || m_gradient_colors.size() > 0 || m_border_width > 0) {
-		// useNew is eWidget.cpp's own proxy for "is this rectangle genuinely
-		// alphaBlend" (see setAlphaBlendMode()'s comment) - it's literally
-		// what gets passed as m_alphaBlend at every drawRectangle() call
-		// site in lib/gui/ewidget.cpp.
-		setAlphaBlendMode(op->parm.rectangle->useNew);
-		for (unsigned int i = 0; i < m_current_clip.rects.size(); ++i) {
-			setGlScissor(m_current_clip.rects[i]);
-			m_advanced_shader.drawAdvancedRect(op->parm.rectangle->area.x() + m_current_offset.x(), op->parm.rectangle->area.y() + m_current_offset.y(), op->parm.rectangle->area.width(),
-											   op->parm.rectangle->area.height(), m_radius, m_radius_edges, m_gradient_colors, m_gradient_orientation, m_gradient_alphablend > 0,
-											   1.0f - (m_background_color_rgb.a / 255.0f), m_background_color_rgb, m_border_width, m_border_color, m_gradient_fullSize);
-		}
-	} else {
-		float r = m_background_color_rgb.r / 255.0f;
-		float g = m_background_color_rgb.g / 255.0f;
-		float b = m_background_color_rgb.b / 255.0f;
-		float a = 1.0f - (m_background_color_rgb.a / 255.0f);
-
-		// See executeFill()'s comment for why blend must be forced off for
-		// a plain flat-color rectangle, to match the CPU renderer's raw
-		// overwrite semantics.
-		glDisable(GL_BLEND);
-		for (unsigned int i = 0; i < m_current_clip.rects.size(); ++i) {
-			setGlScissor(m_current_clip.rects[i]);
-			m_basic_shader.drawRect(op->parm.rectangle->area.x() + m_current_offset.x(), op->parm.rectangle->area.y() + m_current_offset.y(), op->parm.rectangle->area.width(),
-									op->parm.rectangle->area.height(), r, g, b, a);
-		}
-		glEnable(GL_BLEND);
+	if (!currentFramebufferUsesSurface()) {
+		int sx = rect.x();
+		int sy = m_height - (rect.y() + rect.height());
+		glScissor(sx, sy, rect.width(), rect.height());
+		return;
 	}
 
+	const eRect surface_rect = logicalToSurfaceRect(rect);
+	glScissor(surface_rect.x(), surfaceHeight() - surface_rect.bottom(), surface_rect.width(), surface_rect.height());
+}
+
+void gEGLDC::setTextureFiltering(GLuint texture, bool linear) {
+	if (!texture)
+		return;
+
+	const GLint filter = linear ? GL_LINEAR : GL_NEAREST;
+	glBindTexture(GL_TEXTURE_2D, texture);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter);
+}
+
+void gEGLDC::resetFrameStats(unsigned long long now_us) {
+	if (!now_us)
+		now_us = e2eglNowUs();
+	const unsigned int next_frame = m_frame_stats_index + 1;
+	m_frame_stats = FrameStats();
+	m_frame_stats_index = next_frame;
+	m_frame_stats.frame_start_us = now_us;
+}
+
+void gEGLDC::addTextureUploadStats() {
+	gTextureUploadStats upload_stats;
+	m_texture_manager.takeUploadStats(upload_stats);
+	m_frame_stats.nativeImportFailures += upload_stats.importFailures;
+	m_frame_stats.nativeWrites += upload_stats.nativeWrites;
+	m_frame_stats.nativeSyncFailures += upload_stats.nativeSyncFailures;
+	m_frame_stats.cpuUploadBytes += upload_stats.cpuUploadBytes;
+	m_frame_stats.importedBytes += upload_stats.importedBytes;
+	m_frame_stats.nativeWaitUs += upload_stats.nativeWaitUs;
+	m_frame_stats.nativeSyncUs += upload_stats.nativeSyncUs;
+	m_frame_stats.nativeBytes = std::max(m_frame_stats.nativeBytes, upload_stats.nativeBytes);
+	m_frame_stats.texture_uploads += upload_stats.textures;
+#ifdef ENABLE_GLES_TESTLAB
+	m_frame_stats.ionUploads += upload_stats.ionUploads;
+	m_frame_stats.ionAvoidedBytes += upload_stats.ionAvoidedBytes;
+#endif
+	m_frame_stats.texture_dmabuf_uploads += upload_stats.dmabuf;
+	m_frame_stats.texture_32_direct_uploads += upload_stats.upload32_direct;
+	m_frame_stats.texture16Uploads += upload_stats.upload16;
+	m_frame_stats.texture_32_converted_uploads += upload_stats.upload32_converted;
+	m_frame_stats.texture_8_clut_uploads += upload_stats.upload8_clut;
+	m_frame_stats.texture_8_luma_uploads += upload_stats.upload8_luma;
+	m_frame_stats.texture_content_cache_hits += upload_stats.content_cache_hits;
+	m_frame_stats.texture_content_cache_misses += upload_stats.content_cache_misses;
+	m_frame_stats.texture_upload_pixels += upload_stats.pixels;
+	m_frame_stats.texture_upload_bytes += upload_stats.bytes;
+}
+
+void gEGLDC::logAndResetFrameStats() {
+	const unsigned long long now_us = e2eglNowUs();
+	addTextureUploadStats();
+
+	const unsigned long long frame_us = m_frame_stats.frame_start_us ? now_us - m_frame_stats.frame_start_us : 0;
+	const unsigned long long measured_draw_us =
+		m_frame_stats.fill_us + m_frame_stats.rect_us + m_frame_stats.clear_us + m_frame_stats.line_us + m_frame_stats.blit_us + m_frame_stats.text_build_us + m_frame_stats.text_us +
+		m_frame_stats.state_us + m_frame_stats.overlap_us + m_frame_stats.texture_gc_us + m_frame_stats.capture_us + m_frame_stats.restore_us + m_frame_stats.copy_us;
+	const unsigned long long other_us = m_frame_stats.draw_us > measured_draw_us ? m_frame_stats.draw_us - measured_draw_us : 0;
+	const unsigned long long slow_us = e2eglTraceGlSlowUs();
+	const unsigned int limit = e2eglTraceGlLimit();
+	const bool under_limit = !limit || m_frame_stats_index <= limit;
+	const bool slow_enough = !slow_us || frame_us >= slow_us;
+
+	if (e2eglTraceGlEnabled() && under_limit && slow_enough) {
+		eDebug("[e2egl:frame] #%u frame_us=%llu draw_us=%llu other_us=%llu swap_us=%llu cap_us=%llu restore_us=%llu fill_us=%llu rect_us=%llu clear_us=%llu line_us=%llu blit_us=%llu text_build_us=%llu text_us=%llu state_us=%llu overlap_us=%llu tex_gc_us=%llu copy_us=%llu preserved=%d scene=%d anim=%d fill=%u/%u/%llupx solid=%u/%u clear=%u/%u/%llupx rect=%u/%u/%llupx grad=%u round=%u line=%u/%u blit=%u/%u/%llupx glyph=%u text_ops=%u text_batches=%u/%u text_flush=%u/%u/%u/%u/%u/%u/%u/%u text_overlap=%u/%u font_up=%u/%llupx tex_up=%u dmabuf=%u bgra=%u rgba_conv=%u clut8=%u lum8=%u tex_cache=%u/%u tex_px=%llu tex_kib=%llu copies=%u/%llupx restores=%u",
+			m_frame_stats_index, frame_us, m_frame_stats.draw_us, other_us, m_frame_stats.swap_us, m_frame_stats.capture_us, m_frame_stats.restore_us,
+			m_frame_stats.fill_us, m_frame_stats.rect_us, m_frame_stats.clear_us, m_frame_stats.line_us, m_frame_stats.blit_us, m_frame_stats.text_build_us, m_frame_stats.text_us,
+			m_frame_stats.state_us, m_frame_stats.overlap_us, m_frame_stats.texture_gc_us, m_frame_stats.copy_us,
+			m_preserved_swap ? 1 : 0, sceneFramebufferActive() ? 1 : 0, s_egl_animation_current,
+			m_frame_stats.fill_ops, m_frame_stats.fill_rects, m_frame_stats.fill_pixels,
+			m_frame_stats.solid_batches, m_frame_stats.solid_vertices,
+			m_frame_stats.clear_ops, m_frame_stats.clear_rects, m_frame_stats.clear_pixels,
+			m_frame_stats.rect_ops, m_frame_stats.rect_rects, m_frame_stats.rect_pixels,
+			m_frame_stats.gradient_ops, m_frame_stats.rounded_ops,
+			m_frame_stats.line_ops, m_frame_stats.line_rects,
+			m_frame_stats.blit_ops, m_frame_stats.blit_rects, m_frame_stats.blit_pixels,
+			m_frame_stats.glyphs, m_frame_stats.text_ops, m_frame_stats.text_batches, m_frame_stats.text_draw_rects,
+			m_frame_stats.text_flush_fill, m_frame_stats.text_flush_rect, m_frame_stats.text_flush_line, m_frame_stats.text_flush_blit, m_frame_stats.text_flush_clear, m_frame_stats.text_flush_state,
+			m_frame_stats.text_flush_atlas, m_frame_stats.text_flush_limit,
+			m_frame_stats.text_overlap_checks, m_frame_stats.text_overlap_rect_tests,
+			m_frame_stats.font_uploads, m_frame_stats.font_upload_pixels,
+			m_frame_stats.texture_uploads, m_frame_stats.texture_dmabuf_uploads, m_frame_stats.texture_32_direct_uploads, m_frame_stats.texture_32_converted_uploads,
+			m_frame_stats.texture_8_clut_uploads, m_frame_stats.texture_8_luma_uploads, m_frame_stats.texture_content_cache_hits, m_frame_stats.texture_content_cache_misses,
+			m_frame_stats.texture_upload_pixels, m_frame_stats.texture_upload_bytes / 1024ULL,
+			m_frame_stats.frame_copy_draws, m_frame_stats.frame_copy_pixels, m_frame_stats.frame_restores);
+	}
+
+#ifdef ENABLE_GLES_TESTLAB
+	gRenderTest::recordFrame({{{now_us, frame_us, m_frame_stats.draw_us, m_frame_stats.swap_us,
+		m_frame_stats.fill_us, m_frame_stats.rect_us, m_frame_stats.blit_us, m_frame_stats.text_us,
+		m_frame_stats.copy_us, m_frame_stats.texture_upload_bytes, m_frame_stats.texture_uploads,
+		m_frame_stats.ionUploads, m_frame_stats.ionAvoidedBytes, m_frame_stats.texture_8_clut_uploads,
+		m_frame_stats.texture_32_converted_uploads, m_frame_stats.fill_ops, m_frame_stats.gradient_ops,
+		m_frame_stats.rounded_ops, m_frame_stats.blit_ops, m_frame_stats.glyphs,
+		m_frame_stats.frame_copy_draws, m_frame_stats.frame_copy_pixels, m_frame_stats.texture16Uploads,
+		m_frame_stats.texture_dmabuf_uploads, m_frame_stats.nativeImportFailures, m_frame_stats.cpuUploadBytes,
+		m_frame_stats.importedBytes, m_frame_stats.nativeWrites, m_frame_stats.nativeWaitUs,
+		m_frame_stats.nativeSyncUs, m_frame_stats.nativeSyncFailures, m_frame_stats.nativeBytes,
+		m_frame_stats.contentBlits, gContentTransition::liveBytes.load()}}});
+#endif
+	resetFrameStats(now_us);
+}
+
+void gEGLDC::drawRegion(const gRegion& region, const gRGB& color, bool blend, bool count_stats) {
+	if (region.rects.empty())
+		return;
+
+	const bool use_blend = blend;
+	if (m_fill_batch_valid && m_fill_batch_blend != use_blend)
+		flushFillBatch();
+
+	unsigned int drawn_rects = 0;
+	unsigned long long drawn_pixels = 0;
+	for (unsigned int i = 0; i < region.rects.size(); ++i) {
+		eRect area = region.rects[i] & eRect(0, 0, m_width, m_height);
+		if (!area.empty()) {
+			logColorOp("fill", area, color, use_blend);
+			appendColoredRectVertices(m_fill_batch_buffer, area, color);
+			if (m_fill_batch_valid)
+				m_fill_batch_bounds |= area;
+			else {
+				m_fill_batch_bounds = area;
+				m_fill_batch_color = color;
+				m_fill_batch_blend = use_blend;
+				m_fill_batch_valid = true;
+			}
+			++drawn_rects;
+			drawn_pixels += rectPixels(area);
+		}
+	}
+	if (drawn_rects && count_stats) {
+		++m_frame_stats.fill_ops;
+		m_frame_stats.fill_rects += drawn_rects;
+		m_frame_stats.fill_pixels += drawn_pixels;
+	}
+}
+
+void gEGLDC::flushFillBatch() {
+	if (!m_fill_batch_valid || m_fill_batch_buffer.empty())
+		return;
+
+	e2eglScopedTimer timer(m_frame_stats.fill_us);
+	if (m_fill_batch_blend) {
+		glEnable(GL_BLEND);
+		glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+	} else {
+		glDisable(GL_BLEND);
+	}
+
+	glDisable(GL_SCISSOR_TEST);
+	m_basic_shader.drawColoredRectBatch(m_fill_batch_buffer.data(), m_fill_batch_buffer.size() / 6);
+	++m_frame_stats.solid_batches;
+	m_frame_stats.solid_vertices += m_fill_batch_buffer.size() / 6;
+
+	if (m_fill_batch_blend)
+		glDisable(GL_BLEND);
+
+	m_fill_batch_buffer.clear();
+	m_fill_batch_bounds = eRect::emptyRect();
+	m_fill_batch_valid = false;
+}
+
+bool gEGLDC::fillBatchIntersects(const eRect& area) const {
+	if (!m_fill_batch_valid || m_fill_batch_buffer.empty() || area.empty())
+		return false;
+	return m_fill_batch_bounds.intersects(area);
+}
+
+bool gEGLDC::fillBatchIntersects(const gRegion& region) const {
+	if (!m_fill_batch_valid || m_fill_batch_buffer.empty() || region.empty())
+		return false;
+	if (!m_fill_batch_bounds.intersects(region.extends))
+		return false;
+	for (unsigned int i = 0; i < region.rects.size(); ++i) {
+		if (m_fill_batch_bounds.intersects(region.rects[i]))
+			return true;
+	}
+	return false;
+}
+
+void gEGLDC::flushFillBatchIfOverlaps(const eRect& area) {
+	if (fillBatchIntersects(area))
+		flushFillBatch();
+}
+
+void gEGLDC::flushFillBatchIfOverlaps(const gRegion& region) {
+	if (fillBatchIntersects(region))
+		flushFillBatch();
+}
+
+void gEGLDC::resetRectangleState() {
 	m_border_width = 0;
 	m_radius = 0;
 	m_radius_edges = 0;
@@ -492,246 +1571,485 @@ void gEGLDC::executeRectangle(const gOpcode* op) {
 	m_gradient_colors.clear();
 }
 
-void gEGLDC::executeClear(const gOpcode* op) {
-	// See executeFill() above for why pending blit/text batches must flush first.
-	flushBlitBatch();
+void gEGLDC::resetBlitState() {
+	m_radius = 0;
+	m_radius_edges = 0;
+}
+
+bool gEGLDC::textBatchIntersects(const eRect& area) {
+	if (m_text_batch_buffer.empty() || !m_text_batch_bounds_valid || area.empty())
+		return false;
+	if (!m_text_batch_bounds.intersects(area))
+		return false;
+	e2eglScopedTimer timer(m_frame_stats.overlap_us);
+	++m_frame_stats.text_overlap_checks;
+	if (m_text_batch_rects.empty())
+		return true;
+	for (unsigned int i = 0; i < m_text_batch_rects.size(); ++i) {
+		++m_frame_stats.text_overlap_rect_tests;
+		if (m_text_batch_rects[i].intersects(area))
+			return true;
+	}
+	return false;
+}
+
+bool gEGLDC::textBatchIntersects(const gRegion& region) {
+	if (m_text_batch_buffer.empty() || !m_text_batch_bounds_valid || region.empty())
+		return false;
+	if (!m_text_batch_bounds.intersects(region.extends))
+		return false;
+	e2eglScopedTimer timer(m_frame_stats.overlap_us);
+	++m_frame_stats.text_overlap_checks;
+	if (m_text_batch_rects.empty()) {
+		for (unsigned int i = 0; i < region.rects.size(); ++i) {
+			if (m_text_batch_bounds.intersects(region.rects[i]))
+				return true;
+		}
+		return false;
+	}
+	for (unsigned int i = 0; i < m_text_batch_rects.size(); ++i) {
+		const eRect& text_rect = m_text_batch_rects[i];
+		if (!text_rect.intersects(region.extends))
+			continue;
+		for (unsigned int j = 0; j < region.rects.size(); ++j) {
+			++m_frame_stats.text_overlap_rect_tests;
+			if (text_rect.intersects(region.rects[j]))
+				return true;
+		}
+	}
+	return false;
+}
+
+void gEGLDC::noteTextFlushReason(TextFlushReason reason) {
+	switch (reason) {
+		case textFlushFill:
+			++m_frame_stats.text_flush_fill;
+			break;
+		case textFlushRectangle:
+			++m_frame_stats.text_flush_rect;
+			break;
+		case textFlushLine:
+			++m_frame_stats.text_flush_line;
+			break;
+		case textFlushBlit:
+			++m_frame_stats.text_flush_blit;
+			break;
+		case textFlushClear:
+			++m_frame_stats.text_flush_clear;
+			break;
+		case textFlushState:
+			++m_frame_stats.text_flush_state;
+			break;
+		case textFlushAtlas:
+			++m_frame_stats.text_flush_atlas;
+			break;
+		case textFlushLimit:
+			++m_frame_stats.text_flush_limit;
+			break;
+	}
+}
+
+void gEGLDC::flushTextBatchForReason(TextFlushReason reason) {
+	if (!m_text_batch_buffer.empty())
+		noteTextFlushReason(reason);
 	flushTextBatch();
+}
 
-	float r = m_background_color_rgb.r / 255.0f;
-	float g = m_background_color_rgb.g / 255.0f;
-	float b = m_background_color_rgb.b / 255.0f;
-	float a = 1.0f - (m_background_color_rgb.a / 255.0f);
+void gEGLDC::flushTextBatchIfOverlaps(const eRect& area, TextFlushReason reason) {
+	if (textBatchIntersects(area))
+		flushTextBatchForReason(reason);
+}
 
-	// A widget that hides/repaints submits a gOpcode::clear for its own
-	// area, but NOT necessarily a new gOpcode::renderText if it no longer
-	// has any text to draw there. Since text is composited from a
-	// completely separate overlay (m_pixmap's texture, see
-	// gOpcode::renderText below) rather than drawn into this same GPU
-	// target, clearing the background alone does not erase any
-	// previously-composited text sitting at this location - it would just
-	// stay visible forever (e.g. an infobar that "doesn't disappear").
-	//
-	// m_text_overlay_region tracks the union of every area
-	// compositeTextOverlay() has painted into that hasn't since been erased
-	// here. The overwhelming majority of clears (list row highlights,
-	// scrolling backgrounds, plain-color fills) never touched any text and
-	// can skip the erase-and-recomposite work below entirely - only pay for
-	// it when this clear's area actually overlaps something the overlay
-	// drew.
-	GLuint overlay_tex = m_pixmap->surface->gl_texture_id;
-	bool maybe_has_overlay = overlay_tex != 0 && !m_text_overlay_region.empty();
+void gEGLDC::flushTextBatchIfOverlaps(const gRegion& region, TextFlushReason reason) {
+	if (textBatchIntersects(region))
+		flushTextBatchForReason(reason);
+}
 
-	// The blend func's alpha factors are global GL state that persists
-	// across opcodes (see setAlphaBlendMode()) - an earlier rectangle/blit
-	// in this same frame may have left it in the "not true alphaBlend"
-	// mode, which would be wrong for this recomposite: it's uploading real
-	// per-pixel-alpha rendered text/border content back onto the screen,
-	// same as flushTextBatch()/compositeTextOverlay(), so it needs the
-	// normal accumulating formula.
-	if (maybe_has_overlay)
-		setAlphaBlendMode(true);
+void gEGLDC::addTextBatchRect(const eRect& rect) {
+	if (rect.empty())
+		return;
 
-	for (unsigned int i = 0; i < m_current_clip.rects.size(); ++i) {
-		eRect area = m_current_clip.rects[i];
-		setGlScissor(area);
-		// See executeFill()'s comment: this flat background overwrite must
-		// not blend with whatever's already on screen, matching the CPU
-		// renderer's raw-overwrite clear semantics - unlike the erase/
-		// recomposite block below, which is genuinely alpha-aware and
-		// relies on blend being enabled (the default - see initEGL()).
+	const size_t search_count = std::min<size_t>(m_text_batch_rects.size(), 8);
+	for (size_t offset = 0; offset < search_count; ++offset) {
+		eRect& existing = m_text_batch_rects[m_text_batch_rects.size() - 1 - offset];
+		if (textRectsCanMerge(existing, rect)) {
+			existing |= rect;
+			return;
+		}
+	}
+	m_text_batch_rects.push_back(rect);
+}
+
+eRect gEGLDC::lineDrawBounds(const gOpcode::para::pline* op) const {
+	if (!op)
+		return eRect::emptyRect();
+	const int x1 = std::min(op->start.x(), op->end.x()) + m_current_offset.x();
+	const int y1 = std::min(op->start.y(), op->end.y()) + m_current_offset.y();
+	const int x2 = std::max(op->start.x(), op->end.x()) + m_current_offset.x();
+	const int y2 = std::max(op->start.y(), op->end.y()) + m_current_offset.y();
+	return eRect(x1, y1, x2 - x1 + 1, y2 - y1 + 1);
+}
+
+eRect gEGLDC::blitDrawBounds(const gOpcode::para::pblit* op) const {
+	if (!op || !op->pixmap)
+		return eRect::emptyRect();
+
+	const eSize src_size = op->pixmap->size();
+	if (src_size.isEmpty())
+		return eRect::emptyRect();
+
+	int flags = op->flags;
+	eRect pos = op->position;
+	pos.moveBy(m_current_offset);
+
+	if (!(flags & gPixmap::blitScale)) {
+		if (op->position.size().isValid()) {
+			if (flags & gPixmap::blitHAlignCenter)
+				pos.setLeft(pos.left() + (op->position.width() - src_size.width()) / 2);
+			else if (flags & gPixmap::blitHAlignRight)
+				pos.setLeft(pos.right() - src_size.width());
+
+			if (flags & gPixmap::blitVAlignCenter)
+				pos.setTop(pos.top() + (op->position.height() - src_size.height()) / 2);
+			else if (flags & gPixmap::blitVAlignBottom)
+				pos.setTop(pos.bottom() - src_size.height());
+		}
+		pos.setWidth(src_size.width());
+		pos.setHeight(src_size.height());
+	} else if (pos.size() == src_size) {
+		flags &= ~gPixmap::blitScale;
+	} else if (!pos.size().isEmpty()) {
+		if (flags & gPixmap::blitKeepAspectRatio) {
+			const int scaled_width_by_height = src_size.width() * pos.height() / src_size.height();
+			const int scaled_height_by_width = src_size.height() * pos.width() / src_size.width();
+			if (scaled_width_by_height <= pos.width()) {
+				int old_width = pos.width();
+				pos.setWidth(scaled_width_by_height);
+				if (flags & gPixmap::blitHAlignCenter)
+					pos.moveBy((old_width - pos.width()) / 2, 0);
+				else if (flags & gPixmap::blitHAlignRight)
+					pos.moveBy(old_width - pos.width(), 0);
+			} else {
+				int old_height = pos.height();
+				pos.setHeight(scaled_height_by_width);
+				if (flags & gPixmap::blitVAlignCenter)
+					pos.moveBy(0, (old_height - pos.height()) / 2);
+				else if (flags & gPixmap::blitVAlignBottom)
+					pos.moveBy(0, old_height - pos.height());
+			}
+		}
+	}
+
+	if (op->clip.valid()) {
+		eRect c = op->clip;
+		c.moveBy(m_current_offset);
+		return pos & c & m_current_clip.extends;
+	}
+	return pos & m_current_clip.extends;
+}
+
+void gEGLDC::executeFill(const gOpcode* op) {
+	eRect area = op->parm.fill->area;
+	area.moveBy(m_current_offset);
+	gRegion clip = m_current_clip & area;
+
+	drawRegion(clip, m_foreground_color_rgb);
+}
+
+void gEGLDC::executeFillRegion(const gOpcode* op) {
+	gRegion region = op->parm.fillRegion->region;
+	region.moveBy(m_current_offset);
+	gRegion clip = m_current_clip & region;
+
+	drawRegion(clip, m_foreground_color_rgb);
+}
+
+void gEGLDC::executeRectangle(const gOpcode* op) {
+	e2eglScopedTimer timer(m_frame_stats.rect_us);
+	eRect area = op->parm.rectangle->area;
+	area.moveBy(m_current_offset);
+	gRegion clip = m_current_clip & area;
+	if (clip.rects.empty())
+		return;
+
+	++m_frame_stats.rect_ops;
+	m_frame_stats.rect_rects += clip.rects.size();
+	if (m_gradient_colors.size() > 0)
+		++m_frame_stats.gradient_ops;
+	if (m_radius > 0)
+		++m_frame_stats.rounded_ops;
+	for (unsigned int i = 0; i < clip.rects.size(); ++i)
+		m_frame_stats.rect_pixels += rectPixels(clip.rects[i] & area);
+
+	glEnable(GL_SCISSOR_TEST);
+
+	if (m_border_width > 0) {
+		const bool blend_border = op->parm.rectangle->useNew || m_radius > 0 || (!m_gradient_colors.empty() && m_gradient_alphablend);
+		if (blend_border) {
+			glEnable(GL_BLEND);
+			glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+		} else {
+			glDisable(GL_BLEND);
+		}
+		const int border_width = std::min(m_border_width, std::min(area.width(), area.height()) / 2);
+		// Border and fill cover disjoint parts of the pixel. Drawing a solid outer
+		// rectangle first incorrectly places the border behind transparent fills.
+		for (const eRect& clipped : clip.rects) {
+			setGlScissor(clipped);
+			m_advanced_shader.drawAdvancedRect(area.x(), area.y(), area.width(), area.height(), m_radius, m_radius_edges,
+				m_gradient_colors, m_gradient_orientation, m_gradient_alphablend > 0, m_gradient_fullSize,
+				colorAlpha(m_background_color_rgb), m_background_color_rgb, border_width, m_border_color);
+		}
 		glDisable(GL_BLEND);
-		m_basic_shader.drawRect(area.x(), area.y(), area.width(), area.height(), r, g, b, a);
-		glEnable(GL_BLEND);
+		glDisable(GL_SCISSOR_TEST);
+		return;
+	}
 
-		if (!maybe_has_overlay)
+	if (m_radius > 0 || m_gradient_colors.size() > 0) {
+		const bool replaceCoverage = m_radius > 0 && !op->parm.rectangle->useNew && (m_gradient_colors.empty() || !m_gradient_alphablend);
+		const bool blend_rect = !replaceCoverage && (op->parm.rectangle->useNew || (m_gradient_colors.size() > 0 && m_gradient_alphablend));
+		if (blend_rect) {
+			glEnable(GL_BLEND);
+			glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+		} else {
+			glDisable(GL_BLEND);
+		}
+		int inner_radius = m_radius;
+		if (m_border_width > 0)
+			inner_radius = std::max(0, m_radius - m_border_width);
+		if (m_gradient_colors.empty()) {
+			logColorOp("rect-rounded", area, m_background_color_rgb, blend_rect);
+			drawRoundedSolidRect(clip, area, inner_radius, m_radius_edges, m_background_color_rgb, replaceCoverage);
+			glDisable(GL_BLEND);
+			return;
+		}
+		for (unsigned int i = 0; i < clip.rects.size(); ++i) {
+			setGlScissor(clip.rects[i]);
+			logColorOp(m_gradient_colors.size() > 0 ? "rect-gradient" : "rect-rounded", area, m_background_color_rgb, blend_rect);
+			m_advanced_shader.drawAdvancedRect(area.x(), area.y(), area.width(), area.height(), inner_radius, m_radius_edges, m_gradient_colors, m_gradient_orientation, m_gradient_alphablend > 0,
+											   m_gradient_fullSize, colorAlpha(m_background_color_rgb), m_background_color_rgb, 0, gRGB(), replaceCoverage);
+		}
+		if (blend_rect)
+			glDisable(GL_BLEND);
+	} else {
+		const bool blend_rect = op->parm.rectangle->useNew;
+		if (blend_rect) {
+			glEnable(GL_BLEND);
+			glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+		} else {
+			glDisable(GL_BLEND);
+		}
+		std::vector<float> vertices;
+		vertices.reserve(clip.rects.size() * 12);
+		for (unsigned int i = 0; i < clip.rects.size(); ++i) {
+			eRect draw = clip.rects[i] & area & eRect(0, 0, m_width, m_height);
+			if (!draw.empty()) {
+				logColorOp("rect", draw, m_background_color_rgb, blend_rect);
+				appendRectVertices(vertices, draw);
+			}
+		}
+		if (!vertices.empty()) {
+			glDisable(GL_SCISSOR_TEST);
+			m_basic_shader.drawRectBatch(vertices.data(), vertices.size() / 2, colorComponent(m_background_color_rgb.r), colorComponent(m_background_color_rgb.g),
+										colorComponent(m_background_color_rgb.b), colorAlpha(m_background_color_rgb));
+			++m_frame_stats.solid_batches;
+			m_frame_stats.solid_vertices += vertices.size() / 2;
+		}
+		if (blend_rect)
+			glDisable(GL_BLEND);
+	}
+
+	glDisable(GL_SCISSOR_TEST);
+}
+
+void gEGLDC::drawRoundedSolidRect(const gRegion& clip, const eRect& area, int radius, int edges, const gRGB& color, bool replaceCoverage) {
+	// Only the corner squares need the coverage shader, inside the rest it outputs the plain colour.
+	const int corner = (int)std::ceil(std::min((float)radius, std::min(area.width(), area.height()) * 0.5f));
+	const int left = area.left();
+	const int top = area.top();
+	const int right = area.right();
+	const int bottom = area.bottom();
+	const eRect corners[4] = {
+		(edges & 1) ? eRect(left, top, corner, corner) : eRect(),
+		(edges & 2) ? eRect(right - corner, top, corner, corner) : eRect(),
+		(edges & 4) ? eRect(left, bottom - corner, corner, corner) : eRect(),
+		(edges & 8) ? eRect(right - corner, bottom - corner, corner, corner) : eRect()};
+	const int top_left = corners[0].empty() ? left : left + corner;
+	const int top_right = corners[1].empty() ? right : right - corner;
+	const int bottom_left = corners[2].empty() ? left : left + corner;
+	const int bottom_right = corners[3].empty() ? right : right - corner;
+	const eRect bands[3] = {
+		eRect(top_left, top, top_right - top_left, corner),
+		eRect(left, top + corner, area.width(), area.height() - 2 * corner),
+		eRect(bottom_left, bottom - corner, bottom_right - bottom_left, corner)};
+
+	std::vector<float> vertices;
+	vertices.reserve(clip.rects.size() * 3 * 12);
+	for (const eRect& clip_rect : clip.rects) {
+		const eRect visible = clip_rect & area & eRect(0, 0, m_width, m_height);
+		if (visible.empty())
 			continue;
-
-		gRegion overlap = gRegion(area) & m_text_overlay_region;
-		if (overlap.empty())
-			continue;
-
-		int pw = m_pixmap->size().width();
-		int ph = m_pixmap->size().height();
-		uint8_t* base = (uint8_t*)m_pixmap->surface->data;
-		int stride = pw * 4;
-
-		for (unsigned int j = 0; j < overlap.rects.size(); ++j) {
-			eRect erase_area = overlap.rects[j];
-			int left = std::max(0, erase_area.left());
-			int top = std::max(0, erase_area.top());
-			int right = std::min(pw, erase_area.left() + erase_area.width());
-			int bottom = std::min(ph, erase_area.top() + erase_area.height());
-			if (right <= left || bottom <= top)
+		for (const eRect& band : bands) {
+			const eRect draw = band & visible;
+			if (!draw.empty())
+				appendRectVertices(vertices, draw);
+		}
+		for (const eRect& corner_rect : corners) {
+			const eRect draw = corner_rect & visible;
+			if (draw.empty())
 				continue;
+			glEnable(GL_SCISSOR_TEST);
+			setGlScissor(draw);
+			m_advanced_shader.drawAdvancedRect(area.x(), area.y(), area.width(), area.height(), radius, edges, std::vector<gRGB>(), 0, false, 0, colorAlpha(color), color, 0, gRGB(), replaceCoverage);
+		}
+	}
+	glDisable(GL_SCISSOR_TEST);
+	if (!vertices.empty()) {
+		m_basic_shader.drawRectBatch(vertices.data(), vertices.size() / 2, colorComponent(color.r), colorComponent(color.g), colorComponent(color.b), colorAlpha(color));
+		++m_frame_stats.solid_batches;
+		m_frame_stats.solid_vertices += vertices.size() / 2;
+	}
+}
 
-			for (int y = top; y < bottom; ++y)
-				memset(base + (size_t)y * stride + (size_t)left * 4, 0, (size_t)(right - left) * 4);
-
-			glBindTexture(GL_TEXTURE_2D, overlay_tex);
-			glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
-			glTexSubImage2D(GL_TEXTURE_2D, 0, 0, top, pw, bottom - top, GL_RGBA, GL_UNSIGNED_BYTE, base + (size_t)top * stride);
-
-			setGlScissor(eRect(left, top, right - left, bottom - top));
-			m_texture_shader.drawTexture(0, 0, (float)m_width, (float)m_height, overlay_tex);
+void gEGLDC::executeClear(const gOpcode*) {
+	e2eglScopedTimer timer(m_frame_stats.clear_us);
+	if (m_background_color_rgb.a == 255) {
+		const eRect full_frame(0, 0, m_width, m_height);
+		++m_frame_stats.clear_ops;
+		glDisable(GL_BLEND);
+		if (regionCoversRect(m_current_clip, full_frame)) {
+			glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+			glDisable(GL_SCISSOR_TEST);
+			logColorOp("clear-transparent", full_frame, m_background_color_rgb, false);
+			glClear(GL_COLOR_BUFFER_BIT);
+			++m_frame_stats.clear_rects;
+			m_frame_stats.clear_pixels += rectPixels(full_frame);
+			return;
 		}
 
-		m_text_overlay_region -= overlap;
+		if (currentFramebufferUsesSurface()) {
+			for (unsigned int i = 0; i < m_current_clip.rects.size(); ++i) {
+				eRect area = m_current_clip.rects[i] & full_frame;
+				if (!area.empty()) {
+					logColorOp("clear-transparent-rect", area, m_background_color_rgb, false);
+					++m_frame_stats.clear_rects;
+					m_frame_stats.clear_pixels += rectPixels(area);
+				}
+			}
+			drawRegion(m_current_clip, m_background_color_rgb, false, false);
+			return;
+		}
+
+		glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+		{
+			glEnable(GL_SCISSOR_TEST);
+			for (unsigned int i = 0; i < m_current_clip.rects.size(); ++i) {
+				eRect area = m_current_clip.rects[i] & full_frame;
+				if (!area.empty()) {
+					setGlScissor(area);
+					logColorOp("clear-transparent", area, m_background_color_rgb, false);
+					glClear(GL_COLOR_BUFFER_BIT);
+					++m_frame_stats.clear_rects;
+					m_frame_stats.clear_pixels += rectPixels(area);
+				}
+			}
+			glDisable(GL_SCISSOR_TEST);
+		}
+		return;
 	}
+
+	++m_frame_stats.clear_ops;
+	drawRegion(m_current_clip, m_background_color_rgb);
 }
 
 void gEGLDC::executeLine(const gOpcode* op) {
-	float r = m_foreground_color_rgb.r / 255.0f;
-	float g = m_foreground_color_rgb.g / 255.0f;
-	float b = m_foreground_color_rgb.b / 255.0f;
-	float a = 1.0f - (m_foreground_color_rgb.a / 255.0f);
-
+	e2eglScopedTimer timer(m_frame_stats.line_us);
 	if (m_current_clip.rects.empty())
 		return;
 
-	// See executeFill()'s comment for why pending blit/text batches must flush first.
-	flushBlitBatch();
-	flushTextBatch();
+	++m_frame_stats.line_ops;
+	m_frame_stats.line_rects += m_current_clip.rects.size();
 
-	// See executeFill()'s comment: gPixmap::line() is a raw-overwrite
-	// Bresenham rasterizer with no alpha blending, so this must match.
-	glDisable(GL_BLEND);
+	const bool blend_line = colorAlpha(m_foreground_color_rgb) < 1.0f;
+	if (blend_line) {
+		glEnable(GL_BLEND);
+		glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+	} else {
+		glDisable(GL_BLEND);
+	}
+	glEnable(GL_SCISSOR_TEST);
 	for (unsigned int i = 0; i < m_current_clip.rects.size(); ++i) {
 		setGlScissor(m_current_clip.rects[i]);
 		m_basic_shader.drawLine(op->parm.line->start.x() + m_current_offset.x(), op->parm.line->start.y() + m_current_offset.y(), op->parm.line->end.x() + m_current_offset.x(),
-								op->parm.line->end.y() + m_current_offset.y(), r, g, b, a);
+								op->parm.line->end.y() + m_current_offset.y(), colorComponent(m_foreground_color_rgb.r), colorComponent(m_foreground_color_rgb.g),
+								colorComponent(m_foreground_color_rgb.b), colorAlpha(m_foreground_color_rgb));
 	}
-	glEnable(GL_BLEND);
+	glDisable(GL_SCISSOR_TEST);
+	if (blend_line)
+		glDisable(GL_BLEND);
 }
 
 void gEGLDC::executeBlit(const gOpcode* opcode) {
+	e2eglScopedTimer timer(m_frame_stats.blit_us);
 	const gOpcode::para::pblit* op = opcode->parm.blit;
-
-	// gPainter::blit() (grc.cpp) AddRef()s op->pixmap when it queues this
-	// opcode, precisely so the pixmap survives even if its last Python/C++
-	// reference goes away before the render thread gets around to processing
-	// this blit. gDC::exec()'s generic (non-EGL) blit case (grc.cpp) balances
-	// that with pixmap->Release() plus delete o->parm.blit once it's done -
-	// but gEGLDC::exec() calls executeBlit() directly instead of going
-	// through gDC::exec()'s switch, and this function never did either of
-	// those. Every single blit through this backend - not just the first
-	// time a given pixmap is drawn, EVERY draw of it - permanently leaked one
-	// AddRef() (and the heap-allocated pblit struct itself), so a pixmap's
-	// underlying refcount could never reach zero no matter how thoroughly
-	// its Python/C++ owners let go of it: it had already accumulated more
-	// AddRef()s than any amount of caller-side cleanup could ever release.
-	// That's what made gSurface::~gSurface() (and with it, the GPU texture
-	// release in gTextureManager) never run - not a missing-check bug in any
-	// specific caller, but every blit call site leaking equally, just at a
-	// rate proportional to how often each was actually drawn (which is why
-	// eListbox's orGrid content, redrawing many distinct large images far
-	// more often than a typical orVertical/orHorizontal list, exhausted
-	// GPU/ION memory so much faster despite going through the exact same
-	// leak). This guard's destructor runs on every exit path below,
-	// including every early return, so it always releases exactly the one
-	// reference/allocation this specific opcode is responsible for.
-	struct BlitOpcodeGuard {
-		const gOpcode::para::pblit* op;
-		int& radius;
-		uint8_t& radius_edges;
-		~BlitOpcodeGuard() {
-			radius = 0;
-			radius_edges = 0;
-			if (op->pixmap)
-				op->pixmap->Release();
-			delete op;
-		}
-	} guard{op, m_radius, m_radius_edges};
-
 	if (!op->pixmap)
 		return;
-
-	// Reclaim any textures already queued for deletion (their source
-	// gPixmap died - e.g. Python replaced a grid/list entry's pixmap
-	// reference on redraw, see gSurface::~gSurface() in gpixmap.cpp)
-	// BEFORE getTexture() below potentially allocates GPU memory for a new
-	// one. processDeletions() is normally only reached once per real frame
-	// (at gOpcode::flush/flip, see exec()'s switch), which is too late for
-	// this specific ordering problem: a widget that rebuilds its content
-	// (a content grid navigating to a new selection, say) releases its OLD
-	// pixmaps - which queues their textures for deletion - and then
-	// submits blit opcodes for the NEW ones, ALL within the same frame,
-	// before that frame's own flush/flip is ever reached. Deletion only
-	// happening at the end meant the old and new textures were both
-	// GPU-resident simultaneously for the whole frame instead of the old
-	// one's memory being reclaimed first - a transient doubling of GPU
-	// texture memory that's exactly what a content grid with many visible,
-	// uncached, per-item images (poster art, thumbnails - anything not
-	// going through PixmapCache) would hit on every navigation step. Cheap
-	// when there's nothing queued (a mutex lock + empty check - see
-	// gTextureManager::processDeletions()), so safe to call this often.
-	m_texture_manager.processDeletions();
 
 	GLuint tex_id = m_texture_manager.getTexture(op->pixmap);
 	if (tex_id == 0)
 		return;
 
-	// Replicate gPixmap::blit()'s (gpixmap.cpp) own position/size resolution
-	// exactly - that CPU function is this codebase's ground truth for what
-	// the blitScale/blitKeepAspectRatio/alignment flags mean, and this
-	// backend has to match it since a plain (non-blitScale) blit's
-	// op->position is NOT a real target size to stretch to: callers like
-	// ePixmap::event(evtPaint) (lib/gui/epixmap.cpp) always pass the
-	// widget's full box as position regardless of whether scaling was
-	// actually requested, with only the flags bit distinguishing the two -
-	// unconditionally treating position as the destination size (as this
-	// used to) force-stretched/distorted every non-scaled icon to its
-	// widget's box and silently dropped blitKeepAspectRatio's letterboxing
-	// for every scaled one.
 	const eSize src_size = op->pixmap->size();
+	if (src_size.isEmpty())
+		return;
+
+	int flags = op->flags;
+	if (!op->pixmap->surface->transparent)
+		flags &= ~(gPixmap::blitAlphaTest | gPixmap::blitAlphaBlend);
+
 	eRect pos = op->position;
+	pos.moveBy(m_current_offset);
 
-	if (!(op->flags & gPixmap::blitScale)) {
-		// pos' size is ignored if left or top aligning; if its size isn't
-		// set, centre/right/bottom aligning is ignored.
-		if (pos.size().isValid()) {
-			eRect box = pos;
-			if (op->flags & gPixmap::blitHAlignCenter)
-				pos.setLeft(box.left() + (box.width() - src_size.width()) / 2);
-			else if (op->flags & gPixmap::blitHAlignRight)
-				pos.setLeft(box.right() - src_size.width());
+	if (!(flags & gPixmap::blitScale)) {
+		if (op->position.size().isValid()) {
+			if (flags & gPixmap::blitHAlignCenter)
+				pos.setLeft(pos.left() + (op->position.width() - src_size.width()) / 2);
+			else if (flags & gPixmap::blitHAlignRight)
+				pos.setLeft(pos.right() - src_size.width());
 
-			if (op->flags & gPixmap::blitVAlignCenter)
-				pos.setTop(box.top() + (box.height() - src_size.height()) / 2);
-			else if (op->flags & gPixmap::blitVAlignBottom)
-				pos.setTop(box.bottom() - src_size.height());
+			if (flags & gPixmap::blitVAlignCenter)
+				pos.setTop(pos.top() + (op->position.height() - src_size.height()) / 2);
+			else if (flags & gPixmap::blitVAlignBottom)
+				pos.setTop(pos.bottom() - src_size.height());
 		}
 		pos.setWidth(src_size.width());
 		pos.setHeight(src_size.height());
-	} else if (pos.size() != src_size && (op->flags & gPixmap::blitKeepAspectRatio) && src_size.width() > 0 && src_size.height() > 0) {
-		eRect box = pos;
-		// Compare box.width()/src.width() vs box.height()/src.height()
-		// without floating point, the same comparison gPixmap::blit() makes
-		// via its FIX-point scale_x/scale_y - cross-multiply instead.
-		if ((long long)box.width() * src_size.height() > (long long)box.height() * src_size.width()) {
-			// vertical is full height, shrink horizontal to preserve aspect
-			int w = src_size.width() * box.height() / src_size.height();
-			pos.setWidth(w);
-			if (op->flags & gPixmap::blitHAlignCenter)
-				pos.moveBy((box.width() - w) / 2, 0);
-			else if (op->flags & gPixmap::blitHAlignRight)
-				pos.moveBy(box.width() - w, 0);
-		} else {
-			// horizontal is full width, shrink vertical to preserve aspect
-			int h = src_size.height() * box.width() / src_size.width();
-			pos.setHeight(h);
-			if (op->flags & gPixmap::blitVAlignCenter)
-				pos.moveBy(0, (box.height() - h) / 2);
-			else if (op->flags & gPixmap::blitVAlignBottom)
-				pos.moveBy(0, box.height() - h);
+	} else if (pos.size() == src_size) {
+		flags &= ~gPixmap::blitScale;
+	} else if (!pos.size().isEmpty()) {
+		if (flags & gPixmap::blitKeepAspectRatio) {
+			const int scaled_width_by_height = src_size.width() * pos.height() / src_size.height();
+			const int scaled_height_by_width = src_size.height() * pos.width() / src_size.width();
+			if (scaled_width_by_height <= pos.width()) {
+				int old_width = pos.width();
+				pos.setWidth(scaled_width_by_height);
+				if (flags & gPixmap::blitHAlignCenter)
+					pos.moveBy((old_width - pos.width()) / 2, 0);
+				else if (flags & gPixmap::blitHAlignRight)
+					pos.moveBy(old_width - pos.width(), 0);
+			} else {
+				int old_height = pos.height();
+				pos.setHeight(scaled_height_by_width);
+				if (flags & gPixmap::blitVAlignCenter)
+					pos.moveBy(0, (old_height - pos.height()) / 2);
+				else if (flags & gPixmap::blitVAlignBottom)
+					pos.moveBy(0, old_height - pos.height());
+			}
 		}
 	}
-	// else: blitScale is set and either pos already equals src_size, or
-	// blitKeepAspectRatio wasn't requested - pos is already the correct
-	// (possibly non-uniformly stretched) target rect as given.
 
-	pos.moveBy(m_current_offset);
-
-	bool scaled_blit = (op->flags & gPixmap::blitScale) != 0 && pos.size() != src_size;
+	if (pos.empty())
+		return;
 
 	gRegion clip;
 	if (op->clip.valid()) {
@@ -745,905 +2063,2953 @@ void gEGLDC::executeBlit(const gOpcode* opcode) {
 	if (clip.rects.empty())
 		return;
 
-	// Unlike our own solid-color fills (where we compute alpha=1.0 ourselves
-	// for "opaque"), a plain blit's alpha comes from the source pixmap's own
-	// data, which this backend doesn't control - a caller that didn't pass
-	// blitAlphaBlend/blitAlphaTest wants a fast, fully opaque copy that
-	// ignores whatever the source's alpha channel happens to contain, so
-	// blend must stay data-independent rather than being left always-on
-	// like scissor.
-	bool enable_blend = (op->flags & (gPixmap::blitAlphaBlend | gPixmap::blitAlphaTest)) || (m_radius > 0);
+	++m_frame_stats.blit_ops;
 
-	// See setAlphaBlendMode()'s comment. A blit's own blitAlphaBlend/
-	// blitAlphaTest flag means the source pixmap's alpha is genuine
-	// translucent content (icons with soft edges, etc.) - the accumulating
-	// formula. A blit that's only blending because of a corner radius
-	// (rounding forces blend on so the SDF edge anti-aliases smoothly, even
-	// for an otherwise fully opaque image) isn't declaring itself
-	// translucent content in that same sense, so it gets the other formula
-	// - harmless for its opaque interior (src.a=1 either way) and only
-	// matters for the 1px rounded-corner AA fringe.
-	bool true_alpha_blend = (op->flags & (gPixmap::blitAlphaBlend | gPixmap::blitAlphaTest)) != 0;
-
-	bool filter_linear = scaled_blit;
-
-	glBindTexture(GL_TEXTURE_2D, tex_id);
-
-	float x = pos.x();
-	float y = pos.y();
-	float width = pos.width();
-	float height = pos.height();
-
-	// Batching needs exactly one scissor rect (a batched draw call has only
-	// one active scissor for every quad in it) and no rounding (the texture
-	// shader's corner SDF uses a single u_rect_size uniform sized for one
-	// quad - wrong for every quad but the first in a batch). Anything else
-	// falls back to the original immediate per-rect draw.
-	bool can_batch = clip.rects.size() == 1 && m_radius <= 0;
-
-	if (!can_batch) {
-		flushBlitBatch();
-		flushTextBatch();
-
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter_linear ? GL_LINEAR : GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter_linear ? GL_LINEAR : GL_NEAREST);
-
-		if (enable_blend) {
-			setAlphaBlendMode(true_alpha_blend);
-			glEnable(GL_BLEND);
-		} else
-			glDisable(GL_BLEND);
-		for (unsigned int i = 0; i < clip.rects.size(); ++i) {
-			setGlScissor(clip.rects[i]);
-			m_texture_shader.drawTexture(x, y, width, height, tex_id, 1.0f, m_radius, m_radius_edges);
-		}
-		if (!enable_blend)
-			glEnable(GL_BLEND);
-		return;
-	}
-
-	const eRect& r = clip.rects[0];
-	bool state_changed = m_blit_batch_active && (tex_id != m_blit_batch_tex_id || enable_blend != m_blit_batch_blend || true_alpha_blend != m_blit_batch_true_alpha || filter_linear != m_blit_batch_filter_linear || r != m_blit_batch_clip);
-	bool full = m_blit_batch_buffer.size() >= (size_t)gTextureShader::kMaxBatchQuads * 24;
-	if (state_changed || full)
-		flushBlitBatch();
-
-	if (!m_blit_batch_active) {
-		// Starting a fresh blit batch: flush any pending text batch first so
-		// text queued *before* this blit (e.g. a label drawn just before an
-		// icon in the same row) still draws before it, not after - see
-		// executeFill()'s comment for the general reasoning.
-		flushTextBatch();
-		m_blit_batch_tex_id = tex_id;
-		m_blit_batch_blend = enable_blend;
-		m_blit_batch_true_alpha = true_alpha_blend;
-		m_blit_batch_filter_linear = filter_linear;
-		m_blit_batch_clip = r;
-		m_blit_batch_active = true;
-
-		glBindTexture(GL_TEXTURE_2D, m_blit_batch_tex_id);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, m_blit_batch_filter_linear ? GL_LINEAR : GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, m_blit_batch_filter_linear ? GL_LINEAR : GL_NEAREST);
-	}
-
-	// x, y, u, v per vertex - same layout/winding as gTextureShader::drawTexture().
-	float quad[24] = {x,		 y,			 0.0f, 0.0f, x,			y + height, 0.0f, 1.0f, x + width, y,			 1.0f, 0.0f,
-					  x + width, y,			 1.0f, 0.0f, x,			y + height, 0.0f, 1.0f, x + width, y + height, 1.0f, 1.0f};
-	m_blit_batch_buffer.insert(m_blit_batch_buffer.end(), quad, quad + 24);
-}
-
-void gEGLDC::flushBlitBatch() {
-	if (!m_blit_batch_active)
-		return;
-	m_blit_batch_active = false;
-
-	if (m_blit_batch_buffer.empty())
-		return;
-
-	if (m_blit_batch_blend) {
-		setAlphaBlendMode(m_blit_batch_true_alpha);
+	bool enable_blend = (flags & gPixmap::blitAlphaBlend) || m_radius > 0;
+	if (enable_blend) {
 		glEnable(GL_BLEND);
-	} else
+		glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+	} else {
 		glDisable(GL_BLEND);
+	}
 
-	setGlScissor(m_blit_batch_clip);
+	const bool alpha_texture = flags & (gPixmap::blitAlphaTest | gPixmap::blitAlphaBlend);
+	setTextureFiltering(tex_id, !alpha_texture);
 
-	glBindTexture(GL_TEXTURE_2D, m_blit_batch_tex_id);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, m_blit_batch_filter_linear ? GL_LINEAR : GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, m_blit_batch_filter_linear ? GL_LINEAR : GL_NEAREST);
+	glEnable(GL_SCISSOR_TEST);
+	for (unsigned int i = 0; i < clip.rects.size(); ++i) {
+		eRect area = pos;
+		area &= clip.rects[i];
+		area &= eRect(ePoint(0, 0), size());
+		if (area.empty())
+			continue;
 
-	int vertex_count = (int)(m_blit_batch_buffer.size() / 4);
-	m_texture_shader.drawBatch(m_blit_batch_buffer.data(), vertex_count, m_blit_batch_tex_id, 1.0f);
+		eRect srcarea = area;
+		srcarea.moveBy(-pos.x(), -pos.y());
 
-	if (!m_blit_batch_blend)
-		glEnable(GL_BLEND);
+		if (flags & gPixmap::blitScale) {
+			srcarea = eRect(srcarea.x() * src_size.width() / pos.width(), srcarea.y() * src_size.height() / pos.height(), std::max(1, srcarea.width() * src_size.width() / pos.width()),
+							std::max(1, srcarea.height() * src_size.height() / pos.height()));
+		}
 
-	m_blit_batch_buffer.clear();
+		srcarea &= eRect(ePoint(0, 0), src_size);
+		if (srcarea.empty())
+			continue;
+
+		const float u0 = (float)srcarea.left() / (float)src_size.width();
+		const float v0 = (float)srcarea.top() / (float)src_size.height();
+		const float u1 = (float)srcarea.right() / (float)src_size.width();
+		const float v1 = (float)srcarea.bottom() / (float)src_size.height();
+		const bool luma_texture = op->pixmap->surface->bpp == 8 && !op->pixmap->surface->clut.data;
+
+		setGlScissor(area);
+		logBlitOp("blit", area, srcarea, op->pixmap, flags);
+		m_texture_shader.drawTexture(area.x(), area.y(), area.width(), area.height(), tex_id, 1.0f, m_radius, m_radius_edges, u0, v0, u1, v1, flags & gPixmap::blitAlphaTest,
+			luma_texture, pos.x(), pos.y(), pos.width(), pos.height());
+		++m_frame_stats.blit_rects;
+		m_frame_stats.blit_pixels += rectPixels(area);
+	}
+	glDisable(GL_SCISSOR_TEST);
+
+	if (enable_blend) {
+		glDisable(GL_BLEND);
+	}
 }
 
-bool gEGLDC::renderGlyph(const ePoint& pos, const uint8_t* data, int width, int height, int pitch, const gRGB& color, uint64_t glyph_key) {
-	if (!isInitialized())
-		return false; // let eTextPara::blit() (font.cpp) fall back to its CPU path
+void gEGLDC::fillTextBackground(const gRegion& clip) {
+	flushTextBatchIfOverlaps(clip, textFlushFill);
+	drawRegion(clip, m_foreground_color_rgb);
+}
 
+void gEGLDC::drawPixmap(gPixmap* pixmap, const eRect& pos, int flags) {
+	e2eglScopedTimer timer(m_frame_stats.blit_us);
+	if (!pixmap || !pixmap->surface || pos.empty())
+		return;
+
+	eSize src_size = pixmap->size();
+	if (src_size.isEmpty())
+		return;
+
+	eRect dest = pos;
+	if (!(flags & gPixmap::blitScale)) {
+		dest.setWidth(src_size.width());
+		dest.setHeight(src_size.height());
+	} else if (dest.size().isEmpty()) {
+		dest.setWidth(src_size.width());
+		dest.setHeight(src_size.height());
+		flags &= ~gPixmap::blitScale;
+	}
+
+	GLuint tex_id = m_texture_manager.getTexture(pixmap);
+	if (!tex_id)
+		return;
+
+	eRect screen(ePoint(0, 0), size());
+	eRect area = dest & screen;
+	if (!(flags & gPixmap::blitScale) && pos.size().isValid())
+		area &= pos;
+	if (area.empty())
+		return;
+
+	flushFillBatchIfOverlaps(area);
+
+	eRect srcarea = area;
+	srcarea.moveBy(-dest.x(), -dest.y());
+	if (flags & gPixmap::blitScale) {
+		srcarea = eRect(srcarea.x() * src_size.width() / dest.width(), srcarea.y() * src_size.height() / dest.height(), std::max(1, srcarea.width() * src_size.width() / dest.width()),
+						std::max(1, srcarea.height() * src_size.height() / dest.height()));
+	}
+	srcarea &= eRect(ePoint(0, 0), src_size);
+	if (srcarea.empty())
+		return;
+
+	const float u0 = (float)srcarea.left() / (float)src_size.width();
+	const float v0 = (float)srcarea.top() / (float)src_size.height();
+	const float u1 = (float)srcarea.right() / (float)src_size.width();
+	const float v1 = (float)srcarea.bottom() / (float)src_size.height();
+	const bool luma_texture = pixmap->surface->bpp == 8 && !pixmap->surface->clut.data;
+
+	const bool blend = flags & gPixmap::blitAlphaBlend;
+	if (blend) {
+		glEnable(GL_BLEND);
+		glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+	} else {
+		glDisable(GL_BLEND);
+	}
+
+	const bool alpha_texture = flags & (gPixmap::blitAlphaTest | gPixmap::blitAlphaBlend);
+	setTextureFiltering(tex_id, !alpha_texture);
+
+	glEnable(GL_SCISSOR_TEST);
+	setGlScissor(area);
+	logBlitOp("drawPixmap", area, srcarea, pixmap, flags);
+	m_texture_shader.drawTexture(area.x(), area.y(), area.width(), area.height(), tex_id, 1.0f, 0.0f, 0, u0, v0, u1, v1, flags & gPixmap::blitAlphaTest, luma_texture);
+	glDisable(GL_SCISSOR_TEST);
+	++m_frame_stats.blit_ops;
+	++m_frame_stats.blit_rects;
+	m_frame_stats.blit_pixels += rectPixels(area);
+
+	if (blend)
+		glDisable(GL_BLEND);
+}
+
+bool gEGLDC::readFramebufferRegion(const eRect& pos, gPixmap* pixmap) {
+	if (!pixmap || !pixmap->surface || pixmap->surface->bpp != 32 || pos.empty())
+		return false;
+
+	flushFillBatchIfOverlaps(pos);
+
+	const int width = std::min(pos.width(), pixmap->size().width());
+	const int height = std::min(pos.height(), pixmap->size().height());
 	if (width <= 0 || height <= 0)
-		return true; // nothing to draw (e.g. a space), but this glyph *is* handled
+		return false;
 
-	if (m_text_batch_buffer.empty()) {
-		// Starting a fresh text batch: flush any pending blit batch first so
-		// a blit queued *before* this text (e.g. an icon drawn just before a
-		// label in the same row) still draws before it, not after - see
-		// executeFill()'s comment for the general reasoning. Also capture
-		// the clip this batch will be drawn under - see m_text_batch_clip's
-		// declaration comment for why flushTextBatch() must use this
-		// snapshot rather than reading m_current_clip live.
-		flushBlitBatch();
-		m_text_batch_clip = m_current_clip;
+	gUnmanagedSurface* surface = pixmap->surface;
+	m_texture_manager.prepareSurface(surface);
+	if (surface->gl_texture_id) {
+		m_texture_manager.queueForDeletion(surface->gl_texture_id);
+		surface->gl_texture_id = 0;
 	}
 
-	glyph_uv uv;
-	bool was_cached = m_font_atlas.getGlyph(glyph_key, uv);
+	const bool scene_framebuffer = sceneFramebufferActive();
+	const bool scaled_scene_framebuffer = scene_framebuffer && sceneFramebufferUsesSurfaceScale();
+	const bool window_framebuffer = !scene_framebuffer && currentFramebufferUsesSurface();
+	const eRect logical_read(pos.x(), pos.y(), width, height);
+	const eRect framebuffer_read = scaled_scene_framebuffer ? logicalToSceneRect(logical_read) :
+		(window_framebuffer ? logicalToSurfaceRect(logical_read) : logical_read);
+	const int read_x0 = framebuffer_read.x();
+	const int read_y0 = framebuffer_read.y();
+	const int read_width = framebuffer_read.width();
+	const int read_height = framebuffer_read.height();
+	const int read_y1 = read_y0 + read_height;
+	const int framebuffer_height = scene_framebuffer ? m_scene_frame_height : (window_framebuffer ? surfaceHeight() : m_height);
+	if (read_width <= 0 || read_height <= 0 || framebuffer_height <= 0)
+		return false;
 
-	if (!was_cached) {
-		// Only flush the current batch first if this glyph would actually
-		// trigger addGlyph()'s atlas-full reset (which clears m_glyphs and
-		// would leave any already-batched-but-undrawn quad's UVs pointing at
-		// whatever glyph ends up reoccupying that texture region) - NOT on
-		// every cache miss unconditionally. A plain row-advance (the
-		// overwhelming majority of additions - the atlas is 2048x2048,
-		// rarely actually full) leaves all existing glyphs' data and UVs
-		// untouched, so there's nothing to protect against, and flushing
-		// here anyway means uploading the atlas's dirty region and drawing
-		// with it once per *individual* new glyph instead of batching many
-		// new glyphs' worth of atlas changes into one upload+draw at the
-		// next real flush point - each of those premature per-glyph flushes
-		// measured 4.5-13ms (a texture the GPU is still using getting
-		// modified mid-frame forces a pipeline sync), which is what made a
-		// screen with many not-yet-cached glyphs (a first-ever open) take
-		// seconds instead of a couple hundred milliseconds.
-		if (m_font_atlas.wouldOverflow(width, height))
-			flushTextBatch();
-		m_font_atlas.addGlyph(glyph_key, width, height, data, pitch, uv);
+	std::vector<uint8_t> rgba(read_width * read_height * 4);
+	GLint previous_framebuffer = 0;
+	if (scene_framebuffer) {
+		glGetIntegerv(GL_FRAMEBUFFER_BINDING, &previous_framebuffer);
+		glBindFramebuffer(GL_FRAMEBUFFER, m_scene_framebuffer);
 	}
+	glReadPixels(read_x0, framebuffer_height - read_y1, read_width, read_height, GL_RGBA, GL_UNSIGNED_BYTE, rgba.data());
+	if (scene_framebuffer)
+		glBindFramebuffer(GL_FRAMEBUFFER, previous_framebuffer);
 
-	if (uv.width == 0 || uv.height == 0)
-		return true; // empty-space glyph already recorded in the atlas map
-
-	// pos is already an absolute destination-surface pixel position (same
-	// rxbase/rybase eTextPara::blit()'s CPU path writes to directly) - not
-	// relative to m_current_offset like fill/rectangle/blit's opcode-supplied
-	// coordinates are, so unlike executeFill() etc. it must NOT be added
-	// again here, or a GPU-handled glyph would land at a different position
-	// than a CPU-handled one (border text, say) drawn for the very same
-	// eTextPara whenever m_current_offset is non-zero.
-	float r = color.r / 255.0f;
-	float g = color.g / 255.0f;
-	float b = color.b / 255.0f;
-	float a = 1.0f - (color.a / 255.0f);
-
-	float x = (float)pos.x();
-	float y = (float)pos.y();
-	float w = (float)uv.width;
-	float h = (float)uv.height;
-
-	// 6 vertices × 8 floats: x, y, u, v, r, g, b, a
-	float vertices[48] = {x,	 y, uv.u0, uv.v0, r, g, b, a, x, y + h, uv.u0, uv.v1, r, g, b, a, x + w, y,		uv.u1, uv.v0, r, g, b, a,
-						  x + w, y, uv.u1, uv.v0, r, g, b, a, x, y + h, uv.u0, uv.v1, r, g, b, a, x + w, y + h, uv.u1, uv.v1, r, g, b, a};
-
-	m_text_batch_buffer.insert(m_text_batch_buffer.end(), vertices, vertices + 48);
-
-	if (m_text_batch_buffer.size() >= MAX_BATCH_GLYPHS * 48) {
-		flushTextBatch();
+	const bool scale_readback = scaled_scene_framebuffer || window_framebuffer;
+	for (int y = 0; y < height; ++y) {
+		uint8_t* dst = (uint8_t*)surface->data + y * surface->stride;
+		const int src_y_top = scale_readback ? std::min(read_height - 1, (int)(((long long)y * read_height) / height)) : y;
+		const uint8_t* src_row = rgba.data() + (read_height - 1 - src_y_top) * read_width * 4;
+		for (int x = 0; x < width; ++x) {
+			const int src_x = scale_readback ? std::min(read_width - 1, (int)(((long long)x * read_width) / width)) : x;
+			const uint8_t* src = src_row + src_x * 4;
+			dst[x * 4 + 0] = src[2];
+			dst[x * 4 + 1] = src[1];
+			dst[x * 4 + 2] = src[0];
+			dst[x * 4 + 3] = src[3];
+		}
 	}
 
 	return true;
 }
 
-void gEGLDC::flushTextBatch() {
-	if (m_text_batch_buffer.empty())
-		return;
-	// m_text_batch_clip, not m_current_clip - see its declaration comment:
-	// this batch must be scissored against the clip captured when it
-	// started, not whatever the active clip happens to be right now.
-	if (m_text_batch_clip.rects.empty()) {
-		m_text_batch_buffer.clear();
-		return;
-	}
+bool gEGLDC::readOSDToBGRA(std::vector<unsigned char>& pixels, int& width, int& height) {
+	bool result = false;
+	if (runOnRenderThread([&]() { result = readOSDToBGRA(pixels, width, height); }))
+		return result;
 
-	m_text_shader.bind();
+	pixels.clear();
+	width = 0;
+	height = 0;
 
-	// Text glyphs are real translucent content (anti-aliased coverage *
-	// color alpha) - see setAlphaBlendMode()'s comment for why this needs
-	// the accumulating ("true" alphaBlend) formula, overriding whatever an
-	// earlier, unrelated draw this frame may have left the blend func's
-	// alpha factors set to.
-	setAlphaBlendMode(true);
+	std::lock_guard<std::recursive_mutex> lock(m_egl_mutex);
+	if (!isInitialized() || m_egl_display == EGL_NO_DISPLAY || m_egl_surface == EGL_NO_SURFACE || m_egl_context == EGL_NO_CONTEXT)
+		return false;
 
-	// Bind the atlas pixmap
-	gPixmap* atlas_pix = m_font_atlas.getPixmap();
-	GLuint tex_id = m_texture_manager.getTexture(atlas_pix);
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, tex_id);
+	const bool already_current = eglGetCurrentContext() == m_egl_context;
+	if (!already_current && !makeCurrent())
+		return false;
 
-	if (m_font_atlas.isDirty()) {
-		eRect dirty = m_font_atlas.getDirtyRect();
-
-		// GLES 2.0 does not support GL_UNPACK_ROW_LENGTH, so we cannot easily upload
-		// an arbitrary sub-rectangle. Instead, we upload full contiguous scanlines
-		// for the dirty Y range.
-		int start_y = dirty.top();
-		int height = dirty.height();
-		int stride = atlas_pix->size().width();
-
-		const uint8_t* data = (const uint8_t*)atlas_pix->surface->data;
-		data += (start_y * stride);
-
-		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-		GLenum src_fmt = gles::isGLES3() ? GL_RED : GL_LUMINANCE;
-		glTexSubImage2D(GL_TEXTURE_2D, 0, 0, start_y, stride, height, src_fmt, GL_UNSIGNED_BYTE, data);
-		glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
-
-		m_font_atlas.clearDirty();
-	}
-
-	// Bind the text shader's own VBO + vertex attribute layout (pos_uv +
-	// color) before touching GL_ARRAY_BUFFER - without this, whatever another
-	// shader (e.g. gShader's 2-float-per-vertex layout from an earlier
-	// executeFill/executeRectangle in this same frame) last bound is still
-	// active, and this batch's data gets completely misinterpreted.
-	m_text_shader.bindVAO();
-
-	gles::uploadDynamicVBO(m_text_batch_buffer.size() * sizeof(float), m_text_batch_buffer.data());
-
-	int vertex_count = m_text_batch_buffer.size() / 8; // 8 floats per vertex
-
-	for (unsigned int i = 0; i < m_text_batch_clip.rects.size(); ++i) {
-		setGlScissor(m_text_batch_clip.rects[i]);
-		glDrawArrays(GL_TRIANGLES, 0, vertex_count);
-	}
-
-	m_text_shader.unbindVAO();
-
-	m_text_batch_buffer.clear();
-}
-
-void gEGLDC::clearOverlayArea(const eRect& area) {
-	int pw = m_pixmap->size().width();
-	int ph = m_pixmap->size().height();
-	int left = std::max(0, area.left());
-	int top = std::max(0, area.top());
-	int right = std::min(pw, area.left() + area.width());
-	int bottom = std::min(ph, area.top() + area.height());
-	if (right <= left || bottom <= top)
-		return;
-
-	// pw*4, not surface->stride: m_pixmap is this backend's own allocation
-	// (see the constructor), always tightly packed - same assumption
-	// executeClear()'s equivalent erase loop and compositeTextOverlay()'s
-	// row_width already make for this same buffer.
-	uint8_t* base = (uint8_t*)m_pixmap->surface->data;
-	int stride = pw * 4;
-	for (int y = top; y < bottom; ++y)
-		memset(base + (size_t)y * stride + (size_t)left * 4, 0, (size_t)(right - left) * 4);
-}
-
-void gEGLDC::compositeTextOverlay(eRect area, bool trueAlphaBlend) {
-	// See executeFill()'s comment for why a pending blit batch must flush
-	// first - this also uses m_texture_shader's shared VBO, which a
-	// pending batch's data still occupies until drawn. Also flush any
-	// pending GPU-atlas text batch left over from an *earlier* renderText/
-	// renderPara opcode (this call only runs for the CPU-fallback portion of
-	// the *current* one - see m_cpu_overlay_dirty) - otherwise that older,
-	// still-undrawn text would end up rendered after this opcode's overlay
-	// texture instead of before it.
-	flushBlitBatch();
+	flushFillBatch();
 	flushTextBatch();
 
-	// Clamp to the pixmap's actual bounds - a scrolling list widget's
-	// per-row offset can legitimately place a row partially or fully
-	// outside (e.g. mid-scroll, or a row whose valign correction pushes it
-	// off the bottom).
-	int pw = m_pixmap->size().width();
-	int ph = m_pixmap->size().height();
-	int left = std::max(0, area.left());
-	int top = std::max(0, area.top());
-	int right = std::min(pw, area.left() + area.width());
-	int bottom = std::min(ph, area.top() + area.height());
-	if (right <= left || bottom <= top)
-		return;
-	area = eRect(left, top, right - left, bottom - top);
+	GLint previous_framebuffer = 0;
+	GLint previous_pack_alignment = 0;
+	glGetIntegerv(GL_FRAMEBUFFER_BINDING, &previous_framebuffer);
+	glGetIntegerv(GL_PACK_ALIGNMENT, &previous_pack_alignment);
 
-	// Incremental glTexSubImage2D update instead of deleting and recreating
-	// a full 1920x1080 texture on every single text/para draw (which was
-	// both very slow and, before the use-after-free above was fixed, the
-	// apparent source of visible corruption of unrelated content).
-	GLuint tex_id = m_pixmap->surface->gl_texture_id;
-	if (tex_id == 0) {
-		tex_id = m_texture_manager.getTexture(m_pixmap);
+	const bool read_scene_framebuffer = sceneFramebufferActive();
+	int read_width = 0;
+	int read_height = 0;
+	if (read_scene_framebuffer) {
+		glBindFramebuffer(GL_FRAMEBUFFER, m_scene_framebuffer);
+		width = m_width;
+		height = m_height;
+		read_width = m_scene_frame_width;
+		read_height = m_scene_frame_height;
 	} else {
-		glBindTexture(GL_TEXTURE_2D, tex_id);
-		int row_width = m_pixmap->size().width();
-		const uint8_t* src = (const uint8_t*)m_pixmap->surface->data;
-		src += (size_t)area.top() * row_width * 4;
-		// No CPU-side R/B swap here (see gtexture_manager.cpp's bpp==32
-		// branch for the full explanation): m_pixmap is natively BGRA in
-		// memory, and uploading that as-is while telling GL it's GL_RGBA
-		// already produces exactly the pre-swapped bytes needed to cancel
-		// this render target's own R/B swap on the way to the screen.
-		glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
-		glTexSubImage2D(GL_TEXTURE_2D, 0, 0, area.top(), row_width, area.height(), GL_RGBA, GL_UNSIGNED_BYTE, src);
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		width = surfaceWidth();
+		height = surfaceHeight();
+		read_width = width;
+		read_height = height;
 	}
-	if (tex_id) {
-		// m_pixmap is only valid within the text's own bounding area - the
-		// rest of that 1920x1080 CPU buffer is stale/uninitialized content
-		// from whenever it was last (re)allocated. Scissor the fragment
-		// writes down to just the area this opcode actually populated so
-		// nothing outside it can be touched.
-		setGlScissor(area);
-		// Real rendered text/border pixel content normally needs the
-		// accumulating ("true" alphaBlend) formula rather than whatever an
-		// earlier, unrelated draw this frame may have left the blend func's
-		// alpha factors set to - see setAlphaBlendMode()'s comment. A caller
-		// erasing content back to transparent (disableSpinner()) instead
-		// passes false, so its now-fully-transparent source pixels actually
-		// overwrite the destination's alpha instead of leaving whatever
-		// opaque content was already there untouched.
-		if (trueAlphaBlend)
-			setAlphaBlendMode(true);
-		else
-			glDisable(GL_BLEND);
-		m_texture_shader.drawTexture(0, 0, (float)m_width, (float)m_height, tex_id);
-		if (!trueAlphaBlend)
-			glEnable(GL_BLEND);
 
-		// Record that the overlay now has content here so executeClear()
-		// knows to erase-and-recomposite this area before painting a plain
-		// background over it later - see the comment there.
-		m_text_overlay_region |= gRegion(area);
+	if (width <= 0 || height <= 0 || read_width <= 0 || read_height <= 0) {
+		glBindFramebuffer(GL_FRAMEBUFFER, previous_framebuffer);
+		glPixelStorei(GL_PACK_ALIGNMENT, previous_pack_alignment);
+		if (!already_current)
+			releaseCurrent();
+		return false;
+	}
+
+	std::vector<uint8_t> rgba((size_t)read_width * (size_t)read_height * 4U);
+	while (glGetError() != GL_NO_ERROR) {
+	}
+	glPixelStorei(GL_PACK_ALIGNMENT, 1);
+	glFinish();
+	glReadPixels(0, 0, read_width, read_height, GL_RGBA, GL_UNSIGNED_BYTE, rgba.data());
+	const GLenum error = glGetError();
+
+	glBindFramebuffer(GL_FRAMEBUFFER, previous_framebuffer);
+	glPixelStorei(GL_PACK_ALIGNMENT, previous_pack_alignment);
+	if (!already_current)
+		releaseCurrent();
+
+	if (error != GL_NO_ERROR) {
+		eDebug("[gEGLDC] e2egl capture glReadPixels failed: 0x%x", error);
+		width = 0;
+		height = 0;
+		return false;
+	}
+
+	pixels.resize((size_t)width * (size_t)height * 4U);
+	for (int y = 0; y < height; ++y) {
+		const int src_y = std::min(read_height - 1, (int)(((long long)y * read_height) / height));
+		const uint8_t* src_row = rgba.data() + (size_t)(read_height - 1 - src_y) * (size_t)read_width * 4U;
+		uint8_t* dst_row = pixels.data() + (size_t)y * (size_t)width * 4U;
+		for (int x = 0; x < width; ++x) {
+			const int src_x = std::min(read_width - 1, (int)(((long long)x * read_width) / width));
+			const uint8_t* src = src_row + (size_t)src_x * 4U;
+			uint8_t* dst = dst_row + (size_t)x * 4U;
+			const unsigned int alpha = src[3];
+			unsigned int red = src[0];
+			unsigned int green = src[1];
+			unsigned int blue = src[2];
+			if (alpha == 0) {
+				red = green = blue = 0;
+			} else if (alpha < 255) {
+				red = std::min(255U, (red * 255U + alpha / 2U) / alpha);
+				green = std::min(255U, (green * 255U + alpha / 2U) / alpha);
+				blue = std::min(255U, (blue * 255U + alpha / 2U) / alpha);
+			}
+			dst[0] = (uint8_t)blue;
+			dst[1] = (uint8_t)green;
+			dst[2] = (uint8_t)red;
+			dst[3] = (uint8_t)alpha;
+		}
+	}
+
+	return true;
+}
+
+bool gEGLDC::writeCaptureFrame(int client_fd) {
+	std::vector<unsigned char> pixels;
+	int width = 0;
+	int height = 0;
+	if (!readOSDToBGRA(pixels, width, height))
+		return false;
+
+	E2EGLCaptureHeader header;
+	memset(&header, 0, sizeof(header));
+	memcpy(header.magic, E2EGL_CAPTURE_MAGIC, sizeof(header.magic));
+	header.width = (uint32_t)width;
+	header.height = (uint32_t)height;
+	header.stride = (uint32_t)width * 4U;
+	header.format = E2EGL_CAPTURE_FORMAT_BGRA;
+
+	return e2eglWriteAll(client_fd, &header, sizeof(header)) && e2eglWriteAll(client_fd, pixels.data(), pixels.size());
+}
+
+void gEGLDC::startCaptureServer() {
+	if (m_capture_thread_started || m_capture_socket_fd >= 0)
+		return;
+
+	int fd = socket(AF_UNIX, SOCK_STREAM, 0);
+	if (fd < 0) {
+		eDebug("[gEGLDC] failed to create e2egl capture socket: %m");
+		return;
+	}
+
+	const int flags = fcntl(fd, F_GETFD);
+	if (flags >= 0)
+		fcntl(fd, F_SETFD, flags | FD_CLOEXEC);
+
+	unlink(E2EGL_CAPTURE_SOCKET);
+
+	struct sockaddr_un addr;
+	memset(&addr, 0, sizeof(addr));
+	addr.sun_family = AF_UNIX;
+	strncpy(addr.sun_path, E2EGL_CAPTURE_SOCKET, sizeof(addr.sun_path) - 1);
+
+	if (bind(fd, (struct sockaddr*)&addr, sizeof(addr)) < 0) {
+		eDebug("[gEGLDC] failed to bind e2egl capture socket %s: %m", E2EGL_CAPTURE_SOCKET);
+		close(fd);
+		return;
+	}
+
+	if (listen(fd, 2) < 0) {
+		eDebug("[gEGLDC] failed to listen on e2egl capture socket %s: %m", E2EGL_CAPTURE_SOCKET);
+		close(fd);
+		unlink(E2EGL_CAPTURE_SOCKET);
+		return;
+	}
+
+	m_capture_socket_fd = fd;
+	m_capture_thread_stop = false;
+	if (pthread_create(&m_capture_thread, nullptr, &gEGLDC::captureServerThreadEntry, this) != 0) {
+		eDebug("[gEGLDC] failed to start e2egl capture thread");
+		close(fd);
+		unlink(E2EGL_CAPTURE_SOCKET);
+		m_capture_socket_fd = -1;
+		return;
+	}
+
+	m_capture_thread_started = true;
+	eDebug("[gEGLDC] e2egl OSD capture socket active: %s", E2EGL_CAPTURE_SOCKET);
+}
+
+void gEGLDC::stopCaptureServer() {
+	m_capture_thread_stop = true;
+	if (m_capture_thread_started) {
+		pthread_join(m_capture_thread, nullptr);
+		m_capture_thread_started = false;
+	}
+	if (m_capture_socket_fd >= 0) {
+		close(m_capture_socket_fd);
+		m_capture_socket_fd = -1;
+	}
+	unlink(E2EGL_CAPTURE_SOCKET);
+}
+
+void* gEGLDC::captureServerThreadEntry(void* arg) {
+	static_cast<gEGLDC*>(arg)->captureServerThread();
+	return nullptr;
+}
+
+void gEGLDC::captureServerThread() {
+	while (!m_capture_thread_stop) {
+		const int fd = m_capture_socket_fd;
+		if (fd < 0)
+			break;
+
+		struct pollfd pfd;
+		pfd.fd = fd;
+		pfd.events = POLLIN;
+		pfd.revents = 0;
+		const int poll_result = poll(&pfd, 1, 100);
+		if (poll_result < 0) {
+			if (errno == EINTR)
+				continue;
+			break;
+		}
+		if (poll_result == 0 || !(pfd.revents & POLLIN))
+			continue;
+		if (m_capture_thread_stop)
+			break;
+
+		const int client_fd = accept(fd, nullptr, nullptr);
+		if (client_fd < 0) {
+			if (errno == EINTR)
+				continue;
+			if (!m_capture_thread_stop)
+				eDebug("[gEGLDC] e2egl capture accept failed: %m");
+			continue;
+		}
+
+		struct timeval timeout;
+		timeout.tv_sec = 2;
+		timeout.tv_usec = 0;
+		setsockopt(client_fd, SOL_SOCKET, SO_SNDTIMEO, &timeout, sizeof(timeout));
+		if (!writeCaptureFrame(client_fd))
+			eDebug("[gEGLDC] e2egl capture request failed");
+		close(client_fd);
 	}
 }
 
-// The Dreambox EGL backend uses m_pixmap only as a CPU staging buffer; it is
-// not the displayed framebuffer as it is in the classic FBDC path. The base
-// gDC spinner code therefore needs the real GPU background copied into this
-// buffer before it saves/restores the spinner area.
-void gEGLDC::captureBackgroundIntoPixmap(const eRect& rect) {
-	flushBlitBatch();
-	flushTextBatch();
+eRect gEGLDC::clampToScreen(const eRect& rect) const {
+	return rect & eRect(0, 0, m_width, m_height);
+}
 
-	if (!m_pixmap || !m_pixmap->surface || !m_pixmap->surface->data)
-		return;
-
-	const int pw = m_pixmap->size().width();
-	const int ph = m_pixmap->size().height();
-	const int left = std::max(0, rect.left());
-	const int top = std::max(0, rect.top());
-	const int right = std::min(pw, rect.left() + rect.width());
-	const int bottom = std::min(ph, rect.top() + rect.height());
-	const int w = right - left;
-	const int h = bottom - top;
-	if (w <= 0 || h <= 0)
-		return;
-
-	glBindFramebuffer(GL_FRAMEBUFFER, m_fbo ? m_fbo : 0);
-
-	std::vector<uint8_t> pixels((size_t)w * (size_t)h * 4U);
-	glPixelStorei(GL_PACK_ALIGNMENT, 4);
-	const int fb_height = m_fbo ? m_fbo_height : m_surface_height;
-	glReadPixels(left, fb_height - top - h, w, h, GL_RGBA, GL_UNSIGNED_BYTE, pixels.data());
-	if (glGetError() != GL_NO_ERROR) {
-		eDebug("[gEGLDC] spinner background capture failed");
+void gEGLDC::deleteFrameTextures() {
+	completeAnimation(m_event_animation.completion);
+	m_animation_deadline = 0;
+	m_event_animation.selection.selection_pixmap = nullptr;
+	if (!isInitialized()) {
+		m_last_frame_texture = 0;
+		m_animation_frame_texture = 0;
+		m_last_frame_valid = false;
+		m_frame_restore_pending = false;
+		m_frame_texture_surface = false;
+		m_frame_texture_scene_scaled = false;
+		m_frame_texture_width = m_width;
+		m_frame_texture_height = m_height;
 		return;
 	}
 
-	uint8_t* dst_base = (uint8_t*)m_pixmap->surface->data;
-	const size_t dst_stride = (size_t)m_pixmap->surface->stride;
-	const size_t row_bytes = (size_t)w * 4U;
-	for (int row = 0; row < h; ++row) {
-		const uint8_t* src_row = pixels.data() + (size_t)(h - 1 - row) * row_bytes;
-		uint8_t* dst_row = dst_base + (size_t)(top + row) * dst_stride + (size_t)left * 4U;
+	GLuint textures[2];
+	GLsizei count = 0;
+	if (m_last_frame_texture)
+		textures[count++] = m_last_frame_texture;
+	if (m_animation_frame_texture)
+		textures[count++] = m_animation_frame_texture;
+	if (count)
+		glDeleteTextures(count, textures);
+
+	m_last_frame_texture = 0;
+	m_animation_frame_texture = 0;
+	m_last_frame_valid = false;
+	m_frame_restore_pending = false;
+	m_frame_texture_surface = false;
+	m_frame_texture_scene_scaled = false;
+	m_frame_texture_width = m_width;
+	m_frame_texture_height = m_height;
+}
+
+bool gEGLDC::sceneFramebufferWanted() const {
 #ifdef DREAMNEXTGEN
-		// the render target holds true RGBA here, m_pixmap is BGRA in memory
-		// and is uploaded through the R/B texture swizzle
-		for (size_t i = 0; i < row_bytes; i += 4) {
-			dst_row[i] = src_row[i + 2];
-			dst_row[i + 1] = src_row[i + 1];
-			dst_row[i + 2] = src_row[i];
-			dst_row[i + 3] = src_row[i + 3];
-		}
+	return true;
+#elif defined(HAVE_VUPLUS_EGL) || defined(HAVE_VUPLUS_MIPSEL_EGL) || defined(HAVE_NXPL_EGL) || defined(HAVE_V3DPLATFORM_EGL) || defined(HAVE_HISILICON_EGL) || defined(HAVE_DREAMBCM_EGL)
+	if (e2eglForceDestroyedSwap())
+		return true;
+	return !m_preserved_swap;
 #else
-		memcpy(dst_row, src_row, row_bytes);
+	return false;
 #endif
+}
+
+bool gEGLDC::sceneFramebufferActive() const {
+	return sceneFramebufferWanted() && m_scene_framebuffer && m_scene_frame_texture &&
+		m_scene_frame_width == sceneFramebufferWidth() && m_scene_frame_height == sceneFramebufferHeight();
+}
+
+bool gEGLDC::sceneFramebufferUsesSurfaceScale() const {
+	return m_max_texture_size > 0 &&
+		(m_width > m_max_texture_size || m_height > m_max_texture_size) &&
+		surfaceWidth() > 0 && surfaceHeight() > 0 &&
+		surfaceWidth() <= m_max_texture_size && surfaceHeight() <= m_max_texture_size;
+}
+
+int gEGLDC::sceneFramebufferWidth() const {
+	return sceneFramebufferUsesSurfaceScale() ? surfaceWidth() : m_width;
+}
+
+int gEGLDC::sceneFramebufferHeight() const {
+	return sceneFramebufferUsesSurfaceScale() ? surfaceHeight() : m_height;
+}
+
+eRect gEGLDC::logicalToSceneRect(const eRect& rect) const {
+	if (m_width <= 0 || m_height <= 0 || rect.empty())
+		return eRect();
+
+	const int scene_width = m_scene_frame_width > 0 ? m_scene_frame_width : sceneFramebufferWidth();
+	const int scene_height = m_scene_frame_height > 0 ? m_scene_frame_height : sceneFramebufferHeight();
+	const int sx0 = divFloorSigned((long long)rect.x() * scene_width, m_width);
+	const int sy0 = divFloorSigned((long long)rect.y() * scene_height, m_height);
+	const int sx1 = divCeilSigned((long long)(rect.x() + rect.width()) * scene_width, m_width);
+	const int sy1 = divCeilSigned((long long)(rect.y() + rect.height()) * scene_height, m_height);
+	return eRect(sx0, sy0, std::max(0, sx1 - sx0), std::max(0, sy1 - sy0));
+}
+
+bool gEGLDC::currentFramebufferIsScene() const {
+	if (!sceneFramebufferActive())
+		return false;
+
+	GLint framebuffer = 0;
+	glGetIntegerv(GL_FRAMEBUFFER_BINDING, &framebuffer);
+	return framebuffer == (GLint)m_scene_framebuffer || framebuffer == (GLint)m_scene_spare_framebuffer;
+}
+
+void gEGLDC::bindWindowFramebuffer() {
+#ifdef DREAMNEXTGEN
+	m_fb_output.waitBackPage();
+	// A deferred page binds the existing pbuffer instead of scanout memory.
+	glBindFramebuffer(GL_FRAMEBUFFER, m_fb_output.backFramebuffer());
+#else
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+#endif
+	applyWindowViewport();
+}
+
+void gEGLDC::bindAnimationFramebuffer() {
+#ifdef DREAMNEXTGEN
+	// The page is scanned out top-down, so draw the animation with a top-down viewport and projection.
+	m_fb_output.waitBackPage();
+	glBindFramebuffer(GL_FRAMEBUFFER, m_fb_output.backFramebuffer());
+	const eRect dst = osdDestinationSurface();
+	glViewport(dst.x(), dst.y(), dst.width(), dst.height());
+	m_texture_shader.setFramebufferResolution((float)m_width, (float)m_height);
+	m_advanced_shader.setFramebufferResolution((float)m_width, (float)m_height);
+#else
+	bindWindowFramebuffer();
+#endif
+}
+
+bool gEGLDC::presentAnimationFrame() {
+#ifdef DREAMNEXTGEN
+	m_texture_shader.setResolution((float)m_width, (float)m_height);
+	m_advanced_shader.setResolution((float)m_width, (float)m_height);
+#endif
+	return swapWindowFramebuffer();
+}
+
+eRect gEGLDC::osdDestinationLogical() const {
+	const int width = m_osd_width > 0 ? m_osd_width : m_width;
+	const int height = m_osd_height > 0 ? m_osd_height : m_height;
+	return eRect(m_osd_left, m_osd_top, std::max(1, width), std::max(1, height));
+}
+
+eRect gEGLDC::osdDestinationSurface() const {
+	const eRect dst = osdDestinationLogical();
+	const int sx0 = scaleSurfaceFloorX(dst.x());
+	const int sy0 = scaleSurfaceFloorY(dst.y());
+	const int sx1 = scaleSurfaceCeilX(dst.x() + dst.width());
+	const int sy1 = scaleSurfaceCeilY(dst.y() + dst.height());
+	return eRect(sx0, sy0, std::max(1, sx1 - sx0), std::max(1, sy1 - sy0));
+}
+
+eRect gEGLDC::logicalToSurfaceRect(const eRect& rect) const {
+	if (m_width <= 0 || m_height <= 0 || rect.empty())
+		return eRect();
+
+	const eRect dst = osdDestinationSurface();
+	const int sx0 = dst.x() + divFloorSigned((long long)rect.x() * dst.width(), m_width);
+	const int sy0 = dst.y() + divFloorSigned((long long)rect.y() * dst.height(), m_height);
+	const int sx1 = dst.x() + divCeilSigned((long long)(rect.x() + rect.width()) * dst.width(), m_width);
+	const int sy1 = dst.y() + divCeilSigned((long long)(rect.y() + rect.height()) * dst.height(), m_height);
+	return eRect(sx0, sy0, std::max(0, sx1 - sx0), std::max(0, sy1 - sy0));
+}
+
+void gEGLDC::applyWindowViewport() {
+	const eRect dst = osdDestinationSurface();
+	glViewport(dst.x(), surfaceHeight() - (dst.y() + dst.height()), dst.width(), dst.height());
+}
+
+bool gEGLDC::ensureSceneFramebufferObject(GLuint& texture, GLuint& framebuffer, bool& valid, int width, int height, const char* label) {
+	if (width <= 0 || height <= 0)
+		return false;
+
+	GLint previous_framebuffer = 0;
+	GLint previous_texture = 0;
+	GLint previous_viewport[4] = {0, 0, 0, 0};
+	GLboolean scissor_enabled = glIsEnabled(GL_SCISSOR_TEST);
+	GLboolean blend_enabled = glIsEnabled(GL_BLEND);
+	GLfloat previous_clear_color[4] = {0.0f, 0.0f, 0.0f, 0.0f};
+
+	glGetIntegerv(GL_FRAMEBUFFER_BINDING, &previous_framebuffer);
+	glGetIntegerv(GL_TEXTURE_BINDING_2D, &previous_texture);
+	glGetIntegerv(GL_VIEWPORT, previous_viewport);
+	glGetFloatv(GL_COLOR_CLEAR_VALUE, previous_clear_color);
+
+	while (glGetError() != GL_NO_ERROR) {
 	}
+
+	if ((texture && !framebuffer) || (!texture && framebuffer)) {
+		if (framebuffer)
+			glDeleteFramebuffers(1, &framebuffer);
+		if (texture)
+			glDeleteTextures(1, &texture);
+		texture = 0;
+		framebuffer = 0;
+		valid = false;
+	}
+
+	if (texture && framebuffer)
+		return true;
+
+	GLuint new_texture = 0;
+	GLuint new_framebuffer = 0;
+	glGenTextures(1, &new_texture);
+	glBindTexture(GL_TEXTURE_2D, new_texture);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+
+	glGenFramebuffers(1, &new_framebuffer);
+	glBindFramebuffer(GL_FRAMEBUFFER, new_framebuffer);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, new_texture, 0);
+	const GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+	const GLenum error = glGetError();
+
+	if (status != GL_FRAMEBUFFER_COMPLETE || error != GL_NO_ERROR) {
+		eDebug("[gEGLDC] %s framebuffer unavailable status=0x%x error=0x%x", label, status, error);
+		glBindFramebuffer(GL_FRAMEBUFFER, previous_framebuffer);
+		glBindTexture(GL_TEXTURE_2D, previous_texture);
+		if (new_framebuffer)
+			glDeleteFramebuffers(1, &new_framebuffer);
+		if (new_texture)
+			glDeleteTextures(1, &new_texture);
+		texture = 0;
+		framebuffer = 0;
+		valid = false;
+		return false;
+	}
+
+	texture = new_texture;
+	framebuffer = new_framebuffer;
+
+	glViewport(0, 0, width, height);
+	glDisable(GL_SCISSOR_TEST);
+	glDisable(GL_BLEND);
+	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+	glClear(GL_COLOR_BUFFER_BIT);
+	valid = true;
+
+	if (blend_enabled)
+		glEnable(GL_BLEND);
+	else
+		glDisable(GL_BLEND);
+	if (scissor_enabled)
+		glEnable(GL_SCISSOR_TEST);
+	else
+		glDisable(GL_SCISSOR_TEST);
+	glClearColor(previous_clear_color[0], previous_clear_color[1], previous_clear_color[2], previous_clear_color[3]);
+	glViewport(previous_viewport[0], previous_viewport[1], previous_viewport[2], previous_viewport[3]);
+	glBindFramebuffer(GL_FRAMEBUFFER, previous_framebuffer);
+	glBindTexture(GL_TEXTURE_2D, previous_texture);
+
+	static int scene_log_count = 0;
+	if (scene_log_count < 4) {
+		++scene_log_count;
+		eDebug("[gEGLDC] %s framebuffer active %dx%d logical=%dx%d texture=%u framebuffer=%u",
+			label, width, height, m_width, m_height, texture, framebuffer);
+	}
+	return true;
+}
+
+bool gEGLDC::ensureSceneFramebuffer() {
+	if (!sceneFramebufferWanted() || m_width <= 0 || m_height <= 0) {
+		deleteSceneFramebuffer();
+		return false;
+	}
+	if (m_scene_framebuffer_unavailable)
+		return false;
+
+	const int target_width = sceneFramebufferWidth();
+	const int target_height = sceneFramebufferHeight();
+	if (target_width <= 0 || target_height <= 0)
+		return false;
+
+	if ((m_scene_frame_width && m_scene_frame_width != target_width) || (m_scene_frame_height && m_scene_frame_height != target_height))
+		deleteSceneFramebuffer();
+
+	if (!ensureSceneFramebufferObject(m_scene_frame_texture, m_scene_framebuffer, m_scene_frame_valid, target_width, target_height, "scene")) {
+		m_scene_framebuffer_unavailable = true;
+		return false;
+	}
+
+	m_scene_frame_width = target_width;
+	m_scene_frame_height = target_height;
+	return true;
+}
+
+bool gEGLDC::ensureSpareSceneFramebuffer() {
+	if (!ensureSceneFramebuffer())
+		return false;
+	return ensureSceneFramebufferObject(m_scene_spare_frame_texture, m_scene_spare_framebuffer, m_scene_spare_frame_valid,
+		m_scene_frame_width, m_scene_frame_height, "scene-spare");
+}
+
+void gEGLDC::deleteSceneFramebuffer() {
+	completeAnimation(m_event_animation.completion);
+	m_animation_deadline = 0;
+	deleteCompactTextures();
+	m_event_animation.selection.selection_pixmap = nullptr;
+	if (!m_scene_framebuffer && !m_scene_frame_texture && !m_scene_spare_framebuffer && !m_scene_spare_frame_texture) {
+		m_scene_frame_width = 0;
+		m_scene_frame_height = 0;
+		m_scene_frame_valid = false;
+		m_scene_spare_frame_valid = false;
+		m_scene_animation_old_texture = 0;
+		m_scene_animation_old_valid = false;
+		return;
+	}
+
+	if (isInitialized()) {
+		GLint previous_framebuffer = 0;
+		glGetIntegerv(GL_FRAMEBUFFER_BINDING, &previous_framebuffer);
+		if (previous_framebuffer == (GLint)m_scene_framebuffer || previous_framebuffer == (GLint)m_scene_spare_framebuffer)
+			glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		if (m_scene_framebuffer)
+			glDeleteFramebuffers(1, &m_scene_framebuffer);
+		if (m_scene_frame_texture)
+			glDeleteTextures(1, &m_scene_frame_texture);
+		if (m_scene_spare_framebuffer)
+			glDeleteFramebuffers(1, &m_scene_spare_framebuffer);
+		if (m_scene_spare_frame_texture)
+			glDeleteTextures(1, &m_scene_spare_frame_texture);
+	} else {
+		m_scene_framebuffer = 0;
+		m_scene_frame_texture = 0;
+		m_scene_spare_framebuffer = 0;
+		m_scene_spare_frame_texture = 0;
+	}
+
+	m_scene_framebuffer = 0;
+	m_scene_frame_texture = 0;
+	m_scene_spare_framebuffer = 0;
+	m_scene_spare_frame_texture = 0;
+	m_scene_frame_width = 0;
+	m_scene_frame_height = 0;
+	m_scene_frame_valid = false;
+	m_scene_spare_frame_valid = false;
+	m_scene_animation_old_texture = 0;
+	m_scene_animation_old_valid = false;
+}
+
+bool gEGLDC::bindSceneFramebuffer() {
+	if (!ensureSceneFramebuffer())
+		return false;
+
+	glBindFramebuffer(GL_FRAMEBUFFER, m_scene_framebuffer);
+	glViewport(0, 0, m_scene_frame_width, m_scene_frame_height);
+	return true;
+}
+
+void gEGLDC::clearSceneFramebuffer() {
+	if (!bindSceneFramebuffer())
+		return;
+
+	glDisable(GL_BLEND);
+	glDisable(GL_SCISSOR_TEST);
+	glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+	glViewport(0, 0, m_scene_frame_width, m_scene_frame_height);
+	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+	glClear(GL_COLOR_BUFFER_BIT);
+	m_scene_frame_valid = true;
+}
+
+bool gEGLDC::presentSceneFramebuffer() {
+	if (!sceneFramebufferActive())
+		return false;
+
+#ifdef DREAMNEXTGEN
+	if (!m_fb_output.active())
+		return false;
+	{
+		// Waiting for the page to leave the screen is what a blocking swap would do.
+		e2eglScopedTimer wait_timer(m_frame_stats.swap_us);
+		if (!m_fb_output.waitBackPage())
+			return false;
+	}
+	e2eglScopedTimer timer(m_frame_stats.copy_us);
+	const eRect dst = osdDestinationSurface();
+	const bool fullscreen = dst.x() == 0 && dst.y() == 0 && dst.width() == surfaceWidth() && dst.height() == surfaceHeight();
+	bindWindowFramebuffer();
+	glDisable(GL_SCISSOR_TEST);
+	glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+	if (!fullscreen || !m_scene_frame_valid) {
+		glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+		glClear(GL_COLOR_BUFFER_BIT);
+	}
+	if (m_scene_frame_valid) {
+		// The scene is stored bottom-up like a window surface, the page top-down as scanned out.
+		const bool scaled = dst.width() != m_scene_frame_width || dst.height() != m_scene_frame_height;
+		glBindFramebuffer(GL_READ_FRAMEBUFFER, m_scene_framebuffer);
+		glBlitFramebuffer(0, 0, m_scene_frame_width, m_scene_frame_height, dst.x(), dst.y() + dst.height(), dst.x() + dst.width(), dst.y(),
+			GL_COLOR_BUFFER_BIT, scaled ? GL_LINEAR : GL_NEAREST);
+		++m_frame_stats.frame_copy_draws;
+		m_frame_stats.frame_copy_pixels += rectPixels(dst);
+		bindWindowFramebuffer();
+	}
+	return true;
+#else
+	bindWindowFramebuffer();
+	glDisable(GL_SCISSOR_TEST);
+	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+	glClear(GL_COLOR_BUFFER_BIT);
+	if (m_scene_frame_valid) {
+		const eRect full_frame(0, 0, m_width, m_height);
+		drawCopiedFrameTexture(m_scene_frame_texture, full_frame, full_frame, 1.0f, false);
+	}
+	glDisable(GL_BLEND);
+#ifdef HAVE_DREAMBCM_EGL
+	// The old Broadcom driver can expose an unfinished render-to-texture frame.
+	glFinish();
+#endif
+	return true;
+#endif
+}
+
+bool gEGLDC::beginSceneFramebufferAnimation() {
+	if (!sceneFramebufferActive() || m_scene_animation_old_valid || !m_scene_frame_valid)
+		return false;
+
+	flushTextBatch();
+	if (!ensureSpareSceneFramebuffer())
+		return false;
+
+	const GLuint old_texture = m_scene_frame_texture;
+	const eRect full_frame(0, 0, m_width, m_height);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, m_scene_spare_framebuffer);
+	glViewport(0, 0, m_scene_frame_width, m_scene_frame_height);
+	glDisable(GL_SCISSOR_TEST);
+	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+	glClear(GL_COLOR_BUFFER_BIT);
+	drawCopiedFrameTexture(old_texture, full_frame, full_frame, 1.0f, false);
+	glDisable(GL_BLEND);
+	m_scene_spare_frame_valid = true;
+
+	std::swap(m_scene_frame_texture, m_scene_spare_frame_texture);
+	std::swap(m_scene_framebuffer, m_scene_spare_framebuffer);
+	std::swap(m_scene_frame_valid, m_scene_spare_frame_valid);
+
+	m_scene_animation_old_texture = m_scene_spare_frame_texture;
+	m_scene_animation_old_valid = m_scene_animation_old_texture != 0 && m_scene_spare_frame_valid;
+	if (!m_scene_animation_old_valid)
+		return false;
+
+	static int scene_animation_log_count = 0;
+	if (scene_animation_log_count < 4) {
+		++scene_animation_log_count;
+		eDebug("[gEGLDC] scene animation zero-copy old=%u new=%u", m_scene_animation_old_texture, m_scene_frame_texture);
+	}
+	bindSceneFramebuffer();
+	return true;
+}
+
+void gEGLDC::finishSceneFramebufferAnimation() {
+	m_scene_animation_old_texture = 0;
+	m_scene_animation_old_valid = false;
+	if (sceneFramebufferActive())
+		bindSceneFramebuffer();
+}
+
+bool gEGLDC::swapWindowFramebuffer() {
+	const unsigned long long swap_start_us = e2eglNowUs();
+#ifdef DREAMNEXTGEN
+	if (!m_fb_output.present(m_fb))
+		return false;
+#else
+	if (!eglSwapBuffers(m_egl_display, m_egl_surface)) {
+		eDebug("[gEGLDC] eglSwapBuffers failed. EGL error: 0x%x", eglGetError());
+		return false;
+	}
+#endif
+
+	m_frame_stats.swap_us += e2eglNowUs() - swap_start_us;
+	if (m_flip_count < 8) {
+		++m_flip_count;
+		eDebug("[gEGLDC] swap #%d at %dx%d logical=%dx%d", m_flip_count, surfaceWidth(), surfaceHeight(), m_width, m_height);
+	}
+	return true;
+}
+
+bool gEGLDC::ensureFrameTexture(GLuint& texture) {
+	const bool capture_surface = !sceneFramebufferActive() && currentFramebufferUsesSurface();
+	const bool capture_scaled_scene = sceneFramebufferActive() && sceneFramebufferUsesSurfaceScale();
+	const int capture_width = sceneFramebufferActive() ? m_scene_frame_width : (capture_surface ? surfaceWidth() : m_width);
+	const int capture_height = sceneFramebufferActive() ? m_scene_frame_height : (capture_surface ? surfaceHeight() : m_height);
+	if (capture_width <= 0 || capture_height <= 0)
+		return false;
+
+	if (m_frame_texture_width != capture_width || m_frame_texture_height != capture_height ||
+		m_frame_texture_surface != capture_surface || m_frame_texture_scene_scaled != capture_scaled_scene)
+		deleteFrameTextures();
+
+	if (!texture) {
+		glGenTextures(1, &texture);
+		glBindTexture(GL_TEXTURE_2D, texture);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, capture_width, capture_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+		glBindTexture(GL_TEXTURE_2D, 0);
+	}
+
+	m_frame_texture_width = capture_width;
+	m_frame_texture_height = capture_height;
+	m_frame_texture_surface = capture_surface;
+	m_frame_texture_scene_scaled = capture_scaled_scene;
+	return texture != 0;
+}
+
+bool gEGLDC::copyCurrentFrameToTexture(GLuint& texture) {
+	if (!ensureFrameTexture(texture))
+		return false;
+
+	GLint previous_framebuffer = 0;
+	if (sceneFramebufferActive()) {
+		glGetIntegerv(GL_FRAMEBUFFER_BINDING, &previous_framebuffer);
+		glBindFramebuffer(GL_FRAMEBUFFER, m_scene_framebuffer);
+	}
+
+	while (glGetError() != GL_NO_ERROR) {
+	}
+	glBindTexture(GL_TEXTURE_2D, texture);
+	glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0, 0, m_frame_texture_width, m_frame_texture_height);
+	glBindTexture(GL_TEXTURE_2D, 0);
+	if (sceneFramebufferActive())
+		glBindFramebuffer(GL_FRAMEBUFFER, previous_framebuffer);
+	static int frame_capture_log_count = 0;
+	if (frame_capture_log_count < 4) {
+		++frame_capture_log_count;
+		eDebug("[gEGLDC] captured frame texture %dx%d logical=%dx%d", m_frame_texture_width, m_frame_texture_height, m_width, m_height);
+	}
+	return glGetError() == GL_NO_ERROR;
+}
+
+void gEGLDC::captureCurrentFrameAsLast() {
+	flushTextBatch();
+	const unsigned long long start_us = e2eglNowUs();
+	m_last_frame_presented = false;
+	m_last_frame_valid = copyCurrentFrameToTexture(m_last_frame_texture);
+	m_frame_stats.capture_us += e2eglNowUs() - start_us;
+	if (m_last_frame_valid)
+		++m_frame_stats.frame_captures;
+}
+
+void gEGLDC::capturePresentedFrame() {
+	captureCurrentFrameAsLast();
+	m_last_frame_presented = m_last_frame_valid;
+}
+
+void gEGLDC::restoreFrameIfNeeded() {
+	if (!m_frame_restore_pending)
+		return;
+
+	const unsigned long long start_us = e2eglNowUs();
+	m_frame_restore_pending = false;
+	if (sceneFramebufferActive())
+		return;
+	if (m_preserved_swap || !m_last_frame_valid || !m_last_frame_texture)
+		return;
+
+	const eRect full_frame(0, 0, m_width, m_height);
+	static int restore_log_count = 0;
+	if (restore_log_count < 4) {
+		++restore_log_count;
+		eDebug("[gEGLDC] restoring previous frame after non-preserved swap");
+	}
+	glDisable(GL_SCISSOR_TEST);
+	drawCopiedFrameTexture(m_last_frame_texture, full_frame, full_frame, 1.0f, false);
+	glDisable(GL_BLEND);
+	m_frame_stats.restore_us += e2eglNowUs() - start_us;
+	++m_frame_stats.frame_restores;
+}
+
+void gEGLDC::copiedTextureSize(GLuint texture, int& width, int& height) const {
+	width = m_width;
+	height = m_height;
+	if (texture == m_last_frame_texture || texture == m_animation_frame_texture) {
+		width = m_frame_texture_width;
+		height = m_frame_texture_height;
+		return;
+	}
+	if (texture == m_scene_frame_texture || texture == m_scene_spare_frame_texture || texture == m_scene_animation_old_texture) {
+		width = m_scene_frame_width ? m_scene_frame_width : m_width;
+		height = m_scene_frame_height ? m_scene_frame_height : m_height;
+	}
+}
+
+void gEGLDC::drawCopiedFrameTexture(GLuint texture, const eRect& dest, const eRect& source, float alpha, bool blend) {
+	e2eglScopedTimer timer(m_frame_stats.copy_us);
+	if (!texture || dest.empty() || source.empty())
+		return;
+
+	int texture_width = m_width;
+	int texture_height = m_height;
+	copiedTextureSize(texture, texture_width, texture_height);
+	if (texture_width <= 0 || texture_height <= 0)
+		return;
+
+	const bool texture_is_frame_capture = texture == m_last_frame_texture || texture == m_animation_frame_texture;
+	const bool texture_is_surface = texture_is_frame_capture && m_frame_texture_surface;
+	const bool texture_is_scene = texture == m_scene_frame_texture || texture == m_scene_spare_frame_texture ||
+		texture == m_scene_animation_old_texture || (texture_is_frame_capture && m_frame_texture_scene_scaled);
+	const eRect texture_source = texture_is_scene ? logicalToSceneRect(source) : (texture_is_surface ? logicalToSurfaceRect(source) : source);
+	const int source_left = texture_source.left();
+	const int source_right = texture_source.right();
+	const int source_top = texture_source.top();
+	const int source_bottom = texture_source.bottom();
+
+	const float u0 = (float)source_left / (float)texture_width;
+	const float u1 = (float)source_right / (float)texture_width;
+	const float v0 = 1.0f - ((float)source_top / (float)texture_height);
+	const float v1 = 1.0f - ((float)source_bottom / (float)texture_height);
+
+	if (blend) {
+		glEnable(GL_BLEND);
+		glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+	} else {
+		glDisable(GL_BLEND);
+	}
+
+	m_texture_shader.drawTexture(dest.x(), dest.y(), dest.width(), dest.height(), texture, clampFloat(alpha, 0.0f, 1.0f), 0.0f, 0, u0, v0, u1, v1, false);
+	++m_frame_stats.frame_copy_draws;
+	m_frame_stats.frame_copy_pixels += rectPixels(dest);
+}
+
+void gEGLDC::drawStripedWindowTexture(GLuint texture, const eRect& source, float visible_progress) {
+	const int strips = 8;
+	const int strip_width = std::max(1, source.width() / strips);
+
+	for (int i = 0; i < strips; ++i) {
+		const int left = source.left() + i * strip_width;
+		const int right = (i == strips - 1) ? source.right() : std::min(source.right(), left + strip_width);
+		if (left >= right)
+			continue;
+
+		const float local = clampFloat((visible_progress * (strips + 2) - i) / 2.0f, 0.0f, 1.0f);
+		if (local <= 0.0f)
+			continue;
+
+		eRect strip_source(left, source.top(), right - left, source.height());
+		eRect strip_dest = strip_source;
+		const int offset = (int)((1.0f - local) * source.height() * 0.18f);
+		strip_dest.moveBy(0, (i & 1) ? offset : -offset);
+		drawCopiedFrameTexture(texture, strip_dest, strip_source, local, true);
+	}
+}
+
+eRect gEGLDC::stripedWindowDamageRect(const eRect& source) const {
+	const int overscan = std::max(1, (int)((float)source.height() * 0.18f) + 2);
+	return clampToScreen(eRect(source.left(), source.top() - overscan, source.width(), source.height() + overscan * 2));
+}
+
+eRect gEGLDC::animatedWindowDestRect(const eRect& source, float visible_progress, bool show, int animation, float* alpha_out) const {
+	(void)show;
+
+	float x = (float)source.x();
+	float y = (float)source.y();
+	float w = (float)source.width();
+	float h = (float)source.height();
+	float alpha = visible_progress;
+	float scale_x = 1.0f;
+	float scale_y = 1.0f;
+	float anchor_x = 0.5f;
+	float anchor_y = 0.5f;
+	const float hidden = 1.0f - visible_progress;
+	const float screen_w = std::max(1.0f, (float)m_width);
+	const float screen_h = std::max(1.0f, (float)m_height);
+	const float width_ratio = w / screen_w;
+	const float height_ratio = h / screen_h;
+	const bool small_dialog = width_ratio < 0.68f && height_ratio < 0.68f;
+	const bool large_window = width_ratio > 0.82f && height_ratio > 0.72f;
+	const bool bottom_panel = source.bottom() > (int)(screen_h * 0.78f) && height_ratio < 0.42f;
+	const bool top_panel = source.top() < (int)(screen_h * 0.18f) && height_ratio < 0.34f;
+	const bool left_panel = source.left() < (int)(screen_w * 0.12f) && width_ratio < 0.76f && height_ratio > 0.42f;
+	const bool right_panel = source.right() > (int)(screen_w * 0.88f) && width_ratio < 0.76f && height_ratio > 0.42f;
+
+	switch (animation) {
+	case 2: // simple zoom
+		scale_x = scale_y = 0.86f + 0.14f * visible_progress;
+		break;
+	case 3: // grow drop
+		y -= hidden * h * 0.30f;
+		scale_y = 0.68f + 0.32f * visible_progress;
+		anchor_y = 0.0f;
+		break;
+	case 4: // grow from left
+		x -= hidden * w * 0.20f;
+		scale_x = 0.68f + 0.32f * visible_progress;
+		anchor_x = 0.0f;
+		break;
+	case 5: // extrude from left
+		scale_x = 0.08f + 0.92f * visible_progress;
+		anchor_x = 0.0f;
+		alpha = 1.0f;
+		break;
+	case 6: // popup
+		scale_x = scale_y = 0.72f + 0.28f * visible_progress;
+		break;
+	case 7: // slide drop
+		y -= hidden * h;
+		alpha = 1.0f;
+		break;
+	case 8: // slide from left
+		x -= hidden * w;
+		alpha = 1.0f;
+		break;
+	case 9: // slide left to right
+		x = -w + visible_progress * ((float)source.x() + w);
+		alpha = 1.0f;
+		break;
+	case 10: // slide right to left
+		x = (float)m_width - visible_progress * ((float)m_width - (float)source.x());
+		alpha = 1.0f;
+		break;
+	case 11: // slide top to bottom
+		y = -h + visible_progress * ((float)source.y() + h);
+		alpha = 1.0f;
+		break;
+	case 12: // zoom from left
+		scale_x = scale_y = 0.74f + 0.26f * visible_progress;
+		anchor_x = 0.0f;
+		break;
+	case 13: // zoom from right
+		scale_x = scale_y = 0.74f + 0.26f * visible_progress;
+		anchor_x = 1.0f;
+		break;
+	case 15: // basis animation
+	{
+		if (bottom_panel) {
+			y += hidden * std::min(h, screen_h * 0.16f);
+		} else if (top_panel) {
+			y -= hidden * std::min(h, screen_h * 0.12f);
+		} else if (left_panel && !large_window) {
+			x -= hidden * std::min(w, screen_w * 0.14f);
+		} else if (right_panel && !large_window) {
+			x += hidden * std::min(w, screen_w * 0.14f);
+		} else if (small_dialog) {
+			scale_x = scale_y = 0.88f + 0.12f * visible_progress;
+			y += hidden * screen_h * 0.015f;
+		} else {
+			scale_x = scale_y = 0.98f + 0.02f * visible_progress;
+		}
+		break;
+	}
+	case 16: // modern adaptive
+		if (bottom_panel) {
+			y += hidden * std::min(h, screen_h * 0.24f);
+			alpha = 0.18f + 0.82f * visible_progress;
+		} else if (top_panel) {
+			y -= hidden * std::min(h, screen_h * 0.18f);
+			alpha = 0.18f + 0.82f * visible_progress;
+		} else if (left_panel && !large_window) {
+			x -= hidden * std::min(w, screen_w * 0.22f);
+			alpha = 0.20f + 0.80f * visible_progress;
+		} else if (right_panel && !large_window) {
+			x += hidden * std::min(w, screen_w * 0.22f);
+			alpha = 0.20f + 0.80f * visible_progress;
+		} else if (small_dialog) {
+			scale_x = scale_y = 0.82f + 0.18f * visible_progress;
+			y += hidden * screen_h * 0.025f;
+			alpha = 0.18f + 0.82f * visible_progress;
+		} else if (large_window) {
+			scale_x = scale_y = 0.985f + 0.015f * visible_progress;
+			alpha = 0.35f + 0.65f * visible_progress;
+		} else {
+			scale_x = scale_y = 0.94f + 0.06f * visible_progress;
+			alpha = 0.28f + 0.72f * visible_progress;
+		}
+		break;
+	case 17: // fade in / fade out
+		alpha = clampFloat(visible_progress * 1.35f, 0.0f, 1.0f);
+		break;
+	case 18: // dialog pop
+		scale_x = scale_y = 0.78f + 0.22f * visible_progress;
+		y += hidden * std::min(h * 0.12f, screen_h * 0.035f);
+		alpha = 0.16f + 0.84f * visible_progress;
+		break;
+	case 19: // toast slide
+		if (source.top() < (int)(screen_h * 0.5f))
+			y -= hidden * std::min(h, screen_h * 0.20f);
+		else
+			y += hidden * std::min(h, screen_h * 0.20f);
+		alpha = 0.12f + 0.88f * visible_progress;
+		break;
+	case 20: // side sheet
+		if (source.x() + source.width() / 2 < (int)(screen_w * 0.5f)) {
+			x -= hidden * std::min(w, screen_w * 0.28f);
+			anchor_x = 0.0f;
+		} else {
+			x += hidden * std::min(w, screen_w * 0.28f);
+			anchor_x = 1.0f;
+		}
+		alpha = 0.18f + 0.82f * visible_progress;
+		break;
+	case 21: // zoom and fade
+		scale_x = scale_y = 0.72f + 0.28f * visible_progress;
+		alpha = 0.12f + 0.88f * visible_progress;
+		break;
+	case 22: // enter from below the screen; hide along exactly the reverse path
+	case 23: // same path with fade
+		y = screen_h - visible_progress * (screen_h - source.top());
+		alpha = animation == 22 ? 1.0f : visible_progress;
+		break;
+	case 1: // simple fade
+	default:
+		break;
+	}
+
+	if (scale_x != 1.0f) {
+		const float new_w = w * scale_x;
+		x += (w - new_w) * anchor_x;
+		w = new_w;
+	}
+	if (scale_y != 1.0f) {
+		const float new_h = h * scale_y;
+		y += (h - new_h) * anchor_y;
+		h = new_h;
+	}
+
+	if (alpha_out)
+		*alpha_out = alpha;
+	return eRect((int)x, (int)y, std::max(1, (int)w), std::max(1, (int)h));
+}
+
+void gEGLDC::drawAnimatedWindowTexture(GLuint texture, const eRect& source, float visible_progress, bool show, int animation) {
+	if (animation == 14) {
+		drawStripedWindowTexture(texture, source, visible_progress);
+		return;
+	}
+
+	float alpha = visible_progress;
+	eRect dest = animatedWindowDestRect(source, visible_progress, show, animation, &alpha);
+	drawCopiedFrameTexture(texture, dest, source, alpha, true);
+}
+
+void gEGLDC::deleteCompactTextures()
+{
+	if (eglGetCurrentContext() == m_egl_context && m_egl_context != EGL_NO_CONTEXT) {
+		if (m_compactOld) glDeleteTextures(1, &m_compactOld);
+		if (m_compactNew) glDeleteTextures(1, &m_compactNew);
+	}
+	m_compactOld = m_compactNew = 0;
+}
+
+bool gEGLDC::captureCompactTexture(GLuint& texture, const eRect& source)
+{
+	if (!sceneFramebufferActive() || !m_scene_frame_valid)
+		return false;
+	flushFillBatch();
+	flushTextBatch();
+	const eRect rect = logicalToSceneRect(source);
+	if (rect.empty())
+		return false;
+	glBindFramebuffer(GL_FRAMEBUFFER, m_scene_framebuffer);
+	const bool existing = texture != 0;
+	if (!existing) glGenTextures(1, &texture);
+	glBindTexture(GL_TEXTURE_2D, texture);
+	if (existing) {
+		glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, rect.x(), m_scene_frame_height - rect.bottom(), rect.width(), rect.height());
+	} else {
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glCopyTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, rect.x(), m_scene_frame_height - rect.bottom(), rect.width(), rect.height(), 0);
+	}
+	glBindTexture(GL_TEXTURE_2D, 0);
+	if (glGetError() != GL_NO_ERROR) {
+		glDeleteTextures(1, &texture);
+		texture = 0;
+		return false;
+	}
+	++m_frame_stats.frame_copy_draws;
+	m_frame_stats.frame_copy_pixels += rectPixels(rect);
+	return true;
+}
+
+void gEGLDC::drawCompactTexture(GLuint texture, const eRect& dest, float alpha, bool blend)
+{
+	if (blend) {
+		glEnable(GL_BLEND);
+		glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+	} else {
+		glDisable(GL_BLEND);
+	}
+	m_texture_shader.drawTexture(dest.x(), dest.y(), dest.width(), dest.height(), texture, alpha, 0, 0, 0, 1, 1, 0);
+	++m_frame_stats.frame_copy_draws;
+	m_frame_stats.frame_copy_pixels += rectPixels(dest);
+}
+
+void gEGLDC::executeWindowAnimationOpcode(const gOpcode* op, bool show) {
+	if (op->parm.setShowHideInfo) {
+		gAnimationCompletionGuard completionGuard(op->parm.setShowHideInfo->completion);
+		const bool explicitStyle = op->parm.setShowHideInfo->animation >= 0;
+		// InfoBar show/hide also toggles companion windows before the same repaint.
+		// Their generic effects must not replace the user's explicit InfoBar effect.
+		if (m_pending_window_animation.active && m_pending_window_animation.explicitStyle && !explicitStyle) {
+			delete op->parm.setShowHideInfo;
+			return;
+		}
+		eRect rect(op->parm.setShowHideInfo->point, op->parm.setShowHideInfo->size);
+		rect = clampToScreen(rect);
+		const int animation = op->parm.setShowHideInfo->animation < 0 ? effectiveWindowAnimationForRect(rect, m_width, m_height) :
+			clampInt(op->parm.setShowHideInfo->animation, 0, E2EGL_WINDOW_ANIMATION_MAX);
+		if (animation > 0 && !rect.empty()) {
+			if (m_compactOld && m_pending_window_animation.rect != rect) {
+				deleteCompactTextures();
+				completeAnimation(m_pending_window_animation.completion);
+				m_pending_window_animation.active = false;
+			}
+			bool compactReady = m_compactOld != 0;
+#ifndef SYNC_PAINT
+			const char* eventEnabled = getenv("E2EGL_EVENT_ANIMATION");
+			if (!compactReady && !m_pending_window_animation.active && !m_scene_animation_old_valid && explicitStyle &&
+				eventEnabled && eventEnabled[0] == '1' && (animation == 17 || animation == 22 || animation == 23) &&
+				rectPixels(rect) * 2 < (unsigned long long)m_width * m_height)
+				compactReady = captureCompactTexture(m_compactOld, rect);
+#endif
+			const bool scene_animation_ready = !compactReady && (m_scene_animation_old_valid || beginSceneFramebufferAnimation());
+			if (!compactReady && !scene_animation_ready)
+				captureCurrentFrameAsLast();
+			if (compactReady || scene_animation_ready || m_last_frame_valid) {
+				if (m_pending_window_animation.completion)
+					m_pending_window_animation.completion->done = true;
+				m_pending_window_animation.completion = op->parm.setShowHideInfo->completion;
+				completionGuard.transfer();
+				m_pending_listbox_animation.active = false;
+				m_pending_listbox_animation.selection_pixmap = nullptr;
+				m_pending_window_animation.active = true;
+				m_pending_window_animation.show = show;
+				m_pending_window_animation.rect = rect;
+				m_pending_window_animation.style = animation;
+				m_pending_window_animation.durationMs = op->parm.setShowHideInfo->durationMs;
+				m_pending_window_animation.explicitStyle = explicitStyle;
+				if (e2eglTraceGlEnabled())
+					eDebug("[e2egl:animation] pending style=%d explicit=%d show=%d rect=%d,%d %dx%d", animation, explicitStyle, show, rect.x(), rect.y(), rect.width(), rect.height());
+			}
+		}
+		delete op->parm.setShowHideInfo;
+	}
+}
+
+bool gEGLDC::runPendingWindowAnimation() {
+	if (!m_pending_window_animation.active)
+		return false;
+
+	gAnimationToken completion = m_pending_window_animation.completion;
+	m_pending_window_animation.completion.reset();
+	gAnimationCompletionGuard completionGuard(completion);
+	completeAnimation(m_pending_window_animation.completion);
+	m_pending_window_animation.active = false;
+	if (m_compactOld) {
+		const PendingWindowAnimation& pending = m_pending_window_animation;
+		if (captureCompactTexture(m_compactNew, pending.rect)) {
+#ifdef HAVE_DREAMBCM_EGL
+			glFinish();
+#endif
+			const int duration = pending.durationMs > 0 ? clampInt(pending.durationMs, 60, 1500) : windowAnimationDurationMs(pending.rect, m_width, m_height);
+			// Retire an unused full-scene spare instead of retaining it beside the small layers.
+			if (m_scene_spare_framebuffer) glDeleteFramebuffers(1, &m_scene_spare_framebuffer);
+			if (m_scene_spare_frame_texture) glDeleteTextures(1, &m_scene_spare_frame_texture);
+			m_scene_spare_framebuffer = m_scene_spare_frame_texture = 0;
+			m_scene_spare_frame_valid = false;
+			eDebug("[e2egl:compact-animation] snapshot_bytes=%llu full_scene_bytes=%llu rect=%d,%d %dx%d",
+				rectPixels(logicalToSceneRect(pending.rect)) * 8ULL, (unsigned long long)m_scene_frame_width * m_scene_frame_height * 4ULL,
+				pending.rect.x(), pending.rect.y(), pending.rect.width(), pending.rect.height());
+			if (startEventAnimation(m_compactOld, m_compactNew, true, pending.rect, pending.show, duration, nullptr, pending.style, true, completion)) {
+				completionGuard.transfer();
+				return true;
+			}
+		}
+		deleteCompactTextures();
+		bindSceneFramebuffer();
+		return false;
+	}
+
+	const bool use_scene_frames = m_scene_animation_old_valid && sceneFramebufferActive();
+	if (!m_last_frame_valid && !use_scene_frames) {
+		if (use_scene_frames)
+			finishSceneFramebufferAnimation();
+		return false;
+	}
+
+	const eRect source = clampToScreen(m_pending_window_animation.rect);
+	if (source.empty()) {
+		if (use_scene_frames)
+			finishSceneFramebufferAnimation();
+		return false;
+	}
+	const int animation = m_pending_window_animation.style;
+	if (animation <= 0) {
+		if (use_scene_frames)
+			finishSceneFramebufferAnimation();
+		return false;
+	}
+
+	GLuint old_frame = 0;
+	GLuint new_frame = 0;
+	if (use_scene_frames) {
+		old_frame = m_scene_animation_old_texture;
+		new_frame = m_scene_frame_texture;
+	} else {
+		const unsigned long long animation_capture_start_us = e2eglNowUs();
+		if (!copyCurrentFrameToTexture(m_animation_frame_texture)) {
+			const unsigned long long animation_capture_us = e2eglNowUs() - animation_capture_start_us;
+			m_frame_stats.capture_us += animation_capture_us;
+			m_frame_stats.draw_us += animation_capture_us;
+			return false;
+		}
+		const unsigned long long animation_capture_us = e2eglNowUs() - animation_capture_start_us;
+		m_frame_stats.capture_us += animation_capture_us;
+		m_frame_stats.draw_us += animation_capture_us;
+		old_frame = m_last_frame_texture;
+		new_frame = m_animation_frame_texture;
+	}
+
+	if (!old_frame || !new_frame) {
+		if (use_scene_frames)
+			finishSceneFramebufferAnimation();
+		return false;
+	}
+
+	const unsigned long long animation_start_us = e2eglNowUs();
+	unsigned long long source_sync_us = 0;
+#ifdef HAVE_DREAMBCM_EGL
+	if (use_scene_frames) {
+		const unsigned long long sync_start_us = e2eglNowUs();
+		// DreamBCM must finish both render-to-texture scenes before they are sampled by the animation.
+		glFinish();
+		source_sync_us = e2eglNowUs() - sync_start_us;
+	}
+#endif
+
+	const bool show = m_pending_window_animation.show;
+	const eRect full_frame(0, 0, m_width, m_height);
+	const int duration_ms = m_pending_window_animation.durationMs > 0 ? clampInt(m_pending_window_animation.durationMs, 60, 1500) : windowAnimationDurationMs(source, m_width, m_height);
+	if (startEventAnimation(old_frame, new_frame, use_scene_frames, source, show, duration_ms, nullptr, animation, false, completion)) {
+		completionGuard.transfer();
+		return true;
+	}
+	const bool damage_only = !use_scene_frames && m_preserved_swap && e2eglAnimationDamageEnabled();
+	eRect previous_damage = source;
+	if (e2eglTraceGlEnabled())
+		eDebug("[e2egl:animation] start type=%d show=%d rect=%d,%d %dx%d duration_ms=%d scene=%d source_sync_us=%llu",
+			animation, show ? 1 : 0, source.x(), source.y(), source.width(), source.height(), duration_ms, use_scene_frames ? 1 : 0, source_sync_us);
+
+	int frames = 0;
+	for (float t = 0.0f;; t = animationProgress(animation_start_us, duration_ms)) {
+		const unsigned long long animation_draw_start_us = e2eglNowUs();
+		const float progress = easeOut(t);
+		const float visible_progress = show ? progress : (1.0f - progress);
+
+		if (use_scene_frames)
+			bindAnimationFramebuffer();
+		glDisable(GL_SCISSOR_TEST);
+		if (damage_only) {
+			eRect damage = animation == 14 ? stripedWindowDamageRect(source) : animatedWindowDestRect(source, visible_progress, show, animation);
+			damage = clampToScreen((damage | source) | previous_damage);
+			if (!damage.empty()) {
+				drawCopiedFrameTexture(show ? old_frame : new_frame, damage, damage, 1.0f, false);
+				drawAnimatedWindowTexture(show ? new_frame : old_frame, source, visible_progress, show, animation);
+			}
+			previous_damage = damage;
+		} else {
+			{
+				e2eglScopedTimer timer(m_frame_stats.clear_us);
+				glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+				glClear(GL_COLOR_BUFFER_BIT);
+			}
+			++m_frame_stats.clear_ops;
+			++m_frame_stats.clear_rects;
+			m_frame_stats.clear_pixels += rectPixels(full_frame);
+			if (show) {
+				drawCopiedFrameTexture(old_frame, full_frame, full_frame, 1.0f, false);
+				drawAnimatedWindowTexture(new_frame, source, visible_progress, true, animation);
+			} else {
+				drawCopiedFrameTexture(new_frame, full_frame, full_frame, 1.0f, false);
+				drawAnimatedWindowTexture(old_frame, source, visible_progress, false, animation);
+			}
+		}
+
+		glDisable(GL_BLEND);
+		m_frame_stats.draw_us += e2eglNowUs() - animation_draw_start_us;
+		if (use_scene_frames) {
+			if (presentAnimationFrame())
+				logAndResetFrameStats();
+		} else {
+			flip();
+		}
+		++frames;
+		if (t >= 1.0f)
+			break;
+		waitForNextAnimationFrame(animation_draw_start_us);
+	}
+
+	const unsigned long long animation_final_draw_start_us = e2eglNowUs();
+	if (use_scene_frames) {
+		finishSceneFramebufferAnimation();
+		m_frame_stats.draw_us += e2eglNowUs() - animation_final_draw_start_us;
+		flip();
+		if (e2eglTraceGlEnabled())
+			eDebug("[e2egl:animation] end type=%d show=%d frames=%d elapsed_us=%llu", animation, show ? 1 : 0, frames, e2eglNowUs() - animation_start_us);
+		return true;
+	}
+
+	glDisable(GL_SCISSOR_TEST);
+	if (damage_only) {
+		eRect final_damage = clampToScreen(previous_damage | source);
+		drawCopiedFrameTexture(new_frame, final_damage, final_damage, 1.0f, false);
+	} else {
+		{
+			e2eglScopedTimer timer(m_frame_stats.clear_us);
+			glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+			glClear(GL_COLOR_BUFFER_BIT);
+		}
+		++m_frame_stats.clear_ops;
+		++m_frame_stats.clear_rects;
+		m_frame_stats.clear_pixels += rectPixels(full_frame);
+		drawCopiedFrameTexture(new_frame, full_frame, full_frame, 1.0f, false);
+	}
+	glDisable(GL_BLEND);
+
+	std::swap(m_last_frame_texture, m_animation_frame_texture);
+	m_last_frame_valid = true;
+	m_frame_stats.draw_us += e2eglNowUs() - animation_final_draw_start_us;
+	flip();
+	if (e2eglTraceGlEnabled())
+		eDebug("[e2egl:animation] end type=%d show=%d frames=%d elapsed_us=%llu", animation, show ? 1 : 0, frames, e2eglNowUs() - animation_start_us);
+	return true;
+}
+
+void gEGLDC::executeListboxAnimationOpcode(const gOpcode* op) {
+	const gOpcode::para::plistboxAnimation* info = op->parm.listboxAnimation;
+	if (!info)
+		return;
+
+	if (s_egl_animation_listbox && !m_pending_window_animation.active && !m_scene_animation_old_valid) {
+		const eRect from = clampToScreen(info->from);
+		const eRect to = clampToScreen(info->to);
+		if (!from.empty() && !to.empty() && from.size() == to.size() && from.topLeft() != to.topLeft()) {
+			const bool presented_ready = m_last_frame_valid && m_last_frame_presented;
+			const bool scene_animation_ready = beginSceneFramebufferAnimation();
+			if (!scene_animation_ready && !presented_ready)
+				captureCurrentFrameAsLast();
+			if (scene_animation_ready || m_last_frame_valid) {
+				m_pending_listbox_animation.active = true;
+				m_pending_listbox_animation.from = from;
+				m_pending_listbox_animation.to = to;
+				m_pending_listbox_animation.background_color = info->backgroundColor;
+				m_pending_listbox_animation.gradient_colors = info->gradientColors;
+				m_pending_listbox_animation.gradient_orientation = info->gradientOrientation;
+				m_pending_listbox_animation.gradient_alpha_blend = info->gradientAlphaBlend;
+				m_pending_listbox_animation.radius = info->radius;
+				m_pending_listbox_animation.radius_edges = info->radiusEdges;
+				m_pending_listbox_animation.selection_pixmap = info->selectionPixmap;
+			}
+		}
+	}
+
+	if (info->selectionPixmap)
+		info->selectionPixmap->Release();
+	delete info;
+}
+
+void gEGLDC::drawListboxSelection(const eRect& area, const PendingListboxAnimation& animation) {
+	if (area.empty())
+		return;
+
+	// Keep the moving focus slightly translucent so the fixed row text remains
+	// readable while the bar passes underneath it.
+	constexpr float animation_alpha = 0.82f;
+	glEnable(GL_BLEND);
+	glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+
+	if (animation.selection_pixmap) {
+		GLuint texture = m_texture_manager.getTexture(animation.selection_pixmap);
+		if (texture) {
+			const eSize pixmap_size = animation.selection_pixmap->size();
+			const int width = std::min(area.width(), pixmap_size.width());
+			const int height = std::min(area.height(), pixmap_size.height());
+			const eRect dest(area.x() + (area.width() - width) / 2, area.y() + (area.height() - height) / 2, width, height);
+			setTextureFiltering(texture, false);
+			m_texture_shader.drawTexture(dest.x(), dest.y(), dest.width(), dest.height(), texture, animation_alpha,
+				0.0f, 0, 0.0f, 0.0f, (float)width / (float)pixmap_size.width(), (float)height / (float)pixmap_size.height(), false);
+		}
+	} else {
+		gRGB background = animation.background_color;
+		std::vector<gRGB> gradient = animation.gradient_colors;
+		const unsigned char min_transparency = (unsigned char)((1.0f - animation_alpha) * 255.0f);
+		background.a = std::max(background.a, min_transparency);
+		for (gRGB& color : gradient)
+			color.a = std::max(color.a, min_transparency);
+		m_advanced_shader.drawAdvancedRect(area.x(), area.y(), area.width(), area.height(), animation.radius,
+			animation.radius_edges, gradient, animation.gradient_orientation, true, 0,
+			colorAlpha(background), background);
+	}
+
+	glDisable(GL_BLEND);
+}
+
+bool gEGLDC::runPendingListboxAnimation() {
+	if (!m_pending_listbox_animation.active)
+		return false;
+
+	const PendingListboxAnimation animation = m_pending_listbox_animation;
+	m_pending_listbox_animation.active = false;
+	m_pending_listbox_animation.selection_pixmap = nullptr;
+	const bool use_scene_frames = m_scene_animation_old_valid && sceneFramebufferActive();
+	if (!s_egl_animation_listbox || (!m_last_frame_valid && !use_scene_frames)) {
+		if (use_scene_frames)
+			finishSceneFramebufferAnimation();
+		return false;
+	}
+
+	const eRect from = clampToScreen(animation.from);
+	const eRect to = clampToScreen(animation.to);
+	if (from.empty() || to.empty() || from.size() != to.size() || from.topLeft() == to.topLeft()) {
+		if (use_scene_frames)
+			finishSceneFramebufferAnimation();
+		return false;
+	}
+
+	GLuint old_frame = 0;
+	GLuint new_frame = 0;
+	if (use_scene_frames) {
+		old_frame = m_last_frame_valid && m_last_frame_presented ? m_last_frame_texture : m_scene_animation_old_texture;
+		new_frame = m_scene_frame_texture;
+	} else {
+		const unsigned long long capture_start_us = e2eglNowUs();
+		if (!copyCurrentFrameToTexture(m_animation_frame_texture)) {
+			m_frame_stats.capture_us += e2eglNowUs() - capture_start_us;
+			return false;
+		}
+		m_frame_stats.capture_us += e2eglNowUs() - capture_start_us;
+		++m_frame_stats.frame_captures;
+		old_frame = m_last_frame_texture;
+		new_frame = m_animation_frame_texture;
+	}
+	if (!old_frame || !new_frame) {
+		if (use_scene_frames)
+			finishSceneFramebufferAnimation();
+		return false;
+	}
+
+#ifdef HAVE_DREAMBCM_EGL
+	if (use_scene_frames)
+		glFinish();
+#endif
+
+	const unsigned long long animation_start_us = e2eglNowUs();
+	const eRect full_frame(0, 0, m_width, m_height);
+	const int duration_ms = clampInt(s_egl_animation_speed * 7, 90, 210);
+	if (startEventAnimation(old_frame, new_frame, use_scene_frames, to, true, duration_ms, &animation))
+		return true;
+	if (e2eglTraceGlEnabled())
+		eDebug("[e2egl:listbox] start from=%d,%d %dx%d to=%d,%d duration_ms=%d scene=%d",
+			from.x(), from.y(), from.width(), from.height(), to.x(), to.y(), duration_ms, use_scene_frames ? 1 : 0);
+
+	int frames = 0;
+	for (float t = 0.0f;; t = animationProgress(animation_start_us, duration_ms)) {
+		const unsigned long long draw_start_us = e2eglNowUs();
+		const float progress = easeInOut(t);
+		const int x = from.x() + (int)((to.x() - from.x()) * progress);
+		const int y = from.y() + (int)((to.y() - from.y()) * progress);
+		const eRect moving(x, y, from.width(), from.height());
+
+		if (use_scene_frames)
+			bindAnimationFramebuffer();
+		glDisable(GL_SCISSOR_TEST);
+		glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+		glClear(GL_COLOR_BUFFER_BIT);
+		++m_frame_stats.clear_ops;
+		++m_frame_stats.clear_rects;
+		m_frame_stats.clear_pixels += rectPixels(full_frame);
+		drawCopiedFrameTexture(new_frame, full_frame, full_frame, 1.0f, false);
+		// The new frame already contains the old row unselected. Restore the
+		// destination from the old frame as well, then animate only the focus bar.
+		drawCopiedFrameTexture(old_frame, to, to, 1.0f, false);
+		drawListboxSelection(moving, animation);
+		// Inside the old and new row the bar is taken from the frame that shows
+		// that row selected, so the row text stays on top of the bar.
+		const eRect moving_from = moving & from;
+		const eRect moving_to = moving & to;
+		if (!moving_from.empty())
+			drawCopiedFrameTexture(old_frame, moving_from, moving_from, 1.0f, false);
+		if (!moving_to.empty())
+			drawCopiedFrameTexture(new_frame, moving_to, moving_to, 1.0f, false);
+		glDisable(GL_BLEND);
+		m_frame_stats.draw_us += e2eglNowUs() - draw_start_us;
+
+		if (use_scene_frames) {
+			if (presentAnimationFrame())
+				logAndResetFrameStats();
+		} else
+			flip();
+		++frames;
+		if (t >= 1.0f)
+			break;
+		waitForNextAnimationFrame(draw_start_us);
+	}
+
+	const unsigned long long final_draw_start_us = e2eglNowUs();
+	if (use_scene_frames) {
+		finishSceneFramebufferAnimation();
+		m_frame_stats.draw_us += e2eglNowUs() - final_draw_start_us;
+		flip();
+	} else {
+		glDisable(GL_SCISSOR_TEST);
+		glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+		glClear(GL_COLOR_BUFFER_BIT);
+		drawCopiedFrameTexture(new_frame, full_frame, full_frame, 1.0f, false);
+		glDisable(GL_BLEND);
+		std::swap(m_last_frame_texture, m_animation_frame_texture);
+		m_last_frame_valid = true;
+		m_frame_stats.draw_us += e2eglNowUs() - final_draw_start_us;
+		flip();
+	}
+
+	if (e2eglTraceGlEnabled())
+		eDebug("[e2egl:listbox] end frames=%d elapsed_us=%llu", frames, e2eglNowUs() - animation_start_us);
+	return true;
+}
+
+bool gEGLDC::startEventAnimation(GLuint oldFrame, GLuint newFrame, bool scene, const eRect& source, bool show, int durationMs, const PendingListboxAnimation* selection, int style, bool compact, gAnimationToken completion)
+{
+#ifdef SYNC_PAINT
+	return false;
+#else
+	const char* enabled = getenv("E2EGL_EVENT_ANIMATION");
+	if (!enabled || enabled[0] != '1')
+		return false;
+	m_event_animation.completion = completion;
+	m_event_animation.frames = 0;
+	m_event_animation.selection.selection_pixmap = nullptr;
+	m_event_animation.listbox = selection != nullptr;
+	m_event_animation.compact = compact;
+	m_event_animation.scene = scene;
+	m_event_animation.show = show;
+	m_event_animation.oldFrame = oldFrame;
+	m_event_animation.newFrame = newFrame;
+	m_event_animation.source = source;
+	m_event_animation.started = e2eglNowUs();
+	m_event_animation.durationMs = durationMs;
+	m_event_animation.style = style;
+	if (selection) {
+		// ePtr's assignment operator accepts a mutable smart pointer.
+		PendingListboxAnimation copy(*selection);
+		m_event_animation.selection = copy;
+	}
+	m_animation_deadline = m_event_animation.started;
+	eDebug("[e2egl:event-animation] start listbox=%d duration_ms=%d scene=%d style=%d show=%d rect=%d,%d %dx%d", selection != nullptr, durationMs, scene, style, show, source.x(), source.y(), source.width(), source.height());
+	renderAnimationFrame();
+	return true;
+#endif
+}
+
+void gEGLDC::finishEventAnimation(bool present)
+{
+	if (!m_animation_deadline.exchange(0))
+		return;
+	const EventAnimation animation = m_event_animation;
+	gAnimationCompletionGuard completionGuard(animation.completion);
+	m_event_animation.completion.reset();
+	m_event_animation.selection.selection_pixmap = nullptr;
+	if (animation.compact)
+		deleteCompactTextures();
+	if (animation.scene) {
+		finishSceneFramebufferAnimation();
+	} else {
+		const eRect fullFrame(0, 0, m_width, m_height);
+		glDisable(GL_SCISSOR_TEST);
+		glClearColor(0, 0, 0, 0);
+		glClear(GL_COLOR_BUFFER_BIT);
+		drawCopiedFrameTexture(animation.newFrame, fullFrame, fullFrame, 1.0f, false);
+		glDisable(GL_BLEND);
+		std::swap(m_last_frame_texture, m_animation_frame_texture);
+		m_last_frame_valid = true;
+		m_last_frame_presented = false;
+		m_frame_restore_pending = false;
+	}
+	if (present)
+		flip();
+	eDebug("[e2egl:event-animation] end listbox=%d frames=%d elapsed_us=%llu interrupted=%d",
+		animation.listbox, animation.frames, e2eglNowUs() - animation.started, !present);
+}
+
+void gEGLDC::renderAnimationFrame()
+{
+	std::lock_guard<std::recursive_mutex> lock(m_egl_mutex);
+	if (!m_animation_deadline)
+		return;
+	if (m_graphics_suspended || !isInitialized() || !makeCurrent()) {
+		if (m_event_animation.completion)
+			m_event_animation.completion->done = true;
+		m_event_animation.completion.reset();
+		completeAnimation(m_event_animation.completion);
+		m_animation_deadline = 0;
+		m_event_animation.selection.selection_pixmap = nullptr;
+		return;
+	}
+	const unsigned long long started = e2eglNowUs();
+	const float t = animationProgress(m_event_animation.started, m_event_animation.durationMs);
+	if (t >= 1.0f) {
+		finishEventAnimation(true);
+		return;
+	}
+	EventAnimation& animation = m_event_animation;
+	const eRect fullFrame(0, 0, m_width, m_height);
+	if (animation.scene)
+		bindAnimationFramebuffer();
+	glDisable(GL_SCISSOR_TEST);
+	glClearColor(0, 0, 0, 0);
+	glClear(GL_COLOR_BUFFER_BIT);
+	++m_frame_stats.clear_ops;
+	++m_frame_stats.clear_rects;
+	m_frame_stats.clear_pixels += rectPixels(fullFrame);
+	if (animation.compact) {
+		const float progress = easeOut(t);
+		const float visible = animation.show ? progress : 1.0f - progress;
+		float alpha = visible;
+		const eRect moving = animatedWindowDestRect(animation.source, visible, animation.show, animation.style, &alpha);
+		drawCopiedFrameTexture(m_scene_frame_texture, fullFrame, fullFrame, 1.0f, false);
+		if (animation.show)
+			drawCompactTexture(animation.oldFrame, animation.source, 1.0f, false);
+		drawCompactTexture(animation.show ? animation.newFrame : animation.oldFrame, moving, alpha, true);
+	} else if (animation.listbox) {
+		const PendingListboxAnimation& selection = animation.selection;
+		const eRect& from = selection.from;
+		const eRect& to = selection.to;
+		const float progress = easeInOut(t);
+		const eRect moving(from.x() + (int)((to.x() - from.x()) * progress), from.y() + (int)((to.y() - from.y()) * progress), from.width(), from.height());
+		drawCopiedFrameTexture(animation.newFrame, fullFrame, fullFrame, 1.0f, false);
+		drawCopiedFrameTexture(animation.oldFrame, to, to, 1.0f, false);
+		drawListboxSelection(moving, selection);
+		const eRect movingFrom = moving & from;
+		const eRect movingTo = moving & to;
+		if (!movingFrom.empty())
+			drawCopiedFrameTexture(animation.oldFrame, movingFrom, movingFrom, 1.0f, false);
+		if (!movingTo.empty())
+			drawCopiedFrameTexture(animation.newFrame, movingTo, movingTo, 1.0f, false);
+	} else {
+		const float progress = easeOut(t);
+		drawCopiedFrameTexture(animation.show ? animation.oldFrame : animation.newFrame, fullFrame, fullFrame, 1.0f, false);
+		drawAnimatedWindowTexture(animation.show ? animation.newFrame : animation.oldFrame, animation.source,
+			animation.show ? progress : 1.0f - progress, animation.show, animation.style);
+	}
+	glDisable(GL_BLEND);
+	m_frame_stats.draw_us += e2eglNowUs() - started;
+	if (animation.scene) {
+		if (presentAnimationFrame())
+			logAndResetFrameStats();
+	} else {
+		flip();
+	}
+	++animation.frames;
+	m_animation_deadline = started + 16000ULL;
+}
+
+eRect gEGLDC::currentSpinnerRect() const {
+	if (m_nativeSpinner)
+		return m_nativeSpinnerRect;
+	return m_width >= 1920 ? m_spinner_pos_FHD : m_spinner_pos_HD;
+}
+
+gPixmap* gEGLDC::currentSpinnerBackground() const {
+	if (m_nativeSpinner)
+		return m_nativeSpinnerSaved;
+	return m_width >= 1920 ? m_spinner_saved_FHD : m_spinner_saved_HD;
+}
+
+void gEGLDC::updateNativeSpinnerGeometry() {
+	const eSize screen(m_width, m_height);
+	if (screen == m_nativeSpinnerScreen)
+		return;
+
+	// Same geometry as gDC::drawNativeSpinner().
+	const int diameter = std::min(std::min(screen.width(), screen.height()), std::max(8, (32 * screen.height() + 360) / 720));
+	const int x = std::max(0, std::min(screen.width() - diameter, m_nativeSpinnerPosition.x() * screen.width() / 1280));
+	const int y = std::max(0, std::min(screen.height() - diameter, m_nativeSpinnerPosition.y() * screen.height() / 720));
+	const eSize spinner_size(diameter, diameter);
+	m_nativeSpinnerRect = eRect(ePoint(x, y), spinner_size);
+	m_nativeSpinnerFrame = new gPixmap(spinner_size, 32, gPixmap::accelNever);
+	m_nativeSpinnerSaved = new gPixmap(spinner_size, 32, gPixmap::accelNever);
+	m_spinnerRenderer.resize(diameter);
+	m_nativeSpinnerScreen = screen;
+	m_nativeSpinnerVisible = false;
+	invalidateSpinnerBackground();
+}
+
+void gEGLDC::drawNativeSpinnerFrame(const eRect& rect) {
+	if (!m_nativeSpinnerFrame || !m_nativeSpinnerFrame->surface || !m_nativeSpinnerFrame->surface->data)
+		return;
+
+	struct timespec now;
+	clock_gettime(CLOCK_MONOTONIC, &now);
+	const uint64_t milliseconds = uint64_t(now.tv_sec) * 1000 + now.tv_nsec / 1000000;
+	if (!m_nativeSpinnerVisible) {
+		m_nativeSpinnerStart = milliseconds;
+		m_nativeSpinnerVisible = true;
+	}
+
+	gUnmanagedSurface* surface = m_nativeSpinnerFrame->surface;
+	m_texture_manager.prepareSurface(surface);
+	if (surface->gl_texture_id) {
+		m_texture_manager.queueForDeletion(surface->gl_texture_id);
+		surface->gl_texture_id = 0;
+	}
+	m_spinnerRenderer.render(surface->data, surface->stride, milliseconds - m_nativeSpinnerStart, m_spinnerColor.load(std::memory_order_relaxed));
+	surface->cpu_content_valid = true;
+	surface->gl_content_valid = false;
+	drawPixmap(m_nativeSpinnerFrame, rect, gPixmap::blitAlphaBlend);
+}
+
+void gEGLDC::invalidateSpinnerBackground(bool clear_pending) {
+	m_spinner_background_valid = false;
+	m_spinner_background_width = 0;
+	m_spinner_background_height = 0;
+	m_spinner_background_clear = false;
+	if (clear_pending)
+		m_spinner_clear_pending = true;
+}
+
+void gEGLDC::clearSpinnerRect(const eRect& rect) {
+	const eRect area = clampToScreen(rect);
+	if (area.empty())
+		return;
+
+	flushFillBatchIfOverlaps(area);
+	glDisable(GL_BLEND);
+	glEnable(GL_SCISSOR_TEST);
+	setGlScissor(area);
+	glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+	glClear(GL_COLOR_BUFFER_BIT);
+	glDisable(GL_SCISSOR_TEST);
+}
+
+bool gEGLDC::clearSpinnerBackgroundPixmap(gPixmap* background) {
+	if (!background || !background->surface || !background->surface->data || background->surface->bpp != 32)
+		return false;
+
+	gUnmanagedSurface* surface = background->surface;
+	m_texture_manager.prepareSurface(surface);
+	const int width = std::min(std::max(0, surface->x), background->size().width());
+	const int height = std::min(std::max(0, surface->y), background->size().height());
+	if (width <= 0 || height <= 0 || surface->stride < width * 4)
+		return false;
+
+	if (surface->gl_texture_id) {
+		m_texture_manager.queueForDeletion(surface->gl_texture_id);
+		surface->gl_texture_id = 0;
+	}
+	if (surface->gl_framebuffer_id) {
+		m_texture_manager.queueFramebufferForDeletion(surface->gl_framebuffer_id);
+		surface->gl_framebuffer_id = 0;
+	}
+
+	for (int y = 0; y < height; ++y)
+		memset((uint8_t*)surface->data + y * surface->stride, 0, width * 4);
+	surface->cpu_content_valid = true;
+	surface->gl_content_valid = false;
+	return true;
+}
+
+bool gEGLDC::captureSpinnerBackground() {
+	gPixmap* background = currentSpinnerBackground();
+	const eRect rect = clampToScreen(currentSpinnerRect());
+	if (!background || !background->surface || rect.empty())
+		return false;
+
+	bool ok = false;
+	const bool clear_background = m_spinner_clear_pending;
+	bool cleared_background = false;
+	if (clear_background) {
+		ok = clearSpinnerBackgroundPixmap(background);
+		cleared_background = ok;
+	}
+	if (!ok) {
+		ok = readFramebufferRegion(rect, background);
+		cleared_background = false;
+	}
+	m_spinner_clear_pending = false;
+	m_spinner_background_valid = ok;
+	m_spinner_background_width = ok ? m_width : 0;
+	m_spinner_background_height = ok ? m_height : 0;
+	m_spinner_background_clear = ok && cleared_background;
+	return ok;
 }
 
 void gEGLDC::enableSpinner() {
-	// The Dreambox tree has three resolution-specific spinner rectangles;
-	// there is no generic m_spinner_pos member in this backend.
-	eRect spinner_pos =
-		size().width() == 3840 ? m_spinner_pos_UHD :
-		size().width() >= 1920 ? m_spinner_pos_FHD :
-		m_spinner_pos_HD;
-	captureBackgroundIntoPixmap(spinner_pos);
-	gDC::enableSpinner();
-	// m_spinner_pos is a screen-absolute rect (the spinner is a global
-	// overlay, not part of any widget's offset-relative coordinate space),
-	// so unlike renderText/renderPara's area it must NOT have
-	// m_current_offset applied here.
-	//
-	// false, not the default true - see disableSpinner()'s comment. This
-	// first frame's m_pixmap content is already the full background+icon
-	// composite (gDC::enableSpinner() just built it), not translucent
-	// content to layer over whatever the GPU target previously held there,
-	// so it needs the same unconditional-overwrite blend disableSpinner()
-	// and incrementSpinner() use.
-	compositeTextOverlay(spinner_pos, false);
+	flushTextBatch();
+	if (m_nativeSpinner) {
+		if (m_width < 8 || m_height < 8)
+			return;
+		updateNativeSpinnerGeometry();
+		m_nativeSpinnerVisible = false;
+	}
+	// A new spinner must capture the current OSD, including redraws since the last surface reset.
+	m_spinner_clear_pending = false;
+	captureSpinnerBackground();
+	incrementSpinner();
 }
 
 void gEGLDC::disableSpinner() {
-	// The Dreambox tree has three resolution-specific spinner rectangles;
-	// there is no generic m_spinner_pos member in this backend.
-	eRect spinner_pos =
-		size().width() == 3840 ? m_spinner_pos_UHD :
-		size().width() >= 1920 ? m_spinner_pos_FHD :
-		m_spinner_pos_HD;
-	captureBackgroundIntoPixmap(spinner_pos);
-	gDC::disableSpinner();
-	// false, not the default true: gDC::disableSpinner() just restored
-	// m_spinner_pos back to fully-transparent pixels in m_pixmap, and this
-	// needs to actually erase the last spinner frame already baked into the
-	// GPU render target, not accumulate on top of it. With the default
-	// accumulating blend, a fully-transparent source leaves an opaque
-	// destination's alpha unchanged (out.a = src.a + dst.a*(1-src.a), which
-	// for src.a=0 is just dst.a) - the icon would stay stuck on screen
-	// forever once the animation itself stops (no more enableSpinner()/
-	// incrementSpinner() calls to eventually paint over it). false makes
-	// this draw's own (transparent) alpha the absolute truth for that
-	// region instead, actually punching the hole back through to video.
-	compositeTextOverlay(spinner_pos, false);
+	flushTextBatch();
+	const eRect rect = currentSpinnerRect();
+	if (m_spinner_clear_pending) {
+		clearSpinnerRect(rect);
+		m_spinner_clear_pending = false;
+	} else if (m_spinner_background_valid && m_spinner_background_width == m_width && m_spinner_background_height == m_height) {
+		if (m_spinner_background_clear)
+			clearSpinnerRect(rect);
+		else
+			drawPixmap(currentSpinnerBackground(), rect, 0);
+	}
+	m_nativeSpinnerVisible = false;
+	invalidateSpinnerBackground();
 }
 
 void gEGLDC::incrementSpinner() {
-	// The Dreambox tree has three resolution-specific spinner rectangles;
-	// there is no generic m_spinner_pos member in this backend.
-	eRect spinner_pos =
-		size().width() == 3840 ? m_spinner_pos_UHD :
-		size().width() >= 1920 ? m_spinner_pos_FHD :
-		m_spinner_pos_HD;
-	captureBackgroundIntoPixmap(spinner_pos);
-	gDC::incrementSpinner();
-	// false, not the default true - same reasoning as disableSpinner()
-	// above, just mid-animation instead of at the end. gDC::incrementSpinner()
-	// already recomposited this whole rect from scratch (background copied
-	// in fresh, then this frame's rotated icon alpha-blended on top on the
-	// CPU side), so m_pixmap here holds the complete, final pixel content
-	// for the region, not translucent content to accumulate over the GPU
-	// target's existing pixels. The icon's opaque footprint moves every
-	// frame as it rotates; with the default accumulating blend, the pixels
-	// it just vacated (now transparent, src.a=0, in this frame's composite)
-	// leave the destination's alpha/color untouched (out.a = dst.a for
-	// src.a=0), so the previous frame's icon stayed baked into the render
-	// target as a trailing ghost for the whole animation. false makes this
-	// draw's alpha the absolute truth for the region instead, so the
-	// vacated pixels are actually erased back to background every frame.
-	compositeTextOverlay(spinner_pos, false);
+	flushTextBatch();
+	if (m_nativeSpinner) {
+		if (m_width < 8 || m_height < 8)
+			return;
+		updateNativeSpinnerGeometry();
+	} else if (!m_spinner_pic || !m_spinner_num)
+		return;
+
+	if (!m_spinner_background_valid || m_spinner_background_width != m_width || m_spinner_background_height != m_height)
+		captureSpinnerBackground();
+
+	const eRect rect = currentSpinnerRect();
+	if (m_spinner_background_valid) {
+		if (m_spinner_background_clear)
+			clearSpinnerRect(rect);
+		else
+			drawPixmap(currentSpinnerBackground(), rect, 0);
+	}
+	if (m_nativeSpinner) {
+		drawNativeSpinnerFrame(rect);
+		return;
+	}
+	if (m_spinner_pic[m_spinner_i])
+		drawPixmap(m_spinner_pic[m_spinner_i], rect, gPixmap::blitAlphaBlend);
+
+	m_spinner_i++;
+	m_spinner_i %= m_spinner_num;
+}
+
+void gEGLDC::renderGlyph(const ePoint& pos, gPixmap* glyph_mask, const gRGB& color) {
+	if (!glyph_mask || !glyph_mask->surface || glyph_mask->surface->bpp != 8)
+		return;
+
+	const eRect glyph_bounds(pos.x(), pos.y(), glyph_mask->size().width(), glyph_mask->size().height());
+	const eRect screen_bounds(0, 0, m_width, m_height);
+	if (m_current_clip.empty() || !glyph_bounds.intersects(m_current_clip.extends) || !glyph_bounds.intersects(screen_bounds))
+		return;
+	recoverFontAtlas();
+
+	glyph_uv uv;
+	glyph_key_t key = hashGlyphMask(glyph_mask);
+
+	if (!m_font_atlas.getGlyph(key, uv)) {
+		int w = glyph_mask->size().width();
+		int h = glyph_mask->size().height();
+		int pitch = glyph_mask->surface->stride;
+		uint8_t* data = (uint8_t*)glyph_mask->surface->data;
+		if (!m_font_atlas.addGlyph(key, w, h, pitch, data, uv, false)) {
+			flushTextBatchForReason(textFlushAtlas);
+			if (!m_font_atlas.addGlyph(key, w, h, pitch, data, uv, true))
+				return;
+		}
+	}
+
+	float r = colorComponent(color.r);
+	float g = colorComponent(color.g);
+	float b = colorComponent(color.b);
+	float a = colorAlpha(color);
+
+	const float u_span = uv.u1 - uv.u0;
+	const float v_span = uv.v1 - uv.v0;
+	unsigned int clipped_quads = 0;
+
+	for (unsigned int i = 0; i < m_current_clip.rects.size(); ++i) {
+		eRect clipped = glyph_bounds & m_current_clip.rects[i] & screen_bounds;
+		if (clipped.empty())
+			continue;
+
+		const float x0 = clipped.left();
+		const float y0 = clipped.top();
+		const float x1 = clipped.right();
+		const float y1 = clipped.bottom();
+		const float u0 = uv.u0 + ((float)(clipped.left() - glyph_bounds.left()) / (float)uv.width) * u_span;
+		const float v0 = uv.v0 + ((float)(clipped.top() - glyph_bounds.top()) / (float)uv.height) * v_span;
+		const float u1 = uv.u0 + ((float)(clipped.right() - glyph_bounds.left()) / (float)uv.width) * u_span;
+		const float v1 = uv.v0 + ((float)(clipped.bottom() - glyph_bounds.top()) / (float)uv.height) * v_span;
+
+		float vertices[48] = {x0, y0, u0, v0, r, g, b, a, x0, y1, u0, v1, r, g, b, a, x1, y0, u1, v0, r, g, b, a,
+							  x1, y0, u1, v0, r, g, b, a, x0, y1, u0, v1, r, g, b, a, x1, y1, u1, v1, r, g, b, a};
+
+		m_text_batch_buffer.insert(m_text_batch_buffer.end(), vertices, vertices + 48);
+		addTextBatchRect(clipped);
+		if (m_text_batch_bounds_valid)
+			m_text_batch_bounds |= clipped;
+		else {
+			m_text_batch_bounds = clipped;
+			m_text_batch_bounds_valid = true;
+		}
+		++clipped_quads;
+		if (m_text_batch_buffer.size() >= MAX_BATCH_GLYPHS * 48)
+			flushTextBatchForReason(textFlushLimit);
+	}
+
+	if (clipped_quads) {
+		++m_frame_stats.glyphs;
+		m_frame_stats.text_draw_rects += clipped_quads;
+	}
+}
+
+void gEGLDC::recoverFontAtlas()
+{
+	if (!m_fontAtlasRetrySmaller)
+		return;
+	// Never resize inside flushTextBatch(): renderGlyph may still hold UVs
+	// for more clip rectangles of that glyph. Change the atlas before lookup.
+	flushTextBatchForReason(textFlushAtlas);
+	if (m_fontAtlasRetrySmaller) {
+		m_fontAtlasRetrySmaller = false;
+		m_font_atlas.reduceSize();
+	}
+}
+
+void gEGLDC::logTextRenderFailure(const char* stage, GLenum error, const eRect& area)
+{
+	++m_textRenderErrorCount;
+	if (m_textRenderErrorCount > 8 && m_textRenderErrorCount % 64 != 0)
+		return;
+	gPixmap* atlas = m_font_atlas.getPixmap();
+	GLint framebuffer = 0;
+	GLint viewport[4] = {};
+	glGetIntegerv(GL_FRAMEBUFFER_BINDING, &framebuffer);
+	glGetIntegerv(GL_VIEWPORT, viewport);
+	eWarning("[gEGLDC] text render failure stage=%s error=0x%x count=%u atlas=%dx%d texture=%u dirty=%d rect=%d,%d %dx%d quads=%zu osd=%dx%d framebuffer=%d viewport=%d,%d %dx%d",
+		stage, error, m_textRenderErrorCount, atlas ? atlas->size().width() : 0, atlas ? atlas->size().height() : 0,
+		atlas && atlas->surface ? atlas->surface->gl_texture_id : 0, m_font_atlas.isDirty(),
+		area.x(), area.y(), area.width(), area.height(), m_text_batch_buffer.size() / 48,
+		m_width, m_height, framebuffer, viewport[0], viewport[1], viewport[2], viewport[3]);
+}
+
+GLuint gEGLDC::prepareFontAtlasTexture()
+{
+	// Keep errors from earlier rendering separate from the atlas operation.
+	for (int i = 0; i < 8; ++i) {
+		const GLenum error = glGetError();
+		if (error == GL_NO_ERROR)
+			break;
+		logTextRenderFailure("before atlas upload", error);
+	}
+	glActiveTexture(GL_TEXTURE0);
+#ifdef HAVE_GLES3
+	if (gles::isGLES3())
+		glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
+#endif
+	gPixmap* atlas_pix = m_font_atlas.getPixmap();
+	if (atlas_pix && atlas_pix->surface)
+		m_texture_manager.prepareSurface(atlas_pix->surface);
+	const bool atlas_texture_valid = atlas_pix && atlas_pix->surface && atlas_pix->surface->gl_texture_id && atlas_pix->surface->gl_content_valid;
+	GLuint tex_id = m_texture_manager.getTexture(atlas_pix);
+	if (!tex_id) {
+		// getTexture() reports the GL error; retain the CPU atlas and dirty state.
+		logTextRenderFailure("allocate atlas (see gTextureManager)", GL_NO_ERROR);
+		m_fontAtlasRetrySmaller = atlas_pix && atlas_pix->size().width() > 512;
+		return 0;
+	}
+	glBindTexture(GL_TEXTURE_2D, tex_id);
+	if (!atlas_texture_valid)
+		eDebug("[gEGLDC] font atlas uploaded size=%dx%d texture=%u bytes=%llu osd=%dx%d",
+			atlas_pix->size().width(), atlas_pix->size().height(), tex_id,
+			static_cast<unsigned long long>(atlas_pix->size().width()) * atlas_pix->size().height(), m_width, m_height);
+
+	if (m_font_atlas.isDirty()) {
+		if (!atlas_texture_valid) {
+			m_font_atlas.clearDirty();
+		} else {
+			const std::vector<eRect>& dirty_rects = m_font_atlas.getDirtyRects();
+			const eRect fallback_dirty = m_font_atlas.getDirtyRect();
+			const int dirty_count = dirty_rects.empty() ? 1 : (int)dirty_rects.size();
+			const int stride = atlas_pix->size().width();
+			GLenum uploadError = GL_NO_ERROR;
+
+			glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+			GLenum src_fmt = GL_LUMINANCE;
+#ifdef HAVE_GLES3
+			if (gles::isGLES3())
+				src_fmt = GL_RED;
+#endif
+			for (int i = 0; i < dirty_count; ++i) {
+				eRect dirty = dirty_rects.empty() ? fallback_dirty : dirty_rects[i];
+				dirty &= eRect(ePoint(0, 0), atlas_pix->size());
+				if (dirty.empty())
+					continue;
+
+				// GLES 2.0 cannot address sub-rect rows in client memory. GLES3 can upload
+				// only the dirty atlas rectangle via GL_UNPACK_ROW_LENGTH.
+				int start_x = 0;
+				const int start_y = dirty.top();
+				int upload_width = atlas_pix->size().width();
+				const int height = dirty.height();
+				const uint8_t* data = (const uint8_t*)atlas_pix->surface->data + start_y * stride;
+
+#ifdef HAVE_GLES3
+				if (gles::isGLES3()) {
+					start_x = dirty.left();
+					upload_width = dirty.width();
+					data += start_x;
+					glPixelStorei(GL_UNPACK_ROW_LENGTH, stride);
+				}
+#endif
+				glTexSubImage2D(GL_TEXTURE_2D, 0, start_x, start_y, upload_width, height, src_fmt, GL_UNSIGNED_BYTE, data);
+				uploadError = glGetError();
+				if (uploadError != GL_NO_ERROR) {
+					logTextRenderFailure("update atlas", uploadError, eRect(start_x, start_y, upload_width, height));
+					break;
+				}
+				++m_frame_stats.font_uploads;
+				m_frame_stats.font_upload_pixels += rectPixels(eRect(start_x, start_y, upload_width, height));
+			}
+
+#ifdef HAVE_GLES3
+			if (gles::isGLES3())
+				glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
+#endif
+			glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
+			if (uploadError != GL_NO_ERROR) {
+				for (int i = 0; i < 8; ++i) {
+					const GLenum error = glGetError();
+					if (error == GL_NO_ERROR)
+						break;
+					logTextRenderFailure("update atlas (pending error)", error);
+				}
+				// Re-upload the CPU copy once, keeping all glyphs and UVs. Do not
+				// mark a partial/failed update clean or keep using that texture.
+				m_texture_manager.queueForDeletion(tex_id, atlas_pix->surface->gl_context_generation);
+				atlas_pix->surface->gl_texture_id = 0;
+				atlas_pix->surface->gl_content_valid = false;
+				m_texture_manager.processDeletions();
+				tex_id = m_texture_manager.getTexture(atlas_pix);
+				if (!tex_id) {
+					logTextRenderFailure("rebuild atlas (see gTextureManager)", GL_NO_ERROR);
+					m_fontAtlasRetrySmaller = atlas_pix->size().width() > 512;
+					return 0;
+				}
+				glBindTexture(GL_TEXTURE_2D, tex_id);
+				if (m_textRenderErrorCount <= 8 || m_textRenderErrorCount % 64 == 0)
+					eWarning("[gEGLDC] font atlas recovered size=%dx%d texture=%u", atlas_pix->size().width(), atlas_pix->size().height(), tex_id);
+			}
+			m_font_atlas.clearDirty();
+		}
+	}
+	m_fontAtlasRetrySmaller = false;
+	return tex_id;
+}
+
+void gEGLDC::flushTextBatch() {
+	flushFillBatch();
+	if (m_text_batch_buffer.empty())
+		return;
+	e2eglScopedTimer timer(m_frame_stats.text_us);
+	++m_frame_stats.text_batches;
+
+	const GLuint tex_id = prepareFontAtlasTexture();
+	if (tex_id) {
+		glEnable(GL_BLEND);
+		glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+		glDisable(GL_SCISSOR_TEST);
+		if (!m_text_shader.drawBatchChecked(m_text_batch_buffer.data(), m_text_batch_buffer.size()))
+			logTextRenderFailure("draw text (see gTextShader)", GL_NO_ERROR);
+	}
+
+	glDisable(GL_BLEND);
+
+	m_text_batch_buffer.clear();
+	m_text_batch_rects.clear();
+	m_text_batch_bounds_valid = false;
 }
 
 void gEGLDC::exec(const gOpcode* opcode) {
-	if (!isInitialized())
-		return;
+	std::lock_guard<std::recursive_mutex> lock(m_egl_mutex);
 
-	// a frame is open from its first drawing opcode until its flush: the
-	// animation overlay is only presented between frames, never in the middle of one
-	m_frame_open = (opcode->opcode != gOpcode::flush && opcode->opcode != gOpcode::flip);
-	m_last_op = std::chrono::steady_clock::now();
+	if (!m_render_thread_known) {
+		m_render_thread = pthread_self();
+		m_render_thread_known = true;
+	}
+	if (opcode->opcode == gOpcode::invoke) {
+		if (isInitialized() && m_egl_display != EGL_NO_DISPLAY && m_egl_surface != EGL_NO_SURFACE)
+			makeCurrent();
+		(*opcode->parm.invoke)();
+		return;
+	}
+
+	/*
+	 * fbClass::lock() prevents new paint commands while an external GLES
+	 * client is active. Commands which were already queued still have to be
+	 * consumed so their parameter objects and references are released.
+	 * Discard them without drawing while retaining correct ownership cleanup.
+	 */
+	if (m_graphics_suspended) {
+		discardOpcode(opcode);
+		return;
+	}
+
+	if (!isInitialized()) {
+		discardOpcode(opcode);
+		return;
+	}
+
+	if (opcodeCanRunWithoutEGLContext(opcode->opcode)) {
+		const unsigned long long draw_start_us = e2eglNowUs();
+		{
+			e2eglScopedTimer timer(m_frame_stats.state_us);
+			gDC::exec(opcode);
+		}
+		m_frame_stats.draw_us += e2eglNowUs() - draw_start_us;
+		return;
+	}
+
+	if (m_surface_lost && m_egl_surface == EGL_NO_SURFACE && e2eglNowUs() - m_surface_retry_us > 500000ULL) {
+		m_surface_retry_us = e2eglNowUs();
+		eDebug("[gEGLDC] retrying lost EGL window surface at %dx%d logical=%dx%d", surfaceWidth(), surfaceHeight(), m_width, m_height);
+		refresh();
+	}
+
+	const bool already_current = eglGetCurrentContext() == m_egl_context;
+	if (!already_current && !makeCurrent()) {
+		discardOpcode(opcode);
+		return;
+	}
+
+	const unsigned long long draw_start_us = e2eglNowUs();
+	bool draw_time_recorded = false;
+	{
+		e2eglScopedTimer timer(m_frame_stats.texture_gc_us);
+		m_texture_manager.processDeletions();
+	}
+	const bool draws_to_surface = opcodeDrawsToSurface(opcode->opcode);
+	// Position/time updates repaint an already visible MediaInfoBar. Keep its
+	// animation alive and update the final scene; new window transitions still cancel.
+	const bool liveWindowAnimation = m_animation_deadline && m_event_animation.scene && !m_event_animation.listbox &&
+		(m_event_animation.style == 17 || m_event_animation.style == 22 || m_event_animation.style == 23);
+	if (m_animation_deadline && ((draws_to_surface && !liveWindowAnimation) || opcode->opcode == gOpcode::sendShow ||
+		opcode->opcode == gOpcode::sendHide || opcode->opcode == gOpcode::sendListboxAnimation))
+		finishEventAnimation(false);
+	const bool may_flush_to_surface = opcode->opcode == gOpcode::flush || opcode->opcode == gOpcode::flip || opcode->opcode == gOpcode::sendShow || opcode->opcode == gOpcode::sendHide || opcode->opcode == gOpcode::sendListboxAnimation;
+	bool using_scene_framebuffer = false;
+	if (sceneFramebufferWanted() && (draws_to_surface || may_flush_to_surface))
+		using_scene_framebuffer = bindSceneFramebuffer();
+	if (draws_to_surface) {
+		if (!using_scene_framebuffer)
+			restoreFrameIfNeeded();
+		else
+			m_frame_restore_pending = false;
+	}
 
 	switch (opcode->opcode) {
-		// fill/fillRegion/rectangle/line/blit are all handled entirely by
-		// this backend's own executeXXX() helpers instead of falling through
-		// to gDC::exec(opcode) - unlike renderText/renderPara/clear below,
-		// which call gDC::exec(opcode) themselves and get its disposal
-		// (delete o->parm.X, plus Release() on any refcounted member) for
-		// free. These five never did, so their heap-allocated opcode struct
-		// (new'd by gPainter's queuing side - see e.g. gPainter::blit() in
-		// grc.cpp) was never freed. blit is the severe case (op->pixmap also
-		// carries an AddRef() from gPainter::blit() that must be Release()'d
-		// - see executeBlit()'s own BlitOpcodeGuard); the rest hold no
-		// refcounted resource, so a plain delete here is enough.
 		case gOpcode::fill:
+			{
+				eRect area = opcode->parm.fill->area;
+				area.moveBy(m_current_offset);
+				flushTextBatchIfOverlaps(m_current_clip & area, textFlushFill);
+			}
 			executeFill(opcode);
 			delete opcode->parm.fill;
 			break;
 
 		case gOpcode::fillRegion:
+			{
+				gRegion region = opcode->parm.fillRegion->region;
+				region.moveBy(m_current_offset);
+				flushTextBatchIfOverlaps(m_current_clip & region, textFlushFill);
+			}
 			executeFillRegion(opcode);
 			delete opcode->parm.fillRegion;
 			break;
 
 		case gOpcode::rectangle:
+			{
+				eRect area = opcode->parm.rectangle->area;
+				area.moveBy(m_current_offset);
+				gRegion draw_region = m_current_clip & area;
+				flushTextBatchIfOverlaps(draw_region, textFlushRectangle);
+				flushFillBatchIfOverlaps(draw_region);
+			}
 			executeRectangle(opcode);
+			resetRectangleState();
 			delete opcode->parm.rectangle;
 			break;
 
 		case gOpcode::line:
+			{
+				gRegion draw_region = m_current_clip & lineDrawBounds(opcode->parm.line);
+				flushTextBatchIfOverlaps(draw_region, textFlushLine);
+				flushFillBatchIfOverlaps(draw_region);
+			}
 			executeLine(opcode);
 			delete opcode->parm.line;
 			break;
 
-		case gOpcode::blit:
-			executeBlit(opcode);
-			break;
-
-		case gOpcode::renderText: {
-			// eTextPara::blit() (lib/gdi/font.cpp) draws most glyphs straight
-			// to the GPU via renderGlyph()/the atlas below now, but border
-			// text and pre-rendered "image" glyphs (see grc.h's
-			// gDC::renderGlyph() comment) still fall back to pure software
-			// rasterization directly into dc.getPixmap()'s CPU buffer
-			// (gDC::m_pixmap). compositeTextOverlay() uploads that CPU
-			// result and composites it onto the real GPU surface, the same
-			// way any other pixmap (icons etc.) is drawn via executeBlit() -
-			// m_cpu_overlay_dirty (set by onGlyphCpuDrawn()) tracks whether
-			// this particular draw actually used that fallback, so a glyph
-			// fully handled on the GPU doesn't get compositeTextOverlay()
-			// re-painting whatever unrelated old content still sits in
-			// m_pixmap at this screen position on top of it.
-			//
-			// CRITICAL: capture area BEFORE calling gDC::exec(opcode) - its
-			// renderText handling (grc.cpp) does "delete o->parm.renderText;"
-			// as its very last step. Reading opcode->parm.renderText->area
-			// afterward is a use-after-free.
-			eRect area = opcode->parm.renderText->area;
-			// See executeFill()'s comment: a pending blit batch queued
-			// before this text must draw before it, not after.
-			flushBlitBatch();
-			m_cpu_overlay_dirty = false;
-
-			// Flush any pending text batch from an *earlier*, different
-			// renderText/renderPara draw first: a batch only remembers ONE
-			// clip (m_text_batch_clip), captured once when it starts - if
-			// this text's glyphs got appended to a still-open batch from a
-			// prior, differently-positioned text field (e.g. a list row's
-			// channel-name field immediately followed by its event-title
-			// field, with no clip-changing opcode between them to trigger a
-			// flush on its own), they'd wrongly inherit that earlier
-			// field's clip instead of this one's own area below.
+		case gOpcode::blitTransition:
+		{
+			++m_frame_stats.contentBlits;
 			flushTextBatch();
-
-			// Narrow the active clip to this text's own declared area for
-			// the duration of this draw, exactly like eTextPara::blit()'s
-			// CPU path (font.cpp) already does for itself ("clip &=
-			// eRect(area...)") - the GPU glyph path (renderGlyph(), via
-			// m_text_batch_clip above) has no other way to replicate that,
-			// since it never receives `area` itself. Without this,
-			// GPU-rendered text was only ever clipped to the surrounding
-			// widget/row's clip, letting it overflow past its own column
-			// into whatever's drawn next (e.g. EPG title text running into
-			// the signal-strength meter column).
-			gRegion saved_clip = m_current_clip;
-			eRect clip_area = area;
-			clip_area.moveBy(m_current_offset);
-			m_current_clip = m_current_clip & clip_area;
-
-			if (opcode->parm.renderText->markedpos != -1) {
-				eRect clear_area = area;
-				clear_area.moveBy(m_current_offset);
-				clearOverlayArea(clear_area);
+			flushFillBatch();
+			const auto& transition = *opcode->parm.blitTransition;
+			GLuint current = m_texture_manager.getTexture(transition.content->after);
+			GLuint previous = m_texture_manager.getTexture(transition.content->before);
+			eRect position = transition.position;
+			position.moveBy(m_current_offset);
+			if (current && !position.empty()) {
+				if (transition.content->blitFlags & gPixmap::blitAlphaBlend) {
+					glEnable(GL_BLEND);
+					glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+				} else
+					glDisable(GL_BLEND);
+				glEnable(GL_SCISSOR_TEST);
+				for (const eRect& rect : m_current_clip.rects) {
+					const eRect clipped = rect & position;
+					if (clipped.empty()) continue;
+					setGlScissor(clipped);
+					m_texture_shader.drawTexture(position.x(), position.y(), position.width(), position.height(), current,
+						1.0f, transition.content->radius, transition.content->edges, 0, 0, 1, 1, transition.content->blitFlags & gPixmap::blitAlphaTest, false, 0, 0, -1, -1, false, previous, previous ? transition.progress : 1.0f,
+						transition.content->afterPremultiplied, transition.content->beforePremultiplied);
+					++m_frame_stats.blit_rects;
+					m_frame_stats.blit_pixels += rectPixels(clipped);
+				}
+				++m_frame_stats.blit_ops;
 			}
-
-			// Border text (textBColor/textBWidth) always takes the CPU
-			// fallback (eTextPara::blit()'s two-pass border+fill technique -
-			// see grc.cpp's renderText handling) - pre-clear its area to
-			// transparent so whatever's NOT actual glyph/border ink (the
-			// padding within this text's own bounding box, or plain stale
-			// content left over from an earlier, unrelated draw at these
-			// same screen coordinates in this shared staging buffer) doesn't
-			// get uploaded and composited as an opaque block - this is what
-			// made bordered text render with a solid background instead of
-			// staying transparent. Gated on ->border specifically (rather
-			// than unconditionally) since it's known up front here, before
-			// gDC::exec() runs, and the overwhelming majority of text draws
-			// have no border and are fully GPU-rendered - no need to pay for
-			// a clear they'll never actually need composited.
-			if (opcode->parm.renderText->border) {
-				eRect clear_area = area;
-				clear_area.moveBy(m_current_offset);
-				clearOverlayArea(clear_area);
-			}
-
-			gDC::exec(opcode);
-			m_current_clip = saved_clip;
-			if (m_cpu_overlay_dirty) {
-				area.moveBy(m_current_offset);
-				compositeTextOverlay(area);
-			}
+			delete opcode->parm.blitTransition;
 			break;
 		}
-
-		case gOpcode::renderPara: {
-			// eListboxPythonMultiContent (templated lists - channel/EPG
-			// lists etc.) uses gPainter::renderPara() for some entries
-			// instead of renderText(), a completely separate opcode that
-			// this switch never handled - text rendered through it was
-			// correctly software-blitted into m_pixmap but never composited
-			// to the GPU surface at all (fell into the default: case),
-			// exactly matching "list text missing in templated lists".
-			//
-			// CRITICAL (same reasoning as renderText above): grc.cpp's
-			// renderPara handling calls "textpara->Release()" then
-			// "delete o->parm.renderPara" as its last steps, so the area
-			// must be captured before gDC::exec(opcode) runs.
-			eTextPara* textpara = opcode->parm.renderPara->textpara;
-			eRect area = textpara->getArea();
-			area.moveBy(opcode->parm.renderPara->offset);
-			// See executeFill()'s comment: a pending blit batch queued
-			// before this text must draw before it, not after.
-			flushBlitBatch();
-			m_cpu_overlay_dirty = false;
-
-			// See the renderText case above for why this flush and the
-			// clip narrowing below are both needed.
-			flushTextBatch();
-			gRegion saved_clip = m_current_clip;
-			eRect clip_area = area;
-			clip_area.moveBy(m_current_offset);
-			m_current_clip = m_current_clip & clip_area;
-
-			// Same reasoning as renderText's ->border pre-clear above, for a
-			// different trigger: GS_INVERT (a marked/selected character, e.g.
-			// ConfigText's select-all-on-focus state) forces its glyph through
-			// the CPU fallback (font.cpp skips offering it to renderGlyph() -
-			// invert isn't a flat color renderGlyph() can express), so this
-			// call will end up compositeTextOverlay()-ing the CPU buffer over
-			// this WHOLE area, not just that one glyph's cell. Without
-			// clearing first, every position outside that one glyph is
-			// whatever's stale in this shared staging buffer from an earlier,
-			// unrelated draw - compositing that over an otherwise fully
-			// GPU-batched string (every other glyph here has no reason to take
-			// the CPU path) erased the batch-rendered text underneath it
-			// instead of leaving it alone. Checked upfront, before gDC::exec()
-			// runs, same as ->border - most renderPara calls have no inverted
-			// glyph and skip this entirely.
-			bool has_invert_glyph = false;
-			for (int g = 0; g < textpara->size(); ++g) {
-				if (textpara->getGlyphFlags(g) & GS_INVERT) {
-					has_invert_glyph = true;
-					break;
+		case gOpcode::blit:
+			{
+				eRect area = blitDrawBounds(opcode->parm.blit);
+				if (!area.empty()) {
+					gRegion draw_region = m_current_clip & area;
+					flushTextBatchIfOverlaps(draw_region, textFlushBlit);
+					flushFillBatchIfOverlaps(draw_region);
 				}
 			}
-			if (has_invert_glyph) {
-				eRect clear_area = area;
-				clear_area.moveBy(m_current_offset);
-				clearOverlayArea(clear_area);
-			}
-
-			gDC::exec(opcode);
-			m_current_clip = saved_clip;
-			if (m_cpu_overlay_dirty) {
-				area.moveBy(m_current_offset);
-				compositeTextOverlay(area);
-			}
-			break;
-		}
-
-		case gOpcode::setResolution:
-			applyResolution(
-				opcode->parm.setResolution->xres,
-				opcode->parm.setResolution->yres,
-				opcode->parm.setResolution->bpp);
-			delete opcode->parm.setResolution;
+			executeBlit(opcode);
+			resetBlitState();
+			if (opcode->parm.blit->pixmap)
+				opcode->parm.blit->pixmap->Release();
+			delete opcode->parm.blit;
 			break;
 
 		case gOpcode::clear:
+			flushTextBatchIfOverlaps(m_current_clip, textFlushClear);
+			flushFillBatchIfOverlaps(m_current_clip);
 			executeClear(opcode);
-			gDC::exec(opcode);
+			delete opcode->parm.fill;
 			break;
 
 		case gOpcode::flush:
-			// This, not gOpcode::flip, is the real "end of frame" signal for
-			// this system: eWidgetDesktop runs in cmImmediate composition
-			// mode (see eWidgetDesktop::paint()'s cmImmediate branch, and
-			// note cmBuffered's own redrawComposition() call is literally
-			// commented out) - cmImmediate's paint() calls gPainter::flush()
-			// (-> gOpcode::flush), never gPainter::flip(). The comment that
-			// used to be on the flip case below ("gPainter::flip() already
-			// submits this opcode at the end of every frame") was simply
-			// wrong for this composition mode: flip() was being called from
-			// an opcode that never fires during normal UI navigation, so our
-			// present/resolve step (-> presentPixmap()/eglSwapBuffers()) was
-			// never actually running on a real frame boundary at all -
-			// confirmed by a ground-truth debug draw hooked into flip() that
-			// never once fired despite extensive navigation. Content still
-			// rendered because the GPU/driver eventually flushes its tile
-			// buffer on its own with no explicit sync point, which likely
-			// also explains earlier slowness/latency symptoms.
-			//
-			// processDeletions() moved here too: it used to run at the top
-			// of exec() for every single opcode, taking a mutex lock just
-			// to check for pending texture frees even though a list row's
-			// worth of opcodes (5-10 of them) all belong to the same frame
-			// - freeing a texture a few opcodes later than the very next
-			// one after its pixmap died is harmless, so this only needs to
-			// happen once per real frame boundary, same as flip() itself.
-			m_texture_manager.processDeletions();
-			flushBlitBatch();
-			flushTextBatch();
-			if (m_anim_pending)
-				animRun();
-			flip();
-			gDC::exec(opcode);
-			break;
-
 		case gOpcode::flip:
-			m_texture_manager.processDeletions();
-			flushBlitBatch();
 			flushTextBatch();
-			flip();
+			m_frame_stats.draw_us += e2eglNowUs() - draw_start_us;
+			draw_time_recorded = true;
+			if (liveWindowAnimation && m_animation_deadline) {
+				if (m_event_animation.compact && m_event_animation.show) {
+					if (!captureCompactTexture(m_compactNew, m_event_animation.source))
+						finishEventAnimation(true);
+					else
+						m_event_animation.newFrame = m_compactNew;
+				}
+				renderAnimationFrame();
+				gDC::exec(opcode);
+				break;
+			}
+			if (!runPendingWindowAnimation() && !runPendingListboxAnimation()) {
+				if (!m_preserved_swap && !sceneFramebufferActive())
+					capturePresentedFrame();
+				flip();
+			}
 			gDC::exec(opcode);
 			break;
 
 		case gOpcode::sendShow:
-		case gOpcode::sendHide: {
-			const bool show = (opcode->opcode == gOpcode::sendShow);
-			const eRect rect(opcode->parm.setShowHideInfo->point, opcode->parm.setShowHideInfo->size);
-			const int spec_id = opcode->parm.setShowHideInfo->anim_id;
-			delete opcode->parm.setShowHideInfo;
-			m_anim_layer_valid = false;
-			animAbort();
-			AnimSpec spec;
-			{
-				std::lock_guard<std::mutex> lock(s_anim_mutex);
-				spec = s_anim_spec;
-				for (size_t i = 0; i < s_anim_history.size(); ++i) {
-					if (s_anim_history[i].id == spec_id) {
-						spec = s_anim_history[i];
-						break;
-					}
-				}
-				for (size_t i = 0; i < s_anim_profiles.size(); ++i) {
-					if (s_anim_profiles[i].id == spec_id) {
-						spec = s_anim_profiles[i];
-						break;
-					}
-				}
-			}
-			// a window shown in the same frame replaces a pending hide, so the new
-			// window animates in over the old one instead of the old one animating
-			// out over the already drawn new one
-			if (show && m_anim_pending && !m_anim_show)
-				m_anim_pending = false;
-			const eRect clipped = rect & eRect(0, 0, m_fbo_width, m_fbo_height);
-			if (spec.valid && !m_anim_pending && clipped.width() > 0 && clipped.height() > 0) {
-				flushBlitBatch();
-				flushTextBatch();
-				const eRect region = animRegion(spec, clipped);
-				if (animCaptureBlit(m_anim_tex_before, m_anim_fbo_before, region)) {
-					m_anim_pending = true;
-					m_anim_show = show;
-					m_anim_rect = clipped;
-					m_anim_region = region;
-					m_anim_active = spec;
-				}
-			}
-			break;
-		}
-
-		case gOpcode::beginLayer:
-			animBeginLayer();
-			break;
-
-		case gOpcode::endLayer:
-			animEndLayer();
-			break;
-
-		case gOpcode::beginFade: {
-			const eRect rect(opcode->parm.setShowHideInfo->point, opcode->parm.setShowHideInfo->size);
-			delete opcode->parm.setShowHideInfo;
-			const int ms = g_widget_fade_ms;
-			if (ms > 0)
-				fadeBegin(rect, (float)ms / 1000.0f);
-			break;
-		}
-		default:
-			// Unknown to this backend's own opcode handlers - flush any
-			// pending batch first in case it draws something (e.g. a
-			// monoBlit/blitScale variant), same reasoning as executeFill()'s
-			// comment above.
-			flushBlitBatch();
 			flushTextBatch();
-			gDC::exec(opcode);
+			executeWindowAnimationOpcode(opcode, true);
+			break;
+
+		case gOpcode::sendHide:
+			flushTextBatch();
+			executeWindowAnimationOpcode(opcode, false);
+			break;
+
+		case gOpcode::sendListboxAnimation:
+			flushTextBatch();
+			executeListboxAnimationOpcode(opcode);
+			break;
+
+		default:
+			if (!opcodeCanKeepPendingText(opcode->opcode))
+				flushTextBatchForReason(textFlushState);
+			if (opcode->opcode == gOpcode::renderText || opcode->opcode == gOpcode::renderPara) {
+				e2eglScopedTimer timer(m_frame_stats.text_build_us);
+				++m_frame_stats.text_ops;
+				gDC::exec(opcode);
+			} else {
+				e2eglScopedTimer timer(m_frame_stats.state_us);
+				gDC::exec(opcode);
+			}
 			break;
 	}
 
-	// Removed: presenting (glFinish()/resolve) after every single opcode
-	// instead of once per real frame boundary is architecturally wrong for a
-	// tile-based deferred GPU (V3D) - it forces a premature resolve mid-frame
-	// for every tiny draw call, which is both very slow (matches the "list
-	// builds up slowly" symptom) and a plausible cause of the partial/
-	// corrupted content seen across multiple unrelated elements (z-order-like
-	// symptoms, missing scrollbar/icon content) once real work started
-	// happening on the correct thread. gOpcode::flip (handled above, and
-	// submitted by gPainter::flip() at the end of every real frame) is the
-	// correct, single place this should happen.
+	if (!draw_time_recorded)
+		m_frame_stats.draw_us += e2eglNowUs() - draw_start_us;
+
+	releaseCurrent();
 }
 
-gEGLDC* gEGLDC::s_instance = nullptr;
-std::atomic<int> gEGLDC::s_anim_current(0);
-std::atomic<int> gEGLDC::s_anim_speed(20);
-std::atomic<int> gEGLDC::s_anim_listbox(0);
-std::mutex gEGLDC::s_anim_mutex;
-gEGLDC::AnimSpec gEGLDC::s_anim_spec;
-int gEGLDC::s_anim_counter = 0;
-std::vector<gEGLDC::AnimSpec> gEGLDC::s_anim_history;
-std::vector<gEGLDC::AnimSpec> gEGLDC::s_anim_profiles;
+std::string gEGLDC::getGraphicsWindowProvider() const
+{
+#ifdef DREAMNEXTGEN
+	return "Amlogic";
+#elif defined(HAVE_VUPLUS_EGL)
+	return "Vuplus";
+#elif defined(HAVE_VUPLUS_MIPSEL_EGL)
+	return "Vuplus MIPS";
+#elif defined(HAVE_NXPL_EGL)
+	return "NXPL";
+#elif defined(HAVE_V3DPLATFORM_EGL)
+	return "V3DPlatform";
+#elif defined(HAVE_HISILICON_EGL)
+	return "HiSilicon";
+#elif defined(HAVE_DREAMBCM_EGL)
+	return "Dreambox BCM";
+#else
+	return "";
+#endif
+}
 
-bool gEGLDC::parseAnimationSpec(const char *spec, AnimSpec &s) {
-	if (spec && *spec) {
-		std::istringstream in(spec);
-		float duration = 0.0f;
-		in >> duration >> s.base_type >> s.base_factor;
-		for (int i = 0; i < 6; ++i)
-			in >> s.p[i].on >> s.p[i].a >> s.p[i].b >> s.p[i].ax >> s.p[i].ay >> s.p[i].centered >> s.p[i].type >> s.p[i].factor;
-		if (!in.fail() && duration > 0.0f) {
-			s.duration = duration;
-			s.valid = true;
+std::string gEGLDC::getGraphicsAccelerator() const
+{
+	std::string info = "GLES/EGL";
+#ifdef DREAMNEXTGEN
+	info += ", e2ge / Dream GE2D";
+	if (dreamGE2DIsActive())
+		info += " active";
+#endif
+	return info;
+}
+
+std::string gEGLDC::getGraphicsBuffering() const
+{
+	const int pages = getGraphicsBufferPages();
+	if (pages >= 3)
+		return "triple";
+	if (pages == 2)
+		return "double";
+	if (pages == 1)
+		return "single";
+	return "";
+}
+
+int gEGLDC::getGraphicsBufferPages() const
+{
+	return m_fb && m_fb->Available() ? m_fb->getNumPages() : 0;
+}
+
+int gEGLDC::islocked() const
+{
+	if (m_graphics_suspended)
+		return 1;
+	fbClass *fb = m_fb ? m_fb : fbClass::getInstance();
+	return fb ? fb->islocked() : 0;
+}
+
+bool gEGLDC::getGraphicsPreservedSwap() const
+{
+	return !e2eglForceDestroyedSwap() && m_preserved_swap;
+}
+
+#ifdef HAVE_VUPLUS_MIPSEL_EGL
+void gEGLDC::setNativeWindowVisible(bool visible)
+{
+	if (runOnRenderThread([this, visible]() { setNativeWindowVisible(visible); }))
+		return;
+	if (auto *provider = dynamic_cast<VuplusMipsWindowProvider*>(m_window_provider))
+		provider->setVisible(visible);
+}
+#endif
+
+bool gEGLDC::suspendGraphics()
+{
+	if (!islocked())
+		eDebug("[gEGLDC] suspending graphics without fbClass lock; callers should lock painting first");
+#ifdef HAVE_DREAMBCM_EGL
+	// Dream BCM keeps an inter-process device lock while EGLDisplay/EGLContext remain alive;
+	// a second EGL application then blocks before reaching main().
+	return releaseGraphics(true);
+#else
+	return releaseGraphics(false);
+#endif
+}
+
+bool gEGLDC::releaseGraphics(bool releaseClient)
+{
+	bool result = false;
+	if (runOnRenderThread([&]() { result = releaseGraphics(releaseClient); }))
+		return result;
+
+	std::lock_guard<std::recursive_mutex> lock(m_egl_mutex);
+
+	if (m_graphics_suspended)
+		return true;
+
+	if (!isInitialized() || m_egl_display == EGL_NO_DISPLAY || m_egl_context == EGL_NO_CONTEXT)
+		return false;
+
+	if (m_egl_surface != EGL_NO_SURFACE) {
+		if (!makeCurrent()) {
+			eDebug("[gEGLDC] graphics suspend failed; EGL context could not be made current");
+			return false;
+		}
+		flushFillBatch();
+		flushTextBatch();
+		m_texture_manager.releaseGLResources();
+		deleteSceneFramebuffer();
+		deleteFrameTextures();
+		m_font_atlas.release();
+		if (releaseClient) {
+			// The EGL client is terminated below, so release every GL object first.
+			m_texture_manager.releaseNativeTargets();
+			m_basic_shader.release();
+			m_advanced_shader.release();
+			m_texture_shader.release();
+			m_text_shader.release();
+		}
+		m_texture_manager.processDeletions();
+#ifdef DREAMNEXTGEN
+		m_fb_output.destroy();
+#endif
+		glFinish();
+		unbindContext();
+	}
+
+	if (m_egl_surface != EGL_NO_SURFACE) {
+		if (!eglDestroySurface(m_egl_display, m_egl_surface)) {
+			eDebug("[gEGLDC] eglDestroySurface failed while suspending graphics. EGL error: 0x%x", eglGetError());
+			m_font_atlas.init();
+			return false;
+		}
+		m_egl_surface = EGL_NO_SURFACE;
+	}
+
+	if (releaseClient) {
+		if (m_egl_context != EGL_NO_CONTEXT) {
+			eglDestroyContext(m_egl_display, m_egl_context);
+			m_egl_context = EGL_NO_CONTEXT;
+		}
+		if (m_egl_display != EGL_NO_DISPLAY) {
+			eglTerminate(m_egl_display);
+			m_egl_display = EGL_NO_DISPLAY;
+		}
+		eglReleaseThread();
+		m_egl_major = 0;
+		m_egl_minor = 0;
+		m_gles_version = 0;
+		m_max_texture_size = 0;
+		m_preserved_swap = false;
+		gles::version = 0;
+		m_texture_manager.setDisplay(EGL_NO_DISPLAY);
+		m_texture_manager.resetContextGeneration();
+		m_egl_client_released = true;
+		eDebug("[gEGLDC] EGL display and context released");
+	}
+
+#ifdef HAVE_VUPLUS_EGL
+	/*
+	 * The Vuplus compositor retains the last submitted OSD buffer after the
+	 * EGL surface is destroyed. Remove only the native window while external
+	 * framebuffer clients such as TuxText own the display.
+	 */
+	if (m_window_provider && m_native_window_ready) {
+		if (auto *vuplus_provider = dynamic_cast<VuplusWindowProvider*>(m_window_provider)) {
+			if (!vuplus_provider->suspend()) {
+				eDebug("[gEGLDC] graphics suspend failed; Vuplus native window is still visible");
+				return false;
+			}
+			m_native_window_ready = false;
 		}
 	}
-	return s.valid;
-}
+#endif
 
-// Registers a spec that a single window can select (eWindow::setAnimationId). The
-// returned id stays valid; it is not pushed out by changes of the global animation.
-int gEGLDC::registerAnimationSpec(const char *spec) {
-	AnimSpec s;
-	if (!parseAnimationSpec(spec, s))
-		return 0;
-	std::lock_guard<std::mutex> lock(s_anim_mutex);
-	s.id = ++s_anim_counter;
-	s_anim_profiles.push_back(s);
-	return s.id;
-}
-
-void gEGLDC::setAnimationSpec(const char *spec) {
-	AnimSpec s;
-	parseAnimationSpec(spec, s);
-	{
-		std::lock_guard<std::mutex> lock(s_anim_mutex);
-		s.id = ++s_anim_counter;
-		s_anim_spec = s;
-		s_anim_history.push_back(s);
-		if (s_anim_history.size() > 16)
-			s_anim_history.erase(s_anim_history.begin());
+#ifdef HAVE_NXPL_EGL
+	/*
+	 * Destroying the EGL surface alone leaves the last submitted NXPL buffer
+	 * visible in the Broadcom compositor.  A transparent Chromium VideoHole
+	 * would then reveal stale Enigma2 OSD below it.  Drop only the native OSD
+	 * window while suspended; keep the display registration and Nexus client
+	 * joined so refresh() can recreate the window cheaply on resume.
+	 */
+	if (m_window_provider && m_native_window_ready) {
+		if (auto *nxpl_provider = dynamic_cast<NxplWindowProvider*>(m_window_provider)) {
+			if (!nxpl_provider->suspend()) {
+				eDebug("[gEGLDC] graphics suspend failed; NXPL native window is still visible");
+				return false;
+			}
+			m_native_window_ready = false;
+		}
 	}
-	s_anim_current = s.valid ? 1 : 0;
-	g_window_animation_current = s.valid ? 1 : 0;
-	g_window_animation_id = s.id;
+#endif
+
+	m_preserved_swap = false;
+	completeAnimation(m_pending_window_animation.completion);
+	m_pending_window_animation.active = false;
+	m_pending_listbox_animation.active = false;
+	m_pending_listbox_animation.selection_pixmap = nullptr;
+	m_frame_restore_pending = false;
+	invalidateSpinnerBackground(true);
+	std::vector<float>().swap(m_text_batch_buffer);
+	std::vector<eRect>().swap(m_text_batch_rects);
+	m_text_batch_bounds_valid = false;
+	std::vector<float>().swap(m_fill_batch_buffer);
+	m_fill_batch_bounds = eRect::emptyRect();
+	m_fill_batch_valid = false;
+
+	/*
+	 * Keep the logical resolution. Replacing the CPU backing pixmap releases
+	 * its full-screen allocation while queued commands can still be disposed
+	 * safely. Non-Dream providers also retain EGLDisplay and EGLContext.
+	 */
+	m_pixmap = new gPixmap(eSize(1, 1), 32, gPixmap::accelNever);
+	m_graphics_suspended = true;
+	eDebug("[gEGLDC] graphics suspended; EGL surface, frame buffers and transient texture caches released");
+	return true;
 }
 
-// gDC::getRGB() resolves indexed gColor values through m_pixmap's clut.
-// The EGL staging pixmap is 32bpp but still serves legacy painters that use
-// setPalette() and then draw by colour index, so give it the same 256-entry
-// palette contract used by the framebuffer backend.
-static void allocStagingPalette(gPixmap* pixmap) {
-	if (!pixmap || !pixmap->surface || pixmap->surface->clut.data)
-		return;
-	pixmap->surface->clut.colors = 256;
-	pixmap->surface->clut.start = 0;
-	pixmap->surface->clut.data = new gRGB[256];
-	memset(static_cast<void*>(pixmap->surface->clut.data), 0, sizeof(gRGB) * 256);
+bool gEGLDC::resumeGraphics()
+{
+	bool result = false;
+	if (runOnRenderThread([&]() { result = resumeGraphics(); }))
+		return result;
+
+	std::lock_guard<std::recursive_mutex> lock(m_egl_mutex);
+
+	if (!m_graphics_suspended)
+		return true;
+
+	if (m_egl_client_released) {
+		m_pixmap = new gPixmap(eSize(std::max(1, m_width), std::max(1, m_height)), 32, gPixmap::accelNever);
+		m_text_batch_buffer.reserve(MAX_BATCH_GLYPHS * 48);
+		m_text_batch_rects.reserve(MAX_BATCH_GLYPHS);
+		m_fill_batch_buffer.reserve(1024 * 36);
+		m_native_window_ready = m_window_provider && m_window_provider->init(surfaceWidth(), surfaceHeight());
+		if (!m_native_window_ready || !initEGL()) {
+			cleanupEGL();
+			m_graphics_suspended = true;
+			m_pixmap = new gPixmap(eSize(1, 1), 32, gPixmap::accelNever);
+			std::vector<float>().swap(m_text_batch_buffer);
+			std::vector<eRect>().swap(m_text_batch_rects);
+			std::vector<float>().swap(m_fill_batch_buffer);
+			eDebug("[gEGLDC] graphics resume failed; EGL client could not be recreated");
+			return false;
+		}
+		m_egl_client_released = false;
+		m_graphics_suspended = false;
+		eDebug("[gEGLDC] graphics resumed with a new EGL display and context at %dx%d logical=%dx%d",
+			surfaceWidth(), surfaceHeight(), m_width, m_height);
+		return true;
+	}
+
+	if (!isInitialized() || m_egl_display == EGL_NO_DISPLAY || m_egl_context == EGL_NO_CONTEXT)
+		return false;
+
+	m_pixmap = new gPixmap(eSize(std::max(1, m_width), std::max(1, m_height)), 32, gPixmap::accelNever);
+	m_text_batch_buffer.reserve(MAX_BATCH_GLYPHS * 48);
+	m_text_batch_rects.reserve(MAX_BATCH_GLYPHS);
+	m_fill_batch_buffer.reserve(1024 * 36);
+	if (!m_font_atlas.init()) {
+		m_pixmap = new gPixmap(eSize(1, 1), 32, gPixmap::accelNever);
+		eDebug("[gEGLDC] graphics resume failed; font atlas is unavailable");
+		return false;
+	}
+	m_graphics_suspended = false;
+	refresh();
+
+	if (m_egl_surface == EGL_NO_SURFACE) {
+		m_graphics_suspended = true;
+		m_font_atlas.release();
+		m_pixmap = new gPixmap(eSize(1, 1), 32, gPixmap::accelNever);
+		std::vector<float>().swap(m_text_batch_buffer);
+		std::vector<eRect>().swap(m_text_batch_rects);
+		std::vector<float>().swap(m_fill_batch_buffer);
+		eDebug("[gEGLDC] graphics resume failed; EGL surface is unavailable");
+		return false;
+	}
+
+	eDebug("[gEGLDC] graphics resumed at %dx%d logical=%dx%d", surfaceWidth(), surfaceHeight(), m_width, m_height);
+	return true;
 }
 
-gEGLDC::gEGLDC(INativeWindowProvider* window_provider, int width, int height) : gMainDC() {
-	s_instance = this;
+std::string gEGLDC::getOSDAxis() const
+{
+	return "0 0 " + std::to_string(std::max(1, m_width)) + " " + std::to_string(std::max(1, m_height));
+}
+
+bool gEGLDC::setOSDPosition(int left, int top, int width, int height)
+{
+	if (width < 1 || height < 1)
+		return false;
+
+	bool result = false;
+	if (runOnRenderThread([&]() { result = setOSDPosition(left, top, width, height); }))
+		return result;
+
+	std::lock_guard<std::recursive_mutex> lock(m_egl_mutex);
+	const bool old_osd_fullscreen = m_osd_left == 0 && m_osd_top == 0 && m_osd_width == m_width && m_osd_height == m_height;
+	const bool egl_ready = isInitialized() && m_egl_display != EGL_NO_DISPLAY && m_egl_surface != EGL_NO_SURFACE && m_egl_context != EGL_NO_CONTEXT;
+	bool egl_current = false;
+
+	if (egl_ready) {
+		egl_current = makeCurrent();
+		if (egl_current) {
+			flushTextBatch();
+			if (!sceneFramebufferActive() && old_osd_fullscreen)
+				captureCurrentFrameAsLast();
+		}
+	}
+
+	m_osd_left = left;
+	m_osd_top = top;
+	m_osd_width = width;
+	m_osd_height = height;
+#if defined(HAVE_NXPL_EGL) && defined(E2EGL_NXPL_SYNC_FB_DST)
+	e2eglSyncNxplFramebufferDestination(m_osd_left, m_osd_top, m_osd_width, m_osd_height, m_width, m_height);
+#endif
+
+	if (egl_current) {
+		completeAnimation(m_pending_window_animation.completion);
+		m_pending_window_animation.active = false;
+		m_pending_listbox_animation.active = false;
+		m_pending_listbox_animation.selection_pixmap = nullptr;
+		invalidateSpinnerBackground();
+		m_frame_restore_pending = false;
+
+		bool frame_presented = false;
+		if (sceneFramebufferActive() && m_scene_frame_valid) {
+			frame_presented = presentSceneFramebuffer();
+		} else {
+			bindWindowFramebuffer();
+			glDisable(GL_SCISSOR_TEST);
+			glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+			glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+			glClear(GL_COLOR_BUFFER_BIT);
+			if (m_last_frame_valid && m_last_frame_texture) {
+				const eRect full_frame(0, 0, m_width, m_height);
+				glDisable(GL_BLEND);
+				m_texture_shader.drawTexture(full_frame.x(), full_frame.y(), full_frame.width(), full_frame.height(),
+					m_last_frame_texture, 1.0f, 0.0f, 0, 0.0f, 1.0f, 1.0f, 0.0f, false);
+				++m_frame_stats.frame_copy_draws;
+				m_frame_stats.frame_copy_pixels += rectPixels(full_frame);
+				frame_presented = true;
+			}
+		}
+
+		const bool swapped = swapWindowFramebuffer();
+		if (swapped && frame_presented && sceneFramebufferActive())
+			bindSceneFramebuffer();
+		releaseCurrent();
+	}
+
+	const eRect surface_rect = osdDestinationSurface();
+	eDebug("[gEGLDC] OSD position set logical=%d,%d %dx%d surface=%d,%d %dx%d",
+		m_osd_left, m_osd_top, m_osd_width, m_osd_height,
+		surface_rect.x(), surface_rect.y(), surface_rect.width(), surface_rect.height());
+	return true;
+}
+
+gEGLDC::gEGLDC(INativeWindowProvider* window_provider, int width, int height) : gMainDC(), m_fb(nullptr) {
 	int xres = width, yres = height, bpp = 32;
 
+#ifdef DREAMNEXTGEN
+	setenv("DREAM_GE2D_SURFACE_ACCEL", "1", 0);
+	setenv("DREAM_GE2D_ACCEL_FILL", "1", 0);
+	setenv("DREAM_GE2D_ACCEL_BLIT", "1", 0);
+#endif
+
 	if (!window_provider) {
-		if (fbClass::getInstance()) {
-			fbClass::getInstance()->getMode(xres, yres, bpp);
+#if defined(DREAMNEXTGEN) || defined(HAVE_VUPLUS_MIPSEL_EGL) || defined(HAVE_HISILICON_EGL) || defined(HAVE_DREAMBCM_EGL) || defined(HAVE_NXPL_EGL) || defined(HAVE_V3DPLATFORM_EGL)
+		m_fb = new fbClass;
+		if (m_fb->Available())
+			m_fb->getMode(xres, yres, bpp);
+#ifdef HAVE_HISILICON_EGL
+		int skin_xres = 0, skin_yres = 0, skin_bpp = 32;
+		if (e2eglReadConfiguredSkinResolution(skin_xres, skin_yres, skin_bpp)) {
+			xres = skin_xres;
+			yres = skin_yres;
+			bpp = skin_bpp;
+			eDebug("[gEGLDC] Hisi early skin framebuffer mode requested %dx%dx%d", xres, yres, bpp);
+		} else {
+			xres = 1280;
+			yres = 720;
+			bpp = 32;
+			eDebug("[gEGLDC] Hisi early skin framebuffer mode fallback %dx%dx%d", xres, yres, bpp);
 		}
+#endif
+#else
+		if (fbClass::getInstance())
+			fbClass::getInstance()->getMode(xres, yres, bpp);
+#endif
+		if (!((xres == 720 && yres == 576) || (xres == 1280 && yres == 720) || (xres == 1920 && yres == 1080) || (xres == 2560 && yres == 1440))) {
+			xres = 1280;
+			yres = 720;
+		}
+		// The boot loader may leave the framebuffer at 16 bpp, but the EGL configs are RGBA8888.
+		bpp = 32;
+#if defined(DREAMNEXTGEN) || defined(HAVE_VUPLUS_MIPSEL_EGL) || defined(HAVE_HISILICON_EGL) || defined(HAVE_DREAMBCM_EGL) || defined(HAVE_NXPL_EGL) || defined(HAVE_V3DPLATFORM_EGL)
+		if (m_fb && m_fb->Available()) {
+			m_fb->SetMode(xres, yres, bpp);
+			m_fb->getMode(xres, yres, bpp);
+		}
+#endif
 		width = xres;
 		height = yres;
 #ifdef DREAMNEXTGEN
 		window_provider = new AmlogicWindowProvider(width, height);
+#elif defined(HAVE_VUPLUS_EGL)
+		window_provider = new VuplusWindowProvider();
+#elif defined(HAVE_VUPLUS_MIPSEL_EGL)
+		window_provider = new VuplusMipsWindowProvider();
+#elif defined(HAVE_NXPL_EGL)
+		window_provider = new NxplWindowProvider();
+#elif defined(HAVE_V3DPLATFORM_EGL)
+		window_provider = new V3DPlatformWindowProvider();
+#elif defined(HAVE_HISILICON_EGL)
+		window_provider = new HisiliconWindowProvider(width, height);
+#elif defined(HAVE_DREAMBCM_EGL)
+		window_provider = new DreamBcmWindowProvider(width, height);
 #endif
 	}
 
@@ -1652,879 +5018,563 @@ gEGLDC::gEGLDC(INativeWindowProvider* window_provider, int width, int height) : 
 	m_height = height;
 	m_surface_width = width;
 	m_surface_height = height;
-	m_native_width = width;
-	m_native_height = height;
+#ifdef HAVE_VUPLUS_EGL
+	m_video_mode_surface_active = true;
+#else
+	m_video_mode_surface_active = false;
+#endif
+	updateVideoModeSurfaceSize("constructor");
+#if defined(HAVE_NXPL_EGL)
+	if (e2eglNxplUseVideoModeSurface() && m_fb && m_fb->Available()) {
+		int fb_xres = surfaceWidth(), fb_yres = surfaceHeight(), fb_bpp = bpp;
+		m_fb->SetMode(surfaceWidth(), surfaceHeight(), bpp);
+		m_fb->getMode(fb_xres, fb_yres, fb_bpp);
+		m_surface_width = fb_xres;
+		m_surface_height = fb_yres;
+		eDebug("[gEGLDC] NXPL framebuffer mode initialised to %dx%dx%d logical=%dx%d", fb_xres, fb_yres, fb_bpp, m_width, m_height);
+	}
+#endif
+	m_osd_left = 0;
+	m_osd_top = 0;
+	m_osd_width = width;
+	m_osd_height = height;
+#if defined(HAVE_NXPL_EGL) && defined(E2EGL_NXPL_SYNC_FB_DST)
+	e2eglSyncNxplFramebufferDestination(m_osd_left, m_osd_top, m_osd_width, m_osd_height, m_width, m_height);
+#endif
+	m_egl_major = 0;
+	m_egl_minor = 0;
 	m_gles_version = 0;
+	m_max_texture_size = 0;
+	m_flip_count = 0;
+	m_preserved_swap = false;
+	m_native_window_ready = false;
+	m_graphics_suspended = false;
+	m_egl_client_released = false;
+	m_surface_lost = false;
+	m_surface_retry_us = 0;
 	m_egl_display = EGL_NO_DISPLAY;
-	for (int i = 0; i < MAX_EGL_SURFACES; ++i)
-		m_egl_surfaces[i] = EGL_NO_SURFACE;
-	m_page_count = 1;
-	m_render_page = 0;
+	m_egl_surface = EGL_NO_SURFACE;
 	m_egl_context = EGL_NO_CONTEXT;
-	m_cpu_overlay_dirty = false;
-	m_fbo = 0;
-	m_fbo_texture = 0;
-	m_fbo_width = 0;
-	m_fbo_height = 0;
+	m_last_frame_texture = 0;
+	m_animation_frame_texture = 0;
+	m_scene_frame_texture = 0;
+	m_scene_framebuffer = 0;
+	m_scene_spare_frame_texture = 0;
+	m_scene_spare_framebuffer = 0;
+	m_scene_animation_old_texture = 0;
+	m_last_frame_valid = false;
+	m_frame_restore_pending = false;
+	m_frame_texture_surface = false;
+	m_frame_texture_scene_scaled = false;
+	m_frame_texture_width = 0;
+	m_frame_texture_height = 0;
+	m_scene_frame_width = 0;
+	m_scene_frame_height = 0;
+	m_scene_frame_valid = false;
+	m_scene_spare_frame_valid = false;
+	m_scene_animation_old_valid = false;
+	m_scene_framebuffer_unavailable = false;
+	m_spinner_background_valid = false;
+	m_spinner_background_width = 0;
+	m_spinner_background_height = 0;
+	m_spinner_background_clear = false;
+	m_spinner_clear_pending = false;
+	m_capture_socket_fd = -1;
+	m_capture_thread_started = false;
+	m_capture_thread_stop = false;
+	m_frame_stats_index = 0;
+	m_text_batch_bounds = eRect();
+	m_text_batch_bounds_valid = false;
+	m_text_batch_buffer.reserve(MAX_BATCH_GLYPHS * 48);
+	m_text_batch_rects.reserve(MAX_BATCH_GLYPHS);
+	m_fill_batch_bounds = eRect::emptyRect();
+	m_fill_batch_color = gRGB();
+	m_fill_batch_blend = false;
+	m_fill_batch_valid = false;
+	m_fill_batch_buffer.reserve(1024 * 36);
+	resetFrameStats();
 
-	// accelNever: this pixmap is a plain CPU-side staging buffer for text
-	// compositing (see gOpcode::renderText handling below) that we
-	// repeatedly glTexSubImage2D() into - it must never get a physical/ION
-	// accelerated buffer, or createTextureFromPixmap() takes the DMA-BUF
-	// import path (DRM_FORMAT_ARGB8888) on first use instead of a plain
-	// glTexImage2D (GL_BGRA_EXT) texture, and our later glTexSubImage2D
-	// calls (which assume the latter) operate on the wrong kind of texture
-	// object entirely - a very likely source of the wrong colors seen.
 	m_pixmap = new gPixmap(eSize(width, height), 32, gPixmap::accelNever);
-	if (m_pixmap && m_pixmap->surface && m_pixmap->surface->data)
-		memset(m_pixmap->surface->data, 0, m_pixmap->surface->stride * height);
-	// Keep the staging surface compatible with palette-index based legacy
-	// drawing paths even though its pixel storage is 32bpp.
-	allocStagingPalette(m_pixmap);
+	if (m_window_provider) {
+		m_native_window_ready = m_window_provider->init(surfaceWidth(), surfaceHeight());
+		if (!m_native_window_ready)
+			eDebug("[gEGLDC] native window provider init failed");
+	}
 }
 
 gEGLDC::~gEGLDC() {
+	stopCaptureServer();
 	cleanupEGL();
-	// gEGLDCAutoInit::initNow() (egl_init.cpp) transfers ownership of the
-	// provider it constructs to us via the constructor below - nothing else
-	// ever deletes it, so without this DreamboxWindowProvider::cleanup()
-	// (correctly wired to its own destructor) never actually runs, and the
-	// provider itself leaks for the life of the process.
-	delete m_window_provider;
-	m_window_provider = nullptr;
-	if (s_instance == this)
-		s_instance = nullptr;
+	if (m_window_provider) {
+		m_window_provider->cleanup();
+		delete m_window_provider;
+		m_window_provider = nullptr;
+	}
+	delete m_fb;
+	m_fb = nullptr;
 }
 
 void gEGLDC::cleanupEGL() {
-	destroyFBO();
-	if (m_egl_display != EGL_NO_DISPLAY) {
-		// Free every shader's GL objects (program/VBO/VAO) HERE, while this
-		// thread's context is still current, rather than leaving it to
-		// their destructors: those run later as part of gEGLDC's own
-		// member teardown, invoked from ~gEGLDC() on a completely different
-		// thread (eInit's teardown, on the main thread - see this
-		// function's own declaration comment) *after* the context this
-		// function is about to destroy is already gone. A glDelete* call
-		// with no current context at all on that thread is exactly what
-		// was crashing the driver on shutdown even after moving the EGL
-		// context teardown itself to the correct thread - freeing them
-		// here first closes that gap. Each destroy() is safe to call again
-		// later (idempotent), so the destructors calling it a second time
-		// as a fallback is harmless.
-		m_basic_shader.destroy();
-		m_advanced_shader.destroy();
-		m_texture_shader.destroy();
-		m_text_shader.destroy();
+	if (runOnRenderThread([this]() { cleanupEGL(); }))
+		return;
 
-		eglMakeCurrent(m_egl_display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
+	std::lock_guard<std::recursive_mutex> lock(m_egl_mutex);
+
+	// VUGLES can no longer answer context queries after its platform shuts down.
+	// Release every shader here, including partially initialized ones.
+	const bool contextCurrent = m_egl_display != EGL_NO_DISPLAY && m_egl_context != EGL_NO_CONTEXT &&
+		m_egl_surface != EGL_NO_SURFACE && eglMakeCurrent(m_egl_display, m_egl_surface, m_egl_surface, m_egl_context);
+	m_basic_shader.release(contextCurrent);
+	m_advanced_shader.release(contextCurrent);
+	m_texture_shader.release(contextCurrent);
+	m_text_shader.release(contextCurrent);
+	m_font_atlas.release();
+	if (m_egl_display != EGL_NO_DISPLAY) {
+		if (contextCurrent) {
+			m_texture_manager.releaseGLResources();
+			m_texture_manager.releaseNativeTargets();
+			deleteSceneFramebuffer();
+			deleteFrameTextures();
+#ifdef DREAMNEXTGEN
+			m_fb_output.destroy();
+#endif
+			eglMakeCurrent(m_egl_display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
+		}
+#ifdef DREAMNEXTGEN
+		// Without a current context only the EGL images and the dma-buf are left to release.
+		m_fb_output.destroy();
+#endif
 		if (m_egl_context != EGL_NO_CONTEXT) {
 			eglDestroyContext(m_egl_display, m_egl_context);
 		}
-		for (int i = 0; i < MAX_EGL_SURFACES; ++i) {
-			if (m_egl_surfaces[i] != EGL_NO_SURFACE) {
-				eglDestroySurface(m_egl_display, m_egl_surfaces[i]);
-			}
+		if (m_egl_surface != EGL_NO_SURFACE) {
+			eglDestroySurface(m_egl_display, m_egl_surface);
 		}
 		eglTerminate(m_egl_display);
 	}
+	m_texture_manager.resetContextGeneration();
 	m_egl_display = EGL_NO_DISPLAY;
-	for (int i = 0; i < MAX_EGL_SURFACES; ++i)
-		m_egl_surfaces[i] = EGL_NO_SURFACE;
-	m_page_count = 1;
-	m_render_page = 0;
+	m_egl_surface = EGL_NO_SURFACE;
 	m_egl_context = EGL_NO_CONTEXT;
+	m_egl_major = 0;
+	m_egl_minor = 0;
 	m_gles_version = 0;
+	m_max_texture_size = 0;
+	m_scene_frame_texture = 0;
+	m_scene_framebuffer = 0;
+	m_scene_spare_frame_texture = 0;
+	m_scene_spare_framebuffer = 0;
+	m_scene_animation_old_texture = 0;
+	m_scene_frame_width = 0;
+	m_scene_frame_height = 0;
+	m_scene_frame_valid = false;
+	m_scene_spare_frame_valid = false;
+	m_scene_animation_old_valid = false;
+	m_scene_framebuffer_unavailable = false;
+	m_last_frame_texture = 0;
+	m_animation_frame_texture = 0;
+	m_last_frame_valid = false;
+	m_frame_restore_pending = false;
+	m_frame_texture_surface = false;
+	m_frame_texture_scene_scaled = false;
+	m_graphics_suspended = false;
+	m_texture_manager.setDisplay(EGL_NO_DISPLAY);
 	gles::version = 0;
 }
 
-bool gEGLDC::recreateEGLSurfaces(int xres, int yres)
-{
-	if (!isInitialized())
-		return false;
-
-	if (!eglMakeCurrent(m_egl_display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT))
-	{
-		eDebug("[EGLDC] eglMakeCurrent(NO_SURFACE) failed: 0x%x", eglGetError());
-		return false;
-	}
-
-	for (int i = 0; i < MAX_EGL_SURFACES; ++i)
-	{
-		if (m_egl_surfaces[i] != EGL_NO_SURFACE)
-		{
-			eglDestroySurface(m_egl_display, m_egl_surfaces[i]);
-			m_egl_surfaces[i] = EGL_NO_SURFACE;
-		}
-	}
-
-	if (!m_window_provider->init(xres, yres))
-	{
-		eDebug("[EGLDC] window provider reinit failed for %dx%d", xres, yres);
-		return false;
-	}
-
-	bool pixmap_mode = m_window_provider->usesPixmapSurface();
-
-	if (pixmap_mode)
-	{
-		PFNEGLCREATEPLATFORMPIXMAPSURFACEEXTPROC eglCreatePlatformPixmapSurfaceEXT =
-			(PFNEGLCREATEPLATFORMPIXMAPSURFACEEXTPROC)eglGetProcAddress("eglCreatePlatformPixmapSurfaceEXT");
-
-		if (!eglCreatePlatformPixmapSurfaceEXT)
-		{
-			eDebug("[EGLDC] eglCreatePlatformPixmapSurfaceEXT not available");
-			return false;
-		}
-
-		m_page_count = std::max(1, std::min(m_window_provider->getPageCount(), MAX_EGL_SURFACES));
-
-		for (int i = 0; i < m_page_count; ++i)
-		{
-			void *native_pixmap = m_window_provider->getNativePixmap(i);
-
-			m_egl_surfaces[i] = eglCreatePlatformPixmapSurfaceEXT(
-				m_egl_display,
-				m_egl_config,
-				native_pixmap,
-				nullptr);
-
-			if (m_egl_surfaces[i] == EGL_NO_SURFACE)
-			{
-				eDebug("[EGLDC] eglCreatePlatformPixmapSurfaceEXT failed for page %d: 0x%x", i, eglGetError());
-
-				for (int j = 0; j < i; ++j)
-				{
-					eglDestroySurface(m_egl_display, m_egl_surfaces[j]);
-					m_egl_surfaces[j] = EGL_NO_SURFACE;
-				}
-
-				return false;
-			}
-		}
-	}
-	else
-	{
-		m_page_count = 1;
-
-		EGLNativeWindowType native_window = m_window_provider->getNativeWindow();
-
-		m_egl_surfaces[0] = eglCreateWindowSurface(
-			m_egl_display,
-			m_egl_config,
-			native_window,
-			nullptr);
-
-		if (m_egl_surfaces[0] == EGL_NO_SURFACE)
-		{
-			eDebug("[EGLDC] eglCreateWindowSurface failed: 0x%x", eglGetError());
-			return false;
-		}
-	}
-
-	m_render_page = (m_page_count > 1) ? 1 : 0;
-
-	if (!eglMakeCurrent(
-		m_egl_display,
-		m_egl_surfaces[m_render_page],
-		m_egl_surfaces[m_render_page],
-		m_egl_context))
-	{
-		eDebug("[EGLDC] eglMakeCurrent(new surface) failed: 0x%x", eglGetError());
-
-		for (int i = 0; i < m_page_count; ++i)
-		{
-			if (m_egl_surfaces[i] != EGL_NO_SURFACE)
-			{
-				eglDestroySurface(m_egl_display, m_egl_surfaces[i]);
-				m_egl_surfaces[i] = EGL_NO_SURFACE;
-			}
-		}
-
-		return false;
-	}
-
-	return true;
+void gEGLDC::markSurfaceLost() {
+	if (!m_surface_lost)
+		eDebug("[gEGLDC] EGL window surface lost, retrying every 500 ms");
+	m_surface_lost = true;
+	m_surface_retry_us = e2eglNowUs();
 }
 
-void gEGLDC::applyResolution(int xres, int yres, int bpp)
-{
-	if (m_width == xres && m_height == yres && m_fbo)
+void gEGLDC::setResolution(int xres, int yres, int bpp) {
+	if (runOnRenderThread([=]() { setResolution(xres, yres, bpp); }))
 		return;
 
-	flushBlitBatch();
-	flushTextBatch();
+	std::lock_guard<std::recursive_mutex> lock(m_egl_mutex);
 
-	glFinish();
-
-	// Sizes the hardware can scan out get the real framebuffer mode (the hardware
-	// scaler stretches it); bigger ones (WQHD skins) stay on the native mode and are
-	// scaled down by the FBO blit in flip().
-	const bool fits = xres <= m_native_width && yres <= m_native_height;
-	const int target_w = fits ? xres : m_native_width;
-	const int target_h = fits ? yres : m_native_height;
-	if (target_w != m_surface_width || target_h != m_surface_height)
-	{
-		destroyFBO();
-		if (recreateEGLSurfaces(target_w, target_h))
-		{
-			m_surface_width = target_w;
-			m_surface_height = target_h;
-		}
-		else
-		{
-			eDebug("[EGLDC] mode change to %dx%d failed, restoring %dx%d", target_w, target_h, m_surface_width, m_surface_height);
-			recreateEGLSurfaces(m_surface_width, m_surface_height);
+	int surface_xres = xres;
+	int surface_yres = yres;
+#if defined(HAVE_DREAMBCM_EGL)
+	if (m_surface_width > 0 && m_surface_height > 0) {
+		surface_xres = m_surface_width;
+		surface_yres = m_surface_height;
+		if (xres > surface_xres || yres > surface_yres) {
+			surface_xres = xres;
+			surface_yres = yres;
 		}
 	}
-
-	m_width = xres;
-	m_height = yres;
-
-	m_pixmap = new gPixmap(eSize(xres, yres), bpp, gPixmap::accelNever);
-	if (m_pixmap && m_pixmap->surface && m_pixmap->surface->data)
-		memset(m_pixmap->surface->data, 0, m_pixmap->surface->stride * yres);
-	// Keep the staging surface compatible with palette-index based legacy
-	// drawing paths after a resolution change recreates the backing pixmap.
-	allocStagingPalette(m_pixmap);
-	m_text_overlay_region = gRegion();
-
-	m_current_offset = ePoint(0, 0);
-	m_current_clip = gRegion(eRect(ePoint(0, 0), eSize(m_width, m_height)));
-	m_clip_stack = std::stack<gRegion>();
-
-	if (!createFBO(m_width, m_height)) {
-		eDebug("[gEGLDC] FBO failed, direct render");
-	}
-
-	if (m_fbo) {
-		glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
-		glViewport(0, 0, m_fbo_width, m_fbo_height);
-		glScissor(0, 0, m_fbo_width, m_fbo_height);
-	} else {
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-		glViewport(0, 0, m_surface_width, m_surface_height);
-		glScissor(0, 0, m_surface_width, m_surface_height);
-	}
-
-	m_basic_shader.setResolution((float)m_width, (float)m_height);
-	m_advanced_shader.setResolution((float)m_width, (float)m_height);
-	m_texture_shader.setResolution((float)m_width, (float)m_height);
-	m_text_shader.setResolution((float)m_width, (float)m_height);
-
-	eDebug("[EGLDC] resolution applied %dx%d (surface %dx%d, fbo=%d)",
-		m_width, m_height, m_surface_width, m_surface_height, m_fbo ? 1 : 0);
-}
-
-void gEGLDC::setResolution(int xres, int yres, int bpp)
-{
-	if (m_width == xres && m_height == yres)
-		return;
-
-	gRC *grc = gRC::getInstance();
-	if (!grc)
-		return;
-
-	gOpcode o;
-	o.opcode = gOpcode::setResolution;
-	ePtr<gDC> dc = this;
-	o.dc = dc.grabRef();
-	o.parm.setResolution = new gOpcode::para::psetResolution;
-	o.parm.setResolution->xres = xres;
-	o.parm.setResolution->yres = yres;
-	o.parm.setResolution->bpp = bpp;
-
-	grc->submit(o);
-}
-
-bool gEGLDC::gpuCopyPageContent(int from, int to) {
-#ifdef HAVE_GLES3
-	if (!gles::isGLES3())
-		return false;
-
-	// Asymmetric draw/read: glBlitFramebuffer() below copies from whatever
-	// is bound as GL_READ_FRAMEBUFFER (framebuffer 0 of the *read* surface)
-	// into GL_DRAW_FRAMEBUFFER (framebuffer 0 of the *draw* surface) - EGL
-	// supports different draw and read surfaces for exactly this kind of
-	// surface-to-surface copy.
-	if (!eglMakeCurrent(m_egl_display, m_egl_surfaces[to], m_egl_surfaces[from], m_egl_context)) {
-		eDebug("[gEGLDC] eglMakeCurrent (draw=%d read=%d) failed for GPU copy-forward: 0x%x", to, from, eglGetError());
-		return false;
-	}
-
-	// glBlitFramebuffer() is subject to the scissor test like any other
-	// draw, and GL_SCISSOR_TEST is left permanently enabled (see initEGL())
-	// with whatever rect the last opcode drawn set - reset it to the full
-	// surface first or this copy would silently only cover a leftover
-	// unrelated widget's clip rect instead of the whole page.
-	glScissor(0, 0, m_surface_width, m_surface_height);
-	glBlitFramebuffer(0, 0, m_surface_width, m_surface_height, 0, 0, m_surface_width, m_surface_height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
-	return true;
-#else
-	(void)from;
-	(void)to;
-	return false;
 #endif
-}
-
-int gEGLDC::islocked() const {
-	fbClass* fb = fbClass::getInstance();
-	return fb ? fb->islocked() : 0;
-}
-
-static float animInterp(int type, float factor, float t) {
-	t = std::max(0.0f, std::min(1.0f, t));
-	switch (type) {
-		case 1: // accelerate
-			return powf(t, 2.0f * factor);
-		case 2: // decelerate
-			return 1.0f - powf(1.0f - t, 2.0f * factor);
-		case 3: { // overshoot
-			const float s = t - 1.0f;
-			return s * s * ((factor + 1.0f) * s + factor) + 1.0f;
+#if defined(HAVE_VUPLUS_EGL)
+	if (m_video_mode_surface_active) {
+		int mode_xres = 0, mode_yres = 0;
+		const std::string mode = e2eglReadTextFile("/proc/stb/video/videomode");
+		if (e2eglVideoModeToSize(mode, mode_xres, mode_yres)) {
+			e2eglLimitVuplusNativeSurfaceSize(mode_xres, mode_yres);
+			surface_xres = mode_xres;
+			surface_yres = mode_yres;
 		}
-		case 4: { // bounce
-			auto bounce = [](float x) { return x * x * 8.0f; };
-			t *= 1.1226f;
-			if (t < 0.3535f)
-				return bounce(t);
-			if (t < 0.7408f)
-				return bounce(t - 0.54719f) + 0.7f;
-			if (t < 0.9644f)
-				return bounce(t - 0.8526f) + 0.9f;
-			return bounce(t - 1.0435f) + 0.95f;
+	} else if (m_surface_width > 0 && m_surface_height > 0) {
+		surface_xres = m_surface_width;
+		surface_yres = m_surface_height;
+	}
+#elif defined(HAVE_NXPL_EGL)
+	if (e2eglNxplUseVideoModeSurface()) {
+		int mode_xres = 0, mode_yres = 0;
+		const std::string mode = e2eglReadTextFile("/proc/stb/video/videomode");
+		if (e2eglVideoModeToSize(mode, mode_xres, mode_yres)) {
+			surface_xres = mode_xres;
+			surface_yres = mode_yres;
 		}
-		default:
-			return t;
 	}
-}
+#endif
 
-bool gEGLDC::animCapture(GLuint &tex, const eRect &r) {
-	if (!m_fbo || m_fbo_width <= 0 || m_fbo_height <= 0)
-		return false;
-	const eRect c = r & eRect(0, 0, m_fbo_width, m_fbo_height);
-	if (c.width() <= 0 || c.height() <= 0)
-		return false;
-	if (!tex) {
-		glGenTextures(1, &tex);
-		glBindTexture(GL_TEXTURE_2D, tex);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_fbo_width, m_fbo_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	}
-	glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
-	glBindTexture(GL_TEXTURE_2D, tex);
-	const int gy = m_fbo_height - (c.y() + c.height());
-	glCopyTexSubImage2D(GL_TEXTURE_2D, 0, c.x(), gy, c.x(), gy, c.width(), c.height());
-	return true;
-}
-
-void gEGLDC::animBeginLayer() {
-	flushBlitBatch();
-	flushTextBatch();
-	m_anim_running = false;
-	m_anim_layer_valid = false;
-	m_anim_in_layer = false;
-	if (!m_fbo || m_fbo_width <= 0 || m_fbo_height <= 0)
+	const bool surface_size_changed = m_surface_width != surface_xres || m_surface_height != surface_yres;
+	const bool native_window_must_recreate = false;
+	if (m_width == xres && m_height == yres && !surface_size_changed)
 		return;
-	if (!m_anim_fbo_layer) {
-		glGenTextures(1, &m_anim_tex_layer);
-		glBindTexture(GL_TEXTURE_2D, m_anim_tex_layer);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_fbo_width, m_fbo_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-		glGenFramebuffers(1, &m_anim_fbo_layer);
-		glBindFramebuffer(GL_FRAMEBUFFER, m_anim_fbo_layer);
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_anim_tex_layer, 0);
-		if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-			eDebug("[gEGLDC] animation layer FBO incomplete");
-			glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
-			glDeleteFramebuffers(1, &m_anim_fbo_layer);
-			glDeleteTextures(1, &m_anim_tex_layer);
-			m_anim_fbo_layer = 0;
-			m_anim_tex_layer = 0;
+
+	const bool osd_was_fullscreen = m_osd_left == 0 && m_osd_top == 0 && m_osd_width == m_width && m_osd_height == m_height;
+	const bool egl_ready = isInitialized() && m_egl_display != EGL_NO_DISPLAY && m_egl_context != EGL_NO_CONTEXT;
+#ifdef HAVE_HISILICON_EGL
+	// Mali retains the window buffer layout until the EGL client is released, including when shrinking.
+	if (egl_ready && !m_graphics_suspended && m_egl_surface != EGL_NO_SURFACE && surface_size_changed) {
+		if (releaseGraphics(true)) {
+			setResolution(xres, yres, bpp);
+			if (!resumeGraphics())
+				eDebug("[gEGLDC] EGL could not be recreated after resizing to %dx%d", xres, yres);
 			return;
 		}
 	}
-	glBindFramebuffer(GL_FRAMEBUFFER, m_anim_fbo_layer);
-	glDisable(GL_SCISSOR_TEST);
-	glClearColor(0, 0, 0, 0);
-	glClear(GL_COLOR_BUFFER_BIT);
-	glEnable(GL_SCISSOR_TEST);
-	m_anim_in_layer = true;
-}
-
-void gEGLDC::animEndLayer() {
-	flushBlitBatch();
-	flushTextBatch();
-	if (m_anim_in_layer) {
-		m_anim_in_layer = false;
-		m_anim_layer_valid = true;
-	}
-	if (m_fbo)
-		glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
-}
-
-void gEGLDC::animState(const AnimSpec &s, bool show, const eRect &r, float t, float &alpha, float &x, float &y, float &w, float &h) const {
-	const float fx = (float)r.x(), fy = (float)r.y();
-	const float fw = (float)r.width(), fh = (float)r.height();
-	const float W = (float)m_fbo_width, H = (float)m_fbo_height;
-
-	auto progress = [&](const AnimProp &p) {
-		const int type = p.type >= 0 ? p.type : s.base_type;
-		const float factor = p.type >= 0 ? p.factor : s.base_factor;
-		return animInterp(type, factor, t);
-	};
-	auto lerp = [](float a, float b, float p) { return a + (b - a) * p; };
-
-	alpha = 1.0f;
-	x = fx;
-	y = fy;
-	w = fw;
-	h = fh;
-
-	// alpha: [0] show, [1] hide
-	{
-		const AnimProp &sh = s.p[0], &hd = s.p[1];
-		if (show) {
-			if (sh.on)
-				alpha = lerp(sh.a, 1.0f, progress(sh));
-		} else if (hd.on) {
-			alpha = lerp(1.0f, hd.a, progress(hd));
-		} else if (sh.on) {
-			alpha = lerp(sh.a, 1.0f, 1.0f - progress(sh));
-		}
-	}
-
-	// position: [2] show, [3] hide
-	{
-		const AnimProp &sh = s.p[2], &hd = s.p[3];
-		const AnimProp *a = nullptr;
-		float p = 0.0f;
-		bool toTarget = false;
-		if (show) {
-			if (sh.on) { a = &sh; p = progress(sh); }
-		} else if (hd.on) {
-			a = &hd; p = progress(hd); toTarget = true;
-		} else if (sh.on) {
-			a = &sh; p = 1.0f - progress(sh);
-		}
-		if (a) {
-			if (a->ax) {
-				const float v = a->a * W;
-				x = fx + (toTarget ? lerp(0.0f, v, p) : lerp(v, 0.0f, p));
-			}
-			if (a->ay) {
-				const float v = a->a * H;
-				y = fy + (toTarget ? lerp(0.0f, v, p) : lerp(v, 0.0f, p));
-			}
-		}
-	}
-
-	// size: [4] show, [5] hide
-	{
-		const AnimProp &sh = s.p[4], &hd = s.p[5];
-		const AnimProp *a = nullptr;
-		float p = 0.0f;
-		bool toTarget = false;
-		if (show) {
-			if (sh.on) { a = &sh; p = progress(sh); }
-		} else if (hd.on) {
-			a = &hd; p = progress(hd); toTarget = true;
-		} else if (sh.on) {
-			a = &sh; p = 1.0f - progress(sh);
-		}
-		if (a) {
-			if (a->ax)
-				w = toTarget ? lerp(fw, a->a, p) : lerp(a->a, fw, p);
-			if (a->ay)
-				h = toTarget ? lerp(fh, a->b, p) : lerp(a->b, fh, p);
-			if (a->centered) {
-				x += (fw - w) / 2.0f;
-				y += (fh - h) / 2.0f;
-			}
-		}
-	}
-}
-
-eRect gEGLDC::animRegion(const AnimSpec &s, const eRect &r) const {
-	int x0 = r.x(), y0 = r.y();
-	int x1 = r.x() + r.width(), y1 = r.y() + r.height();
-	for (int show = 0; show < 2; ++show) {
-		for (int i = 0; i <= 8; ++i) {
-			float alpha, x, y, w, h;
-			animState(s, show != 0, r, (float)i / 8.0f, alpha, x, y, w, h);
-			x0 = std::min(x0, (int)floorf(x));
-			y0 = std::min(y0, (int)floorf(y));
-			x1 = std::max(x1, (int)ceilf(x + w));
-			y1 = std::max(y1, (int)ceilf(y + h));
-		}
-	}
-	return eRect(x0, y0, x1 - x0, y1 - y0) & eRect(0, 0, m_fbo_width, m_fbo_height);
-}
-
-void gEGLDC::animDrawFrame(float alpha, float x, float y, float w, float h, GLuint bg, GLuint layer, const eRect &region, const eRect &r) {
-	const float W = (float)m_fbo_width;
-	const float H = (float)m_fbo_height;
-
-	// The captured textures are copies of the FBO, whose row 0 is the bottom
-	// of the screen, so the v coordinate runs opposite to the screen y.
-	auto quad = [&](float *d, float dx, float dy, float dw, float dh, float sx, float sy, float sw, float sh) {
-		const float u0 = sx / W, u1 = (sx + sw) / W;
-		const float v0 = 1.0f - sy / H, v1 = 1.0f - (sy + sh) / H;
-		const float q[24] = {
-			dx, dy, u0, v0,
-			dx + dw, dy, u1, v0,
-			dx, dy + dh, u0, v1,
-			dx + dw, dy, u1, v0,
-			dx + dw, dy + dh, u1, v1,
-			dx, dy + dh, u0, v1
-		};
-		memcpy(d, q, sizeof(q));
-	};
-
-	// background: the whole animated region, copied without blending
-	glDisable(GL_BLEND);
-	{
-		float bgq[24];
-		const float rx = (float)region.x(), ry = (float)region.y();
-		const float rw = (float)region.width(), rh = (float)region.height();
-		quad(bgq, rx, ry, rw, rh, rx, ry, rw, rh);
-		m_texture_shader.drawBatch(bgq, 6, bg, 1.0f);
-	}
-
-	// moving layer: the window alone, scaled and moved to its animated rectangle
-	if (w > 0.5f && h > 0.5f && alpha > 0.0f) {
-		float lq[24];
-		quad(lq, x, y, w, h, (float)r.x(), (float)r.y(), (float)r.width(), (float)r.height());
-		glEnable(GL_BLEND);
-		setAlphaBlendMode(true);
-		m_texture_shader.drawBatch(lq, 6, layer, std::min(1.0f, alpha));
-	}
-}
-
-void gEGLDC::animRun() {
-	m_anim_pending = false;
-	animAbort();
-
-	if (!m_anim_active.valid || m_anim_rect.width() <= 0 || m_anim_rect.height() <= 0 || !m_anim_tex_before || !m_fbo_texture)
-		return;
-
-	// show: the saved screen is the background and the window is the live
-	// framebuffer; hide: the live framebuffer is the background and the saved
-	// screen (still holding the window) is the moving layer. Sampling the live
-	// framebuffer means no second screen copy is needed and the window content
-	// keeps updating while it animates.
-	m_anim_run_bg = m_anim_show ? m_anim_tex_before : m_fbo_texture;
-	m_anim_run_layer = m_anim_show ? m_fbo_texture : m_anim_tex_before;
-	m_anim_layer_valid = false;
-
-	m_anim_t0 = std::chrono::steady_clock::now();
-	m_anim_running = true;
-}
-
-void gEGLDC::animAbort() {
-	// an overlay frame may be on screen: one more clean frame has to be presented
-	if (m_anim_running)
-		m_anim_clean_pending = true;
-	m_anim_running = false;
-	fadeClear();
-}
-
-bool gEGLDC::animCaptureBlit(GLuint &tex, GLuint &fbo, const eRect &r) {
-	if (!m_fbo || m_fbo_width <= 0 || m_fbo_height <= 0)
-		return false;
-	const eRect c = r & eRect(0, 0, m_fbo_width, m_fbo_height);
-	if (c.width() <= 0 || c.height() <= 0)
-		return false;
-#ifdef HAVE_GLES3
-	if (!gles::isGLES3())
-		return animCapture(tex, r);
-	if (!fbo) {
-		if (!tex) {
-			glGenTextures(1, &tex);
-			glBindTexture(GL_TEXTURE_2D, tex);
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_fbo_width, m_fbo_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-		}
-		glGenFramebuffers(1, &fbo);
-		glBindFramebuffer(GL_FRAMEBUFFER, fbo);
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex, 0);
-		if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-			eDebug("[gEGLDC] animation capture FBO incomplete, using texture copy");
-			glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
-			glDeleteFramebuffers(1, &fbo);
-			fbo = 0;
-			return animCapture(tex, r);
-		}
-	}
-	// GPU side copy of the region (the old glCopyTexSubImage2D() path stalled on
-	// large regions, i.e. on full screen windows of graphic heavy skins)
-	const int gy = m_fbo_height - (c.y() + c.height());
-	glBindFramebuffer(GL_READ_FRAMEBUFFER, m_fbo);
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbo);
-	glDisable(GL_SCISSOR_TEST);
-	glBlitFramebuffer(c.x(), gy, c.x() + c.width(), gy + c.height(),
-	                  c.x(), gy, c.x() + c.width(), gy + c.height(),
-	                  GL_COLOR_BUFFER_BIT, GL_NEAREST);
-	glEnable(GL_SCISSOR_TEST);
-	glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
-	return true;
-#else
-	return animCapture(tex, r);
 #endif
-}
+	if (egl_ready && surface_size_changed && m_egl_surface != EGL_NO_SURFACE && makeCurrent()) {
+		// Release GPU memory before the window buffers are reallocated at the new size.
+		flushTextBatch();
+		deleteSceneFramebuffer();
+		deleteFrameTextures();
+		m_texture_manager.clearContentTextureCache();
+		m_texture_manager.processDeletions();
+#ifdef DREAMNEXTGEN
+		// The page layout changes with the mode, the placeholder surface and the context stay.
+		m_fb_output.destroy();
+#endif
+		glFinish();
+	}
+#ifndef DREAMNEXTGEN
+	if (egl_ready && eglGetCurrentContext() == m_egl_context)
+		unbindContext();
+	if (egl_ready && (surface_size_changed || native_window_must_recreate) && m_egl_surface != EGL_NO_SURFACE) {
+		eglDestroySurface(m_egl_display, m_egl_surface);
+		m_egl_surface = EGL_NO_SURFACE;
+	}
+#endif
 
-void gEGLDC::overlayScissor(const eRect &rect) {
-	const float xs = (float)m_surface_width / (float)m_fbo_width;
-	const float ys = (float)m_surface_height / (float)m_fbo_height;
-	const int x0 = (int)floorf(rect.x() * xs);
-	const int y0 = (int)floorf(rect.y() * ys);
-	const int x1 = (int)ceilf((rect.x() + rect.width()) * xs);
-	const int y1 = (int)ceilf((rect.y() + rect.height()) * ys);
-	glScissor(x0, m_surface_height - y1, std::max(0, x1 - x0), std::max(0, y1 - y0));
-}
-
-void gEGLDC::animOverlay() {
-	if (!m_anim_running && m_fades.empty())
+	m_width = xres;
+	m_height = yres;
+	m_surface_width = surface_xres;
+	m_surface_height = surface_yres;
+	m_scene_framebuffer_unavailable = false;
+	if (osd_was_fullscreen) {
+		m_osd_left = 0;
+		m_osd_top = 0;
+		m_osd_width = xres;
+		m_osd_height = yres;
+	}
+#if defined(HAVE_NXPL_EGL) && defined(E2EGL_NXPL_SYNC_FB_DST)
+	e2eglSyncNxplFramebufferDestination(m_osd_left, m_osd_top, m_osd_width, m_osd_height, m_width, m_height);
+#endif
+	m_pixmap = new gPixmap(eSize(xres, yres), bpp, gPixmap::accelNever);
+	invalidateSpinnerBackground();
+#ifdef DREAMNEXTGEN
+	if (m_fb && m_fb->Available()) {
+		m_fb->SetMode(xres, yres, bpp);
+		m_fb->getMode(xres, yres, bpp);
+		eDebug("[gEGLDC] framebuffer mode set to %dx%dx%d", xres, yres, bpp);
+	}
+#elif defined(HAVE_HISILICON_EGL)
+	if (m_fb && m_fb->Available()) {
+		int fb_xres = surface_xres, fb_yres = surface_yres, fb_bpp = bpp;
+		m_fb->SetMode(surface_xres, surface_yres, bpp);
+		m_fb->getMode(fb_xres, fb_yres, fb_bpp);
+		m_surface_width = fb_xres;
+		m_surface_height = fb_yres;
+		eDebug("[gEGLDC] Hisi framebuffer mode set to %dx%dx%d logical=%dx%d", fb_xres, fb_yres, fb_bpp, m_width, m_height);
+	}
+#elif defined(HAVE_DREAMBCM_EGL)
+	if (m_fb && m_fb->Available()) {
+		int fb_xres = surface_xres, fb_yres = surface_yres, fb_bpp = bpp;
+		m_fb->SetMode(surface_xres, surface_yres, bpp);
+		m_fb->getMode(fb_xres, fb_yres, fb_bpp);
+		m_surface_width = fb_xres;
+		m_surface_height = fb_yres;
+		eDebug("[gEGLDC] framebuffer mode set to %dx%dx%d logical=%dx%d", fb_xres, fb_yres, fb_bpp, m_width, m_height);
+	}
+#elif defined(HAVE_NXPL_EGL)
+	if (e2eglNxplUseVideoModeSurface() && m_fb && m_fb->Available()) {
+		int fb_xres = surface_xres, fb_yres = surface_yres, fb_bpp = bpp;
+		m_fb->SetMode(surface_xres, surface_yres, bpp);
+		m_fb->getMode(fb_xres, fb_yres, fb_bpp);
+		m_surface_width = fb_xres;
+		m_surface_height = fb_yres;
+		eDebug("[gEGLDC] NXPL framebuffer mode set to %dx%dx%d logical=%dx%d", fb_xres, fb_yres, fb_bpp, m_width, m_height);
+	}
+#endif
+	if (m_graphics_suspended) {
+		m_pixmap = new gPixmap(eSize(1, 1), 32, gPixmap::accelNever);
+		eDebug("[gEGLDC] suspended graphics resolution changed to %dx%d surface=%dx%d",
+			m_width, m_height, surfaceWidth(), surfaceHeight());
 		return;
-
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	glViewport(0, 0, m_surface_width, m_surface_height);
-	glEnable(GL_SCISSOR_TEST);
-
-	if (m_anim_running) {
-		const double t = std::chrono::duration<double>(std::chrono::steady_clock::now() - m_anim_t0).count() / (double)m_anim_active.duration;
-		if (t >= 1.0) {
-			m_anim_running = false;
-		} else {
-			float alpha, x, y, w, h;
-			animState(m_anim_active, m_anim_show, m_anim_rect, (float)t, alpha, x, y, w, h);
-			overlayScissor(m_anim_region);
-			animDrawFrame(alpha, x, y, w, h, m_anim_run_bg, m_anim_run_layer, m_anim_region, m_anim_rect);
+	}
+	if (m_window_provider) {
+		m_native_window_ready = m_window_provider->init(surfaceWidth(), surfaceHeight());
+		if (!m_native_window_ready) {
+			eDebug("[gEGLDC] native window provider resize init failed for %dx%d logical=%dx%d",
+				surfaceWidth(), surfaceHeight(), m_width, m_height);
+			markSurfaceLost();
+			return;
 		}
 	}
-	fadeDraw();
 
-	glEnable(GL_BLEND);
-	glViewport(0, 0, m_fbo_width, m_fbo_height);
-	setGlScissor(eRect(0, 0, m_fbo_width, m_fbo_height));
-}
-
-void gEGLDC::animTick() {
-	if (!animActive() || !isInitialized())
-		return;
-	// never present in the middle of a frame the main thread is still painting
-	if (m_anim_pending)
-		return;
-	if (m_frame_open && std::chrono::steady_clock::now() - m_last_op < std::chrono::milliseconds(40))
-		return;
-	flip();
-}
-
-void gEGLDC::fadeClear() {
-	for (size_t i = 0; i < m_fades.size(); ++i) {
-		if (m_fades[i].tex)
-			glDeleteTextures(1, &m_fades[i].tex);
-	}
-	m_fades.clear();
-}
-
-void gEGLDC::fadeBegin(const eRect &area, float seconds) {
-	if (!m_fbo || m_fbo_width <= 0 || m_fbo_height <= 0 || seconds <= 0.0f || m_anim_pending || m_anim_running)
-		return;
-	const eRect c = area & eRect(0, 0, m_fbo_width, m_fbo_height);
-	if (c.width() <= 0 || c.height() <= 0)
-		return;
-	if ((long)c.width() * (long)c.height() > ((long)m_fbo_width * (long)m_fbo_height) / 4)
-		return;
-	flushBlitBatch();
-	flushTextBatch();
-	for (size_t i = 0; i < m_fades.size();) {
-		const eRect old = m_fades[i].rect;
-		if (old.x() == c.x() && old.y() == c.y() && old.width() == c.width() && old.height() == c.height()) {
-			if (m_fades[i].tex)
-				glDeleteTextures(1, &m_fades[i].tex);
-			m_fades.erase(m_fades.begin() + i);
-		} else {
-			++i;
+	if (egl_ready) {
+#ifdef DREAMNEXTGEN
+		if (!createFramebufferOutput()) {
+			eDebug("[gEGLDC] framebuffer output unavailable after resizing to %dx%d", m_width, m_height);
+			markSurfaceLost();
+			return;
+		}
+		m_surface_lost = false;
+#else
+		if (m_egl_surface == EGL_NO_SURFACE) {
+			EGLNativeWindowType native_window = m_window_provider ? m_window_provider->getNativeWindow() : (EGLNativeWindowType)0;
+			if (!native_window && e2eglRequiresNativeWindow()) {
+				eDebug("[gEGLDC] native window is not available while resizing to %dx%d logical=%dx%d",
+					surfaceWidth(), surfaceHeight(), m_width, m_height);
+				markSurfaceLost();
+				return;
+			}
+			m_egl_surface = eglCreateWindowSurface(m_egl_display, m_egl_config, native_window, nullptr);
+			if (m_egl_surface == EGL_NO_SURFACE) {
+				eDebug("[gEGLDC] eglCreateWindowSurface failed while resizing to %dx%d logical=%dx%d. EGL error: 0x%x",
+					surfaceWidth(), surfaceHeight(), m_width, m_height, eglGetError());
+				markSurfaceLost();
+				return;
+			}
+			m_surface_lost = false;
+			applySwapBehavior();
+		}
+#endif
+		if (makeCurrent()) {
+			deleteSceneFramebuffer();
+			deleteFrameTextures();
+			completeAnimation(m_pending_window_animation.completion);
+			m_pending_window_animation.active = false;
+			m_pending_listbox_animation.active = false;
+			m_pending_listbox_animation.selection_pixmap = nullptr;
+			invalidateSpinnerBackground();
+			m_flip_count = 0;
+			applyWindowViewport();
+			eglSwapInterval(m_egl_display, 1);
+			m_basic_shader.setResolution((float)m_width, (float)m_height);
+			m_advanced_shader.setResolution((float)m_width, (float)m_height);
+			m_texture_shader.setResolution((float)m_width, (float)m_height);
+			m_text_shader.setResolution((float)m_width, (float)m_height);
+			primeEGLSurface();
+			eDebug("[gEGLDC] resized EGL surface to %dx%d logical=%dx%d", surfaceWidth(), surfaceHeight(), m_width, m_height);
+			releaseCurrent();
 		}
 	}
-	if (m_fades.size() >= 8)
-		return;
-	FadeItem f;
-	f.rect = c;
-	f.start = std::chrono::steady_clock::now();
-	f.duration = seconds;
-	glGenTextures(1, &f.tex);
-	glBindTexture(GL_TEXTURE_2D, f.tex);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, c.width(), c.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
-	glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, c.x(), m_fbo_height - (c.y() + c.height()), c.width(), c.height());
-	m_fades.push_back(f);
 }
 
-void gEGLDC::fadeDraw() {
-	if (m_fades.empty() || !m_fbo)
+void gEGLDC::refresh() {
+	if (runOnRenderThread([this]() { refresh(); }))
 		return;
-	const std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
-	glEnable(GL_SCISSOR_TEST);
-	glEnable(GL_BLEND);
-	setAlphaBlendMode(true);
-	for (size_t i = 0; i < m_fades.size();) {
-		FadeItem &f = m_fades[i];
-		const float t = std::chrono::duration<float>(now - f.start).count() / f.duration;
-		if (t >= 1.0f) {
-			if (f.tex)
-				glDeleteTextures(1, &f.tex);
-			m_fades.erase(m_fades.begin() + i);
-			continue;
+
+	std::lock_guard<std::recursive_mutex> lock(m_egl_mutex);
+
+	if (!isInitialized() || m_egl_display == EGL_NO_DISPLAY || m_egl_context == EGL_NO_CONTEXT)
+		return;
+
+	bool preserve_scene = false;
+#if defined(HAVE_DREAMBCM_EGL) || defined(DREAMNEXTGEN)
+	if (m_egl_surface != EGL_NO_SURFACE && makeCurrent()) {
+		if (sceneFramebufferActive()) {
+			bindSceneFramebuffer();
+			flushTextBatch();
+			glFlush();
+			preserve_scene = m_scene_frame_valid;
 		}
-		overlayScissor(f.rect);
-		const float x = (float)f.rect.x();
-		const float y = (float)f.rect.y();
-		const float w = (float)f.rect.width();
-		const float h = (float)f.rect.height();
-		const float q[24] = {
-			x, y, 0.0f, 1.0f,
-			x + w, y, 1.0f, 1.0f,
-			x, y + h, 0.0f, 0.0f,
-			x + w, y, 1.0f, 1.0f,
-			x + w, y + h, 1.0f, 0.0f,
-			x, y + h, 0.0f, 0.0f
-		};
-		m_texture_shader.drawBatch(q, 6, f.tex, 1.0f - t);
-		++i;
+		releaseCurrent();
+	}
+#endif
+
+#ifdef HAVE_VUPLUS_MIPSEL_EGL
+	if (m_egl_surface != EGL_NO_SURFACE) {
+		if (makeCurrent()) {
+			applyWindowViewport();
+			eglSwapInterval(m_egl_display, 1);
+			releaseCurrent();
+		}
+		eDebug("[gEGLDC] Vuplus MIPS refresh keeps existing EGL surface at %dx%d logical=%dx%d",
+			surfaceWidth(), surfaceHeight(), m_width, m_height);
+		return;
+	}
+	eDebug("[gEGLDC] Vuplus MIPS refresh recreates missing EGL surface at %dx%d logical=%dx%d",
+		surfaceWidth(), surfaceHeight(), m_width, m_height);
+#endif
+
+#ifdef DREAMNEXTGEN
+	if (m_fb && m_fb->Available()) {
+		m_fb->SetMode(m_width, m_height, 32);
+		eDebug("[gEGLDC] framebuffer mode refreshed to %dx%d", m_width, m_height);
+	}
+#elif defined(HAVE_HISILICON_EGL)
+	if (m_fb && m_fb->Available()) {
+		int fb_xres = surfaceWidth(), fb_yres = surfaceHeight(), fb_bpp = 32;
+		m_fb->SetMode(surfaceWidth(), surfaceHeight(), 32);
+		m_fb->getMode(fb_xres, fb_yres, fb_bpp);
+		m_surface_width = fb_xres;
+		m_surface_height = fb_yres;
+		eDebug("[gEGLDC] Hisi framebuffer mode refreshed to %dx%dx%d logical=%dx%d", fb_xres, fb_yres, fb_bpp, m_width, m_height);
+	}
+#elif defined(HAVE_DREAMBCM_EGL)
+	if (m_fb && m_fb->Available()) {
+		int fb_xres = surfaceWidth(), fb_yres = surfaceHeight(), fb_bpp = 32;
+		m_fb->SetMode(surfaceWidth(), surfaceHeight(), 32);
+		m_fb->getMode(fb_xres, fb_yres, fb_bpp);
+		m_surface_width = fb_xres;
+		m_surface_height = fb_yres;
+		eDebug("[gEGLDC] framebuffer mode refreshed to %dx%d logical=%dx%d", surfaceWidth(), surfaceHeight(), m_width, m_height);
+	}
+#elif defined(HAVE_VUPLUS_EGL)
+	updateVideoModeSurfaceSize("refresh");
+#elif defined(HAVE_NXPL_EGL)
+	updateVideoModeSurfaceSize("refresh");
+	if (e2eglNxplUseVideoModeSurface() && m_fb && m_fb->Available()) {
+		int fb_xres = surfaceWidth(), fb_yres = surfaceHeight(), fb_bpp = 32;
+		m_fb->SetMode(surfaceWidth(), surfaceHeight(), 32);
+		m_fb->getMode(fb_xres, fb_yres, fb_bpp);
+		m_surface_width = fb_xres;
+		m_surface_height = fb_yres;
+		eDebug("[gEGLDC] NXPL framebuffer mode refreshed to %dx%dx%d logical=%dx%d", fb_xres, fb_yres, fb_bpp, m_width, m_height);
+	}
+#if defined(HAVE_NXPL_EGL) && defined(E2EGL_NXPL_SYNC_FB_DST)
+	e2eglSyncNxplFramebufferDestination(m_osd_left, m_osd_top, m_osd_width, m_osd_height, m_width, m_height);
+#endif
+#elif defined(HAVE_V3DPLATFORM_EGL)
+	eDebug("[gEGLDC] V3D OSD refresh recreates EGL window surface at %dx%d logical=%dx%d",
+		surfaceWidth(), surfaceHeight(), m_width, m_height);
+#endif
+
+#ifdef DREAMNEXTGEN
+	if (!createFramebufferOutput()) {
+		eDebug("[gEGLDC] framebuffer output unavailable while refreshing %dx%d", m_width, m_height);
+		markSurfaceLost();
+		return;
+	}
+	m_surface_lost = false;
+#else
+	if (eglGetCurrentContext() == m_egl_context)
+		unbindContext();
+	if (m_egl_surface != EGL_NO_SURFACE) {
+		eglDestroySurface(m_egl_display, m_egl_surface);
+		m_egl_surface = EGL_NO_SURFACE;
+	}
+	if (m_window_provider) {
+#if defined(HAVE_V3DPLATFORM_EGL)
+		if (auto *v3d_provider = dynamic_cast<V3DPlatformWindowProvider*>(m_window_provider))
+			m_native_window_ready = v3d_provider->recreate(surfaceWidth(), surfaceHeight());
+		else
+#endif
+			m_native_window_ready = m_window_provider->init(surfaceWidth(), surfaceHeight());
+		if (!m_native_window_ready) {
+			eDebug("[gEGLDC] native window provider refresh init failed for %dx%d logical=%dx%d",
+				surfaceWidth(), surfaceHeight(), m_width, m_height);
+			markSurfaceLost();
+			return;
+		}
+	}
+
+	EGLNativeWindowType native_window = m_window_provider ? m_window_provider->getNativeWindow() : (EGLNativeWindowType)0;
+	if (!native_window && e2eglRequiresNativeWindow()) {
+		eDebug("[gEGLDC] native window is not available while refreshing %dx%d logical=%dx%d",
+			surfaceWidth(), surfaceHeight(), m_width, m_height);
+		markSurfaceLost();
+		return;
+	}
+	m_egl_surface = eglCreateWindowSurface(m_egl_display, m_egl_config, native_window, nullptr);
+	if (m_egl_surface == EGL_NO_SURFACE) {
+		eDebug("[gEGLDC] eglCreateWindowSurface failed while refreshing %dx%d logical=%dx%d. EGL error: 0x%x",
+			surfaceWidth(), surfaceHeight(), m_width, m_height, eglGetError());
+		markSurfaceLost();
+		return;
+	}
+	m_surface_lost = false;
+	applySwapBehavior();
+#endif
+
+	if (makeCurrent()) {
+		deleteFrameTextures();
+		if (!preserve_scene)
+			deleteSceneFramebuffer();
+		m_scene_framebuffer_unavailable = false;
+		completeAnimation(m_pending_window_animation.completion);
+		m_pending_window_animation.active = false;
+		m_pending_listbox_animation.active = false;
+		m_pending_listbox_animation.selection_pixmap = nullptr;
+		m_scene_animation_old_texture = 0;
+		m_scene_animation_old_valid = false;
+		invalidateSpinnerBackground();
+		m_flip_count = 0;
+		m_frame_stats_index = 0;
+		resetFrameStats();
+		applyWindowViewport();
+		eglSwapInterval(m_egl_display, 1);
+		m_basic_shader.setResolution((float)m_width, (float)m_height);
+		m_advanced_shader.setResolution((float)m_width, (float)m_height);
+		m_texture_shader.setResolution((float)m_width, (float)m_height);
+		m_text_shader.setResolution((float)m_width, (float)m_height);
+		primeEGLSurface(preserve_scene);
+		if (preserve_scene && presentSceneFramebuffer()) {
+			if (swapWindowFramebuffer())
+				bindSceneFramebuffer();
+		}
+		eDebug("[gEGLDC] refreshed EGL surface at %dx%d logical=%dx%d", surfaceWidth(), surfaceHeight(), m_width, m_height);
+		releaseCurrent();
 	}
 }
 
 void gEGLDC::flip() {
-	if (isInitialized() && m_egl_display != EGL_NO_DISPLAY && m_egl_surfaces[m_render_page] != EGL_NO_SURFACE) {
-#ifdef HAVE_GLES3
-		if (m_fbo) {
-			glBindFramebuffer(GL_READ_FRAMEBUFFER, m_fbo);
-			glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-			glDisable(GL_SCISSOR_TEST);
-			glBlitFramebuffer(0, 0, m_fbo_width, m_fbo_height,
-			                  0, 0, m_surface_width, m_surface_height,
-			                  GL_COLOR_BUFFER_BIT, GL_LINEAR);
-			glEnable(GL_SCISSOR_TEST);
-			animOverlay();
-			m_anim_clean_pending = false;
-		}
+	std::lock_guard<std::recursive_mutex> lock(m_egl_mutex);
+
+	if (isInitialized() && m_egl_display != EGL_NO_DISPLAY && m_egl_surface != EGL_NO_SURFACE) {
+		const bool already_current = eglGetCurrentContext() == m_egl_context;
+		if (!already_current && !makeCurrent())
+			return;
+		if (sceneFramebufferWanted())
+			bindSceneFramebuffer();
+		flushTextBatch();
+		// A listbox repaints its rows before it sends the animation opcode, so
+		// its old frame has to be the one presented here.
+		if (s_egl_animation_listbox && (m_preserved_swap || sceneFramebufferActive()))
+			capturePresentedFrame();
+		const bool scene_presented = presentSceneFramebuffer();
+		const bool swapped = swapWindowFramebuffer();
+#ifdef DREAMNEXTGEN
+		// Keep composing the latest scene while HDMI output is suspended.
+		if (!swapped && sceneFramebufferActive())
+			bindSceneFramebuffer();
 #endif
-		// eglSwapBuffers() is only defined for window surfaces; a pixmap-surface
-		// platform (Dreambox) presents via the provider instead - see
-		// presentPixmap(). m_render_page is the page this frame was just
-		// rendered into (see tryInitEGL()'s initial value and the rotation
-		// below).
-		if (m_window_provider->usesPixmapSurface()) {
-			int shown_page = m_render_page;
-			m_window_provider->presentPixmap(shown_page);
-
-			if (m_page_count > 1) {
-				// Rotate to the next page for the *next* frame's rendering -
-				// never re-render into the page we just told the provider to
-				// show. This is what actually makes rendering happen
-				// off-screen instead of visibly drawing into live scanout
-				// memory (the single-page behavior this replaces rendered
-				// directly into whatever the display was concurrently
-				// showing, so any frame slower than one vblank was visibly
-				// drawn on screen mid-frame no matter how few GL draw calls
-				// it took).
-				m_render_page = (m_render_page + 1) % m_page_count;
-
-				// Seed the new back buffer with what's now actually on screen
-				// (shown_page) before any of the next frame's opcodes run -
-				// needed because the compositor above only redraws dirty
-				// regions, an assumption that only holds if the render
-				// target already reflects the previous frame. Prefer doing
-				// this through the GL pipeline itself (gpuCopyPageContent(),
-				// GLES3's glBlitFramebuffer against asymmetric draw/read
-				// surfaces) over a plain CPU memcpy of the page's backing
-				// memory (INativeWindowProvider::copyPageContent()): this
-				// GPU's tile-based deferred renderer appears to track a
-				// surface's content by what it last wrote through the GL
-				// pipeline, not by re-reading the surface's backing memory
-				// on demand, so a CPU memcpy that bypasses the GL pipeline
-				// can be partially invisible to it on the next frame's
-				// render into that same surface - the actual cause behind
-				// an infobar that looked "half updated" with the memcpy
-				// version despite the copied bytes being correct in memory.
-				bool gpu_copied = false;
-				bool seeded = false;
-				if (m_fbo) {
-					seeded = eglMakeCurrent(m_egl_display, m_egl_surfaces[m_render_page], m_egl_surfaces[m_render_page], m_egl_context);
-				} else {
-					gpu_copied = gpuCopyPageContent(shown_page, m_render_page);
-					seeded = gpu_copied;
-				}
-
-				if (seeded) {
-					// gpuCopyPageContent() already left draw=m_render_page
-					// current (its read surface is stale/irrelevant now -
-					// normal rendering opcodes never read from the
-					// framebuffer). A render-target switch is not cheap on
-					// this tile-based GPU (it has to resolve/flush whatever
-					// was pending for the previous target), so don't pay for
-					// a second one here just to "restore" a draw binding
-					// that's already correct.
-				} else {
-					// GPU copy wasn't available or failed - draw is still
-					// whatever it was before rotation (or in an unknown
-					// state if gpuCopyPageContent()'s own eglMakeCurrent
-					// partially failed). Explicitly bind the new page for
-					// both draw and read before falling back to the CPU copy.
-					if (!eglMakeCurrent(m_egl_display, m_egl_surfaces[m_render_page], m_egl_surfaces[m_render_page], m_egl_context)) {
-						eDebug("[gEGLDC] eglMakeCurrent to page %d failed after flip: 0x%x", m_render_page, eglGetError());
-						seeded = false;
-					} else {
-						m_window_provider->copyPageContent(shown_page, m_render_page);
-						seeded = true;
-					}
-				}
-
-				if (!seeded) {
-					// Both the GL blit and the CPU-copy fallback failed to
-					// seed the new page with shown_page's content. Every
-					// draw opcode from here on only touches its own dirty
-					// rect on the assumption the render target already
-					// holds the previous frame - rendering into this
-					// unseeded page now would bake whatever stale content
-					// it happens to still have (e.g. an already-erased
-					// spinner frame from `page_count` flips ago) back onto
-					// the screen the next time rotation shows it again,
-					// with no later event guaranteed to ever fully repaint
-					// that specific page and clear it. Abandon the rotation
-					// for this frame and go back to rendering into
-					// shown_page instead: it was just presented, so it's
-					// known to hold fully correct, current content. This
-					// re-accepts the single-buffer tearing risk the
-					// rotation above exists to avoid, but only for this one
-					// rare failure frame - far better than a page that can
-					// silently resurrect old content indefinitely.
-					m_render_page = shown_page;
-					if (!eglMakeCurrent(m_egl_display, m_egl_surfaces[shown_page], m_egl_surfaces[shown_page], m_egl_context))
-						eDebug("[gEGLDC] eglMakeCurrent back to shown page %d failed: 0x%x", shown_page, eglGetError());
-				}
-			}
-		} else {
-			eglSwapBuffers(m_egl_display, m_egl_surfaces[0]);
+		if (swapped) {
+			if (scene_presented)
+				bindSceneFramebuffer();
+			if (!already_current)
+				releaseCurrent();
+			logAndResetFrameStats();
+			m_frame_restore_pending = !scene_presented && !m_preserved_swap && m_last_frame_valid;
 		}
-	}
-
-	if (m_fbo) {
-		glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
+		if (!already_current && !swapped)
+			releaseCurrent();
 	}
 }

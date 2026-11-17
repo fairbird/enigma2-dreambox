@@ -12,9 +12,6 @@
 class gAdvancedShader {
 private:
 	GLuint m_program_id;
-#if defined(HAVE_GLES3)
-	GLuint m_vao; // GLES3 only; 0 in GLES2 mode
-#endif
 	GLuint m_vbo;
 
 	GLint m_projection_location;
@@ -22,16 +19,17 @@ private:
 	GLint m_radius_location;
 	GLint m_edges_location;
 	GLint m_solid_color_location;
+	GLint m_alphablend_location;
 	GLint m_border_width_location;
 	GLint m_border_color_location;
-	GLint m_alphablend_location;
+	GLint m_coveragePassLocation;
 
 	// Gradient uniforms
 	GLint m_gradient_colors_location;
 	GLint m_gradient_stops_location; // array of floats
 	GLint m_num_stops_location;
 	GLint m_gradient_orientation_location;
-	GLint m_gradient_full_size_location;
+	GLint m_gradient_extent_location;
 
 	// ES2-only per-corner radius uniforms (replaces integer bitmask u_edges)
 	// GLSL ES 1.00 does not support bitwise operations on integer uniforms.
@@ -49,14 +47,14 @@ public:
 	~gAdvancedShader();
 
 	bool init();
+	void release(bool contextCurrent = true);
 	void bind();
 
-	// See gShader::destroy()'s comment - same reasoning and requirement
-	// (must run while this thread's EGL context is still current).
-	void destroy();
-
+	bool isInitialized() const { return m_program_id != 0; }
 	void setResolution(float width, float height);
+	void setFramebufferResolution(float width, float height);
 
-	void drawAdvancedRect(float x, float y, float width, float height, int radius, uint8_t edges, const std::vector<gRGB>& gradient_colors, uint8_t orientation, bool alphablend, float alpha,
-						  const gRGB& solid_color, int border_width, const gRGB& border_color, int gradient_full_size);
+	// Coverage replacement starts and ends with blending disabled; other draws use the caller's blend state.
+	void drawAdvancedRect(float x, float y, float width, float height, int radius, uint8_t edges, const std::vector<gRGB>& gradient_colors, uint8_t orientation, bool alphablend,
+						  int gradient_full_size, float alpha, const gRGB& solid_color, int border_width = 0, const gRGB& border_color = gRGB(), bool replaceCoverage = false);
 };

@@ -218,7 +218,8 @@ struct gOpcode
 		{
 			ePoint point;
 			eSize size;
-			int anim_id;
+			int animation = -1;
+			int durationMs = 0;
 		} *setShowHideInfo;
 #ifdef USE_LIBVUGLES2
 		struct psetShowItemInfo
@@ -267,6 +268,7 @@ class gRC: public iObject, public sigc::trackable
 	void recv_notify(const int &i);
 
 	ePtr<gDC> m_spinner_dc;
+	ePtr<gDC> m_animation_dc;
 	int m_spinner_enabled;
 
 	int m_spinneronoff;
@@ -411,8 +413,8 @@ public:
 	void setCompositing(gCompositingData *comp);
 
 	void flush();
-	void sendShow(ePoint point, eSize size, int anim_id = 0);
-	void sendHide(ePoint point, eSize size, int anim_id = 0);
+	void sendShow(ePoint point, eSize size, int animation = -1, int durationMs = 0);
+	void sendHide(ePoint point, eSize size, int animation = -1, int durationMs = 0);
 	void beginLayer();
 	void endLayer();
 	void beginFade(ePoint point, eSize size, int ms = 0);
@@ -507,6 +509,9 @@ public:
 	virtual void disableSpinner();
 	virtual void incrementSpinner();
 	virtual void setSpinner(eRect pos, ePtr<gPixmap> *pic, int len);
+	// Render-thread deadlines allow animation frames without blocking queued UI work.
+	virtual unsigned long long animationFrameDeadlineUs() const { return 0; }
+	virtual void renderAnimationFrame() {}
 	void setNativeSpinner(ePoint position, unsigned int color);
 	void setSpinnerColor(unsigned int color) { m_spinnerColor.store(color, std::memory_order_relaxed); }
 	int spinnerInterval() const { return m_nativeSpinner ? 33 : 100; }

@@ -60,6 +60,9 @@ is usually caused by not marking PSignals as immutable.
 #include <lib/gdi/fb.h>
 #include <lib/gdi/font.h>
 #include <lib/gdi/gpixmap.h>
+#ifdef ENABLE_GLES_TESTLAB
+#include <lib/gdi/grendertest.h>
+#endif
 #include <lib/gdi/gfbdc.h>
 #include <lib/gdi/grc.h>
 #include <lib/gdi/gmaindc.h>
@@ -247,6 +250,9 @@ typedef long time_t;
 %include <lib/gdi/fb.h>
 %include <lib/gdi/font.h>
 %include <lib/gdi/gpixmap.h>
+#ifdef ENABLE_GLES_TESTLAB
+%include <lib/gdi/grendertest.h>
+#endif
 %include <lib/gdi/gmaindc.h>
 %include <lib/gdi/epoint.h>
 %include <lib/gdi/erect.h>
@@ -667,11 +673,6 @@ extern const char *getGStreamerVersionString();
 extern const char *getEGLVersionString();
 extern const char *getGLESVersionString();
 extern void dump_malloc_stats(void);
-#ifndef HAVE_OSDANIMATION
-extern void setAnimation_current(int a);
-extern void setAnimation_speed(int speed);
-extern void setAnimation_current_listbox(int a);
-#endif
 extern void pauseInit(void);
 extern void setAnimation_spec(const char *spec);
 extern int registerAnimation_spec(const char *spec);
@@ -697,11 +698,6 @@ extern const char *getGStreamerVersionString();
 extern const char *getEGLVersionString();
 extern const char *getGLESVersionString();
 extern void dump_malloc_stats(void);
-#ifndef HAVE_OSDANIMATION
-extern void setAnimation_current(int a);
-extern void setAnimation_speed(int speed);
-extern void setAnimation_current_listbox(int a);
-#endif
 extern void pauseInit(void);
 extern void setAnimation_spec(const char *spec);
 extern int registerAnimation_spec(const char *spec);

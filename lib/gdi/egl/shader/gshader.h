@@ -6,41 +6,38 @@
 #include <GLES2/gl2.h>
 #include <GLES2/gl2ext.h>
 #endif
+#include <stddef.h>
 
 class gShader {
 private:
 	GLuint m_program_id;
-#if defined(HAVE_GLES3)
-	GLuint m_vao; // GLES3 only; 0 in GLES2 mode
-#endif
+	GLuint m_colored_program_id;
 	GLuint m_vbo;
+	size_t m_vbo_capacity_bytes;
 
 	GLint m_projection_location;
 	GLint m_color_location;
+	GLint m_colored_projection_location;
 
 	GLuint compileShader(GLenum type, const char* source);
+	GLuint linkProgram(const char* vertex_source, const char* fragment_source, bool colored);
 	void bindVAO();
 	void unbindVAO();
+	void bindColoredVAO();
+	void unbindColoredVAO();
+	void ensureVboCapacity(size_t bytes);
 
 public:
 	gShader();
 	~gShader();
 
 	bool init();
+	void release(bool contextCurrent = true);
 	void bind();
-
-	// Frees this shader's GL objects (program/VBO/VAO) - MUST be called
-	// while this thread still has the owning EGL context current (see
-	// gEGLDC::cleanupEGL()'s comment: that's the only guarantee normally
-	// held here, since the destructor below runs later, on a different
-	// thread, after the context is long gone - GL calls with no current
-	// context at all are what actually crashed the driver on shutdown).
-	// Safe to call more than once (idempotent - a second call sees zeroed
-	// handles and does nothing), which is what makes it safe for the
-	// destructor to also call it as a fallback/no-op.
-	void destroy();
 
 	void setResolution(float width, float height);
 	void drawRect(float x, float y, float width, float height, float r, float g, float b, float a);
+	void drawRectBatch(const float* vertices, size_t vertex_count, float r, float g, float b, float a);
+	void drawColoredRectBatch(const float* vertices, size_t vertex_count);
 	void drawLine(float x1, float y1, float x2, float y2, float r, float g, float b, float a);
 };

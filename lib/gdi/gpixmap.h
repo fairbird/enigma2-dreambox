@@ -13,6 +13,10 @@
 #include <vector>
 
 struct gRGB {
+#ifdef SWIG
+	uint32_t value;
+	gRGB(int r, int g, int b, int a=0);
+#else
 	union {
 #if BYTE_ORDER == LITTLE_ENDIAN
 		struct {
@@ -25,10 +29,11 @@ struct gRGB {
 #endif
 		uint32_t value;
 	};
-	gRGB(int r, int g, int b, int a=0): b(b), g(g), r(r), a(a) {}
-	gRGB(uint32_t val): value(val) {}
-	gRGB(const gRGB& other): value(other.value) {}
-	gRGB(const char *colorstring) {
+	gRGB(int r, int g, int b, int a = 0) : b(b), g(g), r(r), a(a) {}
+#endif
+	gRGB(uint32_t val) : value(val) {}
+	gRGB(const gRGB& other) : value(other.value) {}
+	gRGB(const char* colorstring) {
 		uint32_t val = 0;
 
 		if (colorstring) {
@@ -49,14 +54,15 @@ struct gRGB {
 		}
 		value = val;
 	}
-	gRGB(): value(0) {}
+	gRGB() : value(0) {}
 
 	uint32_t argb() const { return value; }
 
 	void set(uint32_t val) { value = val; }
 
+#ifndef SWIG
 	void operator=(uint32_t val) { value = val; }
-	bool operator < (const gRGB &c) const {
+	bool operator<(const gRGB& c) const {
 		if (b < c.b)
 			return true;
 		if (b == c.b) {
@@ -71,15 +77,17 @@ struct gRGB {
 		}
 		return false;
 	}
-	bool operator==(const gRGB &c) const { return c.value == value; }
-	bool operator != (const gRGB &c) const {return c.value != value; }
-	operator const std::string () const {
+#endif
+	bool operator==(const gRGB& c) const { return c.value == value; }
+	bool operator!=(const gRGB& c) const { return c.value != value; }
+#ifndef SWIG
+	operator const std::string() const {
 		uint32_t val = value;
 		std::string escapecolor = "\\c";
 		escapecolor.resize(10);
 		for (int i = 9; i >= 2; i--) {
 			int hexbits = val & 0xf;
-			escapecolor[i] = hexbits < 10	? '0' + hexbits : 'a' - 10 + hexbits;
+			escapecolor[i] = hexbits < 10 ? '0' + hexbits : 'a' - 10 + hexbits;
 			val >>= 4;
 		}
 		return escapecolor;
@@ -92,13 +100,14 @@ struct gRGB {
 		a = BLEND(0xFF, a, other.a);
 #undef BLEND
 	}
+#endif
 };
 
 #ifndef SWIG
 struct gColor {
 	int color;
-	gColor(int color): color(color) {}
-	gColor(): color(0) {}
+	gColor(int color) : color(color) {}
+	gColor() : color(0) {}
 	operator int() const { return color; }
 	bool operator==(const gColor& o) const { return o.color == color; }
 };
@@ -127,19 +136,26 @@ struct gUnmanagedSurface {
 	gPalette clut;
 	void* data;
 	int data_phys;
-	unsigned int gl_texture_id = 0; // cached GLES texture name for this surface, if any (see gTextureManager)
-	// EGL: frame of the last draw using this texture; used by LRU eviction.
-	unsigned int gl_last_used_frame = 0;
-	// EGL: texture is updated in place (font atlas/text overlay), so it must
-	// remain resident and cannot be evicted underneath a later sub-image upload.
-	bool gl_texture_pinned = false;
+	unsigned int gl_texture_id;
+	unsigned int gl_framebuffer_id;
+	unsigned int gl_context_generation;
+	bool gl_content_valid;
+	bool cpu_content_valid;
 	bool transparent = true;
+	// Mutable atlases must retain their own texture rather than enter the content cache.
+	bool gl_content_cacheable = true;
+	// Shared native storage needs a GPU completion barrier before CPU access.
+	bool gl_native_shared = false;
+	bool nativeSwapChannels = false;
+	bool nativeImported = false;
+	bool nativeGPUAccessPending = false;
+	bool nativeAccessFailed = false;
 
 	gUnmanagedSurface();
 	gUnmanagedSurface(int width, int height, int bpp);
 };
 
-struct gSurface: gUnmanagedSurface {
+struct gSurface : gUnmanagedSurface {
 	gSurface() : gUnmanagedSurface() {}
 	gSurface(int width, int height, int bpp, int accel);
 	~gSurface();
@@ -153,7 +169,7 @@ private:
 class gRegion;
 
 SWIG_IGNORE(gPixmap);
-class gPixmap: public iObject {
+class gPixmap : public iObject {
 	DECLARE_REF(gPixmap);
 
 public:
@@ -196,8 +212,14 @@ public:
 #endif
 	virtual ~gPixmap();
 	eSize size() const { return eSize(surface->x, surface->y); }
+	void ensureCPUContent();
+	bool checkCPUContent();
+	bool prepareCPUWrite();
 
 private:
+#ifdef ENABLE_GLES_TESTLAB
+	friend class gRenderTest;
+#endif
 	gPixmapDisposeCallback on_dispose;
 
 	friend class gDC;

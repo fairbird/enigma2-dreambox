@@ -1,59 +1,126 @@
 #include <lib/gdi/gfont_atlas.h>
 #include <lib/base/eerror.h>
 #include <cstring>
+#include <algorithm>
+#include <cstdlib>
+#include <cassert>
+
+extern "C" {
+#define STB_RECT_PACK_IMPLEMENTATION
+#include <include/stb_rect_pack.h>
+}
 
 gFontAtlas::gFontAtlas()
-    : m_atlas_width(0), m_atlas_height(0), m_is_dirty(false),
-      m_current_x(0), m_current_y(0), m_current_row_height(0)
+    : m_atlas_width(0)
+    , m_atlas_height(0)
+    , m_is_dirty(false)
 {
 }
 
 gFontAtlas::~gFontAtlas()
 {
-    // m_pixmap is managed by ePtr
-}
-
-bool gFontAtlas::wouldOverflow(int width, int height) const
-{
-    // Mirrors addGlyph()'s own row-advance-then-overflow-check logic exactly
-    // (see there), without mutating any state, so a caller can decide
-    // whether it needs to flush a pending batch first.
-    int x = m_current_x, y = m_current_y, row_height = m_current_row_height;
-    if (x + width > m_atlas_width) {
-        y += row_height + 1;
-    }
-    return y + height > m_atlas_height;
 }
 
 bool gFontAtlas::init(int width, int height)
 {
-    // Normally 2D blitters support at least 2048x2048, but the user can clamp this down
-    // elsewhere if they know their hardware's max 2D texture limit.
+    // Keep explicit sizes valid. The default grows only after the caller has
+    // flushed its text batch, so no queued vertices retain obsolete UVs.
+    if (width <= 0 || height <= 0) {
+        const char *setting = std::getenv("E2EGL_FONT_ATLAS_START");
+        const int requested = setting ? std::atoi(setting) : 512;
+        const int initial = std::min(m_atlas_limit, requested == 1024 || requested == 2048 ? requested : 512);
+        width = height = initial;
+    }
+    release();
     m_atlas_width = width;
     m_atlas_height = height;
 
-    // Create an 8-bit pixmap for the atlas as a simple byte buffer.
-    // accelNever: this is a CPU-written staging buffer (addGlyph() memcpy's
-    // into it, flushTextBatch() reads it to feed glTexSubImage2D) - not
-    // something ever displayed directly - matching why gEGLDC's own
-    // m_pixmap uses the same flag (see its constructor's comment). Without
-    // it, gPixmap defaults to accelerated/ION-backed memory, which on this
-    // hardware is mapped uncached for GPU coherency - fine for the bulk
-    // reads/writes this class already does (memcpy, glTexSubImage2D), but a
-    // real risk for any other CPU-side access pattern this atlas grows in
-    // the future.
     m_pixmap = new gPixmap(eSize(width, height), 8, gPixmap::accelNever);
-    // Initialize to zero (transparent)
+    m_pixmap->surface->gl_content_cacheable = false;
     memset(m_pixmap->surface->data, 0, width * height);
 
     m_is_dirty = false;
     m_dirty_rect = eRect();
+    m_dirty_rects.clear();
 
-    eDebug("[gFontAtlas] initialized %dx%d glyph atlas", width, height);
+    // stb_rect_pack requires an array of nodes equal to the width of the atlas
+    m_pack_nodes.resize(width);
+    stbrp_init_target(&m_pack_context, width, height, m_pack_nodes.data(), m_pack_nodes.size());
+
+    eDebug("[gFontAtlas] initialized %dx%d glyph atlas via stb_rect_pack", width, height);
     return true;
 }
 
+void gFontAtlas::release()
+{
+    m_pixmap = nullptr;
+    m_atlas_width = 0;
+    m_atlas_height = 0;
+    m_is_dirty = false;
+    m_dirty_rect = eRect();
+    std::vector<eRect>().swap(m_dirty_rects);
+    std::vector<stbrp_node>().swap(m_pack_nodes);
+    std::unordered_map<glyph_key_t, glyph_uv>().swap(m_glyphs);
+}
 
+bool gFontAtlas::reduceSize()
+{
+    const int size = std::max(m_atlas_width, m_atlas_height);
+    if (size <= 512)
+        return false;
+    // The caller must finish/discard the old batch before changing its UVs.
+    // Retain this limit for the session instead of growing back into the OOM.
+    m_atlas_limit = std::max(512, size / 2);
+    eWarning("[gFontAtlas] reducing atlas after upload failure %dx%d -> %dx%d; growth limited to %d",
+        m_atlas_width, m_atlas_height, m_atlas_limit, m_atlas_limit, m_atlas_limit);
+    return init(m_atlas_limit, m_atlas_limit);
+}
+
+static long long atlasRectArea(const eRect &rect)
+{
+    return rect.empty() ? 0 : (long long)rect.width() * (long long)rect.height();
+}
+
+static eRect atlasUnionRect(const eRect &a, const eRect &b)
+{
+    if (a.empty())
+        return b;
+    if (b.empty())
+        return a;
+
+    const int left = std::min(a.left(), b.left());
+    const int top = std::min(a.top(), b.top());
+    const int right = std::max(a.right(), b.right());
+    const int bottom = std::max(a.bottom(), b.bottom());
+    return eRect(left, top, right - left, bottom - top);
+}
+
+void gFontAtlas::markDirty(const eRect &rect)
+{
+    eRect clipped = rect & eRect(0, 0, m_atlas_width, m_atlas_height);
+    if (clipped.empty())
+        return;
+
+    m_dirty_rect = m_is_dirty ? atlasUnionRect(m_dirty_rect, clipped) : clipped;
+    m_is_dirty = true;
+
+    for (auto &existing : m_dirty_rects) {
+        eRect expanded(existing.left() - 4, existing.top() - 4, existing.width() + 8, existing.height() + 8);
+        eRect joined = atlasUnionRect(existing, clipped);
+        const long long separate_area = atlasRectArea(existing) + atlasRectArea(clipped);
+        const bool close_enough = !(expanded & clipped).empty();
+        if (close_enough || atlasRectArea(joined) <= separate_area + 2048) {
+            existing = joined;
+            return;
+        }
+    }
+
+    m_dirty_rects.push_back(clipped);
+    if (m_dirty_rects.size() > 64) {
+        m_dirty_rects.clear();
+        m_dirty_rects.push_back(m_dirty_rect);
+    }
+}
 
 bool gFontAtlas::getGlyph(glyph_key_t key, glyph_uv &uv)
 {
@@ -65,73 +132,77 @@ bool gFontAtlas::getGlyph(glyph_key_t key, glyph_uv &uv)
     return false;
 }
 
-void gFontAtlas::addGlyph(glyph_key_t key, int width, int height, const uint8_t *data, int src_pitch, glyph_uv &uv)
+bool gFontAtlas::addGlyph(glyph_key_t key, int width, int height, int pitch, const uint8_t *data, glyph_uv &uv, bool allow_reset)
 {
-    if (!m_pixmap) return;
-
+    if (!m_pixmap) return false;
+    
     if (width == 0 || height == 0) {
         // Empty space glyph
         uv.u0 = uv.v0 = uv.u1 = uv.v1 = 0.0f;
         uv.width = 0;
         uv.height = 0;
         m_glyphs[key] = uv;
-        return;
+        return true;
     }
 
-    // Check if we need to advance to the next row
-    if (m_current_x + width > m_atlas_width) {
-        m_current_x = 0;
-        m_current_y += m_current_row_height + 1; // 1px padding
-        m_current_row_height = 0;
-    }
+    stbrp_rect rect;
+    rect.id = 0;
+    rect.w = width + 1;
+    rect.h = height + 1;
 
-    // Check if we ran out of space entirely
-    if (m_current_y + height > m_atlas_height) {
-        eDebug("[gFontAtlas] ATLAS FULL! Resetting atlas...");
-        m_current_x = 0;
-        m_current_y = 0;
-        m_current_row_height = 0;
+    stbrp_pack_rects(&m_pack_context, &rect, 1);
+
+    // If completely full, rebuild atlas buffer.
+    if (!rect.was_packed) {
+        if (!allow_reset)
+            return false;
+
+        if (m_atlas_width < m_atlas_limit || m_atlas_height < m_atlas_limit) {
+            const int nextWidth = m_atlas_width < m_atlas_limit ? std::min(m_atlas_limit, m_atlas_width * 2) : m_atlas_width;
+            const int nextHeight = m_atlas_height < m_atlas_limit ? std::min(m_atlas_limit, m_atlas_height * 2) : m_atlas_height;
+            eDebug("[gFontAtlas] growing %dx%d -> %dx%d after text batch flush", m_atlas_width, m_atlas_height, nextWidth, nextHeight);
+            init(nextWidth, nextHeight);
+            return addGlyph(key, width, height, pitch, data, uv, true);
+        }
+
+        eDebug("[gFontAtlas] ATLAS FULL! Resetting atlas at maximum size...");
         m_glyphs.clear();
         memset(m_pixmap->surface->data, 0, m_atlas_width * m_atlas_height);
-        m_is_dirty = true;
-        m_dirty_rect = eRect(0, 0, m_atlas_width, m_atlas_height);
+
+        stbrp_init_target(&m_pack_context, m_atlas_width, m_atlas_height, m_pack_nodes.data(), m_pack_nodes.size());
+        stbrp_pack_rects(&m_pack_context, &rect, 1);
+
+        if (!rect.was_packed) {
+            eDebug("[gFontAtlas] ERROR: Glyph too large to fit in a completely empty atlas!");
+            return false;
+        }
+
+        clearDirty();
+        markDirty(eRect(0, 0, m_atlas_width, m_atlas_height));
     }
 
-    // Manually copy the glyph into our 8-bit pixmap buffer on the CPU.
-    // Source rows are src_pitch bytes apart (>= width - FreeType pads/aligns
-    // small-bitmap cache rows), not tightly packed at width, so row offsets
-    // must use src_pitch on the source side even though the atlas's own
-    // destination rows are tightly packed at m_atlas_width.
+    int px = rect.x;
+    int py = rect.y;
+
+    if (!pitch)
+        pitch = width;
+
     uint8_t *dst = (uint8_t *)m_pixmap->surface->data;
     for (int row = 0; row < height; ++row) {
-        memcpy(dst + ((m_current_y + row) * m_atlas_width) + m_current_x,
-               data + (row * src_pitch),
-               width);
+        const uint8_t *src_row = pitch > 0 ? data + (row * pitch) : data + ((height - 1 - row) * -pitch);
+        memcpy(dst + ((py + row) * m_atlas_width) + px, src_row, width);
     }
 
-    if (!m_is_dirty) {
-        m_dirty_rect = eRect(m_current_x, m_current_y, width, height);
-        m_is_dirty = true;
-    } else {
-        // Expand dirty rect
-        int min_x = std::min(m_dirty_rect.left(), m_current_x);
-        int min_y = std::min(m_dirty_rect.top(), m_current_y);
-        int max_x = std::max(m_dirty_rect.right(), m_current_x + width);
-        int max_y = std::max(m_dirty_rect.bottom(), m_current_y + height);
-        m_dirty_rect = eRect(min_x, min_y, max_x - min_x, max_y - min_y);
-    }
+    markDirty(eRect(px, py, width, height));
 
+    // Generate UVs. We use width/height (not the +1 padded sizes) so the quad wraps the glyph perfectly.
     uv.width = width;
     uv.height = height;
-    uv.u0 = (float)m_current_x / (float)m_atlas_width;
-    uv.v0 = (float)m_current_y / (float)m_atlas_height;
-    uv.u1 = (float)(m_current_x + width) / (float)m_atlas_width;
-    uv.v1 = (float)(m_current_y + height) / (float)m_atlas_height;
+    uv.u0 = (float)px / (float)m_atlas_width;
+    uv.v0 = (float)py / (float)m_atlas_height;
+    uv.u1 = (float)(px + width) / (float)m_atlas_width;
+    uv.v1 = (float)(py + height) / (float)m_atlas_height;
 
     m_glyphs[key] = uv;
-
-    m_current_x += width + 1; // 1 pixel padding
-    if (height > m_current_row_height) {
-        m_current_row_height = height;
-    }
+    return true;
 }

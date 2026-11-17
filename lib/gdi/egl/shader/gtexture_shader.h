@@ -8,23 +8,18 @@
 #endif
 
 class gTextureShader {
-public:
-	// Upper bound on quads per drawBatch() call - the VBO is sized for
-	// exactly this many up front (see init()) so a batch never needs to
-	// grow the buffer mid-frame; gEGLDC's blit-batch accumulator flushes
-	// once it reaches this many quads.
-	static const int kMaxBatchQuads = 256;
-
 private:
 	GLuint m_program_id;
-#if defined(HAVE_GLES3)
-	GLuint m_vao; // GLES3 only; 0 in GLES2 mode
-#endif
 	GLuint m_vbo;
 
 	GLint m_projection_location;
 	GLint m_texture_location;
 	GLint m_alpha_location;
+	GLint m_alpha_test_location;
+	GLint m_luma_texture_location;
+	GLint m_output_bgra_location;
+	GLint previousTextureLocation, transitionLocation;
+	GLint currentPremultipliedLocation, previousPremultipliedLocation;
 
 	GLint m_rect_size_location;
 	GLint m_radius_location;
@@ -45,22 +40,13 @@ public:
 	~gTextureShader();
 
 	bool init();
+	void release(bool contextCurrent = true);
 	void bind();
 
-	// See gShader::destroy()'s comment - same reasoning and requirement
-	// (must run while this thread's EGL context is still current).
-	void destroy();
-
+	bool isInitialized() const { return m_program_id != 0; }
 	void setResolution(float width, float height);
-	void drawTexture(float x, float y, float width, float height, GLuint texture_id, float global_alpha = 1.0f, float radius = 0.0f, uint8_t edges = 0);
-
-	// Draws multiple quads (vertex_count/6 of them, each 4 floats/vertex:
-	// x,y,u,v - see drawTexture()'s "vertices" layout) sharing one texture
-	// and one draw call, for callers that have accumulated several
-	// same-texture quads themselves (see gEGLDC's blit batching). No corner
-	// rounding support: u_rect_size/u_radius are for a single quad's SDF
-	// calculation and would be wrong for every quad but the first in a
-	// batch, so this always draws with radius 0 - callers must not batch
-	// blits that need rounding.
-	void drawBatch(const float* vertex_data, int vertex_count, GLuint texture_id, float global_alpha = 1.0f);
+	void setFramebufferResolution(float width, float height);
+	void drawTexture(float x, float y, float width, float height, GLuint texture_id, float global_alpha = 1.0f, float radius = 0.0f, uint8_t edges = 0, float u0 = 0.0f, float v0 = 0.0f,
+					 float u1 = 1.0f, float v1 = 1.0f, bool alpha_test = false, bool luma_texture = false, float mask_x = 0.0f, float mask_y = 0.0f, float mask_width = -1.0f,
+					 float mask_height = -1.0f, bool output_bgra = false, GLuint previousTexture = 0, float transition = 1.0f, bool currentPremultiplied = false, bool previousPremultiplied = false);
 };

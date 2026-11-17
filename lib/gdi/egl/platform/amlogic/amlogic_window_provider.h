@@ -1,6 +1,13 @@
 #pragma once
 
+#ifdef HAVE_EGL_FBDEV_WINDOW_H
 #include <EGL/fbdev_window.h>
+#else
+typedef struct fbdev_window {
+	unsigned short width;
+	unsigned short height;
+} fbdev_window;
+#endif
 #include <lib/gdi/egl/inative_window_provider.h>
 
 class AmlogicWindowProvider : public INativeWindowProvider {

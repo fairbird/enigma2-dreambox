@@ -1,32 +1,112 @@
 #include <lib/base/eerror.h>
 #include <lib/gdi/egl/gles_version.h>
 #include <lib/gdi/egl/gtexture_manager.h>
+#include <lib/gdi/egl/gegldc.h>
+#include <lib/gdi/region.h>
 #include <algorithm>
+#include <cstdlib>
 #include <cstring>
+#include <mutex>
+#include <time.h>
+#include <unistd.h>
+#include <sys/mman.h>
+#ifdef DREAMNEXTGEN
+#include <lib/gdi/dreamge2d.h>
+#endif
+#if defined(DREAMBCM_ION_ACCEL) && defined(HAVE_DREAMBCM_EGL) && defined(HAVE_GLES3)
+#include <lib/gdi/accel.h>
+#include <EGL/dreameglplatform.h>
+#endif
 
 static gTextureManager* s_active_manager = nullptr;
 
-// Guards s_active_manager across check-and-use. egl_release_surface_texture()
-// runs from ~gSurface() on ANY thread (e.g. ePicLoad's decode thread, the main
-// thread), while ~gTextureManager() can run on another one (gEGLDC teardown).
-// Without this, the pointer could be cleared/freed between the null check and
-// the call, which then locked m_deletion_mutex through a null/dangling 'this'
-// (SIGSEGV in pthread_mutex_lock, fault address = offset of that mutex).
-// Intentionally leaked so it outlives any static destructor that frees a pixmap.
+static unsigned long long nativeNowUs()
+{
+	timespec now = {};
+	clock_gettime(CLOCK_MONOTONIC, &now);
+	return static_cast<unsigned long long>(now.tv_sec) * 1000000ULL + now.tv_nsec / 1000;
+}
+
+// Guards s_active_manager: surfaces queue deletions from any thread while the manager may be torn down.
+// Leaked on purpose so it outlives static destructors that free pixmaps.
 static std::mutex& activeManagerMutex() {
 	static std::mutex* m = new std::mutex();
 	return *m;
 }
 
-gTextureManager::gTextureManager() : m_egl_display(EGL_NO_DISPLAY) {
+gTextureManager::gTextureManager() : m_egl_display(EGL_NO_DISPLAY), m_content_texture_use_counter(0), m_content_texture_bytes(0), m_offscreen_advanced_shader_initialized(false),
+	m_offscreen_texture_shader_initialized(false), m_context_generation(1) {
 	std::lock_guard<std::mutex> guard(activeManagerMutex());
 	s_active_manager = this;
 }
 
 gTextureManager::~gTextureManager() {
+	if (m_dreamBcmIonUploads || m_dreamBcmIonFailures)
+		eDebug("[dreamBCM] ION GPU upload total=%u avoided_cpu_bytes=%llu failures=%u", m_dreamBcmIonUploads, m_dreamBcmIonBytes, m_dreamBcmIonFailures);
 	std::lock_guard<std::mutex> guard(activeManagerMutex());
 	if (s_active_manager == this)
 		s_active_manager = nullptr;
+}
+
+void gTextureManager::recordUpload(int width, int height, int bytes, bool dmabuf, bool upload32_direct, bool upload32_converted, bool upload8_clut, bool upload8_luma) {
+	m_upload_stats.textures++;
+	if (dmabuf)
+		m_upload_stats.dmabuf++;
+	if (upload32_direct)
+		m_upload_stats.upload32_direct++;
+	if (upload32_converted)
+		m_upload_stats.upload32_converted++;
+	if (upload8_clut)
+		m_upload_stats.upload8_clut++;
+	if (upload8_luma)
+		m_upload_stats.upload8_luma++;
+	m_upload_stats.pixels += (unsigned long long)std::max(0, width) * (unsigned long long)std::max(0, height);
+	m_upload_stats.bytes += (unsigned long long)std::max(0, bytes);
+	if (dmabuf)
+		m_upload_stats.importedBytes += std::max(0, bytes);
+	else
+		m_upload_stats.cpuUploadBytes += std::max(0, bytes);
+}
+
+void gTextureManager::takeUploadStats(gTextureUploadStats& stats) {
+	stats = m_upload_stats;
+	for (const auto& target : m_nativeTargets)
+		stats.nativeBytes += target.second.length;
+	m_upload_stats = gTextureUploadStats();
+}
+
+static void fnvMixByte(uint64_t& hash, uint8_t value)
+{
+	hash ^= value;
+	hash *= 1099511628211ULL;
+}
+
+static void fnvMixU32(uint64_t& hash, uint32_t value)
+{
+	for (int i = 0; i < 4; ++i)
+		fnvMixByte(hash, (uint8_t)(value >> (i * 8)));
+}
+
+static size_t contentTextureCacheMaxEntries()
+{
+	static int entries = -1;
+	if (entries < 0) {
+		const char* env = getenv("E2EGL_TEXTURE_CACHE_ENTRIES");
+		entries = env && *env ? atoi(env) : 256;
+		entries = std::max(32, std::min(entries, 1024));
+	}
+	return (size_t)entries;
+}
+
+static unsigned long long contentTextureCacheMaxBytes()
+{
+	static long long megabytes = -1;
+	if (megabytes < 0) {
+		const char* env = getenv("E2EGL_TEXTURE_CACHE_MB");
+		megabytes = env && *env ? atoll(env) : 48;
+		megabytes = std::max(4LL, std::min(megabytes, 256LL));
+	}
+	return (unsigned long long)megabytes * 1024ULL * 1024ULL;
 }
 
 #ifndef EGL_LINUX_DMA_BUF_EXT
@@ -44,48 +124,150 @@ gTextureManager::~gTextureManager() {
 #ifndef EGL_DMA_BUF_PLANE0_PITCH_EXT
 #define EGL_DMA_BUF_PLANE0_PITCH_EXT 0x3274
 #endif
-
 // DRM FourCC formats
 #define DRM_FORMAT_ARGB8888 0x34325241
 
+typedef void (*gEGLImageTargetTexture2DOESProc)(GLenum target, void *image);
+
+static bool hasExtension(const char* extensions, const char* name) {
+	if (!extensions || !name || !*name)
+		return false;
+
+	const char* start = extensions;
+	const size_t name_len = strlen(name);
+	while ((start = strstr(start, name))) {
+		const char before = start == extensions ? ' ' : *(start - 1);
+		const char after = *(start + name_len);
+		if ((before == ' ' || before == '\0') && (after == ' ' || after == '\0'))
+			return true;
+		start += name_len;
+	}
+	return false;
+}
+
+static float textureColorAlpha(const gRGB& color)
+{
+	return 1.0f - (color.a / 255.0f);
+}
+
+static bool regionCoversRect(const gRegion& region, const eRect& bounds)
+{
+	if (bounds.empty())
+		return false;
+
+	long long covered = 0;
+	for (unsigned int i = 0; i < region.rects.size(); ++i) {
+		eRect rect = region.rects[i] & bounds;
+		if (!rect.empty())
+			covered += (long long)rect.width() * rect.height();
+	}
+	return covered >= (long long)bounds.width() * bounds.height();
+}
+
 #include <lib/gdi/fb.h>
+#ifdef DREAMNEXTGEN
+#include <lib/gdi/dreamge2d.h>
+#endif
 
-GLuint gTextureManager::createTextureFromDmabuf(gPixmap* pixmap) {
-#ifdef CONFIG_ION
-	fbClass* fb = fbClass::getInstance();
-	if (!fb || fb->m_accel_fd < 0 || m_egl_display == EGL_NO_DISPLAY)
+static bool shouldUseDirectBGRAUpload()
+{
+#ifdef DREAMNEXTGEN
+	return false;
+#elif defined(HAVE_VUPLUS_EGL)
+	return false;
+#elif defined(HAVE_VUPLUS_MIPSEL_EGL)
+	return false;
+#elif defined(HAVE_NXPL_EGL)
+	return false;
+#elif defined(HAVE_V3DPLATFORM_EGL)
+	return false;
+#elif defined(HAVE_HISILICON_EGL)
+	return false;
+#elif defined(HAVE_DREAMBCM_EGL)
+	return false;
+#else
+	return hasExtension((const char*)glGetString(GL_EXTENSIONS), "GL_EXT_texture_format_BGRA8888");
+#endif
+}
+
+GLuint gTextureManager::createTextureFromDmabuf(gUnmanagedSurface* surface) {
+	if (!surface || m_egl_display == EGL_NO_DISPLAY)
 		return 0;
 
-	gUnmanagedSurface* surface = pixmap->surface;
-	if (surface->bpp != 32 || surface->data_phys == 0)
+	if (surface->bpp != 32 || surface->nativeAccessFailed || !surface->cpu_content_valid)
 		return 0;
 
-	unsigned long offset = surface->data_phys - fb->getAccelPhysAddr();
+	const char* egl_extensions = eglQueryString(m_egl_display, EGL_EXTENSIONS);
+	const char* gl_extensions = (const char*)glGetString(GL_EXTENSIONS);
+	if (!hasExtension(egl_extensions, "EGL_EXT_image_dma_buf_import") || !hasExtension(gl_extensions, "GL_OES_EGL_image"))
+		return 0;
+
 	int width = surface->x;
 	int height = surface->y;
 	int stride = surface->stride;
+	int dma_fd = -1;
+	int offset = 0;
+
+#ifdef DREAMNEXTGEN
+	DreamDmaBuffer buffer;
+	if (!dreamGE2DExportSurface(surface, buffer))
+		return 0;
+	dma_fd = buffer.fd;
+	width = buffer.width;
+	height = buffer.height;
+	stride = buffer.stride;
+	if (!dreamGE2DSyncBuffer(dma_fd, false)) {
+		++m_upload_stats.nativeSyncFailures;
+		close(dma_fd);
+		return 0;
+	}
+#else
+	if (surface->data_phys == 0)
+		return 0;
+#endif
+
+#ifndef DREAMNEXTGEN
+	{
+#ifdef CONFIG_ION
+		fbClass* fb = fbClass::getInstance();
+		if (!fb || fb->m_accel_fd < 0)
+			return 0;
+		dma_fd = fb->m_accel_fd;
+		offset = surface->data_phys - fb->getAccelPhysAddr();
+#else
+		return 0;
+#endif
+	}
+#endif
 
 	EGLint attribs[] = {
 		EGL_WIDTH, width,
 		EGL_HEIGHT, height,
 		EGL_LINUX_DRM_FOURCC_EXT, DRM_FORMAT_ARGB8888,
-		EGL_DMA_BUF_PLANE0_FD_EXT, fb->m_accel_fd,
+		EGL_DMA_BUF_PLANE0_FD_EXT, dma_fd,
 		EGL_DMA_BUF_PLANE0_OFFSET_EXT, (EGLint)offset,
 		EGL_DMA_BUF_PLANE0_PITCH_EXT, stride,
 		EGL_NONE
 	};
 
 	PFNEGLCREATEIMAGEKHRPROC eglCreateImageKHR = (PFNEGLCREATEIMAGEKHRPROC)eglGetProcAddress("eglCreateImageKHR");
-	PFNGLEGLIMAGETARGETTEXTURE2DOESPROC glEGLImageTargetTexture2DOES = (PFNGLEGLIMAGETARGETTEXTURE2DOESPROC)eglGetProcAddress("glEGLImageTargetTexture2DOES");
+	gEGLImageTargetTexture2DOESProc glEGLImageTargetTexture2DOES = (gEGLImageTargetTexture2DOESProc)eglGetProcAddress("glEGLImageTargetTexture2DOES");
 
 	if (!eglCreateImageKHR || !glEGLImageTargetTexture2DOES) {
 		eDebug("[gTextureManager] EGL dmabuf extensions not available");
+#ifdef DREAMNEXTGEN
+		close(dma_fd);
+#endif
 		return 0;
 	}
 
 	EGLImageKHR image = eglCreateImageKHR(m_egl_display, EGL_NO_CONTEXT, EGL_LINUX_DMA_BUF_EXT, (EGLClientBuffer)NULL, attribs);
 	if (image == EGL_NO_IMAGE_KHR) {
+		++m_upload_stats.importFailures;
 		eDebug("[gTextureManager] eglCreateImageKHR failed: 0x%x", eglGetError());
+#ifdef DREAMNEXTGEN
+		close(dma_fd);
+#endif
 		return 0;
 	}
 
@@ -97,29 +279,388 @@ GLuint gTextureManager::createTextureFromDmabuf(gPixmap* pixmap) {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-	glEGLImageTargetTexture2DOES(GL_TEXTURE_2D, image);
+	glEGLImageTargetTexture2DOES(GL_TEXTURE_2D, (void *)image);
 	glBindTexture(GL_TEXTURE_2D, 0);
+	if (!texture_id || glGetError() != GL_NO_ERROR) {
+		++m_upload_stats.importFailures;
+		glDeleteTextures(1, &texture_id);
+		auto destroyImage = (PFNEGLDESTROYIMAGEKHRPROC)eglGetProcAddress("eglDestroyImageKHR");
+		if (destroyImage) destroyImage(m_egl_display, image);
+#ifdef DREAMNEXTGEN
+		close(dma_fd);
+#endif
+		return 0;
+	}
 
 	m_texture_to_image_map[texture_id] = image;
+#ifdef DREAMNEXTGEN
+	NativeTarget target;
+	target.fd = dma_fd;
+	target.length = buffer.length;
+	target.amlogic = true;
+	m_nativeTargets[texture_id] = target;
+	surface->nativeImported = true;
+	surface->nativeSwapChannels = false; // ARGB8888 import performs the BGRA memory conversion.
+#endif
+	recordUpload(width, height, stride * height, true, false, false, false, false);
 	return texture_id;
+}
+
+GLuint gTextureManager::createTextureFromDreamBcmIon(gUnmanagedSurface* surface)
+{
+#if defined(DREAMBCM_ION_ACCEL) && defined(HAVE_DREAMBCM_EGL) && defined(HAVE_GLES3)
+	// This is a source upload accelerator, not a shared BGRA render target.
+	// Keeping the cached result RGBA preserves all existing FBO/readback users.
+	const char *setting = getenv("E2EGL_DREAMBCM_ION_UPLOAD");
+	if ((setting && setting[0] == '0') || !gles::isGLES3() || !surface || surface->bpp != 32 ||
+		!surface->data_phys || !surface->cpu_content_valid || surface->x <= 0 || surface->y <= 0 ||
+		surface->stride <= 0 || surface->stride % 4 || surface->x > surface->stride / 4 ||
+		m_egl_display == EGL_NO_DISPLAY || eglGetCurrentContext() == EGL_NO_CONTEXT)
+		return 0;
+	const unsigned long long bytes = (unsigned long long)surface->x * surface->y * 4;
+	// Small icons do not justify the synchronization and temporary EGL/FBO objects.
+	const char *extensions = eglQueryString(m_egl_display, EGL_EXTENSIONS);
+	// VC5 advertises the original umbrella extension, not KHR_image_pixmap separately.
+	if (bytes < 32768 || (!hasExtension(extensions, "EGL_KHR_image_pixmap") && !hasExtension(extensions, "EGL_KHR_image")) ||
+		!hasExtension((const char *)glGetString(GL_EXTENSIONS), "GL_OES_EGL_image"))
+		return 0;
+	GLint maxSize = 0;
+	glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxSize);
+	if (surface->stride / 4 > maxSize || surface->y > maxSize)
+		return 0;
+	auto createImage = (PFNEGLCREATEIMAGEKHRPROC)eglGetProcAddress("eglCreateImageKHR");
+	auto destroyImage = (PFNEGLDESTROYIMAGEKHRPROC)eglGetProcAddress("eglDestroyImageKHR");
+	auto bindImage = (gEGLImageTargetTexture2DOESProc)eglGetProcAddress("glEGLImageTargetTexture2DOES");
+	gAccel *accel = gAccel::getInstance();
+	if (!createImage || !destroyImage || !bindImage || !accel)
+		return 0;
+	int fd = -1;
+	unsigned long phys = 0;
+	size_t length = 0;
+	if (!accel->exportDreamBcmIonBuffer(surface, fd, phys, length))
+		return 0;
+	if ((unsigned long long)surface->stride * surface->y > length) {
+		close(fd);
+		return 0;
+	}
+	void *mapping = mmap(nullptr, length, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+	if (mapping == MAP_FAILED) {
+		close(fd);
+		return 0;
+	}
+	struct dmegl_pixmap_handle native = {};
+	static_assert(sizeof(native) == 40, "DM9x0 native pixmap requires the ARM32 Dream ABI");
+	native.mem.magic = DMEGL_PIXMAP_MAGIC;
+	native.mem.length = length;
+	native.mem.fd = fd;
+	native.mem.phys = phys;
+	native.mem.addr = mapping;
+	// VC5 ignores pitch: import the storage width and crop UVs to the logical width.
+	native.width = surface->stride / 4;
+	native.height = surface->y;
+	native.pitch = surface->stride;
+	native.format = 0x34324241; // AB24: driver samples raw bytes as RGBA.
+	const EGLint attributes[] = {EGL_IMAGE_PRESERVED_KHR, EGL_TRUE, EGL_NONE};
+	EGLImageKHR image = createImage(m_egl_display, EGL_NO_CONTEXT, EGL_NATIVE_PIXMAP_KHR, (EGLClientBuffer)&native, attributes);
+	GLuint result = 0;
+	GLenum error = GL_NO_ERROR;
+	EGLint imageError = image == EGL_NO_IMAGE_KHR ? eglGetError() : EGL_SUCCESS;
+	if (image != EGL_NO_IMAGE_KHR) {
+		GLint readFbo, drawFbo, viewport[4], program, arrayBuffer, vao, activeTexture, texture;
+		GLboolean colorMask[4];
+		const GLenum capabilities[] = {GL_BLEND, GL_SCISSOR_TEST, GL_DEPTH_TEST, GL_STENCIL_TEST, GL_CULL_FACE, GL_DITHER, GL_RASTERIZER_DISCARD};
+		GLboolean enabled[sizeof(capabilities) / sizeof(capabilities[0])];
+		glGetIntegerv(GL_READ_FRAMEBUFFER_BINDING, &readFbo);
+		glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &drawFbo);
+		glGetIntegerv(GL_VIEWPORT, viewport);
+		glGetIntegerv(GL_CURRENT_PROGRAM, &program);
+		glGetIntegerv(GL_ARRAY_BUFFER_BINDING, &arrayBuffer);
+		glGetIntegerv(GL_VERTEX_ARRAY_BINDING, &vao);
+		glGetIntegerv(GL_ACTIVE_TEXTURE, &activeTexture);
+		glGetBooleanv(GL_COLOR_WRITEMASK, colorMask);
+		glActiveTexture(GL_TEXTURE0);
+		glGetIntegerv(GL_TEXTURE_BINDING_2D, &texture);
+		for (size_t i = 0; i < sizeof(capabilities) / sizeof(capabilities[0]); ++i) {
+			enabled[i] = glIsEnabled(capabilities[i]);
+			glDisable(capabilities[i]);
+		}
+		glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+		GLuint source = 0, fbo = 0, uploadVao = 0;
+		// The shared shader helper changes vertex attributes; isolate those in a private VAO.
+		glGenVertexArrays(1, &uploadVao);
+		glBindVertexArray(uploadVao);
+		glGenTextures(1, &source);
+		glBindTexture(GL_TEXTURE_2D, source);
+		bindImage(GL_TEXTURE_2D, (void *)image);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_R, GL_BLUE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_RED);
+		error = glGetError();
+		if (error == GL_NO_ERROR && ensureOffscreenTextureShader()) {
+			glGenTextures(1, &result);
+			glBindTexture(GL_TEXTURE_2D, result);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, surface->x, surface->y, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+			glGenFramebuffers(1, &fbo);
+			glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, result, 0);
+			error = glGetError();
+			if (error == GL_NO_ERROR && glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE) {
+				glViewport(0, 0, surface->x, surface->y);
+				m_offscreen_texture_shader.setFramebufferResolution(surface->x, surface->y);
+				m_offscreen_texture_shader.drawTexture(0, 0, surface->x, surface->y, source, 1.0f, 0, 0,
+					0, 0, (float)surface->x / native.width, 1, false, false);
+				// Source ownership returns to CPU/BCM after this call; no borrowed GPU read may remain.
+				glFinish();
+				error = glGetError();
+				const char *verify = getenv("E2EGL_DREAMBCM_ION_VERIFY");
+				if (error == GL_NO_ERROR && verify && verify[0] == '1') {
+					// Diagnostic only: compare the actual shader output with the CPU BGRA contract.
+					GLint packAlignment;
+					glGetIntegerv(GL_PACK_ALIGNMENT, &packAlignment);
+					glPixelStorei(GL_PACK_ALIGNMENT, 4);
+					std::vector<uint8_t> pixels(bytes);
+					glReadPixels(0, 0, surface->x, surface->y, GL_RGBA, GL_UNSIGNED_BYTE, pixels.data());
+					glPixelStorei(GL_PACK_ALIGNMENT, packAlignment);
+					error = glGetError();
+					unsigned long long mismatches = 0;
+					for (int y = 0; y < surface->y; ++y) {
+						const uint8_t *expected = (const uint8_t *)surface->data + y * surface->stride;
+						const uint8_t *actual = pixels.data() + (size_t)y * surface->x * 4;
+						for (int x = 0; x < surface->x; ++x)
+							for (int channel = 0; channel < 4; ++channel)
+								mismatches += actual[x * 4 + channel] != expected[x * 4 + (channel == 0 || channel == 2 ? channel ^ 2 : channel)];
+					}
+					eDebug("[dreamBCM] ION verify %dx%d stride=%d mismatched_bytes=%llu gl=0x%x", surface->x, surface->y, surface->stride, mismatches, error);
+					if (mismatches) error = GL_INVALID_OPERATION;
+				}
+			} else if (error == GL_NO_ERROR) {
+				error = GL_INVALID_FRAMEBUFFER_OPERATION;
+			}
+		}
+		if (error != GL_NO_ERROR && result) {
+			glDeleteTextures(1, &result);
+			result = 0;
+		}
+		glBindFramebuffer(GL_READ_FRAMEBUFFER, readFbo);
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, drawFbo);
+		glViewport(viewport[0], viewport[1], viewport[2], viewport[3]);
+		glColorMask(colorMask[0], colorMask[1], colorMask[2], colorMask[3]);
+		for (size_t i = 0; i < sizeof(capabilities) / sizeof(capabilities[0]); ++i)
+			if (enabled[i]) glEnable(capabilities[i]);
+		glBindVertexArray(vao);
+		if (uploadVao) glDeleteVertexArrays(1, &uploadVao);
+		glBindBuffer(GL_ARRAY_BUFFER, arrayBuffer);
+		glUseProgram(program);
+		glBindTexture(GL_TEXTURE_2D, texture);
+		glActiveTexture(activeTexture);
+		if (fbo) glDeleteFramebuffers(1, &fbo);
+		if (source) glDeleteTextures(1, &source);
+		destroyImage(m_egl_display, image);
+	}
+	munmap(mapping, length);
+	close(fd);
+	if (result) {
+		++m_dreamBcmIonUploads;
+		m_dreamBcmIonBytes += bytes;
+#ifdef ENABLE_GLES_TESTLAB
+		++m_upload_stats.ionUploads;
+		m_upload_stats.ionAvoidedBytes += bytes;
+#endif
+		recordUpload(surface->x, surface->y, 0, false, false, false, false, false);
+		if (m_dreamBcmIonUploads <= 8 || m_dreamBcmIonUploads % 32 == 0)
+			eDebug("[dreamBCM] ION GPU upload count=%u avoided_cpu_bytes=%llu last=%dx%d stride=%d failures=%u",
+				m_dreamBcmIonUploads, m_dreamBcmIonBytes, surface->x, surface->y, surface->stride, m_dreamBcmIonFailures);
+	} else if (++m_dreamBcmIonFailures <= 8) {
+		eDebug("[dreamBCM] ION GPU upload fallback egl=0x%x gl=0x%x size=%dx%d", imageError, error, surface->x, surface->y);
+	}
+	return result;
 #else
+	(void)surface;
 	return 0;
 #endif
 }
 
-GLuint gTextureManager::createTextureFromPixmap(gPixmap* pixmap) {
-	m_last_upload_oom = false;
-	if (!pixmap || !pixmap->surface)
+GLuint gTextureManager::createSharedNativeTarget(gUnmanagedSurface* surface)
+{
+#if defined(DREAMNEXTGEN) && defined(HAVE_GLES3)
+	const char* setting = getenv("E2EGL_AML_NATIVE_TARGET");
+	if (!setting || *setting != '1' || !gles::isGLES3() || !surface || surface->nativeAccessFailed)
 		return 0;
+	GLuint texture = createTextureFromDmabuf(surface);
+	if (texture) {
+		surface->gl_native_shared = true;
+		++m_nativeTargetCreates;
+	}
+	return texture;
+#elif defined(DREAMBCM_ION_ACCEL) && defined(HAVE_DREAMBCM_EGL) && defined(HAVE_GLES3)
+	const char* setting = getenv("E2EGL_DREAMBCM_ION_TARGET");
+	if (!setting || *setting != '1' || !gles::isGLES3() || !surface || !surface->data_phys ||
+		!surface->cpu_content_valid || surface->bpp != 32 || surface->x <= 0 || surface->y <= 0 ||
+		surface->stride != surface->x * 4 || m_egl_display == EGL_NO_DISPLAY)
+		return 0;
+	GLint maxSize = 0;
+	glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxSize);
+	if (surface->x > maxSize || surface->y > maxSize)
+		return 0;
+	const char* extensions = eglQueryString(m_egl_display, EGL_EXTENSIONS);
+	if ((!hasExtension(extensions, "EGL_KHR_image") && !hasExtension(extensions, "EGL_KHR_image_pixmap")) ||
+		!hasExtension((const char*)glGetString(GL_EXTENSIONS), "GL_OES_EGL_image"))
+		return 0;
+	auto createImage = (PFNEGLCREATEIMAGEKHRPROC)eglGetProcAddress("eglCreateImageKHR");
+	auto destroyImage = (PFNEGLDESTROYIMAGEKHRPROC)eglGetProcAddress("eglDestroyImageKHR");
+	auto bindImage = (gEGLImageTargetTexture2DOESProc)eglGetProcAddress("glEGLImageTargetTexture2DOES");
+	gAccel* accel = gAccel::getInstance();
+	if (!createImage || !destroyImage || !bindImage || !accel)
+		return 0;
+	NativeTarget target;
+	unsigned long phys = 0;
+	if (!accel->exportDreamBcmIonBuffer(surface, target.fd, phys, target.length))
+		return 0;
+	if ((unsigned long long)surface->stride * surface->y > target.length) {
+		close(target.fd);
+		return 0;
+	}
+	target.mapping = mmap(nullptr, target.length, PROT_READ | PROT_WRITE, MAP_SHARED, target.fd, 0);
+	if (target.mapping == MAP_FAILED) {
+		close(target.fd);
+		return 0;
+	}
+	struct dmegl_pixmap_handle native = {};
+	static_assert(sizeof(native) == 40, "DM9x0 native pixmap requires the ARM32 Dream ABI");
+	native.mem.magic = DMEGL_PIXMAP_MAGIC;
+	native.mem.length = target.length;
+	native.mem.fd = target.fd;
+	native.mem.phys = phys;
+	native.mem.addr = target.mapping;
+	native.width = surface->x;
+	native.height = surface->y;
+	native.pitch = surface->stride;
+	native.format = 0x34324241;
+	const EGLint attributes[] = {EGL_IMAGE_PRESERVED_KHR, EGL_TRUE, EGL_NONE};
+	EGLImageKHR image = createImage(m_egl_display, EGL_NO_CONTEXT, EGL_NATIVE_PIXMAP_KHR, (EGLClientBuffer)&native, attributes);
+	GLuint texture = 0;
+	if (image != EGL_NO_IMAGE_KHR) {
+		glGenTextures(1, &texture);
+		glBindTexture(GL_TEXTURE_2D, texture);
+		bindImage(GL_TEXTURE_2D, (void*)image);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		// Sampling sees logical RGBA; framebuffer stores raw BGRA bytes.
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_R, GL_BLUE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_RED);
+		if (glGetError() != GL_NO_ERROR) {
+			glDeleteTextures(1, &texture);
+			destroyImage(m_egl_display, image);
+			texture = 0;
+		}
+	}
+	if (!texture) {
+		munmap(target.mapping, target.length);
+		close(target.fd);
+		return 0;
+	}
+	m_texture_to_image_map[texture] = image;
+	m_nativeTargets[texture] = target;
+	surface->gl_native_shared = true;
+	surface->nativeImported = true;
+	surface->nativeSwapChannels = true;
+	++m_nativeTargetCreates;
+	if (m_nativeTargetCreates <= 8 || m_nativeTargetCreates % 64 == 0)
+		eDebug("[gTextureManager] shared ION target create=%u live=%zu size=%dx%d bytes=%zu", m_nativeTargetCreates, m_nativeTargets.size(), surface->x, surface->y, target.length);
+	return texture;
+#else
+	(void)surface;
+	return 0;
+#endif
+}
 
-	GLuint texture_id = 0;
+bool gTextureManager::finishSurfaceWrite(gUnmanagedSurface* surface)
+{
+	// Consecutive commands stay on GPU. Only a CPU/GE2D access waits and invalidates.
+	surface->gl_content_valid = true;
+	surface->cpu_content_valid = false;
+	surface->nativeGPUAccessPending = true;
+	++m_nativeTargetWrites;
+	++m_upload_stats.nativeWrites;
+	return true;
+}
 
-	gUnmanagedSurface* surface = pixmap->surface;
+bool gTextureManager::waitNativeGPU()
+{
+	const unsigned long long start = nativeNowUs();
+	bool complete = false;
+#ifdef HAVE_GLES3
+	if (gles::isGLES3()) {
+		GLsync fence = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
+		if (fence) {
+			GLenum status = glClientWaitSync(fence, GL_SYNC_FLUSH_COMMANDS_BIT, 200000000ULL);
+			complete = status == GL_ALREADY_SIGNALED || status == GL_CONDITION_SATISFIED;
+			glDeleteSync(fence);
+		}
+	}
+#endif
+	m_upload_stats.nativeWaitUs += nativeNowUs() - start;
+	if (!complete) ++m_upload_stats.nativeSyncFailures;
+	return complete;
+}
+
+bool gTextureManager::prepareNativeDevice(gUnmanagedSurface* surface)
+{
+	if (surface->nativeAccessFailed)
+		return false;
+	if (surface->gl_content_valid)
+		return true;
+	if (!surface->cpu_content_valid)
+		return false;
+	const auto target = m_nativeTargets.find(surface->gl_texture_id);
+	if (target == m_nativeTargets.end())
+		return false;
+	bool ready = true;
+	const unsigned long long start = nativeNowUs();
+#ifdef DREAMNEXTGEN
+	if (target->second.amlogic)
+		ready = dreamGE2DSyncBuffer(target->second.fd, false);
+#endif
+	__sync_synchronize();
+	m_upload_stats.nativeSyncUs += nativeNowUs() - start;
+	if (!ready) {
+		++m_upload_stats.nativeSyncFailures;
+		return false;
+	}
+	surface->gl_content_valid = true;
+	return true;
+}
+
+GLuint gTextureManager::createTextureFromSurface(gUnmanagedSurface* surface) {
+	if (!surface || surface->nativeAccessFailed)
+		return 0;
+	if (!surface->cpu_content_valid)
+		return 0;
+	// A resize/invalidation can queue the previous texture during this draw
+	// opcode. Release it before allocating its replacement, also with an empty cache.
+	processDeletions();
+
+	GLuint texture_id = createSharedNativeTarget(surface);
+	if (texture_id != 0)
+		return texture_id;
+	texture_id = createTextureFromDreamBcmIon(surface);
+	if (texture_id != 0)
+		return texture_id;
+	texture_id = createTextureFromDmabuf(surface);
+	if (texture_id != 0)
+		return texture_id;
+
 	int width = surface->x;
 	int height = surface->y;
-
-	for (int i = 0; i < 8 && glGetError() != GL_NO_ERROR; ++i) {
-	}
 
 	glGenTextures(1, &texture_id);
 	glBindTexture(GL_TEXTURE_2D, texture_id);
@@ -129,137 +670,173 @@ GLuint gTextureManager::createTextureFromPixmap(gPixmap* pixmap) {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-	if (surface->bpp == 32) {
-#ifdef DREAMNEXTGEN
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_R, GL_BLUE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_RED);
-#endif
-		// This render target's fragment-shader output ends up read back by
-		// the display in the opposite R/B order from what GL writes (see
-		// gshader.cpp's fragment shader for the ground-truth test that
-		// proved this). A GL_TEXTURE_SWIZZLE here would have been the
-		// spec-correct way to compensate for a *sampler* quirk, but this
-		// isn't one - it's a *render-target-vs-scanout* mismatch, unrelated
-		// to how a texture is sampled. Adding a swizzle on top of data
-		// that's already the right bytes to compensate for the mismatch
-		// (see below) just swaps it back to wrong, which is exactly what a
-		// swizzle here did until this was untangled with a controlled
-		// synthetic-texture test.
-		//
-		// e2's 32bpp surfaces are natively BGRA in memory (see gpixmap.h's
-		// gRGB struct: {b,g,r,a} on little-endian). Uploading that memory
-		// as-is while *telling* glTexImage2D it's GL_RGBA means the sampler
-		// reads back (r=trueB, g=trueG, b=trueR) - i.e. already pre-swapped
-		// - which is exactly what's needed to cancel out the render target's
-		// own R/B swap on the way to the screen. No CPU-side byte swapping,
-		// and no texture swizzle, needed.
-		//
-		// glTexImage2D() assumes each row is tightly packed (row length ==
-		// width, no padding) - true for e2's own pixmap allocations, but
-		// NOT guaranteed for a pixmap loaded from an externally-decoded
-		// image (e.g. a JPEG sized to an arbitrary widget width), whose
-		// stride can be padded wider than width*bypp. Uploading that
-		// directly reads each row starting a few bytes short of where it
-		// actually begins, and the error compounds every row - producing
-		// exactly the diagonal-shear/sheared-image corruption seen with
-		// e.g. TMDBCockpit's cover/backdrop pictures (the CPU renderer
-		// never hits this because gPixmap::fill()/blit() always address
-		// rows via surface->stride explicitly, never assume width*bypp).
-		int row_pixels = surface->stride / surface->bypp;
-		if (row_pixels == width) {
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, surface->data);
-#if defined(HAVE_GLES3)
-		} else if (gles::isGLES3()) {
-			// GL_UNPACK_ROW_LENGTH tells GL the source buffer's actual row
-			// length in pixels, so it can skip the padding itself instead
-			// of a CPU-side repack.
-			glPixelStorei(GL_UNPACK_ROW_LENGTH, row_pixels);
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, surface->data);
-			glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
-#endif
-		} else {
-			// GLES2 has no GL_UNPACK_ROW_LENGTH - repack into a tightly
-			// packed buffer first, same technique as the paletted branch
-			// below already uses for its own stride-vs-width mismatch.
-			std::vector<uint32_t> packed((size_t)width * height);
-			const uint8_t* src = (const uint8_t*)surface->data;
-			for (int row = 0; row < height; ++row)
-				memcpy(packed.data() + (size_t)row * width, src + (size_t)row * surface->stride, (size_t)width * 4);
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, packed.data());
+	auto retryWithCacheSpace = [&](GLenum error, GLint internalFormat, GLenum format, const void *data, unsigned int bytesPerPixel) {
+		if (error != GL_OUT_OF_MEMORY || m_content_texture_cache.empty())
+			return error;
+		const size_t entries = m_content_texture_cache.size();
+		const unsigned long long bytes = m_content_texture_bytes;
+		const unsigned long long needed = (unsigned long long)width * height * bytesPerPixel;
+		auto retry = [&]() {
+			processDeletions();
+			glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+			return glGetError();
+		};
+		trimContentTextureCache(entries, bytes > needed ? bytes - needed : 0);
+		error = retry();
+		if (error == GL_OUT_OF_MEMORY && !m_content_texture_cache.empty()) {
+			clearContentTextureCache();
+			error = retry();
 		}
-	} else if (surface->bpp == 8 && surface->clut.data) {
-#ifdef DREAMNEXTGEN
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_R, GL_BLUE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_RED);
-#endif
-		// 8-bit paletted image (often used for picons/skins).
-		// gles 3.0 does not support indexed color textures natively anymore,
-		// so we expand it to 32-bit rgba on the cpu before uploading.
-		std::vector<uint32_t> rgba_buffer(width * height);
-		uint8_t* src_pixels = (uint8_t*)surface->data;
-		uint32_t pal[256];
-		int palette_size = std::min(surface->clut.colors, 256);
-		for (int i = 0; i < palette_size; ++i)
-			pal[i] = surface->clut.data[i].argb() ^ 0xFF000000;
-		for (int i = std::max(0, palette_size); i < 256; ++i)
-			pal[i] = (0x010101 * i) | 0xFF000000;
-		int src_stride = surface->stride; // bytes per row in the *source* -
-		// may differ from width for externally-loaded images (e.g. a PNG
-		// decoder's own row alignment), unlike gPixmap's own allocations
-		// (stride == width for those). Indexing with a flat i = y*width+x
-		// instead of respecting stride is exactly what produces a sheared/
-		// distorted image once stride != width.
+		eDebug("[gTextureManager] GL_OUT_OF_MEMORY on %d-bit upload %dx%d (CLUT %d); released %zu cached texture(s), %llu KiB; retry=0x%x",
+			surface->bpp, width, height, surface->clut.colors, entries - m_content_texture_cache.size(), (bytes - m_content_texture_bytes) / 1024ULL, error);
+		return error;
+	};
 
-		// This source pixmap can be ION/accelerated memory, which on this
-		// hardware is mapped as ARM "Device" type for GPU coherency - a
-		// bulk memcpy of it is fast (benefits from burst reads), but this
-		// loop reading it one byte at a time via scalar loads (row[x]) is
-		// NOT: Device memory disallows the burst/speculative access a
-		// vectorized memcpy implementation uses, so each individual scalar
-		// load pays full memory latency (measured: ~30-45ms for a 400x240
-		// image, vs <1ms via memcpy of the same bytes). Copying the source
-		// rows to an ordinary heap buffer first with that same fast memcpy,
-		// then reading *that* in the loop, sidesteps it - this is what
-		// turned "screen takes 3s to open the first time" into a sub-second
-		// open.
-		std::vector<uint8_t> local_src((size_t)src_stride * height);
-		memcpy(local_src.data(), src_pixels, local_src.size());
+	if (surface->bpp == 32) {
+#ifndef GL_BGRA_EXT
+#define GL_BGRA_EXT 0x80E1
+#endif
+		const uint8_t* src = (const uint8_t*)surface->data;
+		const bool can_upload_bgra = shouldUseDirectBGRAUpload();
+		std::vector<uint8_t> upload_buffer;
+		const void* upload_data = surface->data;
+		GLenum upload_format = GL_BGRA_EXT;
+		bool converted_upload = false;
+
+		auto convert_to_rgba = [&]() {
+			upload_buffer.resize(width * height * 4);
+			for (int y = 0; y < height; ++y) {
+				const uint8_t* row = src + y * surface->stride;
+				uint8_t* dst = upload_buffer.data() + y * width * 4;
+				for (int x = 0; x < width; ++x) {
+					dst[x * 4 + 0] = row[x * 4 + 2];
+					dst[x * 4 + 1] = row[x * 4 + 1];
+					dst[x * 4 + 2] = row[x * 4 + 0];
+					dst[x * 4 + 3] = row[x * 4 + 3];
+				}
+			}
+			upload_data = upload_buffer.data();
+			upload_format = GL_RGBA;
+			converted_upload = true;
+		};
+
+		if (can_upload_bgra) {
+			if (surface->stride != width * 4) {
+				upload_buffer.resize(width * height * 4);
+				for (int y = 0; y < height; ++y)
+					memcpy(upload_buffer.data() + y * width * 4, src + y * surface->stride, width * 4);
+				upload_data = upload_buffer.data();
+			}
+		} else {
+#ifdef DREAMNEXTGEN
+			static int rgba_upload_log_count = 0;
+			if (rgba_upload_log_count < 4) {
+				++rgba_upload_log_count;
+				eDebug("[gTextureManager] using RGBA texture upload for 32-bit pixmap %dx%d stride=%d", width, height, surface->stride);
+			}
+#endif
+			convert_to_rgba();
+		}
+
+		glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, upload_format, GL_UNSIGNED_BYTE, upload_data);
+		GLenum err = glGetError();
+		if (err != GL_NO_ERROR && can_upload_bgra && !converted_upload) {
+			static int bgra_retry_log_count = 0;
+			if (bgra_retry_log_count < 8) {
+				++bgra_retry_log_count;
+				eDebug("[gTextureManager] BGRA texture upload failed: 0x%x, retrying RGBA for %dx%d stride=%d", err, width, height, surface->stride);
+			}
+			convert_to_rgba();
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, upload_data);
+			err = glGetError();
+		}
+		err = retryWithCacheSpace(err, GL_RGBA, upload_format, upload_data, 4);
+		if (err != GL_NO_ERROR) {
+			eDebug("[gTextureManager] glTexImage2D 32-bit upload failed: 0x%x for %dx%d stride=%d", err, width, height, surface->stride);
+			glBindTexture(GL_TEXTURE_2D, 0);
+			glDeleteTextures(1, &texture_id);
+			return 0;
+		}
+		recordUpload(width, height, width * height * 4, false, !converted_upload, converted_upload, false, false);
+	} else if (surface->bpp == 16) {
+		// E2 stores big-endian BGR565 bytes on both host byte orders. GLES
+		// accepts host-endian RGB565; keep the staging buffer at two bytes/pixel.
+		std::vector<uint16_t> rgb565(width * height);
+		for (int y = 0; y < height; ++y) {
+			const uint8_t* row = static_cast<const uint8_t*>(surface->data) + y * surface->stride;
+			for (int x = 0; x < width; ++x) {
+				const uint16_t bgr = (uint16_t(row[x * 2]) << 8) | row[x * 2 + 1];
+				rgb565[y * width + x] = ((bgr & 0x1f) << 11) | (bgr & 0x7e0) | (bgr >> 11);
+			}
+		}
+		glPixelStorei(GL_UNPACK_ALIGNMENT, 2);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_SHORT_5_6_5, rgb565.data());
+		const GLenum error = glGetError();
+		glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
+		if (error != GL_NO_ERROR) {
+			eDebug("[gTextureManager] RGB565 upload failed: 0x%x for %dx%d", error, width, height);
+			glBindTexture(GL_TEXTURE_2D, 0);
+			glDeleteTextures(1, &texture_id);
+			return 0;
+		}
+		++m_upload_stats.upload16;
+		recordUpload(width, height, width * height * 2, false, false, false, false, false);
+	} else if (surface->bpp == 8 && surface->clut.data) {
+		std::vector<uint8_t> rgba_buffer(width * height * 4);
+		uint8_t* src_pixels = (uint8_t*)surface->data;
+		gRGB* palette = surface->clut.data;
 
 		for (int y = 0; y < height; ++y) {
-			const uint8_t* row = local_src.data() + (size_t)y * src_stride;
+			const uint8_t* src_row = src_pixels + y * surface->stride;
+			uint8_t* dst = rgba_buffer.data() + y * width * 4;
 			for (int x = 0; x < width; ++x) {
-				// gRGB::argb() returns the native {b,g,r,a} memory order
-				// (see gpixmap.h) with alpha still in enigma2's inverted
-				// "0=opaque" convention - XOR the top byte to fix alpha.
-				// No R/B swap here (see the bpp==32 branch above): argb()'s
-				// native BGRA memory order, uploaded while telling
-				// glTexImage2D it's GL_RGBA, already comes out pre-swapped
-				// in exactly the way needed to cancel this render target's
-				// own R/B swap on the way to the screen.
-				rgba_buffer[y * width + x] = pal[row[x]];
+				gRGB color = palette[src_row[x]];
+				dst[x * 4 + 0] = color.r;
+				dst[x * 4 + 1] = color.g;
+				dst[x * 4 + 2] = color.b;
+				dst[x * 4 + 3] = 255 - color.a;
 			}
 		}
 
+		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, rgba_buffer.data());
+		const GLenum error = retryWithCacheSpace(glGetError(), GL_RGBA, GL_RGBA, rgba_buffer.data(), 4);
+		glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
+		if (error != GL_NO_ERROR) {
+			eDebug("[gTextureManager] 8-bit CLUT upload failed: 0x%x for %dx%d stride=%d colors=%d", error, width, height, surface->stride, surface->clut.colors);
+			glDeleteTextures(1, &texture_id);
+			return 0;
+		}
+		recordUpload(width, height, width * height * 4, false, false, false, true, false);
 	} else if (surface->bpp == 8) {
-		// Plain 8-bit grayscale surface with no palette - this is what the
-		// font glyph atlas (gFontAtlas) is: a single-channel coverage/alpha
-		// map, not an indexed-color image. Previously this fell into the
-		// "unsupported" branch below, leaving flushTextBatch() uploading
-		// glyph data into a texture object that was never actually created
-		// (id 0) - glyphs rendered as garbage/invisible as a result.
-		// epng.cpp's loadPNG() now always builds a real (identity, for plain
-		// grayscale) clut for anything decoded from a PNG file, so gFontAtlas
-		// - built directly in memory by the font rasterizer, never round-
-		// tripped through a PNG - is the only remaining legitimate producer
-		// of a clut-less bpp==8 surface reaching this branch. A regression
-		// there (e.g. a skin's plain-grayscale PNG asset losing its clut
-		// again) would otherwise be sampled as single-channel alpha against
-		// whatever color a later draw binds, instead of its own color - see
-		// epng.cpp's PNG_COLOR_TYPE_GRAY branch for the incident this fixed.
-		GLenum internal_fmt = gles::isGLES3() ? GL_R8 : GL_LUMINANCE;
-		GLenum src_fmt = gles::isGLES3() ? GL_RED : GL_LUMINANCE;
-		glTexImage2D(GL_TEXTURE_2D, 0, internal_fmt, width, height, 0, src_fmt, GL_UNSIGNED_BYTE, surface->data);
+		const uint8_t* upload_data = (const uint8_t*)surface->data;
+		std::vector<uint8_t> upload_buffer;
+		if (surface->stride != width) {
+			upload_buffer.resize(width * height);
+			for (int y = 0; y < height; ++y)
+				memcpy(upload_buffer.data() + y * width, upload_data + y * surface->stride, width);
+			upload_data = upload_buffer.data();
+		}
+
+		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+		GLenum internal_fmt = GL_LUMINANCE;
+		GLenum src_fmt = GL_LUMINANCE;
+#ifdef HAVE_GLES3
+		if (gles::isGLES3()) {
+			internal_fmt = GL_R8;
+			src_fmt = GL_RED;
+		}
+#endif
+		glTexImage2D(GL_TEXTURE_2D, 0, internal_fmt, width, height, 0, src_fmt, GL_UNSIGNED_BYTE, upload_data);
+		const GLenum error = retryWithCacheSpace(glGetError(), internal_fmt, src_fmt, upload_data, 1);
+		glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
+		if (error != GL_NO_ERROR) {
+			eDebug("[gTextureManager] 8-bit luminance upload failed: 0x%x for %dx%d stride=%d", error, width, height, surface->stride);
+			glDeleteTextures(1, &texture_id);
+			return 0;
+		}
+		recordUpload(width, height, width * height, false, false, false, false, true);
 	} else {
 		eDebug("[gTextureManager] unsupported surface format (bpp: %d)", surface->bpp);
 		glDeleteTextures(1, &texture_id);
@@ -267,14 +844,6 @@ GLuint gTextureManager::createTextureFromPixmap(gPixmap* pixmap) {
 	}
 
 	glBindTexture(GL_TEXTURE_2D, 0);
-	GLenum upload_err = glGetError();
-	if (upload_err == GL_OUT_OF_MEMORY) {
-		// Do not cache a texture name whose storage allocation failed. A
-		// cached empty name would make the image stay black on later draws.
-		glDeleteTextures(1, &texture_id);
-		m_last_upload_oom = true;
-		return 0;
-	}
 	return texture_id;
 }
 
@@ -282,121 +851,277 @@ GLuint gTextureManager::getTexture(gPixmap* pixmap) {
 	if (!pixmap || !pixmap->surface)
 		return 0;
 
-	gUnmanagedSurface* sf = pixmap->surface;
-	if (sf->gl_texture_id != 0) {
-		sf->gl_last_used_frame = m_frame;
-		return sf->gl_texture_id;
+	return getSurfaceTexture(pixmap->surface);
+}
+
+GLuint gTextureManager::getSurfaceTexture(gUnmanagedSurface* surface) {
+	if (!surface)
+		return 0;
+	prepareSurface(surface);
+	if (surface->nativeAccessFailed)
+		return 0;
+	if (surface->nativeImported && surface->gl_texture_id) {
+		if (!prepareNativeDevice(surface))
+			return 0;
+		// The next CPU write must wait for queued texture sampling, even if
+		// the GPU has only read this allocation since the last CPU access.
+		surface->nativeGPUAccessPending = true;
+		return surface->gl_texture_id;
 	}
 
-	GLuint new_texture = createTextureFromPixmap(pixmap);
-	if (!new_texture && m_last_upload_oom) {
-		size_t need = (size_t)sf->x * sf->y * ((sf->bpp == 8 && !sf->clut.data) ? 1 : 4);
-		size_t want = std::max<size_t>(need * 2, 4u << 20);
-		for (int round = 0; round < 2 && !new_texture; ++round, want *= 4) {
-			if (evictLRU(want) == 0)
-				break;
-			new_texture = createTextureFromPixmap(pixmap);
+	if (surface->gl_texture_id != 0 && surface->gl_content_valid) {
+		return surface->gl_texture_id;
+	}
+	if (surface->gl_texture_id != 0) {
+		queueForDeletion(surface->gl_texture_id);
+		surface->gl_texture_id = 0;
+	}
+	if (surface->gl_framebuffer_id != 0) {
+		queueFramebufferForDeletion(surface->gl_framebuffer_id);
+		surface->gl_framebuffer_id = 0;
+	}
+
+	const bool use_content_cache = canContentCacheSurface(surface);
+	uint64_t content_key = 0;
+	if (use_content_cache) {
+		content_key = hashContentTextureSurface(surface);
+		GLuint cached_texture = findContentTexture(content_key);
+		if (cached_texture) {
+			++m_upload_stats.content_cache_hits;
+			return cached_texture;
 		}
+		++m_upload_stats.content_cache_misses;
+	}
+
+	GLuint new_texture = createTextureFromSurface(surface);
+	if (new_texture && use_content_cache) {
+		unsigned long long bytes = (unsigned long long)std::max(0, surface->x) * (unsigned long long)std::max(0, surface->y);
+		if (surface->clut.data)
+			bytes *= 4;
+		return storeContentTexture(content_key, new_texture, bytes);
 	}
 	if (new_texture) {
-		sf->gl_texture_id = new_texture;
-		sf->gl_last_used_frame = m_frame;
-		{
-			std::lock_guard<std::mutex> lock(m_deletion_mutex);
-			m_texture_owner[new_texture] = sf;
-		}
-		++m_live_texture_count;
-		size_t bytes = (size_t)sf->x * sf->y * ((sf->bpp == 8 && !sf->clut.data) ? 1 : 4);
-		m_texture_bytes[new_texture] = bytes;
-		m_live_texture_bytes += bytes;
-		eDebug("[gTextureManager] +texture id=%u live=%ld ~%.1fMB %dx%d bpp=%d", new_texture, m_live_texture_count, m_live_texture_bytes / 1048576.0,
-			sf->x, sf->y, sf->bpp);
+		surface->gl_texture_id = new_texture;
+		surface->gl_content_valid = true;
+		surface->nativeGPUAccessPending = surface->nativeImported;
 	}
 	return new_texture;
 }
 
-// Free textures that were not used in the current frame, from oldest to
-// newest. The surface stays alive; clearing gl_texture_id makes the next
-// getTexture() call recreate the GPU object on demand.
-size_t gTextureManager::evictLRU(size_t bytes_wanted) {
-	struct Candidate {
-		unsigned int last_used;
-		GLuint id;
-		gUnmanagedSurface* surface;
-	};
-	std::vector<Candidate> candidates;
-	size_t freed = 0;
-	std::lock_guard<std::mutex> lock(m_deletion_mutex);
-	for (const auto& entry : m_texture_owner) {
-		gUnmanagedSurface* sf = entry.second;
-		if (sf->gl_texture_pinned || sf->gl_last_used_frame == m_frame)
-			continue;
-		if (m_texture_to_image_map.count(entry.first))
-			continue;
-		candidates.push_back({sf->gl_last_used_frame, entry.first, sf});
-	}
-	std::sort(candidates.begin(), candidates.end(), [](const Candidate& a, const Candidate& b) {
-		return a.last_used < b.last_used;
-	});
-	for (const Candidate& candidate : candidates) {
-		if (freed >= bytes_wanted)
-			break;
-		glDeleteTextures(1, &candidate.id);
-		candidate.surface->gl_texture_id = 0;
-		m_texture_owner.erase(candidate.id);
-		auto bit = m_texture_bytes.find(candidate.id);
-		if (bit != m_texture_bytes.end()) {
-			freed += bit->second;
-			m_live_texture_bytes -= std::min(m_live_texture_bytes, bit->second);
-			m_texture_bytes.erase(bit);
-		}
-		--m_live_texture_count;
-	}
-	return freed;
+bool gTextureManager::canContentCacheSurface(const gUnmanagedSurface* surface) const
+{
+	if (!surface || !surface->gl_content_cacheable || !surface->data || !surface->cpu_content_valid || surface->data_phys || surface->gl_framebuffer_id)
+		return false;
+	if (surface->bpp != 8 || surface->x <= 0 || surface->y <= 0 || surface->stride == 0)
+		return false;
+
+	const unsigned long long pixels = (unsigned long long)surface->x * (unsigned long long)surface->y;
+	return pixels <= 262144ULL;
 }
 
-// Release only when the texture name is still owned by this exact surface.
-// This matters because LRU eviction can clear the cached name before the
-// surface destructor eventually runs.
-void gTextureManager::releaseSurfaceTexture(GLuint texture_id, const void* surface) {
+uint64_t gTextureManager::hashContentTextureSurface(const gUnmanagedSurface* surface) const
+{
+	uint64_t hash = 1469598103934665603ULL;
+	fnvMixU32(hash, (uint32_t)surface->x);
+	fnvMixU32(hash, (uint32_t)surface->y);
+	fnvMixU32(hash, (uint32_t)surface->bpp);
+	fnvMixU32(hash, surface->clut.data ? (uint32_t)surface->clut.start : 0);
+	fnvMixU32(hash, surface->clut.data ? (uint32_t)surface->clut.colors : 0);
+	fnvMixU32(hash, surface->transparent ? 1U : 0U);
+
+	if (surface->clut.data) {
+		for (int i = 0; i < surface->clut.colors; ++i)
+			fnvMixU32(hash, surface->clut.data[i].argb());
+	}
+
+	const uint8_t* data = (const uint8_t*)surface->data;
+	const int row_bytes = surface->x;
+	const int stride = surface->stride;
+	for (int y = 0; y < surface->y; ++y) {
+		const uint8_t* row = stride > 0 ? data + y * stride : data + (surface->y - 1 - y) * -stride;
+		for (int x = 0; x < row_bytes; ++x)
+			fnvMixByte(hash, row[x]);
+	}
+	return hash;
+}
+
+GLuint gTextureManager::findContentTexture(uint64_t key)
+{
+	auto it = m_content_texture_cache.find(key);
+	if (it == m_content_texture_cache.end())
+		return 0;
+	it->second.last_used = ++m_content_texture_use_counter;
+	return it->second.texture_id;
+}
+
+GLuint gTextureManager::storeContentTexture(uint64_t key, GLuint texture_id, unsigned long long bytes)
+{
+	auto it = m_content_texture_cache.find(key);
+	if (it != m_content_texture_cache.end()) {
+		queueForDeletion(texture_id);
+		it->second.last_used = ++m_content_texture_use_counter;
+		return it->second.texture_id;
+	}
+
+	ContentTextureEntry entry;
+	entry.texture_id = texture_id;
+	entry.bytes = bytes;
+	entry.last_used = ++m_content_texture_use_counter;
+	m_content_texture_cache[key] = entry;
+	m_content_texture_bytes += bytes;
+	trimContentTextureCache();
+	return texture_id;
+}
+
+void gTextureManager::trimContentTextureCache()
+{
+	trimContentTextureCache(contentTextureCacheMaxEntries(), contentTextureCacheMaxBytes());
+}
+
+// Drops the least recently used cached textures until both limits are met.
+void gTextureManager::trimContentTextureCache(size_t max_entries, unsigned long long max_bytes)
+{
+	while (m_content_texture_cache.size() > max_entries || m_content_texture_bytes > max_bytes) {
+		auto oldest = m_content_texture_cache.end();
+		for (auto it = m_content_texture_cache.begin(); it != m_content_texture_cache.end(); ++it) {
+			if (oldest == m_content_texture_cache.end() || it->second.last_used < oldest->second.last_used)
+				oldest = it;
+		}
+		if (oldest == m_content_texture_cache.end())
+			break;
+		queueForDeletion(oldest->second.texture_id);
+		m_content_texture_bytes -= std::min(m_content_texture_bytes, oldest->second.bytes);
+		m_content_texture_cache.erase(oldest);
+	}
+}
+
+void gTextureManager::clearContentTextureCache()
+{
+	for (auto &entry : m_content_texture_cache)
+		queueForDeletion(entry.second.texture_id);
+	m_content_texture_cache.clear();
+	m_content_texture_bytes = 0;
+	m_content_texture_use_counter = 0;
+}
+
+bool gTextureManager::ensureOffscreenAdvancedShader()
+{
+	if (m_offscreen_advanced_shader_initialized && m_offscreen_advanced_shader.isInitialized())
+		return true;
+	if (eglGetCurrentContext() == EGL_NO_CONTEXT)
+		return false;
+	m_offscreen_advanced_shader.release();
+	if (!m_offscreen_advanced_shader.init()) {
+		eDebug("[gTextureManager] failed to initialise offscreen advanced shader");
+		return false;
+	}
+	m_offscreen_advanced_shader_initialized = true;
+	return true;
+}
+
+bool gTextureManager::ensureOffscreenTextureShader()
+{
+	if (m_offscreen_texture_shader_initialized && m_offscreen_texture_shader.isInitialized())
+		return true;
+	if (eglGetCurrentContext() == EGL_NO_CONTEXT)
+		return false;
+	m_offscreen_texture_shader.release();
+	if (!m_offscreen_texture_shader.init()) {
+		eDebug("[gTextureManager] failed to initialise offscreen texture shader");
+		return false;
+	}
+	m_offscreen_texture_shader_initialized = true;
+	return true;
+}
+
+void gTextureManager::releaseGLResources()
+{
+	clearContentTextureCache();
+	processDeletions();
+	m_offscreen_advanced_shader.release();
+	m_offscreen_texture_shader.release();
+	m_offscreen_advanced_shader_initialized = false;
+	m_offscreen_texture_shader_initialized = false;
+}
+
+void gTextureManager::releaseNativeTargets()
+{
+	// Called while the context is current, only when that context is being destroyed.
+	for (const auto& entry : m_nativeTargets)
+		queueForDeletion(entry.first);
+	processDeletions();
+}
+
+void gTextureManager::resetContextGeneration()
+{
+	std::lock_guard<std::mutex> lock(m_deletion_mutex);
+	// Also cover a lost context where GL cleanup could no longer run.
+	m_offscreen_advanced_shader.release(false);
+	m_offscreen_texture_shader.release(false);
+	m_offscreen_advanced_shader_initialized = false;
+	m_offscreen_texture_shader_initialized = false;
+	for (const auto& entry : m_nativeTargets) {
+		if (entry.second.mapping)
+			munmap(entry.second.mapping, entry.second.length);
+		close(entry.second.fd);
+	}
+	m_nativeTargets.clear();
+	m_pending_deletions.clear();
+	m_pending_framebuffer_deletions.clear();
+	m_texture_to_image_map.clear();
+	m_content_texture_cache.clear();
+	m_content_texture_bytes = 0;
+	m_content_texture_use_counter = 0;
+	if (++m_context_generation == 0)
+		m_context_generation = 1;
+}
+
+void gTextureManager::prepareSurface(gUnmanagedSurface* surface)
+{
+	if (!surface || surface->gl_context_generation == m_context_generation)
+		return;
+	if (surface->nativeGPUAccessPending)
+		surface->nativeAccessFailed = true; // Completion cannot be certified after context loss.
+	surface->gl_texture_id = 0;
+	surface->gl_framebuffer_id = 0;
+	surface->gl_content_valid = false;
+	surface->gl_native_shared = false;
+	surface->nativeImported = false;
+	surface->nativeGPUAccessPending = false;
+	surface->gl_context_generation = m_context_generation;
+}
+
+void gTextureManager::queueForDeletion(GLuint texture_id, unsigned int context_generation) {
 	if (texture_id == 0)
 		return;
-	{
-		std::lock_guard<std::mutex> lock(m_deletion_mutex);
-		auto it = m_texture_owner.find(texture_id);
-		if (it == m_texture_owner.end() || it->second != surface)
-			return;
-		m_texture_owner.erase(it);
-	}
-	queueForDeletion(texture_id);
-}
-
-void gTextureManager::queueForDeletion(GLuint texture_id) {
-	if (texture_id == 0)
+	if (context_generation && context_generation != m_context_generation)
 		return;
 
 	std::lock_guard<std::mutex> lock(m_deletion_mutex);
 	m_pending_deletions.push_back(texture_id);
-	// If this queue depth climbs and stays high, processDeletions() isn't
-	// being reached often enough (rather than surfaces simply never dying) -
-	// a different problem from the live_texture_count in getTexture()/
-	// processDeletions() ever growing, which would mean surfaces are dying
-	// but their textures are never queued/deleted at all.
-	eDebug("[gTextureManager] queued texture id=%u for deletion, pending=%zu", texture_id, m_pending_deletions.size());
+}
+
+void gTextureManager::queueFramebufferForDeletion(GLuint framebuffer_id, unsigned int context_generation) {
+	if (framebuffer_id == 0)
+		return;
+	if (context_generation && context_generation != m_context_generation)
+		return;
+
+	std::lock_guard<std::mutex> lock(m_deletion_mutex);
+	m_pending_framebuffer_deletions.push_back(framebuffer_id);
 }
 
 void gTextureManager::processDeletions() {
 	std::lock_guard<std::mutex> lock(m_deletion_mutex);
+	if (!m_pending_framebuffer_deletions.empty()) {
+		glDeleteFramebuffers(m_pending_framebuffer_deletions.size(), m_pending_framebuffer_deletions.data());
+		m_pending_framebuffer_deletions.clear();
+	}
 	if (!m_pending_deletions.empty()) {
+		// Keep the borrowed allocation alive until all texture reads have completed.
+		if (!m_nativeTargets.empty() && !waitNativeGPU())
+			return; // Retain the exported allocation until completion is confirmed.
 		glDeleteTextures(m_pending_deletions.size(), m_pending_deletions.data());
-		m_live_texture_count -= (long)m_pending_deletions.size();
-		for (GLuint texture_id : m_pending_deletions) {
-			auto bit = m_texture_bytes.find(texture_id);
-			if (bit != m_texture_bytes.end()) {
-				m_live_texture_bytes -= std::min(m_live_texture_bytes, bit->second);
-				m_texture_bytes.erase(bit);
-			}
-		}
 
 		PFNEGLDESTROYIMAGEKHRPROC eglDestroyImageKHR = (PFNEGLDESTROYIMAGEKHRPROC)eglGetProcAddress("eglDestroyImageKHR");
 		for (GLuint texture_id : m_pending_deletions) {
@@ -407,22 +1132,412 @@ void gTextureManager::processDeletions() {
 				}
 				m_texture_to_image_map.erase(it);
 			}
+			auto native = m_nativeTargets.find(texture_id);
+			if (native != m_nativeTargets.end()) {
+				if (native->second.mapping)
+					munmap(native->second.mapping, native->second.length);
+				close(native->second.fd);
+				m_nativeTargets.erase(native);
+			}
 		}
 
-		eDebug("[gTextureManager] -texture count=%zu live=%ld ~%.1fMB", m_pending_deletions.size(), m_live_texture_count, m_live_texture_bytes / 1048576.0);
 		m_pending_deletions.clear();
 	}
 }
 
-// gSurface::~gSurface() can run outside the EGL render thread, so it only
-// records ownership-aware release here; actual GL deletion remains queued for
-// the thread that owns the current EGL context.
-extern "C" void egl_release_surface_texture(unsigned int gl_texture_id, const void* surface);
-void egl_release_surface_texture(unsigned int gl_texture_id, const void* surface) {
+bool gTextureManager::ensureFramebuffer(gUnmanagedSurface* surface, bool preserve_cpu_content) {
+	if (!surface || surface->bpp != 32 || surface->x <= 0 || surface->y <= 0 || surface->nativeAccessFailed)
+		return false;
+	prepareSurface(surface);
+	if (surface->nativeAccessFailed || eglGetCurrentContext() == EGL_NO_CONTEXT)
+		return false;
+	(void)preserve_cpu_content; // A shared import always preserves its allocation.
+#ifdef DREAMNEXTGEN
+	const char* enabled = getenv("E2EGL_AML_NATIVE_TARGET");
+	if (!enabled || enabled[0] != '1')
+		return false;
+	// A previously sampled ION image is also the writable storage; do not
+	// allocate a second texture or replace its backing with glTexImage2D.
+	if (surface->nativeImported && surface->gl_texture_id)
+		surface->gl_native_shared = true;
+#endif
+	// The bridge uses shared native targets only. Unsupported layouts stay on CPU.
+	if (!surface->gl_native_shared) {
+		GLuint native = createSharedNativeTarget(surface);
+		if (!native)
+			return false;
+		queueForDeletion(surface->gl_texture_id);
+		queueFramebufferForDeletion(surface->gl_framebuffer_id);
+		surface->gl_texture_id = native;
+		surface->gl_framebuffer_id = 0;
+		surface->gl_content_valid = true;
+	}
+	if (!prepareNativeDevice(surface))
+		return false;
+
+	if (!surface->gl_framebuffer_id) {
+		GLint previousFramebuffer = 0;
+		glGetIntegerv(GL_FRAMEBUFFER_BINDING, &previousFramebuffer);
+		glGenFramebuffers(1, &surface->gl_framebuffer_id);
+		glBindFramebuffer(GL_FRAMEBUFFER, surface->gl_framebuffer_id);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, surface->gl_texture_id, 0);
+		if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+			glBindFramebuffer(GL_FRAMEBUFFER, previousFramebuffer);
+			glDeleteFramebuffers(1, &surface->gl_framebuffer_id);
+			surface->gl_framebuffer_id = 0;
+			return false;
+		}
+		glBindFramebuffer(GL_FRAMEBUFFER, previousFramebuffer);
+	}
+	// Mark before submitting any draw, including paths that encounter a GL
+	// error afterwards. A CPU fallback must first wait for that partial draw.
+	surface->nativeGPUAccessPending = true;
+	surface->cpu_content_valid = false;
+	return true;
+}
+
+bool gTextureManager::fillSurface(gUnmanagedSurface* surface, const eRect& area, uint32_t color) {
+	if (!surface || area.empty() || surface->bpp != 32)
+		return false;
+
+	eRect clipped = area & eRect(0, 0, surface->x, surface->y);
+	if (clipped.empty())
+		return true;
+
+	const bool full_surface = clipped.left() == 0 && clipped.top() == 0 && clipped.width() == surface->x && clipped.height() == surface->y;
+	if (!ensureFramebuffer(surface, !full_surface && !surface->gl_content_valid))
+		return false;
+
+	GLint previous_framebuffer = 0;
+	GLint previous_viewport[4] = {0, 0, 0, 0};
+	GLint previous_scissor[4] = {0, 0, 0, 0};
+	GLboolean scissor_enabled = glIsEnabled(GL_SCISSOR_TEST);
+	GLfloat previous_clear_color[4] = {0.0f, 0.0f, 0.0f, 0.0f};
+
+	glGetIntegerv(GL_FRAMEBUFFER_BINDING, &previous_framebuffer);
+	glGetIntegerv(GL_VIEWPORT, previous_viewport);
+	glGetIntegerv(GL_SCISSOR_BOX, previous_scissor);
+	glGetFloatv(GL_COLOR_CLEAR_VALUE, previous_clear_color);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, surface->gl_framebuffer_id);
+	glViewport(0, 0, surface->x, surface->y);
+	glEnable(GL_SCISSOR_TEST);
+	glScissor(clipped.left(), clipped.top(), clipped.width(), clipped.height());
+	const int redShift = surface->nativeSwapChannels ? 0 : 16;
+	const int blueShift = surface->nativeSwapChannels ? 16 : 0;
+	glClearColor(((color >> redShift) & 0xff) / 255.0f, ((color >> 8) & 0xff) / 255.0f, ((color >> blueShift) & 0xff) / 255.0f, ((color >> 24) & 0xff) / 255.0f);
+	glClear(GL_COLOR_BUFFER_BIT);
+
+	if (scissor_enabled)
+		glEnable(GL_SCISSOR_TEST);
+	else
+		glDisable(GL_SCISSOR_TEST);
+	glScissor(previous_scissor[0], previous_scissor[1], previous_scissor[2], previous_scissor[3]);
+	glViewport(previous_viewport[0], previous_viewport[1], previous_viewport[2], previous_viewport[3]);
+	glClearColor(previous_clear_color[0], previous_clear_color[1], previous_clear_color[2], previous_clear_color[3]);
+	glBindFramebuffer(GL_FRAMEBUFFER, previous_framebuffer);
+
+	if (glGetError() != GL_NO_ERROR)
+		return false;
+
+	return finishSurfaceWrite(surface);
+}
+
+bool gTextureManager::drawRectangleSurface(gUnmanagedSurface* surface, const gRegion& region, const eRect& area, const gRGB& background_color, const gRGB& border_color, int border_width,
+	const std::vector<gRGB>& gradient_colors, uint8_t direction, int radius, uint8_t edges, bool alphablend, int gradient_full_size, bool use_new)
+{
+	if (!surface || surface->bpp != 32 || area.empty())
+		return false;
+	if (direction && gradient_colors.size() < 2)
+		return false;
+
+	const eRect surface_rect(0, 0, surface->x, surface->y);
+	eRect draw_area = area & surface_rect;
+	if (draw_area.empty())
+		return true;
+
+	gRegion draw_region = (region & draw_area) & surface_rect;
+	if (draw_region.rects.empty())
+		return true;
+
+	const bool blend_border = border_width > 0 && (use_new || radius > 0);
+	const bool replaceCoverage = radius > 0 && border_width <= 0 && !use_new && (gradient_colors.empty() || !alphablend);
+	const bool blend_rect = !replaceCoverage && (use_new || radius > 0 || (!gradient_colors.empty() && alphablend));
+	const bool full_overwrite = !blend_border && !blend_rect && radius <= 0 && regionCoversRect(draw_region, surface_rect);
+	if (!ensureFramebuffer(surface, !full_overwrite && !surface->gl_content_valid))
+		return false;
+	if (!ensureOffscreenAdvancedShader())
+		return false;
+	if (m_nativeTargetWrites < 12)
+		eDebug("[gTextureManager] shared rectangle radius=%d edges=%u blend=%d area=%d,%d %dx%d", radius, (unsigned)edges, alphablend, area.x(), area.y(), area.width(), area.height());
+
+	GLint previous_framebuffer = 0;
+	GLint previous_viewport[4] = {0, 0, 0, 0};
+	GLint previous_scissor[4] = {0, 0, 0, 0};
+	GLint previous_blend_src_rgb = GL_ONE;
+	GLint previous_blend_dst_rgb = GL_ZERO;
+	GLint previous_blend_src_alpha = GL_ONE;
+	GLint previous_blend_dst_alpha = GL_ZERO;
+	GLint previous_blend_equation_rgb = GL_FUNC_ADD;
+	GLint previous_blend_equation_alpha = GL_FUNC_ADD;
+	GLboolean scissor_enabled = glIsEnabled(GL_SCISSOR_TEST);
+	GLboolean blend_enabled = glIsEnabled(GL_BLEND);
+
+	glGetIntegerv(GL_FRAMEBUFFER_BINDING, &previous_framebuffer);
+	glGetIntegerv(GL_VIEWPORT, previous_viewport);
+	glGetIntegerv(GL_SCISSOR_BOX, previous_scissor);
+	glGetIntegerv(GL_BLEND_SRC_RGB, &previous_blend_src_rgb);
+	glGetIntegerv(GL_BLEND_DST_RGB, &previous_blend_dst_rgb);
+	glGetIntegerv(GL_BLEND_SRC_ALPHA, &previous_blend_src_alpha);
+	glGetIntegerv(GL_BLEND_DST_ALPHA, &previous_blend_dst_alpha);
+	glGetIntegerv(GL_BLEND_EQUATION_RGB, &previous_blend_equation_rgb);
+	glGetIntegerv(GL_BLEND_EQUATION_ALPHA, &previous_blend_equation_alpha);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, surface->gl_framebuffer_id);
+	glViewport(0, 0, surface->x, surface->y);
+	glEnable(GL_SCISSOR_TEST);
+	m_offscreen_advanced_shader.setFramebufferResolution((float)surface->x, (float)surface->y);
+
+	auto setBlend = [](bool enable) {
+		if (enable) {
+			glEnable(GL_BLEND);
+			glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+			glBlendEquationSeparate(GL_FUNC_ADD, GL_FUNC_ADD);
+		} else {
+			glDisable(GL_BLEND);
+		}
+	};
+
+	setBlend(blend_border || blend_rect);
+	auto swapChannels = [surface](const gRGB& color) { return surface->nativeSwapChannels ? gRGB(color.b, color.g, color.r, color.a) : color; };
+	std::vector<gRGB> nativeColors;
+	for (const gRGB& color : gradient_colors)
+		nativeColors.push_back(swapChannels(color));
+	for (const eRect& clipped : draw_region.rects) {
+		glScissor(clipped.left(), clipped.top(), clipped.width(), clipped.height());
+		m_offscreen_advanced_shader.drawAdvancedRect(area.x(), area.y(), area.width(), area.height(), radius, edges,
+			nativeColors, direction, alphablend, gradient_full_size, textureColorAlpha(background_color), swapChannels(background_color), border_width, swapChannels(border_color), replaceCoverage);
+	}
+
+	GLenum err = glGetError();
+	if (blend_enabled)
+		glEnable(GL_BLEND);
+	else
+		glDisable(GL_BLEND);
+	glBlendFuncSeparate(previous_blend_src_rgb, previous_blend_dst_rgb, previous_blend_src_alpha, previous_blend_dst_alpha);
+	glBlendEquationSeparate(previous_blend_equation_rgb, previous_blend_equation_alpha);
+	if (scissor_enabled)
+		glEnable(GL_SCISSOR_TEST);
+	else
+		glDisable(GL_SCISSOR_TEST);
+	glScissor(previous_scissor[0], previous_scissor[1], previous_scissor[2], previous_scissor[3]);
+	glViewport(previous_viewport[0], previous_viewport[1], previous_viewport[2], previous_viewport[3]);
+	glBindFramebuffer(GL_FRAMEBUFFER, previous_framebuffer);
+
+	if (err != GL_NO_ERROR)
+		return false;
+
+	return finishSurfaceWrite(surface);
+}
+
+bool gTextureManager::blitSurface(gUnmanagedSurface* dst, gUnmanagedSurface* src, const eRect& dest_rect, const eRect& area, int flags, int radius, uint8_t edges)
+{
+	if (!dst || !src || dst == src || dst->bpp != 32 || src->bpp != 32 || dest_rect.empty() || area.empty())
+		return false;
+
+	const eRect dst_rect(0, 0, dst->x, dst->y);
+	const eRect src_rect(0, 0, src->x, src->y);
+	eRect clipped_area = area & dst_rect;
+	if (clipped_area.empty() || src_rect.empty())
+		return true;
+
+	const bool alpha_blend = (flags & gPixmap::blitAlphaBlend) || radius > 0;
+	const bool alpha_test = flags & gPixmap::blitAlphaTest;
+	const bool full_overwrite = !alpha_blend && !alpha_test && radius <= 0 && clipped_area == dst_rect && dest_rect == dst_rect;
+	if (!ensureFramebuffer(dst, !full_overwrite && !dst->gl_content_valid))
+		return false;
+
+	GLuint texture_id = getSurfaceTexture(src);
+	if (!texture_id)
+		return false;
+	if (!ensureOffscreenTextureShader())
+		return false;
+	if (m_nativeTargetWrites < 12)
+		eDebug("[gTextureManager] shared blit radius=%d edges=%u flags=%d area=%d,%d %dx%d", radius, (unsigned)edges, flags, dest_rect.x(), dest_rect.y(), dest_rect.width(), dest_rect.height());
+
+	GLint previous_framebuffer = 0;
+	GLint previous_viewport[4] = {0, 0, 0, 0};
+	GLint previous_scissor[4] = {0, 0, 0, 0};
+	GLint previous_blend_src_rgb = GL_ONE;
+	GLint previous_blend_dst_rgb = GL_ZERO;
+	GLint previous_blend_src_alpha = GL_ONE;
+	GLint previous_blend_dst_alpha = GL_ZERO;
+	GLint previous_blend_equation_rgb = GL_FUNC_ADD;
+	GLint previous_blend_equation_alpha = GL_FUNC_ADD;
+	GLboolean scissor_enabled = glIsEnabled(GL_SCISSOR_TEST);
+	GLboolean blend_enabled = glIsEnabled(GL_BLEND);
+
+	glGetIntegerv(GL_FRAMEBUFFER_BINDING, &previous_framebuffer);
+	glGetIntegerv(GL_VIEWPORT, previous_viewport);
+	glGetIntegerv(GL_SCISSOR_BOX, previous_scissor);
+	glGetIntegerv(GL_BLEND_SRC_RGB, &previous_blend_src_rgb);
+	glGetIntegerv(GL_BLEND_DST_RGB, &previous_blend_dst_rgb);
+	glGetIntegerv(GL_BLEND_SRC_ALPHA, &previous_blend_src_alpha);
+	glGetIntegerv(GL_BLEND_DST_ALPHA, &previous_blend_dst_alpha);
+	glGetIntegerv(GL_BLEND_EQUATION_RGB, &previous_blend_equation_rgb);
+	glGetIntegerv(GL_BLEND_EQUATION_ALPHA, &previous_blend_equation_alpha);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, dst->gl_framebuffer_id);
+	glViewport(0, 0, dst->x, dst->y);
+	glEnable(GL_SCISSOR_TEST);
+	glScissor(clipped_area.left(), clipped_area.top(), clipped_area.width(), clipped_area.height());
+	if (alpha_blend) {
+		glEnable(GL_BLEND);
+		glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+		glBlendEquationSeparate(GL_FUNC_ADD, GL_FUNC_ADD);
+	} else {
+		glDisable(GL_BLEND);
+	}
+
+	m_offscreen_texture_shader.setFramebufferResolution((float)dst->x, (float)dst->y);
+	m_offscreen_texture_shader.drawTexture(dest_rect.x(), dest_rect.y(), dest_rect.width(), dest_rect.height(), texture_id, 1.0f, (float)radius, edges, 0.0f, 0.0f, 1.0f, 1.0f,
+		alpha_test, false, 0, 0, -1, -1, dst->nativeSwapChannels);
+
+	GLenum err = glGetError();
+	if (blend_enabled)
+		glEnable(GL_BLEND);
+	else
+		glDisable(GL_BLEND);
+	glBlendFuncSeparate(previous_blend_src_rgb, previous_blend_dst_rgb, previous_blend_src_alpha, previous_blend_dst_alpha);
+	glBlendEquationSeparate(previous_blend_equation_rgb, previous_blend_equation_alpha);
+	if (scissor_enabled)
+		glEnable(GL_SCISSOR_TEST);
+	else
+		glDisable(GL_SCISSOR_TEST);
+	glScissor(previous_scissor[0], previous_scissor[1], previous_scissor[2], previous_scissor[3]);
+	glViewport(previous_viewport[0], previous_viewport[1], previous_viewport[2], previous_viewport[3]);
+	glBindFramebuffer(GL_FRAMEBUFFER, previous_framebuffer);
+
+	if (err != GL_NO_ERROR)
+		return false;
+
+	return finishSurfaceWrite(dst);
+}
+
+bool gTextureManager::syncSurfaceToCPU(gUnmanagedSurface* surface) {
+	if (!surface)
+		return false;
+	prepareSurface(surface);
+	if (surface->nativeAccessFailed)
+		return false;
+	if (surface->nativeImported) {
+		if (!surface->nativeGPUAccessPending)
+			return surface->cpu_content_valid;
+		bool complete = waitNativeGPU();
+		const auto target = m_nativeTargets.find(surface->gl_texture_id);
+		const unsigned long long start = nativeNowUs();
+#ifdef DREAMNEXTGEN
+		if (complete && target != m_nativeTargets.end() && target->second.amlogic)
+			complete = dreamGE2DSyncBuffer(target->second.fd, true);
+#endif
+		complete = complete && target != m_nativeTargets.end();
+		__sync_synchronize();
+		m_upload_stats.nativeSyncUs += nativeNowUs() - start;
+		if (!complete) {
+			++m_upload_stats.nativeSyncFailures;
+			surface->nativeAccessFailed = true;
+			surface->cpu_content_valid = false;
+			eWarning("[gTextureManager] native CPU access denied after sync failure (%dx%d)", surface->x, surface->y);
+			return false;
+		}
+		surface->nativeGPUAccessPending = false;
+		surface->cpu_content_valid = true;
+		return true;
+	}
+	if (surface->cpu_content_valid)
+		return true;
+	if (!surface->gl_texture_id || !surface->gl_content_valid || surface->bpp != 32 || !surface->data)
+		return false;
+	if (!ensureFramebuffer(surface, false))
+		return false;
+
+	GLint previous_framebuffer = 0;
+	GLint previous_pack_alignment = 4;
+	glGetIntegerv(GL_FRAMEBUFFER_BINDING, &previous_framebuffer);
+	glGetIntegerv(GL_PACK_ALIGNMENT, &previous_pack_alignment);
+
+	std::vector<uint8_t> rgba(surface->x * surface->y * 4);
+	glBindFramebuffer(GL_FRAMEBUFFER, surface->gl_framebuffer_id);
+	glPixelStorei(GL_PACK_ALIGNMENT, 4);
+	glReadPixels(0, 0, surface->x, surface->y, GL_RGBA, GL_UNSIGNED_BYTE, rgba.data());
+	GLenum err = glGetError();
+	glPixelStorei(GL_PACK_ALIGNMENT, previous_pack_alignment);
+	glBindFramebuffer(GL_FRAMEBUFFER, previous_framebuffer);
+	if (err != GL_NO_ERROR)
+		return false;
+
+	for (int y = 0; y < surface->y; ++y) {
+		const uint8_t* src = rgba.data() + y * surface->x * 4;
+		uint8_t* dst = (uint8_t*)surface->data + y * surface->stride;
+		for (int x = 0; x < surface->x; ++x) {
+			dst[x * 4 + 0] = src[x * 4 + 2];
+			dst[x * 4 + 1] = src[x * 4 + 1];
+			dst[x * 4 + 2] = src[x * 4 + 0];
+			dst[x * 4 + 3] = src[x * 4 + 3];
+		}
+	}
+
+	surface->cpu_content_valid = true;
+	return true;
+}
+
+// Match the weak C++ hooks in gpixmap.cpp. C linkage leaves those hooks unresolved
+// and silently retains every surface texture until the EGL context is destroyed.
+void egl_queue_texture_deletion(unsigned int gl_texture_id, unsigned int context_generation) {
 	std::lock_guard<std::mutex> guard(activeManagerMutex());
 	if (s_active_manager) {
-		s_active_manager->releaseSurfaceTexture(gl_texture_id, surface);
-	} else {
-		eDebug("[gTextureManager] egl_release_surface_texture(%u) called with no active manager - texture leaked", gl_texture_id);
+		s_active_manager->queueForDeletion(gl_texture_id, context_generation);
 	}
+}
+
+void egl_queue_framebuffer_deletion(unsigned int gl_framebuffer_id, unsigned int context_generation) {
+	std::lock_guard<std::mutex> guard(activeManagerMutex());
+	if (s_active_manager) {
+		s_active_manager->queueFramebufferForDeletion(gl_framebuffer_id, context_generation);
+	}
+}
+
+static bool runSurfaceOperation(const std::function<bool(gTextureManager&)>& operation)
+{
+	ePtr<gMainDC> mainDC;
+	if (gMainDC::getInstance(mainDC) || !mainDC || mainDC->getGraphicsBackend() != "e2egl")
+		return false;
+	return static_cast<gEGLDC*>(mainDC.operator->())->runSurfaceOperation(operation);
+}
+
+bool egl_gpixmap_fill(gUnmanagedSurface* surface, int x, int y, int w, int h, uint32_t color) {
+	return runSurfaceOperation([&](gTextureManager& manager) { return manager.fillSurface(surface, eRect(x, y, w, h), color); });
+}
+
+bool egl_gpixmap_draw_rectangle(gUnmanagedSurface* surface, const gRegion* region, int x, int y, int w, int h, uint32_t background_color, uint32_t border_color, int border_width,
+	const gRGB* gradient_colors, int gradient_count, uint8_t direction, int radius, uint8_t edges, bool alphablend, int gradient_full_size, bool use_new)
+{
+	if (!region)
+		return false;
+	std::vector<gRGB> colors;
+	if (gradient_colors && gradient_count > 0)
+		colors.assign(gradient_colors, gradient_colors + gradient_count);
+	return runSurfaceOperation([&](gTextureManager& manager) {
+		return manager.drawRectangleSurface(surface, *region, eRect(x, y, w, h), gRGB(background_color), gRGB(border_color), border_width, colors, direction, radius, edges, alphablend,
+			gradient_full_size, use_new);
+	});
+}
+
+bool egl_gpixmap_blit(gUnmanagedSurface* dst, gUnmanagedSurface* src, int dx, int dy, int dw, int dh, int ax, int ay, int aw, int ah, int flags, int radius, uint8_t edges)
+{
+	return runSurfaceOperation([&](gTextureManager& manager) { return manager.blitSurface(dst, src, eRect(dx, dy, dw, dh), eRect(ax, ay, aw, ah), flags, radius, edges); });
+}
+
+bool egl_sync_surface_to_cpu(gUnmanagedSurface* surface) {
+	return runSurfaceOperation([&](gTextureManager& manager) { return manager.syncSurfaceToCPU(surface); });
 }

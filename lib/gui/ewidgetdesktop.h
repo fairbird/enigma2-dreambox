@@ -83,6 +83,8 @@ public:
 	void setWidgetAnimationsEnabled(bool enabled);
 	void setWidgetAnimationDuration(int ms);
 	void startFade(const eRect &area);
+	void sendShow(ePoint point, eSize size, int animation = -1, int durationMs = 0);
+	void sendHide(ePoint point, eSize size, int animation = -1, int durationMs = 0);
 	eRect bounds() const; // returns area inside margins
 	eRect margins() const { return m_margins; }
 	void setMargins(const eRect& value) { m_margins = value; }

@@ -195,6 +195,22 @@
 		<item text="AutoRefresh" description="Enable autorefresh templates." requires="CanRefreshTemplates">config.skin.autorefresh</item>
 		<item level="1" text="Fast Skin Reload" description="Reload the skin without restarting the GUI when switching skins.">config.usage.fastSkinReload</item>
 	</setup>
+	<setup key="AnimationSetup" title="OSD Animation Settings" allowDefault="yes" showOpenWebif="yes">
+		<item level="0" text="Window animation" description="Select the default e2egl OSD window animation.">config.misc.animation.default</item>
+		<item level="0" text="Classic animation style" description="Select the classic e2egl OSD window animation style." conditional="str(config.misc.animation.default.value) == '100' or (config.misc.animation.profiles.value and (str(config.misc.animation.dialog.value) == '100' or str(config.misc.animation.popup.value) == '100' or str(config.misc.animation.toast.value) == '100'))">config.misc.animation.classic</item>
+		<item level="0" text="Animation speed" description="Select the speed of OSD window animations. Lower values are faster.">config.misc.animation.speed</item>
+		<item level="0" text="Smooth list selection" description="Move only the list focus bar smoothly to its new position using e2egl.">config.misc.animation.listbox</item>
+		<item level="0" text="TV InfoBar animation" description="Animate the TV InfoBar independently of other windows. Slide moves it fully into the picture from below and out through the bottom edge when hidden.">config.misc.animation.infobar</item>
+		<item level="0" text="Media InfoBar animation" description="Select fade or slide from below for movie playback and the media player InfoBar.">config.misc.animation.mediaInfobar</item>
+		<item level="0" text="InfoBar animation duration (ms)" description="Duration of each InfoBar show or hide transition. Higher values are slower. The normal InfoBar timeout remains unchanged." conditional="str(config.misc.animation.infobar.value) != '0' or str(config.misc.animation.mediaInfobar.value) != '0'">config.misc.animation.infobarDuration</item>
+		<item level="1" text="Adaptive animation profiles" description="Use dedicated e2egl profiles for dialogs, popup panels and toast style notification windows.">config.misc.animation.profiles</item>
+		<if requires="config.misc.animation.profiles">
+			<item level="1" text="Dialog and message animation" description="Select the animation profile used for smaller dialog and message windows when adaptive profiles are enabled.">config.misc.animation.dialog</item>
+			<item level="1" text="Popup and panel animation" description="Select the animation profile used for popup and side panel windows when adaptive profiles are enabled.">config.misc.animation.popup</item>
+			<item level="1" text="Toast notification animation" description="Select the e2egl animation profile used for small top or bottom notification windows. On e2egl the legacy Toast alpha fade is disabled so GLES handles fade in and fade out.">config.misc.animation.toast</item>
+			<item level="1" text="Toast animation speed" description="Select the speed of e2egl toast fade in and fade out. Lower values are faster; the Toast timeout still controls how long the text stays readable." conditional="str(config.misc.animation.toast.value) != '0'">config.misc.animation.toast_speed</item>
+		</if>
+	</setup>
 	<setup key="UserInterface" title="User interface">
 		<item level="1" text="Enable blinking" description="Enable blink functionality for some areas like record icon.">config.usage.enable_blinking</item>
 		<item level="1" text="Show animation while busy" description="Show busy indicator when the system is busy.">config.usage.show_spinner</item>

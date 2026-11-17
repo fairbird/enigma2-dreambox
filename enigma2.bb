@@ -14,6 +14,8 @@ PV = "2.7+git"
 PKGV = "2.7+git${GITPKGV}"
 PR = "r26"
 
+DEPENDS += "${@bb.utils.contains('MACHINE_FEATURES', 'e2egl', 'virtual/egl virtual/libgles2', '', d)}"
+
 FILES_${PN} += "${datadir}/keymaps"
 FILES_${PN}-meta = "${datadir}/meta"
 PACKAGES =+ "${PN}-src"
@@ -66,6 +68,7 @@ EXTRA_OECONF = "\
 	${@bb.utils.contains("MACHINE_FEATURES", "colorlcd720", "--with-colorlcd720" , "", d)} \
 	${@bb.utils.contains("MACHINE_FEATURES", "colorlcd800", "--with-colorlcd800" , "", d)} \
 	${@bb.utils.contains("MACHINE_FEATURES", "nolcd", "--with-nolcd" , "", d)} \
+	${@bb.utils.contains("MACHINE_FEATURES", "e2egl", "--with-egl" , "--without-egl", d)} \
 	"
 
 do_install_append() {

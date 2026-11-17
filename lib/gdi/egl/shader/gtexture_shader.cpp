@@ -20,41 +20,69 @@ static const char *vertex_shader_es3 = R"(#version 300 es
 
 static const char *fragment_shader_es3 = R"(#version 300 es
     precision mediump float;
-
+    
     in vec2 v_uv;
     in vec2 v_pos;
     out vec4 frag_color;
-
+    
     uniform sampler2D u_texture;
+    uniform sampler2D u_previous_texture;
+    uniform float u_transition;
+    uniform int u_current_premultiplied;
+    uniform int u_previous_premultiplied;
     uniform float u_global_alpha;
-
+    uniform int u_alpha_test;
+    uniform int u_luma_texture;
+    uniform int u_output_bgra;
+    
     uniform vec4 u_rect_size;
     uniform float u_radius;
     uniform int u_edges;
 
-    float udRoundBox(vec2 p, vec2 b, float r) {
-        vec2 d = abs(p) - b + vec2(r);
-        return min(max(d.x, d.y), 0.0) + length(max(d, 0.0)) - r;
+    float cornerCoverage(float r, vec2 d) {
+        if (r <= 0.0)
+            return 1.0;
+        float dist = length(d) - r;
+        return clamp(0.5 - dist, 0.0, 1.0);
+    }
+
+    float roundedCoverage(vec2 local) {
+        float w = u_rect_size.z;
+        float h = u_rect_size.w;
+        float r = min(u_radius, min(w, h) * 0.5);
+        float c = 1.0;
+        if ((u_edges & 1) != 0 && local.x < r && local.y < r)
+            c = cornerCoverage(r, vec2(r - local.x, r - local.y));
+        else if ((u_edges & 2) != 0 && local.x > w - r && local.y < r)
+            c = cornerCoverage(r, vec2(local.x - (w - r), r - local.y));
+        else if ((u_edges & 4) != 0 && local.x < r && local.y > h - r)
+            c = cornerCoverage(r, vec2(r - local.x, local.y - (h - r)));
+        else if ((u_edges & 8) != 0 && local.x > w - r && local.y > h - r)
+            c = cornerCoverage(r, vec2(local.x - (w - r), local.y - (h - r)));
+        return c;
     }
 
     void main() {
+        float coverage = 1.0;
         if (u_radius > 0.0) {
-            vec2 half_size = u_rect_size.zw * 0.5;
-            vec2 center = vec2(u_rect_size.x, u_rect_size.y) + half_size;
-            vec2 p = v_pos - center;
-            float r = u_radius;
-
-            if (p.x < 0.0 && p.y < 0.0 && (u_edges & 1) == 0) r = 0.0;
-            if (p.x > 0.0 && p.y < 0.0 && (u_edges & 2) == 0) r = 0.0;
-            if (p.x < 0.0 && p.y > 0.0 && (u_edges & 4) == 0) r = 0.0;
-            if (p.x > 0.0 && p.y > 0.0 && (u_edges & 8) == 0) r = 0.0;
-
-            float dist = udRoundBox(p, half_size, r);
-            if (dist > 0.5) discard;
+            coverage = roundedCoverage(v_pos - u_rect_size.xy);
+            if (coverage <= 0.0)
+                discard;
         }
 
         vec4 tex_color = texture(u_texture, v_uv);
-        frag_color = vec4(tex_color.rgb, tex_color.a * u_global_alpha);
+        if (u_transition < 1.0) {
+            vec4 previous = texture(u_previous_texture, v_uv);
+            float alpha = mix(previous.a, tex_color.a, u_transition);
+            vec3 premultiplied = mix(u_previous_premultiplied == 1 ? previous.rgb : previous.rgb * previous.a, u_current_premultiplied == 1 ? tex_color.rgb : tex_color.rgb * tex_color.a, u_transition);
+            tex_color = vec4(alpha > 0.0001 ? premultiplied / alpha : vec3(0.0), alpha);
+        }
+        else if (u_current_premultiplied == 1 && tex_color.a > 0.0001)
+            tex_color.rgb /= tex_color.a;
+        if (u_luma_texture == 1)
+            tex_color = vec4(tex_color.r, tex_color.r, tex_color.r, tex_color.a);
+        if (u_alpha_test == 1 && tex_color.a < 0.5) discard;
+        frag_color = vec4(u_output_bgra == 1 ? tex_color.bgr : tex_color.rgb, tex_color.a * u_global_alpha * coverage);
     }
 )";
 #endif
@@ -76,14 +104,20 @@ static const char *vertex_shader_es2 = R"(#version 100
 
 static const char *fragment_shader_es2 = R"(#version 100
     precision mediump float;
-
+    
     varying vec2 v_uv;
     varying vec2 v_pos;
-
+    
     uniform sampler2D u_texture;
+    uniform sampler2D u_previous_texture;
+    uniform float u_transition;
+    uniform int u_current_premultiplied;
+    uniform int u_previous_premultiplied;
     uniform float u_global_alpha;
-    // uniform float u_alpha_test;
-
+    uniform int u_alpha_test;
+    uniform int u_luma_texture;
+    uniform int u_output_bgra;
+    
     uniform vec4 u_rect_size;
     uniform float u_radius;
     // Per-corner radii (GLSL ES 1.00 has no bitwise ops on integers)
@@ -92,60 +126,72 @@ static const char *fragment_shader_es2 = R"(#version 100
     uniform float u_r_bl;
     uniform float u_r_br;
 
-    float udRoundBox(vec2 p, vec2 b, float r) {
-        vec2 d = abs(p) - b + vec2(r);
-        return min(max(d.x, d.y), 0.0) + length(max(d, 0.0)) - r;
+    float cornerCoverage(float r, vec2 d) {
+        if (r <= 0.0)
+            return 1.0;
+        float dist = length(d) - r;
+        return clamp(0.5 - dist, 0.0, 1.0);
+    }
+
+    float roundedCoverage(vec2 local) {
+        float w = u_rect_size.z;
+        float h = u_rect_size.w;
+        float max_r = min(w, h) * 0.5;
+        float r_tl = min(u_r_tl, max_r);
+        float r_tr = min(u_r_tr, max_r);
+        float r_bl = min(u_r_bl, max_r);
+        float r_br = min(u_r_br, max_r);
+        float c = 1.0;
+        if (local.x < r_tl && local.y < r_tl)
+            c = cornerCoverage(r_tl, vec2(r_tl - local.x, r_tl - local.y));
+        else if (local.x > w - r_tr && local.y < r_tr)
+            c = cornerCoverage(r_tr, vec2(local.x - (w - r_tr), r_tr - local.y));
+        else if (local.x < r_bl && local.y > h - r_bl)
+            c = cornerCoverage(r_bl, vec2(r_bl - local.x, local.y - (h - r_bl)));
+        else if (local.x > w - r_br && local.y > h - r_br)
+            c = cornerCoverage(r_br, vec2(local.x - (w - r_br), local.y - (h - r_br)));
+        return c;
     }
 
     void main() {
+        float coverage = 1.0;
         if (u_radius > 0.0) {
-            vec2 half_size = u_rect_size.zw * 0.5;
-            vec2 center = vec2(u_rect_size.x, u_rect_size.y) + half_size;
-            vec2 p = v_pos - center;
-            float r = u_radius;
-
-            if (p.x < 0.0 && p.y < 0.0) r = u_r_tl;
-            if (p.x > 0.0 && p.y < 0.0) r = u_r_tr;
-            if (p.x < 0.0 && p.y > 0.0) r = u_r_bl;
-            if (p.x > 0.0 && p.y > 0.0) r = u_r_br;
-
-            float dist = udRoundBox(p, half_size, r);
-            if (dist > 0.5) discard;
+            coverage = roundedCoverage(v_pos - u_rect_size.xy);
+            if (coverage <= 0.0)
+                discard;
         }
 
         vec4 tex_color = texture2D(u_texture, v_uv);
-
-        // if (u_alpha_test > 0.5 && tex_color.a <= 0.5)
-        //    discard;
-
-        gl_FragColor = vec4(tex_color.rgb, tex_color.a * u_global_alpha);
+        if (u_transition < 1.0) {
+            vec4 previous = texture2D(u_previous_texture, v_uv);
+            float alpha = mix(previous.a, tex_color.a, u_transition);
+            vec3 premultiplied = mix(u_previous_premultiplied == 1 ? previous.rgb : previous.rgb * previous.a, u_current_premultiplied == 1 ? tex_color.rgb : tex_color.rgb * tex_color.a, u_transition);
+            tex_color = vec4(alpha > 0.0001 ? premultiplied / alpha : vec3(0.0), alpha);
+        }
+        else if (u_current_premultiplied == 1 && tex_color.a > 0.0001)
+            tex_color.rgb /= tex_color.a;
+        if (u_luma_texture == 1)
+            tex_color = vec4(tex_color.r, tex_color.r, tex_color.r, tex_color.a);
+        if (u_alpha_test == 1 && tex_color.a < 0.5) discard;
+        gl_FragColor = vec4(u_output_bgra == 1 ? tex_color.bgr : tex_color.rgb, tex_color.a * u_global_alpha * coverage);
     }
 )";
 
 // ---------------------------------------------------------------------------
 
-#if defined(HAVE_GLES3)
-gTextureShader::gTextureShader() : m_program_id(0), m_vao(0), m_vbo(0)
-#else
 gTextureShader::gTextureShader() : m_program_id(0), m_vbo(0)
-#endif
 {
 }
 
-gTextureShader::~gTextureShader()
-{
-    destroy();
-}
+gTextureShader::~gTextureShader() = default;
 
-void gTextureShader::destroy()
+void gTextureShader::release(bool contextCurrent)
 {
-#if defined(HAVE_GLES3)
-    if (gles::isGLES3() && m_vao) glDeleteVertexArrays(1, &m_vao);
-    m_vao = 0;
-#endif
-    if (m_vbo) glDeleteBuffers(1, &m_vbo);
+    if (contextCurrent && m_vbo)
+        glDeleteBuffers(1, &m_vbo);
+    if (contextCurrent && m_program_id)
+        glDeleteProgram(m_program_id);
     m_vbo = 0;
-    if (m_program_id) glDeleteProgram(m_program_id);
     m_program_id = 0;
 }
 
@@ -168,6 +214,9 @@ GLuint gTextureShader::compileShader(GLenum type, const char *source)
 
 bool gTextureShader::init()
 {
+    gles::ShaderLocale shaderLocale;
+    if (!shaderLocale.valid())
+        return false;
 #if defined(HAVE_GLES3)
     const char *vs_src = gles::isGLES3() ? vertex_shader_es3   : vertex_shader_es2;
     const char *fs_src = gles::isGLES3() ? fragment_shader_es3 : fragment_shader_es2;
@@ -197,6 +246,13 @@ bool gTextureShader::init()
     m_projection_location  = glGetUniformLocation(m_program_id, "u_projection");
     m_texture_location     = glGetUniformLocation(m_program_id, "u_texture");
     m_alpha_location       = glGetUniformLocation(m_program_id, "u_global_alpha");
+    m_alpha_test_location  = glGetUniformLocation(m_program_id, "u_alpha_test");
+    m_luma_texture_location = glGetUniformLocation(m_program_id, "u_luma_texture");
+    m_output_bgra_location = glGetUniformLocation(m_program_id, "u_output_bgra");
+    previousTextureLocation = glGetUniformLocation(m_program_id, "u_previous_texture");
+    transitionLocation = glGetUniformLocation(m_program_id, "u_transition");
+    currentPremultipliedLocation = glGetUniformLocation(m_program_id, "u_current_premultiplied");
+    previousPremultipliedLocation = glGetUniformLocation(m_program_id, "u_previous_premultiplied");
     m_rect_size_location   = glGetUniformLocation(m_program_id, "u_rect_size");
     m_radius_location      = glGetUniformLocation(m_program_id, "u_radius");
     m_edges_location       = glGetUniformLocation(m_program_id, "u_edges");
@@ -208,28 +264,15 @@ bool gTextureShader::init()
         m_edges_br_location = glGetUniformLocation(m_program_id, "u_r_br");
     }
 
-#if defined(HAVE_GLES3)
-    if (gles::isGLES3()) {
-        glGenVertexArrays(1, &m_vao);
-        glBindVertexArray(m_vao);
-    }
-#endif
-
     glGenBuffers(1, &m_vbo);
     glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
-    // Sized for the largest single upload this shader ever does: a batched
-    // draw of up to kMaxBatchQuads quads (see drawBatch()), 6 vertices x 4
-    // floats (x, y, u, v) each. A single drawTexture() call just uploads
-    // its 6 vertices into the front of this same, larger buffer.
-    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 6 * 4 * kMaxBatchQuads, nullptr, GL_DYNAMIC_DRAW);
-
+    // 6 vertices × 4 floats (x, y, u, v)
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 6 * 4, nullptr, GL_DYNAMIC_DRAW);
+    
     glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
-
+    
     glBindBuffer(GL_ARRAY_BUFFER, 0);
-#if defined(HAVE_GLES3)
-    if (gles::isGLES3()) glBindVertexArray(0);
-#endif
 
     return true;
 }
@@ -241,28 +284,14 @@ void gTextureShader::bind()
 
 void gTextureShader::bindVAO()
 {
-#if defined(HAVE_GLES3)
-    if (gles::isGLES3()) {
-        glBindVertexArray(m_vao);
-    } else
-#endif
-    {
-        glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
-        glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
-        glEnableVertexAttribArray(0);
-    }
+    glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
+    glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
 }
 
 void gTextureShader::unbindVAO()
 {
-#if defined(HAVE_GLES3)
-    if (gles::isGLES3()) {
-        glBindVertexArray(0);
-    } else
-#endif
-    {
-        glDisableVertexAttribArray(0);
-    }
+    glDisableVertexAttribArray(0);
 }
 
 void gTextureShader::setResolution(float width, float height)
@@ -277,16 +306,50 @@ void gTextureShader::setResolution(float width, float height)
     glUniformMatrix4fv(m_projection_location, 1, GL_FALSE, ortho);
 }
 
-void gTextureShader::drawTexture(float x, float y, float width, float height, GLuint texture_id, float global_alpha, float radius, uint8_t edges)
+void gTextureShader::setFramebufferResolution(float width, float height)
 {
     bind();
+    float ortho[16] = {
+        2.0f / width, 0.0f, 0.0f, 0.0f,
+        0.0f, 2.0f / height, 0.0f, 0.0f,
+        0.0f, 0.0f, -1.0f, 0.0f,
+        -1.0f, -1.0f, 0.0f, 1.0f
+    };
+    glUniformMatrix4fv(m_projection_location, 1, GL_FALSE, ortho);
+}
 
+void gTextureShader::drawTexture(float x, float y, float width, float height, GLuint texture_id, float global_alpha, float radius, uint8_t edges, float u0, float v0, float u1, float v1, bool alpha_test,
+								 bool luma_texture, float mask_x, float mask_y, float mask_width, float mask_height, bool output_bgra, GLuint previousTexture, float transition, bool currentPremultiplied, bool previousPremultiplied)
+{
+    bind();
+    
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texture_id);
     glUniform1i(m_texture_location, 0);
     glUniform1f(m_alpha_location, global_alpha);
+    glUniform1i(m_alpha_test_location, alpha_test ? 1 : 0);
+    glUniform1i(m_luma_texture_location, luma_texture ? 1 : 0);
+    glUniform1i(m_output_bgra_location, output_bgra ? 1 : 0);
+    GLint previousBinding = 0;
+    glUniform1f(transitionLocation, previousTexture ? transition : 1.0f);
+    glUniform1i(previousTextureLocation, 1);
+    glUniform1i(currentPremultipliedLocation, currentPremultiplied ? 1 : 0);
+    glUniform1i(previousPremultipliedLocation, previousPremultiplied ? 1 : 0);
+    if (previousTexture) {
+        glActiveTexture(GL_TEXTURE1);
+        glGetIntegerv(GL_TEXTURE_BINDING_2D, &previousBinding);
+        glBindTexture(GL_TEXTURE_2D, previousTexture);
+        glActiveTexture(GL_TEXTURE0);
+    }
+    
+	if (mask_width <= 0.0f || mask_height <= 0.0f) {
+		mask_x = x;
+		mask_y = y;
+		mask_width = width;
+		mask_height = height;
+	}
 
-    glUniform4f(m_rect_size_location, x, y, width, height);
+    glUniform4f(m_rect_size_location, mask_x, mask_y, mask_width, mask_height);
     glUniform1f(m_radius_location, radius);
 
     if (gles::isGLES3()) {
@@ -300,36 +363,22 @@ void gTextureShader::drawTexture(float x, float y, float width, float height, GL
 
     // x, y, u, v
     float vertices[24] = {
-        x,         y,          0.0f, 0.0f,
-        x,         y + height, 0.0f, 1.0f,
-        x + width, y,          1.0f, 0.0f,
-        x + width, y,          1.0f, 0.0f,
-        x,         y + height, 0.0f, 1.0f,
-        x + width, y + height, 1.0f, 1.0f
+        x,         y,          u0, v0,
+        x,         y + height, u0, v1,
+        x + width, y,          u1, v0,
+        x + width, y,          u1, v0,
+        x,         y + height, u0, v1,
+        x + width, y + height, u1, v1
     };
 
     bindVAO();
     glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
-    gles::uploadDynamicVBO(sizeof(vertices), vertices);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
     glDrawArrays(GL_TRIANGLES, 0, 6);
-    unbindVAO();
-}
-
-void gTextureShader::drawBatch(const float* vertex_data, int vertex_count, GLuint texture_id, float global_alpha)
-{
-    bind();
-
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, texture_id);
-    glUniform1i(m_texture_location, 0);
-    glUniform1f(m_alpha_location, global_alpha);
-
-    // No rounding for a batch - see the header comment on drawBatch().
-    glUniform1f(m_radius_location, 0.0f);
-
-    bindVAO();
-    glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
-    gles::uploadDynamicVBO((size_t)vertex_count * 4 * sizeof(float), vertex_data);
-    glDrawArrays(GL_TRIANGLES, 0, vertex_count);
+    if (previousTexture) {
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, previousBinding);
+        glActiveTexture(GL_TEXTURE0);
+    }
     unbindVAO();
 }

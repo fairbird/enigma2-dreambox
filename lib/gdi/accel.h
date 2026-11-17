@@ -27,6 +27,8 @@ public:
 	int accelAlloc(gUnmanagedSurface* surface);
 	void accelFree(gUnmanagedSurface* surface);
 	void dreamBCMPagecopyStat();
+	// Caller owns the duplicated fd. It keeps the allocation alive after surface disposal.
+	bool exportDreamBcmIonBuffer(gUnmanagedSurface *surface, int &fd, unsigned long &phys, size_t &size);
 
 	void dumpDebug();
 	void setAccelDebug(bool enable) { m_accel_debug = enable; }
