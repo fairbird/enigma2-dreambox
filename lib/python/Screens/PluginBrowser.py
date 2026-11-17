@@ -335,6 +335,8 @@ class PluginBrowser(Screen, NumericalTextInput, ProtectedScreen):
 
 	def run(self):
 		current = self["pluginList"].getCurrent()
+		if not current:
+			current = self["list"].getCurrent()
 		if current:
 			plugin = current[0]
 			plugin(session=self.session)
