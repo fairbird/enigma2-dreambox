@@ -601,4 +601,3 @@ void setAnimation_profiles(int enabled, int dialog, int popup, int toast)
 	(void)toast;
 #endif
 }
-#endif
