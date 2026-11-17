@@ -141,9 +141,3 @@ gdi_libenigma_gdi_a_SOURCES += \
 	gdi/gfbdc.cpp \
 	gdi/gfbdc.h
 endif
-
-if LCD_FRAMEBUFFER_MODE
-gdi_libenigma_gdi_a_SOURCES += \
-	gdi/fblcd.cpp \
-	gdi/fblcd.h
-endif
