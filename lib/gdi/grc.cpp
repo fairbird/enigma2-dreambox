@@ -27,6 +27,13 @@ void *gRC::thread_wrapper(void *ptr)
 
 gRC *gRC::instance = 0;
 
+static unsigned long long monotonicMs()
+{
+	struct timespec now = {};
+	clock_gettime(CLOCK_MONOTONIC, &now);
+	return (unsigned long long)now.tv_sec * 1000ULL + now.tv_nsec / 1000000ULL;
+}
+
 gRC::gRC() : rp(0), wp(0)
 #ifdef SYNC_PAINT
 	,
@@ -36,7 +43,7 @@ gRC::gRC() : rp(0), wp(0)
 	m_notify_pump(eApp, 1, "gRC")
 #endif
 	,
-	m_spinner_enabled(0), m_spinneronoff(1), m_prev_idle_count(0),
+	m_spinner_enabled(0), m_spinneronoff(1), m_spinner_suspended(0), m_spinner_suspend_until(0), m_prev_idle_count(0) // NOSONAR
 	m_flush_issued(0), m_flush_completed(0) // NOSONAR
 {
 	ASSERT(!instance);
@@ -149,13 +156,6 @@ void gRC::submit(const gOpcode &o)
 void *gRC::thread()
 {
 	int need_notify = 0;
-#ifdef USE_LIBVUGLES2
-	if (gles_open())
-	{
-		gles_state_open();
-		gles_viewport(720, 576, 720 * 4);
-	}
-#endif
 #ifdef HAVE_EGL
 	// EGL contexts are bound per-thread via eglMakeCurrent(); this is the
 	// thread that actually executes every render opcode (o.dc->exec(&o)
@@ -249,7 +249,7 @@ void *gRC::thread()
 				struct timespec timeout;
 				clock_gettime(CLOCK_REALTIME, &timeout);
 
-				if (m_spinner_enabled)
+				if (m_spinner_enabled || spinnerSuspended())
 				{
 					timeout.tv_nsec += (m_spinner_dc ? m_spinner_dc->spinnerInterval() : 100) * 1000 * 1000;
 					/* yes, this is required. */
@@ -314,6 +314,8 @@ void *gRC::thread()
 
 				if (!idle)
 				{
+					if (spinnerSuspended())
+						continue;
 					if (!m_spinner_enabled)
 					{
 						eDebug("[gRC] Warning: Main thread is busy, displaying spinner!");
@@ -329,10 +331,6 @@ void *gRC::thread()
 #endif
 		}
 	}
-#ifdef USE_LIBVUGLES2
-	gles_state_close();
-	gles_close();
-#endif
 #ifdef HAVE_EGL
 	// Mirror the initEGL() call at the top of this function: EGL contexts
 	// are per-thread, and this is the thread the context was made current
@@ -367,8 +365,16 @@ gRC *gRC::getInstance()
 	return instance;
 }
 
+bool gRC::spinnerSuspended() const
+{
+	return m_spinner_suspended > 0 || (m_spinner_suspend_until && monotonicMs() < m_spinner_suspend_until);
+}
+
 void gRC::enableSpinner()
 {
+	if (spinnerSuspended())
+		return;
+
 	if (!m_spinner_dc)
 	{
 		eDebug("[gRC] enableSpinner Error: No spinner DC!");
@@ -390,6 +396,37 @@ void gRC::setSpinnerColor(unsigned int color)
 {
 	if (m_spinner_dc)
 		m_spinner_dc->setSpinnerColor(color);
+}
+
+void gRC::suspendSpinner()
+{
+#ifndef SYNC_PAINT
+	pthread_mutex_lock(&mutex);
+#endif
+	++m_spinner_suspended;
+	if (m_spinner_enabled)
+		disableSpinner();
+#ifndef SYNC_PAINT
+	pthread_mutex_unlock(&mutex);
+#endif
+}
+
+void gRC::resumeSpinner(int hold_ms)
+{
+#ifndef SYNC_PAINT
+	pthread_mutex_lock(&mutex);
+#endif
+	if (m_spinner_suspended > 0)
+		--m_spinner_suspended;
+	if (hold_ms > 0)
+	{
+		unsigned long long until = monotonicMs() + (unsigned int)hold_ms;
+		if (until > m_spinner_suspend_until)
+			m_spinner_suspend_until = until;
+	}
+#ifndef SYNC_PAINT
+	pthread_mutex_unlock(&mutex);
+#endif
 }
 
 void gRC::disableSpinner()
@@ -916,43 +953,29 @@ void gPainter::beginFade(ePoint point, eSize size, int ms)
 	m_rc->submit(o);
 }
 
-#ifdef USE_LIBVUGLES2
-void gPainter::sendShowItem(long dir, ePoint point, eSize size)
+void gPainter::sendListboxAnimation(const eRect &from, const eRect &to, const gRGB &backgroundColor,
+	const std::vector<gRGB> &gradientColors, uint8_t gradientOrientation, bool gradientAlphaBlend,
+	int radius, uint8_t radiusEdges, gPixmap *selectionPixmap)
 {
-	if (m_dc->islocked())
+	if (m_dc->islocked() || !m_dc->supportsListboxAnimations())
 		return;
 	gOpcode o;
-	o.opcode = gOpcode::sendShowItem;
+	o.opcode = gOpcode::sendListboxAnimation;
 	o.dc = m_dc.grabRef();
-	o.parm.setShowItemInfo = new gOpcode::para::psetShowItemInfo;
-	o.parm.setShowItemInfo->dir = dir;
-	o.parm.setShowItemInfo->point = point;
-	o.parm.setShowItemInfo->size = size;
+	o.parm.listboxAnimation = new gOpcode::para::plistboxAnimation;
+	o.parm.listboxAnimation->from = from;
+	o.parm.listboxAnimation->to = to;
+	o.parm.listboxAnimation->backgroundColor = backgroundColor;
+	o.parm.listboxAnimation->gradientColors = gradientColors;
+	o.parm.listboxAnimation->gradientOrientation = gradientOrientation;
+	o.parm.listboxAnimation->gradientAlphaBlend = gradientAlphaBlend;
+	o.parm.listboxAnimation->radius = radius;
+	o.parm.listboxAnimation->radiusEdges = radiusEdges;
+	o.parm.listboxAnimation->selectionPixmap = selectionPixmap;
+	if (selectionPixmap)
+		selectionPixmap->AddRef();
 	m_rc->submit(o);
 }
-void gPainter::setFlush(bool val)
-{
-	if (m_dc->islocked())
-		return;
-	gOpcode o;
-	o.opcode = gOpcode::setFlush;
-	o.dc = m_dc.grabRef();
-	o.parm.setFlush = new gOpcode::para::psetFlush;
-	o.parm.setFlush->enable = val;
-	m_rc->submit(o);
-}
-void gPainter::setView(eSize size)
-{
-	if (m_dc->islocked())
-		return;
-	gOpcode o;
-	o.opcode = gOpcode::setView;
-	o.dc = m_dc.grabRef();
-	o.parm.setViewInfo = new gOpcode::para::psetViewInfo;
-	o.parm.setViewInfo->size = size;
-	m_rc->submit(o);
-}
-#endif
 
 gDC::gDC()
 {
@@ -1048,17 +1071,11 @@ void gDC::discardOpcode(const gOpcode *o)
 	case gOpcode::sendHide:
 		delete o->parm.setShowHideInfo;
 		break;
-#ifdef USE_LIBVUGLES2
-	case gOpcode::sendShowItem:
-		delete o->parm.setShowItemInfo;
+	case gOpcode::sendListboxAnimation:
+		if (o->parm.listboxAnimation->selectionPixmap)
+			o->parm.listboxAnimation->selectionPixmap->Release();
+		delete o->parm.listboxAnimation;
 		break;
-	case gOpcode::setFlush:
-		delete o->parm.setFlush;
-		break;
-	case gOpcode::setView:
-		delete o->parm.setViewInfo;
-		break;
-#endif
 	case gOpcode::popClip:
 	case gOpcode::flush:
 	case gOpcode::waitVSync:
@@ -1254,10 +1271,7 @@ void gDC::exec(const gOpcode *o)
 				eRect area = o->parm.renderText->area;
 				area.moveBy(offset);
 				gRegion clip = m_current_clip & bbox & area;
-				if (m_pixmap->needClut())
-					m_pixmap->fill(clip, m_foreground_color);
-				else
-					m_pixmap->fill(clip, m_foreground_color_rgb);
+				fillTextBackground(clip);
 			}
 		}
 
@@ -1445,14 +1459,11 @@ void gDC::exec(const gOpcode *o)
 	case gOpcode::beginFade:
 		delete o->parm.setShowHideInfo;
 		break;
-#ifdef USE_LIBVUGLES2
-	case gOpcode::sendShowItem:
+	case gOpcode::sendListboxAnimation:
+		if (o->parm.listboxAnimation->selectionPixmap)
+			o->parm.listboxAnimation->selectionPixmap->Release();
+		delete o->parm.listboxAnimation;
 		break;
-	case gOpcode::setFlush:
-		break;
-	case gOpcode::setView:
-		break;
-#endif
 	case gOpcode::enableSpinner:
 		enableSpinner();
 		break;
@@ -1465,6 +1476,19 @@ void gDC::exec(const gOpcode *o)
 	default:
 		eFatal("[gRC] gDC Error: Illegal opcode %d, expect memory leak!", o->opcode);
 	}
+}
+
+void gDC::fillTextBackground(const gRegion &clip)
+{
+	if (m_pixmap->needClut())
+		m_pixmap->fill(clip, m_foreground_color);
+	else
+		m_pixmap->fill(clip, m_foreground_color_rgb);
+}
+
+// Base implementation for software fallback
+void gDC::renderGlyph(const ePoint &pos, gPixmap *glyph_mask, const gRGB &color)
+{
 }
 
 gRGB gDC::getRGB(gColor col)

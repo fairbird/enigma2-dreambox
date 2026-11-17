@@ -3,6 +3,7 @@
 
 #include <base/elock.h>
 #include <list>
+#include <cstddef>
 
 struct gUnmanagedSurface;
 class eRect;

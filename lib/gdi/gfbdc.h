@@ -46,6 +46,11 @@ public:
 	int getGamma() const { return gamma; }
 
 	int haveDoubleBuffering() const { return surface_back.data_phys != 0; }
+	std::string getGraphicsBackend() const override { return "framebuffer"; }
+	std::string getGraphicsAccelerator() const override;
+	std::string getGraphicsBuffering() const override;
+	int getGraphicsBufferPages() const override { return m_number_of_pages; }
+	bool getGraphicsHardwareAccelerated() const override;
 
 	void saveSettings();
 
@@ -53,10 +58,5 @@ public:
 	virtual ~gFBDC();
 	int islocked() const { return fb->islocked(); }
 };
-#endif
-#ifdef HAVE_OSDANIMATION
-void setAnimation_current(int a);
-void setAnimation_speed(int speed);
-void setAnimation_current_listbox(int a);
 #endif
 #endif

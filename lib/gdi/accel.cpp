@@ -29,7 +29,26 @@
 #define ACCEL_ALIGNMENT_MASK	((1<<ACCEL_ALIGNMENT_SHIFT)-1)
 
 gAccel *gAccel::instance;
+
+#if not defined(HAVE_HISILICON_ACCEL)
 #define BCM_ACCEL
+#endif
+
+#ifdef HAVE_HISILICON_ACCEL 
+extern int  dinobot_accel_init(void);
+extern void dinobot_accel_close(void);
+extern void dinobot_accel_blit(
+		int src_addr, int src_width, int src_height, int src_stride, int src_format,
+		int dst_addr, int dst_width, int dst_height, int dst_stride,
+		int src_x, int src_y, int width, int height,
+		int dst_x, int dst_y, int dwidth, int dheight,
+		int pal_addr,int pal_size, int flags);
+extern void dinobot_accel_fill(
+		int dst_addr, int dst_width, int dst_height, int dst_stride,
+		int x, int y, int width, int height,
+		unsigned long color);
+extern bool dinobot_accel_has_alphablending();
+#endif
 
 #ifdef BCM_ACCEL
 extern int bcm_accel_init(void);
@@ -388,6 +407,9 @@ gAccel::gAccel():
 #ifdef BCM_ACCEL
 	m_bcm_accel_state = bcm_accel_init();
 #endif
+#ifdef HAVE_HISILICON_ACCEL
+	dinobot_accel_init();
+#endif
 }
 
 gAccel::~gAccel()
@@ -399,6 +421,9 @@ gAccel::~gAccel()
 	dreambcm_ion_release_all(false);
 	if (s_dreambcm_ion_fd >= 0)
 		close(s_dreambcm_ion_fd);
+#endif
+#ifdef HAVE_HISILICON_ACCEL
+	dinobot_accel_close();
 #endif
 #ifdef DREAMNEXTGEN
 	dreamGE2DReset();
@@ -439,6 +464,9 @@ void gAccel::releaseAccelMemorySpace()
 #ifdef DREAMBCM_ION_ACCEL
 	dreambcm_ion_release_all(true);
 #endif
+#ifdef DREAMNEXTGEN
+	dreamGE2DReleaseAccelMemory();
+#endif
 	for (MemoryBlockList::const_iterator it = m_accel_allocation.begin();
 		 it != m_accel_allocation.end();
 		 ++it)
@@ -471,6 +499,7 @@ void gAccel::setAccelMemorySpace(void *addr, int phys_addr, int size)
 		dumpDebug();
 	}
 }
+
 
 #ifdef DREAMBCM_ION_ACCEL
 static bool dreambcm_indexed_palette_color_swap_enabled()
@@ -513,6 +542,9 @@ bool gAccel::hasAlphaBlendingSupport()
 {
 #ifdef BCM_ACCEL
 	return bcm_accel_has_alphablending();
+#endif
+#ifdef HAVE_HISILICON_ACCEL
+	return dinobot_accel_has_alphablending();
 #else
 #ifdef DREAMNEXTGEN
 	return dreamGE2DHasAlphaBlendingSupport();
@@ -529,6 +561,7 @@ int gAccel::blit(gUnmanagedSurface *dst, gUnmanagedSurface *src, const eRect &p,
 	if (dreamGE2DIsManagedSurface(dst) || dreamGE2DIsManagedSurface(src))
 		return -1;
 #endif
+
 #ifdef BCM_ACCEL
 	if (!m_bcm_accel_state)
 	{
@@ -569,12 +602,57 @@ int gAccel::blit(gUnmanagedSurface *dst, gUnmanagedSurface *src, const eRect &p,
 			pal_addr, flags);
 		if (ret)
 			return ret;
-#ifdef DREAMBCM_ION_ACCEL
+	#ifdef DREAMBCM_ION_ACCEL
 		DREAMBCM_ACCEL_STAT_INC(s_dreambcm_blit_ok);
 		dreambcm_maybe_dump_stats("blit");
-#endif
+	#endif
 		return 0;
 	}
+#endif
+#ifdef HAVE_HISILICON_ACCEL
+		unsigned long pal_addr = 0;
+		unsigned int  pal_size = 0;
+		int src_format = 0;
+		if (src->bpp == 32)
+			src_format = 0;
+		else if ((src->bpp == 8) && src->clut.data)
+		{
+			src_format = 1;
+			pal_size = src->clut.colors*4*16/16;
+			pal_addr = (unsigned long)new unsigned char [pal_size];
+			/* sync pal */
+			if (src->clut.data_phys == 0)
+			{
+				/* sync pal */
+				unsigned long *pal = (unsigned long*)pal_addr;
+				for (int i = 0; i < src->clut.colors; ++i)
+				    *pal++ = src->clut.data[i].argb() ^ 0xFF000000;
+				src->clut.data_phys = pal_addr;
+				eDebug("!!!!!!!!!![gAccel] pal_addr1 %x clors=%d!!!!!!!!!!",pal_addr,src->clut.colors);
+			}
+			else
+			{
+				//memcpy((void*)pal_addr ,(void *)src->clut.data_phys,pal_size);
+				unsigned long *pal = (unsigned long*)pal_addr;
+				for (int i = 0; i < src->clut.colors; ++i)
+				    *pal++ = src->clut.data[i].argb() ^ 0xFF000000;
+				eDebug("!!!!!!!!!![gAccel] pal_addr2 %x clors=%d!!!!!!!!!!",pal_addr,src->clut.colors);
+			}
+		} else
+			return -1; /* unsupported source format */
+
+		dinobot_accel_blit(
+			src->data_phys, src->x, src->y, src->stride, src_format,
+			dst->data_phys, dst->x, dst->y, dst->stride,
+			area.left(), area.top(), area.width(), area.height(),
+			p.x(), p.y(), p.width(), p.height(),
+			pal_addr, pal_size,flags);
+
+		if(pal_size && pal_addr)
+		{
+			delete (unsigned char *)pal_addr;
+		}
+		return 0;
 #endif
 	return -1;
 }
@@ -602,12 +680,20 @@ int gAccel::fill(gUnmanagedSurface *dst, const eRect &area, unsigned long col)
 			dst->data_phys, dst->x, dst->y, dst->stride,
 			area.left(), area.top(), area.width(), area.height(),
 			col);
-#ifdef DREAMBCM_ION_ACCEL
+	#ifdef DREAMBCM_ION_ACCEL
 		DREAMBCM_ACCEL_STAT_INC(s_dreambcm_fill_ok);
 		dreambcm_maybe_dump_stats("fill");
-#endif
+	#endif
 		return 0;
 	}
+#endif
+
+#ifdef HAVE_HISILICON_ACCEL
+	dinobot_accel_fill(
+		dst->data_phys, dst->x, dst->y, dst->stride,
+		area.left(), area.top(), area.width(), area.height(),
+		col);
+	return 0;
 #endif
 	return -1;
 }
@@ -629,13 +715,13 @@ int gAccel::sync()
 	if (!m_bcm_accel_state)
 	{
 		int ret = bcm_accel_sync();
-#ifdef DREAMBCM_ION_ACCEL
+	#ifdef DREAMBCM_ION_ACCEL
 		if (ret)
 			DREAMBCM_ACCEL_STAT_INC(s_dreambcm_sync_fail);
 		else
 			DREAMBCM_ACCEL_STAT_INC(s_dreambcm_sync_ok);
 		dreambcm_maybe_dump_stats("sync");
-#endif
+	#endif
 		return ret;
 	}
 #endif
@@ -676,6 +762,11 @@ int gAccel::accelAlloc(gUnmanagedSurface* surface)
 #endif
 
 #ifndef DREAMNEXTGEN
+#ifdef DREAMBCM_ION_ACCEL
+	if (!m_bcm_accel_state)
+		return dreambcm_ion_alloc_surface(surface, stride, size, m_accel_debug);
+#endif
+
 	size += ACCEL_ALIGNMENT_MASK;
 	size >>= ACCEL_ALIGNMENT_SHIFT;
 
@@ -705,7 +796,7 @@ int gAccel::accelAlloc(gUnmanagedSurface* surface)
 		}
 	}
 
-	eDebug("[gAccel] accel alloc failed\n");
+	eTrace("[gAccel] accel alloc failed\n");
 	return -3;
 #else
 	if (surface->bpp == 32 && dreamGE2DAllocSurface(surface, stride, size))

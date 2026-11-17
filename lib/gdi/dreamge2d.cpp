@@ -305,6 +305,8 @@ namespace
 		int height;
 		int stride;
 		int size;
+		unsigned int flags;
+		unsigned int heapMask;
 		unsigned long phys;
 		size_t phys_size;
 		void *data;
@@ -681,15 +683,6 @@ namespace
 		return ioctl(ion_fd, cmd, &data) == 0;
 	}
 
-	bool ge2dSyncFD(int fd, unsigned long cmd)
-	{
-		int ge2d_fd = getGE2DFd();
-		if (ge2d_fd < 0 || fd < 0)
-			return false;
-		int sync_fd = fd;
-		return ioctl(ge2d_fd, cmd, &sync_fd) == 0;
-	}
-
 	std::map<const gUnmanagedSurface *, DreamGE2DBuffer>::iterator findBuffer(const gUnmanagedSurface *surface)
 	{
 		return s_buffers.find(surface);
@@ -953,30 +946,31 @@ namespace
 		return target.phys != 0;
 	}
 
-	void syncTargetDevice(const DreamGE2DTarget &target)
+	bool syncTargetDevice(const DreamGE2DTarget &target)
 	{
 		if (target.fd >= 0)
 		{
-			ionSyncFD(target.fd, DREAM_ION_IOC_SYNC);
-			ge2dSyncFD(target.fd, DREAM_GE2D_SYNC_DEVICE);
+			// These are ION exports, not GE2D-owned dma_buf private structures.
+			return ionSyncFD(target.fd, DREAM_ION_IOC_SYNC);
 		}
 		else if (target.framebuffer)
 		{
 			msyncFramebufferTarget(target, MS_SYNC);
 		}
+		return true;
 	}
 
-	void syncTargetCPU(const DreamGE2DTarget &target)
+	bool syncTargetCPU(const DreamGE2DTarget &target)
 	{
 		if (target.fd >= 0)
 		{
-			ge2dSyncFD(target.fd, DREAM_GE2D_SYNC_CPU);
-			ionSyncFD(target.fd, DREAM_ION_IOC_INVALID_CACHE);
+			return ionSyncFD(target.fd, DREAM_ION_IOC_INVALID_CACHE);
 		}
 		else if (target.framebuffer)
 		{
 			msyncFramebufferTarget(target, MS_INVALIDATE);
 		}
+		return true;
 	}
 
 	void freeBuffer(std::map<const gUnmanagedSurface *, DreamGE2DBuffer>::iterator it, bool preserve_cpu_data)
@@ -1400,6 +1394,8 @@ bool dreamGE2DAllocSurface(gUnmanagedSurface *surface, int stride, int size)
 	alloc.align = s_ion_align;
 	alloc.heap_id_mask = s_ion_heap_mask;
 	alloc.flags = s_ion_flags;
+	buffer.flags = alloc.flags;
+	buffer.heapMask = alloc.heap_id_mask;
 
 	if (ioctl(ion_fd, DREAM_ION_IOC_ALLOC, &alloc) < 0)
 	{
@@ -1529,6 +1525,59 @@ bool dreamGE2DIsManagedSurface(const gUnmanagedSurface *surface)
 	return findBuffer(surface) != s_buffers.end();
 }
 
+bool dreamGE2DGetDmabuf(const gUnmanagedSurface *surface, int *fd, int *width, int *height, int *stride, int *offset)
+{
+	std::map<const gUnmanagedSurface *, DreamGE2DBuffer>::iterator it = findBuffer(surface);
+	if (it == s_buffers.end())
+		return false;
+
+	DreamGE2DBuffer &buffer = it->second;
+	if (buffer.fd < 0)
+		return false;
+
+	if (!ionSyncFD(buffer.fd, DREAM_ION_IOC_SYNC))
+		return false;
+	if (fd)
+		*fd = buffer.fd;
+	if (width)
+		*width = buffer.width;
+	if (height)
+		*height = buffer.height;
+	if (stride)
+		*stride = buffer.stride;
+	if (offset)
+		*offset = 0;
+	return true;
+}
+
+bool dreamGE2DExportSurface(const gUnmanagedSurface *surface, DreamDmaBuffer &output)
+{
+	auto it = findBuffer(surface);
+	if (it == s_buffers.end())
+		return false;
+	const DreamGE2DBuffer &buffer = it->second;
+	if (buffer.fd < 0 || buffer.width <= 0 || buffer.height <= 0 || buffer.stride <= 0 ||
+		buffer.width > buffer.stride / 4 || buffer.size <= 0 ||
+		static_cast<unsigned long long>(buffer.stride) * buffer.height > static_cast<unsigned int>(buffer.size))
+		return false;
+	int retainedFD = fcntl(buffer.fd, F_DUPFD_CLOEXEC, 0);
+	if (retainedFD < 0)
+		return false;
+	output.fd = retainedFD;
+	output.width = buffer.width;
+	output.height = buffer.height;
+	output.stride = buffer.stride;
+	output.length = buffer.size;
+	output.flags = buffer.flags;
+	output.heapMask = buffer.heapMask;
+	return true;
+}
+
+bool dreamGE2DSyncBuffer(int fd, bool forCPU)
+{
+	return ionSyncFD(fd, forCPU ? DREAM_ION_IOC_INVALID_CACHE : DREAM_ION_IOC_SYNC);
+}
+
 void dreamGE2DReleaseAccelMemory()
 {
 	while (!s_buffers.empty())
@@ -1580,7 +1629,8 @@ bool dreamGE2DFill(gUnmanagedSurface *dst, const eRect &area, unsigned long col)
 		return false;
 	}
 
-	syncTargetDevice(dst_target);
+	if (!syncTargetDevice(dst_target))
+		return false;
 
 	if (!configureFillTarget(fd, dst_target, fb_dreamos_submit, (unsigned int)col))
 	{
@@ -1606,7 +1656,12 @@ bool dreamGE2DFill(gUnmanagedSurface *dst, const eRect &area, unsigned long col)
 		return false;
 	}
 
-	syncTargetCPU(dst_target);
+	if (!syncTargetCPU(dst_target)) {
+		dst->nativeAccessFailed = true;
+		dst->cpu_content_valid = false;
+		eWarning("[dreamGE2D] ION CPU sync failed after fill; surface quarantined");
+		return true; // The device already wrote: do not retry into this storage on CPU.
+	}
 	++s_stats.fill_ok;
 	if (dst_target.managed)
 		++s_stats.fill_ion_ok;
@@ -1708,8 +1763,8 @@ bool dreamGE2DBlit(gUnmanagedSurface *dst, gUnmanagedSurface *src, const eRect &
 		return false;
 	}
 
-	syncTargetDevice(src_target);
-	syncTargetDevice(dst_target);
+	if (!syncTargetDevice(src_target) || !syncTargetDevice(dst_target))
+		return false;
 
 	struct dream_ge2d_para_s para;
 	const bool fb_operation = src_target.framebuffer || dst_target.framebuffer;
@@ -1778,7 +1833,11 @@ bool dreamGE2DBlit(gUnmanagedSurface *dst, gUnmanagedSurface *src, const eRect &
 		statsEvent("blit-ok");
 	}
 
-	syncTargetCPU(dst_target);
+	if (!syncTargetCPU(dst_target)) {
+		dst->nativeAccessFailed = true;
+		dst->cpu_content_valid = false;
+		eWarning("[dreamGE2D] ION CPU sync failed after blit; surface quarantined");
+	}
 	return true;
 }
 
@@ -1786,6 +1845,35 @@ bool dreamGE2DHasAlphaBlendingSupport()
 {
 	initRuntimeOptions();
 	return s_surface_accel_enabled && s_blend_accel_enabled;
+}
+
+bool dreamGE2DIsActive()
+{
+	return s_ge2d_fd >= 0 || !s_buffers.empty() || s_ge2d_logged_accel_active;
+}
+
+bool dreamGE2DPageCopyEnabled()
+{
+	initRuntimeOptions();
+	return s_flush_enabled;
+}
+
+bool dreamGE2DSurfaceAccelerationEnabled()
+{
+	initRuntimeOptions();
+	return s_surface_accel_enabled;
+}
+
+bool dreamGE2DFillAccelerationEnabled()
+{
+	initRuntimeOptions();
+	return s_fill_accel_enabled;
+}
+
+bool dreamGE2DBlitAccelerationEnabled()
+{
+	initRuntimeOptions();
+	return s_blit_accel_enabled;
 }
 
 void dreamGE2DReset()
@@ -1867,6 +1955,27 @@ bool dreamGE2DIsManagedSurface(const gUnmanagedSurface *surface)
 	return false;
 }
 
+bool dreamGE2DGetDmabuf(const gUnmanagedSurface *surface, int *fd, int *width, int *height, int *stride, int *offset)
+{
+	(void)surface;
+	(void)fd;
+	(void)width;
+	(void)height;
+	(void)stride;
+	(void)offset;
+	return false;
+}
+
+bool dreamGE2DExportSurface(const gUnmanagedSurface *, DreamDmaBuffer &)
+{
+	return false;
+}
+
+bool dreamGE2DSyncBuffer(int, bool)
+{
+	return false;
+}
+
 void dreamGE2DReleaseAccelMemory()
 {
 }
@@ -1890,6 +1999,31 @@ bool dreamGE2DBlit(gUnmanagedSurface *dst, gUnmanagedSurface *src, const eRect &
 }
 
 bool dreamGE2DHasAlphaBlendingSupport()
+{
+	return false;
+}
+
+bool dreamGE2DIsActive()
+{
+	return false;
+}
+
+bool dreamGE2DPageCopyEnabled()
+{
+	return false;
+}
+
+bool dreamGE2DSurfaceAccelerationEnabled()
+{
+	return false;
+}
+
+bool dreamGE2DFillAccelerationEnabled()
+{
+	return false;
+}
+
+bool dreamGE2DBlitAccelerationEnabled()
 {
 	return false;
 }

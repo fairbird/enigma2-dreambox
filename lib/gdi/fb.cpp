@@ -8,6 +8,7 @@
 #include <linux/kd.h>
 
 #include <lib/gdi/fb.h>
+#include <lib/gdi/grc.h>
 
 #ifndef FBIO_WAITFORVSYNC
 #define FBIO_WAITFORVSYNC _IOW('F', 0x20, uint32_t)
@@ -54,6 +55,10 @@ fbClass::fbClass(const char *fb)
 	locked=0;
 	lfb = 0;
 	available=0;
+	m_accel_phys_addr = 0;
+#ifdef CONFIG_ION
+	m_accel_fd = -1;
+#endif
 	cmap.start=0;
 	cmap.len=256;
 	cmap.red=red;
@@ -224,7 +229,7 @@ int fbClass::SetMode(int nxRes, int nyRes, int nbpp)
 #endif
 
 	screeninfo.xres_virtual=screeninfo.xres=nxRes;
-#if defined(CONFIG_ION) || defined(DREAMNEXTGEN)
+#if defined(CONFIG_ION) || defined(DREAMNEXTGEN) || defined(HAVE_HISILICON_EGL)
 	screeninfo.yres = nyRes;
 	int wanted_pages = 3;
 #if defined(DREAMNEXTGEN)
@@ -273,7 +278,7 @@ int fbClass::SetMode(int nxRes, int nyRes, int nbpp)
 		break;
 	}
 
-#if defined(CONFIG_ION) || defined(DREAMNEXTGEN)
+#if defined(CONFIG_ION) || defined(DREAMNEXTGEN) || defined(HAVE_HISILICON_EGL)
 	if (ioctl(fbFd, FBIOPUT_VSCREENINFO, &screeninfo)<0)
 	{
 		screeninfo.yres_virtual = nyRes * 2;
@@ -347,11 +352,12 @@ int fbClass::SetMode(int nxRes, int nyRes, int nbpp)
 	/* map new framebuffer */
 	lfb=(unsigned char*)mmap(0, stride * screeninfo.yres_virtual, PROT_WRITE|PROT_READ, MAP_SHARED, fbFd, 0);
 #endif
-	// Clear all pages, a page left over from the previous run shows up on the first page flip.
-	int clearSize = stride * screeninfo.yres_virtual;
-	if (clearSize > available)
-		clearSize = available;
-	memset(lfb, 0, clearSize);
+	if (lfb) {
+		size_t clear_size = (size_t)stride * screeninfo.yres_virtual;
+		if (available > 0 && clear_size > (size_t)available)
+			clear_size = (size_t)available;
+		memset(lfb, 0, clear_size);
+	}
 	blit();
 	return 0;
 }
@@ -412,6 +418,8 @@ fbClass::~fbClass()
 		::close(fbFd);
 		fbFd = -1;
 	}
+	if (instance == this)
+		instance = 0;
 }
 
 int fbClass::PutCMAP()
@@ -430,18 +438,36 @@ int fbClass::lock()
 	}
 	else
 		locked = 1;
+
+	if (gRC::getInstance())
+		gRC::getInstance()->suspendSpinner();
+
 	return fbFd;
 }
 
-void fbClass::unlock()
+void fbClass::unlock(bool restoreMode)
 {
 	if (!locked)
 		return;
 	if (locked == 2)  // re-enable manualBlit
 		enableManualBlit();
 	locked=0;
-	SetMode(xRes, yRes, bpp);
-	PutCMAP();
+	/*
+	 * External transparent EGL clients (notably HbbTV) keep Enigma2's EGL
+	 * window surface alive while the framebuffer painter is locked.  Resetting
+	 * the framebuffer mode underneath that live surface can change the native
+	 * ARGB channel layout on Dream BCM and leaves the OSD with swapped colours
+	 * after the external client exits.  Such callers only need painting and the
+	 * spinner unlocked; the default keeps the legacy mode/palette restore for
+	 * every existing caller.
+	 */
+	if (restoreMode)
+	{
+		SetMode(xRes, yRes, bpp);
+		PutCMAP();
+	}
+	if (gRC::getInstance())
+		gRC::getInstance()->resumeSpinner(1000);
 }
 
 void fbClass::enableManualBlit()
