@@ -130,7 +130,7 @@ void gRC::submit(const gOpcode &o)
 		queue[wp++] = queued;
 		if (wp == MAXSIZE)
 			wp = 0;
-
+		if (o.opcode == gOpcode::flush || o.opcode == gOpcode::shutdown || o.opcode == gOpcode::notify || o.opcode == gOpcode::invoke)
 #ifndef SYNC_PAINT
 		if (queued.opcode == gOpcode::flush || queued.opcode == gOpcode::shutdown || queued.opcode == gOpcode::notify || queued.opcode == gOpcode::setResolution)
 			pthread_cond_signal(&cond); // wakeup gdi thread

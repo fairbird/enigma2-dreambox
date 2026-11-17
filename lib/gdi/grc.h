@@ -13,6 +13,7 @@
 
 #include <pthread.h>
 #include <atomic>
+#include <functional>
 #include <stack>
 #include <list>
 #include <vector>
@@ -91,6 +92,7 @@ struct gOpcode
 		endLayer,
 		beginFade,
 		sendListboxAnimation,
+		invoke,
 	} opcode;
 	gDC *dc;
 	unsigned int flush_id;
@@ -229,6 +231,8 @@ struct gOpcode
 			uint8_t radiusEdges;
 			gPixmap *selectionPixmap;
 		} *listboxAnimation;
+
+		std::function<void()> *invoke;
 	} parm;
 };
 
