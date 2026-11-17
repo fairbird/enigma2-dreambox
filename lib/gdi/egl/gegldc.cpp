@@ -169,6 +169,18 @@ bool gEGLDC::tryInitEGL(int version) {
 		}
 	}
 
+#ifdef DREAMNEXTGEN
+	// the fbdev window surface buffers are not cleared by the driver: clear both of them
+	// to transparent before anything is scanned out, so stale memory is not shown over the bootlogo
+	if (m_page_count == 1) {
+		glClearColor(0, 0, 0, 0);
+		glClear(GL_COLOR_BUFFER_BIT);
+		eglSwapBuffers(m_egl_display, m_egl_surfaces[0]);
+		glClear(GL_COLOR_BUFFER_BIT);
+		eglSwapBuffers(m_egl_display, m_egl_surfaces[0]);
+	}
+#endif
+
 	// One-time dump of what this driver/hardware actually advertises, as
 	// opposed to what the vendor SDK headers merely *declare* - header
 	// presence (EGL_KHR_partial_update, EGL_KHR_fence_sync, etc. all exist
@@ -1712,6 +1724,17 @@ void gEGLDC::cleanupEGL() {
 		// here first closes that gap. Each destroy() is safe to call again
 		// later (idempotent), so the destructors calling it a second time
 		// as a fallback is harmless.
+#ifdef DREAMNEXTGEN
+		// leave a transparent framebuffer behind so the restart does not show the last frame's memory
+		if (m_page_count == 1 && m_egl_surfaces[0] != EGL_NO_SURFACE) {
+			glBindFramebuffer(GL_FRAMEBUFFER, 0);
+			glClearColor(0, 0, 0, 0);
+			glClear(GL_COLOR_BUFFER_BIT);
+			eglSwapBuffers(m_egl_display, m_egl_surfaces[0]);
+			glClear(GL_COLOR_BUFFER_BIT);
+			eglSwapBuffers(m_egl_display, m_egl_surfaces[0]);
+		}
+#endif
 		m_basic_shader.destroy();
 		m_advanced_shader.destroy();
 		m_texture_shader.destroy();
