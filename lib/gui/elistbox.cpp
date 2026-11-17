@@ -3,41 +3,16 @@
 Scroll Text Feature of eListBox
 Font Scale Feature of eLabel
 
-Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License
-
 Copyright (c) 2025-2026 jbleyel
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-1. Non-Commercial Use: You may not use the Software or any derivative works
-   for commercial purposes without obtaining explicit permission from the
-   copyright holder.
-2. Share Alike: If you distribute or publicly perform the Software or any
-   derivative works, you must do so under the same license terms, and you
-   must make the source code of any derivative works available to the
-   public.
-3. Attribution: You must give appropriate credit to the original author(s)
-   of the Software by including a prominent notice in your derivative works.
-THE SOFTWARE IS PROVIDED "AS IS," WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE, AND NONINFRINGEMENT. IN NO EVENT SHALL
-THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES, OR
-OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT, OR OTHERWISE,
-ARISING FROM, OUT OF, OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
-OTHER DEALINGS IN THE SOFTWARE.
-
-For more details about the CC BY-NC-SA 4.0 License, please visit:
-https://creativecommons.org/licenses/by-nc-sa/4.0/
+This code may be used commercially. Attribution must be given to the original author.
+Licensed under GPLv2.
 */
 
-#include <chrono>
 #include <lib/gui/elistbox.h>
 #include <lib/gui/elistboxcontent.h>
 #include <lib/gui/eslider.h>
+#include <lib/gui/ewindowstyleskinned.h>
 #include <lib/actions/action.h>
 #include <lib/base/nconfig.h>
 #ifdef DREAMNEXTGEN
@@ -55,69 +30,22 @@ uint8_t eListbox::defaultScrollBarScroll = eListbox::DefaultScrollBarScroll;
 uint8_t eListbox::defaultScrollBarMode = eListbox::DefaultScrollBarMode;
 uint8_t eListbox::defaultScrollbarRadiusEdges = 0;
 bool eListbox::defaultWrapAround = eListbox::DefaultWrapAround;
-int eListbox::defaultSmoothMs = 0;
-
-static long long smoothNowMs()
-{
-	return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now().time_since_epoch()).count();
-}
-
-/* current vertical offset of the sliding highlight in rows, relative to its target row */
-float eListbox::smoothRows()
-{
-	if (!m_smooth_active || m_smooth_dur <= 0)
-		return 0.0f;
-	float t = (float)(smoothNowMs() - m_smooth_start_ms) / (float)m_smooth_dur;
-	if (t >= 1.0f)
-		return 0.0f;
-	if (t < 0.0f)
-		t = 0.0f;
-	float inv = 1.0f - t;
-	float ease = 1.0f - inv * inv * inv;
-	return (float)(m_smooth_from - m_smooth_to) * (1.0f - ease);
-}
-
-void eListbox::smoothStart(int oldSel, int newSel)
-{
-	/* continue from the current visual position when a previous slide is still running */
-	float carry = 0.0f;
-	if (m_smooth_active)
-		carry = smoothRows() + (float)(m_smooth_to - newSel);
-	else
-		carry = (float)(oldSel - newSel);
-	if (!m_smooth_timer)
-	{
-		m_smooth_timer = eTimer::create(eApp);
-		CONNECT(m_smooth_timer->timeout, eListbox::smoothTick);
-	}
-	/* store the start as a virtual source row so smoothRows() reproduces the carry offset */
-	m_smooth_from = newSel + (int)(carry >= 0 ? carry + 0.5f : carry - 0.5f);
-	m_smooth_to = newSel;
-	m_smooth_start_ms = smoothNowMs();
-	m_smooth_dur = defaultSmoothMs;
-	m_smooth_active = true;
-	m_smooth_timer->start(16, false);
-}
-
-void eListbox::smoothStop()
-{
-	m_smooth_active = false;
-	if (m_smooth_timer)
-		m_smooth_timer->stop();
-}
-
-void eListbox::smoothTick()
-{
-	if (!m_smooth_active || smoothNowMs() - m_smooth_start_ms >= m_smooth_dur)
-	{
-		m_smooth_active = false;
-		if (m_smooth_timer)
-			m_smooth_timer->stop();
-	}
-	invalidate();
-}
 int eListbox::defaultHorizontalAlignment = -1;
 int eListbox::defaultVerticalAlignment = -1;
+
+static int listboxMaxItemsForSpace(int space, int item, int spacing, bool reserveOuterSpacing)
+{
+	if (space <= 0 || item <= 0)
+		return 0;
+	if (spacing <= 0)
+		return space / item;
+
+	int count = reserveOuterSpacing ? space / (item + spacing) : (space + spacing) / (item + spacing);
+	if (!count && space >= item)
+		count = 1;
+	return count;
+}
+
 
 eListbox::eListbox(eWidget *parent) : eWidget(parent), m_textPixmap(nullptr)
 {
@@ -246,7 +174,10 @@ void eListbox::setContent(iListboxContent *content)
 		m_content->m_listbox = nullptr;
 	m_content = content;
 	if (content)
+	{
 		m_content->setListbox(this);
+		recalcSize();
+	}
 	entryReset();
 }
 
@@ -655,8 +586,33 @@ int eListbox::event(int event, void *data, void *data2)
 			return 0;
 
 		gPainter &painter = *(gPainter *)data2;
+		if (m_selection_animation_pending)
+		{
+			ePoint absolutePosition = getAbsolutePosition();
+			eRect from = m_selection_animation_from;
+			eRect to = m_selection_animation_to;
+			from.moveBy(absolutePosition);
+			to.moveBy(absolutePosition);
+			gRGB selectionColor = style->getColor(eWindowStyleSkinned::colListboxBackgroundSelected);
+			if (m_style.is_set.background_color_selected)
+				selectionColor = m_style.m_background_color_selected;
+			painter.sendListboxAnimation(from, to, selectionColor,
+				m_style.m_gradient_set[1] ? m_style.m_gradient_colors[1] : std::vector<gRGB>(),
+				m_style.m_gradient_set[1] ? m_style.m_gradient_direction[1] : 0,
+				m_style.m_gradient_set[1] ? m_style.m_gradient_alphablend[1] : false,
+				m_style.cornerRadius(1), m_style.cornerRadiusEdges(1), m_style.m_selection);
+			m_selection_animation_pending = false;
+		}
 
-		if (m_paint_pixmap && m_textPixmap) {
+		const gDC *dc = painter.getDC();
+		const bool useScrollPixmap = !(dc && dc->isHardwareAccelerated());
+
+		if (m_paint_pixmap && m_textPixmap && !useScrollPixmap) {
+			m_paint_pixmap = false;
+			m_textPixmap = nullptr;
+		}
+
+		if (m_paint_pixmap && m_textPixmap && useScrollPixmap) {
 			int srcX = m_scroll_rect.x();
 			int srcY = m_scroll_rect.y();
 
@@ -708,13 +664,7 @@ int eListbox::event(int event, void *data, void *data2)
 			if (cornerRadius && cornerRadiusEdges)
 			{
 				painter.setRadius(cornerRadius, cornerRadiusEdges);
-				// A listbox's own panel background is never a
-				// video-reveal widget - under GLES this must use the
-				// "over" blend formula regardless of the style's fill
-				// color, same as lib/gui/elistboxcontent.cpp's item
-				// backgrounds (see gEGLDC::executeRectangle()'s
-				// comment); other backends are unaffected either way.
-				painter.drawRectangle(eRect(ePoint(0, 0), size()), painter.usingGLES());
+				painter.drawRectangle(eRect(ePoint(0, 0), size()));
 			}
 			else
 				painter.clear();
@@ -722,8 +672,6 @@ int eListbox::event(int event, void *data, void *data2)
 		}
 
 		int line = 0;
-		ePoint smoothPos(0, 0);
-		bool smoothPainted = false;
 		int m_max_items = m_orientation == orGrid ? m_max_columns * m_max_rows : m_orientation == orHorizontal ? m_max_columns
 																											   : m_max_rows;
 		bool lockRow = m_lock_first_row && m_orientation == orVertical && m_content->size() > 0;
@@ -766,17 +714,9 @@ int eListbox::event(int event, void *data, void *data2)
 			}
 
 			bool sel = (m_selected == m_content->cursorGet() && m_content->size() && m_selection_enabled);
-			bool smoothSel = false;
 
 			if (sel)
 				line = m_orientation == orGrid ? (i / m_max_columns) : i;
-
-			if (sel && m_smooth_active && m_orientation == orVertical && !m_lock_first_row)
-			{
-				smoothSel = true;
-				smoothPos = ePoint(posx + xOffset, posy + yOffset);
-				sel = false;
-			}
 
 			entryRect = eRect(posx + xOffset, posy + yOffset, m_style.m_selection_width, m_style.m_selection_height);
 			gRegion entry_clip_rect = paint_region & entryRect;
@@ -790,20 +730,7 @@ int eListbox::event(int event, void *data, void *data2)
 						m_content->paint(painter, *style, ePoint(posx + xOffset, posy + yOffset), 0);
 				}
 				else if (m_orientation == orVertical)
-				{
 					m_content->paint(painter, *style, ePoint(posx + xOffset, posy + yOffset), sel);
-					if (smoothSel)
-						smoothPainted = true;
-				}
-#ifdef USE_LIBVUGLES2
-				if (sel && m_orientation == orVertical)
-				{
-					ePoint pos = getAbsolutePosition();
-					painter.sendShowItem(m_dir, ePoint(pos.x() + xOffset, pos.y() + posy + yOffset), eSize(m_scrollbar && m_scrollbar->isVisible() ? size().width() - m_scrollbar->size().width() : size().width(), m_itemheight));
-					gles_set_animation_listbox_current(pos.x() + xOffset, pos.y() + posy + yOffset, m_scrollbar && m_scrollbar->isVisible() ? size().width() - m_scrollbar->size().width() : size().width(), m_itemheight);
-					m_dir = justCheck;
-				}
-#endif
 			}
 
 			m_content->cursorMove(+1);
@@ -811,31 +738,6 @@ int eListbox::event(int event, void *data, void *data2)
 
 		m_content->cursorSaveLine(line);
 		m_content->cursorRestore();
-
-		/* sliding focus bar: all rows stay in place and are drawn unselected; only the bar moves.
-		   The selected look of the rows is drawn clipped to the bar rectangle on top. */
-		if (smoothPainted)
-		{
-			int pitch = m_itemheight + m_spacing.y();
-			int dy = (int)(smoothRows() * (float)pitch);
-			eRect barRect(smoothPos.x(), smoothPos.y() + dy, m_style.m_selection_width, m_style.m_selection_height);
-			int origin = m_content->cursorGet();
-			int rowsVisible = m_max_rows;
-			for (int r = m_selected - 3; r <= m_selected + 3; ++r)
-			{
-				if (r < m_top || r >= m_top + rowsVisible || r < 0 || r >= m_content->size())
-					continue;
-				ePoint rowPos(smoothPos.x(), smoothPos.y() + (r - m_selected) * pitch);
-				eRect part = eRect(rowPos, eSize(m_style.m_selection_width, m_style.m_selection_height)) & barRect;
-				if (part.empty())
-					continue;
-				m_content->cursorSet(r);
-				painter.clip(part);
-				m_content->paint(painter, *style, rowPos, 1);
-				painter.clippop();
-			}
-			m_content->cursorSet(origin);
-		}
 
 		// draw selected item last for horizontal/grid orientations
 		if (m_selected == m_content->cursorGet() && m_content->size() && m_selection_enabled && m_orientation != orVertical)
@@ -974,7 +876,8 @@ void eListbox::recalcSize()
 		if (m_content)
 			m_content->setSize(eSize(m_itemwidth, m_itemheight));
 		int w = size().width();
-		m_max_columns = (w + m_spacing.x()) / (m_itemwidth + m_spacing.x());
+		const bool reserveOuterSpacing = (m_item_alignment & (itemHorizontalAlignCenter | itemHorizontalAlignRight)) && !(m_item_alignment & itemHorizontalAlignJustify);
+		m_max_columns = listboxMaxItemsForSpace(w, m_itemwidth, m_spacing.x(), reserveOuterSpacing);
 		if (m_style.m_selection_zoom > 1.0)
 		{
 			int item_w_zoom = (m_style.m_selection_width) - m_spacing.x();
@@ -993,8 +896,10 @@ void eListbox::recalcSize()
 		int w = size().width() - xscrollBar;
 		int h = size().height();
 
-		m_max_columns = (w + m_spacing.x()) / (m_itemwidth + m_spacing.x());
-		m_max_rows = (h + m_spacing.y()) / (m_itemheight + m_spacing.y());
+		const bool reserveOuterXSpacing = (m_item_alignment & (itemHorizontalAlignCenter | itemHorizontalAlignRight)) && !(m_item_alignment & itemHorizontalAlignJustify);
+		const bool reserveOuterYSpacing = (m_item_alignment & (itemVerticalAlignMiddle | itemVerticalAlignBottom)) && !(m_item_alignment & itemVerticalAlignJustify);
+		m_max_columns = listboxMaxItemsForSpace(w, m_itemwidth, m_spacing.x(), reserveOuterXSpacing);
+		m_max_rows = listboxMaxItemsForSpace(h, m_itemheight, m_spacing.y(), reserveOuterYSpacing);
 
 		if (m_style.m_selection_zoom > 1.0)
 		{
@@ -1031,7 +936,6 @@ void eListbox::recalcSize()
 
 void eListbox::recalcSizeAlignment(bool scrollbarVisible)
 {
-
 	if (m_orientation != orVertical && m_item_alignment != itemAlignLeftTop)
 	{
 
@@ -1039,10 +943,17 @@ void eListbox::recalcSizeAlignment(bool scrollbarVisible)
 		int yscrollBar = (m_orientation == orHorizontal) ? ((scrollbarVisible) ? m_scrollbar->size().height() + m_scrollbar_offset : 0) : 0;
 		int xfullSpace = size().width() - xscrollBar;
 		int yfullSpace = size().height() - yscrollBar;
-		m_x_itemSpace = m_style.m_selection_width + m_defined_spacing.x();
-		if (m_max_columns > 1)
+		int alignment_columns = m_max_columns;
+		if (m_orientation == orHorizontal && m_content && m_max_columns > 0)
 		{
-			m_x_itemSpace += ((m_max_columns - 1) * (m_itemwidth + m_defined_spacing.x()));
+			int visible_items = m_content->size() - m_left;
+			if (visible_items > 0 && visible_items < alignment_columns)
+				alignment_columns = visible_items;
+		}
+		m_x_itemSpace = m_style.m_selection_width + m_defined_spacing.x();
+		if (alignment_columns > 1)
+		{
+			m_x_itemSpace += ((alignment_columns - 1) * (m_itemwidth + m_defined_spacing.x()));
 
 			if (m_style.m_selection_width == m_itemwidth) // no zoom : remove 1 space
 				m_x_itemSpace -= m_defined_spacing.x();
@@ -1076,10 +987,10 @@ void eListbox::recalcSizeAlignment(bool scrollbarVisible)
 				xOffset = ((xfullSpace - m_x_itemSpace) / 2) + scrollbarLeftSpace;
 			if (m_item_alignment & itemHorizontalAlignRight)
 				xOffset = (xfullSpace - m_x_itemSpace) + scrollbarLeftSpace;
-			if (m_item_alignment & itemHorizontalAlignJustify)
+			if ((m_item_alignment & itemHorizontalAlignJustify) && alignment_columns > 1)
 			{
-				m_x_itemSpace = m_style.m_selection_width + ((m_max_columns - 1) * m_itemwidth);
-				int xspace = (xfullSpace - m_x_itemSpace) / (m_max_columns - 1);
+				m_x_itemSpace = m_style.m_selection_width + ((alignment_columns - 1) * m_itemwidth);
+				int xspace = (xfullSpace - m_x_itemSpace) / (alignment_columns - 1);
 				m_spacing.setX(xspace);
 			}
 		}
@@ -1259,35 +1170,8 @@ void eListbox::entryRemoved(int index)
 
 void eListbox::entryChanged(int index)
 {
-	// orGrid: unlike the orVertical/orHorizontal branches above, this had
-	// no "is index actually part of the currently displayed page" check
-	// before computing/invalidating a rect for it. A stale entryChanged()
-	// for an index that has since scrolled off-page (e.g. a content
-	// provider's async thumbnail-loaded callback firing for a row the
-	// user has since scrolled past - see eListbox::redrawItemByIndex())
-	// still fell into this branch, and getItemPostion() has no notion of
-	// "off-page" either - it maps ANY index through the current page's
-	// (m_top, m_max_columns) arithmetic regardless of how far off it
-	// actually is, so a stale index some multiple of a page-width away
-	// can alias right back onto a real, currently visible cell's
-	// position. That invalidates and repaints a cell that was never
-	// actually dirty, and each such repaint re-invokes the content
-	// provider's build callback, which is exactly the kind of spurious,
-	// unbounded extra work orVertical/orHorizontal already guard against
-	// by simply not invalidating for an off-page index at all.
-	if (m_content && index == m_content->cursorGet())
-	{
-		invalidate();
-		return;
-	}
-
-	int gridStart = m_top * m_max_columns;
-	int gridEnd = gridStart + (m_orientation == orGrid ? m_max_columns * m_max_rows : (m_orientation == orHorizontal ? m_max_columns : m_max_rows));
-	if ((index >= gridStart) && (index < gridEnd))
-	{
-		gRegion inv = eRect(getItemPostion(index), eSize(m_itemwidth, m_itemheight));
-		invalidate(inv);
-	}
+	gRegion inv = eRect(getItemPostion(index), eSize(m_itemwidth, m_itemheight));
+	invalidate(inv);
 }
 
 void eListbox::entryReset(bool selectionHome)
@@ -1445,6 +1329,8 @@ void eListbox::setItemAlignment(int align)
 	if (m_item_alignment != align)
 	{
 		m_item_alignment = align;
+		if (m_content)
+			recalcSize();
 		invalidate();
 	}
 }
@@ -1593,6 +1479,7 @@ void eListbox::moveSelection(int dir)
 
 	if (dir == refresh)
 	{
+		m_selection_animation_pending = false;
 		invalidate();
 		return;
 	}
@@ -1611,6 +1498,9 @@ void eListbox::moveSelection(int dir)
 	int oldTop = m_top;
 	int oldLeft = m_left;
 	int oldSel = m_selected;
+	const eRect oldSelectionRect = m_selection_animation_pending
+		? m_selection_animation_from
+		: eRect(getItemPostion(oldSel), eSize(m_style.m_selection_width, m_style.m_selection_height));
 	int prevSel = oldSel;
 	int newSel;
 	int pageOffset = (m_page_size > 0 && m_scrollbar_scroll == byLine) ? m_page_size : maxItems;
@@ -1620,10 +1510,10 @@ void eListbox::moveSelection(int dir)
 	bool indexChanged = dir > 100;
 	if (indexChanged)
 		dir -= 100;
+	const bool animateSelection = !indexChanged && (dir == moveUp || dir == moveDown || dir == moveLeft || dir == moveRight);
+	if (!animateSelection)
+		m_selection_animation_pending = false;
 
-#ifdef USE_LIBVUGLES2
-	m_dir = dir;
-#endif
 	switch (dir)
 	{
 	case moveFirst:
@@ -1952,6 +1842,24 @@ void eListbox::moveSelection(int dir)
 			m_content->resetClip();
 	}
 
+	if (oldSel != m_selected)
+	{
+		const eRect newSelectionRect(getItemPostion(m_selected), eSize(m_style.m_selection_width, m_style.m_selection_height));
+		const eRect listRect(ePoint(0, 0), size());
+		const bool oldVisible = oldSelectionRect == (oldSelectionRect & listRect);
+		const bool newVisible = newSelectionRect == (newSelectionRect & listRect);
+		const bool viewportStable = oldTop == m_top && oldLeft == m_left;
+		if (animateSelection && viewportStable && !oldSelectionRect.empty() && !newSelectionRect.empty() && oldVisible && newVisible &&
+			(oldSelectionRect.x() != newSelectionRect.x() || oldSelectionRect.y() != newSelectionRect.y()))
+		{
+			m_selection_animation_from = oldSelectionRect;
+			m_selection_animation_to = newSelectionRect;
+			m_selection_animation_pending = true;
+		}
+		else
+			m_selection_animation_pending = false;
+	}
+
 	if (oldSel != m_selected) /* emit */
 	{
 #ifdef DREAMNEXTGEN
@@ -1981,26 +1889,13 @@ void eListbox::moveSelection(int dir)
 	{
 		if (m_top != oldTop)
 		{
-			smoothStop();
 			invalidate();
 		}
 		else if (m_selected != oldSel)
 		{
-			if (defaultSmoothMs > 0 && m_orientation == orVertical && !m_lock_first_row && dir != justCheck && std::abs(m_selected - oldSel) == 1)
-			{
-				smoothStart(oldSel, m_selected);
-				invalidate();
-				return;
-			}
-			if (m_smooth_active)
-			{
-				/* a slide is still in flight: its bar sits on a row that is neither the old nor the new one */
-				smoothStop();
-				invalidate();
-				return;
-			}
-			/* repaint the whole list: partial invalidation of the old/new row can leave a stale highlight on the GPU path */
-			invalidate();
+			gRegion inv = eRect(getItemPostion(m_selected), eSize((m_style.m_selection_width), (m_style.m_selection_height)));
+			inv |= eRect(getItemPostion(oldSel), eSize((m_style.m_selection_width), (m_style.m_selection_height)));
+			invalidate(inv);
 		}
 	}
 }
@@ -2136,13 +2031,6 @@ void eListbox::setItemCornerRadiusInternal(uint8_t index, int radius, uint8_t ed
 {
 	m_style.m_itemCornerRadius[index] = radius;
 	m_style.m_itemCornerRadiusEdges[index] = edges;
-
-	// Per-item rounding lives entirely in m_style, never in this widget's own
-	// m_cornerRadius, so eWidgetDesktop::calcWidgetClipRegion has no way to
-	// know each row's antialiased corners need a real backdrop behind them -
-	// see setNeedsBackdrop()'s comment (ewidget.h) for what goes wrong
-	// without this.
-	setNeedsBackdrop(m_style.m_itemCornerRadius[0] != 0 || m_style.m_itemCornerRadius[1] != 0);
 }
 
 void eListbox::setItemCornerRadius(int radius, uint8_t edges)

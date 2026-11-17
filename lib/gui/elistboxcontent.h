@@ -26,8 +26,7 @@ public:
 	eSize getItemSize() { return m_itemsize; }
 	int getMaxItemTextWidth() override;
 	uint8_t getOrientation() { return m_orientation; }
-	int getListSize() { return size(); }
-
+	
 #ifndef SWIG
 protected:
 	void cursorHome();
@@ -84,10 +83,18 @@ protected:
 	int m_repeat_count = 0;
 	bool m_scroll_swap = false;
 	bool m_end_delay_active = false;
+	eTextPara *m_scrollPara = nullptr;
+	eRect m_scrollParaArea;
+	ePoint m_scrollParaOffset;
+	int m_scrollParaFlags = 0;
+	std::string m_scrollParaText;
 	void updateScrollPosition();
 	void stopScroll();
-	void updateTextSize(std::string& text, gFont* font, int flags, gRGB& border_color, int border_size);
+	void updateTextSize(std::string& text, gFont* font, int flags, gRGB& border_color, int border_size, bool useScrollPixmap);
 	void createScrollPixmap(std::string& text, gFont* font, int flags, gRGB& border_color, int border_size);
+	bool canUseScrollPara(const gDC *dc, int flags, int border_size) const;
+	bool ensureScrollPara(const eRect &area, const std::string &text, gFont *font, int flags, ePoint &offset);
+	void clearScrollPara();
 
 #endif
 };
@@ -153,7 +160,6 @@ public:
 	void setTemplate(SWIG_PYOBJECT(ePyObject) tmplate);
 	void setTemplates(SWIG_PYOBJECT(ePyObject) templates);
 	int getMaxItemTextWidth() override;
-	int getListSize() { return size(); }
 protected:
 	virtual void setBuildArgs(int selected) {} // intended extension point for subclasses // NOSONAR
 	virtual bool getIsMarked(int selected) { return false; } // intended extension point for subclasses

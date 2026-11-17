@@ -3,35 +3,10 @@
 Scroll Text Feature of eListBox
 Font Scale Feature of eListBox
 
-Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License
-
 Copyright (c) 2025-2026 jbleyel
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-1. Non-Commercial Use: You may not use the Software or any derivative works
-   for commercial purposes without obtaining explicit permission from the
-   copyright holder.
-2. Share Alike: If you distribute or publicly perform the Software or any
-   derivative works, you must do so under the same license terms, and you
-   must make the source code of any derivative works available to the
-   public.
-3. Attribution: You must give appropriate credit to the original author(s)
-   of the Software by including a prominent notice in your derivative works.
-THE SOFTWARE IS PROVIDED "AS IS," WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE, AND NONINFRINGEMENT. IN NO EVENT SHALL
-THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES, OR
-OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT, OR OTHERWISE,
-ARISING FROM, OUT OF, OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
-OTHER DEALINGS IN THE SOFTWARE.
-
-For more details about the CC BY-NC-SA 4.0 License, please visit:
-https://creativecommons.org/licenses/by-nc-sa/4.0/
+This code may be used commercially. Attribution must be given to the original author.
+Licensed under GPLv2.
 */
 
 
@@ -139,6 +114,7 @@ DEFINE_REF(eListboxPythonStringContent);
 eListboxPythonStringContent::eListboxPythonStringContent() {} // NOSONAR
 
 eListboxPythonStringContent::~eListboxPythonStringContent() {
+	clearScrollPara();
 	Py_XDECREF(m_list);
 }
 
@@ -313,7 +289,8 @@ void eListboxPythonStringContent::paint(gPainter &painter, eWindowStyle &style, 
 	if (m_listbox)
 		local_style = m_listbox->getLocalStyle();
 
-	if (local_style) {
+	if (local_style)
+	{
 		border_size = local_style->m_border_size;
 		border_color = local_style->m_border_color;
 		itemZoomed = local_style->m_selection_zoom > 1.0;
@@ -412,13 +389,6 @@ void eListboxPythonStringContent::paint(gPainter &painter, eWindowStyle &style, 
 
 			if (radius)
 				painter.setRadius(radius, edges);
-			// Under GLES, a rounded item background must use the "over"
-			// blend formula or its AA corner fringe leaks to the video
-			// plane (see gEGLDC::executeRectangle()'s comment) - a listbox
-			// item is never a video-reveal widget. Only forced when radius
-			// is actually in play here (not for a plain gradient fill,
-			// which this same call also handles) and only under GLES -
-			// other backends keep their original unconditional behavior.
 			painter.drawRectangle(itemRect);
 		}
 		else
@@ -477,7 +447,6 @@ void eListboxPythonStringContent::paint(gPainter &painter, eWindowStyle &style, 
 
 			if (radius)
 				painter.setRadius(radius, edges);
-			// See the matching comment above.
 			painter.drawRectangle(itemRect);
 		}
 
@@ -510,7 +479,8 @@ void eListboxPythonStringContent::paint(gPainter &painter, eWindowStyle &style, 
 			if(m_listbox && selected && scroll_text_direction && m_scroll_index != m_cursor)
 				m_listbox->m_scroll_rect = position;
 
-			if (local_style) {
+			if (local_style)
+			{
 				text_offset += local_style->m_text_padding.topLeft();
 				// HACK VTI hat hier scheinbar einen Fehler und addiert den Textoffset zweimal auf, also machen wir das hier auch so
 				if (local_style->is_set.use_vti_workaround)
@@ -548,13 +518,16 @@ void eListboxPythonStringContent::paint(gPainter &painter, eWindowStyle &style, 
 			if(selected && scroll_text_direction) {
 				if(m_scroll_index != m_cursor)
 				{
+					const gDC *dc = painter.getDC();
+					const bool useScrollPixmap = !(dc && dc->isHardwareAccelerated());
 					m_scroll_index = m_cursor;
 					m_scroll_size = eSize(position.width(), position.height());
 					m_scroll_text_str = string;
-					updateTextSize(m_scroll_text_str, fnt, flags & ~gPainter::RT_ELLIPSIS, border_color, border_size);
+					updateTextSize(m_scroll_text_str, fnt, flags & ~gPainter::RT_ELLIPSIS, border_color, border_size, useScrollPixmap);
 				}
 				if(m_scroll_text)
 				{
+					eRect basePosition = position;
 					// ensure timer is started with initial delay if not active
 					if (!scrollTimer->isActive()) {
 						scrollTimer->start(m_listbox->m_scroll_config.startDelay);
@@ -565,7 +538,31 @@ void eListboxPythonStringContent::paint(gPainter &painter, eWindowStyle &style, 
 						position.setX(position.x() - m_scroll_pos);
 					else if (scroll_text_direction == eScrollConfig::scrollTop || scroll_text_direction == eScrollConfig::scrollBottom)
 						position.setY(position.y() - m_scroll_pos);
-					painter.renderText(position, m_scroll_text_str.empty() ? string : m_scroll_text_str, flags & ~gPainter::RT_ELLIPSIS, border_color, border_size);
+					const std::string scrollText = m_scroll_text_str.empty() ? string : m_scroll_text_str;
+					ePoint paraOffset;
+					const gDC *dc = painter.getDC();
+					if (canUseScrollPara(dc, flags, border_size) && ensureScrollPara(basePosition, scrollText, fnt, flags, paraOffset)) {
+						ePoint scrollOffset(position.x() - basePosition.x(), position.y() - basePosition.y());
+						painter.renderPara(m_scrollPara, paraOffset + scrollOffset);
+						if (m_listbox->m_scroll_config.mode == eScrollConfig::scrollModeRoll) {
+							ePoint rollOffset = scrollOffset;
+							if (scroll_text_direction == eScrollConfig::scrollLeft || scroll_text_direction == eScrollConfig::scrollRight)
+								rollOffset += ePoint(m_text_size.width() - m_scroll_size.width(), 0);
+							else
+								rollOffset += ePoint(0, m_text_size.height() - m_scroll_size.height());
+							painter.renderPara(m_scrollPara, paraOffset + rollOffset);
+						}
+					} else {
+						painter.renderText(position, scrollText.c_str(), flags & ~gPainter::RT_ELLIPSIS, border_color, border_size);
+						if (m_listbox->m_scroll_config.mode == eScrollConfig::scrollModeRoll) {
+							eRect rollPosition = position;
+							if (scroll_text_direction == eScrollConfig::scrollLeft || scroll_text_direction == eScrollConfig::scrollRight)
+								rollPosition.setX(position.x() + m_text_size.width() - m_scroll_size.width());
+							else
+								rollPosition.setY(position.y() + m_text_size.height() - m_scroll_size.height());
+							painter.renderText(rollPosition, scrollText.c_str(), flags & ~gPainter::RT_ELLIPSIS, border_color, border_size);
+						}
+					}
 					painter.clippop();
 					return;
 				}
@@ -609,7 +606,6 @@ void eListboxPythonStringContent::updateEntry(int index, ePyObject entry) {
 	if (index >= 0 && index < size()) {
 		Py_XDECREF(PyList_GET_ITEM(m_list, index));
 		Py_INCREF(entry);
-		PyList_SET_ITEM(m_list, index, entry);
 		PyList_SET_ITEM(m_list, index, entry);
 		if (m_listbox)
 			m_listbox->entryChanged(index);
@@ -659,11 +655,45 @@ void eListboxPythonStringContent::invalidate() {
 	}
 }
 
-void eListboxPythonStringContent::updateTextSize(std::string& text, gFont* font, int flags, gRGB& border_color, int border_size) {
+static void realignListboxScrollPara(eTextPara *para, int flags)
+{
+	if (flags & gPainter::RT_HALIGN_LEFT)
+		para->realign(eTextPara::dirLeft);
+	else if (flags & gPainter::RT_HALIGN_RIGHT)
+		para->realign(eTextPara::dirRight);
+	else if (flags & gPainter::RT_HALIGN_CENTER)
+		para->realign((flags & gPainter::RT_WRAP) ? eTextPara::dirCenter : eTextPara::dirCenterIfFits);
+	else if (flags & gPainter::RT_HALIGN_BLOCK)
+		para->realign(eTextPara::dirBlock);
+	else
+		para->realign(eTextPara::dirBidi);
+}
+
+static ePoint listboxScrollParaOffset(eTextPara *para, const eRect &area, int flags)
+{
+	ePoint offset;
+	if (flags & gPainter::RT_VALIGN_CENTER)
+	{
+		eRect bbox = para->getBoundBox();
+		int vcentered_top = area.top() + ((area.height() - bbox.height()) / 2);
+		int correction = vcentered_top - bbox.top();
+		if ((correction > 0) || (para->getLineCount() == 1))
+			offset += ePoint(0, correction);
+	}
+	else if (flags & gPainter::RT_VALIGN_BOTTOM)
+	{
+		eRect bbox = para->getBoundBox();
+		offset += ePoint(0, area.height() - bbox.height() - 2);
+	}
+	return offset;
+}
+
+void eListboxPythonStringContent::updateTextSize(std::string& text, gFont* font, int flags, gRGB& border_color, int border_size, bool useScrollPixmap) {
+	clearScrollPara();
 	if (m_scroll_text)
 		stopScroll();
 
-	if(m_listbox) {
+	if (m_listbox) {
 		const int scroll_text_direction = m_listbox->m_scroll_config.direction;
 
 		if (scroll_text_direction == eScrollConfig::scrollLeft || scroll_text_direction == eScrollConfig::scrollRight) {
@@ -722,8 +752,12 @@ void eListboxPythonStringContent::updateTextSize(std::string& text, gFont* font,
 					m_listbox->m_scroll_config.cached = false;
 					if (m_listbox->m_scroll_config.mode == eScrollConfig::scrollModeRoll)
 						m_listbox->m_scroll_config.mode = eScrollConfig::scrollModeNormal;
-				} else
+				} else if (useScrollPixmap) {
 					createScrollPixmap(text, font, flags, border_color, border_size);
+				} else {
+					m_listbox->m_textPixmap = nullptr;
+					m_listbox->m_paint_pixmap = false;
+				}
 			}
 		}
 	}
@@ -773,8 +807,7 @@ void eListboxPythonStringContent::createScrollPixmap(std::string& text, gFont* f
 
 	eRect position = eRect(posX, posY, s.width(), s.height());
 
-	if(local_style)
-	{
+	if (local_style) {
 		if (local_style->is_set.background_color_selected)
 			p.setBackgroundColor(local_style->m_background_color_selected);
 		if (local_style->is_set.foreground_color_selected)
@@ -786,12 +819,11 @@ void eListboxPythonStringContent::createScrollPixmap(std::string& text, gFont* f
 		int paddingh = local_style->m_text_padding.height();
 
 		position = eRect(paddingx, paddingy, s.width() - (paddingx * 2) - paddingw, s.height() - (paddingy * 2) - paddingh);
-
 	}
 	p.clear();
 
 	p.renderText(position, text.c_str(), flags, border_color, border_size);
-	
+
 	if (m_listbox->m_scroll_config.mode == eScrollConfig::scrollModeRoll) {
 		if (m_listbox->m_scroll_config.direction == eScrollConfig::scrollLeft || m_listbox->m_scroll_config.direction == eScrollConfig::scrollRight)
 			posX = s.width() - m_scroll_size.width();
@@ -804,8 +836,56 @@ void eListboxPythonStringContent::createScrollPixmap(std::string& text, gFont* f
 	}
 }
 
+bool eListboxPythonStringContent::canUseScrollPara(const gDC *dc, int flags, int border_size) const
+{
+	return dc && dc->isHardwareAccelerated() && m_scroll_text && border_size == 0 && !(flags & (gPainter::RT_UNDERLINE | gPainter::RT_ELLIPSIS));
+}
+
+bool eListboxPythonStringContent::ensureScrollPara(const eRect &area, const std::string &text, gFont *font, int flags, ePoint &offset)
+{
+	offset = ePoint();
+	if (m_scrollPara && m_scrollParaArea == area && m_scrollParaFlags == flags && m_scrollParaText == text) {
+		offset = m_scrollParaOffset;
+		return true;
+	}
+
+	clearScrollPara();
+
+	eTextPara *para = new eTextPara(area);
+	para->AddRef();
+	para->setFont(font);
+	if (para->renderString(text.empty() ? nullptr : text.c_str(), (flags & gPainter::RT_WRAP) ? RS_WRAP : 0, 0, -1) < 0) {
+		para->Release();
+		return false;
+	}
+
+	realignListboxScrollPara(para, flags);
+	para->setBlend(flags & gPainter::RT_BLEND);
+
+	m_scrollPara = para;
+	m_scrollParaArea = area;
+	m_scrollParaFlags = flags;
+	m_scrollParaText = text;
+	m_scrollParaOffset = listboxScrollParaOffset(para, area, flags);
+	offset = m_scrollParaOffset;
+	return true;
+}
+
+void eListboxPythonStringContent::clearScrollPara()
+{
+	if (m_scrollPara) {
+		m_scrollPara->Release();
+		m_scrollPara = nullptr;
+	}
+	m_scrollParaText.clear();
+	m_scrollParaFlags = 0;
+	m_scrollParaOffset = ePoint();
+	m_scrollParaArea = eRect();
+}
+
 void eListboxPythonStringContent::stopScroll() {
 	scrollTimer->stop();
+	clearScrollPara();
 	m_end_delay_active = false;
 	m_scroll_text = false;
 	m_scroll_pos = 0;
@@ -825,8 +905,7 @@ static int computeMaxScroll(int direction, const eSize& textSize, const eSize& v
 }
 
 void eListboxPythonStringContent::updateScrollPosition() {
-	if (m_listbox)
-	{
+	if (m_listbox) {
 		const int scroll_text_direction = m_listbox->m_scroll_config.direction;
 		const int repeat = m_listbox->m_scroll_config.repeat;
 		const int end_delay = m_listbox->m_scroll_config.endDelay;
@@ -942,7 +1021,8 @@ void eListboxPythonConfigContent::paint(gPainter &painter, eWindowStyle &style, 
 	if (m_listbox)
 		local_style = m_listbox->getLocalStyle();
 
-	if (local_style) {
+	if (local_style)
+	{
 		border_size = local_style->m_border_size;
 		border_color = local_style->m_border_color;
 		fnt = local_style->m_font;
@@ -1006,7 +1086,6 @@ void eListboxPythonConfigContent::paint(gPainter &painter, eWindowStyle &style, 
 
 			if (radius)
 				painter.setRadius(radius, edges);
-			// See eListboxPythonStringContent::paint()'s matching comment.
 			painter.drawRectangle(itemRect);
 		}
 		else
@@ -1054,7 +1133,6 @@ void eListboxPythonConfigContent::paint(gPainter &painter, eWindowStyle &style, 
 
 			if (radius)
 				painter.setRadius(radius, edges);
-			// See eListboxPythonStringContent::paint()'s matching comment.
 			painter.drawRectangle(itemRect);
 		}
 		int alphablendflag = (alphablendtext) ? gPainter::RT_BLEND : 0;
@@ -1144,7 +1222,7 @@ void eListboxPythonConfigContent::paint(gPainter &painter, eWindowStyle &style, 
 			}
 
 			// Separator
-			if (!strcmp(string,"---") && PyTuple_Size(item) == 1 && local_style)
+			if (!strcmp(string,"---") && PyTuple_Size(item) == 1 && local_style) 
 			{
 
 				if (local_style->is_set.separator_color)
@@ -1166,7 +1244,7 @@ void eListboxPythonConfigContent::paint(gPainter &painter, eWindowStyle &style, 
 					left = offset.x() + leftOffset + indent;
 					width = m_itemsize.width() - left * 2;
 				}
-
+				
 				painter.fill(eRect(ePoint(left, offset.y() + top), eSize(width, sep_sz.height())));
 				painter.clippop();
 				return;
@@ -1210,11 +1288,13 @@ void eListboxPythonConfigContent::paint(gPainter &painter, eWindowStyle &style, 
 			{
 				if (m_scroll_index != m_cursor)
 				{
+					const gDC *dc = painter.getDC();
+					const bool useScrollPixmap = !(dc && dc->isHardwareAccelerated());
 					m_listbox->m_scroll_rect = labelrect;
 					m_scroll_index = m_cursor;
 					m_scroll_size = eSize(labelrect.width(), labelrect.height());
 					m_scroll_text_str = string;
-					updateTextSize(m_scroll_text_str, fnt ? fnt : fnt3, labelflags & ~gPainter::RT_ELLIPSIS, border_color, border_size);
+					updateTextSize(m_scroll_text_str, fnt ? fnt : fnt3, labelflags & ~gPainter::RT_ELLIPSIS, border_color, border_size, useScrollPixmap);
 				}
 				if (m_scroll_text)
 				{
@@ -1458,13 +1538,13 @@ int eListboxPythonConfigContent::getHeaderLeftOffset()
 	return style->getValue(eWindowStyleSkinned::valueHeaderLeftOffset);
 }
 
-
 int eListboxPythonConfigContent::getIndentSize()
 {
 	ePtr<eWindowStyle> style;
 	m_listbox->getStyle(style);
 	return style->getValue(eWindowStyleSkinned::valueIndentSize);
 }
+
 
 //////////////////////////////////////
 
@@ -1495,14 +1575,24 @@ void eListboxPythonMultiContent::setSelectionClip(eRect &rect, bool update)
 		m_listbox->entryChanged(cursorGet());
 }
 
-static void clearRegionHelper(gPainter &painter, eListboxStyle *local_style, const ePoint &offset, const eSize &size, ePyObject &pbackColor, bool cursorValid, bool clear, uint8_t orientation, bool even)
+static bool skipHardwareTransparentTextBackColor(gPainter &painter, eListboxStyle *local_style, const ePyObject &backColor, bool textBackColor)
 {
+	const gDC *dc = painter.getDC();
+	return textBackColor && backColor && local_style && local_style->is_set.transparent_background && dc && dc->isHardwareAccelerated();
+}
+
+static void clearRegionHelper(gPainter &painter, eListboxStyle *local_style, const ePoint &offset, const eSize &size, ePyObject &pbackColor, bool cursorValid, bool clear, uint8_t orientation, bool even, bool textBackColor)
+{
+	if (skipHardwareTransparentTextBackColor(painter, local_style, pbackColor, textBackColor))
+		return;
+
 	if (pbackColor)
 	{
 		uint32_t color = PyLong_AsUnsignedLongMask(pbackColor);
 		painter.setBackgroundColor(gRGB(color));
 	}
-	else if (local_style) {
+	else if (local_style)
+	{
 		if (local_style->is_set.background_color)
 			painter.setBackgroundColor(local_style->m_background_color);
 
@@ -1534,14 +1624,18 @@ static void clearRegionHelper(gPainter &painter, eListboxStyle *local_style, con
 		painter.clear();
 }
 
-static void clearRegionSelectedHelper(gPainter &painter, eListboxStyle *local_style, const ePoint &offset, const eSize &size, ePyObject &pbackColorSelected, bool cursorValid, bool clear, uint8_t orientation)
+static void clearRegionSelectedHelper(gPainter &painter, eListboxStyle *local_style, const ePoint &offset, const eSize &size, ePyObject &pbackColorSelected, bool cursorValid, bool clear, uint8_t orientation, bool textBackColor)
 {
+	if (skipHardwareTransparentTextBackColor(painter, local_style, pbackColorSelected, textBackColor))
+		return;
+
 	if (pbackColorSelected)
 	{
 		uint32_t color = PyLong_AsUnsignedLongMask(pbackColorSelected);
 		painter.setBackgroundColor(gRGB(color));
 	}
-	else if (local_style) {
+	else if (local_style)
+	{
 		if (local_style->is_set.background_color_selected)
 			painter.setBackgroundColor(local_style->m_background_color_selected);
 		if (local_style->m_background && cursorValid)
@@ -1566,7 +1660,7 @@ static void clearRegionSelectedHelper(gPainter &painter, eListboxStyle *local_st
 		painter.clear();
 }
 
-static void clearRegion(gPainter &painter, eWindowStyle &style, eListboxStyle *local_style, ePyObject pforeColor, ePyObject pforeColorSelected, ePyObject pbackColor, ePyObject pbackColorSelected, int selected, bool marked, gRegion &rc, eRect &sel_clip, const ePoint &offset, const eSize &size, bool cursorValid, bool clear, uint8_t orientation, bool even)
+static void clearRegion(gPainter &painter, eWindowStyle &style, eListboxStyle *local_style, ePyObject pforeColor, ePyObject pforeColorSelected, ePyObject pbackColor, ePyObject pbackColorSelected, int selected, bool marked, gRegion &rc, eRect &sel_clip, const ePoint &offset, const eSize &size, bool cursorValid, bool clear, uint8_t orientation, bool even, bool textBackColor = false)
 {
 
 	if (selected && sel_clip.valid())
@@ -1576,7 +1670,7 @@ static void clearRegion(gPainter &painter, eWindowStyle &style, eListboxStyle *l
 		{
 			painter.clip(part);
 			style.setStyle(painter, marked ? eWindowStyle::styleListboxMarked : eWindowStyle::styleListboxNormal);
-			clearRegionHelper(painter, local_style, offset, size, pbackColor, cursorValid, clear, orientation, false);
+			clearRegionHelper(painter, local_style, offset, size, pbackColor, cursorValid, clear, orientation, false, textBackColor);
 			painter.clippop();
 			selected = 0;
 		}
@@ -1585,7 +1679,7 @@ static void clearRegion(gPainter &painter, eWindowStyle &style, eListboxStyle *l
 		{
 			painter.clip(part);
 			style.setStyle(painter, marked ? eWindowStyle::styleListboxMarkedAndSelected : eWindowStyle::styleListboxSelected);
-			clearRegionSelectedHelper(painter, local_style, offset, size, pbackColorSelected, cursorValid, clear, orientation);
+			clearRegionSelectedHelper(painter, local_style, offset, size, pbackColorSelected, cursorValid, clear, orientation, textBackColor);
 			painter.clippop();
 			selected = 1;
 		}
@@ -1593,7 +1687,7 @@ static void clearRegion(gPainter &painter, eWindowStyle &style, eListboxStyle *l
 	else if (selected)
 	{
 		style.setStyle(painter, marked ? eWindowStyle::styleListboxMarkedAndSelected : eWindowStyle::styleListboxSelected);
-		clearRegionSelectedHelper(painter, local_style, offset, size, pbackColorSelected, cursorValid, clear, orientation);
+		clearRegionSelectedHelper(painter, local_style, offset, size, pbackColorSelected, cursorValid, clear, orientation, textBackColor);
 		if (local_style && local_style->m_selection)
 		{
 			int x = offset.x();
@@ -1606,7 +1700,7 @@ static void clearRegion(gPainter &painter, eWindowStyle &style, eListboxStyle *l
 	else
 	{
 		style.setStyle(painter, marked ? eWindowStyle::styleListboxMarked : eWindowStyle::styleListboxNormal);
-		clearRegionHelper(painter, local_style, offset, size, pbackColor, cursorValid, clear, orientation, even);
+		clearRegionHelper(painter, local_style, offset, size, pbackColor, cursorValid, clear, orientation, even, textBackColor);
 	}
 
 	if (selected)
@@ -1714,7 +1808,7 @@ int eListboxPythonMultiContent::getMaxItemTextWidth()
 
 				if (!item)
 				{
-					eDebug("[eListboxPythonMultiContent] no items[%d] ?", i);
+					eDebug("[eListboxPythonMultiContent] no items[%d]?", i);
 					continue;
 				}
 
@@ -1850,7 +1944,8 @@ void eListboxPythonMultiContent::paint(gPainter &painter, eWindowStyle &style, c
 		defaultBackColor = style.getColor(selected ? eWindowStyleSkinned::colListboxBackgroundSelected : eWindowStyleSkinned::colListboxBackground);
 	}
 
-	if (local_style) {
+	if (local_style)
+	{
 		int mode = (selected) ? 1 : 0;
 		mode += (marked) ? 2 : 0;
 		int radius = local_style->cornerRadius(mode);
@@ -1871,11 +1966,6 @@ void eListboxPythonMultiContent::paint(gPainter &painter, eWindowStyle &style, c
 				painter.setGradient(local_style->m_gradient_colors[mode], local_style->m_gradient_direction[mode], local_style->m_gradient_alphablend[mode]);
 			else
 				painter.setBackgroundColor(gRGB(defaultBackColor));
-			// See eListboxPythonStringContent::paint()'s matching comment -
-			// this is the skin-configured (eListboxStyle) item background,
-			// the path most listboxes (e.g. a plain skinned menu list) hit,
-			// as opposed to the per-item TYPE_TEXT cornerRadius tuple
-			// handled further down in this function.
 			painter.drawRectangle(itemRect);
 		}
 		else
@@ -1978,7 +2068,7 @@ void eListboxPythonMultiContent::paint(gPainter &painter, eWindowStyle &style, c
 
 			if (!item)
 			{
-				eDebug("[eListboxPythonMultiContent] no items[%d] ?", i);
+				eDebug("[eListboxPythonMultiContent] no items[%d]?", i);
 				goto error_out;
 			}
 
@@ -2076,14 +2166,17 @@ void eListboxPythonMultiContent::paint(gPainter &painter, eWindowStyle &style, c
 					bool mustClear = (selected && pbackColorSelected) || (!selected && pbackColor);
 					if (cornerRadius && cornerEdges)
 					{
+						bool blend = false;
 						painter.setRadius(cornerRadius, cornerEdges);
 						if(mustClear) {
 							gRGB color = gRGB((uint32_t)PyLong_AsUnsignedLongMask(selected ? pbackColorSelected : pbackColor));
 							painter.setBackgroundColor(color);
+							blend = color.a > 0;
 						}
 						else
 						{
 							painter.setBackgroundColor(defaultBackColor);
+							blend = defaultBackColor.a > 0;
 						}
 
 						if(bwidth && pborderColor)
@@ -2092,20 +2185,7 @@ void eListboxPythonMultiContent::paint(gPainter &painter, eWindowStyle &style, c
 							painter.setBorder(gRGB(color), bwidth);
 						}
 						bwidth = 0;
-						// Only the GLES/EGL backend (gEGLDC) has a
-						// distinct "video hole" blend formula for
-						// gOpcode::rectangle (see its executeRectangle()
-						// comment) - deriving useNew from the fill
-						// color's own translucency there mistakenly
-						// routes ordinary opaque, rounded listbox items
-						// through it too, punching a hole to the video
-						// plane at their AA corner fringe. A listbox
-						// item is never a video-reveal widget (unlike
-						// e.g. Pig's eVideoWidget), so always request
-						// the "over" formula under GLES. Other backends
-						// never had this issue - keep their original
-						// color-alpha-derived behavior unchanged.
-						painter.drawRectangle(rect, painter.usingGLES() ? true : defaultBackColor.a > 0);
+						painter.drawRectangle(rect, blend);
 					}
 					else
 					{
@@ -2280,13 +2360,16 @@ void eListboxPythonMultiContent::paint(gPainter &painter, eWindowStyle &style, c
 					bool mustClear = (selected && pbackColorSelected) || (!selected && pbackColor);
 					if (radius)
 					{
+						bool blend = false;
 						painter.setRadius(radius, edges);
 						if(mustClear) {
 							gRGB color = gRGB((uint32_t)PyLong_AsUnsignedLongMask(selected ? pbackColorSelected : pbackColor));
 							painter.setBackgroundColor(color);
+							blend = color.a > 0;
 						}
 						else {
 							painter.setBackgroundColor(defaultBackColor);
+							blend = defaultBackColor.a > 0;
 						}
 
 						if(bwidth && pborderColor)
@@ -2295,9 +2378,7 @@ void eListboxPythonMultiContent::paint(gPainter &painter, eWindowStyle &style, c
 							painter.setBorder(gRGB(color), bwidth);
 						}
 						bwidth = 0;
-						// See the TYPE_TEXT corner-radius case above for
-						// why this must be forced true only under GLES.
-						painter.drawRectangle(rect, painter.usingGLES() ? true : defaultBackColor.a > 0);
+						painter.drawRectangle(rect, blend);
 
 						if (selected)
 						{
@@ -2331,7 +2412,7 @@ void eListboxPythonMultiContent::paint(gPainter &painter, eWindowStyle &style, c
 					}
 					else
 					{
-						clearRegion(painter, style, local_style, pforeColor, pforeColorSelected, pbackColor, pbackColorSelected, selected, marked, rc, sel_clip, offs, itemRect.size(), cursorValid, mustClear, orientation, even);
+						clearRegion(painter, style, local_style, pforeColor, pforeColorSelected, pbackColor, pbackColorSelected, selected, marked, rc, sel_clip, offs, itemRect.size(), cursorValid, mustClear, orientation, even, true);
 					}
 				}
 
@@ -2356,6 +2437,8 @@ void eListboxPythonMultiContent::paint(gPainter &painter, eWindowStyle &style, c
 
 				if (do_scroll && m_scroll_index != m_cursor)
 				{
+					const gDC *dc = painter.getDC();
+					const bool useScrollPixmap = !(dc && dc->isHardwareAccelerated());
 					// first time we see this cursor position — set up scroll
 					m_listbox->m_scroll_rect = textRect;
 					m_scroll_index = m_cursor;
@@ -2363,7 +2446,7 @@ void eListboxPythonMultiContent::paint(gPainter &painter, eWindowStyle &style, c
 					m_scroll_text_str = string;
 					gRGB bcolor = (pTextBorderColor && btwidth) ? gRGB(PyLong_AsUnsignedLongMask(pTextBorderColor)) : border_color;
 					int bsize = (pTextBorderColor && btwidth) ? btwidth : border_size;
-					updateTextSize(m_scroll_text_str, m_fonts[fnt], flags & ~gPainter::RT_ELLIPSIS, bcolor, bsize);
+					updateTextSize(m_scroll_text_str, m_fonts[fnt], flags & ~gPainter::RT_ELLIPSIS, bcolor, bsize, useScrollPixmap);
 					/* Discard any cached pixmap: createScrollPixmap uses listbox-style colors,
 					   not the per-item pbackColorSelected, so blitting it would show the wrong
 					   background. Force a full-item repaint on each scroll tick instead. */
@@ -2735,10 +2818,7 @@ void eListboxPythonMultiContent::paint(gPainter &painter, eWindowStyle &style, c
 							painter.setBackgroundColor(defaultForeColor);
 						}
 					}
-					// See eListboxPythonStringContent::paint()'s
-					// matching comment - a progress bar fill is never a
-					// video-reveal widget either.
-					painter.drawRectangle(rect, painter.usingGLES());
+					painter.drawRectangle(rect);
 				}
 				else
 					painter.fill(rect);

@@ -4,7 +4,6 @@
 #include <lib/gui/ewidget.h>
 #include <lib/gui/elabel.h>
 #include <connection.h>
-#include <lib/base/ebase.h>
 #include <vector>
 
 class eListbox;
@@ -59,7 +58,6 @@ protected:
 	virtual int getItemWidth() { return -1; }
 	virtual uint8_t getOrientation() { return 1; }
 	virtual int getMaxItemTextWidth() { return 1; }
-	virtual int getListSize() { return 0; }
 	virtual int getScrollPos() { return 0; }
 
 	eListbox *m_listbox;
@@ -379,16 +377,16 @@ public:
 	void setSelectionZoom(float zoom, int zoomContentMode = 0);
 	void setSelectionZoomSize(int width, int height, int zoomContentMode = 0);
 
-	void setSeparatorColor(const gRGB &col) {
+	void setSeparatorColor(const gRGB &col) { 
 		m_style.m_separator_color = col;
 		m_style.is_set.separator_color = true;
 	}
 
-	void setSeparatorSize(const eRect &size) {
+	void setSeparatorSize(const eRect &size) { 
 		m_style.m_separator_size = size;
 	}
 
-	void setHeaderColor(const gRGB &col) {
+	void setHeaderColor(const gRGB &col) { 
 		m_style.m_header_color = col;
 		m_style.is_set.header_color = true;
 	}
@@ -410,9 +408,6 @@ public:
 		defaultWrapAround = enablewraparound;
 		defaultScrollBarMode = mode;
 	}
-
-	/* smooth selection: duration in ms of the sliding highlight between two rows (0 = off) */
-	static void setSmoothSelection(int ms) { defaultSmoothMs = ms < 0 ? 0 : ms; }
 
 	static void setDefaultPadding(const eRect &padding) { defaultPadding = padding; }
 
@@ -561,7 +556,6 @@ private:
 	int effectiveMaxRows() const { return (m_lock_first_row && m_orientation == orVertical && m_max_rows > 1) ? m_max_rows - 1 : m_max_rows; }
 	int setScrollbarPosition();
 	void setItemCornerRadiusInternal(uint8_t index, int radius, uint8_t edges);
-
 	void setItemGradientInternal(uint8_t index, const gRGB &startcolor, const gRGB &midcolor, const gRGB &endcolor, uint8_t direction, bool alphablend);
 
 	static int defaultScrollBarWidth;
@@ -570,7 +564,6 @@ private:
 	static uint8_t defaultScrollBarScroll;
 	static uint8_t defaultScrollBarMode;
 	static bool defaultWrapAround;
-	static int defaultSmoothMs;
 	static eRect defaultPadding;
 	static int defaultItemRadius[4];
 	static uint8_t defaultItemRadiusEdges[4];
@@ -583,6 +576,7 @@ private:
 	uint8_t m_scrollbar_mode = showNever;
 	uint8_t m_scrollbar_scroll = byPage;
 	bool m_content_changed = false;
+	bool m_selection_animation_pending = false;
 	bool m_enabled_wrap_around = false;
 	bool m_itemwidth_set = false;
 	bool m_itemheight_set = false;
@@ -612,27 +606,15 @@ private:
 	int m_scrollbar_calcsize;
 	bool m_lock_first_row = false;
 
-	/* smooth selection animation state */
-	bool m_smooth_active = false;
-	int m_smooth_from = 0, m_smooth_to = 0;
-	long long m_smooth_start_ms = 0;
-	int m_smooth_dur = 0;
-	ePtr<eTimer> m_smooth_timer;
-	void smoothTick();
-	void smoothStop();
-	void smoothStart(int oldSel, int newSel);
-	float smoothRows();
-
 	ePoint m_spacing;
 	ePoint m_defined_spacing;
+	eRect m_selection_animation_from;
+	eRect m_selection_animation_to;
 	bool m_spacing_innerOnly;
 	ePtr<iListboxContent> m_content;
 	eSlider *m_scrollbar = nullptr;
 	eListboxStyle m_style;
 	ePtr<gPixmap> m_scrollbarpixmap, m_scrollbarbackgroundpixmap;
-#ifdef USE_LIBVUGLES2
-	long m_dir;
-#endif
 #endif
 };
 
