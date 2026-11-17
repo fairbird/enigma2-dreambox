@@ -51,7 +51,7 @@ config.misc.pluginbrowser = ConfigSubsection()
 config.misc.pluginbrowser.plugin_order = ConfigText(default="")
 
 config.pluginfilter = ConfigSubsection()
-config.usage.piconInstallLocation = ConfigSelection(default="/", choices=[("/", _("Internal flash (small picon packages only)"))])
+config.usage.piconInstallLocation = ConfigSelection(default="/", choices=[("/", _("Internal flash"))])
 config.pluginfilter.display = ConfigYesNo(default=True)
 config.pluginfilter.drivers = ConfigYesNo(default=True)
 config.pluginfilter.extensions = ConfigYesNo(default=True)
@@ -2361,7 +2361,7 @@ class PluginBrowserSetup(Setup):
 			"cancel": (self.keyResetFeedsCancel, _("Cancel the Reset Feeds command currently being processed"))
 		}, prio=0, description=_("Plugin Browser Actions"))
 		self["resetFeedsAction"].setEnabled(False)
-		choiceList = [("/", _("Internal flash (small picon packages only)"))]
+		choiceList = [("/", _("Internal flash"))]
 		oldLocation = config.usage.piconInstallLocation.savedValue
 		for partition in harddiskmanager.getMountedPartitions():
 			if partition.device and partition.fileSystem() in ("ext3", "ext4"):
@@ -2378,6 +2378,19 @@ class PluginBrowserSetup(Setup):
 		self.opkgComponent.addCallback(self.keyResetFeedsCallback)
 		self.cleanError = False
 		self.refreshIncomplete = 0
+
+	def selectionChanged(self):
+		Setup.selectionChanged(self)
+		self.updatePiconFootnote()
+
+	def changedEntry(self):
+		Setup.changedEntry(self)
+		self.updatePiconFootnote()
+
+	def updatePiconFootnote(self):
+		current = self["config"].getCurrent()
+		if current and current[1] is config.usage.piconInstallLocation and config.usage.piconInstallLocation.value == "/" and not islink("/picon"):
+			self.setFootnote(_("Internal flash only allows small picon packages."))
 
 	def keyResetFeeds(self):
 		self.suspendAllActionMaps()
