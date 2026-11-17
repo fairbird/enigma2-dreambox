@@ -602,17 +602,3 @@ void setAnimation_profiles(int enabled, int dialog, int popup, int toast)
 #endif
 }
 #endif
-
-int registerAnimation_spec(const char *spec)
-{
-#ifdef HAVE_EGL
-	return gEGLDC::registerAnimationSpec(spec);
-#else
-	return 0;
-#endif
-}
-
-void setListboxSmoothSelection(int ms)
-{
-	eListbox::setSmoothSelection(ms);
-}
