@@ -42,6 +42,8 @@ namespace gles
     // 2 = OpenGL ES 2.0, 3 = OpenGL ES 3.0
     // 0 means not yet initialised (context not created).
     extern int version;
-
+    extern std::string eglVersionString;
+    extern std::string glesVersionString;
+    
     inline bool isGLES3() { return version >= 3; }
 }
