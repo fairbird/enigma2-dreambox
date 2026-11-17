@@ -20,18 +20,6 @@
 #include <interfaces/ion.h>
 #define ION_HEAP_TYPE_BMEM      (ION_HEAP_TYPE_CUSTOM + 1)
 #define ION_HEAP_ID_MASK        (1 << ION_HEAP_TYPE_BMEM)
-// This pool is one upfront ION_IOC_ALLOC() call at boot that PERMANENTLY
-// reserves this much from the system-wide ION heap, regardless of how much
-// of it gAccel's own sub-allocator is actually using at any given moment
-// (accel.cpp's accelAlloc()/accelFree() only manage USERSPACE bookkeeping
-// within this already-reserved block - they never give any of it back to
-// the system). Previously shrunk to 8MB on GLES specifically to leave the
-// vendor GPU driver's own internal ION/texture allocations more headroom -
-// that was working around symptoms of a real bug (gEGLDC::executeBlit() and
-// friends leaking a gPixmap AddRef() and its opcode struct on every draw,
-// see gegldc.cpp - fixed now), not an actual capacity shortfall, so back to
-// the same 32MB both renderers have always safely used as sole/primary
-// consumer.
 #define ACCEL_MEM_SIZE          (32*1024*1024)
 
 #elif !defined(FBIO_BLIT)
@@ -81,7 +69,6 @@ fbClass::fbClass(const char *fb)
 		goto nolfb;
 	}
 
-
 	if (ioctl(fbFd, FBIOGET_VSCREENINFO, &screeninfo)<0)
 	{
 		eDebug("[fb] FBIOGET_VSCREENINFO: %m");
@@ -95,7 +82,7 @@ fbClass::fbClass(const char *fb)
 		goto nolfb;
 	}
 
-	available=fix.smem_len;
+	available = fix.smem_len;
 	m_phys_mem = fix.smem_start;
 	eDebug("[fb] %s: %dk video mem", fb, available/1024);
 #if defined(CONFIG_ION) && !defined(DREAMBCM_ION_ACCEL)
@@ -103,10 +90,10 @@ fbClass::fbClass(const char *fb)
 	ion = open("/dev/ion", O_RDWR | O_CLOEXEC);
 	if (ion >= 0)
 	{
-		struct ion_allocation_data alloc_data;
-		struct ion_fd_data share_data;
-		struct ion_handle_data free_data;
-		struct ion_phys_data phys_data;
+		struct ion_allocation_data alloc_data = {};
+		struct ion_fd_data share_data = {};
+		struct ion_handle_data free_data = {};
+		struct ion_phys_data phys_data = {};
 		int ret;
 		unsigned char *lion;
 
@@ -222,6 +209,7 @@ int fbClass::showConsole(int state)
 
 int fbClass::SetMode(int nxRes, int nyRes, int nbpp)
 {
+	if (fbFd < 0) return -1;
 #ifdef CONFIG_ION
 	/* unmap old framebuffer with old size */
 	if (lfb)
@@ -300,6 +288,8 @@ int fbClass::SetMode(int nxRes, int nyRes, int nbpp)
 	m_number_of_pages = screeninfo.yres_virtual / nyRes;
 #if defined(DREAMNEXTGEN)
 	eDebug("[fb] DreamNextGen framebuffer pages requested=%d active=%d", wanted_pages, m_number_of_pages);
+#elif defined(HAVE_HISILICON_EGL)
+	eDebug("[fb] HiSilicon framebuffer pages requested=%d active=%d", wanted_pages, m_number_of_pages);
 #endif
 	if (m_number_of_pages >= 3)
 		eDebug("[fb] triple buffering available!");
@@ -346,12 +336,14 @@ int fbClass::SetMode(int nxRes, int nyRes, int nbpp)
 		eDebug("[fb] FBIOGET_FSCREENINFO: %m");
 	}
 	stride=fix.line_length;
+
 #ifdef CONFIG_ION
     	m_phys_mem = fix.smem_start;
     	available = fix.smem_len;
 	/* map new framebuffer */
 	lfb=(unsigned char*)mmap(0, stride * screeninfo.yres_virtual, PROT_WRITE|PROT_READ, MAP_SHARED, fbFd, 0);
 #endif
+
 	if (lfb) {
 		size_t clear_size = (size_t)stride * screeninfo.yres_virtual;
 		if (available > 0 && clear_size > (size_t)available)
@@ -387,12 +379,14 @@ int fbClass::setOffset(int off)
 int fbClass::waitVSync()
 {
 	int c = 0;
+	if (fbFd < 0) return -1;
 	return ioctl(fbFd, FBIO_WAITFORVSYNC, &c);
 }
 
 void fbClass::blit()
 {
-#ifndef CONFIG_ION
+	if (fbFd < 0) return;
+#if !defined(CONFIG_ION)
 	if (m_manual_blit == 1) {
 		if (ioctl(fbFd, FBIO_BLIT) < 0)
 			eDebug("[fb] FBIO_BLIT %m");
@@ -424,6 +418,7 @@ fbClass::~fbClass()
 
 int fbClass::PutCMAP()
 {
+	if (fbFd < 0) return -1;
 	return ioctl(fbFd, FBIOPUTCMAP, &cmap);
 }
 
@@ -472,6 +467,7 @@ void fbClass::unlock(bool restoreMode)
 
 void fbClass::enableManualBlit()
 {
+	if (fbFd < 0) return;
 #ifndef CONFIG_ION
 	unsigned char tmp = 1;
 	if (ioctl(fbFd,FBIO_SET_MANUAL_BLIT, &tmp)<0)
@@ -485,6 +481,7 @@ void fbClass::disableManualBlit()
 {
 #ifndef CONFIG_ION
 	unsigned char tmp = 0;
+	if (fbFd < 0) return;
 	if (ioctl(fbFd,FBIO_SET_MANUAL_BLIT, &tmp)<0)
 		eDebug("[fb] FBIO_SET_MANUAL_BLIT %m");
 	else
