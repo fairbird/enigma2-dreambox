@@ -262,6 +262,8 @@ def reloadSkins():
 	clearFonts()
 	clearPixmapCache()
 	InitSkins()
+	from Components.AVSwitch import avSwitch  # AVSwitch initialization depends on skin loading.
+	avSwitch.updateOSDCalibration()
 	for callback in onReload:
 		if callable(callback):
 			callback()
