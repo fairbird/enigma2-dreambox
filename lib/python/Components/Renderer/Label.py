@@ -20,6 +20,7 @@ class Label(VariableText, Renderer):
 			print("SKINERROR: render label has no source")
 
 	def changed(self, what):
+		self.updateAnimationPolicy()
 		source = self.source
 		if what[0] == self.CHANGED_CLEAR:
 			self.text = ""

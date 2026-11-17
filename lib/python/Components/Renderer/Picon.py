@@ -216,6 +216,7 @@ class Picon(Renderer):
 	#		self.instance.show()
 
 	def changed(self, what):
+		self.updateAnimationPolicy()
 		if self.instance:
 			pngname = ""
 			if what[0] == 1 or what[0] == 3:

@@ -11,7 +11,7 @@ from Components.config import config, ConfigSubsection, ConfigInteger, ConfigSel
 from Screens.Screen import Screen
 from Screens.Setup import Setup
 from Tools.Directories import resolveFilename, pathExists, SCOPE_MEDIA, SCOPE_GUISKIN
-import skin
+from skin import parameters
 
 
 config.pic = ConfigSubsection()
@@ -201,7 +201,7 @@ class Pic_Thumb(Screen):
 
 		self.textcolor = config.pic.textcolor.value
 		self.color = config.pic.bgcolor.value
-		self.spaceX, self.picX, self.spaceY, self.picY, textsize, thumtxt = skin.parameters.get("PicturePlayerThumb", (35, 190, 30, 200, 20, 14))
+		self.spaceX, self.picX, self.spaceY, self.picY, textsize, thumtxt = parameters.get("PicturePlayerThumb", (35, 190, 30, 200, 20, 14))
 
 		pic_frame = resolveFilename(SCOPE_GUISKIN, "icons/pic_frame.png")
 
@@ -290,6 +290,9 @@ class Pic_Thumb(Screen):
 		self.ThumbTimer.callback.append(self.showPic)
 
 	def setPicloadConf(self):
+		animation = getattr(config.misc, "animation", None)
+		if animation and self["pic"].instance.supportsContentAnimations():
+			self["pic"].instance.setContentAnimation(int(animation.pictureDuration.value) if animation.pictureFade.value else 0)
 		self.picload.setPara([self["thumb0"].instance.size().width(), self["thumb0"].instance.size().height(), 1, 1, config.pic.cache.value, int(config.pic.resize.value), self.color])
 		self.paintFrame()
 
