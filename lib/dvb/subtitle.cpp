@@ -464,6 +464,9 @@ int eDVBSubtitleParser::subtitle_process_segment(uint8_t *segment, bool isBuffer
 
 		if (region->buffer==0) {
 			region->buffer = new gPixmap(eSize(region->width, region->height), 8, 1);
+			// Keep the texture for the lifetime of this region. Superseded subtitle
+			// bitmaps must not occupy the content cache used by reusable OSD images.
+			region->buffer->surface->gl_content_cacheable = false;
 			memset(region->buffer->surface->data, 0, region->height * region->buffer->surface->stride);
 
 			if (region_fill_flag)

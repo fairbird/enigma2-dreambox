@@ -284,6 +284,7 @@ def InitUsageConfig():
 	config.usage.volume_instead_of_channelselection = ConfigYesNo(default=False)
 	config.usage.channelselection_preview = ConfigYesNo(default=False)
 	config.usage.show_spinner = ConfigYesNo(default=True)
+	config.usage.osdRenderer = ConfigSelection(default="gles", choices=[("gles", "OpenGL ES (GLES)"), ("framebuffer", _("Classic framebuffer"))])
 	config.usage.fastSkinReload = ConfigYesNo(default=False)
 	config.usage.enable_blinking = ConfigYesNo(default=False)
 	config.usage.menu_sort_weight = ConfigDictionarySet(default={"mainmenu": {"submenu": {}}})
