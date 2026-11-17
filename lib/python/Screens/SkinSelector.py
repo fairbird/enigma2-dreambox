@@ -8,11 +8,14 @@ from os.path import dirname, exists, isdir, join
 
 from skin import DEFAULT_SKIN, DEFAULT_DISPLAY_SKIN, EMERGENCY_NAME, EMERGENCY_SKIN, currentDisplaySkin, currentPrimarySkin, domScreens
 from Components.ActionMap import HelpableNumberActionMap
-from Components.config import config
+from Components.config import config, configfile
+from Components.PluginComponent import plugins
 from Components.Pixmap import Pixmap
 from Components.Sources.List import List
 from Components.Sources.StaticText import StaticText
+from Plugins.Plugin import PluginDescriptor
 from Screens.MessageBox import MessageBox
+from Screens.Processing import Processing
 from Screens.Screen import Screen, ScreenSummary
 from Screens.Standby import TryQuitMainloop, QUIT_RESTART
 from Tools.Directories import resolveFilename, SCOPE_GUISKIN, SCOPE_LCDSKIN, SCOPE_SKIN, fileReadXML
@@ -193,7 +196,32 @@ class SkinSelector(Screen):
 
 	def save(self):
 		label, skin = self.currentSelectedSkin[1], self.currentSelectedSkin[4]
-		if skin == self.config.value:
+		guiSkinChanged = self.config is config.skin.primary_skin and skin != self.current
+		if guiSkinChanged and config.usage.fastSkinReload.value:
+			self.config.value = skin
+			self.config.save()
+			configfile.save()
+			Processing.instance.setDescription(_("Loading skin..."))
+			Processing.instance.showProgress(endless=True)
+			open("/etc/.restore_skins", "w").close()
+			from skin import reloadSkins
+			reloadSkins()
+			for plugin in plugins.getPlugins(PluginDescriptor.WHERE_SKINCHANGE):
+				plugin(session=self.session)
+			from Screens.ChannelSelection import ChannelSelection, ChannelSelectionSetup
+			exclude = {id(x) for x in self.summaries}
+			for dialog, _shown in self.session.dialog_stack[1:]:
+				exclude.add(id(dialog))
+				exclude.update(id(x) for x in dialog.summaries)
+			for dialog in self.session.allDialogs:
+				if isinstance(dialog, ChannelSelection):
+					exclude.add(id(dialog))
+			self.session.reloadDialogs(exclude=exclude)
+			ChannelSelectionSetup.updateSettings(self.session, force=True)
+			Processing.instance.hideProgress()
+			self.close(True)
+			return
+		elif skin == self.config.value:
 			if skin == self.current:
 				print("[SkinSelector] Selected skin: '%s' (Unchanged!)" % join(self.rootDir, skin))
 				self.cancel()
@@ -211,7 +239,7 @@ class SkinSelector(Screen):
 			restartBox = self.session.openWithCallback(self.restartGUI, MessageBox, _("To save and apply the selected '%s' skin the GUI needs to restart.\nWould you like to save the selection and restart the GUI now?") % label, MessageBox.TYPE_YESNO)
 			restartBox.setTitle(_("SkinSelector: Restart GUI"))
 
-		if config.channelSelection.screenStyle.isChanged() or config.channelSelection.widgetStyle.isChanged():
+		if not guiSkinChanged and (config.channelSelection.screenStyle.isChanged() or config.channelSelection.widgetStyle.isChanged()):
 			from Screens.ChannelSelection import ChannelSelectionSetup
 			ChannelSelectionSetup.updateSettings(self.session, force=True)
 

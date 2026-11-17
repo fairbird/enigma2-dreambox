@@ -410,30 +410,28 @@ class Session:
 		self.execBegin()
 
 	def openWithCallback(self, callback, screen, *arguments, **kwargs):
-		dlg = self.open(screen, *arguments, **kwargs)
-		if dlg != 'config.crash.bsodpython.value=True':
-			dlg.callback = callback
-			return dlg
+		dialog = self.open(screen, *arguments, **kwargs)
+		if dialog != 'config.crash.bsodpython.value=True':
+			dialog.callback = callback
+			return dialog
 
 	def open(self, screen, *arguments, **kwargs):
 		if self.dialog_stack and not self.in_exec:
-			raise RuntimeError("modal open are allowed only from a screen which is modal!")
-			# ...unless it's the very first screen.
-
+			raise RuntimeError("[StartEnigma] Error: Modal open are allowed only from a screen which is modal!")  # ...unless it's the very first screen.
 		self.pushCurrent()
 		if config.crash.bsodpython.value:
 			try:
-				dlg = self.current_dialog = self.instantiateDialog(screen, *arguments, **kwargs)
+				dialog = self.current_dialog = self.instantiateDialog(screen, *arguments, **kwargs)
 			except:
 				self.popCurrent()
 				raise
 				return 'config.crash.bsodpython.value=True'
 		else:
-			dlg = self.current_dialog = self.instantiateDialog(screen, *arguments, **kwargs)
-		dlg.isTmp = True
-		dlg.callback = None
+			dialog = self.current_dialog = self.instantiateDialog(screen, *arguments, **kwargs)
+		dialog.isTmp = True
+		dialog.callback = None
 		self.execBegin()
-		return dlg
+		return dialog
 
 	def close(self, screen, *retVal):
 		if not self.in_exec:
@@ -473,12 +471,24 @@ class Session:
 		Toast.instance.doShutdown()
 
 	def reloadDialogs(self, exclude=None):
-		for dlg in self.allDialogs:
+		for dialog in self.allDialogs:
 			if exclude and id(dialog) in exclude:
 				continue
 			# print(f"[reloadDialogs] dialog={dialog.__class__.__name__} desktop={hasattr(dialog, 'desktop')}")
-			if hasattr(dlg, "desktop"):
+			if hasattr(dialog, "desktop"):
 				dialog.reloadSkin()
+
+	def closePluginBrowser(self):
+		from Screens.PluginBrowser import PluginBrowser, PluginBrowserNew
+		for index in range(len(self.dialog_stack) - 1, -1, -1):
+			dialog, _shown = self.dialog_stack[index]
+			if isinstance(dialog, (PluginBrowser, PluginBrowserNew)):
+				del self.dialog_stack[index]
+				for summary in list(self.summary_stack):
+					if getattr(summary, "parent", None) is dialog:
+						self.summary_stack.remove(summary)
+						self.deleteDialog(summary)
+				self.deleteDialog(dialog)
 
 	def showInfo(self, text, timeout=4, replaceId=None):
 		Toast.instance.showToast(text=text, toastType=Toast.TYPE_INFO, timeout=timeout, replaceId=replaceId)
