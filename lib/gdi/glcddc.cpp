@@ -58,7 +58,7 @@ void gLCDDC::exec(const gOpcode *o)
 		lcd->setPalette(surface);
 		break;
 	}
-#if defined(HAVE_TEXTLCD) || defined(HAVE_7SEGMENT)
+#if defined(HAVE_TEXTLCD)
 	case gOpcode::renderText:
 		if (o->parm.renderText->text)
 		{
