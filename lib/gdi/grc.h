@@ -14,10 +14,10 @@
 #include <pthread.h>
 #include <atomic>
 #include <functional>
+#include <memory>
 #include <stack>
 #include <list>
 #include <vector>
-#include <stdint.h>
 
 #include <string>
 #include <lib/base/elock.h>
@@ -31,11 +31,41 @@
 
 class eTextPara;
 
-extern int g_window_animation_current;
-extern int g_window_animation_id;
-extern int g_widget_fade_ms;
-
 class gDC;
+
+// Render thread writes completion; a native GUI timer delivers the signal on
+// the main thread. No widget pointer is retained by a render command.
+struct gAnimationCompletion {
+	std::atomic<bool> done{false};
+};
+typedef std::shared_ptr<gAnimationCompletion> gAnimationToken;
+
+inline void completeAnimation(gAnimationToken& token) {
+	if (token) token->done = true;
+	token.reset();
+}
+
+class gAnimationCompletionGuard {
+	gAnimationToken token;
+public:
+	explicit gAnimationCompletionGuard(gAnimationToken value) : token(value) {}
+	~gAnimationCompletionGuard() { if (token) token->done = true; }
+	void transfer() { token.reset(); }
+};
+
+// Queued draws keep their images and budget reservation alive after widget close.
+struct gContentTransition {
+	ePtr<gPixmap> before, after;
+	unsigned long long bytes = 0;
+	bool beforePremultiplied = true, afterPremultiplied = true;
+	int blitFlags = gPixmap::blitAlphaBlend;
+	int radius = 0;
+	uint8_t edges = 0;
+	static std::atomic<unsigned long long> liveBytes;
+	static std::atomic<unsigned long long> limitBytes;
+	static std::shared_ptr<gContentTransition> reserve(unsigned long long bytes);
+	~gContentTransition();
+};
 struct gOpcode
 {
 	enum Opcode
@@ -67,7 +97,6 @@ struct gOpcode
 		setBorder,
 
 		setOffset,
-		setResolution,
 
 		setClip,
 		addClip,
@@ -88,14 +117,11 @@ struct gOpcode
 		setCompositing,
 		sendShow,
 		sendHide,
-		beginLayer,
-		endLayer,
-		beginFade,
 		sendListboxAnimation,
 		invoke,
+		blitTransition,
 	} opcode;
 	gDC *dc;
-	unsigned int flush_id;
 	union para
 	{
 		struct pfillRect
@@ -202,13 +228,6 @@ struct gOpcode
 			int rel;
 		} *setOffset;
 
-		struct psetResolution
-		{
-			int xres;
-			int yres;
-			int bpp;
-		} *setResolution;
-
 		gCompositingData *setCompositing;
 
 		struct psetShowHideInfo
@@ -217,8 +236,9 @@ struct gOpcode
 			eSize size;
 			int animation = -1;
 			int durationMs = 0;
+			gAnimationToken completion;
 		} *setShowHideInfo;
-		
+
 		struct plistboxAnimation
 		{
 			eRect from;
@@ -233,13 +253,18 @@ struct gOpcode
 		} *listboxAnimation;
 
 		std::function<void()> *invoke;
+		struct pblitTransition {
+			std::shared_ptr<gContentTransition> content;
+			eRect position;
+			float progress;
+		} *blitTransition;
 	} parm;
 };
 
 #define MAXSIZE 2048
 
 /* gRC is the singleton which controls the fifo and dispatches commands */
-class gRC: public iObject, public sigc::trackable
+class gRC : public iObject, public sigc::trackable
 {
 	DECLARE_REF(gRC);
 	friend class gPainter;
@@ -255,8 +280,6 @@ class gRC: public iObject, public sigc::trackable
 
 	gOpcode queue[MAXSIZE];
 	int rp, wp;
-	unsigned int m_flush_issued;
-	unsigned int m_flush_completed;
 
 	eFixedMessagePump<int> m_notify_pump;
 	void recv_notify(const int &i);
@@ -282,6 +305,7 @@ public:
 	virtual ~gRC();
 
 	void submit(const gOpcode &o);
+	void invoke(const std::function<void()>& function, gDC* dc = nullptr);
 
 #ifdef CONFIG_ION
 	void lock();
@@ -377,20 +401,9 @@ public:
 	void blitScale(gPixmap *pixmap, const eRect &pos, const eRect &clip=eRect(), int flags=0, int aflags = BT_SCALE);
 	void blit(gPixmap *pixmap, ePoint pos, const eRect &clip=eRect(), int flags=0);
 	void blit(gPixmap *pixmap, const eRect &pos, const eRect &clip=eRect(), int flags=0);
+	void blitTransition(std::shared_ptr<gContentTransition> content, const eRect& position, float progress);
 
 	void drawRectangle(const eRect &area, bool useNew=false);
-
-	// Whether the GLES/EGL backend (gEGLDC) is the one actually driving the
-	// screen right now. Some rendering choices only need to differ under
-	// that backend (e.g. which alpha-blend formula a rounded-rect draw
-	// needs - see gEGLDC::executeRectangle()'s comment); every other
-	// backend must keep its existing CPU-composited behavior unconditionally.
-	// Defined in grc.cpp (guarded by #ifdef HAVE_EGL, like every other
-	// gEGLDC-aware spot in that file) rather than as a virtual on gDC, since
-	// gEGLDC/EGL headers aren't available in a non-EGL build at all - adding
-	// a new virtual here would need every backend's header to see it either
-	// way, for no benefit over this free function.
-	bool usingGLES() const;
 
 	void setPalette(gRGB *colors, int start = 0, int len = 256);
 	void setPalette(gPixmap *source);
@@ -414,9 +427,7 @@ public:
 	void flush();
 	void sendShow(ePoint point, eSize size, int animation = -1, int durationMs = 0);
 	void sendHide(ePoint point, eSize size, int animation = -1, int durationMs = 0);
-	void beginLayer();
-	void endLayer();
-	void beginFade(ePoint point, eSize size, int ms = 0);
+	void sendWindowAnimation(bool show, ePoint point, eSize size, int animation, int durationMs, gAnimationToken completion);
 	void sendListboxAnimation(const eRect &from, const eRect &to, const gRGB &backgroundColor,
 		const std::vector<gRGB> &gradientColors, uint8_t gradientOrientation, bool gradientAlphaBlend,
 		int radius, uint8_t radiusEdges, gPixmap *selectionPixmap);
@@ -426,7 +437,7 @@ public:
 	const gDC *getDC() const { return m_dc; }
 };
 
-class gDC: public iObject
+class gDC : public iObject
 {
 	DECLARE_REF(gDC);
 
@@ -452,11 +463,10 @@ protected:
 	std::stack<gRegion> m_clip_stack;
 	gRegion m_current_clip;
 
-	ePtr<gPixmap> m_spinner_saved_HD, m_spinner_temp_HD, m_spinner_saved_FHD, m_spinner_temp_FHD, m_spinner_saved_UHD, m_spinner_temp_UHD;
+	ePtr<gPixmap> m_spinner_saved_HD, m_spinner_temp_HD, m_spinner_saved_FHD, m_spinner_temp_FHD;
 	ePtr<gPixmap> *m_spinner_pic;
 	eRect m_spinner_pos_HD;
 	eRect m_spinner_pos_FHD;
-	eRect m_spinner_pos_UHD;
 	int m_spinner_num, m_spinner_i;
 	bool m_nativeSpinner = false, m_nativeSpinnerVisible = false;
 	std::atomic<unsigned int> m_spinnerColor{0x2b7fd9};
@@ -484,32 +494,14 @@ public:
 	}
 	gRGB getRGB(gColor col);
 	virtual eSize size() { return m_pixmap->size(); }
-
-	// A hardware-accelerated backend (see gEGLDC) can override this to
-	// intercept a glyph's raw FreeType coverage bitmap - before
-	// eTextPara::blit() (font.cpp) applies any color/background blending -
-	// and render it itself (e.g. via a GPU glyph atlas) instead of the CPU
-	// compositing loop below. glyph_key identifies this glyph by (face,
-	// size, glyph index): stable and reusable across draws, unlike a raw
-	// pointer to a per-eTextPara bitmap. blit() only offers glyphs sourced
-	// from the shared FreeType small-bitmap cache this way - not the
-	// per-instance border/rotated "image" glyphs, which have no such stable,
-	// reusable identity to cache against. Return true to skip the existing
-	// CPU compositing loop entirely for this glyph.
-	virtual bool renderGlyph(const ePoint &pos, const uint8_t *data, int width, int height, int pitch, const gRGB &color, uint64_t glyph_key) { return false; }
-
-	// Called by eTextPara::blit() immediately before it falls back to
-	// writing glyph pixels directly into m_pixmap's CPU buffer (renderGlyph()
-	// above declined, or wasn't offered this glyph at all) - lets a backend
-	// that composites text via a separate CPU-buffer-to-texture pass (see
-	// gEGLDC::compositeTextOverlay()) know that pass is still needed for
-	// this draw.
-	virtual void onGlyphCpuDrawn() {}
-
 	virtual int islocked() const { return 0; }
 	virtual bool isHardwareAccelerated() const { return false; }
 	virtual bool supportsShowHideAnimations() const { return false; }
 	virtual bool supportsListboxAnimations() const { return false; }
+	virtual bool supportsContentAnimations() const { return false; }
+	// Render-thread deadlines allow animation frames without blocking queued UI work.
+	virtual unsigned long long animationFrameDeadlineUs() const { return 0; }
+	virtual void renderAnimationFrame() {}
 
 	virtual void renderGlyph(const ePoint &pos, gPixmap *glyph_mask, const gRGB &color);
 
@@ -517,13 +509,11 @@ public:
 	virtual void disableSpinner();
 	virtual void incrementSpinner();
 	virtual void setSpinner(eRect pos, ePtr<gPixmap> *pic, int len);
-	// Render-thread deadlines allow animation frames without blocking queued UI work.
-	virtual unsigned long long animationFrameDeadlineUs() const { return 0; }
-	virtual void renderAnimationFrame() {}
 	void setNativeSpinner(ePoint position, unsigned int color);
 	void setSpinnerColor(unsigned int color) { m_spinnerColor.store(color, std::memory_order_relaxed); }
 	int spinnerInterval() const { return m_nativeSpinner ? 33 : 100; }
 	void invalidateNativeSpinner() { m_nativeSpinnerVisible = false; m_nativeSpinnerScreen = eSize(); }
+
 };
 
 #endif
