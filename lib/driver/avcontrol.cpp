@@ -546,6 +546,16 @@ void eAVControl::setVideoMode(const std::string &newMode, int flags) const
 	}
 #endif
 #ifdef DREAMNEXTGEN
+	// the mode, ppscaler and axis writes re-initialise the video layer that shows the bootlogo during an enigma2 restart:
+	// when the driver is already in this mode there is nothing to do
+	std::string currentMode = CFile::read(proc_videomode, __MODULE__, flags | FLAGS_SUPPRESS_NOT_EXISTS | FLAGS_SUPPRESS_READWRITE_ERROR);
+	currentMode.erase(std::remove_if(currentMode.begin(), currentMode.end(), ::isspace), currentMode.end());
+	if (!currentMode.empty() && currentMode == driverMode)
+	{
+		if (flags & FLAGS_DEBUG)
+			eDebug("[%s] %s: %s is already active, skipped", __MODULE__, "setVideoMode", driverMode.c_str());
+		return;
+	}
 	writeHDMIColorFormat(driverMode, flags);
 #endif
 #ifdef VIDEO_MODE_50
