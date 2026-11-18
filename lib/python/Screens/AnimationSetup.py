@@ -20,7 +20,7 @@ def hasE2EGLAnimations():
 
 E2EGL_ANIMATIONS = hasE2EGLAnimations()
 
-ANIMATION_DEFAULT = 15 if E2EGL_ANIMATIONS else 0
+ANIMATION_DEFAULT = 0 # 15 if E2EGL_ANIMATIONS else 0
 ANIMATION_SPEED_DEFAULT = 15
 ANIMATION_TOAST_SPEED_DEFAULT = 10
 ANIMATION_SPEED_MIN = 5 if BoxInfo.getItem("machinebuild") in ("dreamone", "dreamtwo") else 15
