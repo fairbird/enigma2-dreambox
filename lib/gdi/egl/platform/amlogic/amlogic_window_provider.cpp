@@ -67,7 +67,9 @@ AmlogicWindowProvider::AmlogicWindowProvider(int width, int height) {
 }
 
 AmlogicWindowProvider::~AmlogicWindowProvider() {
-	// nothing to tear down: fbdev_window is stack-allocated
+	// fbdev_window is stack-allocated; the EGL surfaces are already destroyed here: clear the framebuffer
+	// by the CPU so the last OSD does not stay on the screen until the next enigma2 start has cleared it
+	prepareFramebuffer(m_native_window.width, m_native_window.height);
 }
 
 bool AmlogicWindowProvider::init(int width, int height) {
