@@ -429,6 +429,11 @@ int getImageFingerprint()
 	return IMAGE_FINGERPRINT;
  }
 
+int getVFDSymbolsPoll()
+{
+	return VFDSymbolsPoll;
+}
+
 const char *getBoxType()
 {
 	return BOXTYPE;

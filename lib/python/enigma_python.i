@@ -713,6 +713,7 @@ extern void setAnimation_profiles(int enabled, int dialog, int popup, int toast)
 extern bool supportsEGLAnimations(void);
 extern void resumeInit(void);
 extern int checkInternetAccess(const char* host, int timeout = 3);
+extern int getVFDSymbolsPoll();
 extern int getE2Flags();
 extern bool checkLogin(const char *user, const char *pwd);
 %}
@@ -741,6 +742,7 @@ extern void setAnimation_profiles(int enabled, int dialog, int popup, int toast)
 extern bool supportsEGLAnimations(void);
 extern void resumeInit(void);
 extern int checkInternetAccess(const char* host, int timeout = 3);
+extern int getVFDSymbolsPoll();
 extern int getE2Flags();
 extern bool checkLogin(const char *user, const char *pwd);
 
