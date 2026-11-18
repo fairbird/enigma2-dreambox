@@ -12,6 +12,19 @@
 
 namespace gles
 {
+    // 2 = OpenGL ES 2.0, 3 = OpenGL ES 3.0
+    // 0 means not yet initialised (context not created).
+    extern int version;
+
+    inline bool isGLES3() { return version >= 3; }
+
+    // Driver-reported version strings (eglQueryString(EGL_VERSION) and
+    // glGetString(GL_VERSION)), e.g. "1.4" / "OpenGL ES 3.0 Mesa 23.1".
+    // Empty until the context is created; exposed to Python through
+    // getEGLVersionString() / getGLESVersionString() (main/enigma.cpp).
+    extern std::string eglVersionString;
+    extern std::string glesVersionString;
+
     // VC5 parses GLSL decimal constants using the calling thread's locale.
     // Python may have selected a comma-decimal locale before lazy compilation.
     // Keep shader creation independent of the UI locale without setlocale().
@@ -41,12 +54,4 @@ namespace gles
         ShaderLocale& operator=(const ShaderLocale&) = delete;
         bool valid() const { return m_locale != nullptr; }
     };
-
-    // 2 = OpenGL ES 2.0, 3 = OpenGL ES 3.0
-    // 0 means not yet initialised (context not created).
-    extern int version;
-    extern std::string eglVersionString;
-    extern std::string glesVersionString;
-    
-    inline bool isGLES3() { return version >= 3; }
 }
