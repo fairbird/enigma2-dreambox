@@ -33,7 +33,8 @@ public:
 	// INativeWindowProvider
 	bool init(int width, int height) override;
 	EGLNativeDisplayType getNativeDisplay() override;
-	bool usesPixmapSurface() const override { return true; }
+	bool usesPixmapSurface() const override;
+	EGLNativeWindowType getNativeWindow() override;
 	int getPageCount() const override { return m_page_count; }
 	void* getNativePixmap(int page) override;
 	void presentPixmap(int page) override;

@@ -1,3 +1,4 @@
+#include <EGL/egl.h>
 #include <lib/base/eerror.h>
 #include <lib/gdi/egl/platform/dreambox/dreambox_window_provider.h>
 #include <lib/gdi/fb.h>
@@ -95,6 +96,20 @@ bool DreamboxWindowProvider::init(int width, int height) {
 
 EGLNativeDisplayType DreamboxWindowProvider::getNativeDisplay() {
 	return EGL_DEFAULT_DISPLAY;
+}
+
+// The libEGL of the older Dreambox V3D stack (dm820, dm7080) has only a stub for eglCreatePlatformPixmapSurfaceEXT
+// (eglGetProcAddress() returns NULL) and its pixmap path rejects our pixmaps with EGL_BAD_NATIVE_PIXMAP. There
+// libvc5dream drives /dev/fb0 itself for a window surface, so use that one; called after eglInitialize()
+bool DreamboxWindowProvider::usesPixmapSurface() const {
+	static const bool pixmap = eglGetProcAddress("eglCreatePlatformPixmapSurfaceEXT") != nullptr;
+	return pixmap;
+}
+
+EGLNativeWindowType DreamboxWindowProvider::getNativeWindow() {
+	// zeroed: no window object, libvc5dream takes the size and the buffers from /dev/fb0
+	static unsigned char window[64];
+	return (EGLNativeWindowType)window;
 }
 
 void* DreamboxWindowProvider::getNativePixmap(int page) {
