@@ -923,7 +923,7 @@ class FlashImage(Screen, ProtectedScreen):
 			print("[FlashManager] Unable to resume main graphics after ofgwrite!")
 
 	def flashImage(self):
-		if BoxInfo.getItem("model") in ("dm820", "dm7080") and not hasattr(self, "dreamKernelA"):
+		if BoxInfo.getItem("model") == "dm7435" and not hasattr(self, "dreamKernelA"):
 			def featuresDone(data, retVal, extraArgs):
 				self.dreamKernelA = retVal == 0 and "dream-kernel-a" in data.split()
 				self.containerOFGWrite = None
@@ -952,6 +952,15 @@ class FlashImage(Screen, ProtectedScreen):
 			else:
 				mtdKernel = BoxInfo.getItem("mtdkernel")
 				mtdRootFS = BoxInfo.getItem("mtdrootfs")
+				if BoxInfo.getItem("model") == "dms922x":
+					try:
+						with open("/proc/cmdline") as fd:
+							for arg in fd.read().split():
+								if arg.startswith("root=/dev/mmcblk1p"):
+									mtdRootFS = arg[len("root=/dev/"):]
+									break
+					except OSError:
+						pass
 			if BoxInfo.getItem("HasKexecMultiboot"):
 				if self.slotCode == "R":
 					cmdArgs = ["-r", "-k", "-f"]
@@ -959,12 +968,12 @@ class FlashImage(Screen, ProtectedScreen):
 				else:
 					cmdArgs = ["-r%s" % mtdRootFS, "-k", "-m%s" % self.slotCode]
 					if "uuid" in bootSlots[self.slotCode] and "mmcblk" not in mtdRootFS:
-						cmdArgs.insert(2, "-s%s/linuxrootfs" % BoxInfo.getItem("model")[2:])
-			elif BoxInfo.getItem("model") in ("dreamone", "dreamtwo") and not BoxInfo.getItem("HasGPT"):  # Temp solution ofgwrite auto detection not ready.
+						cmdArgs.insert(2, "-s%s/linuxrootfs" % BoxInfo.getItem("machinebuild")[2:])
+			elif BoxInfo.getItem("model") == "dms922x" and not BoxInfo.getItem("HasGPT"):  # Temp solution ofgwrite auto detection not ready.
 				cmdArgs = ["-r%s" % mtdRootFS, "-k%s" % mtdKernel]
-			elif BoxInfo.getItem("model") in ("dreamone", "dreamtwo") and BoxInfo.getItem("HasGPT"):  # Temp solution ofgwrite auto detection not ready.
+			elif BoxInfo.getItem("model") == "dms922x" and BoxInfo.getItem("HasGPT"):  # Temp solution ofgwrite auto detection not ready.
 				cmdArgs = ["-r%s" % mtdRootFS, "-a"]
-			elif BoxInfo.getItem("model") in ("dm820", "dm7080"):
+			elif BoxInfo.getItem("model") == "dm7435":
 				if rootSubDir is None:
 					cmdArgs = ["-r"] if self.dreamKernelA else ["-rmmcblk0p1"]
 				else:
@@ -980,7 +989,7 @@ class FlashImage(Screen, ProtectedScreen):
 					cmdArgs = ["-r%s" % mtdRootFS, "-c%s" % currentSlot, "-m%s" % self.slotCode]
 				else:
 					cmdArgs = ["-r%s" % mtdRootFS, "-k%s" % mtdKernel, "-m0"] if (rootSubDir) is None else ["-r", "-k", "-m%s" % self.slotCode]
-			elif BoxInfo.getItem("model") in ("dm800se", "dm500hd"):  # Temp solution ofgwrite auto detection not ready.
+			elif BoxInfo.getItem("model") == "dm7405nand":  # Temp solution ofgwrite auto detection not ready.
 				cmdArgs = ["-r%s" % mtdRootFS, "-f"]
 			elif mtdKernel == mtdRootFS:  # Receiver with kernel and rootfs on one partition.
 				cmdArgs = ["-r"]
@@ -1007,7 +1016,7 @@ class FlashImage(Screen, ProtectedScreen):
 		self.containerOFGWrite = None
 		if retVal == 0:
 			slotCode = getattr(self, "slotCode", None)
-			if slotCode and BoxInfo.getItem("model") in ("dreamone", "dreamtwo") and BoxInfo.getItem("HasGPT"):
+			if slotCode and BoxInfo.getItem("model") == "dms922x" and BoxInfo.getItem("HasGPT"):
 				MultiBoot.updateDreamBootSection(slotCode)
 			self["header"].setText(_("Flashing image successful"))
 			self["summary_header"].setText(self["header"].getText())

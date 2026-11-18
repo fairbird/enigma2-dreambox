@@ -141,9 +141,9 @@ class BoxInformation:  # To maintain data integrity class variables should not b
 		model = self.getItem("model")
 		if model in ("hzero", "h8", "sfx6008", "sfx6018"):
 			result = 1200
-		elif model in ("dreamone", "dreamtwo", "dreamseven"):
+		elif model in ("dms922x", "dreamseven"):
 			result = 1800
-		elif model in ("vuduo4k",):
+		elif model == "vu7376duo":
 			result = 2100
 		return result
 
@@ -450,22 +450,21 @@ def getKernelVersion():  # Version of the package of the running kernel, with it
 	return result
 
 
-def getChipSetString():
-	if MODEL in ('dm7080', 'dm820'):
-		return "7435"
-	elif MODEL in ('dm520', 'dm525'):
-		return "73625"
-	elif MODEL in ('dm900', 'dm920', 'et13000', 'sf5008'):
-		return "7252S"
-	elif MODEL in ('hd51', 'vs1500', 'h7'):
-		return "7251S"
-	elif MODEL in ('alien5',):
-		return "S905D"
+def getChipsetString():
+	if MODEL == "dm7435":
+		chipset = "7435"
+	elif MODEL in ("dm520", "dm525"):
+		chipset = "73625"
+	elif MODEL in ("dm7252s", "et13000"):
+		chipset = "7252S"
+	elif MODEL in ("hd51", "vs1500", "h7", "h17"):
+		chipset = "7251S"
+	elif MODEL == "dms922x":
+		chipset = "S922X"
 	else:
-		chipset = fileReadLine("/proc/stb/info/chipset", source=MODULE_NAME)
-		if chipset is None:
-			return _("Undefined")
-		return str(chipset.lower().replace('\n', '').replace('bcm', '').replace('brcm', '').replace('sti', ''))
+		chipset = fileReadLine("/proc/stb/info/chipset", default=_("Undefined"), source=MODULE_NAME)
+		chipset = chipset.lower().replace("\n", "").replace("bcm", "").replace("brcm", "").replace("sti", "")
+	return chipset
 
 
 def hasInitCam():
@@ -555,7 +554,7 @@ BoxInfo.setItem("canMultiBoot", MultiBoot.getBootSlots())
 BoxInfo.setItem("HasNewNativeMultiboot", fileExists("/.newMB"))
 BoxInfo.setItem("HasKexecMultiboot", fileHas("/proc/cmdline", "kexec=1"))
 BoxInfo.setItem("cankexec", BoxInfo.getItem("kexecmb") and fileExists("/usr/bin/kernel_auto.bin") and fileExists("/usr/bin/STARTUP.cpio.gz") and not BoxInfo.getItem("HasKexecMultiboot"))
-BoxInfo.setItem("HasChkrootMultiboot", (MultiBoot.isFat32("/dev/block/by-name/others") or fileExists("/dev/block/by-name/startup")) and MODEL not in ("dreamone", "dreamtwo"))
+BoxInfo.setItem("HasChkrootMultiboot", (MultiBoot.isFat32("/dev/block/by-name/others") or fileExists("/dev/block/by-name/startup")) and MODEL != "dms922x")
 BoxInfo.setItem("canchkroot", (BoxInfo.getItem("hasUBIMB") or fileExists("/dev/block/by-name/others")) and not BoxInfo.getItem("HasChkrootMultiboot") and not fileExists("/etc/.disableChkroot"))
 BoxInfo.setItem("HasSDmmc", MultiBoot.canMultiBoot() and "sd" in MultiBoot.getBootSlots().get("2", "") and "mmcblk" in MTDROOTFS)
 BoxInfo.setItem("HasSDswap", MODEL in ("h9", "i55plus") and pathExists("/dev/mmcblk0p1"))
@@ -613,7 +612,7 @@ BoxInfo.setItem("HasExternalPIP", not (MODEL.startswith("et9") or MODEL in ("e4h
 BoxInfo.setItem("VideoDestinationConfigurable", fileExists("/proc/stb/vmpeg/0/dst_left") or fileExists("/sys/class/video/axis"))
 BoxInfo.setItem("hasPIPVisibleProc", fileCheck("/proc/stb/vmpeg/1/visible"))
 BoxInfo.setItem("MaxPIPSize", MODEL in ("hd51", "h7", "vs1500", "e4hd") and (360, 288) or (540, 432))
-BoxInfo.setItem("HasGPT", MODEL in ("dreamone", "dreamtwo") and pathExists("/dev/mmcblk0p7"))
+BoxInfo.setItem("HasGPT", MODEL == "dms922x" and pathExists("/dev/mmcblk0p7"))
 BoxInfo.setItem("StandbyPowerLed", fileExists("/proc/stb/power/standbyled"))
 BoxInfo.setItem("SuspendPowerLed", fileExists("/proc/stb/power/suspendled"))
 BoxInfo.setItem("USETunersetup", BoxInfo.getItem("ForceLNBPowerChanged") or BoxInfo.getItem("ForceToneBurstChanged"))
@@ -647,7 +646,7 @@ BoxInfo.setItem("HasMMC", "root" in cmdline and cmdline["root"].startswith("/dev
 BoxInfo.setItem("HasTranscoding", pathExists("/proc/stb/encoder/0") or fileCheck("/dev/bcm_enc0"))
 BoxInfo.setItem("HasH265Encoder", fileHas("/proc/stb/encoder/0/vcodec_choices", "h265"))
 BoxInfo.setItem("CanNotDoSimultaneousTranscodeAndPIP", MODEL in ("vusolo4k", "gbquad4k", "gbue4k"))
-BoxInfo.setItem("canRecovery", MODEL in ("hd51", "vs1500", "h7", "8100s") and ("disk.img", "mmcblk0p1") or MODEL in ("xc7439", "osmio4k", "osmio4kplus", "osmini4k") and ("emmc.img", "mmcblk1p1") or MODEL in ("gbmv200", "sf8008", "sf8008m", "sx988", "ip8", "ustym4kpro", "ustym4kottpremium", "ustym4ks2ottx", "beyonwizv2", "viper4k", "og2ott4k", "og2s4k", "sx88v2", "sx888") and ("usb_update.bin", "none"))
+BoxInfo.setItem("canRecovery", MODEL in ("hd51", "vs1500", "h7", "8100s") and ("disk.img", "mmcblk0p1") or MODEL in ("xc7439", "ed72604") and ("emmc.img", "mmcblk1p1") or MODEL in ("gbmv200", "ocmv200", "sx988", "ip8", "ustym4kpro", "ustym4kottpremium", "ustym4ks2ottx", "beyonwizv2", "viper4k", "og2ott4k", "og2s4k", "sx88v2", "sx888") and ("usb_update.bin", "none"))
 BoxInfo.setItem("HasFrontDisplayPicon", MODEL in ("et8500", "vusolo4k", "vuuno4kse", "vuduo4k", "vuduo4kse", "vuultimo4k", "gbquad4k", "gbue4k"))
 BoxInfo.setItem("Has24hz", fileCheck("/proc/stb/video/videomode_24hz"))
 BoxInfo.setItem("Has2160p", fileHas("/proc/stb/video/videomode_preferred", "2160p50"))
@@ -668,7 +667,7 @@ BoxInfo.setItem("HasScart", MODEL in ("dm8000", "et4000", "et6500", "et8000", "e
 BoxInfo.setItem("HasSVideo", MODEL in ("dm8000"))
 BoxInfo.setItem("ArchIsARM64", ARCHITECTURE == "aarch64" or "64" in ARCHITECTURE)
 BoxInfo.setItem("ArchIsARM", ARCHITECTURE.startswith(("arm", "cortex")))
-BoxInfo.setItem("RecoveryMode", fileCheck("/proc/stb/fp/boot_mode") or MODEL in ("dreamone", "dreamtwo"))
+BoxInfo.setItem("RecoveryMode", fileCheck("/proc/stb/fp/boot_mode") or MODEL == "dms922x")
 BoxInfo.setItem("Satfinder", isPluginInstalled("Satfinder"))
 BoxInfo.setItem("SmallFlash", BoxInfo.getItem("smallflash"))
 BoxInfo.setItem("AmlogicFamily", SOC_FAMILY.startswith(("aml", "meson")) or exists("/proc/device-tree/amlogic-dt-id") or exists("/usr/bin/amlhalt") or exists("/sys/module/amports"))
@@ -703,8 +702,8 @@ BoxInfo.setItem("FrontpanelLEDBlinkControl", fileExists("/proc/stb/fp/led_blink"
 BoxInfo.setItem("FrontpanelLEDBrightnessControl", fileExists("/proc/stb/fp/led_brightness"))
 BoxInfo.setItem("FrontpanelLEDColorControl", fileExists("/proc/stb/fp/led_color"))
 BoxInfo.setItem("FrontpanelLEDFadeControl", fileExists("/proc/stb/fp/led_fade"))
-BoxInfo.setItem("DisplaySetup", MODEL not in ("dreamone",))
-BoxInfo.setItem("DM9X0", MODEL in ("dm900", "dm920"))
+BoxInfo.setItem("DisplaySetup", MACHINEBUILD != "dreamone")
+BoxInfo.setItem("DM9X0", MODEL == "dm7252s")
 
 # Dont't sort.
 BoxInfo.setItem("ConfigDisplay", BoxInfo.getItem("FrontpanelDisplay") and DISPLAYTYPE not in ("7segment",))

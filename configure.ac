@@ -178,47 +178,39 @@ fi
 
 AM_CONDITIONAL(HAVE_COLORLCD800, test x"$withcolorlcd800" != xno)
 
-AM_CONDITIONAL(DMAMLOGIC, test "$BOXTYPE" == "dreamone" -o "$BOXTYPE" == "dreamtwo")
 AM_CONDITIONAL(DREAMBOX, test `echo "$BOXTYPE" | cut -b 1-2` == "dm" -o `echo "$BOXTYPE" | cut -b 1-5` == "dream")
 AM_CONDITIONAL(HAVE_TEMPFANCONTROL, test "$BOXTYPE" == dm8000 -o "$BOXTYPE" == dm800se -o "$BOXTYPE" == dm500hd)
-
-AM_CONDITIONAL(DREAMONE, test "$BOXTYPE" == dreamone)
-AM_CONDITIONAL(DREAMTWO, test "$BOXTYPE" == dreamtwo)
-AM_CONDITIONAL(DM900, test "$BOXTYPE" == dm900)
-AM_CONDITIONAL(DM920, test "$BOXTYPE" == dm920)
+AM_CONDITIONAL(DM7252S, test "$BOXTYPE" == dm7252s)
 AM_CONDITIONAL(DM8000, test "$BOXTYPE" == dm8000)
-AM_CONDITIONAL(DM7080, test "$BOXTYPE" == dm7080)
-AM_CONDITIONAL(DM820, test "$BOXTYPE" == dm820)
+AM_CONDITIONAL(DM7435, test "$BOXTYPE" == dm7435)
 AM_CONDITIONAL(DM520, test "$BOXTYPE" == dm520)
 AM_CONDITIONAL(DM7020HD, test "$BOXTYPE" == dm7020hd)
-AM_CONDITIONAL(DM7020HDV2, test "$BOXTYPE" == dm7020hdv2)
 AM_CONDITIONAL(DM800, test "$BOXTYPE" == dm800)
-AM_CONDITIONAL(DM800SE, test "$BOXTYPE" == dm800se)
-AM_CONDITIONAL(DM800SEV2, test "$BOXTYPE" == dm800sev2)
-AM_CONDITIONAL(DM500HD, test "$BOXTYPE" == dm500hd)
-AM_CONDITIONAL(DM500HDV2, test "$BOXTYPE" == dm500hdv2)
-
-AM_CONDITIONAL(HAVE_COLORLCD3, test "$BOXTYPE" == dm7080)
-AM_CONDITIONAL(HAVE_COLORLCD240, test "$BOXTYPE" == dreamtwo)
-AM_CONDITIONAL(HAVE_COLORLCD2, test "$BOXTYPE" == dm800se -o "$BOXTYPE" == dm800sev2 -o "$BOXTYPE" == dm820)
-AM_CONDITIONAL(HAVE_COLORLCD1, test "$BOXTYPE" == dm8000 -o "$BOXTYPE" == dm800 -o "$BOXTYPE" == dm7020hd -o "$BOXTYPE" == dm7020hdv2)
+AM_CONDITIONAL(DM7405NAND, test "$BOXTYPE" == dm7405nand)
+AM_CONDITIONAL(DM7405UBI, test "$BOXTYPE" == dm7405ubi)
+AM_CONDITIONAL(HAVE_COLORLCD3, test "$MACHINEBUILD" == dm7080)
+AM_CONDITIONAL(HAVE_COLORLCD240, test "$MACHINEBUILD" == dreamtwo)
+AM_CONDITIONAL(HAVE_COLORLCD2, test "$MACHINEBUILD" == dm800se -o "$MACHINEBUILD" == dm800sev2 -o "$MACHINEBUILD" == dm820)
+AM_CONDITIONAL(HAVE_COLORLCD1, test "$BOXTYPE" == dm8000 -o "$BOXTYPE" == dm800 -o "$BOXTYPE" == dm7020hd -o "$MACHINEBUILD" == dm7020hdv2)
 AM_CONDITIONAL(HAVE_GRAUTEC8000, test "$BOXTYPE" == dm8000)
-AM_CONDITIONAL(HAVE_GRAUTEC70X0, test "$BOXTYPE" == dm7020hd -o "$BOXTYPE" == dm7020hdv2 -o "$BOXTYPE" == dm7080)
+AM_CONDITIONAL(HAVE_GRAUTEC70X0, test "$BOXTYPE" == dm7020hd -o "$MACHINEBUILD" == dm7020hdv2 -o "$MACHINEBUILD" == dm7080)
 AM_CONDITIONAL(LCD_FRAMEBUFFER_MODE, test "$BOXTYPE" == et8500 -o "$BOXTYPE" == et8500s -o "$BOXTYPE" == 8100s)
 
-AS_IF([test "$BOXTYPE" == "dreamone"],[AC_DEFINE(HWDREAMONE, 1,[dreamone])])
-AS_IF([test "$BOXTYPE" == "dreamtwo"],[AC_DEFINE(HWDREAMTWO, 1,[dreamtwo])])
+AS_IF([test "$MACHINEBUILD" == "dreamone"],[AC_DEFINE(HWDREAMONE, 1,[dreamone])])
+AS_IF([test "$MACHINEBUILD" == "dreamtwo"],[AC_DEFINE(HWDREAMTWO, 1,[dreamtwo])])
 AS_IF([test "$BOXTYPE" == "dm8000"],[AC_DEFINE(HWDM8000, 1,[dm8000])])
-AS_IF([test "$BOXTYPE" == "dm7020hd" -o "$BOXTYPE" == "dm7020hdv2"],[AC_DEFINE(HWDM7020HD, 1,[dm7020hd])])
-AS_IF([test "$BOXTYPE" == "dm7080"],[AC_DEFINE(HWDM7080, 1,[dm7080])])
-AS_IF([test "$BOXTYPE" == "dm820"],[AC_DEFINE(HWDM820, 1,[dm820])])
+AS_IF([test "$BOXTYPE" == "dm7020hd" -o "$MACHINEBUILD" == "dm7020hdv2"],[AC_DEFINE(HWDM7020HD, 1,[dm7020hd])])
+AS_IF([test "$BOXTYPE" == "dm7435"],[AC_DEFINE(HWDM7435, 1,[dm7435])])
+AS_IF([test "$MACHINEBUILD" == "dm7080"],[AC_DEFINE(HWDM7080, 1,[dm7080])])
+AS_IF([test "$MACHINEBUILD" == "dm820"],[AC_DEFINE(HWDM820, 1,[dm820])])
 AS_IF([test "$BOXTYPE" == "dm520" -o "$BOXTYPE" == "dm525"],[AC_DEFINE(HWDM520, 1,[dm520])])
-AS_IF([test "$BOXTYPE" == "dm900"],[AC_DEFINE(HWDM900, 1,[dm900])])
-AS_IF([test "$BOXTYPE" == "dm920"],[AC_DEFINE(HWDM920, 1,[dm920])])
-AS_IF([test "$BOXTYPE" == "dm800se"],[AC_DEFINE(HWDM800SE, 1,[dm800se])])
-AS_IF([test "$BOXTYPE" == "dm500hd"],[AC_DEFINE(HWDM500HD, 1,[dm500hd])])
-AS_IF([test "$BOXTYPE" == "dm800sev2"],[AC_DEFINE(HWDM800SEV2, 1,[dm800sev2])])
-AS_IF([test "$BOXTYPE" == "dm500hdv2"],[AC_DEFINE(HWDM500HDV2, 1,[dm500hdv2])])
+AS_IF([test "$BOXTYPE" == "dm7252s"],[AC_DEFINE(HWDM7252S, 1,[dm7252s])])
+AS_IF([test "$MACHINEBUILD" == "dm900"],[AC_DEFINE(HWDM900, 1,[dm900])])
+AS_IF([test "$MACHINEBUILD" == "dm920"],[AC_DEFINE(HWDM920, 1,[dm920])])
+AS_IF([test "$MACHINEBUILD" == "dm800se"],[AC_DEFINE(HWDM800SE, 1,[dm800se])])
+AS_IF([test "$MACHINEBUILD" == "dm500hd"],[AC_DEFINE(HWDM500HD, 1,[dm500hd])])
+AS_IF([test "$MACHINEBUILD" == "dm800sev2"],[AC_DEFINE(HWDM800SEV2, 1,[dm800sev2])])
+AS_IF([test "$MACHINEBUILD" == "dm500hdv2"],[AC_DEFINE(HWDM500HDV2, 1,[dm500hdv2])])
 
 if test `echo "$BOXTYPE" | cut -b 1-2` == "dm" -o `echo "$BOXTYPE" | cut -b 1-5` == "dream"; then
 	AC_DEFINE(DREAMBOX, 1, [Dreambox hardware])
@@ -229,38 +221,30 @@ if test "$BOXTYPE" == "dreamone" -o "$BOXTYPE" == "dreamtwo"; then
 	AC_DEFINE(DMAMLOGIC, 1, [Dreambox Amlogic hardware])
 fi
 
-if test "$BOXTYPE" == "dm7080" -o "$BOXTYPE" == "dm820" -o "$BOXTYPE" == "dm800se" -o "$BOXTYPE" == "dm800sev2" -o "$BOXTYPE" == "dm7020hd" -o "$BOXTYPE" == "dm7020hdv2" -o "$BOXTYPE" == "dm900" -o "$BOXTYPE" == "dm920" -o "$BOXTYPE" == "dreamone" -o "$BOXTYPE" == "dreamtwo"; then
-	AC_DEFINE(DREAMBOX_DUAL_TUNER, 1,[define dreambox dual tuner])
+if test "$BOXTYPE" == "dm7435" -o "$MACHINEBUILD" == "dm800se" -o "$MACHINEBUILD" == "dm800sev2" -o "$BOXTYPE" == "dm7020hd" -o "$MACHINEBUILD" == "dm7020hdv2" -o "$BOXTYPE" == "dms922x" -o "$BOXTYPE" == "dm7252s"; then
+	AC_DEFINE(DREAMBOX_DUAL_TUNER, 1,[define BOXTYPE DM7080])
 fi
 
-if test "$BOXTYPE" == "dreamtwo"; then
+if test "$MACHINEBUILD" == "dreamtwo"; then
 	AC_DEFINE(LCD_COLOR_BYTESWAP_16, 1, [LCD 16-bit Byte-Swap])
 fi
 
-if test "$BOXTYPE" == "dm7080" -o "$BOXTYPE" == "dm820" -o "$BOXTYPE" == "dm900" -o "$BOXTYPE" == "dm920" -o "$BOXTYPE" == "dm520"; then
+if test "$BOXTYPE" == "dm7435" -o "$BOXTYPE" == "dm7252s" -o "$BOXTYPE" == "dm520"; then
 	AC_DEFINE(CONFIG_ION, 1,[define BOX use ION Allocator])
 	AC_DEFINE(DREAMBCM_ION_ACCEL, 1,[define Dreambox Broadcom ION framebuffer acceleration])
 fi
 
-if test "$BOXTYPE" == "dm7080" -o "$BOXTYPE" == "dm820" -o "$BOXTYPE" == "dm900" -o "$BOXTYPE" == "dm920"; then
+if test "$BOXTYPE" == "dm7435" -o "$BOXTYPE" == "dm7252s"; then
 	AC_DEFINE(HAVE_HDMIIN_DM, 1,[has hdmi in dm])
 fi
 
-if test "$BOXTYPE" == "dm900" -o "$BOXTYPE" == "dm920"; then
-	AC_DEFINE(DM9X0_LCD, 1,[define when we need to move lcd text a bit to the right])
+if test "$BOXTYPE" == "dm7252s"; then
+	AC_DEFINE(LCD_DM900_Y_OFFSET, 4,[define LCD Y offset for dm900 and dm920])
 	AC_DEFINE(HAVE_DM_FBC, 1,[define for dm900 and dm920])
 	AC_DEFINE(ENABLE_TIMESHIFT_HW_LATENCY_FIX, 1,[define for dm900 and dm920])
 fi
 
-if test "$BOXTYPE" == "dreamone" -o "$BOXTYPE" == "dreamtwo"; then
-	AC_DEFINE(HAVE_AMLOGIC, 1,[define when we need to use amlogic])
-fi
-
-if test "$BOXTYPE" == "dm7080" -o "$BOXTYPE" == "dm820" -o "$BOXTYPE" == "dm900" -o "$BOXTYPE" == "dm920"; then
-	AC_DEFINE(HAVE_HDMIIN_DREAMBOX, 1,[has dreambox hdmi in])
-fi
-
-if test "$BOXTYPE" == "gb7252" -o "$BOXTYPE" == "dm900" -o "$BOXTYPE" == "dm920"; then
+if test "$BOXTYPE" == "gb7252" -o "$BOXTYPE" == "dm7252s"; then
 	AC_DEFINE(LCD_FORCE_RGB, 1,[define 16 Bit LCD force rgb])
 fi
 AC_ARG_WITH(nolcd,
@@ -318,6 +302,13 @@ fi
 
 if test "$BOXTYPE" == "vuultimo4k" -o "$BOXTYPE" == "vuduo4kse"; then
 	AC_DEFINE(PASSTHROUGH_FIX, 1 ,[define when passthrough is not entirely supported by drivers (usually Vu+)])
+fi
+
+# VFD Symbols Poll Time
+if test "$MACHINEBUILD" == "dm7020hd" -o "$MACHINEBUILD" == "dm7020hdv2"; then
+	AC_DEFINE(VFDSymbolsPoll, 1,[define VFD Symbols Poll])
+else
+	AC_DEFINE(VFDSymbolsPoll, 0,[define VFD Symbols Poll])
 fi
 
 AC_ARG_WITH(libsdl,
@@ -423,18 +414,10 @@ if test x"$with_lcddev" != xno ; then
 fi
 
 AC_ARG_WITH(amlogic,
-	AC_HELP_STRING([--with-amlogic], [use amlogic MPEG decoder]),
+	AS_HELP_STRING([--with-amlogic], [use amlogic MPEG decoder]),
 	[[with_amlogic=$withval]],
 	[[with_amlogic=no]]
 )
-AM_CONDITIONAL(HAVE_AMLOGIC, test x"$with_amlogic" = xyes)
-if test x"$with_amlogic" = xyes ; then
-	AC_DEFINE(HAVE_AMLOGIC, 1,[Enables AMLOGIC decoder support])
-	PKG_CHECK_MODULES(AMCODEC, libamcodec)
-	PKG_CHECK_MODULES(AMADEC, libamadec)
-	PKG_CHECK_MODULES(DVBCSA, libdvbcsa)
-	ALSA_CFLAGS="-lasound"
-fi
 
 FFMPEG_CFLAGS=" "
 
@@ -651,8 +634,8 @@ AC_SUBST([VUPL_LIBS])
 AC_SUBST([V3DPLATFORM_CFLAGS])
 AC_SUBST([V3DPLATFORM_LIBS])
 
-AM_CONDITIONAL(DREAMNEXTGEN, test "$BOXTYPE" == dreamone -o "$BOXTYPE" == dreamtwo)
-if test "$BOXTYPE" == "dreamone" -o "$BOXTYPE" == "dreamtwo"; then
+AM_CONDITIONAL(DREAMNEXTGEN, test "$BOXTYPE" == dms922x)
+if test "$BOXTYPE" == "dms922x"; then
 	ALSA_CFLAGS="-lasound"
 	FFMPEG_CFLAGS=" -lavdevice -lavformat -lavcodec -lswresample -lswscale -lavutil -lm "
 	AC_DEFINE(DREAMNEXTGEN, 1, [Dreambox NexT Generation Hardware])

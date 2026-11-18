@@ -14,7 +14,6 @@ from Components.Console import Console
 from Tools.Directories import fileReadLines, fileReadLine, fileWriteLines
 from Tools.CList import CList
 
-MODEL = BoxInfo.getItem("model")
 MODULE_NAME = __name__.split(".")[-1]
 
 
