@@ -197,11 +197,11 @@ class PluginBrowser(Screen, NumericalTextInput, ProtectedScreen):
 		self.internetCheckedTime = None
 		self.internetCheckThread = None
 
-		self["key_red"] = self["red"] = StaticText(_("Remove plugins"))
-		self["key_green"] = self["green"] = StaticText(_("Download plugins"))
-		self["key_yellow"] = self["yellow"] = StaticText(_("Update plugins"))
-		self["key_blue"] = self["blue"] = StaticText()
-		self["key_menu"] = StaticText(_("MENU"))
+		self["key_red"] = self["red"] = Label("Remove plugins")
+		self["key_green"] = self["green"] = Label("Download plugins")
+		self["key_yellow"] = self["yellow"] = Label("Update plugins")
+		self["key_blue"] = self["blue"] = Label()
+		self["key_menu"] = Label("MENU")
 		self["quickselect"] = Label()
 		self["quickselect"].hide()
 		self["description"] = Label()
@@ -618,9 +618,9 @@ class PluginBrowserNew(Screen, ProtectedScreen):
 		self["list"] = PluginList(self.list)
 		self["pages"] = Label()
 		self["plugin_description"] = Label()
-		self["key_red"] = self["red"] = StaticText(_("Remove plugins"))
-		self["key_green"] = self["green"] = StaticText(_("Download plugins"))
-		self["key_yellow"] = self["yellow"] = StaticText(_("Update plugins"))
+		self["key_red"] = self["red"] = Label("Remove plugins")
+		self["key_green"] = self["green"] = Label("Download plugins")
+		self["key_yellow"] = self["yellow"] = Label("Update plugins")
 
 		self["actions"] = ActionMap(["WizardActions", "MenuActions"],
 		{
