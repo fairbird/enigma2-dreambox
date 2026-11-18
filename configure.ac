@@ -479,7 +479,7 @@ esac
 
 is_dreambcm_egl_box=no
 case "$BOXTYPE" in
-  dm520|dm525|dm7435|dm7252s|dm900|dm920|dm7080|dm820)
+  dm520|dm525|dm7435|dm7252s)
     is_dreambcm_egl_box=yes
     ;;
 esac
