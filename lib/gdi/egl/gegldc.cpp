@@ -1131,6 +1131,9 @@ void gEGLDC::captureBackgroundIntoPixmap(const eRect& rect) {
 	flushBlitBatch();
 	flushTextBatch();
 
+	if (!m_window_provider->canReadBack())
+		return;
+
 	if (!m_pixmap || !m_pixmap->surface || !m_pixmap->surface->data)
 		return;
 

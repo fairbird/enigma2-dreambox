@@ -17,6 +17,9 @@ public:
 	// platforms (Dreambox's VC5/BEGL stack) only implement the pixmap path.
 	virtual bool usesPixmapSurface() const { return false; }
 
+	// False when the platform's EGL cannot read the render target back with glReadPixels()
+	virtual bool canReadBack() const { return true; }
+
 	// Returns the native window (e.g. wl_egl_window for Wayland). Only called when
 	// usesPixmapSurface() is false.
 	virtual EGLNativeWindowType getNativeWindow() { return (EGLNativeWindowType)0; }

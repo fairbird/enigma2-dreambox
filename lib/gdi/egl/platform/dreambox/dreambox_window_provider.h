@@ -34,6 +34,8 @@ public:
 	bool init(int width, int height) override;
 	EGLNativeDisplayType getNativeDisplay() override;
 	bool usesPixmapSurface() const override;
+	// libvc5dream of the older stack (window surface) has no CPU access to the buffers: its bcmDisplayBufferAccess() is assert(0)
+	bool canReadBack() const override { return usesPixmapSurface(); }
 	EGLNativeWindowType getNativeWindow() override;
 	int getPageCount() const override { return m_page_count; }
 	void* getNativePixmap(int page) override;
