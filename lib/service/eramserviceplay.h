@@ -63,6 +63,7 @@ private:
 	// Frozen play position (PTS delta) captured at stream-corruption onset.
 	// Prevents PRS from seeing a spuriously advancing getPTS() during pause.
 	pts_t m_frozen_play_position;
+	unsigned int m_trace_ticks = 0;
 };
 
 #endif // __lib_service_eramserviceplay_h
