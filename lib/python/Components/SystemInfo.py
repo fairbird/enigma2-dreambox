@@ -450,7 +450,7 @@ def getKernelVersion():  # Version of the package of the running kernel, with it
 	return result
 
 
-def getChipsetString():
+def getChipSetString():
 	if MODEL == "dm7435":
 		chipset = "7435"
 	elif MODEL in ("dm520", "dm525"):
