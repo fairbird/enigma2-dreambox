@@ -430,6 +430,7 @@ public:
 };
 
 void gEGLDCSetAnimationCurrent(int animation);
+int gEGLDCRegisterAnimationSpec(const char* spec);
 void gEGLDCSetAnimationSpeed(int speed);
 void gEGLDCSetToastAnimationSpeed(int speed);
 void gEGLDCSetAnimationListbox(int animation);

@@ -12,6 +12,7 @@
 #include <cmath>
 #include <fstream>
 #include <iterator>
+#include <sstream>
 #include <errno.h>
 #include <fcntl.h>
 #include <poll.h>
@@ -462,6 +463,161 @@ static float clampFloat(float value, float min_value, float max_value) {
 	return std::max(min_value, std::min(max_value, value));
 }
 
+// Window animations defined by data/animations.xml (see Components/ScreenAnimations.py). A registered
+// spec is selected like a built-in style with the id E2EGL_SPEC_ANIMATION_BASE + its registration index.
+static const int E2EGL_SPEC_ANIMATION_BASE = 1000;
+
+struct E2EGLAnimProp {
+	int on = 0;
+	float a = 0.0f, b = 0.0f;
+	int ax = 1, ay = 1;
+	int centered = 0;
+	int type = -1;
+	float factor = 1.0f;
+};
+
+struct E2EGLAnimSpec {
+	float duration = 0.25f;
+	int base_type = 0;
+	float base_factor = 1.0f;
+	E2EGLAnimProp p[6]; // alpha show/hide, position show/hide, size show/hide
+};
+
+static std::vector<E2EGLAnimSpec> s_egl_animation_specs;
+static std::mutex s_egl_animation_specs_mutex;
+
+static bool copyAnimationSpec(int style, E2EGLAnimSpec& spec) {
+	std::lock_guard<std::mutex> lock(s_egl_animation_specs_mutex);
+	const int index = style - E2EGL_SPEC_ANIMATION_BASE;
+	if (index < 0 || index >= (int)s_egl_animation_specs.size())
+		return false;
+	spec = s_egl_animation_specs[index];
+	return true;
+}
+
+static int clampAnimationStyle(int animation) {
+	if (animation >= E2EGL_SPEC_ANIMATION_BASE) {
+		E2EGLAnimSpec spec;
+		return copyAnimationSpec(animation, spec) ? animation : 0;
+	}
+	return clampInt(animation, 0, E2EGL_WINDOW_ANIMATION_MAX);
+}
+
+static int specAnimationDurationMs(int style) {
+	E2EGLAnimSpec spec;
+	if (!copyAnimationSpec(style, spec))
+		return 0;
+	return clampInt((int)(spec.duration * 1000.0f * 15.0f / (float)std::max(5, s_egl_animation_speed)), 60, 1500);
+}
+
+static float specAnimationInterpolate(int type, float factor, float t) {
+	t = clampFloat(t, 0.0f, 1.0f);
+	switch (type) {
+	case 1: // accelerate
+		return powf(t, 2.0f * factor);
+	case 2: // decelerate
+		return 1.0f - powf(1.0f - t, 2.0f * factor);
+	case 3: { // overshoot
+		const float s = t - 1.0f;
+		return s * s * ((factor + 1.0f) * s + factor) + 1.0f;
+	}
+	case 4: { // bounce
+		auto bounce = [](float x) { return x * x * 8.0f; };
+		t *= 1.1226f;
+		if (t < 0.3535f)
+			return bounce(t);
+		if (t < 0.7408f)
+			return bounce(t - 0.54719f) + 0.7f;
+		if (t < 0.9644f)
+			return bounce(t - 0.8526f) + 0.9f;
+		return bounce(t - 1.0435f) + 0.95f;
+	}
+	default:
+		return t;
+	}
+}
+
+static void specAnimationState(const E2EGLAnimSpec& s, bool show, const eRect& r, float screen_w, float screen_h, float t, float& alpha, float& x, float& y, float& w, float& h) {
+	const float fx = (float)r.x(), fy = (float)r.y();
+	const float fw = (float)r.width(), fh = (float)r.height();
+
+	auto progress = [&](const E2EGLAnimProp& p) {
+		const int type = p.type >= 0 ? p.type : s.base_type;
+		const float factor = p.type >= 0 ? p.factor : s.base_factor;
+		return specAnimationInterpolate(type, factor, t);
+	};
+	auto lerp = [](float a, float b, float p) { return a + (b - a) * p; };
+
+	alpha = 1.0f;
+	x = fx;
+	y = fy;
+	w = fw;
+	h = fh;
+
+	// alpha: [0] show, [1] hide
+	{
+		const E2EGLAnimProp &sh = s.p[0], &hd = s.p[1];
+		if (show) {
+			if (sh.on)
+				alpha = lerp(sh.a, 1.0f, progress(sh));
+		} else if (hd.on) {
+			alpha = lerp(1.0f, hd.a, progress(hd));
+		} else if (sh.on) {
+			alpha = lerp(sh.a, 1.0f, 1.0f - progress(sh));
+		}
+	}
+
+	// position: [2] show, [3] hide
+	{
+		const E2EGLAnimProp &sh = s.p[2], &hd = s.p[3];
+		const E2EGLAnimProp* a = nullptr;
+		float p = 0.0f;
+		bool toTarget = false;
+		if (show) {
+			if (sh.on) { a = &sh; p = progress(sh); }
+		} else if (hd.on) {
+			a = &hd; p = progress(hd); toTarget = true;
+		} else if (sh.on) {
+			a = &sh; p = 1.0f - progress(sh);
+		}
+		if (a) {
+			if (a->ax) {
+				const float v = a->a * screen_w;
+				x = fx + (toTarget ? lerp(0.0f, v, p) : lerp(v, 0.0f, p));
+			}
+			if (a->ay) {
+				const float v = a->a * screen_h;
+				y = fy + (toTarget ? lerp(0.0f, v, p) : lerp(v, 0.0f, p));
+			}
+		}
+	}
+
+	// size: [4] show, [5] hide
+	{
+		const E2EGLAnimProp &sh = s.p[4], &hd = s.p[5];
+		const E2EGLAnimProp* a = nullptr;
+		float p = 0.0f;
+		bool toTarget = false;
+		if (show) {
+			if (sh.on) { a = &sh; p = progress(sh); }
+		} else if (hd.on) {
+			a = &hd; p = progress(hd); toTarget = true;
+		} else if (sh.on) {
+			a = &sh; p = 1.0f - progress(sh);
+		}
+		if (a) {
+			if (a->ax)
+				w = toTarget ? lerp(fw, a->a, p) : lerp(a->a, fw, p);
+			if (a->ay)
+				h = toTarget ? lerp(fh, a->b, p) : lerp(a->b, fh, p);
+			if (a->centered) {
+				x += (fw - w) / 2.0f;
+				y += (fh - h) / 2.0f;
+			}
+		}
+	}
+}
+
 static bool isToastLikeWindow(const eRect& source, int screen_width, int screen_height) {
 	if (source.empty())
 		return false;
@@ -733,8 +889,25 @@ static void logBlitOp(const char* op, const eRect& dest, const eRect& src, gPixm
 }
 
 void gEGLDCSetAnimationCurrent(int animation) {
-	s_egl_animation_current = clampInt(animation, 0, E2EGL_WINDOW_ANIMATION_MAX);
+	s_egl_animation_current = clampAnimationStyle(animation);
 	eDebug("[gEGLDC] window animation set to %d", s_egl_animation_current);
+}
+
+int gEGLDCRegisterAnimationSpec(const char* spec) {
+	if (!spec || !*spec)
+		return 0;
+	E2EGLAnimSpec s;
+	float duration = 0.0f;
+	std::istringstream in(spec);
+	in >> duration >> s.base_type >> s.base_factor;
+	for (int i = 0; i < 6; ++i)
+		in >> s.p[i].on >> s.p[i].a >> s.p[i].b >> s.p[i].ax >> s.p[i].ay >> s.p[i].centered >> s.p[i].type >> s.p[i].factor;
+	if (in.fail() || duration <= 0.0f)
+		return 0;
+	s.duration = duration;
+	std::lock_guard<std::mutex> lock(s_egl_animation_specs_mutex);
+	s_egl_animation_specs.push_back(s);
+	return E2EGL_SPEC_ANIMATION_BASE + (int)s_egl_animation_specs.size() - 1;
 }
 
 void gEGLDCSetAnimationSpeed(int speed) {
@@ -758,9 +931,9 @@ bool gEGLDC::supportsListboxAnimations() const {
 
 void gEGLDCSetAnimationProfiles(int enabled, int dialog, int popup, int toast) {
 	s_egl_animation_profiles = enabled != 0;
-	s_egl_animation_dialog = clampInt(dialog, 0, E2EGL_WINDOW_ANIMATION_MAX);
-	s_egl_animation_popup = clampInt(popup, 0, E2EGL_WINDOW_ANIMATION_MAX);
-	s_egl_animation_toast = clampInt(toast, 0, E2EGL_WINDOW_ANIMATION_MAX);
+	s_egl_animation_dialog = clampAnimationStyle(dialog);
+	s_egl_animation_popup = clampAnimationStyle(popup);
+	s_egl_animation_toast = clampAnimationStyle(toast);
 	eDebug("[gEGLDC] window animation profiles %s: dialog=%d popup=%d toast=%d",
 		s_egl_animation_profiles ? "enabled" : "disabled",
 		s_egl_animation_dialog, s_egl_animation_popup, s_egl_animation_toast);
@@ -3125,6 +3298,20 @@ eRect gEGLDC::stripedWindowDamageRect(const eRect& source) const {
 eRect gEGLDC::animatedWindowDestRect(const eRect& source, float visible_progress, bool show, int animation, float* alpha_out) const {
 	(void)show;
 
+	if (animation >= E2EGL_SPEC_ANIMATION_BASE) {
+		E2EGLAnimSpec spec;
+		if (copyAnimationSpec(animation, spec)) {
+			// visible_progress is easeOut(t) (inverted when hiding): get the plain time t back, the spec has its own interpolators
+			const float u = clampFloat(show ? visible_progress : 1.0f - visible_progress, 0.0f, 1.0f);
+			const float t = 1.0f - sqrtf(1.0f - u);
+			float spec_alpha, spec_x, spec_y, spec_w, spec_h;
+			specAnimationState(spec, show, source, std::max(1.0f, (float)m_width), std::max(1.0f, (float)m_height), t, spec_alpha, spec_x, spec_y, spec_w, spec_h);
+			if (alpha_out)
+				*alpha_out = clampFloat(spec_alpha, 0.0f, 1.0f);
+			return eRect((int)spec_x, (int)spec_y, std::max(1, (int)spec_w), std::max(1, (int)spec_h));
+		}
+	}
+
 	float x = (float)source.x();
 	float y = (float)source.y();
 	float w = (float)source.width();
@@ -3373,7 +3560,7 @@ void gEGLDC::executeWindowAnimationOpcode(const gOpcode* op, bool show) {
 		eRect rect(op->parm.setShowHideInfo->point, op->parm.setShowHideInfo->size);
 		rect = clampToScreen(rect);
 		const int animation = op->parm.setShowHideInfo->animation < 0 ? effectiveWindowAnimationForRect(rect, m_width, m_height) :
-			clampInt(op->parm.setShowHideInfo->animation, 0, E2EGL_WINDOW_ANIMATION_MAX);
+			clampAnimationStyle(op->parm.setShowHideInfo->animation);
 		if (animation > 0 && !rect.empty()) {
 			if (m_compactOld && m_pending_window_animation.rect != rect) {
 				deleteCompactTextures();
@@ -3402,7 +3589,7 @@ void gEGLDC::executeWindowAnimationOpcode(const gOpcode* op, bool show) {
 				m_pending_window_animation.show = show;
 				m_pending_window_animation.rect = rect;
 				m_pending_window_animation.style = animation;
-				m_pending_window_animation.durationMs = op->parm.setShowHideInfo->durationMs;
+				m_pending_window_animation.durationMs = op->parm.setShowHideInfo->durationMs > 0 ? op->parm.setShowHideInfo->durationMs : specAnimationDurationMs(animation);
 				m_pending_window_animation.explicitStyle = explicitStyle;
 				if (e2eglTraceGlEnabled())
 					eDebug("[e2egl:animation] pending style=%d explicit=%d show=%d rect=%d,%d %dx%d", animation, explicitStyle, show, rect.x(), rect.y(), rect.width(), rect.height());

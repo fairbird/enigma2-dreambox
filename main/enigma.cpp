@@ -538,6 +538,16 @@ void setAnimation_current(int a)
 #endif
 }
 
+int registerAnimation_spec(const char *spec)
+{
+#if defined(HAVE_EGL)
+	if (supportsEGLAnimations())
+		return gEGLDCRegisterAnimationSpec(spec);
+#endif
+	(void)spec;
+	return 0;
+}
+
 void setAnimation_speed(int speed)
 {
 #if defined(HAVE_EGL)

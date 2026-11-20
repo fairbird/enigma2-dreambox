@@ -3,6 +3,7 @@ from enigma import eTimer, eWidget, getDesktop, getGraphicsInfo, setAnimation_cu
 from Components.ActionMap import ActionMap
 from Components.config import ConfigSelection, ConfigSelectionNumber, ConfigSubsection, ConfigYesNo, config
 from Components.Label import Label
+from Components.ScreenAnimations import loadSpecAnimations
 from Components.SystemInfo import BoxInfo
 from Components.Sources.StaticText import StaticText
 from Screens.MessageBox import MessageBox
@@ -39,7 +40,7 @@ ANIMATION_CHOICES = [
 	(ANIMATION_CLASSIC_GROUP, _("Classic animation")),
 ]
 
-CLASSIC_ANIMATION_CHOICES = [
+NATIVE_CLASSIC_ANIMATION_CHOICES = [
 	(1, _("Simple fade")),
 	(2, _("Simple zoom")),
 	(3, _("Grow drop")),
@@ -55,6 +56,9 @@ CLASSIC_ANIMATION_CHOICES = [
 	(13, _("Zoom from right")),
 	(14, _("Stripes")),
 ]
+
+# the animations of animations.xml replace the native classic ones when the engine supports them
+CLASSIC_ANIMATION_CHOICES = (loadSpecAnimations() if E2EGL_ANIMATIONS else []) or NATIVE_CLASSIC_ANIMATION_CHOICES
 
 
 class InfoBarAnimations:
@@ -86,7 +90,7 @@ infoBarAnimations = InfoBarAnimations()
 if not hasattr(config.misc, "animation"):
 	config.misc.animation = ConfigSubsection()
 config.misc.animation.default = ConfigSelection(choices=ANIMATION_CHOICES, default=ANIMATION_DEFAULT)
-config.misc.animation.classic = ConfigSelection(choices=CLASSIC_ANIMATION_CHOICES, default=1)
+config.misc.animation.classic = ConfigSelection(choices=CLASSIC_ANIMATION_CHOICES, default=CLASSIC_ANIMATION_CHOICES[0][0])
 config.misc.animation.speed = ConfigSelectionNumber(ANIMATION_SPEED_MIN, ANIMATION_SPEED_MAX, 1, default=ANIMATION_SPEED_DEFAULT)
 config.misc.animation.toast_speed = ConfigSelectionNumber(5, ANIMATION_SPEED_MAX, 1, default=ANIMATION_TOAST_SPEED_DEFAULT)
 config.misc.animation.listbox = ConfigYesNo(default=False)
