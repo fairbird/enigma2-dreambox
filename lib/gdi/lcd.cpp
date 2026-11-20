@@ -22,7 +22,7 @@ const char *VFD_initial_scroll_delay_proc = "/proc/stb/lcd/initial_scroll_delay"
 const char *VFD_final_scroll_delay_proc = "/proc/stb/lcd/final_scroll_delay"; //  NOSONAR
 const char *VFD_scroll_repeats_proc = "/proc/stb/lcd/scroll_repeats"; //  NOSONAR
 
-#ifdef DM9X0_LCD
+#ifdef LCD_DM900_Y_OFFSET
 #define LCD_DM9X0_Y_OFFSET 4
 #endif
 
@@ -45,7 +45,7 @@ void eLCD::setSize(int xres, int yres, int bpp)
 {
 	_stride = xres * bpp / 8;
 	_buffer = new unsigned char[xres * yres * bpp / 8];
-#ifdef DM9X0_LCD
+#ifdef LCD_DM900_Y_OFFSET
 	xres -= LCD_DM9X0_Y_OFFSET;
 #endif
 	res = eSize(xres, yres);
@@ -499,7 +499,7 @@ void eDBoxLCD::update()
 			}
 			else
 			{
-#if defined(DM9X0_LCD)
+#if defined(LCD_DM900_Y_OFFSET)
 				unsigned char gb_buffer[_stride * res.height()];
 				for (int offset = 0; offset < ((_stride * res.height()) >> 2); offset++)
 				{
