@@ -1,6 +1,6 @@
 #include <lib/gdi/glcddc.h>
 #include <lib/gdi/lcd.h>
-#ifdef LCD_FRAMEBUFFER_MODE
+#ifndef NO_LCD
 #include <lib/gdi/fblcd.h>
 #endif
 #include <lib/base/init.h>
