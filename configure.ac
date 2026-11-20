@@ -83,6 +83,12 @@ AC_ARG_WITH(boxtype,
 AC_SUBST(BOXTYPE)
 AC_DEFINE_UNQUOTED(BOXTYPE,"$BOXTYPE",[box type])
 
+AC_ARG_WITH(machinebuild,
+	[  --with-machinebuild=NAME machine build [[none,atemeo5200,atemeo6000...]]],
+	[MACHINEBUILD="$withval"],[MACHINEBUILD="atemeo5200"])
+AC_SUBST(MACHINEBUILD)
+AC_DEFINE_UNQUOTED(MACHINEBUILD,"$MACHINEBUILD",[machine build])
+
 AC_ARG_WITH(colorlcd,
 	AC_HELP_STRING([--with-colorlcd], [use 96x64 16bpp color display, yes or no]),
 	[[withcolorlcd=$withval]],
