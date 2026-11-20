@@ -14,7 +14,7 @@ from Screens.Standby import inTryQuitMainloop
 from Tools.Directories import fileReadLine, fileWriteLine
 
 
-MODEL = BoxInfo.getItem("model")
+MACHINEBUILD = BoxInfo.getItem("machinebuild")
 
 
 class dummyScreen(Screen):
@@ -472,7 +472,7 @@ def InitLcd():
 		], default="on")
 		if isfile("/proc/stb/fp/power4x7suspend"):
 			config.lcd.power4x7suspend.addNotifier(setPower4x7Suspend)
-		if MODEL in ("dm900", "dm920"):
+		if MACHINEBUILD in ("dm900", "dm920"):
 			standby_default = 4
 		else:
 			standby_default = 1

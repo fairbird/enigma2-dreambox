@@ -13,7 +13,16 @@ gLCDDC::gLCDDC()
 #ifdef LCD_FRAMEBUFFER_MODE
 	lcd = new eFbLCD();
 #else
+#ifndef NO_LCD
+	lcd = new eFbLCD();
+	if (!lcd->detected())
+	{
+		delete lcd;
+		lcd = new eDBoxLCD();
+	}
+#else
 	lcd = new eDBoxLCD();
+#endif
 #endif
 	instance = this;
 

@@ -1048,7 +1048,7 @@ class NimManager:
 
 			entry["fbc"] = [0, 0, 0]  # not fbc
 
-			if entry["name"] and ("fbc" in entry["name"].lower() or (("45308X" in entry["name"].upper() or "45208" in entry["name"].upper() or "BCM3158" in entry["name"].upper()) and BoxInfo.getItem("model") in ("dm900", "dm920")) or (entry["name"] in HasFBCtuner and entry["frontend_device"] is not None and access("/proc/stb/frontend/%d/fbc_id" % entry["frontend_device"], F_OK))):
+			if entry["name"] and ("fbc" in entry["name"].lower() or (("45308X" in entry["name"].upper() or "45208" in entry["name"].upper() or "BCM3158" in entry["name"].upper()) and BoxInfo.getItem("machinebuild") in ("dm900", "dm920")) or (entry["name"] in HasFBCtuner and entry["frontend_device"] is not None and access("/proc/stb/frontend/%d/fbc_id" % entry["frontend_device"], F_OK))):
 				fbc_number += 1
 				if fbc_number <= (entry["type"] and "DVB-C" in entry["type"] and 1 or 2):
 					entry["fbc"] = [1, fbc_number, fbc_tuner]  # fbc root

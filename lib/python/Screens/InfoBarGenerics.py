@@ -81,8 +81,6 @@ from Components.AVSwitch import avSwitch
 # hack alert!
 from Screens.Menu import Menu, MenuHorizontal, findMenu, menuDom
 
-MODEL = BoxInfo.getItem("model")
-
 MODULE_NAME = __name__.split(".")[-1]
 
 AUDIO = False

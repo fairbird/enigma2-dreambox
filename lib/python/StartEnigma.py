@@ -17,8 +17,6 @@ from Components.SystemInfo import BoxInfo
 from Tools.Directories import InitFallbackFiles, resolveFilename, SCOPE_PLUGINS, SCOPE_CURRENT_SKIN
 from traceback import print_exc
 
-MODEL = BoxInfo.getItem("model")
-
 # These entries should be moved back to UsageConfig.py when it is safe to bring UsageConfig init to this location in StartEnigma.py.
 #
 config.crash = ConfigSubsection()
