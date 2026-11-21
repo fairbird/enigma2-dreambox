@@ -361,6 +361,27 @@ def fileWriteLines(filename, lines, source=DEFAULT_MODULE_NAME, debug=False):
 	return result
 
 
+def getPrimarySkinResolution():
+	try:
+		from enigma import getDesktop
+		size = getDesktop(0).size()
+		if size and size.width() > 0 and size.height() > 0:
+			return (size.width(), size.height())
+	except Exception:
+		pass
+	try:
+		from Components.config import config
+		skin_path = getattr(getattr(config, "skin", None), "primary_skin", None)
+		val = skin_path.value if skin_path and hasattr(skin_path, "value") else ""
+		if "2160" in val or "4k" in val.lower() or "uhd" in val.lower():
+			return (3840, 2160)
+		if "1080" in val or "fhd" in val.lower():
+			return (1920, 1080)
+	except Exception:
+		pass
+	return (1280, 720)
+
+
 def fileDate(f):
 	if fileExists(f):
 		return datetime.fromtimestamp(os.stat(f).st_mtime).strftime("%Y-%m-%d")
