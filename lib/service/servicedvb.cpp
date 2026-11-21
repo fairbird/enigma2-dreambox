@@ -4853,6 +4853,8 @@ RESULT eDVBServicePlay::getCachedSubtitle(struct SubtitleTrack &track)
 					int pid = (data&0xFFFF0000)>>16;
 					if (program.textPid == pid) // teletext
 						track.type = 1; // type teletext
+					else if (m_is_stream && !h.isPMTReady())
+						return -1; // the teletext pid is only known after the PMT has been parsed, decide later
 					else
 						track.type = 0; // type dvb
 					track.pid = pid; // pid
