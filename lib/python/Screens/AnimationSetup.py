@@ -24,21 +24,33 @@ E2EGL_ANIMATIONS = hasE2EGLAnimations()
 ANIMATION_DEFAULT = 0 # 15 if E2EGL_ANIMATIONS else 0
 ANIMATION_SPEED_DEFAULT = 15
 ANIMATION_TOAST_SPEED_DEFAULT = 10
-ANIMATION_SPEED_MIN = 5 if BoxInfo.getItem("machinebuild") in ("dreamone", "dreamtwo") else 15
+ANIMATION_SPEED_MIN = 5 if BoxInfo.getItem("machinebuild") in ("dreamone", "dreamtwo", "dm920", "dm900") else 15
 ANIMATION_SPEED_MAX = 30
 ANIMATION_CLASSIC_GROUP = 100
 
-ANIMATION_CHOICES = [
-	(0, _("Disable Animations")),
-	(15, _("Basis animation")),
-	(16, _("Modern adaptive")),
-	(17, _("Fade in / fade out")),
-	(18, _("Dialog pop")),
-	(19, _("Toast slide")),
-	(20, _("Side sheet")),
-	(21, _("Zoom and fade")),
-	(ANIMATION_CLASSIC_GROUP, _("Classic animation")),
-]
+SPEC_ANIMATION_CHOICES = loadSpecAnimations() if E2EGL_ANIMATIONS else []
+
+if SPEC_ANIMATION_CHOICES:
+	ANIMATION_CHOICES = [(0, _("Disable Animations"))] + SPEC_ANIMATION_CHOICES + [
+		(17, _("Fade in / fade out")),
+		(16, _("Modern adaptive")),
+		(18, _("Dialog pop")),
+		(19, _("Toast slide")),
+		(20, _("Side sheet")),
+		(21, _("Zoom and fade")),
+	]
+else:
+	ANIMATION_CHOICES = [
+		(0, _("Disable Animations")),
+		(15, _("Basis animation")),
+		(16, _("Modern adaptive")),
+		(17, _("Fade in / fade out")),
+		(18, _("Dialog pop")),
+		(19, _("Toast slide")),
+		(20, _("Side sheet")),
+		(21, _("Zoom and fade")),
+		(ANIMATION_CLASSIC_GROUP, _("Classic animation")),
+	]
 
 NATIVE_CLASSIC_ANIMATION_CHOICES = [
 	(1, _("Simple fade")),
@@ -57,8 +69,7 @@ NATIVE_CLASSIC_ANIMATION_CHOICES = [
 	(14, _("Stripes")),
 ]
 
-# the animations of animations.xml replace the native classic ones when the engine supports them
-CLASSIC_ANIMATION_CHOICES = (loadSpecAnimations() if E2EGL_ANIMATIONS else []) or NATIVE_CLASSIC_ANIMATION_CHOICES
+CLASSIC_ANIMATION_CHOICES = NATIVE_CLASSIC_ANIMATION_CHOICES
 
 
 class InfoBarAnimations:
@@ -224,10 +235,45 @@ class AnimationSetup(Setup):
 		else:
 			previewAnimation = _animationSelectionValue(config.misc.animation.default)
 		setAnimation_current(previewAnimation)
-		self.session.openWithCallback(self.previewClosed, MessageBox, _("Animation preview"), MessageBox.TYPE_INFO, timeout=3)
+		# the settings screen stays visible below the preview: it is neither hidden nor animated
+		self.instance.setAnimationStyle(0)
+		self.hide = lambda: None
+		self.session.openWithCallback(self.previewClosed, PreviewMessage)
 
 	def previewClosed(self, *result):
+		self.__dict__.pop("hide", None)
+		self.instance.setAnimationStyle(-1)
 		applyAnimationSettings()
+
+
+class PreviewMessage(Screen):
+	skin = """
+		<screen name="PreviewMessage" position="center,center" size="900,340" zPosition="1000" flags="wfNoBorder" transparent="1" resolution="1920,1080">
+			<eLabel position="0,0" size="900,340" zPosition="-1" backgroundColor="#0D1B26" cornerRadius="28" borderWidth="3" borderColor="#5E90A0" />
+			<widget name="text" position="40,40" size="820,100" zPosition="1" font="Regular;48" halign="center" valign="center" foregroundColor="#FFFFFF" transparent="1" />
+			<eLabel position="120,160" size="660,2" backgroundColor="#5E90A0" />
+			<widget name="hint" position="40,180" size="820,120" zPosition="1" font="Regular;32" halign="center" valign="center" foregroundColor="#9FB6C3" transparent="1" />
+		</screen>"""
+
+	def __init__(self, session):
+		Screen.__init__(self, session)
+		self["text"] = Label(_("Animation preview"))
+		self["hint"] = Label()
+		self.left = 3
+		self["actions"] = ActionMap(["OkCancelActions"], {"ok": self.close, "cancel": self.close}, -1)
+		self.timer = eTimer()
+		self.timer.callback.append(self.tick)
+		self.onClose.append(self.timer.stop)
+		self.tick()
+		self.timer.start(1000)
+
+	def tick(self):
+		if self.left <= 0:
+			self.timer.stop()
+			self.close()
+			return
+		self["hint"].setText(_("Closing in %d s") % self.left)
+		self.left -= 1
 
 
 class ContentAnimationPreview(Screen):
