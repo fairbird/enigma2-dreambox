@@ -550,27 +550,6 @@
 		<panel name="SummaryClockPanel" />
 	</screen>
 
-<!-- VMC Screen -->
-	<screen name="VMCBaseSummary" position="0,0" size="390,240">
-		<widget source="parent.Title" render="Label" position="0,0" size="390,178" font="FdLcD;35" foregroundColor="#87CEFA" horizontalAlignment="center" verticalAlignment="center" />
-		<panel name="SummaryClockPanel" />
-	</screen>
-	<screen name="VMCPlayerSummary" position="0,0" size="390,240">
-		<widget source="session.CurrentService" render="Label" position="0,0" size="390,133" font="FdLcD;38" horizontalAlignment="center" verticalAlignment="center" transparent="1" zPosition="2">
-			<convert type="ServiceName">Name</convert>
-		</widget>
-		<eLabel position="0,131" size="390,2" backgroundColor="#BDBDBD" zPosition="3" />
-		<widget source="session.CurrentService" render="Progress" position="0,138" size="390,25" transparent="1">
-			<convert type="ServicePosition">Position</convert>
-		</widget>
-		<eLabel position="0,168" size="390,2" backgroundColor="#BDBDBD" zPosition="3" />
-		<widget source="session.CurrentService" render="Label" position="300,173" size="100,40" font="FdLcD;40" foregroundColor="#A9E2F3" zPosition="0" horizontalAlignment="right" transparent="1">
-			<convert type="ServicePosition">Remaining,ShowNoSeconds,OnlyMinute</convert>
-		</widget>
-		<panel name="MeinRecordingPanel" />
-		<panel name="SummaryClockPanel" />
-		<panel name="MeinTunerInfoPanel" />
-	</screen>
 	<!-- Radio text / optional color-display DAB slideshow -->
 	<screen name="RdsInfoDisplaySummary" position="0,0" size="390,240" zPosition="1" backgroundColor="#000000" flags="wfNoBorder">
 		<widget source="station" render="RunningText" position="0,0" size="390,38" font="Regular;34" halign="center" options="movetype=running,direction=left,wrap=0,always=0,startdelay=3000,steptime=80" />

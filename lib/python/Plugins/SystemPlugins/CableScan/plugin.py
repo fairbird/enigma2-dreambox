@@ -127,7 +127,7 @@ class CableScanScreen(Setup):
 			(_('Frequency'), config.plugins.CableScan.frequency),
 			(_('Symbol rate'), config.plugins.CableScan.symbolrate),
 			(_('Modulation'), config.plugins.CableScan.modulation),
-			(_('Network ID') + _(' (0 - all networks)'), config.plugins.CableScan.networkid),
+			(_('Network-ID') + _(' (0 - all networks)'), config.plugins.CableScan.networkid),
 			(_("Use official channel numbering"), config.plugins.CableScan.keepnumbering),
 			(_("HD list"), config.plugins.CableScan.hdlist),
 			(_("Enable auto cable scan"), config.plugins.CableScan.auto)
