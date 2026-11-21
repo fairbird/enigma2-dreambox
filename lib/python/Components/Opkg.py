@@ -472,8 +472,6 @@ class OpkgComponent:
 	def parseListData(self, listData, listKeys, installed):
 		data = {}
 		if listData:
-			lines = listData.splitlines()
-			for line in lines:
 			requiredFields = 3 if "Update" in listKeys else 2
 			entry = None
 			invalidCount = 0
