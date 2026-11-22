@@ -20,11 +20,7 @@
 // heavy list scrolling. Lowering the cap reduces how many of those
 // GPU-backed entries can be alive at once; tune if picons on a given
 // skin/box are unusually large or small.
-#ifdef HAVE_EGL
-uint PixmapCache::MaximumSize = 100;
-#else
 uint PixmapCache::MaximumSize = 256;
-#endif
 
 // Cache objects work best when we manage the ref counting manually. ePtr brings memory protection violations on shutdown
 // We track the filesize and modified date of the file. If either change, the item is considered stale is removedand must be reloaded
