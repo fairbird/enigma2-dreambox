@@ -676,7 +676,7 @@ class InfoBarShowHide(InfoBarScreenSaver):
 
 	def updateEPGDescription(self):
 		screen = getattr(self, "actualSecondInfoBarScreen", None)
-		if screen is None:
+		if screen is None or not screen.shown:  # nothing to refresh while the second infobar is hidden
 			return
 
 		service = self.session.nav.getCurrentService()
@@ -764,6 +764,7 @@ class InfoBarShowHide(InfoBarScreenSaver):
 			self.actualSecondInfoBarScreen = config.usage.show_simple_second_infobar.value and self.secondInfoBarScreenSimple.skinAttributes and self.secondInfoBarScreenSimple or self.secondInfoBarScreen
 			self.show()
 			self.actualSecondInfoBarScreen.show()
+			self.updateEPGDescription()
 			self.startHideTimer()
 		else:
 			self.hide()
