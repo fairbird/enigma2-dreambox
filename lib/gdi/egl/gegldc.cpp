@@ -2446,7 +2446,7 @@ void gEGLDC::fadeDraw() {
 void gEGLDC::flip() {
 	if (isInitialized() && m_egl_display != EGL_NO_DISPLAY && m_egl_surfaces[m_render_page] != EGL_NO_SURFACE) {
 #ifdef HAVE_GLES3
-		if (m_fbo) {
+		if (m_fbo && gles::isGLES3()) {
 			glBindFramebuffer(GL_READ_FRAMEBUFFER, m_fbo);
 			glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 			glDisable(GL_SCISSOR_TEST);
@@ -2456,8 +2456,29 @@ void gEGLDC::flip() {
 			glEnable(GL_SCISSOR_TEST);
 			animOverlay();
 			m_anim_clean_pending = false;
-		}
+		} else
 #endif
+		if (m_fbo) {
+			// GLES2 context: glBlitFramebuffer() does not exist there, present the FBO with a textured quad
+			glBindFramebuffer(GL_FRAMEBUFFER, 0);
+			glViewport(0, 0, m_surface_width, m_surface_height);
+			glDisable(GL_SCISSOR_TEST);
+			glDisable(GL_BLEND);
+			const float fw = (float)m_width;
+			const float fh = (float)m_height;
+			const float fbo_quad[24] = {
+				0.0f, 0.0f, 0.0f, 1.0f,
+				0.0f, fh, 0.0f, 0.0f,
+				fw, 0.0f, 1.0f, 1.0f,
+				fw, 0.0f, 1.0f, 1.0f,
+				0.0f, fh, 0.0f, 0.0f,
+				fw, fh, 1.0f, 0.0f
+			};
+			m_texture_shader.drawBatch(fbo_quad, 6, m_fbo_texture, 1.0f);
+			glEnable(GL_BLEND);
+			glEnable(GL_SCISSOR_TEST);
+			glViewport(0, 0, m_fbo_width, m_fbo_height);
+		}
 		// eglSwapBuffers() is only defined for window surfaces; a pixmap-surface
 		// platform (Dreambox) presents via the provider instead - see
 		// presentPixmap(). m_render_page is the page this frame was just
