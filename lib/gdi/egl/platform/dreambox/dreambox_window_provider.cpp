@@ -107,9 +107,9 @@ bool DreamboxWindowProvider::usesPixmapSurface() const {
 }
 
 EGLNativeWindowType DreamboxWindowProvider::getNativeWindow() {
-	// zeroed: no window object, libvc5dream takes the size and the buffers from /dev/fb0
-	static unsigned char window[64];
-	return (EGLNativeWindowType)window;
+	// NULL is the default fbdev window of libvc5dream: it takes the size and the buffers from /dev/fb0 itself.
+	// A non-NULL pointer is treated as a real window handle and ends in the assert(0) of bcmDisplayBufferAccess
+	return (EGLNativeWindowType)0;
 }
 
 void* DreamboxWindowProvider::getNativePixmap(int page) {
