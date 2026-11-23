@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: enigma2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-03-16 15:41+0100\n"
-"POT-Creation-Date: 2026-09-11 14:52+0100\n"
+"POT-Creation-Date: 2026-11-21 09:49+0100\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Shabah Net\n"
 "Language-Team: RAED - Fairbirb and Shabah Net\n"
@@ -576,6 +576,9 @@ msgstr "إضافة/حذف المؤقت للحدث الحالي"
 
 msgid "Additional cable of motorized LNB"
 msgstr "الكيبل الثاني من اللاقط المتحرك"
+
+msgid "Additional information on infobar"
+msgstr "عرض معلومات التشفير في شريط المعلومات"
 
 msgid "Additional motor options allow you to enter details from your motor's spec sheet so enigma can work out how long it will take to move the dish from one satellite to another satellite."
 msgstr "يتيح لك خيارات النظام المتحرك الإضافي إمكانية إدخال تفاصيل من المقاييس والمواصفات الخاصة بالنظام المتحرك الخاص بك، لذلك يمكن أن يحدد المدة التي سيستغرقها نقل الطبق من قمر صناعي إلى قمر صناعي آخر."
@@ -1464,6 +1467,9 @@ msgstr "الوقت الأساسي"
 
 msgid "Bosnia and Herzegovina"
 msgstr "البوسنة و الهرسك"
+
+msgid "Both panels"
+msgstr "كلا اللوحين"
 
 msgid "Botswana"
 msgstr "بوتسوانا"
@@ -6678,6 +6684,9 @@ msgstr "العادي"
 msgid "Original"
 msgstr "أصلي"
 
+msgid "Original language"
+msgstr "اللغة الأصلية"
+
 msgid "Original audio"
 msgstr "الصوت الأصلي"
 
@@ -9447,6 +9456,9 @@ msgstr "إذاعات مماثله :"
 
 msgid "Simple"
 msgstr "بسيط"
+
+msgid "Simple second infobar"
+msgstr "عرض شريط معلومات ثانٍ بسيط"
 
 msgid "Simple titleset (compatibility for legacy players)"
 msgstr "ضبط عنوان بسيط (التوافق للاعبين القديمة)"

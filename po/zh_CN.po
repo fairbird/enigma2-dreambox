@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: enigma2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-11 14:52+0100\n"
+"POT-Creation-Date: 2025-07-01 17:09+0200\n"
 "PO-Revision-Date: 2025-01-20 11:41+0800\n"
 "Last-Translator: Mark Stone <Mark@kram.com>\n"
 "Language-Team: \n"
@@ -27,6 +27,13 @@ msgid ""
 msgstr ""
 "\n"
 "按下 OK 键后，请等待！"
+
+msgid ""
+"\n"
+"Press OK on your remote control to continue."
+msgstr ""
+"\n"
+"按遥控器上的 OK 键继续。"
 
 msgid ""
 "\n"
@@ -609,6 +616,9 @@ msgstr "当前正在录制一个重复事件。您希望如何操作？"
 msgid "A required tool (%s) was not found."
 msgstr "未找到所需的工具 (%s)。"
 
+msgid "A search for available updates is currently in progress."
+msgstr "正在搜索可用更新。"
+
 msgid ""
 "A second configured interface has been found.\n"
 "\n"
@@ -705,10 +715,6 @@ msgstr "激活 HbbTV（红色按钮）"
 
 msgid "Activate Picture in Picture"
 msgstr "激活画中画"
-
-#, fuzzy
-msgid "Activate SoftCSA descrambling"
-msgstr "设置"
 
 msgid "Activate network settings"
 msgstr "激活网络设置"
@@ -818,14 +824,23 @@ msgstr "调整 3D 设置"
 msgid "Adjust the color settings so that all the color shades are distinguishable, but appear as saturated as possible. If you are happy with the result, press OK to close the video fine-tuning, or use the number keys to select other test screens."
 msgstr "调整颜色设置，使所有颜色层次都能区分，同时尽可能饱和。如果您对结果满意，请按 OK 关闭视频微调，或使用数字键选择其他测试屏幕。"
 
-msgid "Adult Audience, Strong Violence 15+"
-msgstr ""
-
 msgid "Advanced"
 msgstr "高级"
 
 msgid "Advanced options"
 msgstr "高级选项"
+
+msgid "Advanced options and settings."
+msgstr "高级选项和设置。"
+
+msgid "Advanced restore"
+msgstr "高级恢复"
+
+msgid "Advanced software"
+msgstr "高级软件"
+
+msgid "Advanced software plugin"
+msgstr "高级软件插件"
 
 msgid "Advanced video enhancement setup"
 msgstr "高级视频增强设置"
@@ -859,10 +874,6 @@ msgstr "频道名称对齐"
 
 msgid "All"
 msgstr "全部"
-
-#, fuzzy
-msgid "All active receivers in standby"
-msgstr "将接收机设为待机模式"
 
 msgid "All ages"
 msgstr "所有年龄"
@@ -951,6 +962,9 @@ msgstr "可选编号模式"
 msgid "Alternative services tuner priority"
 msgstr "替代频道的调谐器优先级"
 
+msgid "Always ask"
+msgstr "总是询问"
+
 msgid "Always hide infobar"
 msgstr "总是隐藏信息条"
 
@@ -1032,6 +1046,13 @@ msgstr ""
 "是否确定激活此网络配置?\n"
 "\n"
 
+msgid ""
+"Are you sure you want to delete\n"
+"the following backup:\n"
+msgstr ""
+"确定要删除\n"
+"以下备份：\n"
+
 msgid "Are you sure you want to exit this wizard?"
 msgstr "是否确定退出此向导?"
 
@@ -1041,6 +1062,25 @@ msgid ""
 msgstr ""
 "是否确定重启网络接口?\n"
 "\n"
+
+#, python-format
+msgid ""
+"Are you sure you want to restore\n"
+"the following backup:\n"
+"%s\n"
+"Your receiver will restart after the backup has been restored!"
+msgstr ""
+"是否确定要恢复以下备份：\n"
+"%s\n"
+"\n"
+"备份恢复后，接收机将重新启动！"
+
+msgid ""
+"Are you sure you want to restore the backup?\n"
+"Your receiver will restart after the backup has been restored!"
+msgstr ""
+"确定要恢复备份吗？\n"
+"备份恢复后，您的接收机将重新启动！"
 
 msgid "Argentina"
 msgstr "阿根廷"
@@ -1202,10 +1242,6 @@ msgstr "自动安装完成"
 msgid "Autoinstalling please wait for packages being updated"
 msgstr "正在自动安装，请等待软件包更新"
 
-#, fuzzy
-msgid "Automatic"
-msgstr "自动"
-
 msgid "Automatic Language"
 msgstr "自动语言"
 
@@ -1245,10 +1281,6 @@ msgstr "B"
 msgid "BACK"
 msgstr "返回"
 
-#, python-format
-msgid "BC%d"
-msgstr ""
-
 msgid "BER"
 msgstr "误码率"
 
@@ -1283,17 +1315,29 @@ msgstr "后台删除速度"
 msgid "Backing up to: %s"
 msgstr "正在备份到： %s"
 
+msgid "Backup completed."
+msgstr "备份完成。"
+
+msgid "Backup failed."
+msgstr "备份失败。"
+
+msgid "Backup is running..."
+msgstr "正在进行备份..."
+
 msgid "Backup settings"
 msgstr "备份设置"
+
+msgid "Backup system settings"
+msgstr "备份系统设置"
+
+msgid "Backup your receiver settings."
+msgstr "备份接收机设置。"
 
 msgid "Bahamas"
 msgstr "巴哈马"
 
 msgid "Bahrain"
 msgstr "巴林"
-
-msgid "Bambini Accompagnati"
-msgstr ""
 
 msgid "Band"
 msgstr "波段"
@@ -1678,13 +1722,6 @@ msgstr "更改语言"
 msgid "Change PIN"
 msgstr "更改 PIN 码"
 
-#, fuzzy
-msgid "Change Password"
-msgstr "密码"
-
-msgid "Change Root Password"
-msgstr ""
-
 msgid "Change bouquets in quickzap"
 msgstr "在快速切换中更改频道群"
 
@@ -1800,10 +1837,6 @@ msgstr ""
 "正在检查调谐器 %s\n"
 "DiSEqC 端口 %s 用于 %s"
 
-#, fuzzy
-msgid "Children"
-msgstr "智利"
-
 msgid "Children/Youth/Education/Science"
 msgstr "儿童/青少年/教育/科学"
 
@@ -1851,9 +1884,6 @@ msgstr "选择扫描单个转发器、一颗卫星还是多颗卫星。"
 
 msgid "Choose whether to scan for free services only or whether to include paid/encrypted services too."
 msgstr "选择是否仅扫描免费频道或者是否也包含付费/加密频道。"
-
-msgid "Choose whether to use the streamrelay_whitelist file. The whitelist file should be disabled if you are using softcsa."
-msgstr ""
 
 msgid "Choose which tuner to configure."
 msgstr "选择要配置的调谐器。"
@@ -2286,9 +2316,6 @@ msgstr "配置接收机切换频道的方式。"
 msgid "Configure this tuner using simple or advanced options, or loop it through to another tuner, or copy a configuration from another tuner, or disable it."
 msgstr "使用简单或高级选项配置此调谐器，或将其环路连接到另一个调谐器，或从另一个调谐器复制配置，或将其禁用。"
 
-msgid "Configure when the set-top box should enter standby after startup or restart."
-msgstr ""
-
 msgid "Configure where completed timers show up in the timer list."
 msgstr "配置已完成定时器在定时器列表中的显示位置。"
 
@@ -2508,9 +2535,6 @@ msgstr ""
 msgid "Current mode: %s \n"
 msgstr "当前模式：%s\n"
 
-msgid "Current password incorrect"
-msgstr ""
-
 msgid "Current rotor position: "
 msgstr "当前极轴位置： "
 
@@ -2538,8 +2562,7 @@ msgstr "自定义“7”/“9”键的跳过时间"
 msgid "Customize"
 msgstr "自定义"
 
-#, fuzzy
-msgid "Customize OpenWebIF settings for fallback receiver"
+msgid "Customize OpenWebIF settings for fallback tuner"
 msgstr "自定义备用调谐器的 OpenWebIF 设置"
 
 msgid "Customize channel list cursor behavior"
@@ -2656,15 +2679,6 @@ msgstr "DVD 标题列表"
 msgid "DVDToolbox"
 msgstr "DVD 工具箱"
 
-msgid "Dai 12 anni in su"
-msgstr ""
-
-msgid "Dai 14 anni in su"
-msgstr ""
-
-msgid "Dai 18 anni in su"
-msgstr ""
-
 msgid "Danish"
 msgstr "丹麦语"
 
@@ -2674,25 +2688,11 @@ msgstr "日期"
 msgid "Date/time input"
 msgstr "日期/时间输入"
 
-#, fuzzy
-msgid "Deactivate SoftCSA descrambling"
-msgstr "设置"
-
 msgid "Debug"
 msgstr "调试"
 
 msgid "Debug to file"
 msgstr "调试信息输出到文件"
-
-msgid "Decoder release strategy"
-msgstr ""
-
-msgid "Decoder start delay"
-msgstr ""
-
-#, fuzzy
-msgid "Decoder start timeout"
-msgstr "打开时间取整功能"
 
 msgid "Deep Standby LED"
 msgstr "深度待机指示灯"
@@ -2873,6 +2873,9 @@ msgstr "通过流中继解扰频道的 URL 地址"
 msgid "Description"
 msgstr "描述"
 
+msgid "Deselect"
+msgstr "取消选择"
+
 msgid "Destination of fallback remote receiver"
 msgstr "备用远程接收机的目标地址"
 
@@ -2975,9 +2978,6 @@ msgstr "禁止后台扫描"
 
 msgid "Disable current event but not coming events"
 msgstr "禁用当前事件，但不禁用后续事件"
-
-msgid "Disable SoftCSA descrambling(Off), enable SoftCSA decryption by whitelist(Whitelist) or use automatic detection of SoftCSA descrambling(Auto)."
-msgstr ""
 
 msgid "Disable move mode"
 msgstr "禁用移动模式"
@@ -3171,6 +3171,9 @@ msgstr "是否恢复此播放?"
 msgid "Do you want to select a different skin?"
 msgstr "是否选择其他皮肤?"
 
+msgid "Do you want to update the package:\n"
+msgstr "是否更新软件包:\n"
+
 #, python-format
 msgid "Do you want to update your receiver to %s?"
 msgstr "是否要更新机顶盒到 %s?"
@@ -3237,6 +3240,9 @@ msgstr "正在下载"
 msgid "Downloading Image"
 msgstr "正在下载镜像"
 
+msgid "Downloading a new packet list. Please wait..."
+msgstr "正在下载新的软件包列表。请稍候..."
+
 msgid "Downloading plugin information. Please wait..."
 msgstr "正在下载插件信息，请稍候..."
 
@@ -3299,10 +3305,6 @@ msgid "EPG:"
 msgstr "EPG："
 
 #, fuzzy
-msgid "EPGCatch Up Actions"
-msgstr "选择 EPG 操作"
-
-#, fuzzy
 msgid "EPGFilter Actions"
 msgstr "选择 EPG 操作"
 
@@ -3349,11 +3351,17 @@ msgstr "编辑接收机的域名服务器配置。\n"
 msgid "Edit the network configuration of your receiver.\n"
 msgstr "编辑接收机的网络配置。\n"
 
+msgid "Edit the update source address."
+msgstr "编辑更新源地址。"
+
 msgid "Edit timer"
 msgstr "编辑定时器"
 
 msgid "Edit title"
 msgstr "编辑标题"
+
+msgid "Edit update source url"
+msgstr "编辑更新源 URL"
 
 msgid "Egypt"
 msgstr "埃及"
@@ -3444,8 +3452,7 @@ msgstr "启用 Virgin EPG"
 msgid "Enable freesat EPG"
 msgstr "启用 freesat EPG"
 
-#, fuzzy
-msgid "Enable import timer from fallback receiver"
+msgid "Enable import timer from fallback tuner"
 msgstr "启用从备用调谐器导入定时器"
 
 msgid "Enable move mode"
@@ -3467,9 +3474,6 @@ msgid "Enable remote enigma2 receiver to be tried to tune into services that can
 msgstr "启用远程 enigma2 接收机以尝试调谐到无法在本地调谐的频道（例如，调谐器被占用或本地调谐器上不可用的频道类型）。指定完整的URL，包括http://和端口号（通常为...:8001），例如http://second_box:8001。"
 
 msgid "Enable setting a time interval for filtering events in SingleEPG using the 'Stop' button."
-msgstr ""
-
-msgid "Enable sorting by rating under the yellow button in SingleEPG."
 msgstr ""
 
 msgid "Enable teletext caching"
@@ -3564,9 +3568,6 @@ msgstr "输入 URL 地址"
 msgid "Enter an URL where alternative images could be listed for FlashImage."
 msgstr "请输入一个 URL，用于列出刷写镜像的备用镜像。"
 
-msgid "Enter current password"
-msgstr ""
-
 msgid "Enter if you are in the east or west hemisphere."
 msgstr "输入您位于东半球还是西半球。"
 
@@ -3575,9 +3576,6 @@ msgstr "输入您位于赤道以北或以南的位置。"
 
 msgid "Enter main menu..."
 msgstr "进入主菜单..."
-
-msgid "Enter new password"
-msgstr ""
 
 msgid "Enter persistent PIN code"
 msgstr "输入永久 PIN 码"
@@ -3792,6 +3790,12 @@ msgstr "扩展"
 
 msgid "Extended PID info"
 msgstr "扩展 PID 信息"
+
+msgid "Extended Software"
+msgstr "扩展软件"
+
+msgid "Extended Software Plugin"
+msgstr "扩展软件插件"
 
 msgid "Extended info"
 msgstr "扩展信息"
@@ -4238,9 +4242,6 @@ msgstr "冈比亚"
 msgid "Gateway"
 msgstr "网关"
 
-msgid "General"
-msgstr ""
-
 msgid "General AC3 delay"
 msgstr "通用 AC3 延迟"
 
@@ -4594,9 +4595,6 @@ msgstr "您想在录制中添加多少分钟?"
 
 msgid "How many minutes do you want to record?"
 msgstr "您想录制多少分钟?"
-
-msgid "How to release the hardware decoder when switching to software descrambling. 'Quick' releases immediately (faster zapping). 'Normal' performs clean shutdown first (more stable on some boxes)."
-msgstr ""
 
 msgid "Http(s) stream start delay"
 msgstr "Http(s)串流启动延迟"
@@ -4959,9 +4957,8 @@ msgstr "安装频道列表"
 msgid "Install extensions"
 msgstr "安装扩展"
 
-#, fuzzy
-msgid "Install picons on"
-msgstr "安装插件"
+msgid "Install local extension"
+msgstr "安装本地扩展"
 
 msgid "Install plugin"
 msgstr "安装插件"
@@ -5493,6 +5490,12 @@ msgstr "马里"
 msgid "Malta"
 msgstr "马耳他"
 
+msgid "Manage extensions"
+msgstr "管理扩展"
+
+msgid "Manage extensions or plugins for your receiver."
+msgstr "管理接收机的扩展或插件。"
+
 msgid "Manage your receiver's software"
 msgstr "管理接收机软件"
 
@@ -5539,12 +5542,6 @@ msgstr "马绍尔群岛"
 msgid "Martinique"
 msgstr "马提尼克岛"
 
-msgid "Mature Adult Audience 15+"
-msgstr ""
-
-msgid "Mature Audience 15+"
-msgstr ""
-
 msgid "Mauritania"
 msgstr "毛里塔尼亚"
 
@@ -5559,9 +5556,6 @@ msgstr "最大记忆位置"
 
 msgid "Max. bitrate: "
 msgstr "最大比特率： "
-
-msgid "Maximum time to wait for the first descrambling key (CW) before starting the decoder. 'Disabled' starts the decoder immediately without waiting."
-msgstr ""
 
 msgid "Maybe the reason that recording is currently running. Please stop the recording before trying to configure the positioner."
 msgstr "当前可能正在进行录制。在尝试配置定位器之前，请先停止录制。"
@@ -5893,6 +5887,9 @@ msgstr "否"
 msgid "NOW"
 msgstr "现在"
 
+msgid "NTP Hostname"
+msgstr "NTP 主机名"
+
 msgid "NTSC"
 msgstr "NTSC"
 
@@ -5986,9 +5983,6 @@ msgstr "新喀里多尼亚"
 
 msgid "New Zealand"
 msgstr "新西兰"
-
-msgid "New password not the same as the repeat password"
-msgstr ""
 
 msgid "News/Current Affairs/Social"
 msgstr "新闻/时事/社会"
@@ -6168,11 +6162,14 @@ msgstr "否，但从头开始重启"
 msgid "No, do not flash image"
 msgstr "否，不刷写镜像"
 
+msgid "No, except Wakeup timer"
+msgstr "否，除唤醒定时器外"
+
+msgid "No, never"
+msgstr "否，从不"
+
 msgid "No, only download"
 msgstr "否，仅下载"
-
-msgid "Non Classificato"
-msgstr ""
 
 msgid "None"
 msgstr "无"
@@ -6205,10 +6202,6 @@ msgstr "挪威"
 msgid "Norwegian"
 msgstr "挪威语"
 
-#, fuzzy
-msgid "Not Classified"
-msgstr "未关联"
-
 msgid "Not Installed"
 msgstr "未安装"
 
@@ -6225,8 +6218,7 @@ msgstr "磁盘空间不足。请释放一些磁盘空间并重试。（需要 %(
 msgid "Not tested:"
 msgstr "未测试："
 
-#, fuzzy
-msgid "Note: when enabled, and you do want standby mode after wake up, set option 'Startup to Standby' as 'Yes, only wake-up timers'."
+msgid "Note: when enabled, and you do want standby mode after wake up, set option 'Startup to Standby' as 'No, except Wakeup timer'."
 msgstr "注意：启用后，如果您确实希望唤醒后进入待机模式，请将选项“启动到待机”设置为“否，唤醒定时器除外”。"
 
 msgid ""
@@ -6282,9 +6274,6 @@ msgid "Numberzap or seek backward medium step"
 msgstr ""
 
 msgid "Numberzap or seek backward small step"
-msgstr ""
-
-msgid "Numberzap or seek forward big step"
 msgstr ""
 
 msgid "Numberzap or seek forward medium step"
@@ -6351,6 +6340,9 @@ msgstr "对于有效的 ONID，忽略频率子网络部分"
 msgid "One"
 msgstr "一"
 
+msgid "Online update of your receiver software."
+msgstr "在线更新您的接收机软件。"
+
 msgid "Only change this setting if you are using a SCR device that has been reprogrammed with a custom programmer. For further information check with the person that reprogrammed the device."
 msgstr "仅当您使用的 SCR 设备已通过自定义编程器重新编程时，才更改此设置。更多信息请咨询重新编程设备的人员。"
 
@@ -6405,9 +6397,6 @@ msgstr "运行时指示灯的工作状态"
 msgid "Opkg"
 msgstr "Opkg"
 
-msgid "Optional local NTP server"
-msgstr "NTP 主机名"
-
 msgid "Options disable timer"
 msgstr "禁用定时器选项"
 
@@ -6428,9 +6417,6 @@ msgstr "原始"
 
 msgid "Original audio"
 msgstr "原始音频"
-
-msgid "Oscam Streamrelay"
-msgstr ""
 
 msgid "Other"
 msgstr "其他"
@@ -6453,6 +6439,12 @@ msgstr "总体进展："
 msgid "Overscan wizard"
 msgstr "过扫描向导"
 
+msgid "Overwrite configuration files during software update?"
+msgstr "在软件更新期间覆盖配置文件？"
+
+msgid "Overwrite configuration files?"
+msgstr "覆盖配置文件?"
+
 msgid "PAGEDOWN"
 msgstr "向下翻页"
 
@@ -6470,9 +6462,6 @@ msgstr "PCR PID"
 
 msgid "PDC"
 msgstr "PDC（节目传送控制）"
-
-msgid "PG - Parental Guidance"
-msgstr ""
 
 msgid "PGS file"
 msgstr "PGS 文件"
@@ -6534,6 +6523,12 @@ msgstr "软件包列表更新"
 msgid "Packages to update"
 msgstr "要更新的软件包"
 
+msgid "Packet management"
+msgstr "数据包管理"
+
+msgid "Packet manager"
+msgstr "数据包管理器"
+
 #, fuzzy
 msgid "Page down"
 msgstr "向下换台"
@@ -6570,9 +6565,6 @@ msgstr "巴拉圭"
 msgid "Parent directory"
 msgstr "父目录"
 
-msgid "Parental Guidance Recommended"
-msgstr ""
-
 msgid "Parental control"
 msgstr "家长控制"
 
@@ -6608,9 +6600,6 @@ msgstr "暂停/继续播放"
 
 msgid "Pending restart"
 msgstr "等待重新启动"
-
-msgid "Per Tutti"
-msgstr ""
 
 msgid "Percentage left"
 msgstr "百分比显示在左侧"
@@ -6677,9 +6666,6 @@ msgstr "播放 DVD"
 msgid "Play DVDs"
 msgstr "播放 DVD"
 
-msgid "Play archive"
-msgstr ""
-
 msgid "Play as Picture in Picture"
 msgstr "以画中画播放"
 
@@ -6737,8 +6723,7 @@ msgstr "请更改录制结束时间"
 msgid "Please choose an extension..."
 msgstr "请选择扩展名..."
 
-#, fuzzy
-msgid "Please configure the fallback tuner setup"
+msgid "Please configure the fallback receiver setup"
 msgstr "请配置备用调谐器设置"
 
 msgid ""
@@ -6816,6 +6801,9 @@ msgstr "请选择子频道..."
 
 msgid "Please select medium to be scanned"
 msgstr "请选择要扫描的媒介"
+
+msgid "Please select medium to use as backup location"
+msgstr "请选择用作备份位置的介质"
 
 msgid "Please select tag to filter..."
 msgstr "请选择要过滤的标签..."
@@ -7093,9 +7081,6 @@ msgstr "录制首选调谐器"
 msgid "Preparing... Please wait"
 msgstr "正在准备...请稍候"
 
-msgid "Preschool"
-msgstr ""
-
 msgid "Press '0' to toggle PiP mode"
 msgstr "按“0”切换画中画模式"
 
@@ -7123,6 +7108,12 @@ msgstr ""
 "将在 10 秒内重新启动，\n"
 "除非您有 eMMC 插槽需要恢复。\n"
 "恢复 eMMC 插槽每个插槽可能需要 1 到 5 分钟。"
+
+msgid "Press INFO on your remote control for additional information."
+msgstr "按遥控器上的 INFO 键查看更多信息。"
+
+msgid "Press MENU on your remote control for additional options."
+msgstr "按遥控器上的 MENU 键查看其他选项。"
 
 msgid "Press OK on your remote control to continue."
 msgstr "按遥控器上的 OK 键继续。"
@@ -7358,10 +7349,6 @@ msgstr "Rass 交互操作"
 msgid "Rating defined by broadcaster - %d"
 msgstr "由广播公司定义的评级 - %d"
 
-#, fuzzy
-msgid "Rating sort in SingleEPG"
-msgstr "启用 Virgin EPG"
-
 msgid "Rating undefined"
 msgstr "评级未定义"
 
@@ -7499,6 +7486,9 @@ msgstr "区域"
 msgid "Relative"
 msgstr "相对"
 
+msgid "Reload"
+msgstr "重新加载"
+
 msgid "Reload blacklists"
 msgstr "重新加载黑名单"
 
@@ -7522,6 +7512,9 @@ msgstr "遥控器类型"
 
 msgid "Remote control type setup"
 msgstr "遥控器类型设置"
+
+msgid "Removal has completed."
+msgstr "删除已完成。"
 
 msgid "Remove"
 msgstr "删除"
@@ -7617,9 +7610,6 @@ msgstr "重复"
 msgid "Repeat leave standby messages"
 msgstr "重复离开待机状态的消息"
 
-msgid "Repeat new password"
-msgstr ""
-
 msgid "Repeat playlist"
 msgstr "重复播放列表"
 
@@ -7713,6 +7703,12 @@ msgstr "重新测试"
 msgid "Restart your network connection and interfaces.\n"
 msgstr "重启您的网络连接和接口。\n"
 
+msgid "Restore"
+msgstr "恢复"
+
+msgid "Restore backups"
+msgstr "恢复备份"
+
 msgid "Restore defaults"
 msgstr "恢复默认"
 
@@ -7722,8 +7718,17 @@ msgstr "恢复已删除的镜像"
 msgid "Restore deleted user bouquets"
 msgstr "恢复已删除的用户频道群"
 
-msgid "Restricted 18+"
-msgstr ""
+msgid "Restore system settings"
+msgstr "恢复系统设置"
+
+msgid "Restore your backups by date."
+msgstr "按日期恢复备份。"
+
+msgid "Restore your receiver settings."
+msgstr "恢复接收机设置。"
+
+msgid "Restoring..."
+msgstr "恢复中..."
 
 msgid "Resume from last position"
 msgstr "从上次位置继续"
@@ -8031,6 +8036,9 @@ msgstr "扫描失败！"
 msgid "Scan files..."
 msgstr "扫描文件..."
 
+msgid "Scan for local extensions and install them."
+msgstr "扫描本地扩展并安装。"
+
 msgid "Scan options"
 msgstr "扫描选项"
 
@@ -8237,6 +8245,12 @@ msgstr "选择一个镜像品牌"
 msgid "Select audio track"
 msgstr "选择音轨"
 
+msgid "Select backup files"
+msgstr "选择备份文件"
+
+msgid "Select backup location"
+msgstr "选择备份位置"
+
 msgid "Select channel"
 msgstr "选择频道"
 
@@ -8255,6 +8269,12 @@ msgstr "选择目标位置："
 msgid "Select directory for logfile"
 msgstr "选择日志文件目录"
 
+msgid "Select files for backup."
+msgstr "选择要备份的文件。"
+
+msgid "Select files/folders to backup"
+msgstr "选择要备份的文件/文件夹"
+
 msgid "Select function"
 msgstr "选择功能"
 
@@ -8266,9 +8286,6 @@ msgstr "选择水平分辨率："
 
 msgid "Select how quickly the dish should move between satellites."
 msgstr "选择天线在卫星之间移动的速度。"
-
-msgid "Select how the descrambled data stream is processed. 'Automatic' uses asynchronous writes (lower CPU usage) with automatic fallback to synchronous if kernel AIO is not supported. 'Synchronous' forces blocking writes (stable, most compatible)."
-msgstr ""
 
 msgid "Select how the satellite dish is set up. i.e. fixed dish, single LNB, DiSEqC switch, positioner, etc."
 msgstr "选择卫星天线的设置方式，例如固定天线、单高频头、DiSEqC 开关、极轴等。"
@@ -8349,9 +8366,6 @@ msgstr "选择要分配给此调谐器的用户频段。这是 SCR 开关或 SCR
 msgid "Select the character or action under the keyboard cursor"
 msgstr "选择键盘光标下的字符或操作"
 
-msgid "Select the delay to buffer descrambled data before starting playback. This can reduce AC3 audio dropouts by ensuring enough data is available when the decoder starts. Higher values are more stable but increase channel switch time."
-msgstr ""
-
 msgid "Select the locale from a menu"
 msgstr "从菜单中选择区域设置"
 
@@ -8418,6 +8432,12 @@ msgstr "选择正在使用的高频头/设备类型（通常为“通用”）�
 msgid "Select the type of Single Cable Reception device you are using."
 msgstr "选择您正在使用的单电缆接收（SCR）设备类型。"
 
+msgid "Select update source"
+msgstr "选择更新源"
+
+msgid "Select update source to edit"
+msgstr "选择要编辑的更新源"
+
 msgid "Select video input with up/down buttons"
 msgstr "使用上下按钮选择视频输入"
 
@@ -8441,6 +8461,13 @@ msgstr "选择无线网络"
 
 msgid "Select your ATSC provider."
 msgstr "选择 ATSC 供应商。"
+
+msgid ""
+"Select your backup device.\n"
+"Current device: "
+msgstr ""
+"选择您的备份设备。\n"
+"当前设备："
 
 msgid "Select your country. If not available select 'all'."
 msgstr "选择您的国家。如果不可用，请选择“全部”。"
@@ -8656,16 +8683,13 @@ msgstr "如果您的天线系统需要，请设置序列重复。通常，如果
 msgid "Set startup service"
 msgstr "设置开机频道"
 
-#, fuzzy
-msgid "Set the User ID of the OpenWebif from your fallback receiver"
+msgid "Set the User ID of the OpenWebif from your fallback tuner"
 msgstr "从备用调谐器设置 OpenWebif 的用户 ID"
 
-#, fuzzy
-msgid "Set the password of the OpenWebif from your fallback receiver"
+msgid "Set the password of the OpenWebif from your fallback tuner"
 msgstr "从备用调谐器设置 OpenWebif 的密码"
 
-#, fuzzy
-msgid "Set the port of the OpenWebif from your fallback receiver"
+msgid "Set the port of the OpenWebif from your fallback tuner"
 msgstr "从备用调谐器设置 OpenWebif 的端口"
 
 msgid "Set the type of the progress indication in the channel selection screen (right alignment only available in single line mode)."
@@ -9204,8 +9228,14 @@ msgstr "软件"
 msgid "Software management"
 msgstr "软件管理"
 
+msgid "Software manager setup"
+msgstr "软件管理设置"
+
 msgid "Software update"
 msgstr "软件更新"
+
+msgid "Softwaremanager information"
+msgstr "软件管理信息"
 
 msgid "Solomon Islands"
 msgstr "所罗门群岛"
@@ -9219,8 +9249,15 @@ msgstr "部分电视在收到‘开启图像视图’命令时无法从待机状
 msgid "Some plugins are not available:\n"
 msgstr "一些插件不可用：\n"
 
+#, python-format
+msgid "Sorry, %s has not been installed!"
+msgstr "抱歉，%s 尚未安装！"
+
 msgid "Sorry, deleting directories can (for now) only be done through the trash can."
 msgstr "抱歉，删除目录（目前）只能通过回收站完成。"
+
+msgid "Sorry, no backups found!"
+msgstr "抱歉，没有找到备份！"
 
 msgid "Sorry, no details available!"
 msgstr "抱歉，没有详细信息可用！"
@@ -9228,9 +9265,17 @@ msgstr "抱歉，没有详细信息可用！"
 msgid "Sorry, this tuner is in use."
 msgstr "抱歉，此调谐器正在使用中。"
 
+msgid ""
+"Sorry, your backup destination is not writeable.\n"
+"Please select a different one."
+msgstr ""
+"抱歉，您的备份目标位置不可写入。\n"
+"请选择一个不同的目标位置。"
+
 msgid "Sort"
 msgstr "排序"
 
+#. TRANSLATORS: This must fit into the header button in the EPG-List
 msgid "Sort A-Z"
 msgstr "按 A-Z 排序"
 
@@ -9255,10 +9300,7 @@ msgstr "设置项的排序顺序"
 msgid "Sort plugins list to default?"
 msgstr "将插件列表排序恢复为默认顺序？"
 
-#, fuzzy
-msgid "Sort rating"
-msgstr "按时间排序"
-
+#. TRANSLATORS: This must fit into the header button in the EPG-List
 msgid "Sort time"
 msgstr "按时间排序"
 
@@ -9428,6 +9470,9 @@ msgstr "从列表屏幕开始"
 
 msgid "Starting on"
 msgstr "开始于"
+
+msgid "Startup the set top box in standby"
+msgstr "在待机状态下启动机顶盒"
 
 msgid "Startup to Standby"
 msgstr "启动后进入待机模式"
@@ -9641,23 +9686,8 @@ msgstr "启用字幕"
 msgid "Succeeded:"
 msgstr "成功："
 
-msgid "Successfully changed password for root user"
-msgstr ""
-
-msgid "Successfully cleared password for root user"
-msgstr ""
-
 msgid "Sudan"
 msgstr "苏丹"
-
-msgid "Suitable for ages 12+"
-msgstr ""
-
-msgid "Suitable for ages 15+"
-msgstr ""
-
-msgid "Suitable only for Adults"
-msgstr ""
 
 msgid "Sun"
 msgstr "周日"
@@ -9701,9 +9731,6 @@ msgstr "开关"
 
 msgid "Switch TV to correct input"
 msgstr "将电视切换到正确的输入源"
-
-msgid "Switch all other connected HDMI-CEC enabled receivers (not TV or audio systems) to standby when this box wakes up."
-msgstr ""
 
 msgid "Switch between filelist/playlist"
 msgstr "在文件列表/播放列表之间切换"
@@ -9782,13 +9809,6 @@ msgstr "符号率："
 
 msgid "Sync failure moving back to origin !"
 msgstr "同步失败，正在回退到原点！"
-
-#, fuzzy
-msgid "Sync mode"
-msgstr "缩放模式"
-
-msgid "Synchronous"
-msgstr ""
 
 msgid "Syrian Arab Republic"
 msgstr "阿拉伯叙利亚共和国"
@@ -9980,7 +10000,7 @@ msgstr ""
 msgid "The following files were found..."
 msgstr "找到以下文件..."
 
-msgid "The hostname or the IP address of a local NTP server to synchronise the time with."
+msgid "The hostname or the IP address of the NTP server to synchronise the time with."
 msgstr "用于同步时间的 NTP 服务器的主机名或 IP 地址。"
 
 msgid ""
@@ -10717,9 +10737,6 @@ msgstr "高频头/设备类型"
 msgid "Type of scan"
 msgstr "扫描类型"
 
-msgid "U - Suitable for all"
-msgstr ""
-
 msgid "UNKNOWN"
 msgstr "未知"
 
@@ -10728,10 +10745,6 @@ msgstr "向上"
 
 msgid "URL"
 msgstr "URL"
-
-#, fuzzy
-msgid "URL of fallback remote receiver"
-msgstr "备用远程接收机 IP 地址"
 
 msgid "URL of remote receiver for imports"
 msgstr "备用远程接收器的 URL"
@@ -10756,12 +10769,6 @@ msgstr "乌克兰语"
 
 msgid "Unable to backup settings as the AutoBackup plugin is missing, do you want to continue?"
 msgstr "无法备份设置，因为自动备份插件缺失，是否要继续？"
-
-msgid "Unable to change password for root user"
-msgstr ""
-
-msgid "Unable to clear password for root user"
-msgstr ""
 
 msgid "Unable to complete - Kexec Multiboot files missing!"
 msgstr "无法完成 - Kexec 多重引导文件缺失！"
@@ -10886,6 +10893,9 @@ msgstr "更新失败。接收机未连接到互联网。"
 msgid "Update feed not available."
 msgstr "更新源不可用。"
 
+msgid "Update has completed."
+msgstr "更新已完成。"
+
 msgid "Updating"
 msgstr "正在更新"
 
@@ -10989,9 +10999,6 @@ msgstr "使用功率测量功能"
 msgid "Use skin default"
 msgstr "使用皮肤默认设置"
 
-msgid "Use streamrelay whitelist file"
-msgstr ""
-
 msgid "Use the alternative screen"
 msgstr "使用备用屏幕"
 
@@ -11009,6 +11016,9 @@ msgstr "使用向导设置基本功能"
 
 msgid "Use these input device settings?"
 msgstr "是否使用这些输入设备设置？"
+
+msgid "Use these settings?"
+msgstr "是否使用这些设置?"
 
 msgid "Use this video enhancement settings?"
 msgstr "是否使用此视频增强设置？"
@@ -11220,6 +11230,9 @@ msgstr "查看图文电视..."
 
 msgid "View video CD..."
 msgstr "查看视频 CD..."
+
+msgid "View, install and remove available or installed packages."
+msgstr "查看、安装和移除可用或已安装的软件包。"
 
 msgid "Virgin Islands (British)"
 msgstr "维尔京群岛(英属)"
@@ -11447,12 +11460,11 @@ msgstr "启用后，机顶盒能够通过网络唤醒"
 msgid "When enabled the timer from the fallback receiver is imported"
 msgstr "启用后，将导入备用调谐器的定时器"
 
+msgid "When enabled the timer from the fallback receiver is the default timer"
+msgstr "启用后，备用调谐器的定时器将成为默认定时器"
+
 msgid "When enabled then when you select a new channel in the channel selection the channel selection will not close. It will only close when you select the current playing service. This is a kind of preview mode"
 msgstr "启用后，当您在频道选择中选择一个新频道时，频道选择不会关闭。只有当您选择当前正在播放的频道时，它才会关闭。这是一种预览模式"
-
-#, fuzzy
-msgid "When enabled timers are created on the fallback received by default"
-msgstr "启用后，备用调谐器的定时器将成为默认定时器"
 
 msgid "When enabled you can control the volume with the arrow buttons instead of getting the channel selection list"
 msgstr "启用后，可使用方向键控制音量，而不是打开频道选择列表"
@@ -11658,10 +11670,6 @@ msgstr "当接收机从待机或深度待机状态唤醒时，它会向电视发
 msgid "Where to save temporary timeshift recordings?"
 msgstr "临时时移录像应该保存在哪里？"
 
-#, fuzzy
-msgid "Whitelist"
-msgstr "DVD 标题列表"
-
 msgid "Window Actions"
 msgstr "窗口操作"
 
@@ -11765,9 +11773,6 @@ msgstr "全部选“是”"
 msgid "Yes, I do want to install plugins"
 msgstr "是，我要安装插件"
 
-msgid "Yes, after cold start only"
-msgstr ""
-
 msgid "Yes, always"
 msgstr "是，总是"
 
@@ -11782,10 +11787,6 @@ msgstr "是，仅从深度待机状态"
 
 msgid "Yes, only from standby"
 msgstr "是，仅从待机状态"
-
-#, fuzzy
-msgid "Yes, only wake-up timers"
-msgstr "启用唤醒定时器"
 
 msgid "Yes, returning to movie list"
 msgstr "是，返回影片列表"
@@ -12160,12 +12161,11 @@ msgstr "返回"
 msgid "background image"
 msgstr "背景图片"
 
+msgid "backup EPG cache"
+msgstr "备份 EPG 缓存"
+
 msgid "ballet"
 msgstr "芭蕾舞"
-
-#, python-format
-msgid "bc%d"
-msgstr ""
 
 #, python-format
 msgid "bc%s"
@@ -12437,21 +12437,6 @@ msgstr "高"
 
 msgid "horizontal"
 msgstr "水平"
-
-#, fuzzy
-msgid "SoftCSA descrambing"
-msgstr "设置"
-
-#, fuzzy
-msgid "SoftCSA descrambling"
-msgstr "设置"
-
-#, fuzzy
-msgid "SoftCSA descrambling (SoftCSA)"
-msgstr "设置"
-
-msgid "SoftCSA descrambling: "
-msgstr ""
 
 msgid "in menu and plugins"
 msgstr "在菜单和插件中"
@@ -12833,6 +12818,12 @@ msgstr "显示所有标签"
 
 msgid "show event details"
 msgstr "显示事件详细内容"
+
+msgid "show softwaremanager in setup menu"
+msgstr "在设置菜单中显示软件管理器"
+
+msgid "show softwaremanager on blue button"
+msgstr "按蓝色键显示软件管理器"
 
 msgid "show/game show (general)"
 msgstr "综艺/游戏节目（通用）"
