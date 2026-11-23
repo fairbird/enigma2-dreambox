@@ -1,7 +1,15 @@
 # -*- coding: utf-8 -*-
+import locale
 from traceback import print_stack
 
 from Components.International import international
+
+
+def alphabeticSortKey(name):
+	name = (name or "").lower()
+	if locale.setlocale(locale.LC_COLLATE) == "C":
+		return (False, name)
+	return (not name[:1].isdigit(), locale.strxfrm(name))
 
 
 # WARNING:  Old code refers to locales as languages!
