@@ -1259,6 +1259,11 @@ void gEGLDC::exec(const gOpcode* opcode) {
 	// a frame is open from its first drawing opcode until its flush: the
 	// animation overlay is only presented between frames, never in the middle of one
 	m_frame_open = (opcode->opcode != gOpcode::flush && opcode->opcode != gOpcode::flip);
+	static int s_trace_ops = 0;
+	if (s_trace_ops < 300) {
+		++s_trace_ops;
+		eDebug("[gEGLDC] trace exec opcode=%d", (int)opcode->opcode);
+	}
 	m_last_op = std::chrono::steady_clock::now();
 
 	switch (opcode->opcode) {
@@ -2444,6 +2449,12 @@ void gEGLDC::fadeDraw() {
 }
 
 void gEGLDC::flip() {
+	static int s_trace_flips = 0;
+	const bool trace_flip = s_trace_flips < 5;
+	if (trace_flip) {
+		++s_trace_flips;
+		eDebug("[gEGLDC] trace flip begin fbo=%u es3=%d pixmap=%d", (unsigned)m_fbo, (int)gles::isGLES3(), (int)m_window_provider->usesPixmapSurface());
+	}
 	if (isInitialized() && m_egl_display != EGL_NO_DISPLAY && m_egl_surfaces[m_render_page] != EGL_NO_SURFACE) {
 #ifdef HAVE_GLES3
 		if (m_fbo && gles::isGLES3()) {
@@ -2484,6 +2495,8 @@ void gEGLDC::flip() {
 		// presentPixmap(). m_render_page is the page this frame was just
 		// rendered into (see tryInitEGL()'s initial value and the rotation
 		// below).
+		if (trace_flip)
+			eDebug("[gEGLDC] trace flip fbo presented");
 		if (m_window_provider->usesPixmapSurface()) {
 			int shown_page = m_render_page;
 			m_window_provider->presentPixmap(shown_page);
@@ -2575,7 +2588,11 @@ void gEGLDC::flip() {
 				}
 			}
 		} else {
+			if (trace_flip)
+				eDebug("[gEGLDC] trace flip before eglSwapBuffers");
 			eglSwapBuffers(m_egl_display, m_egl_surfaces[0]);
+			if (trace_flip)
+				eDebug("[gEGLDC] trace flip after eglSwapBuffers");
 		}
 	}
 
