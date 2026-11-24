@@ -21,7 +21,7 @@ IFACE="${2:-}"
 
 validate_iface() {
   case "$IFACE" in
-    wlan[0-9]*) ;;
+    wlan[0-9]*|ath[0-9]*|ra[0-9]*|wl[0-9]*) ;;
     *)
       echo "Invalid interface '$IFACE' (must be wlanX)" >&2
       exit 2
