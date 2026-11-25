@@ -82,6 +82,7 @@ static const char *fragment_shader_es2 = R"(#version 100
 
     uniform sampler2D u_texture;
     uniform float u_global_alpha;
+    uniform float u_swap_rb;
     // uniform float u_alpha_test;
 
     uniform vec4 u_rect_size;
@@ -118,6 +119,8 @@ static const char *fragment_shader_es2 = R"(#version 100
         // if (u_alpha_test > 0.5 && tex_color.a <= 0.5)
         //    discard;
 
+        if (u_swap_rb > 0.5)
+            tex_color = tex_color.bgra;
         gl_FragColor = vec4(tex_color.rgb, tex_color.a * u_global_alpha);
     }
 )";
@@ -197,6 +200,7 @@ bool gTextureShader::init()
     m_projection_location  = glGetUniformLocation(m_program_id, "u_projection");
     m_texture_location     = glGetUniformLocation(m_program_id, "u_texture");
     m_alpha_location       = glGetUniformLocation(m_program_id, "u_global_alpha");
+    m_swap_rb_location     = glGetUniformLocation(m_program_id, "u_swap_rb");
     m_rect_size_location   = glGetUniformLocation(m_program_id, "u_rect_size");
     m_radius_location      = glGetUniformLocation(m_program_id, "u_radius");
     m_edges_location       = glGetUniformLocation(m_program_id, "u_edges");
@@ -237,6 +241,13 @@ bool gTextureShader::init()
 void gTextureShader::bind()
 {
     glUseProgram(m_program_id);
+}
+
+void gTextureShader::setSwapRB(bool swap)
+{
+    bind();
+    if (m_swap_rb_location >= 0)
+        glUniform1f(m_swap_rb_location, swap ? 1.0f : 0.0f);
 }
 
 void gTextureShader::bindVAO()

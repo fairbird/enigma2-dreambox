@@ -2537,7 +2537,11 @@ void gEGLDC::flip() {
 				0.0f, fh, 0.0f, 0.0f,
 				fw, fh, 1.0f, 0.0f
 			};
+			if (!m_pixmap_surface)
+				m_texture_shader.setSwapRB(true);
 			m_texture_shader.drawBatch(fbo_quad, 6, m_fbo_texture, 1.0f);
+			if (!m_pixmap_surface)
+				m_texture_shader.setSwapRB(false);
 			glEnable(GL_BLEND);
 			glEnable(GL_SCISSOR_TEST);
 			glViewport(0, 0, m_fbo_width, m_fbo_height);
@@ -2642,7 +2646,16 @@ void gEGLDC::flip() {
 		} else {
 			if (trace_flip)
 				eDebug("[gEGLDC] trace flip before eglSwapBuffers");
+			const auto swap_t0 = std::chrono::steady_clock::now();
 			eglSwapBuffers(m_egl_display, m_egl_surfaces[0]);
+			static long s_swap_us = 0;
+			static int s_swap_n = 0;
+			s_swap_us += (long)std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - swap_t0).count();
+			if (++s_swap_n == 120) {
+				eDebug("[gEGLDC] swap avg %ld us over 120 flips", s_swap_us / 120);
+				s_swap_us = 0;
+				s_swap_n = 0;
+			}
 			if (trace_flip)
 				eDebug("[gEGLDC] trace flip after eglSwapBuffers");
 		}
