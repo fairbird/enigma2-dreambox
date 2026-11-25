@@ -56,8 +56,6 @@ def refreshChannelSelectionStyleChoices():
 			setattr(config.channelSelection, name, ConfigSelection(default=default, choices=choices))
 		else:
 			setting.setChoices(choices, default=default)
-			# Refresh the cached label even when the new skin uses the same selection key.
-			setting.value = setting.value
 
 
 def InitUsageConfig():
