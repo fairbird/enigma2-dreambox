@@ -1,9 +1,15 @@
 # -*- coding: utf-8 -*-
+from gettext import bindtextdomain, dgettext
+import os
+import time
+import locale
+from os import makedirs, unlink
+from os.path import dirname, exists, isdir, isfile, join as pathjoin, normpath, splitext
 from Components.Harddisk import harddiskmanager
 from Components.International import international
 from Components.Console import Console
 from Components.config import ConfigSubsection, ConfigDirectory, ConfigYesNo, config, ConfigSelection, ConfigText, ConfigNumber, ConfigSet, ConfigLocations, ConfigSelectionNumber, ConfigSelectionInteger, ConfigClock, ConfigSlider, ConfigEnableDisable, ConfigSubDict, ConfigDictionarySet, ConfigIP, ConfigInteger, ConfigPassword, ConfigSequence, NoSave, ConfigBoolean, configfile
-from Tools.Directories import SCOPE_HDD, SCOPE_TIMESHIFT, defaultRecordingLocation, fileContains, resolveFilename, fileHas, fileReadXML, fileWriteLine, fileWriteLines, SCOPE_SKIN
+from Tools.Directories import SCOPE_HDD, SCOPE_PLUGINS, SCOPE_TIMESHIFT, defaultRecordingLocation, fileContains, resolveFilename, fileHas, fileReadXML, fileWriteLine, fileWriteLines, SCOPE_SKIN
 from enigma import eAVControl, setTunerTypePriorityOrder, setPreferredTuner, setSpinnerColor, setSpinnerOnOff, setEnableTtCachingOnOff, eActionMap, eEnv, eDVBDB, Misc_Options, eBackgroundFileEraser, eServiceEvent, eSettings, eSubtitleSettings, eDVBLocalTimeHandler, eEPGCache
 from Components.About import GetIPsFromNetworkInterfaces
 from Components.NimManager import nimmanager
@@ -12,11 +18,6 @@ from Components.ServiceList import refreshServiceList
 from Components.SystemInfo import BoxInfo
 from Components.DateTimes import dateTimes
 from skin import domScreens, getcomponentTemplateNames
-from os import makedirs, unlink
-from os.path import exists, isfile, join as pathjoin, normpath
-import os
-import time
-import locale
 from boxbranding import getDisplayType
 
 displaytype = getDisplayType()
@@ -28,13 +29,24 @@ visuallyImpairedCommentary = "NAR qad"
 
 
 def refreshChannelSelectionStyleChoices():
+	def translateSkinString(text):
+		return dgettext(skinDir, text)
+
+	skinDir = dirname(config.skin.primary_skin.value).replace("MetrixHD", "MyMetrixLite")
+	localePath = resolveFilename(SCOPE_PLUGINS, pathjoin("Extensions", skinDir, "locale"))
+
+	if skinDir and isdir(localePath):
+		bindtextdomain(skinDir, localePath)
+	else:
+		translateSkinString = _
+
 	screenChoiceList = [("", _("Legacy mode"))]
 	styles = getcomponentTemplateNames("serviceList") or []
 	if styles:
 		for screen, (element, path) in domScreens.items():
 			if element.get("base") == "ChannelSelection":
-				screenChoiceList.append((screen, element.get("label", screen)))
-	widgetChoiceList = [(style, style) for style in styles]
+				screenChoiceList.append((screen, translateSkinString(element.get("label", screen))))
+	widgetChoiceList = [(style, translateSkinString(style)) for style in styles]
 	for name, choices, default in (
 		("screenStyle", screenChoiceList, ""),
 		("widgetStyle", widgetChoiceList, styles[0] if styles else "")
