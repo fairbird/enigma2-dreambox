@@ -64,6 +64,7 @@ bool gEGLDC::tryInitEGL(int version) {
 	// 3. choose EGL config for the requested GLES version
 	EGLint renderable_type = (version >= 3) ? EGL_OPENGL_ES3_BIT_KHR : EGL_OPENGL_ES2_BIT;
 	bool pixmap_mode = m_window_provider->usesPixmapSurface();
+	eDebug("[gEGLDC] surface mode: %s", pixmap_mode ? "pixmap" : "window");
 	EGLint surface_type_bit = pixmap_mode ? EGL_PIXMAP_BIT : EGL_WINDOW_BIT;
 
 	const EGLint config_attribs[] = {

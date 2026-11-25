@@ -1,4 +1,5 @@
 #include <EGL/egl.h>
+#include <dlfcn.h>
 #include <lib/base/eerror.h>
 #include <lib/gdi/egl/platform/dreambox/dreambox_window_provider.h>
 #include <lib/gdi/fb.h>
@@ -102,8 +103,9 @@ EGLNativeDisplayType DreamboxWindowProvider::getNativeDisplay() {
 // (eglGetProcAddress() returns NULL) and its pixmap path rejects our pixmaps with EGL_BAD_NATIVE_PIXMAP. There
 // libvc5dream drives /dev/fb0 itself for a window surface, so use that one; called after eglInitialize()
 bool DreamboxWindowProvider::usesPixmapSurface() const {
-	static const bool pixmap = eglGetProcAddress("eglCreatePlatformPixmapSurfaceEXT") != nullptr;
-	return pixmap;
+	// asked every time and with the same lookup as gEGLDC (eglGetProcAddress, then the exported symbol): a value cached once
+	// could report a pixmap surface while the entry point does not exist, and the whole EGL initialisation failed
+	return eglGetProcAddress("eglCreatePlatformPixmapSurfaceEXT") != nullptr || dlsym(RTLD_DEFAULT, "eglCreatePlatformPixmapSurfaceEXT") != nullptr;
 }
 
 EGLNativeWindowType DreamboxWindowProvider::getNativeWindow() {
