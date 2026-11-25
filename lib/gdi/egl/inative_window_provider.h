@@ -16,6 +16,7 @@ public:
 	// rather than a window (eglCreateWindowSurface) - see getNativePixmap(). Some
 	// platforms (Dreambox's VC5/BEGL stack) only implement the pixmap path.
 	virtual bool usesPixmapSurface() const { return false; }
+	virtual bool supportsWindowSurface() const { return false; }
 
 	// False when the platform's EGL cannot read the render target back with glReadPixels()
 	virtual bool canReadBack() const { return true; }

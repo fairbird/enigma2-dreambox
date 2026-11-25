@@ -56,6 +56,8 @@ private:
 	EGLSurface m_egl_surfaces[MAX_EGL_SURFACES];
 	int m_page_count; // 1 unless a multi-page pixmap-surface provider
 	int m_render_page; // index into m_egl_surfaces currently bound for rendering
+	bool m_pixmap_surface;
+	bool tryInitEGLSurface(int version, bool pixmap_mode);
 
 	int m_width;
 	int m_height;

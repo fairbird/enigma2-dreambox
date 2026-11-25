@@ -34,6 +34,7 @@ public:
 	bool init(int width, int height) override;
 	EGLNativeDisplayType getNativeDisplay() override;
 	bool usesPixmapSurface() const override;
+	bool supportsWindowSurface() const override { return true; }
 	// libvc5dream of the older stack (window surface) has no CPU access to the buffers: its bcmDisplayBufferAccess() is assert(0)
 	bool canReadBack() const override { return usesPixmapSurface(); }
 	EGLNativeWindowType getNativeWindow() override;

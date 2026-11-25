@@ -38,6 +38,117 @@ static PFNEGLCREATEPLATFORMPIXMAPSURFACEEXTPROC getCreatePlatformPixmapSurface()
 // Initialization is now managed by gEGLDCAutoInit in egl_init.cpp
 // to support runtime fallback to FBDC/SDLDC.
 
+bool gEGLDC::tryInitEGLSurface(int version, bool pixmap_mode)
+{
+	PFNEGLCREATEPLATFORMPIXMAPSURFACEEXTPROC pixmap_function =
+		pixmap_mode ? getCreatePlatformPixmapSurface() : nullptr;
+
+	if (pixmap_mode && !pixmap_function) {
+		eDebug("[gEGLDC] eglCreatePlatformPixmapSurfaceEXT not available.");
+		return false;
+	}
+
+	EGLint renderable_type = (version >= 3) ? EGL_OPENGL_ES3_BIT_KHR : EGL_OPENGL_ES2_BIT;
+	eDebug("[gEGLDC] surface mode: %s", pixmap_mode ? "pixmap" : "window");
+	EGLint surface_type_bit = pixmap_mode ? EGL_PIXMAP_BIT : EGL_WINDOW_BIT;
+
+	const EGLint config_attribs[] = {
+		EGL_SURFACE_TYPE, surface_type_bit,
+		EGL_RENDERABLE_TYPE, renderable_type,
+		EGL_RED_SIZE, 8,
+		EGL_GREEN_SIZE, 8,
+		EGL_BLUE_SIZE, 8,
+		EGL_ALPHA_SIZE, 8,
+		EGL_DEPTH_SIZE, 0,
+		EGL_STENCIL_SIZE, 0,
+		EGL_NONE
+	};
+
+	EGLint num_configs = 0;
+	if (!eglChooseConfig(m_egl_display, config_attribs, &m_egl_config, 1, &num_configs) || num_configs == 0) {
+		eDebug("[gEGLDC] no suitable EGL config found for GLES%d (%s).", version, pixmap_mode ? "pixmap" : "window");
+		return false;
+	}
+
+	const EGLint context_attribs[] = {EGL_CONTEXT_CLIENT_VERSION, version, EGL_NONE};
+
+	m_egl_context = eglCreateContext(m_egl_display, m_egl_config, EGL_NO_CONTEXT, context_attribs);
+	if (m_egl_context == EGL_NO_CONTEXT) {
+		eDebug("[gEGLDC] eglCreateContext for GLES%d failed (%s).", version, pixmap_mode ? "pixmap" : "window");
+		return false;
+	}
+
+	for (int i = 0; i < MAX_EGL_SURFACES; ++i)
+		m_egl_surfaces[i] = EGL_NO_SURFACE;
+
+	m_page_count = pixmap_mode
+		? std::max(1, std::min(m_window_provider->getPageCount(), MAX_EGL_SURFACES))
+		: 1;
+
+	auto cleanup = [this]() {
+		eglMakeCurrent(m_egl_display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
+
+		for (int i = 0; i < MAX_EGL_SURFACES; ++i) {
+			if (m_egl_surfaces[i] != EGL_NO_SURFACE) {
+				eglDestroySurface(m_egl_display, m_egl_surfaces[i]);
+				m_egl_surfaces[i] = EGL_NO_SURFACE;
+			}
+		}
+
+		if (m_egl_context != EGL_NO_CONTEXT) {
+			eglDestroyContext(m_egl_display, m_egl_context);
+			m_egl_context = EGL_NO_CONTEXT;
+		}
+
+		m_page_count = 1;
+		m_render_page = 0;
+	};
+
+	if (pixmap_mode) {
+		for (int i = 0; i < m_page_count; ++i) {
+			void* native_pixmap = m_window_provider->getNativePixmap(i);
+			m_egl_surfaces[i] = pixmap_function(
+				m_egl_display,
+				m_egl_config,
+				native_pixmap,
+				nullptr);
+			if (m_egl_surfaces[i] == EGL_NO_SURFACE) {
+				EGLint error = eglGetError();
+				eDebug("[gEGLDC] eglCreatePlatformPixmapSurfaceEXT failed for page %d: 0x%x", i, error);
+				cleanup();
+				return false;
+			}
+		}
+	} else {
+		EGLNativeWindowType native_window = m_window_provider->getNativeWindow();
+		m_egl_surfaces[0] = eglCreateWindowSurface(
+			m_egl_display,
+			m_egl_config,
+			native_window,
+			nullptr);
+		if (m_egl_surfaces[0] == EGL_NO_SURFACE) {
+			EGLint error = eglGetError();
+			eDebug("[gEGLDC] eglCreateWindowSurface failed: 0x%x", error);
+			cleanup();
+			return false;
+		}
+	}
+
+	m_render_page = (m_page_count > 1) ? 1 : 0;
+	if (!eglMakeCurrent(
+		m_egl_display,
+		m_egl_surfaces[m_render_page],
+		m_egl_surfaces[m_render_page],
+		m_egl_context)) {
+		EGLint error = eglGetError();
+		eDebug("[gEGLDC] eglMakeCurrent failed: 0x%x", error);
+		cleanup();
+		return false;
+	}
+
+	return true;
+}
+
 // ---------------------------------------------------------------------------
 // tryInitEGL – attempts to create an EGL context for a specific GLES version.
 // Returns true on success.  On failure the EGL state is left clean so that the
@@ -61,89 +172,26 @@ bool gEGLDC::tryInitEGL(int version) {
 	}
 	eDebug("[gEGLDC] EGL version %d.%d initialised", major, minor);
 
-	// 3. choose EGL config for the requested GLES version
-	EGLint renderable_type = (version >= 3) ? EGL_OPENGL_ES3_BIT_KHR : EGL_OPENGL_ES2_BIT;
 	bool pixmap_mode = m_window_provider->usesPixmapSurface();
-	eDebug("[gEGLDC] surface mode: %s", pixmap_mode ? "pixmap" : "window");
-	EGLint surface_type_bit = pixmap_mode ? EGL_PIXMAP_BIT : EGL_WINDOW_BIT;
-
-	const EGLint config_attribs[] = {
-		EGL_SURFACE_TYPE, surface_type_bit, EGL_RENDERABLE_TYPE, renderable_type, EGL_RED_SIZE, 8, EGL_GREEN_SIZE, 8, EGL_BLUE_SIZE, 8, EGL_ALPHA_SIZE, 8, EGL_DEPTH_SIZE, 0, EGL_STENCIL_SIZE, 0,
-		EGL_NONE};
-
-	EGLint num_configs = 0;
-	if (!eglChooseConfig(m_egl_display, config_attribs, &m_egl_config, 1, &num_configs) || num_configs == 0) {
-		eDebug("[gEGLDC] no suitable EGL config found for GLES%d.", version);
-		return false;
-	}
-
-	// 4. create the context
-	const EGLint context_attribs[] = {EGL_CONTEXT_CLIENT_VERSION, version, EGL_NONE};
-
-	m_egl_context = eglCreateContext(m_egl_display, m_egl_config, EGL_NO_CONTEXT, context_attribs);
-	if (m_egl_context == EGL_NO_CONTEXT) {
-		eDebug("[gEGLDC] eglCreateContext for GLES%d failed.", version);
-		return false;
-	}
-
-	// 5. create the rendering surface(s) - a pixmap surface per available
-	// framebuffer page for platforms that only implement EGL_EXT_platform_base's
-	// pixmap path (e.g. Dreambox's VC5/BEGL stack, where the "pixmap" IS live
-	// display memory - see DreamboxWindowProvider's class comment), so this
-	// can ping-pong rendering between pages instead of always rendering into
-	// (and presenting) the one currently on screen - see flip(). A single
-	// window surface otherwise, which already gets real double-buffering for
-	// free via eglSwapBuffers().
-	for (int i = 0; i < MAX_EGL_SURFACES; ++i)
-		m_egl_surfaces[i] = EGL_NO_SURFACE;
 
 	if (pixmap_mode) {
-		PFNEGLCREATEPLATFORMPIXMAPSURFACEEXTPROC eglCreatePlatformPixmapSurfaceEXT = getCreatePlatformPixmapSurface();
-		if (!eglCreatePlatformPixmapSurfaceEXT) {
-			eDebug("[gEGLDC] eglCreatePlatformPixmapSurfaceEXT not available.");
-			eglDestroyContext(m_egl_display, m_egl_context);
-			m_egl_context = EGL_NO_CONTEXT;
-			return false;
-		}
+		if (tryInitEGLSurface(version, true)) {
+			m_pixmap_surface = true;
+		} else if (m_window_provider->supportsWindowSurface()) {
+			eDebug("[gEGLDC] Pixmap surface failed, retrying with window surface.");
 
-		m_page_count = std::max(1, std::min(m_window_provider->getPageCount(), MAX_EGL_SURFACES));
-		for (int i = 0; i < m_page_count; ++i) {
-			void* native_pixmap = m_window_provider->getNativePixmap(i);
-			m_egl_surfaces[i] = eglCreatePlatformPixmapSurfaceEXT(m_egl_display, m_egl_config, native_pixmap, nullptr);
-			if (m_egl_surfaces[i] == EGL_NO_SURFACE) {
-				eDebug("[gEGLDC] eglCreatePlatformPixmapSurfaceEXT failed for page %d. EGL error: 0x%x", i, eglGetError());
-				for (int j = 0; j < i; ++j)
-					eglDestroySurface(m_egl_display, m_egl_surfaces[j]);
-				eglDestroyContext(m_egl_display, m_egl_context);
-				m_egl_context = EGL_NO_CONTEXT;
+			if (!tryInitEGLSurface(version, false))
 				return false;
-			}
+
+			m_pixmap_surface = false;
+		} else {
+			return false;
 		}
 	} else {
-		m_page_count = 1;
-		EGLNativeWindowType native_window = m_window_provider->getNativeWindow();
-		m_egl_surfaces[0] = eglCreateWindowSurface(m_egl_display, m_egl_config, native_window, nullptr);
-		if (m_egl_surfaces[0] == EGL_NO_SURFACE) {
-			eDebug("[gEGLDC] eglCreateWindowSurface failed. EGL error: 0x%x", eglGetError());
-			eglDestroyContext(m_egl_display, m_egl_context);
-			m_egl_context = EGL_NO_CONTEXT;
+		if (!tryInitEGLSurface(version, false))
 			return false;
-		}
-	}
 
-	// 6. make context current against the page the first frame will render
-	// into. Start one page *ahead* of whatever the provider is showing at
-	// startup (page 0 - see DreamboxWindowProvider::init()'s initial
-	// setOffset(0)) so the very first frame never renders into the page
-	// that's simultaneously being scanned out.
-	m_render_page = (m_page_count > 1) ? 1 : 0;
-	if (!eglMakeCurrent(m_egl_display, m_egl_surfaces[m_render_page], m_egl_surfaces[m_render_page], m_egl_context)) {
-		eDebug("[gEGLDC] eglMakeCurrent failed.");
-		for (int i = 0; i < m_page_count; ++i)
-			eglDestroySurface(m_egl_display, m_egl_surfaces[i]);
-		eglDestroyContext(m_egl_display, m_egl_context);
-		m_egl_context = EGL_NO_CONTEXT;
-		return false;
+		m_pixmap_surface = false;
 	}
 
 	m_gles_version = version;
@@ -1132,7 +1180,7 @@ void gEGLDC::captureBackgroundIntoPixmap(const eRect& rect) {
 	flushBlitBatch();
 	flushTextBatch();
 
-	if (!m_window_provider->canReadBack())
+	if (!m_pixmap_surface || !m_window_provider->canReadBack())
 		return;
 
 	if (!m_pixmap || !m_pixmap->surface || !m_pixmap->surface->data)
@@ -1690,6 +1738,7 @@ gEGLDC::gEGLDC(INativeWindowProvider* window_provider, int width, int height) : 
 		m_egl_surfaces[i] = EGL_NO_SURFACE;
 	m_page_count = 1;
 	m_render_page = 0;
+	m_pixmap_surface = false;
 	m_egl_context = EGL_NO_CONTEXT;
 	m_cpu_overlay_dirty = false;
 	m_fbo = 0;
@@ -1774,6 +1823,7 @@ void gEGLDC::cleanupEGL() {
 		m_egl_surfaces[i] = EGL_NO_SURFACE;
 	m_page_count = 1;
 	m_render_page = 0;
+	m_pixmap_surface = false;
 	m_egl_context = EGL_NO_CONTEXT;
 	m_gles_version = 0;
 	gles::version = 0;
@@ -1805,7 +1855,7 @@ bool gEGLDC::recreateEGLSurfaces(int xres, int yres)
 		return false;
 	}
 
-	bool pixmap_mode = m_window_provider->usesPixmapSurface();
+	bool pixmap_mode = m_pixmap_surface;
 
 	if (pixmap_mode)
 	{
@@ -2454,7 +2504,7 @@ void gEGLDC::flip() {
 	const bool trace_flip = s_trace_flips < 5;
 	if (trace_flip) {
 		++s_trace_flips;
-		eDebug("[gEGLDC] trace flip begin fbo=%u es3=%d pixmap=%d", (unsigned)m_fbo, (int)gles::isGLES3(), (int)m_window_provider->usesPixmapSurface());
+		eDebug("[gEGLDC] trace flip begin fbo=%u es3=%d pixmap=%d", (unsigned)m_fbo, (int)gles::isGLES3(), (int)m_pixmap_surface);
 	}
 	if (isInitialized() && m_egl_display != EGL_NO_DISPLAY && m_egl_surfaces[m_render_page] != EGL_NO_SURFACE) {
 #ifdef HAVE_GLES3
@@ -2498,7 +2548,7 @@ void gEGLDC::flip() {
 		// below).
 		if (trace_flip)
 			eDebug("[gEGLDC] trace flip fbo presented");
-		if (m_window_provider->usesPixmapSurface()) {
+		if (m_pixmap_surface) {
 			int shown_page = m_render_page;
 			m_window_provider->presentPixmap(shown_page);
 
