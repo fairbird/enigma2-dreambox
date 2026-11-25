@@ -27,6 +27,27 @@ originalAudioTracks = "orj dos ory org esl qaa qaf und qae mis mul ORY ORJ Audio
 visuallyImpairedCommentary = "NAR qad"
 
 
+def refreshChannelSelectionStyleChoices():
+	screenChoiceList = [("", _("Legacy mode"))]
+	styles = getcomponentTemplateNames("serviceList") or []
+	if styles:
+		for screen, (element, path) in domScreens.items():
+			if element.get("base") == "ChannelSelection":
+				screenChoiceList.append((screen, element.get("label", screen)))
+	widgetChoiceList = [(style, style) for style in styles]
+	for name, choices, default in (
+		("screenStyle", screenChoiceList, ""),
+		("widgetStyle", widgetChoiceList, styles[0] if styles else "")
+	):
+		setting = getattr(config.channelSelection, name, None)
+		if setting is None:
+			setattr(config.channelSelection, name, ConfigSelection(default=default, choices=choices))
+		else:
+			setting.setChoices(choices, default=default)
+			# Refresh the cached label even when the new skin uses the same selection key.
+			setting.value = setting.value
+
+
 def InitUsageConfig():
 	config.usage = ConfigSubsection()
 	if isfile("/etc/crontab") and not fileContains("/etc/crontab", "registry.arm.bin"):
@@ -230,23 +251,7 @@ def InitUsageConfig():
 
 	config.channelSelection.showTimers = ConfigYesNo(default=False)
 
-	screenChoiceList = [("", _("Legacy mode"))]
-	widgetChoiceList = []
-	styles = getcomponentTemplateNames("serviceList")
-	default = ""
-	if styles:
-		for screen in domScreens:
-			element, path = domScreens.get(screen, (None, None))
-			if element.get("base") == "ChannelSelection":
-				label = element.get("label", screen)
-				screenChoiceList.append((screen, label))
-
-		default = styles[0]
-		for style in styles:
-			widgetChoiceList.append((style, style))
-
-	config.channelSelection.screenStyle = ConfigSelection(default="", choices=screenChoiceList)
-	config.channelSelection.widgetStyle = ConfigSelection(default=default, choices=widgetChoiceList)
+	refreshChannelSelectionStyleChoices()
 
 	# ########  Workaround for VTI Skins   ##############
 	config.usage.picon_dir = ConfigDirectory(default="/usr/share/enigma2/picon")

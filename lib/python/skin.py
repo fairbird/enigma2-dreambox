@@ -261,7 +261,10 @@ def reloadSkins():
 	clearResolveLists()
 	clearFonts()
 	clearPixmapCache()
+	componentTemplates.clear()
 	InitSkins()
+	from Components.UsageConfig import refreshChannelSelectionStyleChoices
+	refreshChannelSelectionStyleChoices()
 	for callback in onReload:
 		if callable(callback):
 			callback()
@@ -1851,11 +1854,10 @@ class ComponentTemplates:
 	def clear(self):
 		self.templates = {}
 		self.changedTimes = {}
+		BoxInfo.setMutableItem("CanRefreshTemplates", False)
 
 	def get(self, component, name):
-		if component in self.templates and self.templates[component][name] is not None:
-			return self.templates[component][name]
-		return None
+		return self.templates.get(component, {}).get(name)
 
 	def names(self, component):
 		if component in self.templates:
