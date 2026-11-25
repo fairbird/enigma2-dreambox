@@ -170,9 +170,10 @@ bool gEGLDC::tryInitEGL(int version) {
 		eDebug("[gEGLDC] error: eglInitialize failed.");
 		return false;
 	}
-	eDebug("[gEGLDC] EGL version %d.%d initialised", major, minor);
 
 	bool pixmap_mode = m_window_provider->usesPixmapSurface();
+	eDebug("[gEGLDC] surface mode: %s", pixmap_mode ? "pixmap" : "window");
+	EGLint surface_type_bit = pixmap_mode ? EGL_PIXMAP_BIT : EGL_WINDOW_BIT;
 
 	if (pixmap_mode) {
 		if (tryInitEGLSurface(version, true)) {

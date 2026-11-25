@@ -1,5 +1,6 @@
 #include <EGL/egl.h>
 #include <dlfcn.h>
+#include <dlfcn.h>
 #include <lib/base/eerror.h>
 #include <lib/gdi/egl/platform/dreambox/dreambox_window_provider.h>
 #include <lib/gdi/fb.h>
