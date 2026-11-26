@@ -1653,6 +1653,16 @@ void gEGLDC::exec(const gOpcode* opcode) {
 				fadeBegin(rect, (float)ms / 1000.0f);
 			break;
 		}
+		case gOpcode::setOffset:
+		case gOpcode::setClip:
+		case gOpcode::addClip:
+		case gOpcode::popClip:
+			// State-only opcodes: queued quads already carry absolute coordinates, the blit
+			// batch compares its own clip and every renderText/renderPara flushes the text
+			// batch itself, so flushing here only breaks batching into one draw call per op.
+			gDC::exec(opcode);
+			break;
+
 		default:
 			// Unknown to this backend's own opcode handlers - flush any
 			// pending batch first in case it draws something (e.g. a
