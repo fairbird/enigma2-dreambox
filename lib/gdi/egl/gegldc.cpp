@@ -1316,6 +1316,37 @@ void gEGLDC::exec(const gOpcode* opcode) {
 	}
 	m_last_op = std::chrono::steady_clock::now();
 
+	static long s_prof_us[64];
+	static int s_prof_n[64];
+	static int s_prof_flushes = 0;
+	struct ProfTimer {
+		int op;
+		std::chrono::steady_clock::time_point t0;
+		long *us;
+		int *n;
+		int *flushes;
+		~ProfTimer() {
+			if (op < 0 || op >= 64)
+				return;
+			us[op] += (long)std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - t0).count();
+			n[op]++;
+			if (op == (int)gOpcode::flush && ++(*flushes) == 100) {
+				std::string line;
+				char buf[64];
+				for (int i = 0; i < 64; ++i) {
+					if (n[i]) {
+						snprintf(buf, sizeof(buf), " op%d:n=%d,us=%ld", i, n[i], us[i]);
+						line += buf;
+					}
+					us[i] = 0;
+					n[i] = 0;
+				}
+				*flushes = 0;
+				eDebug("[gEGLDC] prof 100 frames:%s", line.c_str());
+			}
+		}
+	} prof_timer = {(int)opcode->opcode, std::chrono::steady_clock::now(), s_prof_us, s_prof_n, &s_prof_flushes};
+
 	switch (opcode->opcode) {
 		// fill/fillRegion/rectangle/line/blit are all handled entirely by
 		// this backend's own executeXXX() helpers instead of falling through
