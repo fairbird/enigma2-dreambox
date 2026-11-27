@@ -67,6 +67,7 @@ namespace gles
             // Map can legally fail (e.g. GL_OUT_OF_MEMORY) - fall back below.
         }
 #endif
+	glBufferData(GL_ARRAY_BUFFER, size, nullptr, GL_STREAM_DRAW);
         glBufferSubData(GL_ARRAY_BUFFER, 0, size, data);
     }
 }

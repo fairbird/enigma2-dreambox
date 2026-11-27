@@ -529,7 +529,7 @@ void gEGLDC::executeRectangle(const gOpcode* op) {
 		// alphaBlend" (see setAlphaBlendMode()'s comment) - it's literally
 		// what gets passed as m_alphaBlend at every drawRectangle() call
 		// site in lib/gui/ewidget.cpp.
-		setAlphaBlendMode(op->parm.rectangle->useNew);
+		setAlphaBlendMode(!gles::isGLES3() && !m_gradient_colors.empty() ? m_gradient_alphablend > 0 : op->parm.rectangle->useNew);
 		for (unsigned int i = 0; i < m_current_clip.rects.size(); ++i) {
 			setGlScissor(m_current_clip.rects[i]);
 			m_advanced_shader.drawAdvancedRect(op->parm.rectangle->area.x() + m_current_offset.x(), op->parm.rectangle->area.y() + m_current_offset.y(), op->parm.rectangle->area.width(),

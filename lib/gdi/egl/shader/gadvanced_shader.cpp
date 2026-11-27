@@ -66,8 +66,8 @@ static const char* fragment_shader_es3 = R"(#version 300 es
             // distance is how many pixels outside the shape this fragment
             // is, so fading coverage to 0 across that last pixel replaces a
             // jagged binary edge with a soft one at the same per-pixel cost.
-            if (dist > 0.0) discard;
-            coverage = 1.0;
+            coverage = clamp(0.5 - dist, 0.0, 1.0);
+            if (coverage <= 0.0) discard;
         }
 
         vec4 final_color = u_solid_color;
@@ -104,7 +104,7 @@ static const char* fragment_shader_es3 = R"(#version 300 es
             }
 
             if (u_alphablend == 1) {
-                final_color.rgb = mix(final_color.rgb, grad_color.rgb, grad_color.a);
+                final_color = grad_color;
             } else {
                 final_color = grad_color;
             }
@@ -449,7 +449,7 @@ void gAdvancedShader::drawAdvancedRect(float x, float y, float width, float heig
 			colors[i * 4 + 0] = gradient_colors[i].r / 255.0f;
 			colors[i * 4 + 1] = gradient_colors[i].g / 255.0f;
 			colors[i * 4 + 2] = gradient_colors[i].b / 255.0f;
-			colors[i * 4 + 3] = alphablend ? alpha : (1.0f - (gradient_colors[i].a / 255.0f));
+			colors[i * 4 + 3] = (!gles::isGLES3() && alphablend) ? (1.0f - (gradient_colors[i].a / 255.0f)) : (alphablend ? alpha : (1.0f - (gradient_colors[i].a / 255.0f)));
 			stops[i] = (float)i / (float)(stops_count - 1);
 		}
 
