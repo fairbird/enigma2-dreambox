@@ -1657,6 +1657,13 @@ void gEGLDC::exec(const gOpcode* opcode) {
 		case gOpcode::setClip:
 		case gOpcode::addClip:
 		case gOpcode::popClip:
+		case gOpcode::setBackgroundColor:
+		case gOpcode::setForegroundColor:
+		case gOpcode::setBackgroundColorRGB:
+		case gOpcode::setForegroundColorRGB:
+		case gOpcode::setGradient:
+		case gOpcode::setRadius:
+		case gOpcode::setBorder:
 			// State-only opcodes: queued quads already carry absolute coordinates, the blit
 			// batch compares its own clip and every renderText/renderPara flushes the text
 			// batch itself, so flushing here only breaks batching into one draw call per op.
