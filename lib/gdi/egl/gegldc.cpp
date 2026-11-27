@@ -70,6 +70,7 @@ bool gEGLDC::tryInitEGLSurface(int version, bool pixmap_mode)
 		return false;
 	}
 
+	EGLint native_visual = 0; eglGetConfigAttrib(m_egl_display, m_egl_config, EGL_NATIVE_VISUAL_ID, &native_visual); eDebug("[gEGLDC] EGL_NATIVE_VISUAL_ID=0x%x", native_visual);
 	const EGLint context_attribs[] = {EGL_CONTEXT_CLIENT_VERSION, version, EGL_NONE};
 
 	m_egl_context = eglCreateContext(m_egl_display, m_egl_config, EGL_NO_CONTEXT, context_attribs);
