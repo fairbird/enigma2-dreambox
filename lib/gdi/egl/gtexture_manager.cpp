@@ -166,6 +166,8 @@ GLuint gTextureManager::createTextureFromPixmap(gPixmap* pixmap) {
 		// never hits this because gPixmap::fill()/blit() always address
 		// rows via surface->stride explicitly, never assume width*bypp).
 		int row_pixels = surface->stride / surface->bypp;
+		if (row_pixels != width)
+			eDebug("[gTextureManager] padded upload %dx%d stride=%d bypp=%d", width, height, (int)surface->stride, (int)surface->bypp);
 		if (row_pixels == width) {
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, surface->data);
 #if defined(HAVE_GLES3)
