@@ -363,8 +363,14 @@ bool gEGLDC::createFBO(int w, int h) {
 		destroyFBO();
 		return false;
 	}
+	// the scissor test stays enabled for the life of the context and its box may be smaller than
+	// this FBO (the default box is the initial window size): clear the whole texture
+	const GLboolean scissor_was_on = glIsEnabled(GL_SCISSOR_TEST);
+	glDisable(GL_SCISSOR_TEST);
 	glClearColor(0, 0, 0, 0);
 	glClear(GL_COLOR_BUFFER_BIT);
+	if (scissor_was_on)
+		glEnable(GL_SCISSOR_TEST);
 	m_fbo_width = w;
 	m_fbo_height = h;
 	eDebug("[gEGLDC] FBO created %dx%d", w, h);
