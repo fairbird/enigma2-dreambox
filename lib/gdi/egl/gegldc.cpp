@@ -1328,8 +1328,11 @@ void gEGLDC::exec(const gOpcode* opcode) {
 		~ProfTimer() {
 			if (op < 0 || op >= 64)
 				return;
-			us[op] += (long)std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - t0).count();
+			const long d = (long)std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - t0).count();
+			us[op] += d;
 			n[op]++;
+			if (d > 30000)
+				eDebug("[gEGLDC] slow op%d took %ld us", op, d);
 			if (op == (int)gOpcode::flush && ++(*flushes) == 100) {
 				std::string line;
 				char buf[64];
