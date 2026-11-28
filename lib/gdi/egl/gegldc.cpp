@@ -672,10 +672,13 @@ void gEGLDC::executeRectangle(const gOpcode* op) {
 		float b = m_background_color_rgb.b / 255.0f;
 		float a = 1.0f - (m_background_color_rgb.a / 255.0f);
 
-		// See executeFill()'s comment for why blend must be forced off for
-		// a plain flat-color rectangle, to match the CPU renderer's raw
-		// overwrite semantics.
-		glDisable(GL_BLEND);
+		if (op->parm.rectangle->useNew) {
+			setAlphaBlendMode(true);
+			glEnable(GL_BLEND);
+		} else {
+			glDisable(GL_BLEND);
+		}
+
 		for (unsigned int i = 0; i < m_current_clip.rects.size(); ++i) {
 			setGlScissor(m_current_clip.rects[i]);
 			m_basic_shader.drawRect(op->parm.rectangle->area.x() + m_current_offset.x(), op->parm.rectangle->area.y() + m_current_offset.y(), op->parm.rectangle->area.width(),
