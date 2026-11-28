@@ -79,7 +79,6 @@ bool gEGLDC::tryInitEGLSurface(int version, bool pixmap_mode)
 		return false;
 	}
 
-	EGLint native_visual = 0; eglGetConfigAttrib(m_egl_display, m_egl_config, EGL_NATIVE_VISUAL_ID, &native_visual); eDebug("[gEGLDC] EGL_NATIVE_VISUAL_ID=0x%x", native_visual);
 	const EGLint context_attribs[] = {EGL_CONTEXT_CLIENT_VERSION, version, EGL_NONE};
 
 	m_egl_context = eglCreateContext(m_egl_display, m_egl_config, EGL_NO_CONTEXT, context_attribs);
@@ -446,12 +445,8 @@ static void e2eglCaptureFrame(GLuint fbo, int w, int h) {
 	for (int y = 0; y < h; ++y) {
 		const uint8_t *src = raw.data() + (size_t)(h - 1 - y) * w * 4;
 		uint8_t *dst = out.data() + (size_t)y * w * 4;
-		for (int x = 0; x < w; ++x) {
-			dst[x * 4 + 0] = src[x * 4 + 2];
-			dst[x * 4 + 1] = src[x * 4 + 1];
-			dst[x * 4 + 2] = src[x * 4 + 0];
-			dst[x * 4 + 3] = src[x * 4 + 3];
-		}
+		// the FBO already holds BGRA byte order (see gtexture_manager.cpp), so no channel swap here
+		memcpy(dst, src, (size_t)w * 4);
 	}
 	std::lock_guard<std::mutex> lk(s_cap_mx);
 	s_cap_buf.swap(out);
@@ -562,6 +557,15 @@ void gEGLDC::setAlphaBlendMode(bool trueAlphaBlend) {
 		glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 	else
 		glBlendFuncSeparate(GL_ONE, GL_ZERO, GL_ONE, GL_ZERO);
+
+	static bool s_blend_logged[2] = {false, false};
+	if (!s_blend_logged[trueAlphaBlend ? 1 : 0]) {
+		s_blend_logged[trueAlphaBlend ? 1 : 0] = true;
+		GLint src_a = 0, dst_a = 0;
+		glGetIntegerv(GL_BLEND_SRC_ALPHA, &src_a);
+		glGetIntegerv(GL_BLEND_DST_ALPHA, &dst_a);
+		eDebug("[gEGLDC] blend mode true=%d src_alpha=0x%x dst_alpha=0x%x", (int)trueAlphaBlend, (unsigned)src_a, (unsigned)dst_a);
+	}
 }
 
 void gEGLDC::executeFill(const gOpcode* op) {
