@@ -265,6 +265,8 @@ bool gEGLDC::tryInitEGL(int version) {
 	return true;
 }
 
+static void e2eglCaptureThread();
+
 // ---------------------------------------------------------------------------
 // initEGL – cascades from GLES3 down to GLES2, then initialises shaders.
 // ---------------------------------------------------------------------------
