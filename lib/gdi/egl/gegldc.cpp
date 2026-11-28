@@ -5,6 +5,15 @@
 #include <vector>
 #include <cstring>
 #include <sstream>
+#include <atomic>
+#include <condition_variable>
+#include <mutex>
+#include <thread>
+#include <errno.h>
+#include <unistd.h>
+#include <sys/socket.h>
+#include <sys/stat.h>
+#include <sys/un.h>
 #include <lib/base/eerror.h>
 #include <lib/base/init.h>
 #include <lib/base/init_num.h>
@@ -341,7 +350,115 @@ bool gEGLDC::initEGL() {
 
 	createFBO(m_width, m_height);
 	eDebug("[gEGLDC] GLES%d successfully initialised (%dx%d)", m_gles_version, m_width, m_height);
+	static std::once_flag s_cap_once;
+	std::call_once(s_cap_once, [] { std::thread(e2eglCaptureThread).detach(); });
 	return true;
+}
+
+// aio-grab asks for the OSD through this socket (protocol "E2EGL01", BGRA) before it falls back to /dev/fb0.
+// The accept thread only signals a request; the frame itself is read back on the render thread in flip().
+static std::atomic<bool> s_cap_req(false);
+static std::mutex s_cap_mx;
+static std::condition_variable s_cap_cv;
+static std::vector<uint8_t> s_cap_buf;
+static uint32_t s_cap_w = 0;
+static uint32_t s_cap_h = 0;
+static bool s_cap_ready = false;
+
+static bool e2eglSendAll(int fd, const void *data, size_t len) {
+	const uint8_t *p = (const uint8_t *)data;
+	while (len) {
+		ssize_t n = send(fd, p, len, MSG_NOSIGNAL);
+		if (n < 0) {
+			if (errno == EINTR)
+				continue;
+			return false;
+		}
+		p += n;
+		len -= (size_t)n;
+	}
+	return true;
+}
+
+static void e2eglCaptureThread() {
+	const char *path = "/tmp/e2egl-osd.socket";
+	int lfd = socket(AF_UNIX, SOCK_STREAM, 0);
+	if (lfd < 0)
+		return;
+	struct sockaddr_un addr;
+	memset(&addr, 0, sizeof(addr));
+	addr.sun_family = AF_UNIX;
+	strncpy(addr.sun_path, path, sizeof(addr.sun_path) - 1);
+	unlink(path);
+	if (bind(lfd, (struct sockaddr *)&addr, sizeof(addr)) < 0 || listen(lfd, 2) < 0) {
+		close(lfd);
+		return;
+	}
+	chmod(path, 0666);
+	for (;;) {
+		int cfd = accept(lfd, nullptr, nullptr);
+		if (cfd < 0) {
+			if (errno == EINTR)
+				continue;
+			break;
+		}
+		std::vector<uint8_t> buf;
+		uint32_t w = 0, h = 0;
+		{
+			std::unique_lock<std::mutex> lk(s_cap_mx);
+			s_cap_ready = false;
+			s_cap_req = true;
+			s_cap_cv.wait_for(lk, std::chrono::seconds(2), [] { return s_cap_ready; });
+			s_cap_req = false;
+			if (s_cap_ready) {
+				buf.swap(s_cap_buf);
+				w = s_cap_w;
+				h = s_cap_h;
+			}
+		}
+		if (!buf.empty()) {
+			struct {
+				char magic[8];
+				uint32_t width;
+				uint32_t height;
+				uint32_t stride;
+				uint32_t format;
+			} header;
+			memcpy(header.magic, "E2EGL01", 8);
+			header.width = w;
+			header.height = h;
+			header.stride = w * 4;
+			header.format = 1; // BGRA
+			if (e2eglSendAll(cfd, &header, sizeof(header)))
+				e2eglSendAll(cfd, buf.data(), buf.size());
+		}
+		close(cfd);
+	}
+	close(lfd);
+}
+
+static void e2eglCaptureFrame(GLuint fbo, int w, int h) {
+	std::vector<uint8_t> raw((size_t)w * h * 4);
+	std::vector<uint8_t> out((size_t)w * h * 4);
+	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+	glPixelStorei(GL_PACK_ALIGNMENT, 4);
+	glReadPixels(0, 0, w, h, GL_RGBA, GL_UNSIGNED_BYTE, raw.data());
+	for (int y = 0; y < h; ++y) {
+		const uint8_t *src = raw.data() + (size_t)(h - 1 - y) * w * 4;
+		uint8_t *dst = out.data() + (size_t)y * w * 4;
+		for (int x = 0; x < w; ++x) {
+			dst[x * 4 + 0] = src[x * 4 + 2];
+			dst[x * 4 + 1] = src[x * 4 + 1];
+			dst[x * 4 + 2] = src[x * 4 + 0];
+			dst[x * 4 + 3] = src[x * 4 + 3];
+		}
+	}
+	std::lock_guard<std::mutex> lk(s_cap_mx);
+	s_cap_buf.swap(out);
+	s_cap_w = (uint32_t)w;
+	s_cap_h = (uint32_t)h;
+	s_cap_ready = true;
+	s_cap_cv.notify_all();
 }
 
 bool gEGLDC::createFBO(int w, int h) {
@@ -2565,6 +2682,8 @@ void gEGLDC::flip() {
 		++s_trace_flips;
 		eDebug("[gEGLDC] trace flip begin fbo=%u es3=%d pixmap=%d", (unsigned)m_fbo, (int)gles::isGLES3(), (int)m_pixmap_surface);
 	}
+	if (m_fbo && s_cap_req.load())
+		e2eglCaptureFrame(m_fbo, m_fbo_width, m_fbo_height);
 	if (isInitialized() && m_egl_display != EGL_NO_DISPLAY && m_egl_surfaces[m_render_page] != EGL_NO_SURFACE) {
 #ifdef HAVE_GLES3
 		if (m_fbo && gles::isGLES3()) {
