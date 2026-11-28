@@ -409,7 +409,20 @@ static void e2eglCaptureThread() {
 			std::unique_lock<std::mutex> lk(s_cap_mx);
 			s_cap_ready = false;
 			s_cap_req = true;
-			s_cap_cv.wait_for(lk, std::chrono::seconds(2), [] { return s_cap_ready; });
+			// the render thread only reaches flip() when something is drawn, so an idle screen would never
+			// answer: queue a flush to wake it up
+			gEGLDC *wake_dc = gEGLDC::getInstance();
+			gRC *wake_rc = gRC::getInstance();
+			if (wake_dc && wake_rc) {
+				lk.unlock();
+				gOpcode wake;
+				wake.opcode = gOpcode::flush;
+				wake_dc->AddRef();
+				wake.dc = wake_dc;
+				wake_rc->submit(wake);
+				lk.lock();
+			}
+			s_cap_cv.wait_for(lk, std::chrono::milliseconds(1500), [] { return s_cap_ready; });
 			s_cap_req = false;
 			if (s_cap_ready) {
 				buf.swap(s_cap_buf);
@@ -1442,11 +1455,6 @@ void gEGLDC::exec(const gOpcode* opcode) {
 	// a frame is open from its first drawing opcode until its flush: the
 	// animation overlay is only presented between frames, never in the middle of one
 	m_frame_open = (opcode->opcode != gOpcode::flush && opcode->opcode != gOpcode::flip);
-	static int s_trace_ops = 0;
-	if (s_trace_ops < 300) {
-		++s_trace_ops;
-		eDebug("[gEGLDC] trace exec opcode=%d", (int)opcode->opcode);
-	}
 	m_last_op = std::chrono::steady_clock::now();
 
 	switch (opcode->opcode) {
@@ -1959,15 +1967,19 @@ void gEGLDC::cleanupEGL() {
 		m_text_shader.destroy();
 
 		eglMakeCurrent(m_egl_display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
-		if (m_egl_context != EGL_NO_CONTEXT) {
-			eglDestroyContext(m_egl_display, m_egl_context);
-		}
-		for (int i = 0; i < MAX_EGL_SURFACES; ++i) {
-			if (m_egl_surfaces[i] != EGL_NO_SURFACE) {
-				eglDestroySurface(m_egl_display, m_egl_surfaces[i]);
+		// libvc5dream's default window surface aborts the process when it is destroyed or the display is
+		// terminated; the process is exiting anyway, so leave it to the OS in window mode
+		if (m_pixmap_surface) {
+			if (m_egl_context != EGL_NO_CONTEXT) {
+				eglDestroyContext(m_egl_display, m_egl_context);
 			}
+			for (int i = 0; i < MAX_EGL_SURFACES; ++i) {
+				if (m_egl_surfaces[i] != EGL_NO_SURFACE) {
+					eglDestroySurface(m_egl_display, m_egl_surfaces[i]);
+				}
+			}
+			eglTerminate(m_egl_display);
 		}
-		eglTerminate(m_egl_display);
 	}
 	m_egl_display = EGL_NO_DISPLAY;
 	for (int i = 0; i < MAX_EGL_SURFACES; ++i)
@@ -2104,7 +2116,9 @@ void gEGLDC::applyResolution(int xres, int yres, int bpp)
 	const bool fits = xres <= m_native_width && yres <= m_native_height;
 	const int target_w = fits ? xres : m_native_width;
 	const int target_h = fits ? yres : m_native_height;
-	if (target_w != m_surface_width || target_h != m_surface_height)
+	// window mode (libvc5dream default surface): the surface cannot be destroyed and re-created without the
+	// driver aborting, so keep it as it is - the present pass scales the FBO to it
+	if (m_pixmap_surface && (target_w != m_surface_width || target_h != m_surface_height))
 	{
 		destroyFBO();
 		if (recreateEGLSurfaces(target_w, target_h))
